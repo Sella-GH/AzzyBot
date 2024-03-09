@@ -36,7 +36,7 @@ jobs:
       
       - name: Publish Release for ${{ matrix.os }}-${{ matrix.arch }}
         run: |
-          dotnet publish -c Release -r ${{ matrix.os }}-${{ matrix.arch }} ./AzzyBot/AzzyBot.csproj
+          dotnet publish -c Release -r ${{ matrix.os }}-${{ matrix.arch }}
           
       - name: Download Updater for ${{ matrix.os }}-${{ matrix.arch }}
         uses: dsaltares/fetch-gh-release-asset@master
@@ -50,6 +50,7 @@ jobs:
           mkdir -p ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Updater
           unzip ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Updater/release-${{ matrix.os }}-${{ matrix.arch }}.zip -d ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Updater/
           rm ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Updater/release-${{ matrix.os }}-${{ matrix.arch }}.zip
+          echo "${{ github.event.head_commit.timestamp }}" > ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/BuildDate.txt
           echo "${{ github.sha }}" > ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Commit.txt
         
       - name: Archive Build Artifact
