@@ -6,7 +6,7 @@
     General purpose discord bot, written in C# and with DSharpPlus, dedicated for the use with AzuraCast.
     <br/>
     <br/>
-    <a href="https://github.com/Sella-GH/AzzyBot"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/Sella-GH/AzzyBot/wiki"><strong>Explore the docs »</strong></a>
     <br/>
     <br/>
     <a href="https://github.com/Sella-GH/AzzyBot/issues">Report Bug</a>
@@ -15,7 +15,7 @@
   </p>
 </p>
 
-![Downloads](https://img.shields.io/github/downloads/Sella-GH/AzzyBot/total) ![Contributors](https://img.shields.io/github/contributors/Sella-GH/AzzyBot?color=dark-green) ![Forks](https://img.shields.io/github/forks/Sella-GH/AzzyBot?style=social) ![Stargazers](https://img.shields.io/github/stars/Sella-GH/AzzyBot?style=social) ![Issues](https://img.shields.io/github/issues/Sella-GH/AzzyBot)
+![Downloads](https://img.shields.io/github/downloads/Sella-GH/AzzyBot/total) ![Contributors](https://img.shields.io/github/contributors/Sella-GH/AzzyBot?color=dark-green) ![Issues](https://img.shields.io/github/issues/Sella-GH/AzzyBot)
 
 ## Table Of Contents
 
