@@ -36,7 +36,7 @@ jobs:
       
       - name: Publish Release for ${{ matrix.os }}-${{ matrix.arch }}
         run: |
-          dotnet publish -c Release -r ${{ matrix.os }}-${{ matrix.arch }}
+          dotnet publish -c Release -r ${{ matrix.os }}-${{ matrix.arch }} ./AzzyBot/AzzyBot.csproj
           
       - name: Download Updater for ${{ matrix.os }}-${{ matrix.arch }}
         uses: dsaltares/fetch-gh-release-asset@master
