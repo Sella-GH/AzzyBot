@@ -1,0 +1,10 @@
+blank_issues_enabled : false
+
+contact_links :
+  - name : Azzy Discussion Page
+    url : https://github.com/Sella-GH/AzzyBot/discussions
+    about : Need help with something that isnt a bug? Ask our community.
+
+  - name : Azzy Wiki
+    url : https://github.com/Sella-GH/AzzyBot/wiki
+    about : Check the wiki for a guide on how to prepare and install the discord bot.

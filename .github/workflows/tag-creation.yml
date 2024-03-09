@@ -1,0 +1,71 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: Check for new release version
+
+on:
+  workflow_call:
+    outputs:
+      tag_created:
+        description: "Tells if the tag was created"
+        value: ${{ jobs.create_tag.outputs.tag_was_created }}
+  workflow_dispatch:
+
+jobs:
+  check_csproj:
+    name: Check the project version
+    runs-on: ubuntu-latest
+    if: contains(github.event.head_commit.message, '[release]')
+    outputs:
+      create_tag_needed: ${{ steps.compare.outputs.create_tag }}
+      tag_version: ${{ steps.compare.outputs.set_tag_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get Version from csproj
+        uses: kzrnm/get-net-sdk-project-versions-action@v2
+        id: get-version
+        with:
+          proj-path: AzzyBot/AzzyBot.csproj
+
+      - name: Compare tags
+        id: compare
+        run: |
+          if git rev-parse "v${{steps.get-version.outputs.version}}" >/dev/null 2>&1; then
+            echo "create_tag=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "create_tag=true" >> "$GITHUB_OUTPUT"
+            echo "set_tag_version=v${{steps.get-version.outputs.version}}" >> "$GITHUB_OUTPUT"
+          fi
+
+  create_tag:
+    name: Create the tag if needed
+    needs: check_csproj
+    if: ${{ needs.check_csproj.outputs.create_tag_needed == 'true' &&  needs.check_csproj.outputs.tag_version != ''}} 
+    runs-on: ubuntu-latest
+    outputs:
+      tag_was_created: ${{ steps.create-tag.outputs.created-tag }}
+    steps:          
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create tag and set output
+        id: create-tag
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const tagName = `${process.env.TAG_VERSION}`;
+            await github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/${tagName}`,
+              sha: context.sha
+            });
+            core.setOutput('created-tag', 'true');
+        env:
+          TAG_VERSION: ${{ needs.check_csproj.outputs.tag_version }}

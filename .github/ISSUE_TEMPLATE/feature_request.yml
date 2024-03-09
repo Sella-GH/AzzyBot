@@ -1,0 +1,43 @@
+name : Feature requests
+description : Create a feature request to help us improving the discord bot.
+title : "[FEATURE]"
+labels : enhancement
+assignees : Sella-GH
+body :
+  - type : markdown
+    attributes :
+      value: |
+        Thank you very much for suggesting a feature for our discord bot.
+        Please note that this form is only intended to be used for feature requests.
+        If you want to report a bug, please use the [following form](https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D)
+
+  - type : textarea
+    id : feature-description
+    attributes :
+     label : "Is your feature request related to a problem? Please describe."
+     description : "A clear and concise description of what the problem is."
+     placeholder : "I'm always frustrated when [...]"
+    validations :
+     required : true
+
+  - type : textarea
+    id : expected-behavior
+    attributes :
+     label : "Describe the solution you'd like"
+     description : "A clear and concise description of what you want to happen."
+    validations :
+     required : true
+
+  - type : textarea
+    id : alternatives
+    attributes :
+     label : "Describe alternatives you've considered"
+     description : "A clear and concise description of any alternative solutions or features you've considered."
+    validations :
+     required : true
+     
+  - type : textarea
+    id : more-info
+    attributes :
+     label : "Additional information"
+     description : "Add additional information if you want to provide some."

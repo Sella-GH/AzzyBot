@@ -1,0 +1,60 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: Publish debug build
+
+on:
+  push:
+    paths:
+      - "**.cs"
+      - ".github/workflows/dotnet.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and Publish for ${{ matrix.os }} - ${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - os: linux
+            arch: x64
+          - os: linux
+            arch: arm64
+          - os: win
+            arch: x64
+          - os: win
+            arch: arm64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET 8.0.x
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      
+      - name: Publish Release for ${{ matrix.os }}-${{ matrix.arch }}
+        run: |
+          dotnet publish -c Release -r ${{ matrix.os }}-${{ matrix.arch }}
+          
+      - name: Download Updater for ${{ matrix.os }}-${{ matrix.arch }}
+        uses: dsaltares/fetch-gh-release-asset@master
+        with:
+          repo: Sella-GH/AzzyBot-Updater
+          file: release-${{ matrix.os }}-${{ matrix.arch }}.zip
+          target: ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Updater/release-${{ matrix.os }}-${{ matrix.arch }}.zip
+
+      - name: Unzip the downloaded Artifact and add some basic information
+        run: |
+          mkdir -p ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Updater
+          unzip ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Updater/release-${{ matrix.os }}-${{ matrix.arch }}.zip -d ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Updater/
+          rm ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Updater/release-${{ matrix.os }}-${{ matrix.arch }}.zip
+          echo "${{ github.event.head_commit.timestamp }}" > ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/BuildDate.txt
+          echo "${{ github.sha }}" > ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Commit.txt
+        
+      - name: Archive Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ matrix.os }}-${{ matrix.arch }}
+          path: ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}

@@ -1,0 +1,43 @@
+{
+    "Slogans": {
+        "DefaultSlogan": "",
+        "DefaultSloganListener": {
+            "None": "",
+            "OnePerson": "",
+            "TwoPersons": "",
+            "Multiple": ""
+        },
+        "LiveStream": "",
+        "LiveStreamListener": {
+            "None": "",
+            "OnePerson": "",
+            "TwoPersons": "",
+            "Multiple": ""
+        },
+        "SongRequests": "",
+        "SongRequestListener": {
+            "None": "",
+            "OnePerson": "",
+            "TwoPersons": "",
+            "Multiple": ""
+        },
+        "UserDefined": [
+            {
+                "Name": "",
+                "Slogan": "",
+                "None": "",
+                "OnePerson": "",
+                "TwoPersons": "",
+                "Multiple": ""
+            },
+            {
+                "Name": "",
+                "Slogan": "",
+                "None": "",
+                "OnePerson": "",
+                "TwoPersons": "",
+                "Multiple": ""
+            }
+        ]
+    }
+}
