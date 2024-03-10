@@ -35,6 +35,7 @@
 Since my previous project "needed" a discord bot solution to comfort the opening and closing of a so called "club" - I built a discord bot to ensure the best comfort while using it.
 
 The bot contains of the following features:
+- A modular approach on the activating/disabling of features
 - Help command to see all features
 - Integrated updater (more or less functional)
 - Resource usage of AzuraCast and AzzyBot displayed in embeds
@@ -71,7 +72,7 @@ To get a local copy up and running follow these simple example steps.
 
 ### Installation
 
-Follow the instructions inside the Wiki.
+Follow the instructions inside the [Wiki](https://github.com/Sella-GH/AzzyBot/wiki).
 
 ## Roadmap
 
