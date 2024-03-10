@@ -14,7 +14,6 @@ namespace AzzyBot.Settings;
 internal abstract class BaseSettings
 {
     internal static bool ActivateAzuraCast { get; private set; }
-    internal static bool ActivateGiphy { get; private set; }
     internal static bool ActivateClubManagement { get; private set; }
     internal static bool ActivateTimers { get; private set; }
 
@@ -37,7 +36,6 @@ internal abstract class BaseSettings
         Config = builder.Build();
 
         ActivateAzuraCast = Convert.ToBoolean(Config["AzuraCast:ActivateAzuraCast"], CultureInfo.InvariantCulture);
-        ActivateGiphy = Convert.ToBoolean(Config["Giphy:ActivateGiphy"], CultureInfo.InvariantCulture);
         ActivateClubManagement = Convert.ToBoolean(Config["ClubManagement:ActivateClubManagement"], CultureInfo.InvariantCulture);
 
         if (!CoreSettings.LoadCore())
