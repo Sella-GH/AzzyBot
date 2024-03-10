@@ -420,9 +420,6 @@ internal static class BotInfo
         if (BaseSettings.ActivateAzuraCast)
             text += "\n- AzuraCast";
 
-        if (BaseSettings.ActivateGiphy)
-            text += "\n- Giphy";
-
         if (BaseSettings.ActivateClubManagement)
             text += "\n- ClubManagement";
 
