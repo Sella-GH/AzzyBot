@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    name: Build and Publish for ${{ matrix.os }} - ${{ matrix.arch }}
+    name: Build and Publish DEBUG for ${{ matrix.os }} - ${{ matrix.arch }}
     runs-on: ubuntu-latest
     strategy:
       matrix:

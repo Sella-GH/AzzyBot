@@ -18,7 +18,7 @@ jobs:
     uses: ./.github/workflows/tag-creation.yml
 
   build:
-    name: Build and Publish for ${{ matrix.os }} - ${{ matrix.arch }}
+    name: Build and Publish RELEASE for ${{ matrix.os }} - ${{ matrix.arch }}
     needs: check_for_tag
     if: ${{ needs.check_for_tag.outputs.tag_created }} == "true"
     runs-on: ubuntu-latest
