@@ -3,6 +3,10 @@
   <h3 align="center">AzzyBot</h3>
 
   <p align="center">
+    <img src="https://github.com/Sella-GH/AzzyBot/blob/feat/VoiceChannelStreaming/Assets/Azzy_Logo.png" />
+  </p>
+  
+  <p align="center">
     General purpose discord bot, written in C# and with DSharpPlus, dedicated for the use with AzuraCast.
     <br/>
     <br/>
