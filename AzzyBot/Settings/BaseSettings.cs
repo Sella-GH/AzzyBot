@@ -7,6 +7,7 @@ using AzzyBot.Modules.Core;
 using AzzyBot.Settings.AzuraCast;
 using AzzyBot.Settings.ClubManagement;
 using AzzyBot.Settings.Core;
+using AzzyBot.Settings.MusicStreaming;
 using Microsoft.Extensions.Configuration;
 
 namespace AzzyBot.Settings;
@@ -15,6 +16,7 @@ internal abstract class BaseSettings
 {
     internal static bool ActivateAzuraCast { get; private set; }
     internal static bool ActivateClubManagement { get; private set; }
+    internal static bool ActivateMusicStreaming { get; private set; }
     internal static bool ActivateTimers { get; private set; }
 
     protected static readonly IConfigurationBuilder builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", true, false);
@@ -37,6 +39,7 @@ internal abstract class BaseSettings
 
         ActivateAzuraCast = Convert.ToBoolean(Config["AzuraCast:ActivateAzuraCast"], CultureInfo.InvariantCulture);
         ActivateClubManagement = Convert.ToBoolean(Config["ClubManagement:ActivateClubManagement"], CultureInfo.InvariantCulture);
+        ActivateMusicStreaming = Convert.ToBoolean(Config["MusicStreaming:ActivateMusicStreaming"], CultureInfo.InvariantCulture);
 
         if (!CoreSettings.LoadCore())
             throw new InvalidOperationException("Core settings can't be loaded");
@@ -54,6 +57,9 @@ internal abstract class BaseSettings
 
         if (ActivateClubManagement && !ClubManagementSettings.LoadClubManagement())
             throw new InvalidOperationException("ClubManagement settings can't be loaded");
+
+        if (ActivateMusicStreaming && !MusicStreamingSettings.LoadMusicStreaming())
+            throw new InvalidOperationException("MusicStreaming settings can't be loaded");
 
         if ((ActivateAzuraCast || ActivateClubManagement) && (AzuraCastSettings.AutomaticFileChangeCheck || AzuraCastSettings.AutomaticServerPing || AzuraCastSettings.AutomaticUpdateCheck || ClubManagementSettings.AutomaticClubClosingCheck))
             ActivateTimers = true;
