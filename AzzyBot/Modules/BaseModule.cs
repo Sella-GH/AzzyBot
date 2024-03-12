@@ -27,7 +27,8 @@ internal abstract class BaseModule
         GetAzuraCastApiUrl,
         GetClubOpeningTime,
         GetClubClosedTime,
-        GlobalTimerTick
+        GlobalTimerTick,
+        LavalinkPassword
     }
 
     protected sealed class ModuleEvent

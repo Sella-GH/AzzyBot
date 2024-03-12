@@ -114,6 +114,7 @@ internal static class Program
             config.ReadyTimeout = TimeSpan.FromSeconds(15);
             config.ResumptionOptions = new(TimeSpan.Zero);
             config.Label = "AzzyBot";
+            config.Passphrase = CoreModule.GetLavalinkPassword();
         });
 
         IServiceProvider serviceProvider = services.BuildServiceProvider();

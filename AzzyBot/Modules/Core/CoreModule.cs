@@ -73,4 +73,11 @@ internal sealed class CoreModule : BaseModule
         BroadcastModuleEvent(evt);
         return evt.ResultString;
     }
+
+    internal static string GetLavalinkPassword()
+    {
+        ModuleEvent evt = new(ModuleEventType.LavalinkPassword);
+        BroadcastModuleEvent(evt);
+        return evt.ResultString;
+    }
 }
