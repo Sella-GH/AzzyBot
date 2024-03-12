@@ -46,6 +46,7 @@
 	<PackageReference Include="DSharpPlus" Version="4.4.6" />
 	<PackageReference Include="DSharpPlus.Interactivity" Version="4.4.6" />
 	<PackageReference Include="DSharpPlus.SlashCommands" Version="4.4.6" />
+	<PackageReference Include="Lavalink4NET.DSharpPlus" Version="4.0.14" />
 	<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
 	<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
 	<PackageReference Include="Roslynator.Analyzers" Version="4.11.0">
