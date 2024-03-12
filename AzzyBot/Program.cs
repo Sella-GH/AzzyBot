@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules;
@@ -15,6 +16,10 @@ using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.SlashCommands;
+using Lavalink4NET;
+using Lavalink4NET.Extensions;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot;
@@ -22,12 +27,14 @@ namespace AzzyBot;
 internal static class Program
 {
     private static DiscordClient? DiscordClient;
+    private static IAudioService? AudioService;
 
     internal static ILogger<BaseDiscordClient> GetDiscordClientLogger => DiscordClient?.Logger ?? throw new InvalidOperationException("DiscordClient is null");
     internal static string GetDiscordClientAvatarUrl => DiscordClient?.CurrentUser.AvatarUrl ?? throw new InvalidOperationException("DiscordClient is null");
     internal static ulong GetDiscordClientId => DiscordClient?.CurrentUser.Id ?? throw new InvalidOperationException("DiscordClient is null");
     internal static string GetDiscordClientUserName => DiscordClient?.CurrentUser.Username ?? throw new InvalidOperationException("DiscordClient is null");
     internal static string GetDiscordClientVersion => DiscordClient?.VersionString ?? throw new InvalidOperationException("DiscordClient is null");
+    internal static IAudioService GetAudioService => AudioService ?? throw new InvalidOperationException("AudioService is null");
 
     private static async Task Main()
     {
@@ -99,6 +106,28 @@ internal static class Program
         DiscordClient.UseInteractivity(interactivityConfiguration);
 
         #endregion Initialize Interactivity
+
+        #region Initialize Lavalink
+
+        IServiceCollection services = new ServiceCollection().AddLavalink().AddSingleton(DiscordClient).ConfigureLavalink(config =>
+        {
+            config.ReadyTimeout = TimeSpan.FromSeconds(15);
+            config.ResumptionOptions = new(TimeSpan.Zero);
+            config.Label = "AzzyBot";
+        });
+
+        IServiceProvider serviceProvider = services.BuildServiceProvider();
+
+        foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
+        {
+            await hostedService.StartAsync(new CancellationToken());
+        }
+
+        AudioService = serviceProvider.GetRequiredService<IAudioService>();
+
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Lavalink loaded");
+
+        #endregion Initialize Lavalink
 
         #region Add ShutdownProcess
 
