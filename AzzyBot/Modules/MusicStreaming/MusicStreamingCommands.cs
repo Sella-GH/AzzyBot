@@ -14,6 +14,28 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
     [SlashRequireGuild]
     internal sealed class PlayerCommandGroup : ApplicationCommandModule
     {
+        [SlashCommand("disconnect", "Disconnect the bot from your voice channel")]
+        internal static async Task PlayerDisconnectCommandAsync(InteractionContext ctx)
+        {
+            ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerDisconnectCommandAsync requested");
+
+            await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+
+            if (await LavalinkService.DisconnectAsync(ctx))
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Bot disconnecting"));
+        }
+
+        [SlashCommand("join", "Joins the bot into your voice channel")]
+        internal static async Task PlayerJoinCommandAsync(InteractionContext ctx)
+        {
+            ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerJoinCommandAsync requested");
+
+            await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+
+            if (await LavalinkService.JoinMusicAsync(ctx))
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Bot joining"));
+        }
+
         [SlashCommand("start", "Starts the music stream into your voice channel")]
         internal static async Task PlayerStartCommandAsync(InteractionContext ctx)
         {
@@ -32,7 +54,7 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
         }
 
         [SlashCommand("stop", "Stops the music stream from playing")]
-        internal static async Task PlayerStopCommandAsync(InteractionContext ctx)
+        internal static async Task PlayerStopCommandAsync(InteractionContext ctx, [Option("disconnect", "Should the bot disconnect after?")] bool disconnect = false)
         {
             ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerStopCommandAsync requested");
 
@@ -44,7 +66,7 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
                 return;
             }
 
-            if (await LavalinkService.StopMusicAsync(ctx))
+            if (await LavalinkService.StopMusicAsync(ctx, disconnect))
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Track's stopping"));
         }
     }

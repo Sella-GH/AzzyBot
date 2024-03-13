@@ -39,6 +39,26 @@ internal static class LavalinkService
         return null;
     }
 
+    internal static async Task<bool> DisconnectAsync(InteractionContext ctx)
+    {
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, true, true);
+
+        if (player is null)
+            return false;
+
+        await player.DisconnectAsync();
+        await player.DisposeAsync();
+
+        return true;
+    }
+
+    internal static async Task<bool> JoinMusicAsync(InteractionContext ctx)
+    {
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying, PlayerPrecondition.Playing]);
+
+        return player is not null;
+    }
+
     internal static async Task<bool> PlayMusicAsync(InteractionContext ctx)
     {
         LavalinkPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying]);
@@ -64,7 +84,7 @@ internal static class LavalinkService
         return true;
     }
 
-    internal static async Task<bool> StopMusicAsync(InteractionContext ctx)
+    internal static async Task<bool> StopMusicAsync(InteractionContext ctx, bool disconnect)
     {
         LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true, [PlayerPrecondition.Playing]);
 
@@ -72,8 +92,9 @@ internal static class LavalinkService
             return false;
 
         await player.StopAsync();
-        await player.DisconnectAsync();
-        await player.DisposeAsync();
+
+        if (disconnect)
+            await DisconnectAsync(ctx);
 
         return true;
     }
