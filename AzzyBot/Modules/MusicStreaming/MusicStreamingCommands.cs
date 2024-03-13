@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.AzuraCast;
 using DSharpPlus.Entities;
@@ -34,6 +35,27 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
 
             if (await LavalinkService.JoinMusicAsync(ctx))
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Bot joining"));
+        }
+
+        [SlashCommand("set-volume", "Changes the volume of the player")]
+        internal static async Task PlayerSetVolumeCommandAsync(InteractionContext ctx, [Option("volume", "The new volume between 1 and 100")] double volume, [Option("reset", "Resets the volume to 100%")] bool reset = false)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(volume, nameof(volume));
+            ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerSetVolumeCommandAsync requested");
+
+            if (volume is > 100 or < 0)
+                await ctx.CreateResponseAsync("Volume must be between 0 and 1000", true);
+
+            await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+
+            if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
+            {
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AzuraCastEmbedBuilder.BuildServerIsOfflineEmbed(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl, false)));
+                return;
+            }
+
+            if (await LavalinkService.SetVolumeAsync(ctx, (float)volume, reset))
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Volume changed to {((reset) ? 100 : Math.Round(volume, 2))}%"));
         }
 
         [SlashCommand("start", "Starts the music stream into your voice channel")]

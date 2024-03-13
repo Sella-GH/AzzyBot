@@ -84,6 +84,24 @@ internal static class LavalinkService
         return true;
     }
 
+    internal static async Task<bool> SetVolumeAsync(InteractionContext ctx, float volume, bool reset)
+    {
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true);
+
+        if (player is null)
+            return false;
+
+        if (reset)
+        {
+            await player.SetVolumeAsync(100 / 100f);
+            return true;
+        }
+
+        await player.SetVolumeAsync(volume / 100f);
+
+        return true;
+    }
+
     internal static async Task<bool> StopMusicAsync(InteractionContext ctx, bool disconnect)
     {
         LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true, [PlayerPrecondition.Playing]);
