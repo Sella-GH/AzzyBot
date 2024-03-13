@@ -117,6 +117,8 @@ internal static class Program
             config.Passphrase = CoreModule.GetLavalinkPassword();
         });
 
+        services.AddLogging(x => x.AddConsole().SetMinimumLevel((LogLevel)Enum.ToObject(typeof(LogLevel), CoreSettings.LogLevel)));
+
         IServiceProvider serviceProvider = services.BuildServiceProvider();
 
         foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
