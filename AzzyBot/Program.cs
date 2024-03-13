@@ -126,7 +126,7 @@ internal static class Program
 
         AudioService = serviceProvider.GetRequiredService<IAudioService>();
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Lavalink loaded");
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Lavalink4NET loaded");
 
         #endregion Initialize Lavalink
 
