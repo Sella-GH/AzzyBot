@@ -27,9 +27,8 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
                 return;
             }
 
-            await LavalinkService.PlayMusicAsync(ctx);
-
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Track's playing"));
+            if (await LavalinkService.PlayMusicAsync(ctx))
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Track's playing"));
         }
 
         [SlashCommand("stop", "Stops the music stream from playing")]
@@ -45,9 +44,8 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
                 return;
             }
 
-            await LavalinkService.StopMusicAsync(ctx);
-
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Track's stopping"));
+            if (await LavalinkService.StopMusicAsync(ctx))
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Track's stopping"));
         }
     }
 }
