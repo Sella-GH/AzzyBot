@@ -2,6 +2,8 @@
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.AzuraCast;
+using AzzyBot.Modules.Core;
+using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using DSharpPlus.SlashCommands.Attributes;
@@ -20,7 +22,21 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
         {
             ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerDisconnectCommandAsync requested");
 
-            await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+            DiscordMember member = ctx.Member;
+
+            if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(ctx.Member))
+            {
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("You have to be in a voice channel for this action!").AsEphemeral());
+                return;
+            }
+
+            if (!CoreDiscordCommands.CheckIfBotIsInVoiceChannel(member, ctx.Client.CurrentUser.Id))
+            {
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Bot is already disconnected").AsEphemeral());
+                return;
+            }
+
+            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
             if (await LavalinkService.DisconnectAsync(ctx))
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Bot disconnecting"));
@@ -31,7 +47,21 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
         {
             ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerJoinCommandAsync requested");
 
-            await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+            DiscordMember member = ctx.Member;
+
+            if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(member))
+            {
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("You have to be in a voice channel for this action!").AsEphemeral());
+                return;
+            }
+
+            if (CoreDiscordCommands.CheckIfBotIsInVoiceChannel(member, ctx.Client.CurrentUser.Id))
+            {
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Bot is already joined").AsEphemeral());
+                return;
+            }
+
+            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
             if (await LavalinkService.JoinMusicAsync(ctx))
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Bot joining"));
@@ -43,10 +73,16 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(volume, nameof(volume));
             ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerSetVolumeCommandAsync requested");
 
+            if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(ctx.Member))
+            {
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("You have to be in a voice channel for this action!").AsEphemeral());
+                return;
+            }
+
             if (volume is > 100 or < 0)
                 await ctx.CreateResponseAsync("Volume must be between 0 and 1000", true);
 
-            await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
@@ -63,7 +99,13 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
         {
             ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerStartCommandAsync requested");
 
-            await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+            if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(ctx.Member))
+            {
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("You have to be in a voice channel for this action!").AsEphemeral());
+                return;
+            }
+
+            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
@@ -80,7 +122,13 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
         {
             ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerStopCommandAsync requested");
 
-            await ctx.CreateResponseAsync(DSharpPlus.InteractionResponseType.DeferredChannelMessageWithSource);
+            if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(ctx.Member))
+            {
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("You have to be in a voice channel for this action!").AsEphemeral());
+                return;
+            }
+
+            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
