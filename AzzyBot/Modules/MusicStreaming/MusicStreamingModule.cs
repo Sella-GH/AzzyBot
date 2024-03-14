@@ -15,6 +15,14 @@ internal sealed class MusicStreamingModule : BaseModule
             case ModuleEventType.LavalinkPassword:
                 evt.ResultString = MusicStreamingSettings.LavalinkPassword;
                 break;
+
+            case ModuleEventType.GetMusicStreamingInactivity:
+                evt.ResultBool = MusicStreamingSettings.AutoDisconnect;
+                break;
+
+            case ModuleEventType.GetMusicStreamingInactivityTime:
+                evt.ResultInt = MusicStreamingSettings.AutoDisconnectTime;
+                break;
         }
     }
 
