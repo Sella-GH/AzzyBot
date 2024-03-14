@@ -74,6 +74,13 @@ internal sealed class CoreModule : BaseModule
         return evt.ResultString;
     }
 
+    internal static bool GetJavaVersion()
+    {
+        ModuleEvent evt = new(ModuleEventType.JavaVersion);
+        BroadcastModuleEvent(evt);
+        return evt.ResultBool;
+    }
+
     internal static string GetLavalinkPassword()
     {
         ModuleEvent evt = new(ModuleEventType.LavalinkPassword);

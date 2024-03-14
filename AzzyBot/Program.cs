@@ -109,26 +109,32 @@ internal static class Program
 
         #region Initialize Lavalink
 
-        IServiceCollection services = new ServiceCollection().AddLavalink().AddSingleton(DiscordClient).ConfigureLavalink(config =>
+        if (ModuleStates.MusicStreaming)
         {
-            config.ReadyTimeout = TimeSpan.FromSeconds(15);
-            config.ResumptionOptions = new(TimeSpan.Zero);
-            config.Label = "AzzyBot";
-            config.Passphrase = CoreModule.GetLavalinkPassword();
-        });
+            if (CoreModule.GetJavaVersion())
+                await Console.Error.WriteLineAsync("You have to install the Java/OpenJDK Runtime in version 17 or 21 LTS to use the MusicStreaming Module!");
 
-        services.AddLogging(x => x.AddConsole().SetMinimumLevel((LogLevel)Enum.ToObject(typeof(LogLevel), CoreSettings.LogLevel)));
+            IServiceCollection services = new ServiceCollection().AddLavalink().AddSingleton(DiscordClient).ConfigureLavalink(config =>
+            {
+                config.ReadyTimeout = TimeSpan.FromSeconds(15);
+                config.ResumptionOptions = new(TimeSpan.Zero);
+                config.Label = "AzzyBot";
+                config.Passphrase = CoreModule.GetLavalinkPassword();
+            });
 
-        IServiceProvider serviceProvider = services.BuildServiceProvider();
+            services.AddLogging(x => x.AddConsole().SetMinimumLevel((LogLevel)Enum.ToObject(typeof(LogLevel), CoreSettings.LogLevel)));
 
-        foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
-        {
-            await hostedService.StartAsync(new CancellationToken());
+            IServiceProvider serviceProvider = services.BuildServiceProvider();
+
+            foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
+            {
+                await hostedService.StartAsync(new CancellationToken());
+            }
+
+            AudioService = serviceProvider.GetRequiredService<IAudioService>();
+
+            ExceptionHandler.LogMessage(LogLevel.Debug, "Lavalink4NET loaded");
         }
-
-        AudioService = serviceProvider.GetRequiredService<IAudioService>();
-
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Lavalink4NET loaded");
 
         #endregion Initialize Lavalink
 

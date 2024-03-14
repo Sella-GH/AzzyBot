@@ -28,6 +28,7 @@ internal abstract class BaseModule
         GetClubOpeningTime,
         GetClubClosedTime,
         GlobalTimerTick,
+        JavaVersion,
         LavalinkPassword
     }
 
