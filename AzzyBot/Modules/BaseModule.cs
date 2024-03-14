@@ -27,29 +27,32 @@ internal abstract class BaseModule
         GetAzuraCastApiUrl,
         GetClubOpeningTime,
         GetClubClosedTime,
+        GetMusicStreamingInactivity,
+        GetMusicStreamingInactivityTime,
         GlobalTimerTick,
-        JavaVersion,
         LavalinkPassword
     }
 
     protected sealed class ModuleEvent
     {
         internal ModuleEventType Type { get; }
-        internal bool ResultBool { get; set; }
-        internal TimeSpan ResultTimeSpan { get; set; }
         internal int ParameterInt { get; set; }
+        internal bool ResultBool { get; set; }
+        internal int ResultInt { get; set; }
         internal DiscordMember? ResultMember { get; set; }
         internal string ResultString { get; set; }
+        internal TimeSpan ResultTimeSpan { get; set; }
         internal string ResultReason { get; set; }
 
         internal ModuleEvent(ModuleEventType type)
         {
             Type = type;
-            ResultBool = false;
-            ResultTimeSpan = TimeSpan.Zero;
             ParameterInt = 0;
+            ResultBool = false;
+            ResultInt = 0;
             ResultMember = null;
             ResultString = string.Empty;
+            ResultTimeSpan = TimeSpan.Zero;
             ResultReason = string.Empty;
         }
     }

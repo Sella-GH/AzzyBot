@@ -18,6 +18,8 @@ using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.SlashCommands;
 using Lavalink4NET;
 using Lavalink4NET.Extensions;
+using Lavalink4NET.InactivityTracking;
+using Lavalink4NET.InactivityTracking.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -128,6 +130,16 @@ internal static class Program
             });
 
             services.AddLogging(x => x.AddConsole().SetMinimumLevel((LogLevel)Enum.ToObject(typeof(LogLevel), CoreSettings.LogLevel)));
+
+            if (CoreModule.GetMusicStreamingInactivity())
+            {
+                services.AddInactivityTracking();
+                services.ConfigureInactivityTracking(config =>
+                {
+                    config.DefaultTimeout = TimeSpan.FromMinutes(CoreModule.GetMusicStreamingInactivityTime());
+                    config.TrackingMode = InactivityTrackingMode.All;
+                });
+            }
 
             IServiceProvider serviceProvider = services.BuildServiceProvider();
 
