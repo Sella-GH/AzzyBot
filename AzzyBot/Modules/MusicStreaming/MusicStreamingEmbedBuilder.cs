@@ -16,9 +16,9 @@ internal static class MusicStreamingEmbedBuilder
         string title = "Error";
         string message = result.Status switch
         {
-            PlayerRetrieveStatus.UserNotInVoiceChannel => "You are not connected to a voice channel",
-            PlayerRetrieveStatus.BotNotConnected => "The bot is currently not connected",
-            PlayerRetrieveStatus.VoiceChannelMismatch => "You must be in the same voice channel as the bot.",
+            PlayerRetrieveStatus.UserNotInVoiceChannel => "You have to be in a voice channel for this action!",
+            PlayerRetrieveStatus.BotNotConnected => "The bot is currently not connected!",
+            PlayerRetrieveStatus.VoiceChannelMismatch => "You must be in the same voice channel as the bot!",
 
             PlayerRetrieveStatus.PreconditionFailed when result.Precondition == PlayerPrecondition.Playing => "The player is currently not playing any track.",
             PlayerRetrieveStatus.PreconditionFailed when result.Precondition == PlayerPrecondition.NotPlaying => "The player is currently playing any track.",
