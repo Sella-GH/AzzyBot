@@ -7,19 +7,17 @@ internal sealed class MusicStreamingModule : BaseModule
 {
     internal override void RegisterCommands(SlashCommandsExtension slashCommandsExtension, ulong? serverId) => slashCommandsExtension.RegisterCommands<MusicStreamingCommands>(serverId);
 
-    protected override async void HandleModuleEvent(ModuleEvent evt)
+    protected override void HandleModuleEvent(ModuleEvent evt)
     {
         switch (evt.Type)
         {
             case ModuleEventType.LavalinkPassword:
                 evt.ResultString = MusicStreamingSettings.LavalinkPassword;
                 break;
-
-            case ModuleEventType.JavaVersion:
-                evt.ResultBool = await MusicStreamingLavalink.CheckIfJavaIsInstalledAsync();
-                break;
         }
     }
 
+    internal override void StartProcesses() => MusicStreamingLavalink.StartLavalink();
+    internal override async void StopProcesses() => await MusicStreamingLavalink.StopLavalinkAsync();
     internal override void Activate() => ModuleStates.ActivateMusicStreaming();
 }

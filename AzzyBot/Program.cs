@@ -26,6 +26,8 @@ namespace AzzyBot;
 
 internal static class Program
 {
+    private static readonly CancellationTokenSource CancellationTokenSource = new();
+    private static readonly CancellationToken CancellationToken = CancellationTokenSource.Token;
     private static DiscordClient? DiscordClient;
     private static IAudioService? AudioService;
 
@@ -107,13 +109,16 @@ internal static class Program
 
         #endregion Initialize Interactivity
 
+        #region Initialize Processes
+
+        BaseModule.StartAllProcesses();
+
+        #endregion Initialize Processes
+
         #region Initialize Lavalink
 
         if (ModuleStates.MusicStreaming)
         {
-            if (CoreModule.GetJavaVersion())
-                await Console.Error.WriteLineAsync("You have to install the Java/OpenJDK Runtime in version 17 or 21 LTS to use the MusicStreaming Module!");
-
             IServiceCollection services = new ServiceCollection().AddLavalink().AddSingleton(DiscordClient).ConfigureLavalink(config =>
             {
                 config.ReadyTimeout = TimeSpan.FromSeconds(15);
@@ -128,7 +133,7 @@ internal static class Program
 
             foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
             {
-                await hostedService.StartAsync(new CancellationToken());
+                await hostedService.StartAsync(CancellationToken);
             }
 
             AudioService = serviceProvider.GetRequiredService<IAudioService>();
@@ -142,8 +147,14 @@ internal static class Program
 
         async Task BotShutdown()
         {
+            await CancellationTokenSource.CancelAsync();
+            CancellationTokenSource.Dispose();
+
             BaseModule.StopAllTimers();
             ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all timers");
+
+            BaseModule.StopAllProcesses();
+            ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all processes");
 
             BaseModule.DisposeAllFileLocks();
             ExceptionHandler.LogMessage(LogLevel.Debug, "Disposed all file locks");
@@ -205,12 +216,12 @@ internal static class Program
 
         #endregion Initialize Strings
 
-        #region InitializeTimers
+        #region Initialize Timers
 
         if (BaseSettings.ActivateTimers)
             BaseModule.StartAllGlobalTimers();
 
-        #endregion InitializeTimers
+        #endregion Initialize Timers
 
         #region Check for updates
 

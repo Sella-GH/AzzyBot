@@ -98,7 +98,9 @@ internal abstract class BaseModule
     internal static void RegisterAllFileLocks() => ForEachModuleDo(module => module.RegisterFileLocks());
     internal static void DisposeAllFileLocks() => ForEachModuleDo(module => module.DisposeFileLocks());
     internal static void StartAllGlobalTimers() => ForEachModuleDo(module => module.StartGlobalTimers());
+    internal static void StartAllProcesses() => ForEachModuleDo(module => module.StartProcesses());
     internal static void StopAllTimers() => ForEachModuleDo(module => module.StopTimers());
+    internal static void StopAllProcesses() => ForEachModuleDo(module => module.StopProcesses());
     protected static void BroadcastModuleEvent(ModuleEvent evt) => ForEachModuleDo(module => module.HandleModuleEvent(evt));
     internal abstract void Activate();
     internal abstract void RegisterCommands(SlashCommandsExtension slashCommandsExtension, ulong? serverId);
@@ -112,7 +114,13 @@ internal abstract class BaseModule
     internal virtual void StartGlobalTimers()
     { }
 
+    internal virtual void StartProcesses()
+    { }
+
     internal virtual void StopTimers()
+    { }
+
+    internal virtual void StopProcesses()
     { }
 
     protected virtual void HandleModuleEvent(ModuleEvent evt)
