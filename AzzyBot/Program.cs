@@ -28,8 +28,6 @@ namespace AzzyBot;
 
 internal static class Program
 {
-    private static readonly CancellationTokenSource CancellationTokenSource = new();
-    private static readonly CancellationToken CancellationToken = CancellationTokenSource.Token;
     private static DiscordClient? DiscordClient;
     private static IAudioService? AudioService;
 
@@ -145,7 +143,7 @@ internal static class Program
 
             foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
             {
-                await hostedService.StartAsync(CancellationToken);
+                await hostedService.StartAsync(new CancellationToken());
             }
 
             AudioService = serviceProvider.GetRequiredService<IAudioService>();
@@ -159,9 +157,6 @@ internal static class Program
 
         async Task BotShutdown()
         {
-            await CancellationTokenSource.CancelAsync();
-            CancellationTokenSource.Dispose();
-
             BaseModule.StopAllTimers();
             ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all timers");
 
