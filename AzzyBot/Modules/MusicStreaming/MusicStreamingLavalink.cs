@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using AzzyBot.Settings.MusicStreaming;
 
 namespace AzzyBot.Modules.MusicStreaming;
 
@@ -84,6 +85,10 @@ internal static class MusicStreamingLavalink
             process.Kill();
             await process.WaitForExitAsync();
             process.Dispose();
+
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files", "logs");
+            if (MusicStreamingSettings.DeleteLavalinkLogs && Directory.Exists(path))
+                Directory.Delete(path);
 
             return true;
         }
