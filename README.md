@@ -7,7 +7,7 @@
   </p>
   
   <p align="center">
-    General purpose discord bot, written in C# and with DSharpPlus, dedicated for the use with [AzuraCast](https://github.com/AzuraCast/AzuraCast)
+    General purpose discord bot, written in C# and with DSharpPlus, dedicated for the use with <a href="https://github.com/AzuraCast/AzuraCast">AzuraCast</a>
     <br/>
     <br/>
     <a href="https://github.com/Sella-GH/AzzyBot/wiki"><strong>Explore the docs »</strong></a>
