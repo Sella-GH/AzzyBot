@@ -104,6 +104,9 @@
 	<None Update="Modules\AzuraCast\Files\FileCache.json">
 	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	</None>
+	<None Update="Modules\MusicStreaming\Files\application.yml">
+	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>
   </ItemGroup>
 
   <Target Name="WriteBuildDateToFile" BeforeTargets="PreBuildEvent">
