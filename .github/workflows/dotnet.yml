@@ -33,6 +33,9 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
+
+      - name: Install GitHub CLI
+        run: sudo apt-get update && sudo apt-get install -y gh
       
       - name: Publish Debug
         run: |
@@ -41,14 +44,11 @@ jobs:
       - name: Create the Lavalink folder
         run: |
           mkdir -p ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files
-          
+
       - name: Download Lavalink
-        uses: dsaltares/fetch-gh-release-asset@master
-        with:
-          repo: lavalink-devs/Lavalink
-          file: Lavalink.jar
-          target: ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files/Lavalink.jar
-          
+        run: |
+          gh release download 4.0.4 --dir './artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files' --pattern 'Lavalink.jar' --repo lavalink-devs/Lavalink
+                    
       - name: Download Updater
         uses: dsaltares/fetch-gh-release-asset@master
         with:
