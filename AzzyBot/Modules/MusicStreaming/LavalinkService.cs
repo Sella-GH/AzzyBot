@@ -29,9 +29,7 @@ internal static class LavalinkService
         PlayerResult<LavalinkPlayer> result = await Program.GetAudioService.Players.RetrieveAsync(ctx.Guild.Id, ctx.Member?.VoiceState.Channel.Id, PlayerFactory.Default, Options.Create(playerOptions), retrieveOptions, cancellationToken);
 
         if (result.IsSuccess)
-        {
             return result.Player;
-        }
 
         DiscordMember member = await ctx.Guild.GetMemberAsync(ctx.User.Id);
         await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddEmbed(MusicStreamingEmbedBuilder.BuildPreconditionErrorEmbed(CoreDiscordCommands.GetBestUsername(member.Username, member.Nickname), member.AvatarUrl, result)).AsEphemeral());
@@ -41,7 +39,7 @@ internal static class LavalinkService
 
     internal static async Task<bool> DisconnectAsync(InteractionContext ctx)
     {
-        LavalinkPlayer? player = await GetPlayerAsync(ctx, true, true);
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true);
 
         if (player is null)
             return false;
@@ -54,7 +52,7 @@ internal static class LavalinkService
 
     internal static async Task<bool> JoinMusicAsync(InteractionContext ctx)
     {
-        LavalinkPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying, PlayerPrecondition.Playing]);
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying]);
 
         return player is not null;
     }
@@ -104,7 +102,8 @@ internal static class LavalinkService
 
     internal static async Task<bool> StopMusicAsync(InteractionContext ctx, bool disconnect)
     {
-        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true, [PlayerPrecondition.Playing]);
+        IPlayerPrecondition precondition = PlayerPrecondition.Any(PlayerPrecondition.Playing, PlayerPrecondition.Paused);
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true, [precondition]);
 
         if (player is null)
             return false;
