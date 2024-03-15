@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using AzzyBot.Modules.Core;
 using AzzyBot.Settings.MusicStreaming;
 
 namespace AzzyBot.Modules.MusicStreaming;
@@ -72,7 +75,16 @@ internal static class MusicStreamingLavalinkHandler
             if (LavalinkProcess is null)
                 throw new InvalidOperationException("No Lavalink process was created!");
 
-            LavalinkProcess.Close();
+            if (CoreMisc.CheckIfLinuxOs())
+            {
+                int errorCode = sys_kill(LavalinkProcess.Id, 19);
+
+                LavalinkProcess.Dispose();
+
+                return errorCode is 0;
+            }
+
+            LavalinkProcess.Kill();
             await LavalinkProcess.WaitForExitAsync();
             LavalinkProcess.Dispose();
 
@@ -87,4 +99,9 @@ internal static class MusicStreamingLavalinkHandler
             throw;
         }
     }
+
+    [SuppressMessage("SYSLIB", "SYSLIB1054:Use LibraryImportAttribute instead of DllImportAttribute to generate p/invoke marshalling code at compile time.", Justification = "No use of unsafe code")]
+    [SuppressMessage("Security", "CA5392:Use DefaultDllImportSearchPaths attribute for P/Invokes.", Justification = "This is linux")]
+    [DllImport("libc", SetLastError = true, EntryPoint = "kill")]
+    private static extern int sys_kill(int pid, int sig);
 }
