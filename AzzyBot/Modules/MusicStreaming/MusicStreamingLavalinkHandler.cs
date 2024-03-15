@@ -35,9 +35,8 @@ internal static class MusicStreamingLavalinkHandler
 
             return javaString[0] is "17" or "21";
         }
-        catch
+        catch (Exception)
         {
-            return false;
             throw;
         }
     }
@@ -61,9 +60,8 @@ internal static class MusicStreamingLavalinkHandler
 
             return true;
         }
-        catch
+        catch (Exception)
         {
-            return false;
             throw;
         }
     }
@@ -85,9 +83,8 @@ internal static class MusicStreamingLavalinkHandler
 
             return true;
         }
-        catch
+        catch (Exception)
         {
-            return false;
             throw;
         }
     }
