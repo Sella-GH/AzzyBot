@@ -77,7 +77,7 @@ internal static class MusicStreamingLavalinkHandler
             if (LavalinkProcess is null)
                 throw new InvalidOperationException("No Lavalink process was created!");
 
-            LavalinkProcess.Kill();
+            LavalinkProcess.Close();
             await LavalinkProcess.WaitForExitAsync();
             LavalinkProcess.Dispose();
 
