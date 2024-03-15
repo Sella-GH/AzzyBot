@@ -15,7 +15,7 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
 {
     [SlashCommandGroup("player", "Player commands")]
     [SlashRequireGuild]
-    internal sealed class PlayerCommandGroup : ApplicationCommandModule
+    internal sealed partial class PlayerCommandGroup : ApplicationCommandModule
     {
         [SlashCommand("disconnect", "Disconnect the bot from your voice channel")]
         internal static async Task PlayerDisconnectCommandAsync(InteractionContext ctx)
@@ -84,12 +84,6 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
-            if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
-            {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AzuraCastEmbedBuilder.BuildServerIsOfflineEmbed(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl, false)));
-                return;
-            }
-
             if (await MusicStreamingLavalink.SetVolumeAsync(ctx, (float)volume, reset))
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Volume changed to {((reset) ? 100 : Math.Round(volume, 2))}%"));
         }
@@ -130,14 +124,30 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
+            if (await MusicStreamingLavalink.StopMusicAsync(ctx, disconnect))
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Track's stopping"));
+        }
+    }
+}
+
+internal sealed class MusicStreamingLyricsClass : ApplicationCommandModule
+{
+    internal sealed partial class PlayerCommandGroup : ApplicationCommandModule
+    {
+        [SlashCommand("show-lyrics", "Shows you the lyrics of the current played song")]
+        internal static async Task PlayerShowLyricsCommandAsync(InteractionContext ctx)
+        {
+            ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerShowLyricsCommandAsync requested");
+
+            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
+
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AzuraCastEmbedBuilder.BuildServerIsOfflineEmbed(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl, false)));
                 return;
             }
 
-            if (await MusicStreamingLavalink.StopMusicAsync(ctx, disconnect))
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Track's stopping"));
+
         }
     }
 }
