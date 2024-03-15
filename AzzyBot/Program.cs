@@ -135,7 +135,7 @@ internal static class Program
                 services.ConfigureInactivityTracking(config =>
                 {
                     config.DefaultTimeout = TimeSpan.FromMinutes(CoreModule.GetMusicStreamingInactivityTime());
-                    config.TrackingMode = InactivityTrackingMode.All;
+                    config.TrackingMode = InactivityTrackingMode.Any;
                 });
             }
 
