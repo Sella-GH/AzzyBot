@@ -18,8 +18,6 @@ internal static class MusicStreamingLavalinkHandler
             {
                 FileName = "java",
                 Arguments = "--version",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
