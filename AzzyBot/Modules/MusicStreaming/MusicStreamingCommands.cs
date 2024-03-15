@@ -24,7 +24,7 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
 
             DiscordMember member = ctx.Member;
 
-            if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(ctx.Member))
+            if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(member))
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("You have to be in a voice channel for this action!").AsEphemeral());
                 return;
@@ -38,7 +38,7 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
-            if (await LavalinkService.DisconnectAsync(ctx))
+            if (await MusicStreamingLavalink.DisconnectAsync(ctx))
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Bot disconnecting"));
         }
 
@@ -63,7 +63,7 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
-            if (await LavalinkService.JoinMusicAsync(ctx))
+            if (await MusicStreamingLavalink.JoinMusicAsync(ctx))
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Bot joining"));
         }
 
@@ -90,7 +90,7 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
                 return;
             }
 
-            if (await LavalinkService.SetVolumeAsync(ctx, (float)volume, reset))
+            if (await MusicStreamingLavalink.SetVolumeAsync(ctx, (float)volume, reset))
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Volume changed to {((reset) ? 100 : Math.Round(volume, 2))}%"));
         }
 
@@ -113,7 +113,7 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
                 return;
             }
 
-            if (await LavalinkService.PlayMusicAsync(ctx))
+            if (await MusicStreamingLavalink.PlayMusicAsync(ctx))
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Track's playing"));
         }
 
@@ -136,7 +136,7 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
                 return;
             }
 
-            if (await LavalinkService.StopMusicAsync(ctx, disconnect))
+            if (await MusicStreamingLavalink.StopMusicAsync(ctx, disconnect))
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Track's stopping"));
         }
     }

@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DSharpPlus;
 using DSharpPlus.Entities;
-using DSharpPlus.SlashCommands;
 
 namespace AzzyBot.Modules.Core;
 
@@ -50,9 +48,7 @@ internal static class CoreDiscordCommands
         foreach (DiscordMember channelMember in (IReadOnlyList<DiscordMember>)member.VoiceState.Channel.Users)
         {
             if (channelMember.Id == botId)
-            {
                 return true;
-            }
         }
 
         return false;

@@ -1,101 +1,118 @@
 ﻿using System;
-using System.Diagnostics;
-using System.IO;
+using System.Collections.Immutable;
+using System.Threading;
 using System.Threading.Tasks;
+using AzzyBot.Modules.AzuraCast.Enums;
+using AzzyBot.Modules.Core;
+using AzzyBot.Settings.AzuraCast;
 using AzzyBot.Settings.MusicStreaming;
+using DSharpPlus.Entities;
+using DSharpPlus.SlashCommands;
+using Lavalink4NET.Clients;
+using Lavalink4NET.Players;
+using Lavalink4NET.Players.Preconditions;
+using Lavalink4NET.Rest.Entities;
+using Lavalink4NET.Rest.Entities.Tracks;
+using Lavalink4NET.Tracks;
+using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Modules.MusicStreaming;
 
 internal static class MusicStreamingLavalink
 {
-    private static int? ProcessId;
-
-    internal static async Task<bool> CheckIfJavaIsInstalledAsync()
+    private static async ValueTask<LavalinkPlayer?> GetPlayerAsync(InteractionContext ctx, bool allowConnect = false, bool requireChannel = true, ImmutableArray<IPlayerPrecondition> preconditions = default, CancellationToken cancellationToken = default)
     {
-        try
-        {
-            ProcessStartInfo processStartInfo = new()
-            {
-                FileName = "java",
-                Arguments = "--version",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
+        cancellationToken.ThrowIfCancellationRequested();
 
-            using Process? process = Process.Start(processStartInfo);
+        PlayerRetrieveOptions retrieveOptions = new((allowConnect) ? PlayerChannelBehavior.Join : PlayerChannelBehavior.None, (requireChannel) ? MemberVoiceStateBehavior.RequireSame : MemberVoiceStateBehavior.Ignore, preconditions);
+        LavalinkPlayerOptions playerOptions = new() { SelfDeaf = true };
+        PlayerResult<LavalinkPlayer> result = await Program.GetAudioService.Players.RetrieveAsync(ctx.Guild.Id, ctx.Member?.VoiceState.Channel.Id, PlayerFactory.Default, Options.Create(playerOptions), retrieveOptions, cancellationToken);
 
-            if (process is null)
-                return false;
+        if (result.IsSuccess)
+            return result.Player;
 
-            string? output = await process.StandardOutput.ReadLineAsync();
-            if (string.IsNullOrWhiteSpace(output))
-                return false;
+        DiscordMember member = await ctx.Guild.GetMemberAsync(ctx.User.Id);
+        await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddEmbed(MusicStreamingEmbedBuilder.BuildPreconditionErrorEmbed(CoreDiscordCommands.GetBestUsername(member.Username, member.Nickname), member.AvatarUrl, result)).AsEphemeral());
 
-            string[] javaString = output.Split(' ')[1].Split('.');
-
-            return javaString[0] is "17" or "21";
-        }
-        catch
-        {
-            return false;
-            throw;
-        }
+        return null;
     }
 
-    internal static bool StartLavalink()
+    internal static async Task<bool> DisconnectAsync(InteractionContext ctx)
     {
-        try
-        {
-            ProcessStartInfo processStartInfo = new()
-            {
-                FileName = "java",
-                Arguments = $"-jar {Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files", "Lavalink.jar")}",
-                WorkingDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files"),
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true);
 
-            ProcessId = Process.Start(processStartInfo)?.Id ?? throw new InvalidOperationException("Could not start Lavalink process!");
-            if (ProcessId is null or 0)
-                throw new InvalidOperationException("Lavalink process is not loaded!");
-
-            return true;
-        }
-        catch
-        {
+        if (player is null)
             return false;
-            throw;
-        }
+
+        await player.DisconnectAsync();
+        await player.DisposeAsync();
+
+        return true;
     }
 
-    internal static async Task<bool> StopLavalinkAsync()
+    internal static async Task<bool> JoinMusicAsync(InteractionContext ctx)
     {
-        try
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying]);
+
+        return player is not null;
+    }
+
+    internal static async Task<bool> PlayMusicAsync(InteractionContext ctx)
+    {
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying]);
+
+        if (player is null)
+            return false;
+
+        TrackLoadOptions trackLoadOptions = new()
         {
-            if (ProcessId is null or 0)
-                throw new InvalidOperationException("Lavalink process is not loaded!");
+            SearchMode = TrackSearchMode.None,
+            SearchBehavior = StrictSearchBehavior.Passthrough,
+            CacheMode = CacheMode.Bypass
+        };
 
-            int processId = ProcessId.Value;
+        string url = string.Join("/", AzuraCastSettings.AzuraApiUrl.Replace("/api", string.Empty, StringComparison.OrdinalIgnoreCase), AzuraCastApiEnum.listen, MusicStreamingSettings.MountPointStub);
+        LavalinkTrack? track = await Program.GetAudioService.Tracks.LoadTrackAsync(url, trackLoadOptions);
 
-            Process process = Process.GetProcessById(processId);
-            process.Kill();
-            await process.WaitForExitAsync();
-            process.Dispose();
+        if (track is null)
+            return false;
 
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files", "logs");
-            if (MusicStreamingSettings.DeleteLavalinkLogs && Directory.Exists(path))
-                Directory.Delete(path);
+        await player.PlayAsync(track);
 
+        return true;
+    }
+
+    internal static async Task<bool> SetVolumeAsync(InteractionContext ctx, float volume, bool reset)
+    {
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true);
+
+        if (player is null)
+            return false;
+
+        if (reset)
+        {
+            await player.SetVolumeAsync(100 / 100f);
             return true;
         }
-        catch
-        {
+
+        await player.SetVolumeAsync(volume / 100f);
+
+        return true;
+    }
+
+    internal static async Task<bool> StopMusicAsync(InteractionContext ctx, bool disconnect)
+    {
+        IPlayerPrecondition precondition = PlayerPrecondition.Any(PlayerPrecondition.Playing, PlayerPrecondition.Paused);
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true, [precondition]);
+
+        if (player is null)
             return false;
-            throw;
-        }
+
+        await player.StopAsync();
+
+        if (disconnect)
+            await DisconnectAsync(ctx);
+
+        return true;
     }
 }
