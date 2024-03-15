@@ -18,6 +18,7 @@ internal static class MusicStreamingLavalinkHandler
             {
                 FileName = "java",
                 Arguments = "--version",
+                RedirectStandardOutput = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
@@ -50,8 +51,6 @@ internal static class MusicStreamingLavalinkHandler
                 FileName = "java",
                 Arguments = $"-jar {Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files", "Lavalink.jar")}",
                 WorkingDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files"),
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
