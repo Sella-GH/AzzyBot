@@ -57,10 +57,12 @@ The bot contains of the following features:
 ## Built With
 
 * [.NET 8](https://github.com/dotnet/runtime)
-* [Visual Studio 2022 Community](https://visualstudio.microsoft.com/de/downloads/)
+* [Visual Studio 2022 Community](https://visualstudio.microsoft.com/de/downloads)
 * [CsvHelper 31.0.2](https://github.com/JoshClose/CsvHelper)
 * [DSharpPlus 4.4.6](https://github.com/DSharpPlus/DSharpPlus)
 * [Roslynator 4.11](https://github.com/dotnet/roslynator)
+* [Lavalink](https://github.com/lavalink-devs/Lavalink)
+* [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
 
 ## Getting Started
 
