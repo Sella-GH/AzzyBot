@@ -1,5 +1,6 @@
 ﻿using System;
 using AzzyBot.Modules.Core;
+using AzzyBot.Strings.MusicStreaming;
 using DSharpPlus.Entities;
 using Lavalink4NET.Players;
 using Lavalink4NET.Players.Preconditions;
@@ -13,13 +14,13 @@ internal static class MusicStreamingEmbedBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
 
-        string title = "Lyrics";
-        string message = "Sorry, no lyrics found!";
+        string title = MusicStreamingStringBuilder.GetEmbedsLyricsTitle;
+        string message = MusicStreamingStringBuilder.GetEmbedsLyricsMessageNotFound;
 
         if (!string.IsNullOrWhiteSpace(text))
             message = text;
 
-        string footerText = $"**{song}** by **{artist}**";
+        string footerText = MusicStreamingStringBuilder.GetEmbedsLyricsFooter(song, artist);
 
         return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.SpringGreen, string.Empty, footerText);
     }
@@ -29,19 +30,18 @@ internal static class MusicStreamingEmbedBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
 
-        string title = "Error";
+        string title = MusicStreamingStringBuilder.GetEmbedsPreconditionTitle;
         string message = result.Status switch
         {
-            PlayerRetrieveStatus.UserNotInVoiceChannel => "You have to be in a voice channel for this action!",
-            PlayerRetrieveStatus.BotNotConnected => "The bot is currently not connected!",
-            PlayerRetrieveStatus.VoiceChannelMismatch => "You must be in the same voice channel as the bot!",
+            PlayerRetrieveStatus.UserNotInVoiceChannel => MusicStreamingStringBuilder.GetEmbedsPreconditionNotInVoice,
+            PlayerRetrieveStatus.BotNotConnected => MusicStreamingStringBuilder.GetEmbedsPreconditionBotNotInVoice,
+            PlayerRetrieveStatus.VoiceChannelMismatch => MusicStreamingStringBuilder.GetEmbedsPreconditionVoiceMismatch,
 
-            PlayerRetrieveStatus.PreconditionFailed when result.Precondition == PlayerPrecondition.Playing => "The player is currently not playing any track.",
-            PlayerRetrieveStatus.PreconditionFailed when result.Precondition == PlayerPrecondition.NotPlaying => "The player is currently playing any track.",
-            PlayerRetrieveStatus.PreconditionFailed when result.Precondition == PlayerPrecondition.NotPaused => "The player is not paused.",
-            PlayerRetrieveStatus.PreconditionFailed when result.Precondition == PlayerPrecondition.Paused => "The player is already paused.",
-            PlayerRetrieveStatus.PreconditionFailed when result.Precondition == PlayerPrecondition.QueueEmpty => "The queue is empty.",
-            _ => "An unknown error occurred"
+            PlayerRetrieveStatus.PreconditionFailed when result.Precondition == PlayerPrecondition.Playing => MusicStreamingStringBuilder.GetEmbedsPreconditionVoiceNotPlaying,
+            PlayerRetrieveStatus.PreconditionFailed when result.Precondition == PlayerPrecondition.NotPlaying => MusicStreamingStringBuilder.GetEmbedsPreconditionVoiceAlreadyPlaying,
+            PlayerRetrieveStatus.PreconditionFailed when result.Precondition == PlayerPrecondition.NotPaused => MusicStreamingStringBuilder.GetEmbedsPreconditionVoiceNotPaused,
+            PlayerRetrieveStatus.PreconditionFailed when result.Precondition == PlayerPrecondition.Paused => MusicStreamingStringBuilder.GetEmbedsPreconditionVoiceAlreadyPaused,
+            _ => MusicStreamingStringBuilder.GetEmbedsPreconditionError
         };
 
         return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl);

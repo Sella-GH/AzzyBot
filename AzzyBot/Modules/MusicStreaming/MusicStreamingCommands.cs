@@ -4,6 +4,7 @@ using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.Core;
 using AzzyBot.Settings.MusicStreaming;
+using AzzyBot.Strings.MusicStreaming;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
@@ -27,20 +28,20 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
 
             if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(member))
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("You have to be in a voice channel for this action!").AsEphemeral());
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MusicStreamingStringBuilder.GetCommandsDisconnectVoiceRequired).AsEphemeral());
                 return;
             }
 
             if (!CoreDiscordCommands.CheckIfBotIsInVoiceChannel(member, ctx.Client.CurrentUser.Id))
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Bot is already disconnected").AsEphemeral());
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MusicStreamingStringBuilder.GetCommandsDisconnectVoiceBotIsDisc).AsEphemeral());
                 return;
             }
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
             if (await MusicStreamingLavalink.DisconnectAsync(ctx))
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Bot disconnecting"));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(MusicStreamingStringBuilder.GetCommandsDisconnectVoiceSuccess));
         }
 
         [SlashCommand("join", "Joins the bot into your voice channel")]
@@ -52,41 +53,41 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
 
             if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(member))
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("You have to be in a voice channel for this action!").AsEphemeral());
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MusicStreamingStringBuilder.GetCommandsJoinVoiceRequired).AsEphemeral());
                 return;
             }
 
             if (CoreDiscordCommands.CheckIfBotIsInVoiceChannel(member, ctx.Client.CurrentUser.Id))
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Bot is already joined").AsEphemeral());
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MusicStreamingStringBuilder.GetCommandsJoinVoiceBotIsThere).AsEphemeral());
                 return;
             }
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
             if (await MusicStreamingLavalink.JoinMusicAsync(ctx))
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Bot joining"));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(MusicStreamingStringBuilder.GetCommandsJoinVoiceSuccess));
         }
 
         [SlashCommand("set-volume", "Changes the volume of the player")]
-        internal static async Task PlayerSetVolumeCommandAsync(InteractionContext ctx, [Option("volume", "The new volume between 1 and 100")] double volume, [Option("reset", "Resets the volume to 100%")] bool reset = false)
+        internal static async Task PlayerSetVolumeCommandAsync(InteractionContext ctx, [Option("volume", "The new volume value between 0 and 100")] double volume, [Option("reset", "Resets the volume to 100%")] bool reset = false)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(volume, nameof(volume));
             ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerSetVolumeCommandAsync requested");
 
             if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(ctx.Member))
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("You have to be in a voice channel for this action!").AsEphemeral());
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MusicStreamingStringBuilder.GetCommandsSetVolumeVoiceRequired).AsEphemeral());
                 return;
             }
 
             if (volume is > 100 or < 0)
-                await ctx.CreateResponseAsync("Volume must be between 0 and 1000", true);
+                await ctx.CreateResponseAsync(MusicStreamingStringBuilder.GetCommandsSetVolumeVoiceInvalid, true);
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
             if (await MusicStreamingLavalink.SetVolumeAsync(ctx, (float)volume, reset))
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Volume changed to {((reset) ? 100 : Math.Round(volume, 2))}%"));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(MusicStreamingStringBuilder.GetCommandsSetVolumeVoiceSuccess((reset) ? 100 : Math.Round(volume, 2))));
         }
 
         [SlashCommand("show-lyrics", "Shows you the lyrics of the current played song")]
@@ -96,7 +97,7 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
 
             if (!MusicStreamingSettings.ActivateLyrics)
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Please enable the setting 'ActivateLyrics' to use this command!").AsEphemeral());
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MusicStreamingStringBuilder.GetCommandsShowLyricsModuleRequired).AsEphemeral());
                 return;
             }
 
@@ -118,7 +119,7 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
 
             if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(ctx.Member))
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("You have to be in a voice channel for this action!").AsEphemeral());
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MusicStreamingStringBuilder.GetCommandsStartVoiceRequired).AsEphemeral());
                 return;
             }
 
@@ -131,7 +132,7 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
             }
 
             if (await MusicStreamingLavalink.PlayMusicAsync(ctx))
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Track's playing"));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(MusicStreamingStringBuilder.GetCommandsStartVoiceMusicPlaying));
         }
 
         [SlashCommand("stop", "Stops the music stream from playing")]
@@ -141,14 +142,14 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
 
             if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(ctx.Member))
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("You have to be in a voice channel for this action!").AsEphemeral());
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MusicStreamingStringBuilder.GetCommandsStopVoiceRequired).AsEphemeral());
                 return;
             }
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
             if (await MusicStreamingLavalink.StopMusicAsync(ctx, disconnect))
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Track's stopping"));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(MusicStreamingStringBuilder.GetCommandsStopVoiceMusicPlaying));
         }
     }
 }

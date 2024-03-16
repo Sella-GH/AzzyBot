@@ -7,6 +7,7 @@ internal enum CoreFileDirectoriesEnum
     Core,
     Customization,
     Modules,
+    MusicStreaming,
     Files,
     None
 }
