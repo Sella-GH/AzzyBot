@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.Core;
+using AzzyBot.Settings.MusicStreaming;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
@@ -88,6 +89,28 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent($"Volume changed to {((reset) ? 100 : Math.Round(volume, 2))}%"));
         }
 
+        [SlashCommand("show-lyrics", "Shows you the lyrics of the current played song")]
+        internal static async Task PlayerShowLyricsCommandAsync(InteractionContext ctx)
+        {
+            ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerShowLyricsCommandAsync requested");
+
+            if (!MusicStreamingSettings.ActivateLyrics)
+            {
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent("Please enable the setting 'ActivateLyrics' to use this command!").AsEphemeral());
+                return;
+            }
+
+            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
+
+            if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
+            {
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AzuraCastEmbedBuilder.BuildServerIsOfflineEmbed(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl, false)));
+                return;
+            }
+
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(await MusicStreamingLavalink.GetSongLyricsAsync(ctx)));
+        }
+
         [SlashCommand("start", "Starts the music stream into your voice channel")]
         internal static async Task PlayerStartCommandAsync(InteractionContext ctx)
         {
@@ -126,28 +149,6 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
 
             if (await MusicStreamingLavalink.StopMusicAsync(ctx, disconnect))
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent("Track's stopping"));
-        }
-    }
-}
-
-internal sealed class MusicStreamingLyricsClass : ApplicationCommandModule
-{
-    internal sealed partial class PlayerCommandGroup : ApplicationCommandModule
-    {
-        [SlashCommand("show-lyrics", "Shows you the lyrics of the current played song")]
-        internal static async Task PlayerShowLyricsCommandAsync(InteractionContext ctx)
-        {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerShowLyricsCommandAsync requested");
-
-            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
-
-            if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
-            {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AzuraCastEmbedBuilder.BuildServerIsOfflineEmbed(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl, false)));
-                return;
-            }
-
-
         }
     }
 }

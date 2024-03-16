@@ -2,13 +2,17 @@
 using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
+using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.AzuraCast.Enums;
+using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.Core;
 using AzzyBot.Settings.AzuraCast;
 using AzzyBot.Settings.MusicStreaming;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using Lavalink4NET.Clients;
+using Lavalink4NET.Integrations.LyricsJava;
+using Lavalink4NET.Integrations.LyricsJava.Extensions;
 using Lavalink4NET.Players;
 using Lavalink4NET.Players.Preconditions;
 using Lavalink4NET.Rest.Entities;
@@ -39,10 +43,7 @@ internal static class MusicStreamingLavalink
 
     internal static async Task<bool> DisconnectAsync(InteractionContext ctx)
     {
-        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true);
-
-        if (player is null)
-            return false;
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true) ?? throw new InvalidOperationException("Player is null");
 
         await player.DisconnectAsync();
         await player.DisposeAsync();
@@ -59,10 +60,7 @@ internal static class MusicStreamingLavalink
 
     internal static async Task<bool> PlayMusicAsync(InteractionContext ctx)
     {
-        LavalinkPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying]);
-
-        if (player is null)
-            return false;
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying]) ?? throw new InvalidOperationException("Player is null");
 
         TrackLoadOptions trackLoadOptions = new()
         {
@@ -84,10 +82,7 @@ internal static class MusicStreamingLavalink
 
     internal static async Task<bool> SetVolumeAsync(InteractionContext ctx, float volume, bool reset)
     {
-        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true);
-
-        if (player is null)
-            return false;
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true) ?? throw new InvalidOperationException("Player is null");
 
         if (reset)
         {
@@ -103,10 +98,7 @@ internal static class MusicStreamingLavalink
     internal static async Task<bool> StopMusicAsync(InteractionContext ctx, bool disconnect)
     {
         IPlayerPrecondition precondition = PlayerPrecondition.Any(PlayerPrecondition.Playing, PlayerPrecondition.Paused);
-        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true, [precondition]);
-
-        if (player is null)
-            return false;
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true, [precondition]) ?? throw new InvalidOperationException("Player is null");
 
         await player.StopAsync();
 
@@ -114,5 +106,45 @@ internal static class MusicStreamingLavalink
             await DisconnectAsync(ctx);
 
         return true;
+    }
+
+    internal static async Task<DiscordEmbed> GetSongLyricsAsync(InteractionContext ctx)
+    {
+        NowPlayingData nowPlaying = await AzuraCastServer.GetNowPlayingAsync();
+
+        string lyrics = await GetLyricsFromGeniusAsync($"{nowPlaying.Now_Playing.Song.Artist} - {nowPlaying.Now_Playing.Song.Title}");
+
+        if (string.IsNullOrWhiteSpace(lyrics))
+            lyrics = await GetLyricsFromYouTubeAsync($"{nowPlaying.Now_Playing.Song.Artist} - {nowPlaying.Now_Playing.Song.Title}");
+
+        DiscordMember member = await ctx.Guild.GetMemberAsync(ctx.User.Id);
+        return MusicStreamingEmbedBuilder.BuildLyricsEmbed(CoreDiscordCommands.GetBestUsername(member.Username, member.Nickname), member.AvatarUrl, lyrics);
+    }
+
+    private static async Task<string> GetLyricsFromGeniusAsync(string search)
+    {
+        Lyrics? lyrics = await Program.GetAudioService.Tracks.GetGeniusLyricsAsync(search);
+
+        if (lyrics is not null)
+            return lyrics.Text;
+
+        return string.Empty;
+    }
+
+    private static async Task<string> GetLyricsFromYouTubeAsync(string search)
+    {
+        ImmutableArray<LyricsSearchResult> results = await Program.GetAudioService.Tracks.SearchLyricsAsync(search);
+
+        if (!results.IsDefaultOrEmpty)
+        {
+            string videoId = results[0].VideoId;
+
+            Lyrics? lyrics = await Program.GetAudioService.Tracks.GetYouTubeLyricsAsync(videoId);
+
+            if (lyrics is not null)
+                return lyrics.Text;
+        }
+
+        return string.Empty;
     }
 }
