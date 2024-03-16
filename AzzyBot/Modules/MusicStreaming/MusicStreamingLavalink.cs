@@ -112,13 +112,15 @@ internal static class MusicStreamingLavalink
     {
         NowPlayingData nowPlaying = await AzuraCastServer.GetNowPlayingAsync();
 
-        string lyrics = await GetLyricsFromGeniusAsync($"{nowPlaying.Now_Playing.Song.Artist} - {nowPlaying.Now_Playing.Song.Title}");
+        string searchTerm = $"{nowPlaying.Now_Playing.Song.Artist} - {nowPlaying.Now_Playing.Song.Title}";
+
+        string lyrics = await GetLyricsFromGeniusAsync(searchTerm);
 
         if (string.IsNullOrWhiteSpace(lyrics))
-            lyrics = await GetLyricsFromYouTubeAsync($"{nowPlaying.Now_Playing.Song.Artist} - {nowPlaying.Now_Playing.Song.Title}");
+            lyrics = await GetLyricsFromYouTubeAsync(searchTerm);
 
         DiscordMember member = await ctx.Guild.GetMemberAsync(ctx.User.Id);
-        return MusicStreamingEmbedBuilder.BuildLyricsEmbed(CoreDiscordCommands.GetBestUsername(member.Username, member.Nickname), member.AvatarUrl, lyrics);
+        return MusicStreamingEmbedBuilder.BuildLyricsEmbed(CoreDiscordCommands.GetBestUsername(member.Username, member.Nickname), member.AvatarUrl, lyrics, nowPlaying.Now_Playing.Song.Artist, nowPlaying.Now_Playing.Song.Title);
     }
 
     private static async Task<string> GetLyricsFromGeniusAsync(string search)

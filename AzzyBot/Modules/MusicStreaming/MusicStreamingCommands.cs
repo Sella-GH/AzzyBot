@@ -16,7 +16,7 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
 {
     [SlashCommandGroup("player", "Player commands")]
     [SlashRequireGuild]
-    internal sealed partial class PlayerCommandGroup : ApplicationCommandModule
+    internal sealed class PlayerCommandGroup : ApplicationCommandModule
     {
         [SlashCommand("disconnect", "Disconnect the bot from your voice channel")]
         internal static async Task PlayerDisconnectCommandAsync(InteractionContext ctx)
