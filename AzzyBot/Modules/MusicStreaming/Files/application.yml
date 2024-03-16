@@ -7,7 +7,8 @@ plugins:
 #  name: # Name of the plugin
 #    some_key: some_value # Some key-value pair for the plugin
 #    another_key: another_value
-    countryCode: en #country code for resolving isrc tracks
+  lyrics:
+    countryCode: de #country code for resolving isrc tracks
     geniusApiKey: "Your Genius Client Access Token" # leave this out to disable genius searching. Get your api key (Client Access Token) from https://genius.com/api-clients
 lavalink:
   plugins:

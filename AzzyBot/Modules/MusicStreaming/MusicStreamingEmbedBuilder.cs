@@ -16,7 +16,7 @@ internal static class MusicStreamingEmbedBuilder
         string title = "Lyrics";
         string message = "Sorry, no lyrics found!";
 
-        if (string.IsNullOrWhiteSpace(text))
+        if (!string.IsNullOrWhiteSpace(text))
             message = text;
 
         return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl);
