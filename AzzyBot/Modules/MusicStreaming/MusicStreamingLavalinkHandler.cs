@@ -45,10 +45,26 @@ internal static class MusicStreamingLavalinkHandler
         }
     }
 
+    private static bool CheckIfLavalinkIsThere()
+    {
+        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files");
+
+        bool directoryExists = Directory.Exists(path);
+        bool lavalinkJarExists = File.Exists(Path.Combine(path, "Lavalink.jar"));
+        bool applicationYmlExists = File.Exists(Path.Combine(path, "application.yml"));
+        bool pluginsDirectoryExists = Directory.Exists(Path.Combine(path, "plugins"));
+        bool lyricsPluginExists = File.Exists(Path.Combine(path, "plugins", "java-lyrics-plugin-1.6.2.jar"));
+
+        return directoryExists && lavalinkJarExists && applicationYmlExists && pluginsDirectoryExists && lyricsPluginExists;
+    }
+
     internal static bool StartLavalink()
     {
         try
         {
+            if (!CheckIfLavalinkIsThere())
+                return false;
+
             ProcessStartInfo processStartInfo = new()
             {
                 FileName = "java",
