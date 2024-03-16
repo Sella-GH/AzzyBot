@@ -29,6 +29,7 @@ internal abstract class BaseModule
         GetClubClosedTime,
         GetMusicStreamingInactivity,
         GetMusicStreamingInactivityTime,
+        GetMusicStreamingLyrics,
         GlobalTimerTick,
         LavalinkPassword
     }

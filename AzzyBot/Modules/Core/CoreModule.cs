@@ -94,4 +94,11 @@ internal sealed class CoreModule : BaseModule
         BroadcastModuleEvent(evt);
         return evt.ResultInt;
     }
+
+    internal static bool GetMusicStreamingLyrics()
+    {
+        ModuleEvent evt = new(ModuleEventType.GetMusicStreamingLyrics);
+        BroadcastModuleEvent(evt);
+        return evt.ResultBool;
+    }
 }

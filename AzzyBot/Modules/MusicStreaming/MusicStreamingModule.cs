@@ -23,6 +23,10 @@ internal sealed class MusicStreamingModule : BaseModule
             case ModuleEventType.GetMusicStreamingInactivityTime:
                 evt.ResultInt = MusicStreamingSettings.AutoDisconnectTime;
                 break;
+
+            case ModuleEventType.GetMusicStreamingLyrics:
+                evt.ResultBool = MusicStreamingSettings.ActivateLyrics;
+                break;
         }
     }
 

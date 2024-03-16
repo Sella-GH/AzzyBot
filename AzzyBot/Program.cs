@@ -20,6 +20,7 @@ using Lavalink4NET;
 using Lavalink4NET.Extensions;
 using Lavalink4NET.InactivityTracking;
 using Lavalink4NET.InactivityTracking.Extensions;
+using Lavalink4NET.Integrations.LyricsJava.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -111,7 +112,10 @@ internal static class Program
 
         #region Initialize Processes
 
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Starting all processes");
         BaseModule.StartAllProcesses();
+        await Task.Delay(3000);
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Started all processes");
 
         #endregion Initialize Processes
 
@@ -137,6 +141,8 @@ internal static class Program
                     config.DefaultTimeout = TimeSpan.FromMinutes(CoreModule.GetMusicStreamingInactivityTime());
                     config.TrackingMode = InactivityTrackingMode.Any;
                 });
+
+                ExceptionHandler.LogMessage(LogLevel.Debug, "Applied inactivity tracking to Lavalink4NET");
             }
 
             IServiceProvider serviceProvider = services.BuildServiceProvider();
@@ -147,6 +153,12 @@ internal static class Program
             }
 
             AudioService = serviceProvider.GetRequiredService<IAudioService>();
+
+            if (CoreModule.GetMusicStreamingLyrics())
+            {
+                AudioService.UseLyricsJava();
+                ExceptionHandler.LogMessage(LogLevel.Debug, "Applied Lyrics.Java to Lavalink4NET");
+            }
 
             ExceptionHandler.LogMessage(LogLevel.Debug, "Lavalink4NET loaded");
         }
