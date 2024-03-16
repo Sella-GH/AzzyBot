@@ -8,7 +8,7 @@ namespace AzzyBot.Modules.MusicStreaming;
 
 internal static class MusicStreamingEmbedBuilder
 {
-    internal static DiscordEmbed BuildLyricsEmbed(string userName, string userAvatarUrl, string text)
+    internal static DiscordEmbed BuildLyricsEmbed(string userName, string userAvatarUrl, string text, string artist, string song)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
@@ -19,7 +19,9 @@ internal static class MusicStreamingEmbedBuilder
         if (!string.IsNullOrWhiteSpace(text))
             message = text;
 
-        return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl);
+        string footerText = $"**{song}** by **{artist}**";
+
+        return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.SpringGreen, string.Empty, footerText);
     }
 
     internal static DiscordEmbed BuildPreconditionErrorEmbed(string userName, string userAvatarUrl, in PlayerResult<LavalinkPlayer> result)
