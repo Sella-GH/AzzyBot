@@ -31,6 +31,7 @@ internal static class Program
 {
     private static DiscordClient? DiscordClient;
     private static IAudioService? AudioService;
+    private static IServiceCollection? ServiceCollection;
 
     internal static ILogger<BaseDiscordClient> GetDiscordClientLogger => DiscordClient?.Logger ?? throw new InvalidOperationException("DiscordClient is null");
     internal static string GetDiscordClientAvatarUrl => DiscordClient?.CurrentUser.AvatarUrl ?? throw new InvalidOperationException("DiscordClient is null");
@@ -123,7 +124,7 @@ internal static class Program
 
         if (ModuleStates.MusicStreaming)
         {
-            IServiceCollection services = new ServiceCollection().AddLavalink().AddSingleton(DiscordClient).ConfigureLavalink(config =>
+            ServiceCollection = new ServiceCollection().AddLavalink().AddSingleton(DiscordClient).ConfigureLavalink(config =>
             {
                 config.ReadyTimeout = TimeSpan.FromSeconds(15);
                 config.ResumptionOptions = new(TimeSpan.Zero);
@@ -131,12 +132,12 @@ internal static class Program
                 config.Passphrase = CoreModule.GetLavalinkPassword();
             });
 
-            services.AddLogging(x => x.AddConsole().SetMinimumLevel((LogLevel)Enum.ToObject(typeof(LogLevel), CoreSettings.LogLevel)));
+            ServiceCollection.AddLogging(x => x.AddConsole().SetMinimumLevel((LogLevel)Enum.ToObject(typeof(LogLevel), CoreSettings.LogLevel)));
 
             if (CoreModule.GetMusicStreamingInactivity())
             {
-                services.AddInactivityTracking();
-                services.ConfigureInactivityTracking(config =>
+                ServiceCollection.AddInactivityTracking();
+                ServiceCollection.ConfigureInactivityTracking(config =>
                 {
                     config.DefaultTimeout = TimeSpan.FromMinutes(CoreModule.GetMusicStreamingInactivityTime());
                     config.TrackingMode = InactivityTrackingMode.Any;
@@ -145,7 +146,7 @@ internal static class Program
                 ExceptionHandler.LogMessage(LogLevel.Debug, "Applied inactivity tracking to Lavalink4NET");
             }
 
-            IServiceProvider serviceProvider = services.BuildServiceProvider();
+            IServiceProvider serviceProvider = ServiceCollection.BuildServiceProvider();
 
             foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
             {
@@ -169,6 +170,16 @@ internal static class Program
 
         async Task BotShutdown()
         {
+            if (ModuleStates.MusicStreaming)
+            {
+                IServiceProvider serviceProvider = ServiceCollection?.BuildServiceProvider() ?? throw new InvalidOperationException("No services started!");
+
+                foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
+                {
+                    await hostedService.StopAsync(new CancellationToken());
+                }
+            }
+
             BaseModule.StopAllTimers();
             ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all timers");
 
