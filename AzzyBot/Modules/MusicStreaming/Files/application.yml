@@ -91,7 +91,9 @@ logging:
 
   level:
     root: INFO
-    lavalink: INFO
+    lavalink: TRACE
+    koe: TRACE
+    lavaplayer: TRACE
 
   request:
     enabled: true
