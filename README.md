@@ -3,7 +3,7 @@
   <h3 align="center">AzzyBot</h3>
 
   <p align="center">
-    <img src="https://github.com/Sella-GH/AzzyBot/blob/feat/VoiceChannelStreaming/Assets/Azzy_Logo.png" height="512" width="512" />
+    <img src="https://github.com/Sella-GH/AzzyBot/blob/main/Assets/Azzy_Logo.png" height="512" width="512" />
   </p>
   
   <p align="center">
