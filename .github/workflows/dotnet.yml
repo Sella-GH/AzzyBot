@@ -7,6 +7,10 @@ on:
   push:
     paths:
       - "**.cs"
+      - "**.csproj"
+      - "**.json"
+      - "**.props"
+      - "**.sln"
       - ".github/workflows/dotnet.yml"
   workflow_dispatch:
 
