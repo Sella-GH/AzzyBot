@@ -110,4 +110,4 @@ Distributed under the AGPL-3.0 License. See [LICENSE](https://github.com/Sella-G
 
 ## Acknowledgements
 
-* [CurtWoodman](https://github.com/CurtWoodman)
+* CurtWoodman
