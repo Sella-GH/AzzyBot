@@ -41,7 +41,7 @@ internal sealed class CoreModule : BaseModule
         switch (evt.Type)
         {
             case ModuleEventType.GlobalTimerTick:
-                if (BotInfo.GetBotEnvironment == "Development")
+                if (CoreAzzyStatsGeneral.GetBotEnvironment == "Development")
                     break;
 
                 DateTime now = DateTime.Now;

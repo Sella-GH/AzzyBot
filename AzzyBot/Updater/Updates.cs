@@ -22,8 +22,7 @@ internal static class Updates
         UpdaterMisc.CheckIfDirIsPresent();
 
         string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Updater");
-        string updater = (BotInfo.GetBotEnvironment == "Development") ? "Updater-Dev" : "Updater";
-        string filePath = Path.Combine(basePath, updater);
+        string filePath = Path.Combine(basePath, "Updater");
         string versionPath = Path.Combine(basePath, "version.txt");
         string version = string.Empty;
 
@@ -101,9 +100,8 @@ internal static class Updates
     {
         UpdaterMisc.CheckIfDirIsPresent();
 
-        string updater = (BotInfo.GetBotEnvironment == "Development") ? "Updater-Dev.dll" : "Updater.dll";
         string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Updater");
-        string filePath = Path.Combine(basePath, updater);
+        string filePath = Path.Combine(basePath, "Updater.dll");
         string settingsPath = Path.Combine(basePath, "appsettings.json");
         string text;
 

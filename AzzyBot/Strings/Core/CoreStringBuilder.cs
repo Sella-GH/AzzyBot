@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
@@ -53,33 +54,45 @@ internal sealed class CoreStringBuilder : StringBuilding
     internal static string GetEmbedAzzyStatsCpuUsageCore(int counter, double value) => BuildString(BuildString(Model.EmbedAzzyStatsCpuUsageCore, "%COUNTER%", counter), "%VALUE%", value);
     internal static string GetEmbedAzzyStatsDiskUsageDesc(double used, double total) => BuildString(BuildString(Model.EmbedAzzyStatsDiskUsageDesc, "%USED%", used), "%TOTAL%", total);
 
-    [SuppressMessage("Roslynator", "RCS1250:Use implicit/explicit object creation", Justification = "Collection Expression are not yet available for Dictionaries.")]
     internal static Dictionary<string, DiscordEmbedStruct> GetEmbedAzzyStatsFields(long uptime, int ping, string coreUsage, double oneMinLoad, double fiveMinLoad, double fifteenMinLoad, double memUsage, double azzyMem, double memTotal, string diskUsage)
     {
-        return new Dictionary<string, DiscordEmbedStruct>()
-        {
-            [Model.EmbedAzzyStatsSystemUptimeTitle] = new(Model.EmbedAzzyStatsSystemUptimeTitle, BuildString(Model.EmbedAzzyStatsSystemUptimeDesc, "%VALUE%", $"<t:{uptime}>"), false),
-            [Model.EmbedAzzyStatsPingTitle] = new(Model.EmbedAzzyStatsPingTitle, BuildString(Model.EmbedAzzyStatsPingDesc, "%VALUE%", ping), false),
-            [Model.EmbedAzzyStatsCpuUsageTitle] = new(Model.EmbedAzzyStatsCpuUsageTitle, coreUsage, false),
-            [Model.EmbedAzzyStats1MinLoadTitle] = new(Model.EmbedAzzyStats1MinLoadTitle, BuildString(Model.EmbedAzzyStats1MinLoadDesc, "%VALUE%", oneMinLoad), true),
-            [Model.EmbedAzzyStats5MinLoadTitle] = new(Model.EmbedAzzyStats5MinLoadTitle, BuildString(Model.EmbedAzzyStats5MinLoadDesc, "%VALUE%", fiveMinLoad), true),
-            [Model.EmbedAzzyStats15MinLoadTitle] = new(Model.EmbedAzzyStats15MinLoadTitle, BuildString(Model.EmbedAzzyStats15MinLoadDesc, "%VALUE%", fifteenMinLoad), true),
-            [Model.EmbedAzzyStatsRamUsageTitle] = new(Model.EmbedAzzyStatsRamUsageTitle, BuildString(BuildString(BuildString(Model.EmbedAzzyStatsRamUsageDesc, "%USED%", memUsage), "%BOT%", azzyMem), "%TOTAL%", memTotal), false),
-            [Model.EmbedAzzyStatsDiskUsageTitle] = new(Model.EmbedAzzyStatsDiskUsageTitle, diskUsage, false)
-        };
+        Dictionary<string, DiscordEmbedStruct> fields = [];
+
+        if (uptime is not 0)
+            fields.Add(Model.EmbedAzzyStatsSystemUptimeTitle, new(Model.EmbedAzzyStatsSystemUptimeTitle, BuildString(Model.EmbedAzzyStatsSystemUptimeDesc, "%VALUE%", $"<t:{uptime}>"), false));
+
+        if (ping is not 0)
+            fields.Add(Model.EmbedAzzyStatsPingTitle, new(Model.EmbedAzzyStatsPingTitle, BuildString(Model.EmbedAzzyStatsPingDesc, "%VALUE%", ping), false));
+
+        if (!string.IsNullOrWhiteSpace(coreUsage))
+            fields.Add(Model.EmbedAzzyStatsCpuUsageTitle, new(Model.EmbedAzzyStatsCpuUsageTitle, coreUsage, false));
+
+        if (oneMinLoad is not 0)
+            fields.Add(Model.EmbedAzzyStats1MinLoadTitle, new(Model.EmbedAzzyStats1MinLoadTitle, BuildString(Model.EmbedAzzyStats1MinLoadDesc, "%VALUE%", oneMinLoad), true));
+
+        if (fiveMinLoad is not 0)
+            fields.Add(Model.EmbedAzzyStats5MinLoadTitle, new(Model.EmbedAzzyStats5MinLoadTitle, BuildString(Model.EmbedAzzyStats5MinLoadDesc, "%VALUE%", fiveMinLoad), true));
+
+        if (fifteenMinLoad is not 0)
+            fields.Add(Model.EmbedAzzyStats15MinLoadTitle, new(Model.EmbedAzzyStats15MinLoadTitle, BuildString(Model.EmbedAzzyStats15MinLoadDesc, "%VALUE%", fifteenMinLoad), true));
+
+        if (memUsage is not 0 && memTotal is not 0)
+            fields.Add(Model.EmbedAzzyStatsRamUsageTitle, new(Model.EmbedAzzyStatsRamUsageTitle, BuildString(BuildString(Model.EmbedAzzyStatsRamUsageDesc, "%USED%", memUsage), "%TOTAL%", memTotal), false));
+
+        if (azzyMem is not 0)
+            fields.Add(Model.EmbedAzzyStatsRamUsageAzzyTitle, new(Model.EmbedAzzyStatsRamUsageAzzyTitle, BuildString(Model.EmbedAzzyStatsRamUsageAzzyDesc, "%BOT%", azzyMem), false));
+
+        if (!string.IsNullOrWhiteSpace(diskUsage))
+            fields.Add(Model.EmbedAzzyStatsDiskUsageTitle, new(Model.EmbedAzzyStatsDiskUsageTitle, diskUsage, false));
+
+        return fields;
     }
 
     internal static string GetEmbedAzzyStatsNetworkUsageTitle(string name) => BuildString(Model.EmbedAzzyStatsNetworkUsageTitle, "%NAME%", name);
     internal static string GetEmbedAzzyStatsNetworkUsageDesc(double receive, double transmit) => BuildString(BuildString(Model.EmbedAzzyStatsNetworkUsageDesc, "%RECEIVE%", receive), "%TRANSMIT%", transmit);
+    internal static string GetEmbedAzzyStatsMoreStats => Model.EmbedAzzyStatsMoreStats;
 
     #endregion BuildAzzyStatsEmbed
-
-    #region BuildAzzyStatsNotAvailableEmbed
-
-    internal static string GetEmbedAzzyStatsNotAvailableTitle => Model.EmbedAzzyStatsNotAvailableTitle;
-    internal static string GetEmbedAzzyStatsNotAvailableDesc => Model.EmbedAzzyStatsNotAvailableDesc;
-
-    #endregion BuildAzzyStatsNotAvailableEmbed
 
     #region BuildInfoAzzyEmbed
 

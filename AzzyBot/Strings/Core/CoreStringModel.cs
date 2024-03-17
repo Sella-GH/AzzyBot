@@ -36,19 +36,15 @@ internal sealed class CoreStringModel
     public string EmbedAzzyStats15MinLoadDesc { get; set; } = string.Empty;
     public string EmbedAzzyStatsRamUsageTitle { get; set; } = string.Empty;
     public string EmbedAzzyStatsRamUsageDesc { get; set; } = string.Empty;
+    public string EmbedAzzyStatsRamUsageAzzyTitle { get; set; } = string.Empty;
+    public string EmbedAzzyStatsRamUsageAzzyDesc { get; set; } = string.Empty;
     public string EmbedAzzyStatsDiskUsageTitle { get; set; } = string.Empty;
     public string EmbedAzzyStatsDiskUsageDesc { get; set; } = string.Empty;
     public string EmbedAzzyStatsNetworkUsageTitle { get; set; } = string.Empty;
     public string EmbedAzzyStatsNetworkUsageDesc { get; set; } = string.Empty;
+    public string EmbedAzzyStatsMoreStats { get; set; } = string.Empty;
 
     #endregion BuildAzzyStatsEmbed
-
-    #region BuildAzzyStatsNotAvailableEmbed
-
-    public string EmbedAzzyStatsNotAvailableTitle { get; set; } = string.Empty;
-    public string EmbedAzzyStatsNotAvailableDesc { get; set; } = string.Empty;
-
-    #endregion BuildAzzyStatsNotAvailableEmbed
 
     #region BuildInfoAzzyEmbed
 

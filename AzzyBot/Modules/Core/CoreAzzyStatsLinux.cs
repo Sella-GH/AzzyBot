@@ -1,22 +1,18 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.Core.Structs;
-using AzzyBot.Settings;
-using AzzyBot.Strings.Core;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.Core;
 
 /// <summary>
-/// Contains methods for getting the CPU usage of the server.
+/// Contains methods for getting stats of the server on linux OS.
 /// </summary>
-internal static class ServerCpuUsage
+internal static class CoreAzzyStatsLinux
 {
     /// <summary>
     /// Gets the CPU usage of each core on the server.
@@ -158,13 +154,7 @@ internal static class ServerCpuUsage
             throw;
         }
     }
-}
 
-/// <summary>
-/// Contains methods for getting the memory usage of the server.
-/// </summary>
-internal static class ServerMemoryUsage
-{
     /// <summary>
     /// Gets the total and used memory of the server.
     /// </summary>
@@ -223,70 +213,7 @@ internal static class ServerMemoryUsage
             throw;
         }
     }
-}
 
-/// <summary>
-/// Contains methods for getting the memory usage only of the bot itself.
-/// </summary>
-internal static class BotMemoryUsage
-{
-    /// <summary>
-    /// Gets the memory usage only of the bot itself.
-    /// </summary>
-    /// <returns>The memory usage of the bot in GB.</returns>
-    internal static double GetMemoryUsage()
-    {
-        Process? process = Process.GetCurrentProcess();
-        double usedMemoryGB = process.WorkingSet64 / (1024.0 * 1024.0 * 1024.0);
-
-        process.Dispose();
-
-        return Math.Round(usedMemoryGB, 2);
-    }
-}
-
-/// <summary>
-/// Contains methods for getting the disk usage of the server.
-/// </summary>
-internal static class ServerDiskUsage
-{
-    /// <summary>
-    /// Gets the disk usage of the server.
-    /// </summary>
-    /// <returns>A string representing the disk usage in GB.</returns>
-    internal static string GetDiskUsage()
-    {
-        try
-        {
-            string diskUsage = string.Empty;
-
-            foreach (DriveInfo drive in DriveInfo.GetDrives())
-            {
-                if (drive.IsReady && drive.Name == "/")
-                {
-                    double totalSizeGB = drive.TotalSize / (1024.0 * 1024.0 * 1024.0);
-                    double freeSpaceGB = drive.TotalFreeSpace / (1024.0 * 1024.0 * 1024.0);
-                    double usedSpaceGB = totalSizeGB - freeSpaceGB;
-
-                    return CoreStringBuilder.GetEmbedAzzyStatsDiskUsageDesc(Math.Round(usedSpaceGB, 2), Math.Round(totalSizeGB, 2));
-                }
-            }
-
-            return diskUsage;
-        }
-        catch (DriveNotFoundException)
-        {
-            ExceptionHandler.LogMessage(LogLevel.Error, "Main drive not found");
-            throw;
-        }
-    }
-}
-
-/// <summary>
-/// Contains methods for getting the network usage of the server.
-/// </summary>
-internal static class ServerNetworkUsage
-{
     /// <summary>
     /// Gets the network usage of the server.
     /// </summary>
@@ -358,13 +285,7 @@ internal static class ServerNetworkUsage
             throw;
         }
     }
-}
 
-/// <summary>
-/// Contains methods for getting information about the server.
-/// </summary>
-internal static class ServerInfo
-{
     /// <summary>
     /// Gets the system uptime of the server.
     /// </summary>
@@ -395,65 +316,4 @@ internal static class ServerInfo
             throw;
         }
     }
-}
-
-/// <summary>
-/// Contains methods for getting information about the bot.
-/// </summary>
-internal static class BotInfo
-{
-    private static DateTime StartTime = DateTime.MinValue;
-
-    /// <summary>
-    /// Sets the start time of the bot.
-    /// </summary>
-    internal static void SetStartTime()
-    {
-        if (StartTime == DateTime.MinValue)
-            StartTime = DateTime.Now;
-    }
-
-    internal static string GetActivatedModules()
-    {
-        string text = "- Core";
-
-        if (BaseSettings.ActivateAzuraCast)
-            text += "\n- AzuraCast";
-
-        if (BaseSettings.ActivateClubManagement)
-            text += "\n- ClubManagement";
-
-        return text;
-    }
-
-    internal static string GetBotName => Assembly.GetExecutingAssembly().GetName().Name ?? "Bot name not found";
-    internal static string GetBotUptime => (CoreMisc.CheckIfLinuxOs()) ? $"<t:{CoreMisc.ConvertToUnixTime(StartTime).ToString(CultureInfo.InvariantCulture)}>" : "This feature is not available on Windows";
-    internal static string GetBotEnvironment => (Program.GetDiscordClientId == 1169381408939192361) ? "Development" : "Production";
-    internal static string GetBotVersion => Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "Azzy version not found";
-
-    internal static async Task<string> GetBotCommitAsync()
-    {
-        if (CoreModule.CommitLock is null)
-            return "Commit not found";
-
-        string commit = await CoreModule.CommitLock.GetFileContentAsync();
-        if (string.IsNullOrWhiteSpace(commit))
-            commit = "Commit not found";
-
-        return commit;
-    }
-
-    internal static async Task<string> GetBotCompileDateAsync()
-    {
-        if (CoreModule.BuildTimeLock is null)
-            return "CompileDate not found";
-
-        if (!DateTime.TryParse(await CoreModule.BuildTimeLock.GetFileContentAsync(), out DateTime dateTime))
-            return "CompileDate not found";
-
-        return $"<t:{CoreMisc.ConvertToUnixTime(dateTime)}>";
-    }
-
-    internal static string GetDotNetVersion => Environment.Version.ToString() ?? ".NET version not found";
-    internal static string GetDSharpNetVersion => Program.GetDiscordClientVersion;
 }
