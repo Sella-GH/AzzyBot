@@ -112,9 +112,7 @@ internal static class MusicStreamingLavalink
     {
         NowPlayingData nowPlaying = await AzuraCastServer.GetNowPlayingAsync();
 
-        string searchTerm = $"{nowPlaying.Now_Playing.Song.Artist} - {nowPlaying.Now_Playing.Song.Title}";
-
-        Lyrics lyrics = await GetLyricsFromGeniusAsync(searchTerm);
+        Lyrics lyrics = await GetLyricsFromGeniusAsync(nowPlaying.Now_Playing.Song.Text);
 
         //if (string.IsNullOrWhiteSpace(lyrics.Text))
         //    lyrics = await GetLyricsFromYouTubeAsync(searchTerm);

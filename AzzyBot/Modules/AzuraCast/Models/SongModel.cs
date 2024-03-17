@@ -25,11 +25,14 @@ internal sealed class SongDetailed : SongSimple
 
 internal class SongSimple
 {
-    [JsonProperty("title")]
-    public string Title { get; set; } = string.Empty;
+    [JsonProperty("text")]
+    public string Text { get; set; } = string.Empty;
 
     [JsonProperty("artist")]
     public string Artist { get; set; } = string.Empty;
+
+    [JsonProperty("title")]
+    public string Title { get; set; } = string.Empty;
 
     [JsonProperty("album")]
     public string Album { get; set; } = string.Empty;
