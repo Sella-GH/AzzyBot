@@ -22,10 +22,9 @@ internal static class UpdaterMisc
 
     internal static void RestartBot()
     {
-        string updater = (BotInfo.GetBotEnvironment == "Development") ? "Updater-Dev" : "Updater";
         ProcessStartInfo startInfo = new()
         {
-            Arguments = $"-c \"{Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Updater", updater)} restart\"",
+            Arguments = $"-c \"{Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Updater", "Updater")} restart\"",
             FileName = "/bin/bash",
             CreateNoWindow = true,
             RedirectStandardOutput = true

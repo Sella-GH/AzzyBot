@@ -24,7 +24,7 @@ internal abstract class BaseSettings
 
     private static void SetDevConfig()
     {
-        if (BotInfo.GetBotName != "AzzyBot-Dev")
+        if (CoreAzzyStatsGeneral.GetBotName != "AzzyBot-Dev")
             return;
 
         builder.Sources.Clear();

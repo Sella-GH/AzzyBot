@@ -87,14 +87,14 @@ internal static class CoreEmbedBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
 
-        Dictionary<int, double> cpuUsage = await ServerCpuUsage.GetCpuUsageAsync();
-        long uptime = await ServerInfo.GetSystemUptimeAsync();
+        Dictionary<int, double> cpuUsage = await CoreAzzyStatsLinux.GetCpuUsageAsync();
+        long uptime = await CoreAzzyStatsLinux.GetSystemUptimeAsync();
         string coreUsage = string.Empty;
         string allCoreUsage = string.Empty;
-        MemoryUsageStruct memory = await ServerMemoryUsage.GetMemoryUsageAsync();
-        double processMem = BotMemoryUsage.GetMemoryUsage();
-        string diskUsage = ServerDiskUsage.GetDiskUsage();
-        Dictionary<string, NetworkSpeedStruct> networkUsage = await ServerNetworkUsage.GetNetworkUsageAsync();
+        MemoryUsageStruct memory = await CoreAzzyStatsLinux.GetMemoryUsageAsync();
+        double processMem = CoreAzzyStatsGeneral.GetBotMemoryUsage();
+        string diskUsage = CoreAzzyStatsGeneral.GetDiskUsage();
+        Dictionary<string, NetworkSpeedStruct> networkUsage = await CoreAzzyStatsLinux.GetNetworkUsageAsync();
 
         foreach (KeyValuePair<int, double> kvp in cpuUsage)
         {
@@ -114,7 +114,7 @@ internal static class CoreEmbedBuilder
         coreUsage += allCoreUsage;
 
         string title = CoreStringBuilder.GetEmbedAzzyStatsTitle;
-        CpuLoadStruct cpuLoad = await ServerCpuUsage.GetCpuLoadAsync();
+        CpuLoadStruct cpuLoad = await CoreAzzyStatsLinux.GetCpuLoadAsync();
         Dictionary<string, DiscordEmbedStruct> fields = CoreStringBuilder.GetEmbedAzzyStatsFields(uptime, ping, coreUsage, cpuLoad.OneMin, cpuLoad.FiveMin, cpuLoad.FifteenMin, memory.Used, processMem, memory.Total, diskUsage);
 
         foreach (KeyValuePair<string, NetworkSpeedStruct> kvp in networkUsage)
@@ -142,15 +142,15 @@ internal static class CoreEmbedBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
 
         string title = CoreStringBuilder.GetEmbedAzzyInfoTitle;
-        string botName = BotInfo.GetBotName;
-        string botUptime = BotInfo.GetBotUptime;
-        string botVersion = BotInfo.GetBotVersion;
-        string dotnetVersion = BotInfo.GetDotNetVersion;
-        string libVersion = BotInfo.GetDSharpNetVersion.Split('+')[0];
-        string commit = await BotInfo.GetBotCommitAsync();
-        string compilationDate = await BotInfo.GetBotCompileDateAsync();
-        string botEnvironment = BotInfo.GetBotEnvironment;
-        string activatedModules = BotInfo.GetActivatedModules();
+        string botName = CoreAzzyStatsGeneral.GetBotName;
+        string botUptime = CoreAzzyStatsGeneral.GetBotUptime;
+        string botVersion = CoreAzzyStatsGeneral.GetBotVersion;
+        string dotnetVersion = CoreAzzyStatsGeneral.GetDotNetVersion;
+        string libVersion = CoreAzzyStatsGeneral.GetDSharpNetVersion.Split('+')[0];
+        string commit = await CoreAzzyStatsGeneral.GetBotCommitAsync();
+        string compilationDate = await CoreAzzyStatsGeneral.GetBotCompileDateAsync();
+        string botEnvironment = CoreAzzyStatsGeneral.GetBotEnvironment;
+        string activatedModules = CoreAzzyStatsGeneral.GetActivatedModules();
 
         Dictionary<string, DiscordEmbedStruct> fields = new()
         {

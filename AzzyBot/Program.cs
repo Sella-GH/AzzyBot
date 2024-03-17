@@ -241,7 +241,7 @@ internal static class Program
 
         #region Initialize Strings
 
-        BotInfo.SetStartTime();
+        CoreAzzyStatsGeneral.SetStartTime();
         await StringBuilding.LoadStringsAsync();
 
         #endregion Initialize Strings
