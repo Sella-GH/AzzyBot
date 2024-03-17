@@ -61,17 +61,6 @@ internal static class CoreAzzyStatsGeneral
         }
     }
 
-    private static DateTime StartTime = DateTime.MinValue;
-
-    /// <summary>
-    /// Sets the start time of the bot.
-    /// </summary>
-    internal static void SetStartTime()
-    {
-        if (StartTime == DateTime.MinValue)
-            StartTime = DateTime.Now;
-    }
-
     internal static string GetActivatedModules()
     {
         string text = "- Core";
@@ -86,7 +75,14 @@ internal static class CoreAzzyStatsGeneral
     }
 
     internal static string GetBotName => Assembly.GetExecutingAssembly().GetName().Name ?? "Bot name not found";
-    internal static string GetBotUptime => (CoreMisc.CheckIfLinuxOs()) ? $"<t:{CoreMisc.ConvertToUnixTime(StartTime).ToString(CultureInfo.InvariantCulture)}>" : "This feature is not available on Windows";
+
+    internal static string GetBotUptime()
+    {
+        using Process azzy = Process.GetCurrentProcess();
+
+        return $"<t:{CoreMisc.ConvertToUnixTime(azzy.StartTime)}";
+    }
+
     internal static string GetBotEnvironment => (Program.GetDiscordClientId == 1169381408939192361) ? "Development" : "Production";
     internal static string GetBotVersion => Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "Azzy version not found";
 

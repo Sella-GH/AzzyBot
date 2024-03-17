@@ -143,7 +143,7 @@ internal static class CoreEmbedBuilder
 
         string title = CoreStringBuilder.GetEmbedAzzyInfoTitle;
         string botName = CoreAzzyStatsGeneral.GetBotName;
-        string botUptime = CoreAzzyStatsGeneral.GetBotUptime;
+        string botUptime = CoreAzzyStatsGeneral.GetBotUptime();
         string botVersion = CoreAzzyStatsGeneral.GetBotVersion;
         string dotnetVersion = CoreAzzyStatsGeneral.GetDotNetVersion;
         string libVersion = CoreAzzyStatsGeneral.GetDSharpNetVersion.Split('+')[0];
