@@ -15,7 +15,7 @@
     "CommandsStopVoiceMusicPlaying": "The stream stops right now!",
     "EmbedsLyricsTitle": "Lyrics",
     "EmbedsLyricsMessageNotFound": "No lyrics found for this song.",
-    "EmbedsLyricsFooter": "**%SONG%** by **%ARTIST%**",
+    "EmbedsLyricsFooter": "%SONG% by %ARTIST%",
     "EmbedsPreconditionTitle": "Error",
     "EmbedsPreconditionNotInVoice": "You have to be in a voice channel for this action!",
     "EmbedsPreconditionBotNotInVoice": "Azzy has to be in a voice channel for this action!",
