@@ -17,3 +17,7 @@
 ### Improvements
 - Code cleanup
 - CI Updates for better processability
+
+### Fixes
+- `core info azzy` and `core ping azzy` can now be used on windows too
+  - `core ping azzy` has way less information than on linux because of the insufficient rights of a regular user account
