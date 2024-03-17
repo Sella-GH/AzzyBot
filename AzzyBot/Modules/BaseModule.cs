@@ -2,10 +2,12 @@ using System;
 using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.ClubManagement;
 using AzzyBot.Modules.Core;
+using AzzyBot.Modules.MusicStreaming;
 using AzzyBot.Settings;
 using AzzyBot.Settings.AzuraCast;
 using AzzyBot.Settings.ClubManagement;
 using AzzyBot.Settings.Core;
+using AzzyBot.Settings.MusicStreaming;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 
@@ -25,27 +27,33 @@ internal abstract class BaseModule
         GetAzuraCastApiUrl,
         GetClubOpeningTime,
         GetClubClosedTime,
-        GlobalTimerTick
+        GetMusicStreamingInactivity,
+        GetMusicStreamingInactivityTime,
+        GetMusicStreamingLyrics,
+        GlobalTimerTick,
+        LavalinkPassword
     }
 
     protected sealed class ModuleEvent
     {
         internal ModuleEventType Type { get; }
-        internal bool ResultBool { get; set; }
-        internal TimeSpan ResultTimeSpan { get; set; }
         internal int ParameterInt { get; set; }
+        internal bool ResultBool { get; set; }
+        internal int ResultInt { get; set; }
         internal DiscordMember? ResultMember { get; set; }
         internal string ResultString { get; set; }
+        internal TimeSpan ResultTimeSpan { get; set; }
         internal string ResultReason { get; set; }
 
         internal ModuleEvent(ModuleEventType type)
         {
             Type = type;
-            ResultBool = false;
-            ResultTimeSpan = TimeSpan.Zero;
             ParameterInt = 0;
+            ResultBool = false;
+            ResultInt = 0;
             ResultMember = null;
             ResultString = string.Empty;
+            ResultTimeSpan = TimeSpan.Zero;
             ResultReason = string.Empty;
         }
     }
@@ -68,6 +76,9 @@ internal abstract class BaseModule
 
         if (ModuleStates.AzuraCast && BaseSettings.ActivateClubManagement && ClubManagementSettings.ClubManagementSettingsLoaded)
             RegisterModule(new ClubManagementModule());
+
+        if (ModuleStates.AzuraCast && BaseSettings.ActivateMusicStreaming && MusicStreamingSettings.MusicStreamingSettingsLoaded)
+            RegisterModule(new MusicStreamingModule());
     }
 
     private static void ForEachModuleDo(Action<BaseModule> action)
@@ -91,7 +102,9 @@ internal abstract class BaseModule
     internal static void RegisterAllFileLocks() => ForEachModuleDo(module => module.RegisterFileLocks());
     internal static void DisposeAllFileLocks() => ForEachModuleDo(module => module.DisposeFileLocks());
     internal static void StartAllGlobalTimers() => ForEachModuleDo(module => module.StartGlobalTimers());
+    internal static void StartAllProcesses() => ForEachModuleDo(module => module.StartProcesses());
     internal static void StopAllTimers() => ForEachModuleDo(module => module.StopTimers());
+    internal static void StopAllProcesses() => ForEachModuleDo(module => module.StopProcesses());
     protected static void BroadcastModuleEvent(ModuleEvent evt) => ForEachModuleDo(module => module.HandleModuleEvent(evt));
     internal abstract void Activate();
     internal abstract void RegisterCommands(SlashCommandsExtension slashCommandsExtension, ulong? serverId);
@@ -105,7 +118,13 @@ internal abstract class BaseModule
     internal virtual void StartGlobalTimers()
     { }
 
+    internal virtual void StartProcesses()
+    { }
+
     internal virtual void StopTimers()
+    { }
+
+    internal virtual void StopProcesses()
     { }
 
     protected virtual void HandleModuleEvent(ModuleEvent evt)

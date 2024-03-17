@@ -1,110 +1,124 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<RootNamespace>AzzyBot</RootNamespace>
-	<OutputType>Exe</OutputType>
-	<TargetFramework>net8.0</TargetFramework>
-	<ImplicitUsings>disable</ImplicitUsings>
-	<Nullable>enable</Nullable>
-	<IsPublishable>True</IsPublishable>
-	<Platforms>x64;ARM64</Platforms>
+  <RootNamespace>AzzyBot</RootNamespace>
+  <OutputType>Exe</OutputType>
+  <TargetFramework>net8.0</TargetFramework>
+  <ImplicitUsings>disable</ImplicitUsings>
+  <Nullable>enable</Nullable>
+  <IsPublishable>True</IsPublishable>
+  <Platforms>x64;ARM64</Platforms>
   <PlatformTarget>AnyCPU</PlatformTarget>
-	<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-	<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-	<Authors>Sella-GH, AzzyBot Contributors</Authors>
-	<Version>1.7.1</Version>
-	<Copyright>© 2024 - $(Authors)</Copyright>
-	<Product>Azzy</Product>
-	<Description>General purpose discord bot, written in C# and with DSharpPlus, dedicated for the use with AzuraCast.</Description>
-	<RepositoryUrl>https://github.com/Sella-GH/AzzyBot</RepositoryUrl>
-	<PathMap>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)=.</PathMap>
-	<AnalysisLevel>latest-all</AnalysisLevel>
+  <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+  <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+  <Authors>Sella-GH, AzzyBot Contributors</Authors>
+  <Version>1.7.1</Version>
+  <Copyright>© 2024 - $(Authors)</Copyright>
+  <Product>Azzy</Product>
+  <Description>General purpose discord bot, written in C# and with DSharpPlus, dedicated for the use with AzuraCast.</Description>
+  <RepositoryUrl>https://github.com/Sella-GH/AzzyBot</RepositoryUrl>
+  <PathMap>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)=.</PathMap>
+  <AnalysisLevel>latest-all</AnalysisLevel>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-	<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-	<AssemblyName>AzzyBot-Dev</AssemblyName>
+  <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+  <AssemblyName>AzzyBot-Dev</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-	<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-	<AssemblyName>AzzyBot-Dev</AssemblyName>
+  <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+  <AssemblyName>AzzyBot-Dev</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-	<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-	<AssemblyName>AzzyBot</AssemblyName>
+  <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+  <AssemblyName>AzzyBot</AssemblyName>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-	<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-	<AssemblyName>AzzyBot</AssemblyName>
+  <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+  <AssemblyName>AzzyBot</AssemblyName>
   </PropertyGroup>
   
   <ItemGroup>
-	<PackageReference Include="CsvHelper" Version="31.0.2" />
-	<PackageReference Include="DSharpPlus" Version="4.4.6" />
-	<PackageReference Include="DSharpPlus.Interactivity" Version="4.4.6" />
-	<PackageReference Include="DSharpPlus.SlashCommands" Version="4.4.6" />
-	<PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-	<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
-	<PackageReference Include="Roslynator.Analyzers" Version="4.11.0">
-	  <PrivateAssets>all</PrivateAssets>
-	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	</PackageReference>
-	<PackageReference Include="Roslynator.CodeAnalysis.Analyzers" Version="4.11.0">
-	  <PrivateAssets>all</PrivateAssets>
-	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	</PackageReference>
-	<PackageReference Include="Roslynator.CodeFixes" Version="4.11.0">
-	  <PrivateAssets>all</PrivateAssets>
-	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	</PackageReference>
-	<PackageReference Include="Roslynator.Formatting.Analyzers" Version="4.11.0">
-	  <PrivateAssets>all</PrivateAssets>
-	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	</PackageReference>
-	<PackageReference Include="Roslynator.Refactorings" Version="4.11.0">
-	  <PrivateAssets>all</PrivateAssets>
-	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-	</PackageReference>
-	<PackageReference Include="System.Net.Security" Version="4.3.2" />
+  <PackageReference Include="CsvHelper" Version="31.0.2" />
+  <PackageReference Include="DSharpPlus" Version="4.4.6" />
+  <PackageReference Include="DSharpPlus.Interactivity" Version="4.4.6" />
+  <PackageReference Include="DSharpPlus.SlashCommands" Version="4.4.6" />
+  <PackageReference Include="Lavalink4NET.DSharpPlus" Version="4.0.17" />
+  <PackageReference Include="Lavalink4NET.InactivityTracking" Version="4.0.17" />
+  <PackageReference Include="Lavalink4NET.Integrations.LyricsJava" Version="4.0.17" />
+  <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+  <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+  <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
+  <PackageReference Include="Roslynator.Analyzers" Version="4.11.0">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+  </PackageReference>
+  <PackageReference Include="Roslynator.CodeAnalysis.Analyzers" Version="4.11.0">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+  </PackageReference>
+  <PackageReference Include="Roslynator.CodeFixes" Version="4.11.0">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+  </PackageReference>
+  <PackageReference Include="Roslynator.Formatting.Analyzers" Version="4.11.0">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+  </PackageReference>
+  <PackageReference Include="Roslynator.Refactorings" Version="4.11.0">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+  </PackageReference>
+  <PackageReference Include="System.Net.Security" Version="4.3.2" />
   </ItemGroup>
 
   <ItemGroup>
-	<None Update="appsettings.development.json">
-	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</None>
-	<None Update="appsettings.json">
-	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</None>
-	<None Update="BuildDate.txt">
-	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	</None>
-	<None Update="Customization\ClubManagement\ClubBotStatus.json">
-	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</None>
-	<None Update="Customization\AzuraCast\FavoriteSongs.json">
-	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</None>
-	<None Update="Customization\AzuraCast\PlaylistSlogans.json">
-	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</None>
-	<None Update="Customization\AzuraCast\StringsAzuraCast.json">
-	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</None>
-	<None Update="Customization\ClubManagement\StringsClubManagement.json">
-	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</None>
-	<None Update="Customization\Core\StringsCore.json">
-	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</None>
-	<None Update="Modules\AzuraCast\Files\FileCache.json">
-	  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	</None>
+  <None Update="appsettings.development.json">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+  <None Update="appsettings.json">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+  <None Update="BuildDate.txt">
+    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </None>
+  <None Update="Customization\ClubManagement\ClubBotStatus.json">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+  <None Update="Customization\AzuraCast\FavoriteSongs.json">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+  <None Update="Customization\AzuraCast\PlaylistSlogans.json">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+  <None Update="Customization\AzuraCast\StringsAzuraCast.json">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+  <None Update="Customization\ClubManagement\StringsClubManagement.json">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+  <None Update="Customization\Core\StringsCore.json">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+  <None Update="Customization\MusicStreaming\StringsMusicStreaming.json">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+  <None Update="Modules\AzuraCast\Files\FileCache.json">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+  <None Update="Modules\MusicStreaming\Files\application.yml">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Customization\MusicStreaming\" />
   </ItemGroup>
 
   <Target Name="WriteBuildDateToFile" BeforeTargets="PreBuildEvent">
-	  <WriteLinesToFile File="$(ProjectDir)BuildDate.txt" Lines="$([System.DateTime]::Now.ToString(&quot;yyyy-MM-dd HH:mm:ss&quot;))" Overwrite="true" Encoding="UTF-8" />
+    <WriteLinesToFile File="$(ProjectDir)BuildDate.txt" Lines="$([System.DateTime]::Now.ToString(&quot;yyyy-MM-dd HH:mm:ss&quot;))" Overwrite="true" Encoding="UTF-8" />
   </Target>
 </Project>

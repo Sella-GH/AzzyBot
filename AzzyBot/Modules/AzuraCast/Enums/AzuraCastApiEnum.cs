@@ -9,6 +9,7 @@ internal enum AzuraCastApiEnum
     files,
     history,
     list,
+    listen,
     listeners,
     m3u,
     nowplaying,

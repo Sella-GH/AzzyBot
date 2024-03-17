@@ -3,7 +3,11 @@
   <h3 align="center">AzzyBot</h3>
 
   <p align="center">
-    General purpose discord bot, written in C# and with DSharpPlus, dedicated for the use with AzuraCast.
+    <img src="https://github.com/Sella-GH/AzzyBot/blob/feat/VoiceChannelStreaming/Assets/Azzy_Logo.png" height="512" width="512" />
+  </p>
+  
+  <p align="center">
+    General purpose discord bot, written in C# and with DSharpPlus, dedicated for the use with <a href="https://github.com/AzuraCast/AzuraCast">AzuraCast</a>
     <br/>
     <br/>
     <a href="https://github.com/Sella-GH/AzzyBot/wiki"><strong>Explore the docs »</strong></a>
@@ -53,10 +57,12 @@ The bot contains of the following features:
 ## Built With
 
 * [.NET 8](https://github.com/dotnet/runtime)
-* [Visual Studio 2022 Community](https://visualstudio.microsoft.com/de/downloads/)
+* [Visual Studio 2022 Community](https://visualstudio.microsoft.com/de/downloads)
 * [CsvHelper 31.0.2](https://github.com/JoshClose/CsvHelper)
 * [DSharpPlus 4.4.6](https://github.com/DSharpPlus/DSharpPlus)
 * [Roslynator 4.11](https://github.com/dotnet/roslynator)
+* [Lavalink](https://github.com/lavalink-devs/Lavalink)
+* [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
 
 ## Getting Started
 
@@ -104,4 +110,4 @@ Distributed under the AGPL-3.0 License. See [LICENSE](https://github.com/Sella-G
 
 ## Acknowledgements
 
-* [CurtWoodman](https://github.com/CurtWoodman)
+* CurtWoodman

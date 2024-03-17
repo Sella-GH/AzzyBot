@@ -73,4 +73,32 @@ internal sealed class CoreModule : BaseModule
         BroadcastModuleEvent(evt);
         return evt.ResultString;
     }
+
+    internal static string GetLavalinkPassword()
+    {
+        ModuleEvent evt = new(ModuleEventType.LavalinkPassword);
+        BroadcastModuleEvent(evt);
+        return evt.ResultString;
+    }
+
+    internal static bool GetMusicStreamingInactivity()
+    {
+        ModuleEvent evt = new(ModuleEventType.GetMusicStreamingInactivity);
+        BroadcastModuleEvent(evt);
+        return evt.ResultBool;
+    }
+
+    internal static int GetMusicStreamingInactivityTime()
+    {
+        ModuleEvent evt = new(ModuleEventType.GetMusicStreamingInactivityTime);
+        BroadcastModuleEvent(evt);
+        return evt.ResultInt;
+    }
+
+    internal static bool GetMusicStreamingLyrics()
+    {
+        ModuleEvent evt = new(ModuleEventType.GetMusicStreamingLyrics);
+        BroadcastModuleEvent(evt);
+        return evt.ResultBool;
+    }
 }

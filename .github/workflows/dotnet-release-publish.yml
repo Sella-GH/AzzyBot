@@ -41,25 +41,31 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
+
+      - name: Install GitHub CLI
+        run: sudo apt-get update && sudo apt-get install -y gh
       
-      - name: Publish Release for ${{ matrix.os }}-${{ matrix.arch }}
+      - name: Publish Release
         run: |
           dotnet publish -c Release -r ${{ matrix.os }}-${{ matrix.arch }}
           
-      - name: Download Updater for ${{ matrix.os }}-${{ matrix.arch }}
-        uses: dsaltares/fetch-gh-release-asset@master
-        with:
-          repo: Sella-GH/AzzyBot-Updater
-          file: release-${{ matrix.os }}-${{ matrix.arch }}.zip
-          target: ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Updater/release-${{ matrix.os }}-${{ matrix.arch }}.zip
+      - name: Download and extract Lavalink
+        run: |
+          mkdir -p ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files
+          gh release download 4.0.4 --dir './artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files' --pattern 'Lavalink.jar' --repo lavalink-devs/Lavalink
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Unzip the downloaded Artifact and add some basic information
+      - name: Download and extract Updater
         run: |
           mkdir -p ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Updater
+          gh release download --dir './artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Updater' --pattern 'release-${{ matrix.os }}-${{ matrix.arch }}.zip' --repo Sella-GH/AzzyBot-Updater
           unzip ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Updater/release-${{ matrix.os }}-${{ matrix.arch }}.zip -d ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Updater/
           rm ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Updater/release-${{ matrix.os }}-${{ matrix.arch }}.zip
           echo "${{ github.event.head_commit.timestamp }}" > ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/BuildDate.txt
           echo "${{ github.sha }}" > ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Commit.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       - name: Archive Build Artifact
         uses: actions/upload-artifact@v4

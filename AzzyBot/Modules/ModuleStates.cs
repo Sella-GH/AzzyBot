@@ -8,6 +8,7 @@ internal static class ModuleStates
     internal static bool AzuraCast { get; private set; }
     internal static bool ClubManagement { get; private set; }
     internal static bool Core { get; private set; }
+    internal static bool MusicStreaming { get; private set; }
 
     internal static void ActivateAzuraCast()
     {
@@ -25,5 +26,11 @@ internal static class ModuleStates
     {
         Core = true;
         ExceptionHandler.LogMessage(LogLevel.Information, "Module Core activated");
+    }
+
+    internal static void ActivateMusicStreaming()
+    {
+        MusicStreaming = true;
+        ExceptionHandler.LogMessage(LogLevel.Information, "Module MusicStreaming activated");
     }
 }

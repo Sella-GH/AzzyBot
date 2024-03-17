@@ -10,5 +10,6 @@ internal enum CoreFileNamesEnum
     PlaylistSlogansJSON,
     StringsAzuraCastJSON,
     StringsClubManagementJSON,
-    StringsCoreJSON
+    StringsCoreJSON,
+    StringsMusicStreamingJSON
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using DSharpPlus.Entities;
 
@@ -40,6 +41,18 @@ internal static class CoreDiscordCommands
     }
 
     internal static bool CheckUserId(ulong checkUserId, ulong againstUserId) => checkUserId == againstUserId;
+    internal static bool CheckIfUserIsInVoiceChannel(DiscordMember member) => member.VoiceState is not null;
+
+    internal static bool CheckIfBotIsInVoiceChannel(DiscordMember member, ulong botId)
+    {
+        foreach (DiscordMember channelMember in (IReadOnlyList<DiscordMember>)member.VoiceState.Channel.Users)
+        {
+            if (channelMember.Id == botId)
+                return true;
+        }
+
+        return false;
+    }
 
     internal static Task<DiscordMember> GetMemberAsync(ulong userId, DiscordGuild guild)
     {

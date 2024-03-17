@@ -5,6 +5,7 @@ using AzzyBot.Settings;
 using AzzyBot.Strings.AzuraCast;
 using AzzyBot.Strings.ClubManagement;
 using AzzyBot.Strings.Core;
+using AzzyBot.Strings.MusicStreaming;
 
 namespace AzzyBot.Strings;
 
@@ -20,6 +21,9 @@ internal abstract class StringBuilding
 
         if (BaseSettings.ActivateClubManagement && !await ClubManagementStringBuilder.LoadClubManagementStringsAsync())
             throw new InvalidOperationException("ClubManagement strings can't be loaded");
+
+        if (BaseSettings.ActivateMusicStreaming && !await MusicStreamingStringBuilder.LoadMusicStreamingStringsAsync())
+            throw new InvalidOperationException("MusicStreaming strings can't be loaded");
     }
 
     protected static string BuildString(string template, string parameterName, double parameterValue) => template.Replace(parameterName, parameterValue.ToString(CultureInfo.InvariantCulture), StringComparison.InvariantCultureIgnoreCase);
