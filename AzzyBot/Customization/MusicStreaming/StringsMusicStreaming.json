@@ -15,6 +15,7 @@
     "CommandsStopVoiceMusicPlaying": "The stream stops right now!",
     "EmbedsLyricsTitle": "Lyrics",
     "EmbedsLyricsMessageNotFound": "No lyrics found for this song.",
+    "EmbedsLyricsMessageTooBig": "Sorry, the lyrics are too big. Please check them out here:",
     "EmbedsLyricsFooter": "%SONG% by %ARTIST%",
     "EmbedsPreconditionTitle": "Error",
     "EmbedsPreconditionNotInVoice": "You have to be in a voice channel for this action!",

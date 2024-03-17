@@ -81,6 +81,7 @@ internal sealed class MusicStreamingStringBuilder : StringBuilding
 
     internal static string GetEmbedsLyricsTitle => Model.EmbedsLyricsTitle;
     internal static string GetEmbedsLyricsMessageNotFound => Model.EmbedsLyricsMessageNotFound;
+    internal static string GetEmbedsLyricsMessageTooBig => Model.EmbedsLyricsMessageTooBig;
     internal static string GetEmbedsLyricsFooter(string song, string artist) => BuildString(BuildString(Model.EmbedsLyricsFooter, "%SONG%", song), "%ARTIST%", artist);
 
     #endregion EmbedsLyrics

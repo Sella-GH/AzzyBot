@@ -114,26 +114,23 @@ internal static class MusicStreamingLavalink
 
         string searchTerm = $"{nowPlaying.Now_Playing.Song.Artist} - {nowPlaying.Now_Playing.Song.Title}";
 
-        string lyrics = await GetLyricsFromGeniusAsync(searchTerm);
+        Lyrics lyrics = await GetLyricsFromGeniusAsync(searchTerm);
 
-        if (string.IsNullOrWhiteSpace(lyrics))
+        if (string.IsNullOrWhiteSpace(lyrics.Text))
             lyrics = await GetLyricsFromYouTubeAsync(searchTerm);
 
         DiscordMember member = await ctx.Guild.GetMemberAsync(ctx.User.Id);
         return MusicStreamingEmbedBuilder.BuildLyricsEmbed(CoreDiscordCommands.GetBestUsername(member.Username, member.Nickname), member.AvatarUrl, lyrics, nowPlaying.Now_Playing.Song.Artist, nowPlaying.Now_Playing.Song.Title);
     }
 
-    private static async Task<string> GetLyricsFromGeniusAsync(string search)
+    private static async Task<Lyrics> GetLyricsFromGeniusAsync(string search)
     {
         Lyrics? lyrics = await Program.GetAudioService.Tracks.GetGeniusLyricsAsync(search);
 
-        if (lyrics is not null)
-            return lyrics.Text;
-
-        return string.Empty;
+        return lyrics ?? new(string.Empty, string.Empty, new LyricsTrack(string.Empty, string.Empty, string.Empty, []), []);
     }
 
-    private static async Task<string> GetLyricsFromYouTubeAsync(string search)
+    private static async Task<Lyrics> GetLyricsFromYouTubeAsync(string search)
     {
         ImmutableArray<LyricsSearchResult> results = await Program.GetAudioService.Tracks.SearchLyricsAsync(search);
 
@@ -144,9 +141,9 @@ internal static class MusicStreamingLavalink
             Lyrics? lyrics = await Program.GetAudioService.Tracks.GetYouTubeLyricsAsync(videoId);
 
             if (lyrics is not null)
-                return lyrics.Text;
+                return lyrics;
         }
 
-        return string.Empty;
+        return new(string.Empty, string.Empty, new LyricsTrack(string.Empty, string.Empty, string.Empty, []), []);
     }
 }

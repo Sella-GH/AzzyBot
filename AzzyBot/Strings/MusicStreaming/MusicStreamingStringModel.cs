@@ -56,6 +56,7 @@ internal sealed class MusicStreamingStringModel
 
     public string EmbedsLyricsTitle { get; set; } = string.Empty;
     public string EmbedsLyricsMessageNotFound { get; set; } = string.Empty;
+    public string EmbedsLyricsMessageTooBig { get; set; } = string.Empty;
     public string EmbedsLyricsFooter { get; set; } = string.Empty;
 
     #endregion EmbedsLyrics

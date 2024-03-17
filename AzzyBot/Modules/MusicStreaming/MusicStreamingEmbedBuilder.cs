@@ -2,6 +2,7 @@
 using AzzyBot.Modules.Core;
 using AzzyBot.Strings.MusicStreaming;
 using DSharpPlus.Entities;
+using Lavalink4NET.Integrations.LyricsJava;
 using Lavalink4NET.Players;
 using Lavalink4NET.Players.Preconditions;
 
@@ -9,7 +10,7 @@ namespace AzzyBot.Modules.MusicStreaming;
 
 internal static class MusicStreamingEmbedBuilder
 {
-    internal static DiscordEmbed BuildLyricsEmbed(string userName, string userAvatarUrl, string text, string artist, string song)
+    internal static DiscordEmbed BuildLyricsEmbed(string userName, string userAvatarUrl, Lyrics lyrics, string artist, string song)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
@@ -17,8 +18,11 @@ internal static class MusicStreamingEmbedBuilder
         string title = MusicStreamingStringBuilder.GetEmbedsLyricsTitle;
         string message = MusicStreamingStringBuilder.GetEmbedsLyricsMessageNotFound;
 
-        if (!string.IsNullOrWhiteSpace(text))
-            message = text;
+        if (!string.IsNullOrWhiteSpace(lyrics.Text))
+            message = lyrics.Text;
+
+        if (message.Length > 4096)
+            message = MusicStreamingStringBuilder.GetEmbedsLyricsMessageTooBig + $"\n{lyrics.Source}";
 
         string footerText = MusicStreamingStringBuilder.GetEmbedsLyricsFooter(song, artist);
 
