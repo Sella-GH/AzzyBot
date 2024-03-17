@@ -73,12 +73,6 @@ internal sealed class CoreCommands : ApplicationCommandModule
                 ExceptionHandler.LogMessage(LogLevel.Debug, "CorePingAzzyCommand requested");
                 await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
-                if (!CoreMisc.CheckIfLinuxOs())
-                {
-                    await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(CoreEmbedBuilder.BuildAzzyStatsNotAvailableEmbed(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl)));
-                    return;
-                }
-
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(await CoreEmbedBuilder.BuildAzzyStatsEmbedAsync(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl, ctx.Client.Ping)));
             }
         }

@@ -37,6 +37,9 @@ internal static class CoreFileOperations
 
         try
         {
+            if (!File.Exists(GetFileNameAndPath(fileName, directory)))
+                throw new FileNotFoundException();
+
             return await File.ReadAllTextAsync(GetFileNameAndPath(fileName, directory));
         }
         catch (DirectoryNotFoundException)
@@ -135,7 +138,9 @@ internal static class CoreFileOperations
                 return true;
 
             await File.Create(path).DisposeAsync();
-            UpdaterMisc.SetFilePermission(path, "0755");
+
+            if (CoreMisc.CheckIfLinuxOs())
+                UpdaterMisc.SetFilePermission(path, "0755");
 
             if (!File.Exists(path))
                 throw new FileNotFoundException($"Could not create file: {path}");

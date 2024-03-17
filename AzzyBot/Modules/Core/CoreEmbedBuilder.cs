@@ -87,53 +87,58 @@ internal static class CoreEmbedBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
 
-        Dictionary<int, double> cpuUsage = await CoreAzzyStatsLinux.GetCpuUsageAsync();
-        long uptime = await CoreAzzyStatsLinux.GetSystemUptimeAsync();
+        string title = CoreStringBuilder.GetEmbedAzzyStatsTitle;
+        string footer = string.Empty;
+        long uptime = CoreAzzyStatsGeneral.GetSystemUptime(); // is incorrect on windows systems without administative privileges
         string coreUsage = string.Empty;
-        string allCoreUsage = string.Empty;
-        MemoryUsageStruct memory = await CoreAzzyStatsLinux.GetMemoryUsageAsync();
         double processMem = CoreAzzyStatsGeneral.GetBotMemoryUsage();
         string diskUsage = CoreAzzyStatsGeneral.GetDiskUsage();
-        Dictionary<string, NetworkSpeedStruct> networkUsage = await CoreAzzyStatsLinux.GetNetworkUsageAsync();
+        CpuLoadStruct cpuLoad = new();
+        MemoryUsageStruct memory = new();
 
-        foreach (KeyValuePair<int, double> kvp in cpuUsage)
+        if (CoreMisc.CheckIfLinuxOs())
         {
-            int counter = kvp.Key;
+            uptime = await CoreAzzyStatsLinux.GetSystemUptimeAsync();
+            string allCoreUsage = string.Empty;
+            Dictionary<int, double> cpuUsage = await CoreAzzyStatsLinux.GetCpuUsageAsync();
+            memory = await CoreAzzyStatsLinux.GetMemoryUsageAsync();
 
-            if (counter == 0)
+            foreach (KeyValuePair<int, double> kvp in cpuUsage)
             {
-                allCoreUsage = CoreStringBuilder.GetEmbedAzzyStatsCpuUsageAll(kvp.Value);
+                int counter = kvp.Key;
+
+                if (counter == 0)
+                {
+                    allCoreUsage = CoreStringBuilder.GetEmbedAzzyStatsCpuUsageAll(kvp.Value);
+                }
+                else
+                {
+                    int core = counter - 1;
+                    coreUsage += CoreStringBuilder.GetEmbedAzzyStatsCpuUsageCore(core, kvp.Value);
+                }
             }
-            else
-            {
-                int core = counter - 1;
-                coreUsage += CoreStringBuilder.GetEmbedAzzyStatsCpuUsageCore(core, kvp.Value);
-            }
+
+            coreUsage += allCoreUsage;
+
+            cpuLoad = await CoreAzzyStatsLinux.GetCpuLoadAsync();
         }
 
-        coreUsage += allCoreUsage;
-
-        string title = CoreStringBuilder.GetEmbedAzzyStatsTitle;
-        CpuLoadStruct cpuLoad = await CoreAzzyStatsLinux.GetCpuLoadAsync();
         Dictionary<string, DiscordEmbedStruct> fields = CoreStringBuilder.GetEmbedAzzyStatsFields(uptime, ping, coreUsage, cpuLoad.OneMin, cpuLoad.FiveMin, cpuLoad.FifteenMin, memory.Used, processMem, memory.Total, diskUsage);
 
-        foreach (KeyValuePair<string, NetworkSpeedStruct> kvp in networkUsage)
+        if (CoreMisc.CheckIfLinuxOs())
         {
-            fields.Add(CoreStringBuilder.GetEmbedAzzyStatsNetworkUsageTitle(kvp.Key), new(kvp.Key, CoreStringBuilder.GetEmbedAzzyStatsNetworkUsageDesc(kvp.Value.Received, kvp.Value.Transmitted), true));
+            Dictionary<string, NetworkSpeedStruct> networkUsage = await CoreAzzyStatsLinux.GetNetworkUsageAsync();
+            foreach (KeyValuePair<string, NetworkSpeedStruct> kvp in networkUsage)
+            {
+                fields.Add(CoreStringBuilder.GetEmbedAzzyStatsNetworkUsageTitle(kvp.Key), new(kvp.Key, CoreStringBuilder.GetEmbedAzzyStatsNetworkUsageDesc(kvp.Value.Received, kvp.Value.Transmitted), true));
+            }
+        }
+        else
+        {
+            footer = CoreStringBuilder.GetEmbedAzzyStatsMoreStats;
         }
 
-        return CreateBasicEmbed(title, string.Empty, userName, userAvatarUrl, DiscordColor.Red, userAvatarUrl, string.Empty, fields);
-    }
-
-    internal static DiscordEmbed BuildAzzyStatsNotAvailableEmbed(string userName, string userAvatarUrl)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
-        ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
-
-        string title = CoreStringBuilder.GetEmbedAzzyStatsNotAvailableTitle;
-        string description = CoreStringBuilder.GetEmbedAzzyStatsNotAvailableDesc;
-
-        return CreateBasicEmbed(title, description, userName, userAvatarUrl, DiscordColor.IndianRed);
+        return CreateBasicEmbed(title, string.Empty, userName, userAvatarUrl, DiscordColor.Red, userAvatarUrl, footer, fields);
     }
 
     internal static async Task<DiscordEmbed> BuildInfoAzzyEmbedAsync(string userName, string userAvatarUrl)
