@@ -4,8 +4,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.Core;
 using AzzyBot.Settings.MusicStreaming;
+using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.MusicStreaming;
 
@@ -45,6 +47,28 @@ internal static class MusicStreamingLavalinkHandler
         }
     }
 
+    private static async Task<bool> CheckIfLavalinkConfigIsRightAsync()
+    {
+        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files", "application.yml");
+
+        if (!File.Exists(path))
+            return false;
+
+        string[] lines = await File.ReadAllLinesAsync(path);
+
+        foreach (string line in lines)
+        {
+            string newLine = line.Trim();
+            if (newLine.StartsWith("geniusApiKey:", StringComparison.OrdinalIgnoreCase) && newLine.Contains("\"Your Genius Client Access Token\"", StringComparison.OrdinalIgnoreCase))
+            {
+                ExceptionHandler.LogMessage(LogLevel.Error, "You forgot to set your genius api key!");
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private static bool CheckIfLavalinkIsThere()
     {
         string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files");
@@ -58,11 +82,17 @@ internal static class MusicStreamingLavalinkHandler
         return directoryExists && lavalinkJarExists && applicationYmlExists && pluginsDirectoryExists && lyricsPluginExists;
     }
 
-    internal static bool StartLavalink()
+    internal static async Task<bool> StartLavalinkAsync()
     {
         try
         {
             if (!CheckIfLavalinkIsThere())
+            {
+                ExceptionHandler.LogMessage(LogLevel.Error, "Lavalink files are missing!");
+                return false;
+            }
+
+            if (MusicStreamingSettings.ActivateLyrics && !await CheckIfLavalinkConfigIsRightAsync())
                 return false;
 
             ProcessStartInfo processStartInfo = new()
