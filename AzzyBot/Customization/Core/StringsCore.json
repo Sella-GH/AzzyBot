@@ -20,7 +20,7 @@
     "EmbedAzzyStatsRamUsageTitle": "RAM usage",
     "EmbedAzzyStatsRamUsageDesc": "Used: **%USED%** GB\nTotal: **%TOTAL%** GB",
     "EmbedAzzyStatsRamUsageAzzyTitle": "AzzyBot RAM usage",
-    "EmbedAzzyStatsRamUsageAzzyDesc": "AzzyBot: **%BOT%** GB",
+    "EmbedAzzyStatsRamUsageAzzyDesc": "**%BOT%** GB",
     "EmbedAzzyStatsDiskUsageTitle": "Disk usage",
     "EmbedAzzyStatsDiskUsageDesc": "Used: **%USED%** GB\nTotal: **%TOTAL%** GB",
     "EmbedAzzyStatsNetworkUsageTitle": "Network \"%NAME%\"",
