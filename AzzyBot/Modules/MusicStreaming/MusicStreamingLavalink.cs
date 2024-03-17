@@ -53,9 +53,9 @@ internal static class MusicStreamingLavalink
 
     internal static async Task<bool> JoinMusicAsync(InteractionContext ctx)
     {
-        LavalinkPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying]);
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying]) ?? throw new InvalidOperationException("Player is null");
 
-        return player is not null;
+        return player.VoiceChannelId is not 0;
     }
 
     internal static async Task<bool> PlayMusicAsync(InteractionContext ctx)
