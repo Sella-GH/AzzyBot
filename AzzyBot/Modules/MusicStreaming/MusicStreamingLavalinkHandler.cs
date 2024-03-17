@@ -134,12 +134,15 @@ internal static class MusicStreamingLavalinkHandler
             await LavalinkProcess.WaitForExitAsync();
             LavalinkProcess.Dispose();
 
-            await Task.Delay(1000);
-
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files", "logs");
             if (MusicStreamingSettings.DeleteLavalinkLogs && Directory.Exists(path))
                 Directory.Delete(path, true);
 
+            return true;
+        }
+        catch (IOException)
+        {
+            ExceptionHandler.LogMessage(LogLevel.Warning, "Could not delete lavalink log path");
             return true;
         }
         catch (Exception)
