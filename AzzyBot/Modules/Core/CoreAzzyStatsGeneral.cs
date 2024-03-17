@@ -71,6 +71,9 @@ internal static class CoreAzzyStatsGeneral
         if (BaseSettings.ActivateClubManagement)
             text += "\n- ClubManagement";
 
+        if (BaseSettings.ActivateMusicStreaming)
+            text += "\n- MusicStreaming";
+
         return text;
     }
 
