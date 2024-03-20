@@ -158,6 +158,7 @@ internal static class CoreWebRequests
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
 
+        string result = string.Empty;
         try
         {
             // Cut the host to the straight point
@@ -169,24 +170,29 @@ internal static class CoreWebRequests
             }
             else
             {
-                return await PingServerAsync(host);
+                result = await PingServerAsync(host, AddressFamily.InterNetworkV6);
+                if (string.IsNullOrWhiteSpace(result))
+                    ExceptionHandler.LogMessage(LogLevel.Debug, "Server not reachable over IPv6");
             }
 
             if (!await CheckLocalConnectionAsync(AddressFamily.InterNetwork))
             {
                 ExceptionHandler.LogMessage(LogLevel.Warning, "IPv4 is down!");
             }
-            else
+            else if (string.IsNullOrWhiteSpace(result))
             {
-                return await PingServerAsync(host);
+                result = await PingServerAsync(host, AddressFamily.InterNetwork);
+                if (string.IsNullOrWhiteSpace(result))
+                    ExceptionHandler.LogMessage(LogLevel.Debug, "Server not reachable over IPv4");
             }
 
-            ExceptionHandler.LogMessage(LogLevel.Warning, "No internet connection available!");
+            if (string.IsNullOrWhiteSpace(result))
+                ExceptionHandler.LogMessage(LogLevel.Critical, "No internet connection available!");
         }
         catch (HttpRequestException)
         { }
 
-        return string.Empty;
+        return result;
     }
 
     private static async Task<bool> CheckLocalConnectionAsync(AddressFamily family)
@@ -207,7 +213,7 @@ internal static class CoreWebRequests
         return false;
     }
 
-    private static async Task<string> PingServerAsync(string url)
+    private static async Task<string> PingServerAsync(string url, AddressFamily family)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
 
@@ -219,7 +225,7 @@ internal static class CoreWebRequests
 
             foreach (IPAddress ipAdr in addresses)
             {
-                if (ipAdr.AddressFamily is AddressFamily.InterNetworkV6 or AddressFamily.InterNetwork)
+                if (ipAdr.AddressFamily == family)
                 {
                     address = ipAdr;
                     break;
