@@ -15,6 +15,24 @@ namespace AzzyBot.Modules.Core;
 
 internal static class CoreWebRequests
 {
+    /// <summary>
+    /// Forcing this client to use IPv4, only TCP ports because AzuraCast prefers TCP
+    /// </summary>
+    private static readonly HttpClient ClientV4 = new(new SocketsHttpHandler()
+        {
+            ConnectCallback = async(context, cancellationToken) =>
+            {
+                Socket socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                await socket.ConnectAsync(context.DnsEndPoint, cancellationToken);
+                return new NetworkStream(socket, true);
+            }
+        })
+    {
+        DefaultRequestVersion = new(2, 0),
+        DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher,
+        Timeout = TimeSpan.FromSeconds(15),
+    };
+
     private static readonly HttpClient Client = new()
     {
         DefaultRequestVersion = new(2, 0),
@@ -22,7 +40,7 @@ internal static class CoreWebRequests
         Timeout = TimeSpan.FromSeconds(15)
     };
 
-    internal static async Task<string> GetWebAsync(string url, Dictionary<string, string>? headers = null)
+    internal static async Task<string> GetWebAsync(string url, Dictionary<string, string>? headers = null, bool ipv6 = true)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
 
@@ -31,8 +49,10 @@ internal static class CoreWebRequests
             if (headers is not null)
                 AddHeaders(headers);
 
+            HttpClient client = (ipv6) ? Client : ClientV4;
             string content;
-            using (HttpResponseMessage? response = await Client.GetAsync(new Uri(url)))
+
+            using (HttpResponseMessage response = await client.GetAsync(new Uri(url)))
             {
                 response.EnsureSuccessStatusCode();
                 content = await response.Content.ReadAsStringAsync();
@@ -47,7 +67,7 @@ internal static class CoreWebRequests
         }
     }
 
-    internal static async Task<Stream> GetWebDownloadAsync(string url, Dictionary<string, string> headers)
+    internal static async Task<Stream> GetWebDownloadAsync(string url, Dictionary<string, string> headers, bool ipv6 = true)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
 
@@ -55,8 +75,10 @@ internal static class CoreWebRequests
         {
             AddHeaders(headers);
 
-            HttpResponseMessage? response = await Client.GetAsync(new Uri(url));
+            HttpClient client = (ipv6) ? Client : ClientV4;
+            HttpResponseMessage response = await client.GetAsync(new Uri(url));
             response.EnsureSuccessStatusCode();
+
             return await response.Content.ReadAsStreamAsync();
         }
         catch (HttpRequestException e)
@@ -66,7 +88,7 @@ internal static class CoreWebRequests
         }
     }
 
-    internal static async Task<bool> PostWebAsync(string url, string content = "", Dictionary<string, string>? headers = null)
+    internal static async Task<bool> PostWebAsync(string url, string content = "", Dictionary<string, string>? headers = null, bool ipv6 = true)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
 
@@ -75,25 +97,26 @@ internal static class CoreWebRequests
             if (headers is not null)
                 AddHeaders(headers);
 
-            HttpResponseMessage? response = null;
+            HttpResponseMessage? response;
+            HttpClient client = (ipv6) ? Client : ClientV4;
+            HttpContent? httpContent = null;
+
             if (!string.IsNullOrWhiteSpace(content))
-            {
-                using HttpContent httpContent = new StringContent(content, Encoding.UTF8, "application/json");
-                response = await Client.PostAsync(new Uri(url), httpContent);
-            }
-            else
-            {
-                response = await Client.PostAsync(new Uri(url), null);
-            }
+                httpContent = new StringContent(content, Encoding.UTF8, "application/json");
+
+            response = await client.PostAsync(new Uri(url), httpContent);
 
             if (response.StatusCode != HttpStatusCode.BadRequest && url.Contains(CoreModule.GetAzuraCastApiUrl(), StringComparison.OrdinalIgnoreCase))
             {
                 response.EnsureSuccessStatusCode();
                 response.Dispose();
                 response = null;
+                httpContent?.Dispose();
 
                 return true;
             }
+
+            httpContent?.Dispose();
 
             return false;
         }
@@ -104,7 +127,7 @@ internal static class CoreWebRequests
         }
     }
 
-    internal static async Task<bool> PutWebAsync(string url, string content = "", Dictionary<string, string>? headers = null)
+    internal static async Task<bool> PutWebAsync(string url, string content = "", Dictionary<string, string>? headers = null, bool ipv6 = true)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
 
@@ -113,20 +136,18 @@ internal static class CoreWebRequests
             if (headers is not null)
                 AddHeaders(headers);
 
-            HttpResponseMessage? response = null;
-            if (!string.IsNullOrWhiteSpace(content))
-            {
-                using HttpContent httpContent = new StringContent(content, Encoding.UTF8, "application/json");
-                response = await Client.PutAsync(new Uri(url), httpContent);
-            }
-            else
-            {
-                response = await Client.PutAsync(new Uri(url), null);
-            }
+            HttpResponseMessage? response;
+            HttpClient client = (ipv6) ? Client : ClientV4;
+            HttpContent? httpContent = null;
 
+            if (!string.IsNullOrWhiteSpace(content))
+                httpContent = new StringContent(content, Encoding.UTF8, "application/json");
+
+            response = await client.PutAsync(new Uri(url), httpContent);
             response.EnsureSuccessStatusCode();
             response.Dispose();
             response = null;
+            httpContent?.Dispose();
 
             return true;
         }
@@ -164,15 +185,18 @@ internal static class CoreWebRequests
             // Cut the host to the straight point
             string host = new Uri(url).Host;
 
-            if (!await CheckLocalConnectionAsync(AddressFamily.InterNetworkV6))
+            if (CoreModule.GetAzuracastIPv6Availability())
             {
-                ExceptionHandler.LogMessage(LogLevel.Warning, "IPv6 is down!");
-            }
-            else
-            {
-                result = await PingServerAsync(host, AddressFamily.InterNetworkV6);
-                if (string.IsNullOrWhiteSpace(result))
-                    ExceptionHandler.LogMessage(LogLevel.Debug, "Server not reachable over IPv6");
+                if (!await CheckLocalConnectionAsync(AddressFamily.InterNetworkV6))
+                {
+                    ExceptionHandler.LogMessage(LogLevel.Warning, "IPv6 is down!");
+                }
+                else
+                {
+                    result = await PingServerAsync(host, AddressFamily.InterNetworkV6);
+                    if (string.IsNullOrWhiteSpace(result))
+                        ExceptionHandler.LogMessage(LogLevel.Debug, "Server not reachable over IPv6");
+                }
             }
 
             if (!await CheckLocalConnectionAsync(AddressFamily.InterNetwork))

@@ -24,7 +24,7 @@ internal static class AzuraCastServer
     internal static async Task<NowPlayingData> GetNowPlayingAsync()
     {
         string url = string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.nowplaying, AzuraCastSettings.AzuraStationKey);
-        string body = await CoreWebRequests.GetWebAsync(url);
+        string body = await CoreWebRequests.GetWebAsync(url, null, AzuraCastSettings.Ipv6Available);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
@@ -99,7 +99,7 @@ internal static class AzuraCastServer
     internal static async Task<bool> CheckIfSongRequestsAreAllowedAsync()
     {
         string url = string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.admin, AzuraCastApiEnum.station, AzuraCastSettings.AzuraStationKey);
-        string body = await CoreWebRequests.GetWebAsync(url, Headers);
+        string body = await CoreWebRequests.GetWebAsync(url, Headers, AzuraCastSettings.Ipv6Available);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
@@ -164,7 +164,7 @@ internal static class AzuraCastServer
     private static async Task<List<SongRequestsQueueModel>> GetSongRequestsQueuesAsync()
     {
         string url = string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.station, AzuraCastSettings.AzuraStationKey, AzuraCastApiEnum.reports, AzuraCastApiEnum.requests);
-        string body = await CoreWebRequests.GetWebAsync(url, Headers);
+        string body = await CoreWebRequests.GetWebAsync(url, Headers, AzuraCastSettings.Ipv6Available);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
@@ -179,7 +179,7 @@ internal static class AzuraCastServer
     private static async Task<List<QueueItemModel>> GetQueueAsync()
     {
         string url = string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.station, AzuraCastSettings.AzuraStationKey, AzuraCastApiEnum.queue);
-        string body = await CoreWebRequests.GetWebAsync(url, Headers);
+        string body = await CoreWebRequests.GetWebAsync(url, Headers, AzuraCastSettings.Ipv6Available);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
@@ -194,7 +194,7 @@ internal static class AzuraCastServer
     private static async Task<List<SongRequestsQueueModel>> GetSongRequestsHistoryAsync(string songName = "")
     {
         string url = $"{string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.station, AzuraCastSettings.AzuraStationKey, AzuraCastApiEnum.reports, AzuraCastApiEnum.requests)}?{AzuraCastApiEnum.type}={AzuraCastApiEnum.history}&{AzuraCastApiEnum.searchPhrase}={songName.Replace(" ", "+", StringComparison.InvariantCultureIgnoreCase)}";
-        string body = await CoreWebRequests.GetWebAsync(url, Headers);
+        string body = await CoreWebRequests.GetWebAsync(url, Headers, AzuraCastSettings.Ipv6Available);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
@@ -209,7 +209,7 @@ internal static class AzuraCastServer
     internal static async Task<List<SongHistory>> GetSongHistoryAsync(DateTime startTime, DateTime endTime)
     {
         string url = $"{string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.station, AzuraCastSettings.AzuraStationKey, AzuraCastApiEnum.history)}?{AzuraCastApiEnum.start}={startTime.ToString("yyyy-MM-dd_HH:mm:ss.fff", CultureInfo.InvariantCulture)}&{AzuraCastApiEnum.end}={endTime.ToString("yyyy-MM-dd_HH:mm:ss.fff", CultureInfo.InvariantCulture)}".Replace("_", "T", StringComparison.OrdinalIgnoreCase);
-        string body = await CoreWebRequests.GetWebAsync(url, Headers);
+        string body = await CoreWebRequests.GetWebAsync(url, Headers, AzuraCastSettings.Ipv6Available);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
@@ -224,7 +224,7 @@ internal static class AzuraCastServer
     internal static async Task<List<ListenerModel>> GetListenersAsync(DateTime startTime, DateTime endTime)
     {
         string url = $"{string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.station, AzuraCastSettings.AzuraStationKey, AzuraCastApiEnum.listeners)}?{AzuraCastApiEnum.start}={startTime.ToString("yyyy-MM-dd_HH:mm:ss.fff", CultureInfo.InvariantCulture)}&{AzuraCastApiEnum.end}={endTime.ToString("yyyy-MM-dd_HH:mm:ss.fff", CultureInfo.InvariantCulture)}".Replace("_", "T", StringComparison.OrdinalIgnoreCase);
-        string body = await CoreWebRequests.GetWebAsync(url, Headers);
+        string body = await CoreWebRequests.GetWebAsync(url, Headers, AzuraCastSettings.Ipv6Available);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
@@ -241,7 +241,7 @@ internal static class AzuraCastServer
         ArgumentException.ThrowIfNullOrWhiteSpace(songName, nameof(songName));
 
         string url = string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.station, AzuraCastSettings.AzuraStationKey, AzuraCastApiEnum.requests);
-        string body = await CoreWebRequests.GetWebAsync(url);
+        string body = await CoreWebRequests.GetWebAsync(url, null, AzuraCastSettings.Ipv6Available);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
@@ -281,7 +281,7 @@ internal static class AzuraCastServer
         ArgumentException.ThrowIfNullOrWhiteSpace(songId, nameof(songId));
 
         string url = string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.station, AzuraCastSettings.AzuraStationKey, AzuraCastApiEnum.requests);
-        string body = await CoreWebRequests.GetWebAsync(url);
+        string body = await CoreWebRequests.GetWebAsync(url, null, AzuraCastSettings.Ipv6Available);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
@@ -402,7 +402,7 @@ internal static class AzuraCastServer
         string url = string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.station, AzuraCastSettings.AzuraStationKey, AzuraCastApiEnum.request, songRequest.Request_Id);
 
         // Request the song and save the state inside a variable
-        bool isRequested = await CoreWebRequests.PostWebAsync(url);
+        bool isRequested = await CoreWebRequests.PostWebAsync(url, string.Empty, null, AzuraCastSettings.Ipv6Available);
 
         // If song was successfully requested by Azzy send the embed
         // Otherwise send unable to request embed
@@ -458,7 +458,7 @@ internal static class AzuraCastServer
         string url = string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.station, AzuraCastSettings.AzuraStationKey, AzuraCastApiEnum.request, requestId);
 
         // Request the song and save the state inside a variable
-        bool isRequested = await CoreWebRequests.PostWebAsync(url);
+        bool isRequested = await CoreWebRequests.PostWebAsync(url, string.Empty, null, AzuraCastSettings.Ipv6Available);
         bool isFavUser = CoreDiscordCommands.CheckUserId(requester.Id, favUser.Id);
 
         // If song was successfully requested by Azzy send the embed
@@ -476,9 +476,12 @@ internal static class AzuraCastServer
             ? string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.station, AzuraCastSettings.AzuraStationKey, AzuraCastApiEnum.playlists)
             : string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.station, AzuraCastSettings.AzuraStationKey, AzuraCastApiEnum.playlist, playlistId);
 
-        string body = await CoreWebRequests.GetWebAsync(url, Headers);
+        string body = await CoreWebRequests.GetWebAsync(url, Headers, AzuraCastSettings.Ipv6Available);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
+
+        if (body.Contains("You must be logged in to access this page.", StringComparison.OrdinalIgnoreCase))
+            return [];
 
         List<PlaylistModel>? playlists = [];
 
@@ -521,7 +524,7 @@ internal static class AzuraCastServer
             return string.Empty;
 
         string url = $"{string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.station, AzuraCastSettings.AzuraStationKey, AzuraCastApiEnum.files, AzuraCastApiEnum.list)}?{AzuraCastApiEnum.searchPhrase}={AzuraCastApiEnum.playlist}:{playlistName}";
-        string body = await CoreWebRequests.GetWebAsync(url, Headers);
+        string body = await CoreWebRequests.GetWebAsync(url, Headers, AzuraCastSettings.Ipv6Available);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
@@ -592,7 +595,7 @@ internal static class AzuraCastServer
     {
         string url = string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.station, AzuraCastSettings.AzuraStationKey, AzuraCastApiEnum.playlist, id, AzuraCastApiEnum.toggle);
 
-        if (!await CoreWebRequests.PutWebAsync(url, string.Empty, Headers))
+        if (!await CoreWebRequests.PutWebAsync(url, string.Empty, Headers, AzuraCastSettings.Ipv6Available))
             throw new InvalidOperationException("Unable to update playlist");
     }
 
@@ -625,7 +628,7 @@ internal static class AzuraCastServer
     {
         // Get the station info
         string url = string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.admin, AzuraCastApiEnum.station, AzuraCastSettings.AzuraStationKey);
-        string body = await CoreWebRequests.GetWebAsync(url, Headers);
+        string body = await CoreWebRequests.GetWebAsync(url, Headers, AzuraCastSettings.Ipv6Available);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
@@ -638,7 +641,7 @@ internal static class AzuraCastServer
 
         string payload = JsonConvert.SerializeObject(config, Formatting.Indented);
 
-        if (!await CoreWebRequests.PutWebAsync(url, payload, Headers))
+        if (!await CoreWebRequests.PutWebAsync(url, payload, Headers, AzuraCastSettings.Ipv6Available))
             throw new InvalidOperationException("Unable to change song request availability");
     }
 
@@ -649,7 +652,7 @@ internal static class AzuraCastServer
 
         // Get the files from the music server and write into list
         string url = string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.station, AzuraCastSettings.AzuraStationKey, AzuraCastApiEnum.files);
-        string body = await CoreWebRequests.GetWebAsync(url, Headers);
+        string body = await CoreWebRequests.GetWebAsync(url, Headers, AzuraCastSettings.Ipv6Available);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
@@ -751,7 +754,7 @@ internal static class AzuraCastServer
                 continue;
 
             string url = string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.station, AzuraCastSettings.AzuraStationKey, AzuraCastApiEnum.playlist, playlist.Id, AzuraCastApiEnum.export, AzuraCastApiEnum.m3u);
-            Stream stream = await CoreWebRequests.GetWebDownloadAsync(url, Headers);
+            Stream stream = await CoreWebRequests.GetWebDownloadAsync(url, Headers, AzuraCastSettings.Ipv6Available);
             await using (stream)
             {
                 if (!await CoreFileOperations.WriteFileContentAsync($"{playlist.Short_name}.m3u", directory, "ZipFile", stream))
@@ -766,7 +769,7 @@ internal static class AzuraCastServer
     {
         // Get the details from the music server and write into model
         string url = string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.admin, AzuraCastApiEnum.updates);
-        string body = await CoreWebRequests.GetWebAsync(url, Headers);
+        string body = await CoreWebRequests.GetWebAsync(url, Headers, AzuraCastSettings.Ipv6Available);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
