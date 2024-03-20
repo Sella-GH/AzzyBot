@@ -55,4 +55,28 @@ updates:
         update-types:
         - "minor"
         - "patch"
+      Microsoft:
+        applies-to: version-updates
+        patterns:
+        - "Microsoft*"
+        update-types:
+        - "minor"
+        - "patch"
+      System:
+        applies-to: version-updates
+        patterns:
+        - "System*"
+        update-types:
+        - "minor"
+        - "patch"
+      Others:
+        applies-to: version-updates
+        exclude-patterns:
+        - "DSharpPlus*"
+        - "Lavalink4NET*"
+        - "Microsoft*"
+        - "System*"
+        update-types:
+        - "minor"
+        - "patch"
     open-pull-requests-limit: 25
