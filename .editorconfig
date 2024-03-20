@@ -939,6 +939,9 @@ dotnet_diagnostic.rcs1266.severity = suggestion
 # Use string interpolation instead of 'string.Concat'
 dotnet_diagnostic.rcs1267.severity = suggestion
 
+# Simplify numeric comparison
+dotnet_diagnostic.rcs1268.severity = suggestion
+
 # Use pattern matching
 dotnet_diagnostic.rcs9001.severity = suggestion
 
