@@ -9,8 +9,50 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
+    assignees:
+      - "Sella-GH"
+    commit-messages:
+      prefix: "[Actions]"
+      include: "scope"
+    groups:
+      GitHub:
+        applies-to: version-updates
+        patterns:
+        - "actions*"
+        update-types:
+        - "minor"
+        - "patch"
+      Non-GitHub:
+        applies-to: version-updates
+        exclude-patterns:
+        - "actions*"
+        update-types:
+        - "minor"
+        - "patch"
+    open-pull-requests-limit: 25
 
   - package-ecosystem: "nuget" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
+    assignees:
+      - "Sella-GH"
+    commit-messages:
+      prefix: "[NuGet]"
+      include: "scope"
+    groups:
+      DSharpPlus:
+        applies-to: version-updates
+        patterns:
+        - "DSharpPlus*"
+        update-types:
+        - "minor"
+        - "patch"
+      Lavalink4NET:
+        applies-to: version-updates
+        patterns:
+        - "Lavalink4NET*"
+        update-types:
+        - "minor"
+        - "patch"
+    open-pull-requests-limit: 25
