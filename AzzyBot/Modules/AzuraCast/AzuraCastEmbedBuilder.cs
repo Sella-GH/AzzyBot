@@ -287,14 +287,17 @@ internal static class AzuraCastEmbedBuilder
             fields.Add(dataStruct.Name, dataStruct);
 
             List<PlaylistModel> playlists = await AzuraCastServer.GetPlaylistsAsync();
-            foreach (PlaylistModel playlist in playlists)
+            if (playlists.Count is not 0)
             {
-                if (playlist.Name == data.Now_Playing.Playlist && !AzuraCastModule.CheckIfDeniedPlaylist(playlist.Id))
+                foreach (PlaylistModel playlist in playlists)
                 {
-                    dataStruct = AzuraCastStringBuilder.GetEmbedAzuraNowPlayingPlaylist(data.Now_Playing.Playlist.Replace($"({AzuraCastPlaylistKeywordsEnum.NOREQUESTS})", string.Empty, StringComparison.InvariantCultureIgnoreCase).Trim());
-                    fields.Add(dataStruct.Name, dataStruct);
+                    if (playlist.Name == data.Now_Playing.Playlist && !AzuraCastModule.CheckIfDeniedPlaylist(playlist.Id))
+                    {
+                        dataStruct = AzuraCastStringBuilder.GetEmbedAzuraNowPlayingPlaylist(data.Now_Playing.Playlist.Replace($"({AzuraCastPlaylistKeywordsEnum.NOREQUESTS})", string.Empty, StringComparison.InvariantCultureIgnoreCase).Trim());
+                        fields.Add(dataStruct.Name, dataStruct);
 
-                    break;
+                        break;
+                    }
                 }
             }
         }
