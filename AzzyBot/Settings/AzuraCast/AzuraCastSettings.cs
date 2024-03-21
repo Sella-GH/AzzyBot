@@ -6,6 +6,7 @@ namespace AzzyBot.Settings.AzuraCast;
 internal sealed class AzuraCastSettings : BaseSettings
 {
     internal static bool AzuraCastSettingsLoaded { get; private set; }
+    internal static bool Ipv6Available { get; private set; }
     internal static bool AutomaticFileChangeCheck { get; private set; }
     internal static bool AutomaticServerPing { get; private set; }
     internal static bool AutomaticUpdateCheck { get; private set; }
@@ -19,6 +20,7 @@ internal sealed class AzuraCastSettings : BaseSettings
     {
         ArgumentNullException.ThrowIfNull(Config);
 
+        Ipv6Available = Convert.ToBoolean(Config["AzuraCast:Ipv6Available"], CultureInfo.InvariantCulture);
         AutomaticFileChangeCheck = Convert.ToBoolean(Config["AzuraCast:AutomaticFileChangeCheck"], CultureInfo.InvariantCulture);
         AutomaticServerPing = Convert.ToBoolean(Config["AzuraCast:AutomaticServerPing"], CultureInfo.InvariantCulture);
         AutomaticUpdateCheck = Convert.ToBoolean(Config["AzuraCast:AutomaticUpdateCheck"], CultureInfo.InvariantCulture);

@@ -114,9 +114,6 @@ internal static class MusicStreamingLavalink
 
         Lyrics lyrics = await GetLyricsFromGeniusAsync(nowPlaying.Now_Playing.Song.Text);
 
-        //if (string.IsNullOrWhiteSpace(lyrics.Text))
-        //    lyrics = await GetLyricsFromYouTubeAsync(searchTerm);
-
         DiscordMember member = await ctx.Guild.GetMemberAsync(ctx.User.Id);
         return MusicStreamingEmbedBuilder.BuildLyricsEmbed(CoreDiscordCommands.GetBestUsername(member.Username, member.Nickname), member.AvatarUrl, lyrics, nowPlaying.Now_Playing.Song.Artist, nowPlaying.Now_Playing.Song.Title);
     }
@@ -127,21 +124,4 @@ internal static class MusicStreamingLavalink
 
         return lyrics ?? new(string.Empty, string.Empty, new LyricsTrack(string.Empty, string.Empty, string.Empty, []), []);
     }
-
-    //private static async Task<Lyrics> GetLyricsFromYouTubeAsync(string search)
-    //{
-    //    ImmutableArray<LyricsSearchResult> results = await Program.GetAudioService.Tracks.SearchLyricsAsync(search);
-
-    //    if (!results.IsDefaultOrEmpty)
-    //    {
-    //        string videoId = results[0].VideoId;
-
-    //        Lyrics? lyrics = await Program.GetAudioService.Tracks.GetYouTubeLyricsAsync(videoId);
-
-    //        if (lyrics is not null)
-    //            return lyrics;
-    //    }
-
-    //    return new(string.Empty, string.Empty, new LyricsTrack(string.Empty, string.Empty, string.Empty, []), []);
-    //}
 }

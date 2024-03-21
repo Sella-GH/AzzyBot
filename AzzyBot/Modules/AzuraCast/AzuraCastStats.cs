@@ -23,7 +23,7 @@ internal static class AzuraCastStats
         if (string.IsNullOrWhiteSpace(ping))
             return AzuraCastEmbedBuilder.BuildServerIsOfflineEmbed(userName, userAvatarUrl, false);
 
-        string body = await CoreWebRequests.GetWebAsync(url, AzuraCastServer.Headers);
+        string body = await CoreWebRequests.GetWebAsync(url, AzuraCastServer.Headers, AzuraCastSettings.Ipv6Available);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty!");
 

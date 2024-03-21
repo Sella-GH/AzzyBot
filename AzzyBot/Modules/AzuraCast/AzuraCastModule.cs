@@ -65,6 +65,10 @@ internal sealed class AzuraCastModule : BaseModule
             case ModuleEventType.GetAzuraCastApiUrl:
                 evt.ResultString = AzuraCastSettings.AzuraApiUrl;
                 break;
+
+            case ModuleEventType.GetAzuraCastIPv6Availability:
+                evt.ResultBool = AzuraCastSettings.Ipv6Available;
+                break;
         }
     }
 

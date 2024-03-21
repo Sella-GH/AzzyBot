@@ -74,6 +74,13 @@ internal sealed class CoreModule : BaseModule
         return evt.ResultString;
     }
 
+    internal static bool GetAzuracastIPv6Availability()
+    {
+        ModuleEvent evt = new(ModuleEventType.GetAzuraCastIPv6Availability);
+        BroadcastModuleEvent(evt);
+        return evt.ResultBool;
+    }
+
     internal static string GetLavalinkPassword()
     {
         ModuleEvent evt = new(ModuleEventType.LavalinkPassword);

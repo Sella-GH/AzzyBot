@@ -25,6 +25,7 @@ internal abstract class BaseModule
         CheckIfSongRequestsAreAppropriate,
         CheckIfUserHasStaffRole,
         GetAzuraCastApiUrl,
+        GetAzuraCastIPv6Availability,
         GetClubOpeningTime,
         GetClubClosedTime,
         GetMusicStreamingInactivity,
