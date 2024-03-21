@@ -480,9 +480,6 @@ internal static class AzuraCastServer
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
-        if (body.Contains("You must be logged in to access this page.", StringComparison.OrdinalIgnoreCase))
-            return [];
-
         List<PlaylistModel>? playlists = [];
 
         if (playlistId == -1)

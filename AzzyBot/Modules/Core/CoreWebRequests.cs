@@ -58,6 +58,9 @@ internal static class CoreWebRequests
                 content = await response.Content.ReadAsStringAsync();
             }
 
+            if (content.Contains("You must be logged in to access this page.", StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("Either you forgot your AzuraCast API key or the API key is wrong!");
+
             return content;
         }
         catch (HttpRequestException e)
