@@ -103,15 +103,17 @@ internal static class MusicStreamingLavalinkHandler
             string lineAfter = string.Empty;
             string password = string.Empty;
 
-            for (int i = 0; i > lines.Length; i++)
+            for (int i = 0; lines.Length > i; i++)
             {
                 string line = lines[i].Trim();
-                lineBefore = lines[i-1].Trim();
-                lineAfter = lines[i+1].Trim();
+                if (i > 1)
+                    lineBefore = lines[i - 1].Trim();
+
+                lineAfter = lines[i + 1].Trim();
 
                 if (line.StartsWith("password:", StringComparison.OrdinalIgnoreCase) && lineBefore is "#######################################" && lineAfter is "#######################################")
                 {
-                    password = line;
+                    password = line.Split(':')[1].Trim().Trim('\"');
                     break;
                 }
             }
