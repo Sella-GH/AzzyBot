@@ -10,6 +10,7 @@ RUN dotnet publish -c Docker -o out
 FROM mcr.microsoft.com/dotnet/runtime:8.0-bookworm-slim-$ARCH
 
 # Upgrade internal tools and packages first
+USER root
 RUN apt update && apt upgrade -y
 RUN apt install -y wget apt-transport-https gpg icu
 
@@ -22,6 +23,7 @@ RUN wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | gp
 RUN echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
 RUN apt update && apt upgrade -y
 RUN apt install -y temurin-17-jre
+USER AzzyBot
 RUN wget -qO https://github.com/lavalink-devs/Lavalink/releases/download/4.0.4/Lavalink.jar /app/Modules/MusicStreaming/Files/Lavalink.jar
 
 # Configure Lavalink
@@ -30,5 +32,4 @@ RUN sed -i "s|Your Genius Client Access Token|${GENIUS_TOKEN}|g" /app/Modules/Mu
 
 # Start the app
 WORKDIR /config
-USER AzzyBot
 ENTRYPOINT ["dotnet", "/app/AzzyBot.dll"]
