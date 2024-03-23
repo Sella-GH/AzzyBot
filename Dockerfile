@@ -23,7 +23,7 @@ RUN wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | gp
 RUN echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
 RUN apt update && apt upgrade -y
 RUN apt install -y temurin-17-jre
-RUN wget -qO https://github.com/lavalink-devs/Lavalink/releases/download/4.0.4/Lavalink.jar /app/Modules/MusicStreaming/Files/Lavalink.jar
+RUN wget -qO /app/Modules/MusicStreaming/Files/Lavalink.jar https://github.com/lavalink-devs/Lavalink/releases/download/4.0.4/Lavalink.jar
 
 # Configure Lavalink
 ARG GENIUS_TOKEN=test
