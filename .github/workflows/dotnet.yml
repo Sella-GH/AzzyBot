@@ -69,6 +69,12 @@ jobs:
           name: debug-${{ matrix.os }}-${{ matrix.arch }}
           path: ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}
 
+      - name: Show where you are
+        run: ls -R
+
+      - name: Change directory for docker build
+        run: cd && ls -R
+
       - name: Publish Docker image to Docker Hub
         uses: ./.github/workflows/docker.yml
         with:
