@@ -3,7 +3,7 @@ ARG ARCH
 FROM mcr.microsoft.com/dotnet/sdk:8.0.203-alpine3.19-$ARCH AS build
 WORKDIR /src
 COPY ./AzzyBot ./
-RUN dotnet restore
+RUN dotnet restore --force --no-cache
 RUN dotnet publish -c Docker -o out
 
 # RUNNER IMAGE
