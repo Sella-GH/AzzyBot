@@ -12,6 +12,14 @@ on:
         required: false
         default: 'dev'
         type: string
+      docker-arch:
+        description: 'Architecture'
+        required: false
+        type: string
+      docker-os:
+        description: 'Operating system'
+        required: false
+        type: string
   workflow_dispatch:
     inputs:
       docker-env:
