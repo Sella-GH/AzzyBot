@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup>
-	<UseArtifactsOutput>true</UseArtifactsOutput>
+    <NoWarn>CA1812,CA2007</NoWarn>
+	  <UseArtifactsOutput>true</UseArtifactsOutput>
   </PropertyGroup>
 </Project>
