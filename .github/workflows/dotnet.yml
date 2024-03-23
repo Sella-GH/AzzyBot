@@ -11,9 +11,7 @@ on:
       - "**.json"
       - "**.props"
       - "**.sln"
-      - ".github/workflows/docker.yml"
       - ".github/workflows/dotnet.yml"
-      - "Dockerfile"
   workflow_dispatch:
 
 jobs:
@@ -72,8 +70,3 @@ jobs:
         with:
           name: debug-${{ matrix.os }}-${{ matrix.arch }}
           path: ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}
-
-  docker-build:
-    needs: build
-    name: Create and uploads the Docker image
-    uses: ./.github/workflows/docker.yml
