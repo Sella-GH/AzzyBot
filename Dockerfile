@@ -30,6 +30,7 @@ ARG GENIUS_TOKEN=test
 RUN sed -i "s|Your Genius Client Access Token|${GENIUS_TOKEN}|g" /app/Modules/MusicStreaming/Files/application.yml
 
 # Add new user
+RUN groupadd azzy
 RUN useradd -m /home/azzy -s /bin/bash -g azzy azzy
 RUN chown -R /app azzy:azzy
 RUN chmod 0755 -R /app
