@@ -1,7 +1,14 @@
 name: Build Docker image and publish to Hub
 
 on:
-  workflow_call:
+  push:
+    paths:
+      - "**.cs"
+      - "**.csproj"
+      - "**.props"
+      - "**.sln"
+      - "./.github/workflows/docker.yml"
+      - "Dockerfile"
   workflow_dispatch:
 
 jobs:
@@ -28,3 +35,12 @@ jobs:
           platforms: linux/amd64,linux/arm64,win/amd64,win/arm64
           push: true
           tags: sellagh/azzybot:dev
+
+      - name: Build and push (release)
+        uses: docker/build-push-action@v5
+        if: ${{ contains(github.event.head_commit.message, '[release]') }}
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64,win/amd64,win/arm64
+          push: true
+          tags: sellagh/azzybot:latest
