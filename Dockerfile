@@ -12,7 +12,7 @@ FROM mcr.microsoft.com/dotnet/runtime:8.0-bookworm-slim-$ARCH
 # Upgrade internal tools and packages first
 USER root
 RUN apt update && apt upgrade -y
-RUN apt install -y wget apt-transport-https gpg icu
+RUN apt install -y wget apt-transport-https gpg libicu72
 
 # Copy the built app
 WORKDIR /app
