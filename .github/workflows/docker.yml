@@ -2,35 +2,7 @@ name: Build Docker image and publish to Hub
 
 on:
   workflow_call:
-    inputs:
-      docker-env:
-        description: 'Environment'
-        required: false
-        default: 'dev'
-        type: string
-      docker-arch:
-        description: 'Architecture'
-        required: false
-        type: string
-      docker-os:
-        description: 'Operating system'
-        required: false
-        type: string
   workflow_dispatch:
-    inputs:
-      docker-env:
-        description: 'Environment'
-        required: false
-        default: 'dev'
-        type: string
-      docker-arch:
-        description: 'Architecture'
-        required: false
-        type: string
-      docker-os:
-        description: 'Operating system'
-        required: false
-        type: string
 
 jobs:
   build:
@@ -43,12 +15,12 @@ jobs:
           fetch-depth: 0
     
       - name: Build the Docker image
-        if: contains(github.event.head_commit.message, '[release]') || contains(github.event.inputs.docker-env, 'latest')
-        run: docker build --no-cache . -t sellagh/azzybot:latest
+        if: contains(github.event.head_commit.message, '[release]')
+        run: docker build --no-cache . -t sellagh/azzybot:latest -p linux/amd64,linux/arm64,win/amd64,win/arm64
 
       - name: Build the Docker image
-        if: contains(github.event.inputs.docker-env, 'dev') || !contains(github.event.head_commit.message, '[release]')
-        run: docker build --no-cache . -t sellagh/azzybot:dev -p ${{ github.event.inputs.docker-os }}/${{ github.event.inputs.docker-arch }}
+        if: ${{ !contains(github.event.head_commit.message, '[release]') }}
+        run: docker build --no-cache . -t sellagh/azzybot:dev -p linux/amd64,linux/arm64,win/amd64,win/arm64
 
       - name: Log into Docker Hub
         uses: docker/login-action@v3
@@ -57,9 +29,9 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Push the image to Docker Hub
-        if: contains(github.event.head_commit.message, '[release]') || contains(github.event.inputs.docker-env, 'latest')
+        if: contains(github.event.head_commit.message, '[release]')
         run: docker push sellagh/azzybot:latest
 
       - name: Push the image to Docker Hub
-        if: contains(github.event.inputs.docker-env, 'dev') || !contains(github.event.head_commit.message, '[release]')
+        if: ${{ !contains(github.event.head_commit.message, '[release]') }}
         run: docker push sellagh/azzybot:dev
