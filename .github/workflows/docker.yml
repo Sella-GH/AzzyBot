@@ -25,6 +25,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Show me the directory
+        run: ls -R
     
       - name: Build the Docker image
         run: docker build --no-cache . -t sellagh/${{ github.repository }}@${{ github.event.inputs.docker-env }}
