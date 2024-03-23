@@ -1,10 +1,6 @@
 name: Build Docker image and publish to Hub
 
 on:
-  push:
-    paths:
-      - ".github/workflows/docker.yml"
-      - "Dockerfile"
   workflow_call:
     inputs:
       docker-env:
@@ -27,6 +23,14 @@ on:
         required: false
         default: 'dev'
         type: string
+      docker-arch:
+        description: 'Architecture'
+        required: false
+        type: string
+      docker-os:
+        description: 'Operating system'
+        required: false
+        type: string
 
 jobs:
   build:
@@ -43,7 +47,7 @@ jobs:
         run: docker build --no-cache . -t sellagh/azzybot:latest
 
       - name: Build the Docker image
-        if: github.event_name == 'push' || contains(github.event.inputs.docker-env, 'dev') || !contains(github.event.head_commit.message, '[release]')
+        if: contains(github.event.inputs.docker-env, 'dev') || !contains(github.event.head_commit.message, '[release]')
         run: docker build --no-cache . -t sellagh/azzybot:dev -p ${{ github.event.inputs.docker-os }}/${{ github.event.inputs.docker-arch }}
 
       - name: Log into Docker Hub
@@ -57,5 +61,5 @@ jobs:
         run: docker push sellagh/azzybot:latest
 
       - name: Push the image to Docker Hub
-        if: github.event_name == 'push' || contains(github.event.inputs.docker-env, 'dev') || !contains(github.event.head_commit.message, '[release]')
+        if: contains(github.event.inputs.docker-env, 'dev') || !contains(github.event.head_commit.message, '[release]')
         run: docker push sellagh/azzybot:dev
