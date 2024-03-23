@@ -5,6 +5,13 @@ on:
     paths:
       - ".github/workflows/docker.yml"
       - "Dockerfile"
+  workflow_call:
+    inputs:
+      docker-env:
+        description: 'Environment'
+        required: false
+        default: 'dev'
+        type: string
   workflow_dispatch:
     inputs:
       docker-env:
@@ -28,7 +35,7 @@ jobs:
         run: docker build --no-cache . -t sellagh/azzybot:latest
 
       - name: Build the Docker image
-        if: github.event_name == 'push' || !contains(github.event.head_commit.message, '[release]') || contains(github.event.inputs.docker-env, 'dev')
+        if: github.event_name == 'push' || contains(github.event.inputs.docker-env, 'dev') || !contains(github.event.head_commit.message, '[release]')
         run: docker build --no-cache . -t sellagh/azzybot:dev
 
       - name: Log into Docker Hub
@@ -38,9 +45,9 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Push the image to Docker Hub
-        if: contains(github.event.head_commit.message, '[release]')
+        if: contains(github.event.head_commit.message, '[release]') || contains(github.event.inputs.docker-env, 'latest')
         run: docker push sellagh/azzybot:latest
 
       - name: Push the image to Docker Hub
-        if: github.event_name == 'push' || !contains(github.event.head_commit.message, '[release]')
+        if: github.event_name == 'push' || contains(github.event.inputs.docker-env, 'dev') || !contains(github.event.head_commit.message, '[release]')
         run: docker push sellagh/azzybot:dev
