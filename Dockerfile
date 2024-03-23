@@ -5,7 +5,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0.203-alpine3.19-$ARCH AS build
 WORKDIR /src
 COPY ./AzzyBot ./
 RUN dotnet restore
-RUN if [[ "$ARCH" = "arm64v8" ]] ; then dotnet publish -c Docker -r $OS-"arm64" -o out ; else dotnet publish -c Docker -r $OS-"amd64" -o out
+RUN case $ARCH in (*arm64v8*) dotnet publish -c Docker -r $OS-"arm64" -o out ;; (*) dotnet publish -c Docker -r $OS-"amd64" -o out; esac
+#RUN if [[ "$ARCH" = "arm64v8" ]] ; then dotnet publish -c Docker -r $OS-"arm64" -o out ; else dotnet publish -c Docker -r $OS-"amd64" -o out
 
 # RUNNER IMAGE
 FROM mcr.microsoft.com/dotnet/runtime:8.0.3-alpine3.19-$ARCH
