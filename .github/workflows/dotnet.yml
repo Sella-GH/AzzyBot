@@ -71,4 +71,9 @@ jobs:
 
       - name: Publish Docker image to Docker Hub
         uses: ./.github/workflows/docker.yml
-    
+
+  docker-publish:
+    name: Publish image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/workflows/docker.yml
