@@ -32,6 +32,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       
       - name: Setup .NET 8.0.x
         uses: actions/setup-dotnet@v4
@@ -69,11 +71,10 @@ jobs:
           name: debug-${{ matrix.os }}-${{ matrix.arch }}
           path: ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}
 
-      - name: Show where you are
-        run: ls -R
-
-      - name: Change directory for docker build
-        run: cd && ls -R
+      - name: Checkout Repo again
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Publish Docker image to Docker Hub
         uses: ./.github/workflows/docker.yml
