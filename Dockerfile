@@ -29,6 +29,6 @@ ARG GENIUS_TOKEN
 RUN sed -i "s|Your Genius Client Access Token|${GENIUS_TOKEN}|g" /app/Modules/MusicStreaming/Files/application.yml
 
 # Start the app
-WORKDIR /config 
-
+WORKDIR /config
+USER AzzyBot
 ENTRYPOINT ["dotnet", "/app/AzzyBot.dll"]
