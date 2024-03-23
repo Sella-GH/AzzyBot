@@ -7,7 +7,7 @@ on:
       - "**.csproj"
       - "**.props"
       - "**.sln"
-      - "./.github/workflows/docker.yml"
+      - ".github/workflows/docker.yml"
       - "Dockerfile"
   workflow_dispatch:
 
