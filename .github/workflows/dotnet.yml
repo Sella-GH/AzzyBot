@@ -72,9 +72,7 @@ jobs:
           name: debug-${{ matrix.os }}-${{ matrix.arch }}
           path: ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}
 
-      - name: Publish Docker image to Docker Hub
-        uses: ./.github/actions/docker
-        with:
-          docker-env: 'dev'
-          docker-arch: ${{ matrix.arch }}
-          docker-os: ${{ matrix.os }}
+  docker-build:
+    needs: build
+    name: Create and uploads the Docker image
+    uses: ./.github/workflows/docker.yml
