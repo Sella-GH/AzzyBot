@@ -8,14 +8,14 @@ on:
     inputs:
       docker-env:
         description: 'Environment'
-        required: true
+        required: false
         default: 'dev'
         type: string
   workflow_dispatch:
     inputs:
       docker-env:
         description: 'Environment'
-        required: true
+        required: false
         default: 'dev'
         type: string
 
@@ -33,7 +33,12 @@ jobs:
         run: ls -R
     
       - name: Build the Docker image
+        if: github.event_name != 'push'
         run: docker build --no-cache . -t sellagh/${{ github.repository }}@${{ github.event.inputs.docker-env }}
+
+      - name: Build the Docker image
+        if: github.event_name == 'push'
+        run: docker build --no-cache . -t sellagh/${{ github.repository }}@dev
 
       - name: Log into Docker Hub
         uses: docker/login-action@v3
