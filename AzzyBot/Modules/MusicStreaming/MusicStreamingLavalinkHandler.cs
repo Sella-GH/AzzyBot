@@ -54,19 +54,26 @@ internal static class MusicStreamingLavalinkHandler
         if (!File.Exists(path))
             return false;
 
-        string[] lines = await File.ReadAllLinesAsync(path);
-
-        foreach (string line in lines)
+        try
         {
-            string newLine = line.Trim();
-            if (newLine.StartsWith("geniusApiKey:", StringComparison.OrdinalIgnoreCase) && newLine.Contains("\"Your Genius Client Access Token\"", StringComparison.OrdinalIgnoreCase))
-            {
-                ExceptionHandler.LogMessage(LogLevel.Error, "You forgot to set your genius api key!");
-                return false;
-            }
-        }
+            string[] lines = await File.ReadAllLinesAsync(path);
 
-        return true;
+            foreach (string line in lines)
+            {
+                string newLine = line.Trim();
+                if (newLine.StartsWith("geniusApiKey:", StringComparison.OrdinalIgnoreCase) && newLine.Contains("\"Your Genius Client Access Token\"", StringComparison.OrdinalIgnoreCase))
+                {
+                    ExceptionHandler.LogMessage(LogLevel.Error, "You forgot to set your genius api key!");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     private static bool CheckIfLavalinkIsThere()
@@ -80,6 +87,46 @@ internal static class MusicStreamingLavalinkHandler
         bool lyricsPluginExists = File.Exists(Path.Combine(path, "plugins", "java-lyrics-plugin-1.6.2.jar"));
 
         return directoryExists && lavalinkJarExists && applicationYmlExists && pluginsDirectoryExists && lyricsPluginExists;
+    }
+
+    internal static async Task<string> GetLavalinkPasswordAsync()
+    {
+        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files", "application.yml");
+
+        if (!File.Exists(path))
+            return string.Empty;
+
+        try
+        {
+            string[] lines = await File.ReadAllLinesAsync(path);
+            string lineBefore = string.Empty;
+            string lineAfter = string.Empty;
+            string password = string.Empty;
+
+            for (int i = 0; lines.Length > i; i++)
+            {
+                string line = lines[i].Trim();
+                if (i > 1)
+                    lineBefore = lines[i - 1].Trim();
+
+                lineAfter = lines[i + 1].Trim();
+
+                if (line.StartsWith("password:", StringComparison.OrdinalIgnoreCase) && lineBefore is "#######################################" && lineAfter is "#######################################")
+                {
+                    password = line.Split(':')[1].Trim().Trim('\"');
+                    break;
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(password))
+                throw new InvalidOperationException("The password couldn't be found");
+
+            return password;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     internal static async Task<bool> StartLavalinkAsync()

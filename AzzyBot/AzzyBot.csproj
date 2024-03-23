@@ -12,7 +12,7 @@
   <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
   <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
   <Authors>Sella-GH, AzzyBot Contributors</Authors>
-  <Version>1.7.1</Version>
+  <Version>1.8.0</Version>
   <Copyright>© 2024 - $(Authors)</Copyright>
   <Product>Azzy</Product>
   <Description>General purpose discord bot, written in C# and with DSharpPlus, dedicated for the use with AzuraCast.</Description>
