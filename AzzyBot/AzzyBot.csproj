@@ -20,6 +20,7 @@
     <PathMap>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)=.</PathMap>
     <AnalysisLevel>latest-all</AnalysisLevel>
     <Configurations>Debug;Release;Docker</Configurations>
+    <NoWarn>CA1812,CA2007</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
