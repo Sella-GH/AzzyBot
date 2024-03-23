@@ -34,11 +34,11 @@ jobs:
     
       - name: Build the Docker image
         if: github.event_name != 'push'
-        run: docker build --no-cache . -t sellagh/${{ github.repository }}@${{ github.event.inputs.docker-env }}
+        run: docker build --no-cache . -t sellagh/AzzyBot@${{ github.event.inputs.docker-env }}
 
       - name: Build the Docker image
         if: github.event_name == 'push'
-        run: docker build --no-cache . -t sellagh/${{ github.repository }}@dev
+        run: docker build --no-cache . -t sellagh/AzzyBot@dev
 
       - name: Log into Docker Hub
         uses: docker/login-action@v3
