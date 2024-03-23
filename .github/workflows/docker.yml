@@ -47,4 +47,9 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Push the image to Docker Hub
-        run: docker push sellagh/azzybot
+        if: github.event_name != 'push'
+        run: docker push sellagh/azzybot:${{ github.event.inputs.docker-env }}
+
+      - name: Push the image to Docker Hub
+        if: github.event_name == 'push'
+        run: docker push sellagh/azzybot:dev
