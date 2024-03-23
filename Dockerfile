@@ -8,7 +8,7 @@ RUN dotnet restore
 RUN if [[ "$ARCH" = "arm64v8" ]] ; then dotnet publish -c Docker -r $OS-"arm64" -o out ; else dotnet publish -c Docker -r $OS-$ARCH -o out
 
 # RUNNER IMAGE
-FROM mcr.microsoft.com/dotnet/runtime:8.0-alpine
+FROM mcr.microsoft.com/dotnet/runtime:8.0.3-alpine3.19-$ARCH
 
 # Upgrade internal tools and packages first
 RUN echo "@edge https://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories
