@@ -19,11 +19,11 @@ jobs:
       matrix:
         include:
           - os: linux
-            arch: x64
+            arch: amd64
           - os: linux
             arch: arm64v8
           - os: win
-            arch: x64
+            arch: amd64
           - os: win
             arch: arm64v8
             
