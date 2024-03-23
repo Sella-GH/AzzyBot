@@ -1,14 +1,10 @@
 # BUILD
 ARG ARCH
-ARG OS
-ENV BUILD_ARCH=$ARCH
-ENV BUILD_ARCH=$OS
-FROM mcr.microsoft.com/dotnet/sdk:8.0.203-alpine3.19-$BUILD_ARCH AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0.203-alpine3.19-$ARCH AS build
 WORKDIR /src
 COPY ./AzzyBot ./
 RUN dotnet restore
-#RUN case $ARCH in (*arm64v8*) dotnet publish -c Docker -r $OS-"arm64" -o out ;; (*) dotnet publish -c Docker -r $OS-"amd64" -o out; esac
-RUN if [[ "$BUILD_ARCH" = "arm64v8" ]] ; then dotnet publish -c Docker -r $BUILD_OS-"arm64" -o out ; else dotnet publish -c Docker -r $BUILD_OS-"amd64" -o out ; fi
+RUN dotnet publish -c Docker -o out
 
 # RUNNER IMAGE
 FROM mcr.microsoft.com/dotnet/runtime:8.0.3-alpine3.19-$ARCH
