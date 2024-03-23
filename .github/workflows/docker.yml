@@ -1,6 +1,9 @@
 name: Build Docker image and publish to Hub
 
 on:
+  push:
+    paths:
+      - ".github/workflows/docker.yml"
   workflow_call:
     inputs:
       docker-env:
