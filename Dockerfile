@@ -11,7 +11,7 @@ FROM mcr.microsoft.com/dotnet/runtime:8.0-bookworm-slim-$ARCH
 
 # Upgrade internal tools and packages first
 RUN apt update && apt upgrade -y
-RUN apt install -y icu-libs
+RUN apt install -y icu
 
 # Copy the built app
 WORKDIR /app
