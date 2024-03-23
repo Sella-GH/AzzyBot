@@ -11,6 +11,7 @@ on:
       - "**.json"
       - "**.props"
       - "**.sln"
+      - ".github/workflows/docker.yml"
       - ".github/workflows/dotnet.yml"
       - "Dockerfile"
   workflow_dispatch:
