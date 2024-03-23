@@ -16,11 +16,11 @@ jobs:
     
       - name: Build the Docker image
         if: contains(github.event.head_commit.message, '[release]')
-        run: docker build --no-cache . -t sellagh/azzybot:latest -p linux/amd64,linux/arm64,win/amd64,win/arm64
+        run: docker build --no-cache . -t sellagh/azzybot:latest --platform linux/amd64,linux/arm64,win/amd64,win/arm64
 
       - name: Build the Docker image
         if: ${{ !contains(github.event.head_commit.message, '[release]') }}
-        run: docker build --no-cache . -t sellagh/azzybot:dev -p linux/amd64,linux/arm64,win/amd64,win/arm64
+        run: docker build --no-cache . -t sellagh/azzybot:dev --platform linux/amd64,linux/arm64,win/amd64,win/arm64
 
       - name: Log into Docker Hub
         uses: docker/login-action@v3
