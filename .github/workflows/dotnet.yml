@@ -12,6 +12,7 @@ on:
       - "**.props"
       - "**.sln"
       - ".github/workflows/dotnet.yml"
+      - "Dockerfile"
   workflow_dispatch:
 
 jobs:
@@ -71,12 +72,9 @@ jobs:
           name: debug-${{ matrix.os }}-${{ matrix.arch }}
           path: ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}
 
-      - name: Checkout Repo again
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - name: Publish Docker image to Docker Hub
-        uses: ./.github/workflows/docker.yml
+        uses: ./.github/actions/docker
         with:
           docker-env: 'dev'
+          docker-arch: ${{ matrix.arch }}
+          docker-os: ${{ matrix.os }}
