@@ -32,7 +32,7 @@ RUN sed -i "s|Your Genius Client Access Token|${GENIUS_TOKEN}|g" /app/Modules/Mu
 # Add new user
 RUN groupadd azzy
 RUN useradd -m -s /bin/bash -g azzy azzy
-RUN chown -R /app azzy:azzy
+RUN chown -R azzy:azzy /app
 RUN chmod 0755 -R /app
 USER azzy
 
