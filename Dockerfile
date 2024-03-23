@@ -27,7 +27,7 @@ RUN apk add --no-cache temurin-17-jre
 RUN wget -O /app/Modules/MusicStreaming/Files/Lavalink.jar https://github.com/lavalink-devs/Lavalink/releases/download/4.0.4/Lavalink.jar
 
 # Configure Lavalink
-ARG GENIUS_TOKEN = "test"
+ARG GENIUS_TOKEN=test
 RUN sed -i "s|Your Genius Client Access Token|${GENIUS_TOKEN}|g" /app/Modules/MusicStreaming/Files/application.yml
 
 # Start the app
