@@ -1,13 +1,13 @@
 # BUILD
 ARG ARCH
-FROM mcr.microsoft.com/dotnet/sdk:8.0.203-alpine3.19-$ARCH AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim-$ARCH AS build
 WORKDIR /src
 COPY ./AzzyBot ./
 RUN dotnet restore --force --no-cache
 RUN dotnet publish -c Docker -o out
 
 # RUNNER IMAGE
-FROM mcr.microsoft.com/dotnet/runtime:8.0.3-alpine3.19-$ARCH
+FROM mcr.microsoft.com/dotnet/runtime:8.0-bookworm-slim-$ARCH
 
 # Upgrade internal tools and packages first
 RUN echo "@edge https://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories
