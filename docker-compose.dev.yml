@@ -1,0 +1,9 @@
+services:
+  AzzyBot:
+    container_name: AzzyBot
+    image: sellagh/azzybot:dev
+    restart: unless-stopped
+    volumes:
+      - ./appsettings.development.json:/app/appsettings.development.json
+      - ./AzzyBot/Customization:/app/AzzyBot/Customization
+      - ./AzzyBot/Modules:/app/AzzyBot/Modules
