@@ -10,7 +10,6 @@ RUN dotnet publish -c Docker -o out
 FROM mcr.microsoft.com/dotnet/runtime:8.0-bookworm-slim-$ARCH
 
 # Upgrade internal tools and packages first
-RUN echo "@edge https://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories
 RUN apt update && apt upgrade -y
 RUN apt install --no-cache icu-libs
 
