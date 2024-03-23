@@ -23,12 +23,17 @@ RUN wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | gp
 RUN echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
 RUN apt update && apt upgrade -y
 RUN apt install -y temurin-17-jre
-USER AzzyBot
 RUN wget -qO https://github.com/lavalink-devs/Lavalink/releases/download/4.0.4/Lavalink.jar /app/Modules/MusicStreaming/Files/Lavalink.jar
 
 # Configure Lavalink
 ARG GENIUS_TOKEN=test
 RUN sed -i "s|Your Genius Client Access Token|${GENIUS_TOKEN}|g" /app/Modules/MusicStreaming/Files/application.yml
+
+# Add new user
+RUN useradd -m /home/azzy -s /bin/bash -g azzy azzy
+RUN chown -R /app azzy:azzy
+RUN chmod 0755 -R /app
+USER azzy
 
 # Start the app
 WORKDIR /config
