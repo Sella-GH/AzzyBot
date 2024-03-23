@@ -12,9 +12,21 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build Docker image
+  docker-build:
+    name: Build Docker image for ${{ matrix.os }} - ${{ matrix.arch }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - os: linux
+            arch: x64
+          - os: linux
+            arch: arm64v8
+          - os: win
+            arch: x64
+          - os: win
+            arch: arm64v8
+            
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,8 +49,9 @@ jobs:
         uses: docker/build-push-action@v5
         if: ${{ !contains(github.event.head_commit.message, '[release]') }}
         with:
+          build-args: ARCH=${{ matrix.arch }} OS=${{ matrix.os }}
           context: .
-          platforms: linux/amd64,linux/arm64,win/amd64,win/arm64
+          platforms: ${{ matrix.os }}/${{ matrix.arch }}
           push: true
           tags: sellagh/azzybot:dev
 
@@ -47,6 +60,6 @@ jobs:
         if: ${{ contains(github.event.head_commit.message, '[release]') }}
         with:
           context: .
-          platforms: linux/amd64,linux/arm64,win/amd64,win/arm64
+          platforms: ${{ matrix.os }}/${{ matrix.arch }}
           push: true
           tags: sellagh/azzybot:latest
