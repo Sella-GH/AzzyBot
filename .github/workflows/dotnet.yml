@@ -77,3 +77,6 @@ jobs:
     needs: build
     name: Create and uploads the Docker image
     uses: ./.github/workflows/docker.yml
+    with:
+      docker-username: ${{ secrets.DOCKERHUB_USERNAME }}
+      docker-password: ${{ secrets.DOCKERHUB_PASSWORD }}
