@@ -13,6 +13,11 @@ name: "CodeQL"
 
 on:
   push:
+    paths:
+      - "**.cs"
+      - "**.csproj"
+      - "**.props"
+      - "**.sln"
   pull_request:
 
 jobs:
