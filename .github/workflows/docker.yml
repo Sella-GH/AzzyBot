@@ -64,9 +64,9 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          #build-args: |
-          #  ARCH=${{ matrix.arch }}
-          #  OS=${{ matrix.os }}
+          build-args: |
+            ARCH=${{ matrix.arch }}
+            OS=${{ matrix.os }}
           context: .
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ matrix.os }}/${{ matrix.arch }}
@@ -88,7 +88,7 @@ jobs:
 
   docker-build-arm:
     name: Build Docker image for ${{ matrix.os }} - ${{ matrix.arch }}
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     outputs:
       environment: ${{ steps.environment.outputs.set-env }}
     strategy:
@@ -138,9 +138,9 @@ jobs:
         id: build
         uses: docker/build-push-action@v5
         with:
-          #build-args: |
-          #  ARCH=${{ matrix.arch }}
-          #  OS=${{ matrix.os }}
+          build-args: |
+            ARCH=${{ matrix.arch }}
+            OS=${{ matrix.os }}
           context: .
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ matrix.os }}/${{ matrix.arch }}
@@ -160,13 +160,13 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-      #- name: Cleanup Runner
-      #  run: |
-      #    cd /home/runner/actions-runner/_work
-      #    rm -rf /tmp/digests
-      #    docker stop $(docker ps -a -q)
-      #    docker system prune -a -f --volumes
-      #    docker volume prune -a -f
+      - name: Cleanup Runner
+        run: |
+          cd /home/runner/actions-runner/_work
+          rm -rf /tmp/digests
+          docker stop $(docker ps -a -q)
+          docker system prune -a -f --volumes
+          docker volume prune -a -f
 
   merge:
     runs-on: ubuntu-latest
