@@ -56,7 +56,7 @@ jobs:
       - name: Get build environment
         id: environment
         run: |
-          if [[ ${{ contains(github.event.head_commit.message, '[release]') }} ]] then
+          if [[ ${{ contains(github.event.head_commit.message, '[release]') }} ]]; then
             echo "latest" >> "$GITHUB_OUTPUT"
           else
             echo "dev" >> "$GITHUB_OUTPUT"
