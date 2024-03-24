@@ -162,9 +162,14 @@ jobs:
 
       - name: Cleanup Runner
         run: |
-          cd
-          rm -rf !(_actions)
+          cd /home/runner/actions-runner/_work
+          rm -rf AzzyBot
+          rm -rf _PipelineMapping
+          rm -rf _temp
+          rm -rf _tool
           rm -rf /tmp/digests
+          docker stop $(docker ps -a -q)
+          docker system prune -a -f --volumes
 
   merge:
     runs-on: ubuntu-latest
