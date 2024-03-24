@@ -22,8 +22,6 @@ jobs:
         include:
           - os: linux
             arch: amd64
-          - os: win
-            arch: amd64
             
     steps:    
       - name: Checkout
@@ -95,8 +93,6 @@ jobs:
       matrix:
         include:
           - os: linux
-            arch: arm64v8
-          - os: win
             arch: arm64v8
             
     steps:       
