@@ -103,7 +103,7 @@ jobs:
       - name: Prepare runner
         run: |
           brew update
-          brew install docker
+          brew install colima docker
           colima start
         
       - name: Checkout
