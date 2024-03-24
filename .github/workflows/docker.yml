@@ -103,8 +103,8 @@ jobs:
       - name: Prepare runner
         run: |
           brew update
-          brew upgrade
           brew install docker
+          brew start docker-daemon
         
       - name: Checkout
         uses: actions/checkout@v4
