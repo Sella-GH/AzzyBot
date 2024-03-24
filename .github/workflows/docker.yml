@@ -166,6 +166,7 @@ jobs:
           rm -rf /tmp/digests
           docker stop $(docker ps -a -q)
           docker system prune -a -f --volumes
+          docker volume prune -a -f
 
   merge:
     runs-on: ubuntu-latest
