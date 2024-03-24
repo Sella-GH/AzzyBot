@@ -1,6 +1,6 @@
 # BUILD
 ARG ARCH
-FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim-$ARCH AS build
 USER root
 RUN apt update && apt upgrade -y && apt autoremove -y
 WORKDIR /src
@@ -9,7 +9,7 @@ RUN dotnet restore ./AzzyBot.csproj
 RUN dotnet publish -c Docker -o out
 
 # RUNNER IMAGE
-FROM mcr.microsoft.com/dotnet/runtime:8.0-bookworm-slim
+FROM mcr.microsoft.com/dotnet/runtime:8.0-bookworm-slim-$ARCH
 
 # Upgrade internal tools and packages first
 USER root
