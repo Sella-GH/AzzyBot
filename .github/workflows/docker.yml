@@ -12,7 +12,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  docker-build:
+  docker-build-amd:
     name: Build Docker image for ${{ matrix.os }} - ${{ matrix.arch }}
     runs-on: ubuntu-latest
     outputs:
@@ -22,12 +22,82 @@ jobs:
         include:
           - os: linux
             arch: amd64
-          #- os: linux
-          #  arch: arm64v8
           - os: win
             arch: amd64
-          #- os: win
-          #  arch: arm64v8
+            
+    steps:    
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get build environment
+        id: environment
+        run: |
+          if ${{ contains(github.event.head_commit.message, '[release]') }}; then
+            echo "set-env=latest" >> "$GITHUB_OUTPUT"
+          else
+            echo "set-env=dev" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          flavor: latest=true
+          images: sellagh/azzybot
+          tags: type=raw,value=${{ steps.environment.outputs.set-env }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log into Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
+            ARCH=${{ matrix.arch }}
+            OS=${{ matrix.os }}
+          context: .
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: ${{ matrix.os }}/${{ matrix.arch }}
+          outputs: type=image,name=sellagh/azzybot,push-by-digest=true,name-canonical=true,push=true
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ matrix.os }}-${{ matrix.arch }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  docker-build-arm:
+    name: Build Docker image for ${{ matrix.os }} - ${{ matrix.arch }}
+    runs-on: macos-14
+    outputs:
+      environment: ${{ steps.environment.outputs.set-env }}
+    strategy:
+      matrix:
+        include:
+          - os: linux
+            arch: arm64v8
+          - os: win
+            arch: arm64v8
             
     steps:    
       - name: Checkout
@@ -92,7 +162,9 @@ jobs:
 
   merge:
     runs-on: ubuntu-latest
-    needs: docker-build
+    needs: [docker-build-amd,docker-build-arm]
+    outputs:
+      environment: ${{ steps.environment.outputs.set-env }}
     steps:
       - name: Download digests
         uses: actions/download-artifact@v4
@@ -103,6 +175,15 @@ jobs:
           
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Get build environment
+        id: environment
+        run: |
+          if ${{ contains(github.event.head_commit.message, '[release]') }}; then
+            echo "set-env=latest" >> "$GITHUB_OUTPUT"
+          else
+            echo "set-env=dev" >> "$GITHUB_OUTPUT"
+          fi
         
       - name: Docker meta
         id: meta
