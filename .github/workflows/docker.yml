@@ -161,7 +161,7 @@ jobs:
           retention-days: 1
 
   merge:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: [docker-build-amd,docker-build-arm]
     outputs:
       environment: ${{ steps.environment.outputs.set-env }}
