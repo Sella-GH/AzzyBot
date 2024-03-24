@@ -99,7 +99,13 @@ jobs:
           - os: win
             arch: arm64v8
             
-    steps:    
+    steps:
+      - name: Prepare runner
+        run: |
+          brew update
+          brew upgrade
+          brew install docker
+        
       - name: Checkout
         uses: actions/checkout@v4
         with:
