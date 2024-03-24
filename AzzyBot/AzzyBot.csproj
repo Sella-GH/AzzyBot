@@ -90,10 +90,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="appsettings.development.json">
+    <None Update="Settings\appsettings.development.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="appsettings.json">
+    <None Update="Settings\appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="BuildDate.txt">

@@ -19,7 +19,7 @@ internal abstract class BaseSettings
     internal static bool ActivateMusicStreaming { get; private set; }
     internal static bool ActivateTimers { get; private set; }
 
-    protected static readonly IConfigurationBuilder builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("appsettings.json", true, false);
+    protected static readonly IConfigurationBuilder builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile("Settings/appsettings.json", true, false);
     protected static IConfiguration? Config { get; private set; }
 
     private static void SetDevConfig()
@@ -28,7 +28,7 @@ internal abstract class BaseSettings
             return;
 
         builder.Sources.Clear();
-        builder.AddJsonFile("appsettings.development.json", true, false);
+        builder.AddJsonFile("Settings/appsettings.development.json", true, false);
     }
 
     internal static void LoadSettings()
