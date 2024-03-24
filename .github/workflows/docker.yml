@@ -99,13 +99,7 @@ jobs:
           - os: win
             arch: arm64v8
             
-    steps:
-      - name: Prepare runner
-        run: |
-          brew update
-          brew install colima docker
-          colima start
-        
+    steps:       
       - name: Checkout
         uses: actions/checkout@v4
         with:
