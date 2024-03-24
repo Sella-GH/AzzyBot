@@ -57,9 +57,9 @@ jobs:
         id: environment
         run: |
           if ${{ contains(github.event.head_commit.message, '[release]') }}; then
-            echo "latest" >> "$GITHUB_OUTPUT"
+            echo "set-env=latest" >> "$GITHUB_OUTPUT"
           else
-            echo "dev" >> "$GITHUB_OUTPUT"
+            echo "set-env=dev" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build and push by digest
