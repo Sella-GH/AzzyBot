@@ -20,12 +20,12 @@ jobs:
         include:
           - os: linux
             arch: amd64
-          #- os: linux
-          #  arch: arm64v8
+          - os: linux
+            arch: arm64v8
           - os: win
             arch: amd64
-          #- os: win
-          #  arch: arm64v8
+          - os: win
+            arch: arm64v8
             
     steps:
       - name: Checkout
