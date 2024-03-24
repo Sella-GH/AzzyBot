@@ -3,8 +3,8 @@ ARG ARCH
 FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim-$ARCH AS build
 WORKDIR /src
 COPY ./AzzyBot ./
-RUN dotnet restore ./AzzyBot.csproj --verbosity diag
-RUN dotnet publish -c Docker -o out --verbosity diag
+RUN dotnet restore ./AzzyBot.csproj
+RUN dotnet publish -c Docker -o out
 
 # RUNNER IMAGE
 FROM mcr.microsoft.com/dotnet/runtime:8.0-bookworm-slim-$ARCH
