@@ -169,6 +169,7 @@ jobs:
           docker volume prune -a -f
 
   merge:
+    name: Creating Docker Release
     runs-on: ubuntu-latest
     needs: [docker-build-amd,docker-build-arm]
     outputs:
