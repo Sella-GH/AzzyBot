@@ -162,8 +162,8 @@ jobs:
 
       - name: Cleanup Runner
         run: |
-          rm -rf /home/runner/actions-runner/_work
-          mkdir /home/runner/actions-runner/_work
+          cd
+          rm -rf !(_actions)
           rm -rf /tmp/digests
 
   merge:
