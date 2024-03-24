@@ -44,7 +44,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          flavor: latest=true
+          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') }}
           images: sellagh/azzybot
           tags: type=raw,value=${{ steps.environment.outputs.set-env }}
 
@@ -118,7 +118,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          flavor: latest=true
+          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') }}
           images: sellagh/azzybot
           tags: type=raw,value=${{ steps.environment.outputs.set-env }}
 
@@ -189,7 +189,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          flavor: latest=true
+          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') }}
           images: sellagh/azzybot
           tags: type=raw,value=${{ steps.environment.outputs.set-env }}
           
