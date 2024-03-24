@@ -44,6 +44,8 @@ internal static class Program
     {
         #region Add OS Architecture Check
 
+        await Console.Out.WriteLineAsync("Checking OS");
+
         if (!CoreMisc.CheckCorrectArchitecture())
         {
             await Console.Error.WriteLineAsync("You can only run this bot with a 64-bit architecture OS!");
@@ -51,40 +53,49 @@ internal static class Program
             Environment.Exit(0);
         }
 
+        await Console.Out.WriteLineAsync("OS check passed");
+
         #endregion Add OS Architecture Check
 
         #region Add Exception Handler
 
+        await Console.Out.WriteLineAsync("Adding Exception Handler");
         AppDomain.CurrentDomain.UnhandledException += GlobalExceptionHandler;
+        ExceptionHandler.LogMessage(LogLevel.Debug, "ExceptionHandler added");
 
         #endregion Add Exception Handler
 
         #region Initialize .json Settings
 
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Loading settings");
         BaseSettings.LoadSettings();
 
         #endregion Initialize .json Settings
 
         #region Initialize client
 
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Creating DiscordClient");
         DiscordClient = InitializeBot();
 
         #endregion Initialize client
 
         #region Initialize the modules
 
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Adding modules");
         BaseModule.RegisterAllModules();
 
         #endregion Initialize the modules
 
         #region Initialize file lockings
 
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Registering all file locks");
         BaseModule.RegisterAllFileLocks();
 
         #endregion Initialize file lockings
 
         #region Initialize Slash Commands
 
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Initializing SlashCommands");
         SlashCommandsExtension? slash = DiscordClient.UseSlashCommands();
         BaseModule.RegisterAllCommands(slash, CoreSettings.ServerId);
 
@@ -92,6 +103,7 @@ internal static class Program
 
         #region Initialize Events
 
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Adding events");
         DiscordClient.ClientErrored += DiscordClientError.DiscordErrorAsync;
         slash.SlashCommandErrored += SlashCommandError.SlashErrorAsync;
         slash.AutocompleteErrored += SlashCommandError.AutocompleteErrorAsync;
@@ -100,6 +112,7 @@ internal static class Program
 
         #region Initialize Interactivity
 
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Configuring interactivity");
         InteractivityConfiguration interactivityConfiguration = new()
         {
             ResponseBehavior = InteractionResponseBehavior.Ignore,
@@ -124,6 +137,7 @@ internal static class Program
 
         if (ModuleStates.MusicStreaming)
         {
+            ExceptionHandler.LogMessage(LogLevel.Debug, "Initializing Lavalink4NET");
             ServiceCollection = new ServiceCollection().AddLavalink().AddSingleton(DiscordClient).ConfigureLavalink(config =>
             {
                 config.ReadyTimeout = TimeSpan.FromSeconds(15);
@@ -168,6 +182,7 @@ internal static class Program
 
         #region Add ShutdownProcess
 
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Adding shutdown process");
         async Task BotShutdown()
         {
             if (ModuleStates.MusicStreaming)
@@ -234,6 +249,7 @@ internal static class Program
 
         #region Connecting to Gateway
 
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Connecting to Discord Gateway");
         (UserStatus status, DiscordActivity activity) = InitBotStatus(CoreSettings.BotStatus, CoreSettings.BotActivity, CoreSettings.BotDoing, CoreSettings.BotStreamUrl);
         await DiscordClient.ConnectAsync(activity, status);
 
@@ -241,12 +257,14 @@ internal static class Program
 
         #region Initialize Strings
 
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Loading strings");
         await StringBuilding.LoadStringsAsync();
 
         #endregion Initialize Strings
 
         #region Initialize Timers
 
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Starting timers");
         if (BaseSettings.ActivateTimers)
             BaseModule.StartAllGlobalTimers();
 
@@ -254,6 +272,7 @@ internal static class Program
 
         #region Check for updates
 
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Checking for updates");
         if (CoreMisc.CheckIfLinuxOs())
             await Updates.CheckForUpdatesAsync(true);
 
@@ -261,6 +280,7 @@ internal static class Program
 
         #region Finalizing
 
+        ExceptionHandler.LogMessage(LogLevel.Information, "Bot is ready");
         await Task.Delay(-1);
 
         #endregion Finalizing
