@@ -61,21 +61,21 @@ internal static class Program
 
         await Console.Out.WriteLineAsync("Adding Exception Handler");
         AppDomain.CurrentDomain.UnhandledException += GlobalExceptionHandler;
-        ExceptionHandler.LogMessage(LogLevel.Debug, "ExceptionHandler added");
 
         #endregion Add Exception Handler
 
         #region Initialize .json Settings
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Loading settings");
+        await Console.Out.WriteLineAsync("Loading settings");
         BaseSettings.LoadSettings();
 
         #endregion Initialize .json Settings
 
         #region Initialize client
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Creating DiscordClient");
+        await Console.Out.WriteLineAsync("Creating DiscordClient");
         DiscordClient = InitializeBot();
+        ExceptionHandler.LogMessage(LogLevel.Debug, "DiscordClient loaded");
 
         #endregion Initialize client
 
