@@ -86,9 +86,15 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
+      - name: Cleanup Runner
+        run: |
+          rm -rf /home/runner/actions-runner/_work
+          mkdir /home/runner/actions-runner/_work
+          rm -rf /tmp/digests
+
   docker-build-arm:
     name: Build Docker image for ${{ matrix.os }} - ${{ matrix.arch }}
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     outputs:
       environment: ${{ steps.environment.outputs.set-env }}
     strategy:
