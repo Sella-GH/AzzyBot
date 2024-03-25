@@ -64,7 +64,8 @@ jobs:
         with:
           build-args: |
             ARCH=${{ matrix.arch }}
-            OS=${{ matrix.os }}
+            COMMIT=${{ github.sha }}
+            TIMESTAMP=${{ github.event.head_commit.timestamp }}
           context: .
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ matrix.os }}/${{ matrix.arch }}

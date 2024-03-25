@@ -36,6 +36,12 @@ RUN sed -i "s|countryCode: de|countryCode: ${GENIUS_COUNTRY_CODE}|g" /app/Module
 RUN sed -i "s|Your Genius Client Access Token|${GENIUS_API_KEY}|g" /app/Modules/MusicStreaming/Files/application.yml
 RUN sed -i "s|youshallnotpass|${LAVALINK_PASSWORD}|g" /app/Modules/MusicStreaming/Files/application.yml
 
+# Add commit and timestamp
+ARG COMMIT
+ARG TIMESTAMP
+RUN echo $COMMIT > /app/Commit.txt
+RUN echo $TIMESTAMP > /app/BuildDate.txt
+
 # Add new user
 RUN groupadd azzy
 RUN useradd -m -s /bin/bash -g azzy azzy
