@@ -48,7 +48,6 @@ internal abstract class BaseSettings
         if (!CoreSettings.CoreSettingsLoaded)
         {
             await Console.Error.WriteLineAsync("Core settings aren't loaded");
-            Console.ReadKey();
             Environment.Exit(1);
         }
 

@@ -33,7 +33,7 @@ internal sealed class MusicStreamingSettings : BaseSettings
 
     private static async Task<string> GetGeniusApiKeyAsync()
     {
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Getting Genius API key");
+        await Console.Out.WriteLineAsync("Getting Genius API key");
         string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files", "application.yml");
 
         if (!File.Exists(path))
