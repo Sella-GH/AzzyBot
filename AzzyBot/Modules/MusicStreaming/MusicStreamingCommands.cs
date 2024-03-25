@@ -95,7 +95,7 @@ internal sealed class MusicStreamingCommands : ApplicationCommandModule
         {
             ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerShowLyricsCommandAsync requested");
 
-            if (!MusicStreamingSettings.ActivateLyrics)
+            if (!MusicStreamingSettings.ActivateLyrics || string.IsNullOrWhiteSpace(MusicStreamingSettings.GeniusApiKey) || MusicStreamingSettings.GeniusApiKey is "empty")
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MusicStreamingStringBuilder.GetCommandsShowLyricsModuleRequired).AsEphemeral());
                 return;

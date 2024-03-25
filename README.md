@@ -63,6 +63,8 @@ The bot contains of the following features:
 * [Roslynator 4.11](https://github.com/dotnet/roslynator)
 * [Lavalink](https://github.com/lavalink-devs/Lavalink)
 * [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
+* [Docker](https://docker.com/)
+* [Docker Compose](https://docker.com/)
 
 ## Getting Started
 

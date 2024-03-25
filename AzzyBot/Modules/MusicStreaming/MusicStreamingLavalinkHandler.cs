@@ -17,6 +17,8 @@ internal static class MusicStreamingLavalinkHandler
 
     internal static async Task<bool> CheckIfJavaIsInstalledAsync()
     {
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Checking if OpenJDK JRE is installed");
+
         try
         {
             ProcessStartInfo processStartInfo = new()
@@ -49,6 +51,8 @@ internal static class MusicStreamingLavalinkHandler
 
     private static async Task<bool> CheckIfLavalinkConfigIsRightAsync()
     {
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Checking if Lavalink config is correct");
+
         string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files", "application.yml");
 
         if (!File.Exists(path))
@@ -78,19 +82,20 @@ internal static class MusicStreamingLavalinkHandler
 
     private static bool CheckIfLavalinkIsThere()
     {
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Checking if Lavalink files are present");
+
         string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files");
 
         bool directoryExists = Directory.Exists(path);
         bool lavalinkJarExists = File.Exists(Path.Combine(path, "Lavalink.jar"));
         bool applicationYmlExists = File.Exists(Path.Combine(path, "application.yml"));
-        bool pluginsDirectoryExists = Directory.Exists(Path.Combine(path, "plugins"));
-        bool lyricsPluginExists = File.Exists(Path.Combine(path, "plugins", "java-lyrics-plugin-1.6.2.jar"));
 
-        return directoryExists && lavalinkJarExists && applicationYmlExists && pluginsDirectoryExists && lyricsPluginExists;
+        return directoryExists && lavalinkJarExists && applicationYmlExists;
     }
 
     internal static async Task<string> GetLavalinkPasswordAsync()
     {
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Getting Lavalink password");
         string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files", "application.yml");
 
         if (!File.Exists(path))
@@ -131,6 +136,8 @@ internal static class MusicStreamingLavalinkHandler
 
     internal static async Task<bool> StartLavalinkAsync()
     {
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Starting Lavalink");
+
         try
         {
             if (!CheckIfLavalinkIsThere())
@@ -163,6 +170,8 @@ internal static class MusicStreamingLavalinkHandler
 
     internal static async Task<bool> StopLavalinkAsync()
     {
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Stopping Lavalink");
+
         try
         {
             if (LavalinkProcess is null)

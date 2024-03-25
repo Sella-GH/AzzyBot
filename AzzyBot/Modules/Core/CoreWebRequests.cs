@@ -19,14 +19,14 @@ internal static class CoreWebRequests
     /// Forcing this client to use IPv4, only TCP ports because AzuraCast prefers TCP
     /// </summary>
     private static readonly HttpClient ClientV4 = new(new SocketsHttpHandler()
+    {
+        ConnectCallback = async (context, cancellationToken) =>
         {
-            ConnectCallback = async(context, cancellationToken) =>
-            {
-                Socket socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                await socket.ConnectAsync(context.DnsEndPoint, cancellationToken);
-                return new NetworkStream(socket, true);
-            }
-        })
+            Socket socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            await socket.ConnectAsync(context.DnsEndPoint, cancellationToken);
+            return new NetworkStream(socket, true);
+        }
+    })
     {
         DefaultRequestVersion = new(2, 0),
         DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher,
