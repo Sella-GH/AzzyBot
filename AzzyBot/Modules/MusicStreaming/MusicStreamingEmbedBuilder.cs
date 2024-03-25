@@ -1,5 +1,6 @@
 ﻿using System;
 using AzzyBot.Modules.Core;
+using AzzyBot.Modules.MusicStreaming.Player;
 using AzzyBot.Strings.MusicStreaming;
 using DSharpPlus.Entities;
 using Lavalink4NET.Integrations.LyricsJava;
@@ -29,7 +30,7 @@ internal static class MusicStreamingEmbedBuilder
         return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.SpringGreen, string.Empty, footerText);
     }
 
-    internal static DiscordEmbed BuildPreconditionErrorEmbed(string userName, string userAvatarUrl, in PlayerResult<LavalinkPlayer> result)
+    internal static DiscordEmbed BuildPreconditionErrorEmbed(string userName, string userAvatarUrl, in PlayerResult<MusicStreamingPlayer> result)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));

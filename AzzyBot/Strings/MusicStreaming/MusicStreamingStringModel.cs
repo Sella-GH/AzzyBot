@@ -48,6 +48,14 @@ internal sealed class MusicStreamingStringModel
 
     #endregion CommandsStop
 
+    #region CustomPlayerMessages
+
+    public string CustomPlayerIsActiveAgain { get; set; } = string.Empty;
+    public string CustomPlayerIsInactive { get; set; } = string.Empty;
+    public string CustomPlayerLeaves { get; set; } = string.Empty;
+
+    #endregion CustomPlayerMessages
+
     #endregion Commands
 
     #region Embeds
