@@ -67,7 +67,7 @@ internal static class Program
         #region Initialize .json Settings
 
         await Console.Out.WriteLineAsync("Loading settings");
-        BaseSettings.LoadSettings();
+        await BaseSettings.LoadSettingsAsync();
 
         #endregion Initialize .json Settings
 

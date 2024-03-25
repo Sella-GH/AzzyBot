@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using AzzyBot.Modules.Core;
 using AzzyBot.Settings.AzuraCast;
 using AzzyBot.Settings.ClubManagement;
@@ -30,7 +31,7 @@ internal abstract class BaseSettings
         builder.AddJsonFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Settings", "appsettings.development.json"), true, false);
     }
 
-    internal static void LoadSettings()
+    internal static async Task LoadSettingsAsync()
     {
         SetDevConfig();
 
@@ -46,7 +47,7 @@ internal abstract class BaseSettings
         // Ensure core is activated first
         if (!CoreSettings.CoreSettingsLoaded)
         {
-            Console.Error.WriteLine("Core settings aren't loaded");
+            await Console.Error.WriteLineAsync("Core settings aren't loaded");
             Console.ReadKey();
             Environment.Exit(1);
         }
@@ -57,7 +58,7 @@ internal abstract class BaseSettings
         if (ActivateClubManagement && !ClubManagementSettings.LoadClubManagement())
             throw new InvalidOperationException("ClubManagement settings can't be loaded");
 
-        if (ActivateMusicStreaming && !MusicStreamingSettings.LoadMusicStreaming())
+        if (ActivateMusicStreaming && !await MusicStreamingSettings.LoadMusicStreamingAsync())
             throw new InvalidOperationException("MusicStreaming settings can't be loaded");
 
         if ((ActivateAzuraCast || ActivateClubManagement) && (AzuraCastSettings.AutomaticFileChangeCheck || AzuraCastSettings.AutomaticServerPing || AzuraCastSettings.AutomaticUpdateCheck || ClubManagementSettings.AutomaticClubClosingCheck))

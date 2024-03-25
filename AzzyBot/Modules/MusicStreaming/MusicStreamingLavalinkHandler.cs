@@ -85,16 +85,10 @@ internal static class MusicStreamingLavalinkHandler
         ExceptionHandler.LogMessage(LogLevel.Debug, "Checking if Lavalink files are present");
 
         string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files");
-        ExceptionHandler.LogMessage(LogLevel.Debug, path);
 
         bool directoryExists = Directory.Exists(path);
-        ExceptionHandler.LogMessage(LogLevel.Debug, directoryExists.ToString());
         bool lavalinkJarExists = File.Exists(Path.Combine(path, "Lavalink.jar"));
-        ExceptionHandler.LogMessage(LogLevel.Debug, Path.Combine(path, "Lavalink.jar"));
-        ExceptionHandler.LogMessage(LogLevel.Debug, lavalinkJarExists.ToString());
         bool applicationYmlExists = File.Exists(Path.Combine(path, "application.yml"));
-        ExceptionHandler.LogMessage(LogLevel.Debug, Path.Combine(path, "application.yml"));
-        ExceptionHandler.LogMessage(LogLevel.Debug, applicationYmlExists.ToString());
 
         return directoryExists && lavalinkJarExists && applicationYmlExists;
     }
