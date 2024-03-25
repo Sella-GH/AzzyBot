@@ -43,7 +43,10 @@ internal static class MusicStreamingLavalink
 
     internal static async Task<bool> DisconnectAsync(InteractionContext ctx)
     {
-        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true) ?? throw new InvalidOperationException("Player is null");
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true);
+
+        if (player is null)
+            return false;
 
         await player.DisconnectAsync();
         await player.DisposeAsync();
@@ -53,14 +56,20 @@ internal static class MusicStreamingLavalink
 
     internal static async Task<bool> JoinMusicAsync(InteractionContext ctx)
     {
-        LavalinkPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying]) ?? throw new InvalidOperationException("Player is null");
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying]);
+
+        if (player is null)
+            return false;
 
         return player.VoiceChannelId is not 0;
     }
 
     internal static async Task<bool> PlayMusicAsync(InteractionContext ctx)
     {
-        LavalinkPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying]) ?? throw new InvalidOperationException("Player is null");
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying]);
+
+        if (player is null)
+            return false;
 
         TrackLoadOptions trackLoadOptions = new()
         {
@@ -82,7 +91,10 @@ internal static class MusicStreamingLavalink
 
     internal static async Task<bool> SetVolumeAsync(InteractionContext ctx, float volume, bool reset)
     {
-        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true) ?? throw new InvalidOperationException("Player is null");
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true);
+
+        if (player is null)
+            return false;
 
         if (reset)
         {
@@ -98,7 +110,10 @@ internal static class MusicStreamingLavalink
     internal static async Task<bool> StopMusicAsync(InteractionContext ctx, bool disconnect)
     {
         IPlayerPrecondition precondition = PlayerPrecondition.Any(PlayerPrecondition.Playing, PlayerPrecondition.Paused);
-        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true, [precondition]) ?? throw new InvalidOperationException("Player is null");
+        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true, [precondition]);
+
+        if (player is null)
+            return false;
 
         await player.StopAsync();
 
