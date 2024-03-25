@@ -27,10 +27,6 @@ RUN apt update && apt upgrade -y && apt autoremove -y
 RUN apt install -y temurin-17-jre
 RUN wget -qO /app/Modules/MusicStreaming/Files/Lavalink.jar https://github.com/lavalink-devs/Lavalink/releases/download/4.0.4/Lavalink.jar
 
-# Configure Lavalink
-ARG GENIUS_TOKEN=test
-RUN sed -i "s|Your Genius Client Access Token|${GENIUS_TOKEN}|g" /app/Modules/MusicStreaming/Files/application.yml
-
 # Add new user
 RUN groupadd azzy
 RUN useradd -m -s /bin/bash -g azzy azzy
