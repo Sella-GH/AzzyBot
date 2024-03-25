@@ -3,7 +3,10 @@ services:
     container_name: AzzyBot
     image: sellagh/azzybot:dev
     restart: unless-stopped
+    environment:
+      - GENIUS_COUNTRY_CODE # (optional) Replace with your country code
+      - GENIUS_API_KEY # (optional) Replace with your API key
+      - LAVALINK_PASSWORD # (optional) Replace with your own
     volumes:
-      - ./appsettings.development.json:/app/appsettings.development.json
-      - ./AzzyBot/Customization:/app/AzzyBot/Customization
-      - ./AzzyBot/Modules:/app/AzzyBot/Modules
+      - ./AzzyBot/Settings:/app/Settings
+      - ./AzzyBot/Customization:/app/Customization
