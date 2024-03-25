@@ -26,6 +26,7 @@ RUN echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION
 RUN apt update && apt upgrade -y && apt autoremove -y
 RUN apt install -y temurin-17-jre
 RUN wget -qO /app/Modules/MusicStreaming/Files/Lavalink.jar https://github.com/lavalink-devs/Lavalink/releases/download/4.0.4/Lavalink.jar
+RUN wget -qO /app/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.2.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.2/java-lyrics-plugin-1.6.2.jar
 
 # Configure Lavalink
 ENV GENIUS_COUNTRY_CODE=de
