@@ -140,6 +140,7 @@ internal static class Program
             ExceptionHandler.LogMessage(LogLevel.Debug, "Initializing Lavalink4NET");
             ServiceCollection = new ServiceCollection().AddLavalink().AddSingleton(DiscordClient).ConfigureLavalink(config =>
             {
+                config.BaseAddress = (CoreAzzyStatsGeneral.GetBotName is "AzzyBot-Docker") ? new Uri("http://lavalink:2333") : new Uri("http://localhost:2333");
                 config.ReadyTimeout = TimeSpan.FromSeconds(15);
                 config.ResumptionOptions = new(TimeSpan.Zero);
                 config.Label = "AzzyBot";
