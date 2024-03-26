@@ -1,8 +1,12 @@
+include:
+  - ./AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
 services:
   AzzyBot:
     container_name: AzzyBot
     image: sellagh/azzybot:latest
     restart: unless-stopped
+    depends-on:
+      - lavalink
     environment:
       - GENIUS_COUNTRY_CODE # (optional) Replace with your country code
       - GENIUS_API_KEY # (optional) Replace with your API key
