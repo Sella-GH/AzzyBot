@@ -70,7 +70,7 @@ internal static class CoreAzzyStatsGeneral
         return text;
     }
 
-    internal static string GetBotName => Assembly.GetExecutingAssembly().GetName().Name ?? "Bot name not found";
+    internal static string GetBotName => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductName ?? "Bot name not found";
 
     /// <summary>
     /// Gets the memory usage only of the bot itself.

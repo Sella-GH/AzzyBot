@@ -42,6 +42,12 @@ internal static class Program
 
     private static async Task Main()
     {
+        #region Add basic startup information
+
+        await Console.Out.WriteLineAsync($"Starting {CoreAzzyStatsGeneral.GetBotName} in version {CoreAzzyStatsGeneral.GetBotVersion}");
+
+        #endregion Add basic startup information
+
         #region Add OS Architecture Check
 
         await Console.Out.WriteLineAsync("Checking OS");

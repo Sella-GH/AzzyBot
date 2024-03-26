@@ -26,21 +26,25 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Dev</AssemblyName>
+    <Product>AzzyBot-Dev</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Dev</AssemblyName>
+    <Product>AzzyBot-Dev</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|ARM64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Docker</AssemblyName>
+    <Product>AzzyBot-Docker</Product>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|x64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Docker</AssemblyName>
+    <Product>AzzyBot-Docker</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
