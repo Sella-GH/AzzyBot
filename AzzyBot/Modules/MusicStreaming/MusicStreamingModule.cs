@@ -32,11 +32,13 @@ internal sealed class MusicStreamingModule : BaseModule
 
     internal override async void StartProcesses()
     {
+        /*
         if (!await MusicStreamingLavalinkHandler.CheckIfJavaIsInstalledAsync())
             throw new InvalidOperationException("You have to install Java/OpenJDK Runtime 17 or 21 first!");
 
         if (!await MusicStreamingLavalinkHandler.StartLavalinkAsync())
             throw new InvalidOperationException("Lavalink failed to start!");
+        */
     }
 
     internal override async void StopProcesses() => await MusicStreamingLavalinkHandler.StopLavalinkAsync();
