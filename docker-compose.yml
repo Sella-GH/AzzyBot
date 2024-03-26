@@ -5,15 +5,10 @@ services:
     container_name: AzzyBot
     image: sellagh/azzybot:latest
     restart: unless-stopped
-    depends-on:
+    depends_on:
       - lavalink
-    environment:
-      - GENIUS_COUNTRY_CODE # (optional) Replace with your country code
-      - GENIUS_API_KEY # (optional) Replace with your API key
-      - LAVALINK_PASSWORD # (optional) Replace with your own
+    networks:
+      - lavalink
     volumes:
       - ./AzzyBot/Settings:/app/Settings
       - ./AzzyBot/Customization:/app/Customization
-networks:
-  AzzyBot:
-    name: lavalink
