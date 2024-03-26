@@ -6,7 +6,7 @@ RUN apt update && apt upgrade -y && apt autoremove -y
 WORKDIR /src
 COPY ./AzzyBot ./
 RUN dotnet restore ./AzzyBot.csproj
-RUN dotnet publish -c Docker -o out
+RUN dotnet publish ./AzzyBot.csproj -c Docker -o out
 
 # RUNNER IMAGE
 FROM mcr.microsoft.com/dotnet/runtime:8.0-bookworm-slim-$ARCH
@@ -51,4 +51,4 @@ USER azzy
 
 # Start the app
 WORKDIR /config
-ENTRYPOINT ["dotnet", "/app/AzzyBot.dll"]
+ENTRYPOINT ["dotnet", "/app/AzzyBot-Docker.dll"]
