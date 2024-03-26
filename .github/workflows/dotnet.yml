@@ -74,10 +74,7 @@ jobs:
   build-docker:
     name: Build and publish docker .zip file
     runs-on: ubuntu-latest
-    steps:
-      - name: Install GitHub CLI
-        run: sudo apt-get update && sudo apt-get install -y gh
-    
+    steps:    
       - name: Checkout
         uses: actions/checkout@v4
         with:
