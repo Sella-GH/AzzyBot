@@ -93,48 +93,6 @@ internal static class MusicStreamingLavalinkHandler
         return directoryExists && lavalinkJarExists && applicationYmlExists;
     }
 
-    internal static async Task<string> GetLavalinkPasswordAsync()
-    {
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Getting Lavalink password");
-        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files", "application.yml");
-
-        if (!File.Exists(path))
-            return string.Empty;
-
-        try
-        {
-            string[] lines = await File.ReadAllLinesAsync(path);
-            string lineBefore = string.Empty;
-            string lineAfter = string.Empty;
-            string password = string.Empty;
-
-            for (int i = 0; lines.Length > i; i++)
-            {
-                string line = lines[i].Trim();
-                if (i > 1)
-                    lineBefore = lines[i - 1].Trim();
-
-                lineAfter = lines[i + 1].Trim();
-
-                if (line.StartsWith("password:", StringComparison.OrdinalIgnoreCase) && lineBefore is "#######################################" && lineAfter is "#######################################")
-                {
-                    password = line.Split(':')[1].Trim().Trim('\"');
-                    ExceptionHandler.LogMessage(LogLevel.Debug, password);
-                    break;
-                }
-            }
-
-            if (string.IsNullOrWhiteSpace(password))
-                throw new InvalidOperationException("The password couldn't be found");
-
-            return password;
-        }
-        catch (Exception)
-        {
-            throw;
-        }
-    }
-
     internal static async Task<bool> StartLavalinkAsync()
     {
         ExceptionHandler.LogMessage(LogLevel.Debug, "Starting Lavalink");

@@ -32,8 +32,7 @@ internal abstract class BaseModule
         GetMusicStreamingInactivity,
         GetMusicStreamingInactivityTime,
         GetMusicStreamingLyrics,
-        GlobalTimerTick,
-        LavalinkPassword
+        GlobalTimerTick
     }
 
     protected sealed class ModuleEvent

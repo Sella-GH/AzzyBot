@@ -85,13 +85,6 @@ internal sealed class CoreModule : BaseModule
         return evt.ResultBool;
     }
 
-    internal static string GetLavalinkPassword()
-    {
-        ModuleEvent evt = new(ModuleEventType.LavalinkPassword);
-        BroadcastModuleEvent(evt);
-        return evt.ResultString;
-    }
-
     internal static bool GetMusicStreamingInactivity()
     {
         ModuleEvent evt = new(ModuleEventType.GetMusicStreamingInactivity);
