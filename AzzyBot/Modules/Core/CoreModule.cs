@@ -40,6 +40,10 @@ internal sealed class CoreModule : BaseModule
     {
         switch (evt.Type)
         {
+            case ModuleEventType.GetAzzyBotName:
+                evt.ResultString = CoreAzzyStatsGeneral.GetBotName;
+                break;
+
             case ModuleEventType.GlobalTimerTick:
                 if (CoreAzzyStatsGeneral.GetBotEnvironment == "Development")
                     break;

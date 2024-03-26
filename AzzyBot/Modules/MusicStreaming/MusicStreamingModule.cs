@@ -32,15 +32,23 @@ internal sealed class MusicStreamingModule : BaseModule
 
     internal override async void StartProcesses()
     {
-        /*
+        if (GetAzzyBotName() is not "AzzyBot-Docker")
+            return;
+
         if (!await MusicStreamingLavalinkHandler.CheckIfJavaIsInstalledAsync())
             throw new InvalidOperationException("You have to install Java/OpenJDK Runtime 17 or 21 first!");
 
         if (!await MusicStreamingLavalinkHandler.StartLavalinkAsync())
             throw new InvalidOperationException("Lavalink failed to start!");
-        */
     }
 
     internal override async void StopProcesses() => await MusicStreamingLavalinkHandler.StopLavalinkAsync();
     internal override void Activate() => ModuleStates.ActivateMusicStreaming();
+
+    internal static string GetAzzyBotName()
+    {
+        ModuleEvent evt = new(ModuleEventType.GetAzzyBotName);
+        BroadcastModuleEvent(evt);
+        return evt.ResultString;
+    }
 }
