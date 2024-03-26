@@ -14,3 +14,6 @@ services:
     volumes:
       - ./AzzyBot/Settings:/app/Settings
       - ./AzzyBot/Customization:/app/Customization
+networks:
+  AzzyBot:
+    name: lavalink
