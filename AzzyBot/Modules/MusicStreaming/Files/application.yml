@@ -22,11 +22,11 @@ lavalink:
       repository: "https://maven.lavalink.dev/releases"
   server:
   #######################################
-  #          CHANGE THIS !!!
+  #          DO NOT CHANGE THIS !!!     #
   #######################################
     password: "youshallnotpass"
   #######################################
-  #          CHANGE THIS !!!
+  #          DO NOT CHANGE THIS !!!     #
   #######################################
     sources: # All sources are disabled but AzuraCast (http)
       youtube: false
