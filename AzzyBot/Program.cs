@@ -134,7 +134,7 @@ internal static class Program
 
         ExceptionHandler.LogMessage(LogLevel.Debug, "Starting all processes");
         BaseModule.StartAllProcesses();
-        await Task.Delay(5000);
+        await Task.Delay(1000);
         ExceptionHandler.LogMessage(LogLevel.Debug, "Started all processes");
 
         #endregion Initialize Processes
