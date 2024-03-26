@@ -51,4 +51,4 @@ USER azzy
 
 # Start the app
 WORKDIR /config
-ENTRYPOINT ["dotnet", "/app/AzzyBot.dll"]
+ENTRYPOINT ["dotnet", "/app/AzzyBot-Docker.dll"]
