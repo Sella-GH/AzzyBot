@@ -32,7 +32,7 @@ internal sealed class MusicStreamingModule : BaseModule
 
     internal override async void StartProcesses()
     {
-        if (GetAzzyBotName() is not "AzzyBot-Docker")
+        if (GetAzzyBotName() is "AzzyBot-Docker")
             return;
 
         if (!await MusicStreamingLavalinkHandler.CheckIfJavaIsInstalledAsync())
