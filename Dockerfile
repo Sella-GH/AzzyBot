@@ -21,20 +21,20 @@ WORKDIR /app
 COPY --from=build /src/out .
 
 # Add AdoptOpenJDK 17 Runtime and Lavalink
-RUN wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | gpg --dearmor | tee /etc/apt/trusted.gpg.d/adoptium.gpg > /dev/null
-RUN echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
-RUN apt update && apt upgrade -y && apt autoremove -y
-RUN apt install -y temurin-17-jre
-RUN wget -qO /app/Modules/MusicStreaming/Files/Lavalink.jar https://github.com/lavalink-devs/Lavalink/releases/download/4.0.4/Lavalink.jar
-RUN mkdir -p /app/Modules/MusicStreaming/Files/plugins && wget -qO /app/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.2.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.2/java-lyrics-plugin-1.6.2.jar
+#RUN wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | gpg --dearmor | tee /etc/apt/trusted.gpg.d/adoptium.gpg > /dev/null
+#RUN echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
+#RUN apt update && apt upgrade -y && apt autoremove -y
+#RUN apt install -y temurin-17-jre
+#RUN wget -qO /app/Modules/MusicStreaming/Files/Lavalink.jar https://github.com/lavalink-devs/Lavalink/releases/download/4.0.4/Lavalink.jar
+#RUN mkdir -p /app/Modules/MusicStreaming/Files/plugins && wget -qO /app/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.2.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.2/java-lyrics-plugin-1.6.2.jar
 
 # Configure Lavalink
-ENV GENIUS_COUNTRY_CODE=de
-ENV GENIUS_API_KEY=empty
-ENV LAVALINK_PASSWORD=youshallnotpass
-RUN sed -i "s|countryCode: de|countryCode: ${GENIUS_COUNTRY_CODE}|g" /app/Modules/MusicStreaming/Files/application.yml
-RUN sed -i "s|Your Genius Client Access Token|${GENIUS_API_KEY}|g" /app/Modules/MusicStreaming/Files/application.yml
-RUN sed -i "s|youshallnotpass|${LAVALINK_PASSWORD}|g" /app/Modules/MusicStreaming/Files/application.yml
+#ENV GENIUS_COUNTRY_CODE=de
+#ENV GENIUS_API_KEY=empty
+#ENV LAVALINK_PASSWORD=youshallnotpass
+#RUN sed -i "s|countryCode: de|countryCode: ${GENIUS_COUNTRY_CODE}|g" /app/Modules/MusicStreaming/Files/application.yml
+#RUN sed -i "s|Your Genius Client Access Token|${GENIUS_API_KEY}|g" /app/Modules/MusicStreaming/Files/application.yml
+#RUN sed -i "s|youshallnotpass|${LAVALINK_PASSWORD}|g" /app/Modules/MusicStreaming/Files/application.yml
 
 # Add commit and timestamp
 ARG COMMIT
