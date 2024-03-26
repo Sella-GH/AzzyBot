@@ -119,6 +119,7 @@ internal static class MusicStreamingLavalinkHandler
                 if (line.StartsWith("password:", StringComparison.OrdinalIgnoreCase) && lineBefore is "#######################################" && lineAfter is "#######################################")
                 {
                     password = line.Split(':')[1].Trim().Trim('\"');
+                    ExceptionHandler.LogMessage(LogLevel.Debug, password);
                     break;
                 }
             }
