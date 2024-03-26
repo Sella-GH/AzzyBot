@@ -6,6 +6,7 @@ using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.AzuraCast.Enums;
 using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.Core;
+using AzzyBot.Modules.MusicStreaming.Player;
 using AzzyBot.Settings.AzuraCast;
 using AzzyBot.Settings.MusicStreaming;
 using DSharpPlus.Entities;
@@ -24,16 +25,31 @@ namespace AzzyBot.Modules.MusicStreaming;
 
 internal static class MusicStreamingLavalink
 {
-    private static async ValueTask<LavalinkPlayer?> GetPlayerAsync(InteractionContext ctx, bool allowConnect = false, bool requireChannel = true, ImmutableArray<IPlayerPrecondition> preconditions = default, CancellationToken cancellationToken = default)
+    internal static DiscordChannel? GetRequestChannel { get; private set; }
+
+    private static async ValueTask<MusicStreamingPlayer?> GetPlayerAsync(InteractionContext ctx, bool allowConnect = false, bool requireChannel = true, ImmutableArray<IPlayerPrecondition> preconditions = default, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
         PlayerRetrieveOptions retrieveOptions = new((allowConnect) ? PlayerChannelBehavior.Join : PlayerChannelBehavior.None, (requireChannel) ? MemberVoiceStateBehavior.RequireSame : MemberVoiceStateBehavior.Ignore, preconditions);
-        LavalinkPlayerOptions playerOptions = new() { SelfDeaf = true };
-        PlayerResult<LavalinkPlayer> result = await Program.GetAudioService.Players.RetrieveAsync(ctx.Guild.Id, ctx.Member?.VoiceState.Channel.Id, PlayerFactory.Default, Options.Create(playerOptions), retrieveOptions, cancellationToken);
+        MusicStreamingPlayerOptions playerOptions = new() { SelfDeaf = true };
+
+        static ValueTask<MusicStreamingPlayer> CreatePlayerAsync(IPlayerProperties<MusicStreamingPlayer, MusicStreamingPlayerOptions> properties, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ArgumentNullException.ThrowIfNull(properties, nameof(properties));
+
+            return ValueTask.FromResult(new MusicStreamingPlayer(properties));
+        }
+
+        PlayerResult<MusicStreamingPlayer> result = await Program.GetAudioService.Players.RetrieveAsync<MusicStreamingPlayer, MusicStreamingPlayerOptions>(ctx.Guild.Id, ctx.Member?.VoiceState.Channel.Id, CreatePlayerAsync, Options.Create(playerOptions), retrieveOptions, cancellationToken);
 
         if (result.IsSuccess)
+        {
+            GetRequestChannel = ctx.Channel;
+
             return result.Player;
+        }
 
         DiscordMember member = await ctx.Guild.GetMemberAsync(ctx.User.Id);
         await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddEmbed(MusicStreamingEmbedBuilder.BuildPreconditionErrorEmbed(CoreDiscordCommands.GetBestUsername(member.Username, member.Nickname), member.AvatarUrl, result)).AsEphemeral());
@@ -43,7 +59,10 @@ internal static class MusicStreamingLavalink
 
     internal static async Task<bool> DisconnectAsync(InteractionContext ctx)
     {
-        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true) ?? throw new InvalidOperationException("Player is null");
+        MusicStreamingPlayer? player = await GetPlayerAsync(ctx, false, true);
+
+        if (player is null)
+            return false;
 
         await player.DisconnectAsync();
         await player.DisposeAsync();
@@ -53,14 +72,20 @@ internal static class MusicStreamingLavalink
 
     internal static async Task<bool> JoinMusicAsync(InteractionContext ctx)
     {
-        LavalinkPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying]) ?? throw new InvalidOperationException("Player is null");
+        MusicStreamingPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying]);
+
+        if (player is null)
+            return false;
 
         return player.VoiceChannelId is not 0;
     }
 
     internal static async Task<bool> PlayMusicAsync(InteractionContext ctx)
     {
-        LavalinkPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying]) ?? throw new InvalidOperationException("Player is null");
+        MusicStreamingPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying]);
+
+        if (player is null)
+            return false;
 
         TrackLoadOptions trackLoadOptions = new()
         {
@@ -82,7 +107,10 @@ internal static class MusicStreamingLavalink
 
     internal static async Task<bool> SetVolumeAsync(InteractionContext ctx, float volume, bool reset)
     {
-        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true) ?? throw new InvalidOperationException("Player is null");
+        MusicStreamingPlayer? player = await GetPlayerAsync(ctx, false, true);
+
+        if (player is null)
+            return false;
 
         if (reset)
         {
@@ -98,7 +126,10 @@ internal static class MusicStreamingLavalink
     internal static async Task<bool> StopMusicAsync(InteractionContext ctx, bool disconnect)
     {
         IPlayerPrecondition precondition = PlayerPrecondition.Any(PlayerPrecondition.Playing, PlayerPrecondition.Paused);
-        LavalinkPlayer? player = await GetPlayerAsync(ctx, false, true, [precondition]) ?? throw new InvalidOperationException("Player is null");
+        MusicStreamingPlayer? player = await GetPlayerAsync(ctx, false, true, [precondition]);
+
+        if (player is null)
+            return false;
 
         await player.StopAsync();
 
