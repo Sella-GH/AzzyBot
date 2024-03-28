@@ -16,11 +16,6 @@ USER root
 RUN apt update && apt upgrade -y && apt autoremove -y
 RUN apt install -y wget apt-transport-https gpg libicu72 iputils-ping
 
-# Add backports to solve security issues with CVEs
-RUN echo "deb http://deb.debian.org/debian bookworm-backports main contrib non-free" | tee -a /etc/apt/sources.list.d/backports.list
-RUN apt update
-RUN apt -t bookworm-backports install -y libgnutls-dane0 libgnutls-openssl27 libgnutls28-dev libgnutls30 libexpat1 libgcrypt20
-
 # Copy the built app
 WORKDIR /app
 COPY --from=build /src/out .
