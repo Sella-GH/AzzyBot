@@ -185,8 +185,10 @@ internal static class CoreWebRequests
         string result = string.Empty;
         try
         {
-            // Cut the host to the straight point
-            string host = new Uri(url).Host;
+            bool isIPaddress = IPAddress.TryParse(url, out IPAddress? iPAddress);
+
+            // Check if it's an IP adress and yes, then take it otherwise cut the host to the straight point
+            string host = (isIPaddress) ? iPAddress?.ToString() ?? string.Empty : new Uri(url).Host;
 
             if (CoreModule.GetAzuracastIPv6Availability())
             {
@@ -196,7 +198,7 @@ internal static class CoreWebRequests
                 }
                 else
                 {
-                    result = await PingServerAsync(host, AddressFamily.InterNetworkV6);
+                    result = await PingServerAsync(host, AddressFamily.InterNetworkV6, isIPaddress);
                     if (string.IsNullOrWhiteSpace(result))
                         ExceptionHandler.LogMessage(LogLevel.Debug, "Server not reachable over IPv6");
                 }
@@ -208,7 +210,7 @@ internal static class CoreWebRequests
             }
             else if (string.IsNullOrWhiteSpace(result))
             {
-                result = await PingServerAsync(host, AddressFamily.InterNetwork);
+                result = await PingServerAsync(host, AddressFamily.InterNetwork, isIPaddress);
                 if (string.IsNullOrWhiteSpace(result))
                     ExceptionHandler.LogMessage(LogLevel.Debug, "Server not reachable over IPv4");
             }
@@ -240,14 +242,14 @@ internal static class CoreWebRequests
         return false;
     }
 
-    private static async Task<string> PingServerAsync(string url, AddressFamily family)
+    private static async Task<string> PingServerAsync(string url, AddressFamily family, bool isIpAddress)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
 
         try
         {
-            // Get the correct ip address for the correct protocol via the host url
-            IPAddress[] addresses = await Dns.GetHostAddressesAsync(url);
+            // Check if the provided url is a IP address or a domain
+            IPAddress[] addresses = (isIpAddress) ? [IPAddress.Parse(url)] : await Dns.GetHostAddressesAsync(url);
             IPAddress address = IPAddress.Parse("0.0.0.0");
 
             foreach (IPAddress ipAdr in addresses)
