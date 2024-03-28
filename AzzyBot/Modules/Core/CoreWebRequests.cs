@@ -28,14 +28,14 @@ internal static class CoreWebRequests
             }
         })
     {
-        DefaultRequestVersion = new(2, 0),
+        DefaultRequestVersion = new(1, 1),
         DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher,
         Timeout = TimeSpan.FromSeconds(15)
     };
 
     private static readonly HttpClient Client = new()
     {
-        DefaultRequestVersion = new(2, 0),
+        DefaultRequestVersion = new(1, 1),
         DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher,
         Timeout = TimeSpan.FromSeconds(15)
     };
