@@ -6,7 +6,7 @@
     "CommandsExportPlaylistContentFound": "Here is the song list! Have fun with it.",
     "CommandsGetSongHistoryForgotDate": "You forgot to add a date!",
     "CommandsGetSongHistoryWrongDate": "You entered a wrong date - remember: YYYY-MM-DD !",
-    "CommandsGetSongHistoryNoOpening": "The club wasn't open at that day.",
+    "CommandsGetSongHistoryNoOpening": "The station wasn't online at that date'.",
     "CommandsGetSongHistoryTooEarly": "You can only go back up to 14 days.",
     "CommandsGetSongHistoryHistoryFound": "Here is the song list! Have fun with it.",
     "CommandsFindSongForgotSong": "You forgot to add a song name!",
