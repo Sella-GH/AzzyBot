@@ -185,22 +185,29 @@ internal static class CoreWebRequests
         string result = string.Empty;
         try
         {
-            bool isIPaddress = IPAddress.TryParse(url, out IPAddress? iPAddress);
-
-            // Check if it's an IP adress and yes, then take it otherwise cut the host to the straight point
-            string host = (isIPaddress) ? iPAddress?.ToString() ?? string.Empty : new Uri(url).Host;
+            string host = new Uri(url).Host;
+            bool isIPaddress = IPAddress.TryParse(host, out IPAddress? iPAddress);
 
             if (CoreModule.GetAzuracastIPv6Availability())
             {
-                if (!await CheckLocalConnectionAsync(AddressFamily.InterNetworkV6))
+                if (isIPaddress && iPAddress?.AddressFamily is not AddressFamily.InterNetworkV6)
                 {
-                    ExceptionHandler.LogMessage(LogLevel.Warning, "IPv6 is down!");
+                    ExceptionHandler.LogMessage(LogLevel.Warning, "Host address is no IPv6 address!");
+                    result = "down";
                 }
-                else
+
+                if (string.IsNullOrWhiteSpace(result))
                 {
-                    result = await PingServerAsync(host, AddressFamily.InterNetworkV6, isIPaddress);
-                    if (string.IsNullOrWhiteSpace(result))
-                        ExceptionHandler.LogMessage(LogLevel.Debug, "Server not reachable over IPv6");
+                    if (!await CheckLocalConnectionAsync(AddressFamily.InterNetworkV6))
+                    {
+                        ExceptionHandler.LogMessage(LogLevel.Warning, "IPv6 is down!");
+                    }
+                    else
+                    {
+                        result = await PingServerAsync(host, AddressFamily.InterNetworkV6, isIPaddress);
+                        if (string.IsNullOrWhiteSpace(result))
+                            ExceptionHandler.LogMessage(LogLevel.Debug, "Server not reachable over IPv6");
+                    }
                 }
             }
 
