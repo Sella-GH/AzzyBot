@@ -26,6 +26,7 @@ namespace AzzyBot.Modules.MusicStreaming;
 internal static class MusicStreamingLavalink
 {
     internal static DiscordChannel? GetRequestChannel { get; private set; }
+    internal static DiscordChannel? GetVoiceChannel { get; private set; }
 
     private static async ValueTask<MusicStreamingPlayer?> GetPlayerAsync(InteractionContext ctx, bool allowConnect = false, bool requireChannel = true, ImmutableArray<IPlayerPrecondition> preconditions = default, CancellationToken cancellationToken = default)
     {
@@ -77,7 +78,12 @@ internal static class MusicStreamingLavalink
         if (player is null)
             return false;
 
-        return player.VoiceChannelId is not 0;
+        if (player.VoiceChannelId is 0)
+            return false;
+
+        GetVoiceChannel = ctx.Guild.GetChannel(player.VoiceChannelId);
+
+        return true;
     }
 
     internal static async Task<bool> PlayMusicAsync(InteractionContext ctx)
@@ -86,6 +92,11 @@ internal static class MusicStreamingLavalink
 
         if (player is null)
             return false;
+
+        if (player.VoiceChannelId is 0)
+            return false;
+
+        GetVoiceChannel = ctx.Guild.GetChannel(player.VoiceChannelId);
 
         TrackLoadOptions trackLoadOptions = new()
         {
