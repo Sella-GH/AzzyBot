@@ -75,7 +75,7 @@
     "EmbedAzuraSearchSongRequestsFoundSong": "Song",
     "EmbedAzuraSearchSongRequestsFoundArtist": "By",
     "EmbedAzuraSearchSongRequestsFoundAlbum": "On",
-    "EmbedAzuraSearchSongRequestsFoundAlbumNotAvailable": "On",
+    "EmbedAzuraSearchSongRequestsFoundAlbumNotAvailable": "Album not available",
     "EmbedAzuraSearchSongRequestsFoundFooter": "Please use for the next search the title and the artist name!",
     "EmbedAzuraSearchSongRequestsNotDesc": "The requested song is sadly not available!",
     "EmbedAzuraSearchSongRequestsNotFooter": "Don't worry, we're already informed!",
@@ -93,5 +93,6 @@
     "EmbedAzuraFavoriteSongDescIsNot": "Hey, %NAME%, do you hear that?\nIt's your damn favourite song!\n\nGet yourself online to hear it!",
     "EmbedAzuraFavoriteSongSong": "Song",
     "EmbedAzuraFavoriteSongArtist": "By",
-    "EmbedAzuraFavoriteSongAlbum": "On"
+    "EmbedAzuraFavoriteSongAlbum": "On",
+    "EmbedAzuraFavoriteSongAlbumNotAvailable": "Album not available"
 }

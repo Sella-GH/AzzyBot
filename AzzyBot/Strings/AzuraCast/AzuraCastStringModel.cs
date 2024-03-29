@@ -200,6 +200,7 @@ internal sealed class AzuraCastStringModel
     public string EmbedAzuraFavoriteSongSong { get; set; } = string.Empty;
     public string EmbedAzuraFavoriteSongArtist { get; set; } = string.Empty;
     public string EmbedAzuraFavoriteSongAlbum { get; set; } = string.Empty;
+    public string EmbedAzuraFavoriteSongAlbumNotAvailable { get; set; } = string.Empty;
 
     #endregion BuildFavouriteSongEmbed
 
