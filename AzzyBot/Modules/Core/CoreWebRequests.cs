@@ -109,7 +109,7 @@ internal static class CoreWebRequests
 
             response = await client.PostAsync(new Uri(url), httpContent);
 
-            if (response.StatusCode != HttpStatusCode.BadRequest && url.Contains(CoreModule.GetAzuraCastApiUrl(), StringComparison.OrdinalIgnoreCase))
+            if (response.StatusCode is not HttpStatusCode.BadRequest and HttpStatusCode.InternalServerError && url.Contains(CoreModule.GetAzuraCastApiUrl(), StringComparison.OrdinalIgnoreCase))
             {
                 response.EnsureSuccessStatusCode();
                 response.Dispose();

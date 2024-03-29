@@ -597,7 +597,7 @@ internal static class AzuraCastServer
 
         return (songs.Count == 0)
             ? string.Empty
-            : await CoreFileOperations.CreateTempCsvFileAsync(songs, $"{openTime:yyyy-MM-dd}-history.csv");
+            : await CoreFileOperations.CreateTempCsvFileAsync(songs, $"{startDate:yyyy-MM-dd}-history.csv");
     }
 
     internal static async Task TogglePlaylistAsync(int id)
