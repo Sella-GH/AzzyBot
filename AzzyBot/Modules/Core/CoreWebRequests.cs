@@ -37,7 +37,7 @@ internal static class CoreWebRequests
     {
         DefaultRequestVersion = new(1, 1),
         DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher,
-        Timeout = TimeSpan.FromSeconds(15)
+        Timeout = TimeSpan.FromSeconds(30)
     };
 
     internal static async Task<string> GetWebAsync(string url, Dictionary<string, string>? headers = null, bool ipv6 = true)
