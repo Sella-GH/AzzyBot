@@ -18,6 +18,7 @@ internal static class AzuraCastServer
 {
     internal static readonly Dictionary<string, string> Headers = new()
     {
+        ["accept"] = "application/json",
         ["X-API-Key"] = AzuraCastSettings.AzuraApiKey
     };
 
@@ -539,17 +540,26 @@ internal static class AzuraCastServer
 
     internal static async Task<string> GetSongsPlayedAtDateAsync(DateTime dateTime)
     {
-        // Get the opening and closing time of the club by converting the data accordingly
-        TimeSpan openingTime = AzuraCastModule.GetClubOpenedTime();
-        TimeSpan closingTime = AzuraCastModule.GetClubClosedTime();
-        DateTime openTime = new(dateTime.Year, dateTime.Month, dateTime.Day, openingTime.Hours, openingTime.Minutes, openingTime.Seconds);
-        DateTime closeTime = new(dateTime.Year, dateTime.Month, dateTime.Day, closingTime.Hours, closingTime.Minutes, closingTime.Seconds);
+        DateTime startDate = dateTime;
+        DateTime endDate = dateTime.AddDays(1);
 
-        // Add one day assuming the club closes after midnight
-        if (closingTime > new TimeSpan(0, 0, 0) && closingTime < openingTime)
-            closeTime = closeTime.AddDays(1);
+        if (ModuleStates.ClubManagement)
+        {
+            // Get the opening and closing time of the club by converting the data accordingly
+            TimeSpan openingTime = AzuraCastModule.GetClubOpenedTime();
+            TimeSpan closingTime = AzuraCastModule.GetClubClosedTime();
+            DateTime openTime = new(dateTime.Year, dateTime.Month, dateTime.Day, openingTime.Hours, openingTime.Minutes, openingTime.Seconds);
+            DateTime closeTime = new(dateTime.Year, dateTime.Month, dateTime.Day, closingTime.Hours, closingTime.Minutes, closingTime.Seconds);
 
-        List<SongHistory> history = await GetSongHistoryAsync(openTime, closeTime);
+            // If the closing time is in the next day, then add a day to the closing time
+            if (closingTime > new TimeSpan(0, 0, 0) && closingTime < openingTime)
+                closeTime = closeTime.AddDays(1);
+
+            startDate = openTime;
+            endDate = closeTime;
+        }
+
+        List<SongHistory> history = await GetSongHistoryAsync(startDate, endDate);
         List<PlaylistModel> playlists = await GetPlaylistsAsync();
 
         if (history.Count == 0)
@@ -588,7 +598,7 @@ internal static class AzuraCastServer
 
         return (songs.Count == 0)
             ? string.Empty
-            : await CoreFileOperations.CreateTempCsvFileAsync(songs, $"{openTime:yyyy-MM-dd}-history.csv");
+            : await CoreFileOperations.CreateTempCsvFileAsync(songs, $"{startDate:yyyy-MM-dd}-history.csv");
     }
 
     internal static async Task TogglePlaylistAsync(int id)

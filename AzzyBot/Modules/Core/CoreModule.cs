@@ -40,6 +40,10 @@ internal sealed class CoreModule : BaseModule
     {
         switch (evt.Type)
         {
+            case ModuleEventType.GetAzzyBotName:
+                evt.ResultString = CoreAzzyStatsGeneral.GetBotName;
+                break;
+
             case ModuleEventType.GlobalTimerTick:
                 if (CoreAzzyStatsGeneral.GetBotEnvironment == "Development")
                     break;
@@ -79,13 +83,6 @@ internal sealed class CoreModule : BaseModule
         ModuleEvent evt = new(ModuleEventType.GetAzuraCastIPv6Availability);
         BroadcastModuleEvent(evt);
         return evt.ResultBool;
-    }
-
-    internal static string GetLavalinkPassword()
-    {
-        ModuleEvent evt = new(ModuleEventType.LavalinkPassword);
-        BroadcastModuleEvent(evt);
-        return evt.ResultString;
     }
 
     internal static bool GetMusicStreamingInactivity()

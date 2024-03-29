@@ -46,10 +46,17 @@ internal sealed class MusicStreamingPlayer : LavalinkPlayer, IInactivityPlayerLi
         cancellationToken.ThrowIfCancellationRequested();
 
         DiscordChannel? channel = MusicStreamingLavalink.GetRequestChannel;
+        DiscordChannel? voiceChannel = MusicStreamingLavalink.GetVoiceChannel;
 
-        if (channel is null)
+        if (channel is null || voiceChannel is null)
             return;
 
-        await channel.SendMessageAsync(MusicStreamingStringBuilder.GetCustomPlayerIsInactive(MusicStreamingSettings.AutoDisconnectTime));
+        if (voiceChannel.Users.Count == 1)
+        {
+            await channel.SendMessageAsync(MusicStreamingStringBuilder.GetCustomPlayerIsInactiveUsers(MusicStreamingSettings.AutoDisconnectTime));
+            return;
+        }
+
+        await channel.SendMessageAsync(MusicStreamingStringBuilder.GetCustomPlayerIsInactivePlaying(MusicStreamingSettings.AutoDisconnectTime));
     }
 }

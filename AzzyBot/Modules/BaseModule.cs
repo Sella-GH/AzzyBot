@@ -26,13 +26,13 @@ internal abstract class BaseModule
         CheckIfUserHasStaffRole,
         GetAzuraCastApiUrl,
         GetAzuraCastIPv6Availability,
+        GetAzzyBotName,
         GetClubOpeningTime,
         GetClubClosedTime,
         GetMusicStreamingInactivity,
         GetMusicStreamingInactivityTime,
         GetMusicStreamingLyrics,
-        GlobalTimerTick,
-        LavalinkPassword
+        GlobalTimerTick
     }
 
     protected sealed class ModuleEvent

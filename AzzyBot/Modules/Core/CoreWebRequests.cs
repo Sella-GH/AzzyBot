@@ -28,16 +28,16 @@ internal static class CoreWebRequests
             }
         })
     {
-        DefaultRequestVersion = new(2, 0),
+        DefaultRequestVersion = new(1, 1),
         DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher,
         Timeout = TimeSpan.FromSeconds(15)
     };
 
     private static readonly HttpClient Client = new()
     {
-        DefaultRequestVersion = new(2, 0),
+        DefaultRequestVersion = new(1, 1),
         DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher,
-        Timeout = TimeSpan.FromSeconds(15)
+        Timeout = TimeSpan.FromSeconds(30)
     };
 
     internal static async Task<string> GetWebAsync(string url, Dictionary<string, string>? headers = null, bool ipv6 = true)
@@ -47,7 +47,7 @@ internal static class CoreWebRequests
         try
         {
             if (headers is not null)
-                AddHeaders(headers);
+                AddHeaders(headers, ipv6);
 
             HttpClient client = (ipv6) ? Client : ClientV4;
             string content;
@@ -76,7 +76,7 @@ internal static class CoreWebRequests
 
         try
         {
-            AddHeaders(headers);
+            AddHeaders(headers, ipv6);
 
             HttpClient client = (ipv6) ? Client : ClientV4;
             HttpResponseMessage response = await client.GetAsync(new Uri(url));
@@ -98,7 +98,7 @@ internal static class CoreWebRequests
         try
         {
             if (headers is not null)
-                AddHeaders(headers);
+                AddHeaders(headers, ipv6);
 
             HttpResponseMessage? response;
             HttpClient client = (ipv6) ? Client : ClientV4;
@@ -109,7 +109,7 @@ internal static class CoreWebRequests
 
             response = await client.PostAsync(new Uri(url), httpContent);
 
-            if (response.StatusCode != HttpStatusCode.BadRequest && url.Contains(CoreModule.GetAzuraCastApiUrl(), StringComparison.OrdinalIgnoreCase))
+            if (response.StatusCode != HttpStatusCode.BadRequest && response.StatusCode != HttpStatusCode.InternalServerError && url.Contains(CoreModule.GetAzuraCastApiUrl(), StringComparison.OrdinalIgnoreCase))
             {
                 response.EnsureSuccessStatusCode();
                 response.Dispose();
@@ -137,7 +137,7 @@ internal static class CoreWebRequests
         try
         {
             if (headers is not null)
-                AddHeaders(headers);
+                AddHeaders(headers, ipv6);
 
             HttpResponseMessage? response;
             HttpClient client = (ipv6) ? Client : ClientV4;
@@ -161,20 +161,16 @@ internal static class CoreWebRequests
         }
     }
 
-    private static void AddHeaders(Dictionary<string, string> headers)
+    private static void AddHeaders(Dictionary<string, string> headers, bool ipv6 = true)
     {
-        //
-        // client.DefaultRequestHeaders.Clear() is greatly neccessary!
-        // Otherwise the Headers just add up and up and up
-        //
-
         ArgumentNullException.ThrowIfNull(headers, nameof(headers));
 
-        Client.DefaultRequestHeaders.Clear();
+        HttpClient client = (ipv6) ? Client : ClientV4;
+        client.DefaultRequestHeaders.Clear();
 
         foreach (KeyValuePair<string, string> header in headers)
         {
-            Client.DefaultRequestHeaders.Add(header.Key, header.Value);
+            client.DefaultRequestHeaders.Add(header.Key, header.Value);
         }
     }
 
@@ -185,20 +181,29 @@ internal static class CoreWebRequests
         string result = string.Empty;
         try
         {
-            // Cut the host to the straight point
             string host = new Uri(url).Host;
+            bool isIPaddress = IPAddress.TryParse(host, out IPAddress? iPAddress);
 
             if (CoreModule.GetAzuracastIPv6Availability())
             {
-                if (!await CheckLocalConnectionAsync(AddressFamily.InterNetworkV6))
+                if (isIPaddress && iPAddress?.AddressFamily is not AddressFamily.InterNetworkV6)
                 {
-                    ExceptionHandler.LogMessage(LogLevel.Warning, "IPv6 is down!");
+                    ExceptionHandler.LogMessage(LogLevel.Warning, "Host address is no IPv6 address!");
+                    result = "down";
                 }
-                else
+
+                if (string.IsNullOrWhiteSpace(result))
                 {
-                    result = await PingServerAsync(host, AddressFamily.InterNetworkV6);
-                    if (string.IsNullOrWhiteSpace(result))
-                        ExceptionHandler.LogMessage(LogLevel.Debug, "Server not reachable over IPv6");
+                    if (!await CheckLocalConnectionAsync(AddressFamily.InterNetworkV6))
+                    {
+                        ExceptionHandler.LogMessage(LogLevel.Warning, "IPv6 is down!");
+                    }
+                    else
+                    {
+                        result = await PingServerAsync(host, AddressFamily.InterNetworkV6, isIPaddress);
+                        if (string.IsNullOrWhiteSpace(result))
+                            ExceptionHandler.LogMessage(LogLevel.Debug, "Server not reachable over IPv6");
+                    }
                 }
             }
 
@@ -208,7 +213,7 @@ internal static class CoreWebRequests
             }
             else if (string.IsNullOrWhiteSpace(result))
             {
-                result = await PingServerAsync(host, AddressFamily.InterNetwork);
+                result = await PingServerAsync(host, AddressFamily.InterNetwork, isIPaddress);
                 if (string.IsNullOrWhiteSpace(result))
                     ExceptionHandler.LogMessage(LogLevel.Debug, "Server not reachable over IPv4");
             }
@@ -240,14 +245,14 @@ internal static class CoreWebRequests
         return false;
     }
 
-    private static async Task<string> PingServerAsync(string url, AddressFamily family)
+    private static async Task<string> PingServerAsync(string url, AddressFamily family, bool isIpAddress)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
 
         try
         {
-            // Get the correct ip address for the correct protocol via the host url
-            IPAddress[] addresses = await Dns.GetHostAddressesAsync(url);
+            // Check if the provided url is a IP address or a domain
+            IPAddress[] addresses = (isIpAddress) ? [IPAddress.Parse(url)] : await Dns.GetHostAddressesAsync(url);
             IPAddress address = IPAddress.Parse("0.0.0.0");
 
             foreach (IPAddress ipAdr in addresses)

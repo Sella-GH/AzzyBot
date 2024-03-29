@@ -191,14 +191,13 @@ internal sealed class AzuraCastStringBuilder : StringBuilding
     internal static string GetEmbedAzuraSearchSongRequestsAvaDesc => Model.EmbedAzuraSearchSongRequestsAvaDesc;
     internal static DiscordEmbedStruct GetEmbedAzuraSearchSongRequestsAvaSong(string song) => new(Model.EmbedAzuraSearchSongRequestsAvaSong, song, true);
     internal static DiscordEmbedStruct GetEmbedAzuraSearchSongRequestsAvaArtist(string artist) => new(Model.EmbedAzuraSearchSongRequestsAvaArtist, artist, true);
-    internal static DiscordEmbedStruct GetEmbedAzuraSearchSongRequestsAvaAlbum(string album) => new(Model.EmbedAzuraSearchSongRequestsAvaAlbum, album, true);
+    internal static DiscordEmbedStruct GetEmbedAzuraSearchSongRequestsAvaAlbum(string album) => new(Model.EmbedAzuraSearchSongRequestsAvaAlbum, (string.IsNullOrWhiteSpace(album)) ? Model.EmbedAzuraSearchSongRequestsFoundAlbumNotAvailable : album, true);
     internal static string GetEmbedAzuraSearchSongRequestsFoundDesc => Model.EmbedAzuraSearchSongRequestsFoundDesc;
 
     internal static DiscordEmbedStruct GetEmbedAzuraSearchSongRequestsFoundInfo(int counter, string song, string artist, string album = "")
     {
         string text = $"**{song}**\n{Model.EmbedAzuraSearchSongRequestsFoundArtist} **{artist}**";
-        if (!string.IsNullOrWhiteSpace(album))
-            text += $"\n{Model.EmbedAzuraSearchSongRequestsFoundAlbum} **{album}**";
+        text += $"\n{Model.EmbedAzuraSearchSongRequestsFoundAlbum} **{((string.IsNullOrWhiteSpace(album)) ? Model.EmbedAzuraSearchSongRequestsFoundAlbumNotAvailable : album)}**";
 
         return new($"{Model.EmbedAzuraSearchSongRequestsFoundSong} {counter}", text, false);
     }
@@ -234,7 +233,7 @@ internal sealed class AzuraCastStringBuilder : StringBuilding
     internal static string GetEmbedAzuraFavoriteSongDescUser(bool isUser, string name) => (isUser) ? Model.EmbedAzuraFavoriteSongDescIsUser : BuildString(Model.EmbedAzuraFavoriteSongDescIsNot, "%NAME%", name);
     internal static DiscordEmbedStruct GetEmbedAzuraFavoriteSongSong(string song) => new(Model.EmbedAzuraSearchSongRequestsRequestDesc, song, true);
     internal static DiscordEmbedStruct GetEmbedAzuraFavoriteSongArtist(string artist) => new(Model.EmbedAzuraSearchSongRequestsRequestArtist, artist, true);
-    internal static DiscordEmbedStruct GetEmbedAzuraFavoriteSongAlbum(string album) => new(Model.EmbedAzuraSearchSongRequestsRequestAlbum, album, true);
+    internal static DiscordEmbedStruct GetEmbedAzuraFavoriteSongAlbum(string album) => new(Model.EmbedAzuraSearchSongRequestsRequestAlbum, (string.IsNullOrWhiteSpace(album)) ? Model.EmbedAzuraFavoriteSongAlbumNotAvailable : album, true);
 
     #endregion BuildFavouriteSongEmbed
 

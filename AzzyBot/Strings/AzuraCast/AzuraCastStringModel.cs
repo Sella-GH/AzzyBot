@@ -166,6 +166,7 @@ internal sealed class AzuraCastStringModel
     public string EmbedAzuraSearchSongRequestsFoundSong { get; set; } = string.Empty;
     public string EmbedAzuraSearchSongRequestsFoundArtist { get; set; } = string.Empty;
     public string EmbedAzuraSearchSongRequestsFoundAlbum { get; set; } = string.Empty;
+    public string EmbedAzuraSearchSongRequestsFoundAlbumNotAvailable { get; set; } = string.Empty;
     public string EmbedAzuraSearchSongRequestsFoundFooter { get; set; } = string.Empty;
 
     #endregion BuildSearchSongRequestsEmbed
@@ -199,6 +200,7 @@ internal sealed class AzuraCastStringModel
     public string EmbedAzuraFavoriteSongSong { get; set; } = string.Empty;
     public string EmbedAzuraFavoriteSongArtist { get; set; } = string.Empty;
     public string EmbedAzuraFavoriteSongAlbum { get; set; } = string.Empty;
+    public string EmbedAzuraFavoriteSongAlbumNotAvailable { get; set; } = string.Empty;
 
     #endregion BuildFavouriteSongEmbed
 

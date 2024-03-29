@@ -20,6 +20,8 @@ using Lavalink4NET;
 using Lavalink4NET.Extensions;
 using Lavalink4NET.InactivityTracking;
 using Lavalink4NET.InactivityTracking.Extensions;
+using Lavalink4NET.InactivityTracking.Trackers.Idle;
+using Lavalink4NET.InactivityTracking.Trackers.Users;
 using Lavalink4NET.Integrations.LyricsJava.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -42,6 +44,12 @@ internal static class Program
 
     private static async Task Main()
     {
+        #region Add basic startup information
+
+        await Console.Out.WriteLineAsync($"Starting {CoreAzzyStatsGeneral.GetBotName} in version {CoreAzzyStatsGeneral.GetBotVersion}");
+
+        #endregion Add basic startup information
+
         #region Add OS Architecture Check
 
         await Console.Out.WriteLineAsync("Checking OS");
@@ -128,7 +136,7 @@ internal static class Program
 
         ExceptionHandler.LogMessage(LogLevel.Debug, "Starting all processes");
         BaseModule.StartAllProcesses();
-        await Task.Delay(5000);
+        await Task.Delay(1000);
         ExceptionHandler.LogMessage(LogLevel.Debug, "Started all processes");
 
         #endregion Initialize Processes
@@ -140,10 +148,10 @@ internal static class Program
             ExceptionHandler.LogMessage(LogLevel.Debug, "Initializing Lavalink4NET");
             ServiceCollection = new ServiceCollection().AddLavalink().AddSingleton(DiscordClient).ConfigureLavalink(config =>
             {
+                config.BaseAddress = (CoreAzzyStatsGeneral.GetBotName is "AzzyBot-Docker") ? new Uri("http://lavalink:2333") : new Uri("http://localhost:2333");
                 config.ReadyTimeout = TimeSpan.FromSeconds(15);
                 config.ResumptionOptions = new(TimeSpan.Zero);
                 config.Label = "AzzyBot";
-                config.Passphrase = CoreModule.GetLavalinkPassword();
             });
 
             ServiceCollection.AddLogging(x => x.AddConsole().SetMinimumLevel((LogLevel)Enum.ToObject(typeof(LogLevel), CoreSettings.LogLevel)));
@@ -155,7 +163,9 @@ internal static class Program
                 {
                     config.DefaultTimeout = TimeSpan.FromMinutes(CoreModule.GetMusicStreamingInactivityTime());
                     config.TrackingMode = InactivityTrackingMode.Any;
+                    config.UseDefaultTrackers = true;
                 });
+                ServiceCollection.Configure<IdleInactivityTrackerOptions>(config => config.TrackNewPlayers = false);
 
                 ExceptionHandler.LogMessage(LogLevel.Debug, "Applied inactivity tracking to Lavalink4NET");
             }

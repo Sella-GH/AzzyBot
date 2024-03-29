@@ -271,7 +271,7 @@ dotnet_diagnostic.rcs0027.severity = suggestion
 dotnet_diagnostic.rcs0028.severity = suggestion
 
 # Put constructor initializer on its own line
-dotnet_diagnostic.rcs0029.severity = suggestion
+dotnet_diagnostic.rcs0029.severity = none
 
 # Put embedded statement on its own line
 dotnet_diagnostic.rcs0030.severity = suggestion

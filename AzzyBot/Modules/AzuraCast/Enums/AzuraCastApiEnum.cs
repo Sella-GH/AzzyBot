@@ -8,6 +8,7 @@ internal enum AzuraCastApiEnum
     export,
     files,
     history,
+    hls,
     list,
     listen,
     listeners,

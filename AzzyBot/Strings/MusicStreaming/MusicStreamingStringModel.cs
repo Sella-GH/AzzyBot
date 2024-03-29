@@ -51,7 +51,8 @@ internal sealed class MusicStreamingStringModel
     #region CustomPlayerMessages
 
     public string CustomPlayerIsActiveAgain { get; set; } = string.Empty;
-    public string CustomPlayerIsInactive { get; set; } = string.Empty;
+    public string CustomPlayerIsInactivePlaying { get; set; } = string.Empty;
+    public string CustomPlayerIsInactiveUsers { get; set; } = string.Empty;
     public string CustomPlayerLeaves { get; set; } = string.Empty;
 
     #endregion CustomPlayerMessages
