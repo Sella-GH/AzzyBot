@@ -75,6 +75,7 @@
     "EmbedAzuraSearchSongRequestsFoundSong": "Song",
     "EmbedAzuraSearchSongRequestsFoundArtist": "By",
     "EmbedAzuraSearchSongRequestsFoundAlbum": "On",
+    "EmbedAzuraSearchSongRequestsFoundAlbumNotAvailable": "On",
     "EmbedAzuraSearchSongRequestsFoundFooter": "Please use for the next search the title and the artist name!",
     "EmbedAzuraSearchSongRequestsNotDesc": "The requested song is sadly not available!",
     "EmbedAzuraSearchSongRequestsNotFooter": "Don't worry, we're already informed!",
