@@ -76,7 +76,8 @@ internal sealed class MusicStreamingStringBuilder : StringBuilding
     #region CustomPlayerMessages
 
     internal static string GetCustomPlayerIsActiveAgain => Model.CustomPlayerIsActiveAgain;
-    internal static string GetCustomPlayerIsInactive(int minutes) => BuildString(Model.CustomPlayerIsInactive, "%MINUTES%", minutes);
+    internal static string GetCustomPlayerIsInactivePlaying(int minutes) => BuildString(Model.CustomPlayerIsInactivePlaying, "%MINUTES%", minutes);
+    internal static string GetCustomPlayerIsInactiveUsers(int minutes) => BuildString(Model.CustomPlayerIsInactiveUsers, "%MINUTES%", minutes);
     internal static string GetCustomPlayerLeaves => Model.CustomPlayerLeaves;
 
     #endregion CustomPlayerMessages

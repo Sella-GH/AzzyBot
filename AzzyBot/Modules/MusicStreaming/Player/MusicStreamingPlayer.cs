@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Settings.MusicStreaming;
 using AzzyBot.Strings.MusicStreaming;
@@ -10,7 +9,6 @@ using Lavalink4NET.Players;
 
 namespace AzzyBot.Modules.MusicStreaming.Player;
 
-[SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "This is no static class")]
 internal sealed class MusicStreamingPlayer : LavalinkPlayer, IInactivityPlayerListener
 {
     internal MusicStreamingPlayer(IPlayerProperties<MusicStreamingPlayer, MusicStreamingPlayerOptions> properties) : base(properties)
@@ -52,6 +50,12 @@ internal sealed class MusicStreamingPlayer : LavalinkPlayer, IInactivityPlayerLi
         if (channel is null)
             return;
 
-        await channel.SendMessageAsync(MusicStreamingStringBuilder.GetCustomPlayerIsInactive(MusicStreamingSettings.AutoDisconnectTime));
+        if (channel.Users.Count == 0)
+        {
+            await channel.SendMessageAsync(MusicStreamingStringBuilder.GetCustomPlayerIsInactiveUsers(MusicStreamingSettings.AutoDisconnectTime));
+            return;
+        }
+
+        await channel.SendMessageAsync(MusicStreamingStringBuilder.GetCustomPlayerIsInactivePlaying(MusicStreamingSettings.AutoDisconnectTime));
     }
 }
