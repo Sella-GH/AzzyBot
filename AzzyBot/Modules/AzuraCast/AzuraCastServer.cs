@@ -18,6 +18,7 @@ internal static class AzuraCastServer
 {
     internal static readonly Dictionary<string, string> Headers = new()
     {
+        ["accept"] = "application/json",
         ["X-API-Key"] = AzuraCastSettings.AzuraApiKey
     };
 

@@ -47,7 +47,7 @@ internal static class CoreWebRequests
         try
         {
             if (headers is not null)
-                AddHeaders(headers);
+                AddHeaders(headers, ipv6);
 
             HttpClient client = (ipv6) ? Client : ClientV4;
             string content;
@@ -76,7 +76,7 @@ internal static class CoreWebRequests
 
         try
         {
-            AddHeaders(headers);
+            AddHeaders(headers, ipv6);
 
             HttpClient client = (ipv6) ? Client : ClientV4;
             HttpResponseMessage response = await client.GetAsync(new Uri(url));
@@ -98,7 +98,7 @@ internal static class CoreWebRequests
         try
         {
             if (headers is not null)
-                AddHeaders(headers);
+                AddHeaders(headers, ipv6);
 
             HttpResponseMessage? response;
             HttpClient client = (ipv6) ? Client : ClientV4;
@@ -137,7 +137,7 @@ internal static class CoreWebRequests
         try
         {
             if (headers is not null)
-                AddHeaders(headers);
+                AddHeaders(headers, ipv6);
 
             HttpResponseMessage? response;
             HttpClient client = (ipv6) ? Client : ClientV4;
@@ -161,20 +161,16 @@ internal static class CoreWebRequests
         }
     }
 
-    private static void AddHeaders(Dictionary<string, string> headers)
+    private static void AddHeaders(Dictionary<string, string> headers, bool ipv6 = true)
     {
-        //
-        // client.DefaultRequestHeaders.Clear() is greatly neccessary!
-        // Otherwise the Headers just add up and up and up
-        //
-
         ArgumentNullException.ThrowIfNull(headers, nameof(headers));
 
-        Client.DefaultRequestHeaders.Clear();
+        HttpClient client = (ipv6) ? Client : ClientV4;
+        client.DefaultRequestHeaders.Clear();
 
         foreach (KeyValuePair<string, string> header in headers)
         {
-            Client.DefaultRequestHeaders.Add(header.Key, header.Value);
+            client.DefaultRequestHeaders.Add(header.Key, header.Value);
         }
     }
 
