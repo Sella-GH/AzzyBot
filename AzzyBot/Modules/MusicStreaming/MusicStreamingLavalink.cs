@@ -94,7 +94,18 @@ internal static class MusicStreamingLavalink
             CacheMode = CacheMode.Bypass
         };
 
-        string url = string.Join("/", AzuraCastSettings.AzuraApiUrl.Replace("/api", string.Empty, StringComparison.OrdinalIgnoreCase), AzuraCastApiEnum.listen, MusicStreamingSettings.MountPointStub);
+        bool hlsStream = MusicStreamingSettings.MountPointStub.EndsWith("m3u8", StringComparison.OrdinalIgnoreCase);
+        string url;
+
+        if (hlsStream)
+        {
+            url = string.Join("/", AzuraCastSettings.AzuraApiUrl.Replace("/api", string.Empty, StringComparison.OrdinalIgnoreCase), AzuraCastApiEnum.hls, MusicStreamingSettings.MountPointStub);
+        }
+        else
+        {
+            url = string.Join("/", AzuraCastSettings.AzuraApiUrl.Replace("/api", string.Empty, StringComparison.OrdinalIgnoreCase), AzuraCastApiEnum.listen, MusicStreamingSettings.MountPointStub);
+        }
+
         LavalinkTrack? track = await Program.GetAudioService.Tracks.LoadTrackAsync(url, trackLoadOptions);
 
         if (track is null)

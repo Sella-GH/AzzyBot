@@ -13,6 +13,7 @@
 ### Additions
 - `appsettings.json` now supports an ip address as value for the `AzuraApiUrl` setting
 - Messages added if the music streaming plugin is not used for the specific amount of time OR if no users are in the voice channel anymore
+- Support for HLS streams
  
 ### Improvements
 - CI Updates for better processability
