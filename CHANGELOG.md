@@ -20,3 +20,6 @@
 - More logging in case something goes wrong
 - Useless checks removed
 - Code and reliability improvements
+
+### Fixes
+- IPv4 only issues with api key related requests
