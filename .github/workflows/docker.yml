@@ -137,7 +137,6 @@ jobs:
         with:
           build-args: |
             ARCH=${{ matrix.arch }}
-            OS=${{ matrix.os }}
           context: .
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ matrix.os }}/${{ matrix.arch }}
