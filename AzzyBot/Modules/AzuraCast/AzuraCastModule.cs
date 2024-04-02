@@ -6,7 +6,6 @@ using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
-using AzzyBot.Settings.AzuraCast;
 using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.Logging;
 

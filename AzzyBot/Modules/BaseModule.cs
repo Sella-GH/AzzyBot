@@ -3,11 +3,6 @@ using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.ClubManagement;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.MusicStreaming;
-using AzzyBot.Settings;
-using AzzyBot.Settings.AzuraCast;
-using AzzyBot.Settings.ClubManagement;
-using AzzyBot.Settings.Core;
-using AzzyBot.Settings.MusicStreaming;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 

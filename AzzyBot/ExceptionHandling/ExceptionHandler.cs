@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using AzzyBot.Modules.Core;
-using AzzyBot.Settings.Core;
 using AzzyBot.Strings.Core;
 using DSharpPlus;
 using DSharpPlus.Entities;

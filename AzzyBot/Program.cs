@@ -6,8 +6,6 @@ using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules;
 using AzzyBot.Modules.Core;
-using AzzyBot.Settings;
-using AzzyBot.Settings.Core;
 using AzzyBot.Strings;
 using AzzyBot.Updater;
 using DSharpPlus;

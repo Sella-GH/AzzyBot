@@ -7,8 +7,6 @@ using AzzyBot.Modules.AzuraCast.Enums;
 using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.MusicStreaming.Player;
-using AzzyBot.Settings.AzuraCast;
-using AzzyBot.Settings.MusicStreaming;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using Lavalink4NET.Clients;

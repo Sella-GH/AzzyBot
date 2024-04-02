@@ -7,7 +7,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
-using AzzyBot.Settings.Core;
+using AzzyBot.Modules.Core;
 using AzzyBot.Strings.Core;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

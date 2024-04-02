@@ -8,7 +8,6 @@ using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.Core.Structs;
-using AzzyBot.Settings.AzuraCast;
 using DSharpPlus.Entities;
 using Newtonsoft.Json;
 

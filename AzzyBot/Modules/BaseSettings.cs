@@ -4,14 +4,13 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using AzzyBot.Modules.AzuraCast;
+using AzzyBot.Modules.ClubManagement;
 using AzzyBot.Modules.Core;
-using AzzyBot.Settings.AzuraCast;
-using AzzyBot.Settings.ClubManagement;
-using AzzyBot.Settings.Core;
-using AzzyBot.Settings.MusicStreaming;
+using AzzyBot.Modules.MusicStreaming;
 using Microsoft.Extensions.Configuration;
 
-namespace AzzyBot.Settings;
+namespace AzzyBot.Modules;
 
 internal abstract class BaseSettings
 {

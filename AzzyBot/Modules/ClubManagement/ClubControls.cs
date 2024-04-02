@@ -8,8 +8,6 @@ using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.ClubManagement.Models;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
-using AzzyBot.Settings.ClubManagement;
-using AzzyBot.Settings.Core;
 using AzzyBot.Strings.ClubManagement;
 using DSharpPlus;
 using DSharpPlus.Entities;

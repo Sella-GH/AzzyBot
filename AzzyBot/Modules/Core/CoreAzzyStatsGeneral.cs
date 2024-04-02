@@ -4,7 +4,6 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
-using AzzyBot.Settings;
 using AzzyBot.Strings.Core;
 using Microsoft.Extensions.Logging;
 

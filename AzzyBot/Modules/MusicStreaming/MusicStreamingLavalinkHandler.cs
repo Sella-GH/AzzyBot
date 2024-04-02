@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.Core;
-using AzzyBot.Settings.MusicStreaming;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.MusicStreaming;

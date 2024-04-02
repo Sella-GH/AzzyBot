@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using Microsoft.Extensions.Logging;
 
-namespace AzzyBot.Settings.MusicStreaming;
+namespace AzzyBot.Modules.MusicStreaming;
 
 internal sealed class MusicStreamingSettings : BaseSettings
 {

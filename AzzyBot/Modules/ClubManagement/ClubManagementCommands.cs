@@ -4,7 +4,6 @@ using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.AzuraCast.Autocomplete;
 using AzzyBot.Modules.Core;
-using AzzyBot.Settings.ClubManagement;
 using AzzyBot.Strings.ClubManagement;
 using DSharpPlus;
 using DSharpPlus.Entities;

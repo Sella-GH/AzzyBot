@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using AzzyBot.Settings.Core;
+using AzzyBot.Modules.Core;
 using AzzyBot.Strings.Core;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
