@@ -370,7 +370,7 @@ internal static class AzuraCastServer
             // If nothing is equal
             // Send message to channel
             //
-            await Program.SendMessageAsync(AzuraCastSettings.MusicRequestsChannelId, string.Empty, AzuraCastEmbedBuilder.BuildRequestNotAvailableEmbed(userName, userAvatarUrl, songName, songArtist));
+            await AzzyBot.SendMessageAsync(AzuraCastSettings.MusicRequestsChannelId, string.Empty, AzuraCastEmbedBuilder.BuildRequestNotAvailableEmbed(userName, userAvatarUrl, songName, songArtist));
         }
 
         return AzuraCastEmbedBuilder.BuildSearchSongRequestsEmbed(userName, userAvatarUrl, matchingSongs);
@@ -744,7 +744,7 @@ internal static class AzuraCastServer
             fileNames[idxFiles] = await CoreFileOperations.CreateTempFileAsync(files[idxFiles], removedFileName);
         }
 
-        await Program.SendMessageAsync(AzuraCastSettings.MusicRequestsChannelId, string.Empty, AzuraCastEmbedBuilder.BuildFilesHaveChangedEmbed(Program.GetDiscordClientUserName, Program.GetDiscordClientAvatarUrl, addedFiles.Count, removedFiles.Count), fileNames);
+        await AzzyBot.SendMessageAsync(AzuraCastSettings.MusicRequestsChannelId, string.Empty, AzuraCastEmbedBuilder.BuildFilesHaveChangedEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, addedFiles.Count, removedFiles.Count), fileNames);
         if (!await AzuraCastModule.FileCacheLock.SetFileContentAsync(JsonConvert.SerializeObject(onlineFiles, Formatting.Indented)))
             throw new InvalidOperationException("File couldn't be modified");
     }

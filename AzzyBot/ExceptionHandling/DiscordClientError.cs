@@ -27,7 +27,7 @@ internal static class DiscordClientError
             case ServerErrorException:
             case UnauthorizedException:
                 await ExceptionHandler.LogErrorAsync(ex, ((DiscordException)e.Exception).JsonMessage);
-                await Program.SendMessageAsync(CoreSettings.ErrorChannelId, CoreStringBuilder.GetExceptionHandlingDiscordPermissions(c.CurrentUser.Username));
+                await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, CoreStringBuilder.GetExceptionHandlingDiscordPermissions(c.CurrentUser.Username));
                 break;
 
             default:

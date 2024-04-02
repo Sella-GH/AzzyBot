@@ -169,7 +169,7 @@ internal sealed class ClubManagementModule : BaseModule
             return;
 
         await ClubControls.CloseClubAsync();
-        await ClubControls.SendClubClosingStatisticsAsync(await Program.SendMessageAsync(ClubManagementSettings.ClubNotifyChannelId, string.Empty, ClubEmbedBuilder.BuildCloseClubEmbed(Program.GetDiscordClientUserName, Program.GetDiscordClientAvatarUrl, true)));
+        await ClubControls.SendClubClosingStatisticsAsync(await AzzyBot.SendMessageAsync(ClubManagementSettings.ClubNotifyChannelId, string.Empty, ClubEmbedBuilder.BuildCloseClubEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, true)));
     }
 
     internal static bool CheckForSystemGeneratedPlaylist(int playlistId) => playlistId == ClubManagementSettings.AzuraAllSongsPlaylist;

@@ -19,7 +19,6 @@ using Lavalink4NET.Extensions;
 using Lavalink4NET.InactivityTracking;
 using Lavalink4NET.InactivityTracking.Extensions;
 using Lavalink4NET.InactivityTracking.Trackers.Idle;
-using Lavalink4NET.InactivityTracking.Trackers.Users;
 using Lavalink4NET.Integrations.LyricsJava.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,7 +26,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot;
 
-internal static class Program
+internal static class AzzyBot
 {
     private static DiscordClient? DiscordClient;
     private static IAudioService? AudioService;

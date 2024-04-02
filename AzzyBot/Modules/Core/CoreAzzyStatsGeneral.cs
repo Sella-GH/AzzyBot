@@ -92,7 +92,7 @@ internal static class CoreAzzyStatsGeneral
         return $"<t:{CoreMisc.ConvertToUnixTime(azzy.StartTime)}>";
     }
 
-    internal static string GetBotEnvironment => (Program.GetDiscordClientId == 1217214768159653978) ? "Development" : "Production";
+    internal static string GetBotEnvironment => (AzzyBot.GetDiscordClientId == 1217214768159653978) ? "Development" : "Production";
     internal static string GetBotVersion => Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "Azzy version not found";
 
     internal static async Task<string> GetBotCommitAsync()
@@ -119,5 +119,5 @@ internal static class CoreAzzyStatsGeneral
     }
 
     internal static string GetDotNetVersion => Environment.Version.ToString() ?? ".NET version not found";
-    internal static string GetDSharpNetVersion => Program.GetDiscordClientVersion;
+    internal static string GetDSharpNetVersion => AzzyBot.GetDiscordClientVersion;
 }

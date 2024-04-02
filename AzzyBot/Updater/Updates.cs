@@ -73,7 +73,7 @@ internal static class Updates
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(version);
 
-        await Program.SendMessageAsync(CoreSettings.ErrorChannelId, CoreStringBuilder.GetUpdatesAvailable((updater) ? "Updater" : "Azzy", version));
+        await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, CoreStringBuilder.GetUpdatesAvailable((updater) ? "Updater" : "Azzy", version));
     }
 
     private static readonly HttpClient Client = new()
