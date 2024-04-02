@@ -34,10 +34,10 @@ jobs:
         run: |
           if ${{ contains(github.event.head_commit.message, '[release]') }}; then
             echo "set-env=latest" >> "$GITHUB_OUTPUT"
-          elif ${{ contains(github.ref##*/, 'main') }}; then
+          elif ${{ contains(GITHUB_REF##*/, 'main') }}; then
             echo "set-env=dev" >> "$GITHUB_OUTPUT"
           else
-            echo "set-env=${{ github.ref##*/ }}" >> "$GITHUB_OUTPUT"
+            echo "set-env=${{ GITHUB_REF##*/ }}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Docker meta
@@ -109,10 +109,10 @@ jobs:
         run: |
           if ${{ contains(github.event.head_commit.message, '[release]') }}; then
             echo "set-env=latest" >> "$GITHUB_OUTPUT"
-          elif ${{ contains(github.ref##*/, 'main') }}; then
+          elif ${{ contains(GITHUB_REF##*/, 'main') }}; then
             echo "set-env=dev" >> "$GITHUB_OUTPUT"
           else
-            echo "set-env=${{ github.ref##*/ }}" >> "$GITHUB_OUTPUT"
+            echo "set-env=${{ GITHUB_REF##*/ }}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Docker meta
@@ -191,10 +191,10 @@ jobs:
         run: |
           if ${{ contains(github.event.head_commit.message, '[release]') }}; then
             echo "set-env=latest" >> "$GITHUB_OUTPUT"
-          elif ${{ contains(github.ref##*/, 'main') }}; then
+          elif ${{ contains(GITHUB_REF##*/, 'main') }}; then
             echo "set-env=dev" >> "$GITHUB_OUTPUT"
           else
-            echo "set-env=${{ github.ref##*/ }}" >> "$GITHUB_OUTPUT"
+            echo "set-env=${{ GITHUB_REF##*/ }}" >> "$GITHUB_OUTPUT"
           fi
         
       - name: Docker meta
