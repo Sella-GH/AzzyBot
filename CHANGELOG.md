@@ -20,6 +20,7 @@
 - Some settings now have a default value
 - More logging in case something goes wrong
 - Useless checks removed
+- Better check for lavalink stuff implemented
 - Code and reliability improvements
 
 ### Fixes

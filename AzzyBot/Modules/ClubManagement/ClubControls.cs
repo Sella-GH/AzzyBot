@@ -8,8 +8,6 @@ using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.ClubManagement.Models;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
-using AzzyBot.Settings.ClubManagement;
-using AzzyBot.Settings.Core;
 using AzzyBot.Strings.ClubManagement;
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -96,7 +94,7 @@ internal static class ClubControls
             streamUrl = botStatus.ClubBotStatusList[number].BotStreamUrl;
         }
 
-        await Program.SetBotStatusAsync(status, type, doing, streamUrl);
+        await AzzyBot.SetBotStatusAsync(status, type, doing, streamUrl);
     }
 
     internal static async Task<string> OpenClubAsync(string playlistId)
@@ -155,7 +153,7 @@ internal static class ClubControls
             throw new InvalidOperationException($"{nameof(botStatus)} is null!");
         }
 
-        await Program.SetBotStatusAsync(status, type, doing, streamUrl);
+        await AzzyBot.SetBotStatusAsync(status, type, doing, streamUrl);
 
         return playlist[0].Name;
     }
@@ -165,6 +163,6 @@ internal static class ClubControls
         ArgumentNullException.ThrowIfNull(message, nameof(message));
 
         DiscordThreadChannel threadChannel = await message.CreateThreadAsync(ClubManagementStringBuilder.CommandCloseClubThreadTitle, AutoArchiveDuration.Hour, ClubManagementStringBuilder.CommandCloseClubThreadReason);
-        await threadChannel.SendMessageAsync(string.Empty, await ClubEmbedBuilder.BuildClubStatisticsEmbedAsync(Program.GetDiscordClientUserName, Program.GetDiscordClientAvatarUrl));
+        await threadChannel.SendMessageAsync(string.Empty, await ClubEmbedBuilder.BuildClubStatisticsEmbedAsync(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl));
     }
 }

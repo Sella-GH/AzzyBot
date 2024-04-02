@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.Core;
-using AzzyBot.Settings.MusicStreaming;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.MusicStreaming;
@@ -67,7 +66,7 @@ internal static class MusicStreamingLavalinkHandler
                 string newLine = line.Trim();
                 if (newLine.StartsWith("geniusApiKey:", StringComparison.OrdinalIgnoreCase) && newLine.Contains("\"Your Genius Client Access Token\"", StringComparison.OrdinalIgnoreCase))
                 {
-                    ExceptionHandler.LogMessage(LogLevel.Error, "You forgot to set your genius api key!");
+                    ExceptionHandler.LogMessage(LogLevel.Critical, "You forgot to set your genius api key!");
                     return false;
                 }
             }
@@ -101,7 +100,7 @@ internal static class MusicStreamingLavalinkHandler
         {
             if (!CheckIfLavalinkIsThere())
             {
-                ExceptionHandler.LogMessage(LogLevel.Error, "Lavalink files are missing!");
+                ExceptionHandler.LogMessage(LogLevel.Critical, "Lavalink files are missing!");
                 return false;
             }
 

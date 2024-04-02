@@ -7,8 +7,6 @@ using AzzyBot.Modules.AzuraCast.Enums;
 using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.MusicStreaming.Player;
-using AzzyBot.Settings.AzuraCast;
-using AzzyBot.Settings.MusicStreaming;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using Lavalink4NET.Clients;
@@ -43,7 +41,7 @@ internal static class MusicStreamingLavalink
             return ValueTask.FromResult(new MusicStreamingPlayer(properties));
         }
 
-        PlayerResult<MusicStreamingPlayer> result = await Program.GetAudioService.Players.RetrieveAsync<MusicStreamingPlayer, MusicStreamingPlayerOptions>(ctx.Guild.Id, ctx.Member?.VoiceState.Channel.Id, CreatePlayerAsync, Options.Create(playerOptions), retrieveOptions, cancellationToken);
+        PlayerResult<MusicStreamingPlayer> result = await AzzyBot.GetAudioService.Players.RetrieveAsync<MusicStreamingPlayer, MusicStreamingPlayerOptions>(ctx.Guild.Id, ctx.Member?.VoiceState.Channel.Id, CreatePlayerAsync, Options.Create(playerOptions), retrieveOptions, cancellationToken);
 
         if (result.IsSuccess)
         {
@@ -117,7 +115,7 @@ internal static class MusicStreamingLavalink
             url = string.Join("/", AzuraCastSettings.AzuraApiUrl.Replace("/api", string.Empty, StringComparison.OrdinalIgnoreCase), AzuraCastApiEnum.listen, MusicStreamingSettings.MountPointStub);
         }
 
-        LavalinkTrack? track = await Program.GetAudioService.Tracks.LoadTrackAsync(url, trackLoadOptions);
+        LavalinkTrack? track = await AzzyBot.GetAudioService.Tracks.LoadTrackAsync(url, trackLoadOptions);
 
         if (track is null)
             return false;
@@ -173,7 +171,7 @@ internal static class MusicStreamingLavalink
 
     private static async Task<Lyrics> GetLyricsFromGeniusAsync(string search)
     {
-        Lyrics? lyrics = await Program.GetAudioService.Tracks.GetGeniusLyricsAsync(search);
+        Lyrics? lyrics = await AzzyBot.GetAudioService.Tracks.GetGeniusLyricsAsync(search);
 
         return lyrics ?? new(string.Empty, string.Empty, new LyricsTrack(string.Empty, string.Empty, string.Empty, []), []);
     }

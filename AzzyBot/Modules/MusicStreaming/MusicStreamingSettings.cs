@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using Microsoft.Extensions.Logging;
 
-namespace AzzyBot.Settings.MusicStreaming;
+namespace AzzyBot.Modules.MusicStreaming;
 
 internal sealed class MusicStreamingSettings : BaseSettings
 {
@@ -49,12 +49,16 @@ internal sealed class MusicStreamingSettings : BaseSettings
             for (int i = 0; lines.Length > i; i++)
             {
                 string line = lines[i].Trim();
+
+                if (i == lines.Length - 1)
+                    break;
+
                 if (i > 1)
                     lineBefore = lines[i - 1].Trim();
 
                 lineAfter = lines[i + 1].Trim();
 
-                if (line.StartsWith("geniusApiKey:", StringComparison.OrdinalIgnoreCase) && lineBefore is "countryCode: de #country code for resolving isrc tracks" && lineAfter is "lavalink:")
+                if (line.StartsWith("geniusApiKey:", StringComparison.OrdinalIgnoreCase) && lineBefore.StartsWith("countryCode:", StringComparison.OrdinalIgnoreCase) && lineAfter.StartsWith("lavalink:", StringComparison.OrdinalIgnoreCase))
                 {
                     password = line.Split(':')[1].Trim().Trim('\"');
                     break;

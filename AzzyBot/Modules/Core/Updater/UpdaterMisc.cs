@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-namespace AzzyBot.Updater;
+namespace AzzyBot.Modules.Core.Updater;
 
 internal static class UpdaterMisc
 {

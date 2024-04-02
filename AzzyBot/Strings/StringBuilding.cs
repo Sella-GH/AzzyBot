@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 using System.Threading.Tasks;
-using AzzyBot.Settings;
+using AzzyBot.Modules;
 using AzzyBot.Strings.AzuraCast;
 using AzzyBot.Strings.ClubManagement;
 using AzzyBot.Strings.Core;

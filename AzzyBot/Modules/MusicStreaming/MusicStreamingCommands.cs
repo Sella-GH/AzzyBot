@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.Core;
-using AzzyBot.Settings.MusicStreaming;
 using AzzyBot.Strings.MusicStreaming;
 using DSharpPlus;
 using DSharpPlus.Entities;

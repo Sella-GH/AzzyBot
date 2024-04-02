@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using AzzyBot.Modules.AzuraCast.Enums;
 using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.Core;
-using AzzyBot.Settings.AzuraCast;
 using DSharpPlus.Entities;
 using Newtonsoft.Json;
 

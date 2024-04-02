@@ -6,7 +6,6 @@ using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
-using AzzyBot.Settings.AzuraCast;
 using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.Logging;
 
@@ -263,7 +262,7 @@ internal sealed class AzuraCastModule : BaseModule
             return;
 
         LastMusicServerUpdateNotify = now;
-        await Program.SendMessageAsync(AzuraCastSettings.OutagesChannelId, string.Empty, AzuraCastEmbedBuilder.BuildUpdatesAvailableEmbed(Program.GetDiscordClientUserName, Program.GetDiscordClientAvatarUrl, updates));
+        await AzzyBot.SendMessageAsync(AzuraCastSettings.OutagesChannelId, string.Empty, AzuraCastEmbedBuilder.BuildUpdatesAvailableEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, updates));
     }
 
     private static async Task PingMusicServerAsync()
@@ -274,7 +273,7 @@ internal sealed class AzuraCastModule : BaseModule
             IsMusicServerOnline = false;
 
             if (AzuraCastSettings.AutomaticServerPing)
-                await Program.SendMessageAsync(AzuraCastSettings.OutagesChannelId, string.Empty, AzuraCastEmbedBuilder.BuildServerIsOfflineEmbed(Program.GetDiscordClientUserName, Program.GetDiscordClientAvatarUrl, false));
+                await AzzyBot.SendMessageAsync(AzuraCastSettings.OutagesChannelId, string.Empty, AzuraCastEmbedBuilder.BuildServerIsOfflineEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, false));
         }
 
         // When the server was previously offline but is online again now
@@ -283,7 +282,7 @@ internal sealed class AzuraCastModule : BaseModule
             IsMusicServerOnline = true;
 
             if (AzuraCastSettings.AutomaticServerPing)
-                await Program.SendMessageAsync(AzuraCastSettings.OutagesChannelId, string.Empty, AzuraCastEmbedBuilder.BuildServerIsOfflineEmbed(Program.GetDiscordClientUserName, Program.GetDiscordClientAvatarUrl, true));
+                await AzzyBot.SendMessageAsync(AzuraCastSettings.OutagesChannelId, string.Empty, AzuraCastEmbedBuilder.BuildServerIsOfflineEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, true));
         }
     }
 }

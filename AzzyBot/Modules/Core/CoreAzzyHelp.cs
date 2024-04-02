@@ -5,7 +5,6 @@ using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.ClubManagement;
 using AzzyBot.Modules.Core.Models;
 using AzzyBot.Modules.MusicStreaming;
-using AzzyBot.Settings.Core;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 

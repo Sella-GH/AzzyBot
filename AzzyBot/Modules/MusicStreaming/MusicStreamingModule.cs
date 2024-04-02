@@ -1,5 +1,4 @@
 ﻿using System;
-using AzzyBot.Settings.MusicStreaming;
 using DSharpPlus.SlashCommands;
 
 namespace AzzyBot.Modules.MusicStreaming;

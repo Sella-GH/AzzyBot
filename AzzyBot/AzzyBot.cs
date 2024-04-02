@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules;
 using AzzyBot.Modules.Core;
-using AzzyBot.Settings;
-using AzzyBot.Settings.Core;
+using AzzyBot.Modules.Core.Updater;
 using AzzyBot.Strings;
-using AzzyBot.Updater;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
@@ -21,7 +19,6 @@ using Lavalink4NET.Extensions;
 using Lavalink4NET.InactivityTracking;
 using Lavalink4NET.InactivityTracking.Extensions;
 using Lavalink4NET.InactivityTracking.Trackers.Idle;
-using Lavalink4NET.InactivityTracking.Trackers.Users;
 using Lavalink4NET.Integrations.LyricsJava.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,7 +26,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot;
 
-internal static class Program
+internal static class AzzyBot
 {
     private static DiscordClient? DiscordClient;
     private static IAudioService? AudioService;

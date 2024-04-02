@@ -4,7 +4,6 @@ using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using AzzyBot.Modules.Core;
-using AzzyBot.Settings.Core;
 using AzzyBot.Strings.Core;
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -108,7 +107,7 @@ internal static class ExceptionHandler
             if (string.IsNullOrWhiteSpace(tempFilePath))
                 throw new IOException("Couldn't create temp file for StackTrace!");
 
-            if (!await Program.SendMessageAsync(CoreSettings.ErrorChannelId, $"<@!{CoreSettings.OwnerUserId}> new error dropped in!", BuildErrorEmbed(ex.GetType().Name, message, timestamp, jsonMessage), tempFilePath, true))
+            if (!await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, $"<@!{CoreSettings.OwnerUserId}> new error dropped in!", BuildErrorEmbed(ex.GetType().Name, message, timestamp, jsonMessage), tempFilePath, true))
                 throw new InvalidOperationException("Exception message couldn't be sent!");
 
             if (!CoreFileOperations.DeleteTempFile(tempFilePath))
@@ -157,7 +156,7 @@ internal static class ExceptionHandler
             if (string.IsNullOrWhiteSpace(tempFilePath))
                 throw new IOException("Couldn't create temp file for StackTrace!");
 
-            if (!await Program.SendMessageAsync(CoreSettings.ErrorChannelId, $"<@{CoreSettings.OwnerUserId}> new error dropped in!", BuildErrorEmbed(ex.GetType().Name, exMessage, timestamp, jsonMessage, message, user, slashCommandName, slashCommandOptions), tempFilePath, true))
+            if (!await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, $"<@{CoreSettings.OwnerUserId}> new error dropped in!", BuildErrorEmbed(ex.GetType().Name, exMessage, timestamp, jsonMessage, message, user, slashCommandName, slashCommandOptions), tempFilePath, true))
                 throw new InvalidOperationException("Exception message couldn't be sent!");
 
             if (!CoreFileOperations.DeleteTempFile(tempFilePath))
@@ -202,7 +201,7 @@ internal static class ExceptionHandler
             if (string.IsNullOrWhiteSpace(tempFilePath))
                 throw new IOException("Couldn't create temp file for StackTrace!");
 
-            if (!await Program.SendMessageAsync(CoreSettings.ErrorChannelId, $"<@{CoreSettings.OwnerUserId}> new error dropped in!", BuildErrorEmbed(ex.GetType().Name, exMessage, timestamp, jsonMessage, string.Empty, user, string.Empty, slashCommandOptions), tempFilePath, true))
+            if (!await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, $"<@{CoreSettings.OwnerUserId}> new error dropped in!", BuildErrorEmbed(ex.GetType().Name, exMessage, timestamp, jsonMessage, string.Empty, user, string.Empty, slashCommandOptions), tempFilePath, true))
                 throw new InvalidOperationException("Exception message couldn't be sent!");
 
             if (!CoreFileOperations.DeleteTempFile(tempFilePath))
@@ -252,7 +251,7 @@ internal static class ExceptionHandler
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(message, nameof(message));
 
-        ILogger<BaseDiscordClient> client = Program.GetDiscordClientLogger;
+        ILogger<BaseDiscordClient> client = AzzyBot.GetDiscordClientLogger;
 
         switch (level)
         {

@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 
-namespace AzzyBot.Settings.AzuraCast;
+namespace AzzyBot.Modules.AzuraCast;
 
 internal sealed class AzuraCastSettings : BaseSettings
 {
