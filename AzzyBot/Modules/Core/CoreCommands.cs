@@ -3,7 +3,6 @@ using AzzyBot.Commands.Attributes;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.Core.Autocomplete;
 using AzzyBot.Strings.Core;
-using AzzyBot.Updater;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;

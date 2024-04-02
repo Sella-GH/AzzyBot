@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using AzzyBot.Modules.Core.Enums;
-using AzzyBot.Updater;
+using AzzyBot.Modules.Core.Updater;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 

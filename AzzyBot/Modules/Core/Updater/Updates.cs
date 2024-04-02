@@ -7,12 +7,11 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
-using AzzyBot.Modules.Core;
 using AzzyBot.Strings.Core;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace AzzyBot.Updater;
+namespace AzzyBot.Modules.Core.Updater;
 
 internal static class Updates
 {

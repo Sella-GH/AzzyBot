@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace AzzyBot.Updater;
+namespace AzzyBot.Modules.Core.Updater;
 
 internal sealed class UpdaterModel
 {
