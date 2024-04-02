@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using AzzyBot.Commands.Attributes;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.Core.Autocomplete;
+using AzzyBot.Modules.Core.Updater;
 using AzzyBot.Strings.Core;
 using DSharpPlus;
 using DSharpPlus.Entities;
