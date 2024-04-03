@@ -69,6 +69,6 @@ internal static class Updates
         LastOnlineVersion = updateVersion;
         UpdateNotifyCounter++;
 
-        await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, string.Empty, [CoreEmbedBuilder.BuildUpdatesAvailableEmbed(updateVersion, releaseDate), CoreEmbedBuilder.BuildUpdatesAvailableChangelogEmbed(changelog)]);
+        await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, string.Empty, [CoreEmbedBuilder.BuildUpdatesAvailableEmbed(updateVersion, releaseDate), CoreEmbedBuilder.BuildUpdatesAvailableChangelogEmbed(changelog), CoreEmbedBuilder.BuildUpdatesInstructionEmbed()]);
     }
 }

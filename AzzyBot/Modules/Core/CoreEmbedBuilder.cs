@@ -197,4 +197,26 @@ internal static class CoreEmbedBuilder
 
         return CreateBasicEmbed(title, body, string.Empty, string.Empty, DiscordColor.White);
     }
+
+    internal static DiscordEmbed BuildUpdatesInstructionEmbed()
+    {
+        bool isDocker = CoreAzzyStatsGeneral.GetBotName == "AzzyBot-Docker";
+        const string title = "Update Instructions";
+        string description;
+
+        if (isDocker)
+        {
+            description = "To update the bot please go into the command line of the machine running the docker container and execute the following commands:\n\n- `docker compose down`\n- `docker compose pull`\n- `docker compose up -d`";
+        }
+        else if (CoreMisc.CheckIfLinuxOs())
+        {
+            description = "Please follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wiki/Linux-Update-Instructions)";
+        }
+        else
+        {
+            description = "Please follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wiki/Windows-Update-Instructions)";
+        }
+
+        return CreateBasicEmbed(title, description, string.Empty, string.Empty, DiscordColor.White);
+    }
 }
