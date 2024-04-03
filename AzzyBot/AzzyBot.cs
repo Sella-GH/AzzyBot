@@ -374,13 +374,14 @@ internal static class AzzyBot
     /// </summary>
     /// <param name="channelId">The ID of the channel to send the message to.</param>
     /// <param name="content">The text content of the message. This is optional.</param>
-    /// <param name="embed">A DiscordEmbed to include in the message. This is optional.</param>
+    /// <param name="embeds">A List of DiscordEmbeds to include in the message. This is optional.</param>
     /// <param name="mention">A boolean indicating whether to allow mentions in this message. This is optional.</param>
     /// <returns>A Task representing the asynchronous operation.</returns>
-    internal static async Task<DiscordMessage> SendMessageAsync(ulong channelId, string content = "", DiscordEmbed? embed = null, bool mention = false)
+    internal static async Task<DiscordMessage> SendMessageAsync(ulong channelId, string content = "", List<DiscordEmbed?>? embeds = null, bool mention = false)
     {
         ArgumentNullException.ThrowIfNull(DiscordClient);
         ArgumentOutOfRangeException.ThrowIfZero(channelId);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(embeds?.Count ?? 0, 10, nameof(embeds));
 
         DiscordMessageBuilder builder = new();
 
@@ -390,8 +391,8 @@ internal static class AzzyBot
         if (mention)
             builder.WithAllowedMentions([EveryoneMention.All, RepliedUserMention.All, RoleMention.All, UserMention.All]);
 
-        if (embed is not null)
-            builder.WithEmbed(embed);
+        if (embeds?.Count > 0)
+            builder.AddEmbeds(embeds);
 
         DiscordChannel channel = await DiscordClient.GetChannelAsync(channelId);
         return await channel.SendMessageAsync(builder);

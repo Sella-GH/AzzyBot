@@ -32,7 +32,6 @@ internal static class Updates
         if (!DateTime.TryParse(updaterModel.createdAt, out DateTime releaseDate))
             releaseDate = DateTime.Now;
 
-        await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, string.Empty, CoreEmbedBuilder.BuildUpdatesAvailableEmbed(updateVersion, releaseDate));
-        await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, string.Empty, CoreEmbedBuilder.BuildUpdatesAvailableChangelogEmbed(updaterModel.body));
+        await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, string.Empty, [CoreEmbedBuilder.BuildUpdatesAvailableEmbed(updateVersion, releaseDate), CoreEmbedBuilder.BuildUpdatesAvailableChangelogEmbed(updaterModel.body)]);
     }
 }
