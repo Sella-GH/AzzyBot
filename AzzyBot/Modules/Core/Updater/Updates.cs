@@ -24,10 +24,7 @@ internal static class Updates
 
         Version updateVersion = new(updaterModel.name);
         if (updateVersion == localVersion)
-        {
-            await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, "No update neccessary");
             return;
-        }
 
         if (!DateTime.TryParse(updaterModel.createdAt, out DateTime releaseDate))
             releaseDate = DateTime.Now;
