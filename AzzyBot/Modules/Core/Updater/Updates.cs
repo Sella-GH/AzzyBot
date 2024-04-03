@@ -138,13 +138,13 @@ internal static class Updates
         Dictionary<string, string> headers = new()
         {
             ["X-GitHub-Api-Version"] = "2022-11-28",
-            ["Authorization"] = $"Bearer {model.Updater.PersonalAccessToken}",
+            ["Authorization"] = $"Bearer model.Updater.PersonalAccessToken",
             ["User-Agent"] = "AzzyBot-Dev"
         };
 
         DeleteOldFiles();
 
-        string url = string.Join("/", $"{model.Updater.ApiUrl}-Updater", "tags");
+        string url = string.Join("/", $"model.Updater.ApiUrl-Updater", "tags");
         AddHeaders(headers, Client);
         HttpResponseMessage? reponse = await Client.GetAsync(new Uri(url));
         reponse.EnsureSuccessStatusCode();
@@ -161,7 +161,7 @@ internal static class Updates
             throw new InvalidOperationException("Version can not be found");
 
         if (onlineVersion > localVersion)
-            await InstallUpdaterUpdateAsync(onlineVersion, model.Updater.ApiUrl, model.Updater.PersonalAccessToken, model.Updater.Permissions);
+            await InstallUpdaterUpdateAsync(onlineVersion, "model.Updater.ApiUrl", "model.Updater.PersonalAccessToken", "model.Updater.Permissions");
     }
 
     private static async Task InstallUpdaterUpdateAsync(Version version, string apiUrl, string pat, string permissions)
