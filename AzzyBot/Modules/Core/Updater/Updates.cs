@@ -7,6 +7,10 @@ namespace AzzyBot.Modules.Core.Updater;
 
 internal static class Updates
 {
+    private static DateTime LastNotificationTime;
+    private static Version LastOnlineVersion = new(0, 0, 0);
+    private static int UpdateNotifyCounter;
+
     internal static async Task CheckForUpdatesAsync()
     {
         const string gitHubUrl = "https://api.github.com/repos/Sella-GH/AzzyBot/releases/latest";
@@ -29,6 +33,42 @@ internal static class Updates
         if (!DateTime.TryParse(updaterModel.createdAt, out DateTime releaseDate))
             releaseDate = DateTime.Now;
 
-        await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, string.Empty, [CoreEmbedBuilder.BuildUpdatesAvailableEmbed(updateVersion, releaseDate), CoreEmbedBuilder.BuildUpdatesAvailableChangelogEmbed(updaterModel.body)]);
+        await SendUpdateMessageAsync(updateVersion, releaseDate, updaterModel.body);
+    }
+
+    private static async Task SendUpdateMessageAsync(Version updateVersion, DateTime releaseDate, string changelog)
+    {
+        DateTime now = DateTime.Now;
+        bool dayNotification = false;
+        bool halfDayNotification = false;
+        bool quarterDayNotification = false;
+
+        if (LastOnlineVersion != updateVersion)
+        {
+            LastNotificationTime = DateTime.MinValue;
+            UpdateNotifyCounter = 0;
+        }
+
+        if (UpdateNotifyCounter < 3 && now > LastNotificationTime.AddHours(23).AddMinutes(59))
+        {
+            dayNotification = true;
+        }
+        else if (UpdateNotifyCounter < 7 && now > LastNotificationTime.AddHours(11).AddMinutes(59))
+        {
+            halfDayNotification = true;
+        }
+        else if (UpdateNotifyCounter > 7 && now > LastNotificationTime.AddHours(5).AddMinutes(59))
+        {
+            quarterDayNotification = true;
+        }
+
+        if (!dayNotification && !halfDayNotification && !quarterDayNotification)
+            return;
+
+        LastNotificationTime = now;
+        LastOnlineVersion = updateVersion;
+        UpdateNotifyCounter++;
+
+        await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, string.Empty, [CoreEmbedBuilder.BuildUpdatesAvailableEmbed(updateVersion, releaseDate), CoreEmbedBuilder.BuildUpdatesAvailableChangelogEmbed(changelog)]);
     }
 }
