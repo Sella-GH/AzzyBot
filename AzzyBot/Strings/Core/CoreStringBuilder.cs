@@ -29,12 +29,6 @@ internal sealed class CoreStringBuilder : StringBuilding
         return Model is not null;
     }
 
-    #region CommandsBotRestart
-
-    internal static string GetCommandsBotRestart => Model.CommandsBotRestart;
-
-    #endregion CommandsBotRestart
-
     #region Embeds
 
     #region BuildAzzyHelpEmbed

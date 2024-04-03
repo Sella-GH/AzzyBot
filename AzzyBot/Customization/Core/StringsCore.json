@@ -1,5 +1,4 @@
 ﻿{
-    "CommandsBotRestart": "Bot restarts now!",
     "EmbedAzzyHelpTitle": "All Commands And Descriptions",
     "EmbedAzzyHelpDesc": "Here you can find all commands and their respective descriptions.\nIf you want to know more about a command, add it using the optional parameter of this command.",
     "EmbedAzzyHelpOptionDesc": "\n\nUse these additional parameters to change the behaviour of the command:",

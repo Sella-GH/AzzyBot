@@ -6,6 +6,7 @@
   - `StringsClubManagement`
 
 ### General
+- The updater is now included instead of an own application and only provides notifications. You have to update manually
 - Now available as a docker image too!
   - Follow the instructions in the wiki if you want to get it up and running
   - The bot is still available as a base x64 or arm64 dedicated executable if you prefer this
@@ -14,6 +15,9 @@
 - `appsettings.json` now supports an ip address as value for the `AzuraApiUrl` setting
 - Messages added if the music streaming plugin is not used for the specific amount of time OR if no users are in the voice channel anymore
 - Support for HLS streams
+
+### Removements
+- `config bot-restart` command
  
 ### Improvements
 - CI Updates for better processability

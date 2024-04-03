@@ -2,8 +2,6 @@ using System.Threading.Tasks;
 using AzzyBot.Commands.Attributes;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.Core.Autocomplete;
-using AzzyBot.Modules.Core.Updater;
-using AzzyBot.Strings.Core;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
@@ -40,18 +38,6 @@ internal sealed class CoreCommands : ApplicationCommandModule
     [RequireUserRole]
     internal sealed class CoreCommandGroup : ApplicationCommandModule
     {
-        [SlashCommandGroup("Config", "Configuration commands")]
-        internal sealed class AdminConfigCommandGroup : ApplicationCommandModule
-        {
-            [SlashCommand("bot-restart", "Restarts the bot")]
-            internal static async Task RestartBotAsync(InteractionContext ctx)
-            {
-                ExceptionHandler.LogMessage(LogLevel.Information, "RestartBot requsted");
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(CoreStringBuilder.GetCommandsBotRestart));
-                UpdaterMisc.RestartBot();
-            }
-        }
-
         [SlashCommandGroup("info", "Info commands")]
         internal sealed class CoreInfoCommandGroup : ApplicationCommandModule
         {

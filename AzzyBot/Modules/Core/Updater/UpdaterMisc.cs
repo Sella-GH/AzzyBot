@@ -19,25 +19,6 @@ internal static class UpdaterMisc
             throw new IOException("Unable to create Directory: Updater");
     }
 
-    internal static void RestartBot()
-    {
-        ProcessStartInfo startInfo = new()
-        {
-            Arguments = $"-c \"{Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Updater", "Updater")} restart\"",
-            FileName = "/bin/bash",
-            CreateNoWindow = true,
-            RedirectStandardOutput = true
-        };
-
-        using Process process = new()
-        {
-            EnableRaisingEvents = true,
-            StartInfo = startInfo
-        };
-
-        process.Start();
-    }
-
     internal static void SetFilePermission(string file, string permissions)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(nameof(file));

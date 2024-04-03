@@ -2,12 +2,6 @@ namespace AzzyBot.Strings.Core;
 
 internal sealed class CoreStringModel
 {
-    #region CommandsBotRestart
-
-    public string CommandsBotRestart { get; set; } = string.Empty;
-
-    #endregion CommandsBotRestart
-
     #region Embeds
 
     #region BuildAzzyHelpEmbed
