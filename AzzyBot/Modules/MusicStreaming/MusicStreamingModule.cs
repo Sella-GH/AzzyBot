@@ -37,7 +37,14 @@ internal sealed class MusicStreamingModule : BaseModule
             throw new InvalidOperationException("Lavalink failed to start!");
     }
 
-    internal override async void StopProcesses() => await MusicStreamingLavalinkHandler.StopLavalinkAsync();
+    internal override async void StopProcesses()
+    {
+        if (GetAzzyBotName() is "AzzyBot-Docker")
+            return;
+
+        await MusicStreamingLavalinkHandler.StopLavalinkAsync();
+    }
+
     internal override void Activate() => ModuleStates.ActivateMusicStreaming();
 
     internal static string GetAzzyBotName()
