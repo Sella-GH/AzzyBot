@@ -172,4 +172,29 @@ internal static class CoreEmbedBuilder
 
         return CreateBasicEmbed(title, string.Empty, userName, userAvatarUrl, DiscordColor.Red, userAvatarUrl, string.Empty, fields);
     }
+
+    internal static DiscordEmbed BuildUpdatesAvailableEmbed(Version version, in DateTime updateDate)
+    {
+        string title = "Azzy Updates Available";
+        string body = "Update now to get the latest bug fixes, features and improvements!";
+
+        Dictionary<string, DiscordEmbedStruct> fields = new()
+        {
+            ["Release Date"] = new(new("Release Date"), $"<t:{CoreMisc.ConvertToUnixTime(updateDate)}>", false),
+            ["Your Version"] = new(new("Your Version"), CoreAzzyStatsGeneral.GetBotVersion, false),
+            ["Updated Version"] = new(new("Updated Version"), version.ToString(), false)
+        };
+
+        return CreateBasicEmbed(title, body, AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, DiscordColor.White, string.Empty, string.Empty, fields);
+    }
+
+    internal static DiscordEmbed BuildUpdatesAvailableChangelogEmbed(string changelog)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(changelog, nameof(changelog));
+
+        string title = "Azzy Updates Changelog";
+        string body = changelog;
+
+        return CreateBasicEmbed(title, body, string.Empty, string.Empty, DiscordColor.White);
+    }
 }

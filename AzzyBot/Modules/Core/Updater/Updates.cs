@@ -15,62 +15,33 @@ namespace AzzyBot.Modules.Core.Updater;
 
 internal static class Updates
 {
-    internal static async Task CheckForUpdatesAsync(bool notify)
+    internal static async Task CheckForUpdatesAsync()
     {
-        string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Updater");
-        string filePath = Path.Combine(basePath, "Updater");
-        string versionPath = Path.Combine(basePath, "version.txt");
-        string version = string.Empty;
+        const string gitHubUrl = "https://api.github.com/repos/Sella-GH/AzzyBot/releases/latest";
+        Version localVersion = new(CoreAzzyStatsGeneral.GetBotVersion);
 
-        ProcessStartInfo startInfo = new()
+        Dictionary<string, string> headers = new()
         {
-            Arguments = $"-c \"{filePath} check\"",
-            FileName = "/bin/bash",
-            CreateNoWindow = true,
-            RedirectStandardOutput = true
+            ["User-Agent"] = CoreAzzyStatsGeneral.GetBotName
         };
+        string body = await CoreWebRequests.GetWebAsync(gitHubUrl, headers);
+        if (string.IsNullOrWhiteSpace(body))
+            throw new InvalidOperationException("GitHub release version body is empty");
 
-        using Process process = new()
+        UpdaterModel? updaterModel = JsonConvert.DeserializeObject<UpdaterModel>(body) ?? throw new InvalidOperationException("UpdaterModel is null");
+
+        Version updateVersion = new(updaterModel.name);
+        if (updateVersion == localVersion)
         {
-            EnableRaisingEvents = true,
-            StartInfo = startInfo
-        };
-
-        process.Start();
-        await process.WaitForExitAsync();
-
-        if (process.ExitCode != 100)
+            await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, "No update neccessary");
             return;
-
-        try
-        {
-            version = await File.ReadAllTextAsync(versionPath);
-        }
-        catch (DirectoryNotFoundException)
-        {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"Directory not found: {basePath}");
-            throw;
-        }
-        catch (FileNotFoundException)
-        {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"File not found: {versionPath}");
-            throw;
-        }
-        catch (UnauthorizedAccessException)
-        {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"Can't access file: {versionPath} - invalid permissions");
-            throw;
         }
 
-        if (notify)
-            await NotifyUsersAboutUpdateAsync(version);
-    }
+        if (!DateTime.TryParse(updaterModel.createdAt, out DateTime releaseDate))
+            releaseDate = DateTime.Now;
 
-    private static async Task NotifyUsersAboutUpdateAsync(string version, bool updater = false)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(version);
-
-        await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, CoreStringBuilder.GetUpdatesAvailable((updater) ? "Updater" : "Azzy", version));
+        await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, string.Empty, CoreEmbedBuilder.BuildUpdatesAvailableEmbed(updateVersion, releaseDate));
+        await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, string.Empty, CoreEmbedBuilder.BuildUpdatesAvailableChangelogEmbed(updaterModel.body));
     }
 
     private static readonly HttpClient Client = new()

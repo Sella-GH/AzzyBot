@@ -280,8 +280,7 @@ internal static class AzzyBot
         #region Check for updates
 
         ExceptionHandler.LogMessage(LogLevel.Debug, "Checking for updates");
-        if (CoreMisc.CheckIfLinuxOs())
-            await Updates.CheckForUpdatesAsync(true);
+        await Updates.CheckForUpdatesAsync();
 
         #endregion Check for updates
 
