@@ -17,8 +17,6 @@ internal static class Updates
 {
     internal static async Task CheckForUpdatesAsync(bool notify)
     {
-        UpdaterMisc.CheckIfDirIsPresent();
-
         string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Updater");
         string filePath = Path.Combine(basePath, "Updater");
         string versionPath = Path.Combine(basePath, "version.txt");
@@ -96,8 +94,6 @@ internal static class Updates
 
     internal static async Task CheckForUpdaterUpdatesAsync()
     {
-        UpdaterMisc.CheckIfDirIsPresent();
-
         string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Updater");
         string filePath = Path.Combine(basePath, "Updater.dll");
         string settingsPath = Path.Combine(basePath, "appsettings.json");
@@ -254,9 +250,6 @@ internal static class Updates
                     continue;
 
                 entry.ExtractToFile(fullPath);
-
-                // Set correct file permissions
-                UpdaterMisc.SetFilePermission(fullPath, permissions);
             }
         }
 

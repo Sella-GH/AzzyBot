@@ -139,9 +139,6 @@ internal static class CoreFileOperations
 
             await File.Create(path).DisposeAsync();
 
-            if (CoreMisc.CheckIfLinuxOs())
-                UpdaterMisc.SetFilePermission(path, "0755");
-
             if (!File.Exists(path))
                 throw new FileNotFoundException($"Could not create file: {path}");
 
