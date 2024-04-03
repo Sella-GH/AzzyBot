@@ -55,6 +55,22 @@ internal sealed class CoreStringModel
 
     #endregion BuildInfoAzzyEmbed
 
+    #region BuildUpdatesAvailableEmbed
+
+    public string EmbedUpdatesAvailableTitle { get; set; } = string.Empty;
+    public string EmbedUpdatesAvailableDesc { get; set; } = string.Empty;
+    public string EmbedUpdatesAvailableReleaseDate { get; set; } = string.Empty;
+    public string EmbedUpdatesAvailableYourVersion { get; set; } = string.Empty;
+    public string EmbedUpdatesAvailableUpdatedVersion { get; set; } = string.Empty;
+
+    #endregion BuildUpdatesAvailableEmbed
+
+    #region BuildUpdatesAvailableChangelogEmbed
+
+    public string EmbedUpdatesAvailableChangelogTitle { get; set; } = string.Empty;
+
+    #endregion BuildUpdatesAvailableChangelogEmbed
+
     #endregion Embeds
 
     #region ExceptionHandling
@@ -80,10 +96,4 @@ internal sealed class CoreStringModel
     #endregion SlashCommandError
 
     #endregion ExceptionHandling
-
-    #region Updater
-
-    public string UpdatesAvailable { get; set; } = string.Empty;
-
-    #endregion Updater
 }
