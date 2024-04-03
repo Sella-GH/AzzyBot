@@ -7,7 +7,7 @@
   </p>
   
   <p align="center">
-    General purpose discord bot, written in C# and with DSharpPlus, dedicated for the use with <a href="https://github.com/AzuraCast/AzuraCast">AzuraCast</a>
+    Kind of music bot for discord, written in C# and with DSharpPlus. This bot is dedicated for the use with <a href="https://github.com/AzuraCast/AzuraCast">AzuraCast</a> and does not work at it's fully glory without it. 
     <br/>
     <br/>
     <a href="https://github.com/Sella-GH/AzzyBot/wiki"><strong>Explore the docs »</strong></a>
@@ -58,9 +58,9 @@ The bot contains of the following features:
 
 * [.NET 8](https://github.com/dotnet/runtime)
 * [Visual Studio 2022 Community](https://visualstudio.microsoft.com/de/downloads)
-* [CsvHelper 31.0.2](https://github.com/JoshClose/CsvHelper)
-* [DSharpPlus 4.4.6](https://github.com/DSharpPlus/DSharpPlus)
-* [Roslynator 4.11](https://github.com/dotnet/roslynator)
+* [CsvHelper](https://github.com/JoshClose/CsvHelper)
+* [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus)
+* [Roslynator](https://github.com/dotnet/roslynator)
 * [Lavalink](https://github.com/lavalink-devs/Lavalink)
 * [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
 * [Docker](https://docker.com/)
