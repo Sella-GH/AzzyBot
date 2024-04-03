@@ -206,7 +206,7 @@ internal static class CoreEmbedBuilder
 
         if (isDocker)
         {
-            description = "To update the bot please go into the command line of the machine running the docker container and execute the following commands:\n\n- `docker compose down`\n- `docker compose pull`\n- `docker compose up -d`";
+            description = "To update the bot please go into the command line of the machine running the docker container and execute the following commands:\n- `docker compose down`\n- `docker compose pull`\n- `docker compose up -d`";
         }
         else if (CoreMisc.CheckIfLinuxOs())
         {
