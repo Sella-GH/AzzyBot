@@ -18,7 +18,6 @@ on:
       - "**.csproj"
       - "**.props"
       - "**.sln"
-  pull_request:
 
 jobs:
   analyze:

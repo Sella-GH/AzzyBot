@@ -3,8 +3,8 @@ blank_issues_enabled : false
 contact_links :
   - name : Azzy Discussion Page
     url : https://github.com/Sella-GH/AzzyBot/discussions
-    about : Need help with something that isnt a bug? Ask our community.
+    about : "Need help with something that isn't a bug? Ask the community."
 
   - name : Azzy Wiki
     url : https://github.com/Sella-GH/AzzyBot/wiki
-    about : Check the wiki for a guide on how to prepare and install the discord bot.
+    about : "Check out the wiki for a guide on how to prepare and set-up the discord bot."

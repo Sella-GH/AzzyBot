@@ -7,15 +7,15 @@ body :
   - type : markdown
     attributes :
       value: |
-        Thank you very much for suggesting a feature for our discord bot.
+        Thank you very much for suggesting a feature for Azzy.
         Please note that this form is only intended to be used for feature requests.
-        If you want to report a bug, please use the [following form](https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D)
+        If you want to report a bug, please use the [following form](https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D).
 
   - type : textarea
     id : feature-description
     attributes :
-     label : "Is your feature request related to a problem? Please describe."
-     description : "A clear and concise description of what the problem is."
+     label : "Is your feature request related to an issue? Please describe."
+     description : "A clear and concise description of what the issue is. You are able to link existing GitHub issues with a # ."
      placeholder : "I'm always frustrated when [...]"
     validations :
      required : true
@@ -24,7 +24,7 @@ body :
     id : expected-behavior
     attributes :
      label : "Describe the solution you'd like"
-     description : "A clear and concise description of what you want to happen."
+     description : "A clear and concise description of what you want us to implement and what should happen."
     validations :
      required : true
 
@@ -32,7 +32,7 @@ body :
     id : alternatives
     attributes :
      label : "Describe alternatives you've considered"
-     description : "A clear and concise description of any alternative solutions or features you've considered."
+     description : "A clear and concise description of any alternative solution or feature you've considered."
     validations :
      required : true
      
