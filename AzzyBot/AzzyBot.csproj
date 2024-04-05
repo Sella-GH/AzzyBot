@@ -112,7 +112,7 @@
 
   <ItemGroup>
     <None Update="AzzyBot.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Settings\appsettings.development.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -155,8 +155,4 @@
   <ItemGroup>
     <Folder Include="Customization\MusicStreaming\" />
   </ItemGroup>
-
-  <Target Name="WriteBuildDateToFile" BeforeTargets="PreBuildEvent">
-    <WriteLinesToFile File="$(ProjectDir)BuildDate.txt" Lines="$([System.DateTime]::Now.ToString(&quot;yyyy-MM-dd HH:mm:ss&quot;))" Overwrite="true" Encoding="UTF-8" />
-  </Target>
 </Project>
