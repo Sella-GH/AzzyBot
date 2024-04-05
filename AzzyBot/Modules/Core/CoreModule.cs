@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.Core.Updater;
 using DSharpPlus.Entities;
@@ -20,13 +19,9 @@ internal sealed class CoreModule : BaseModule
         string fileName;
         string[] directory;
 
-        fileName = nameof(CoreFileNamesEnum.BuildDateTXT);
+        fileName = nameof(CoreFileNamesEnum.AzzyBotJSON);
         directory = [nameof(CoreFileDirectoriesEnum.None)];
         BuildTimeLock = new(fileName, directory);
-
-        fileName = nameof(CoreFileNamesEnum.CommitTXT);
-        directory = [nameof(CoreFileDirectoriesEnum.None)];
-        CommitLock = new(fileName, directory);
     }
 
     internal override void DisposeFileLocks()

@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
+using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Strings.Core;
 using Microsoft.Extensions.Logging;
 
@@ -100,7 +101,7 @@ internal static class CoreAzzyStatsGeneral
         if (CoreModule.CommitLock is null)
             return "Commit not found";
 
-        string commit = await CoreModule.CommitLock.GetFileContentAsync();
+        string commit = await CoreModule.CommitLock.GetFileContentAsync(CoreFileValuesEnum.Commit);
         if (string.IsNullOrWhiteSpace(commit))
             commit = "Commit not found";
 
@@ -112,7 +113,7 @@ internal static class CoreAzzyStatsGeneral
         if (CoreModule.BuildTimeLock is null)
             return "CompileDate not found";
 
-        if (!DateTime.TryParse(await CoreModule.BuildTimeLock.GetFileContentAsync(), out DateTime dateTime))
+        if (!DateTime.TryParse(await CoreModule.BuildTimeLock.GetFileContentAsync(CoreFileValuesEnum.CompileDate), out DateTime dateTime))
             return "CompileDate not found";
 
         return $"<t:{CoreMisc.ConvertToUnixTime(dateTime)}>";

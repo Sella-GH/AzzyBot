@@ -2,9 +2,8 @@ namespace AzzyBot.Modules.Core.Enums;
 
 internal enum CoreFileNamesEnum
 {
-    BuildDateTXT,
+    AzzyBotJSON,
     ClubBotStatusJSON,
-    CommitTXT,
     FavoriteSongsJSON,
     FileCacheJSON,
     PlaylistSlogansJSON,
