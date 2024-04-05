@@ -23,8 +23,8 @@ COPY --from=build /src/out .
 # Add commit and timestamp
 ARG COMMIT
 ARG TIMESTAMP
-RUN echo $COMMIT > /app/Commit.txt
-RUN echo $TIMESTAMP > /app/BuildDate.txt
+RUN sed -i 's\Commit not found\$COMMIT\g' /app/AzzyBot.json
+RUN sed -i 's\Compile date not found\$TIMESTAMP\g' /app/AzzyBot.json
 
 # Add new user
 RUN groupadd azzy
