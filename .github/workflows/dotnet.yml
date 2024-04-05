@@ -59,14 +59,12 @@ jobs:
         uses: PavanMudigonda/lines-of-code-reporter@v1.6
         with:
           include_lang: "C#,MSBuild script"
-          skip_check_run: true
 
       - name: Calculate Lines of JSON Code
         id: loc_json
         uses: PavanMudigonda/lines-of-code-reporter@v1.6
         with:
           include_lang: "JSON"
-          skip_check_run: true
 
       - name: Add some basic information
         run: |
