@@ -54,10 +54,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Calculate Lines of Code
+        id: loc
+        uses: PavanMudigonda/lines-of-code-reporter@v1
+        with:
+          include_lang: "C#"
+
+      - name: Add Lines of Code Summary
+        run: echo "${{ steps.loc.outputs.lines-of-code-summary }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Print Lines of Code Summary
+        run: echo "${{ steps.loc.outputs.total_lines }}"
+
       - name: Add some basic information
         run: |
           sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
           sed -i 's\Compile date not found\${{ github.event.head_commit.timestamp }}\g' ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
+          sed -i 's\Lines of code not found\${{ steps.loc.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
