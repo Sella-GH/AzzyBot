@@ -55,16 +55,19 @@ The bot contains of the following features:
 - Opening and closing a "club" (a station) also includes statistics for the "opening"
 
 ## Built With
-
+### Software
 * [.NET 8](https://github.com/dotnet/runtime)
 * [Visual Studio 2022 Community](https://visualstudio.microsoft.com/de/downloads)
-* [CsvHelper](https://github.com/JoshClose/CsvHelper)
-* [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus)
-* [Roslynator](https://github.com/dotnet/roslynator)
 * [Lavalink](https://github.com/lavalink-devs/Lavalink)
-* [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
 * [Docker](https://docker.com/)
 * [Docker Compose](https://docker.com/)
+
+### Dependancies
+* [CsvHelper](https://github.com/JoshClose/CsvHelper)
+* [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus)
+* [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
+* [Roslynator](https://github.com/dotnet/roslynator)
+* [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
 
 ## Getting Started
 
