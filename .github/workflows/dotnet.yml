@@ -56,7 +56,7 @@ jobs:
 
       - name: Calculate Lines of Code
         id: loc
-        uses: PavanMudigonda/lines-of-code-reporter@v1
+        uses: PavanMudigonda/lines-of-code-reporter@v1.6
         with:
           include_lang: "C#"
 
