@@ -98,10 +98,10 @@ internal static class CoreAzzyStatsGeneral
 
     internal static async Task<string> GetBotCommitAsync()
     {
-        if (CoreModule.CommitLock is null)
+        if (CoreModule.AzzyBotLock is null)
             return "Commit not found";
 
-        string commit = await CoreModule.CommitLock.GetFileContentAsync(CoreFileValuesEnum.Commit);
+        string commit = await CoreModule.AzzyBotLock.GetFileContentAsync(CoreFileValuesEnum.Commit);
         if (string.IsNullOrWhiteSpace(commit))
             commit = "Commit not found";
 
@@ -110,10 +110,10 @@ internal static class CoreAzzyStatsGeneral
 
     internal static async Task<string> GetBotCompileDateAsync()
     {
-        if (CoreModule.BuildTimeLock is null)
+        if (CoreModule.AzzyBotLock is null)
             return "CompileDate not found";
 
-        if (!DateTime.TryParse(await CoreModule.BuildTimeLock.GetFileContentAsync(CoreFileValuesEnum.CompileDate), out DateTime dateTime))
+        if (!DateTime.TryParse(await CoreModule.AzzyBotLock.GetFileContentAsync(CoreFileValuesEnum.CompileDate), out DateTime dateTime))
             return "CompileDate not found";
 
         return $"<t:{CoreMisc.ConvertToUnixTime(dateTime)}>";
