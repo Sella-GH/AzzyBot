@@ -44,11 +44,12 @@ internal static class ExceptionHandler
         ArgumentException.ThrowIfNullOrWhiteSpace(exMessage, nameof(exMessage));
         ArgumentException.ThrowIfNullOrWhiteSpace(timestamp, nameof(timestamp));
 
+        const string bugReportUrl = "https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D";
+
         DiscordEmbedBuilder builder = new()
         {
             Color = DiscordColor.Red,
-            Title = "Error occured",
-            Description = string.Empty
+            Title = "Error occured"
         };
 
         if (!string.IsNullOrWhiteSpace(discordMessage))
@@ -75,6 +76,8 @@ internal static class ExceptionHandler
 
         if (!string.IsNullOrWhiteSpace(jsonMessage))
             builder.AddField("Advanced Error Message", jsonMessage);
+
+        builder.AddField("Bug report", $"Send a [bug report]({bugReportUrl}) to help us fixing this issue!\nYour Contribution is very welcome.");
 
         return builder;
     }
