@@ -58,13 +58,7 @@ jobs:
         id: loc
         uses: PavanMudigonda/lines-of-code-reporter@v1.6
         with:
-          include_lang: "C#"
-
-      - name: Add Lines of Code Summary
-        run: echo "${{ steps.loc.outputs.lines-of-code-summary }}" >> $GITHUB_STEP_SUMMARY
-
-      - name: Print Lines of Code Summary
-        run: echo "${{ steps.loc.outputs.total_lines }}"
+          include_lang: "C#,JSON,MSBuild script"
 
       - name: Add some basic information
         run: |
