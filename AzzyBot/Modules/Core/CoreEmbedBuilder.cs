@@ -157,14 +157,18 @@ internal static class CoreEmbedBuilder
         string botVersion = CoreAzzyStatsGeneral.GetBotVersion;
         string dotnetVersion = CoreAzzyStatsGeneral.GetDotNetVersion;
         string libVersion = CoreAzzyStatsGeneral.GetDSharpNetVersion.Split('+')[0];
+        const string authorUrl = "https://github.com/Sella-GH";
+        string[] authors = CoreAzzyStatsGeneral.GetBotAuthors.Split(',');
+        const string repository = $"{authorUrl}/AzzyBot";
         string commit = await CoreAzzyStatsGeneral.GetBotCommitAsync();
         string compilationDate = await CoreAzzyStatsGeneral.GetBotCompileDateAsync();
         string botEnvironment = CoreAzzyStatsGeneral.GetBotEnvironment;
         string activatedModules = CoreAzzyStatsGeneral.GetActivatedModules();
 
+        string formattedAuthors = $"- [{authors[0].Trim()}]({authorUrl})\n- [{authors[1].Trim()}]({repository})";
         string formattedCommit = commit;
         if (commit is not "Commit not found")
-            formattedCommit = $"[{commit}](https://github.com/Sella-GH/AzzyBot/commit/{commit})";
+            formattedCommit = $"[{commit}]({repository}/commit/{commit})";
 
         Dictionary<string, DiscordEmbedStruct> fields = new()
         {
@@ -173,6 +177,9 @@ internal static class CoreEmbedBuilder
             [CoreStringBuilder.EmbedAzzyInfoBotVersion] = new(nameof(botVersion), botVersion, true),
             [CoreStringBuilder.EmbedAzzyInfoNetVersion] = new(nameof(dotnetVersion), dotnetVersion, true),
             [CoreStringBuilder.EmbedAzzyInfoDspVersion] = new(nameof(libVersion), libVersion, true),
+            ["Authors"] = new(nameof(formattedAuthors), formattedAuthors, true),
+            ["Repository"] = new(nameof(repository), $"[On GitHub]({repository})", true),
+            ["Language"] = new("language", "C#", true),
             [CoreStringBuilder.EmbedAzzyInfoGitHubCommit] = new(nameof(formattedCommit), formattedCommit, false),
             [CoreStringBuilder.EmbedAzzyInfoCompDate] = new(nameof(compilationDate), compilationDate, false),
             [CoreStringBuilder.EmbedAzzyInfoEnv] = new(nameof(botEnvironment), botEnvironment, false),
