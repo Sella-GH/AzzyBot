@@ -48,8 +48,7 @@ internal sealed class CoreModule : BaseModule
                     break;
 
                 DateTime now = DateTime.Now;
-                // If the setting is 0 check every day, if it's 1 check every week
-                if (now - LastUpdateCheck >= TimeSpan.FromDays(1) || (CoreSettings.UpdaterCheckInterval == 1 && now - LastUpdateCheck >= TimeSpan.FromDays(7)))
+                if (now - LastUpdateCheck >= TimeSpan.FromDays(CoreSettings.UpdaterCheckInterval))
                 {
                     LastUpdateCheck = now;
                     await Updates.CheckForUpdatesAsync();

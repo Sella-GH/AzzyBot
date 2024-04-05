@@ -51,7 +51,7 @@ internal sealed class CoreSettings : BaseSettings
         UpdaterMessageChannelId = Convert.ToUInt64(Config["Core:Updater:MessageChannelId"], CultureInfo.InvariantCulture);
 
         List<string> excludedStrings = [nameof(BotStreamUrl), nameof(LogoUrl)];
-        List<string> excludedInts = [nameof(ServerId), nameof(UpdaterCheckInterval), nameof(UpdaterMessageChannelId)];
+        List<string> excludedInts = [nameof(ServerId), nameof(UpdaterMessageChannelId)];
         return CoreSettingsLoaded = CheckSettings(typeof(CoreSettings), excludedStrings, excludedInts);
     }
 }
