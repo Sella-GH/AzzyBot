@@ -54,17 +54,26 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Calculate Lines of Code
-        id: loc
+      - name: Calculate Lines of Source Code
+        id: loc-cs
         uses: PavanMudigonda/lines-of-code-reporter@v1.6
         with:
-          include_lang: "C#,JSON,MSBuild script"
+          include_lang: "C#,MSBuild script"
+          skip_check_run: true
+
+      - name: Calculate Lines of JSON Code
+        id: loc-json
+        uses: PavanMudigonda/lines-of-code-reporter@v1.6
+        with:
+          include_lang: "JSON"
+          skip_check_run: true
 
       - name: Add some basic information
         run: |
           sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
           sed -i 's\Compile date not found\${{ github.event.head_commit.timestamp }}\g' ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
-          sed -i 's\Lines of code not found\${{ steps.loc.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
+          sed -i 's\Lines of source code not found\${{ steps.loc-cs.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
+          sed -i 's\Lines of JSON code not found\${{ steps.loc-json.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
