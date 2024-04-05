@@ -56,8 +56,8 @@ jobs:
 
       - name: Add some basic information
         run: |
-          sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
-          sed -i 's\Compile date not found\${{ github.event.head_commit.timestamp }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
+          sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
+          sed -i 's\Compile date not found\${{ github.event.head_commit.timestamp }}\g' ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
