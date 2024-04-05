@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.Core.Updater;
 using DSharpPlus.Entities;
@@ -10,8 +9,7 @@ namespace AzzyBot.Modules.Core;
 internal sealed class CoreModule : BaseModule
 {
     private static DateTime LastUpdateCheck = DateTime.MinValue;
-    internal static CoreFileLock? BuildTimeLock;
-    internal static CoreFileLock? CommitLock;
+    internal static CoreFileLock? AzzyBotLock;
 
     internal override void RegisterCommands(SlashCommandsExtension slashCommandsExtension, ulong? serverId) => slashCommandsExtension.RegisterCommands<CoreCommands>(serverId);
 
@@ -20,20 +18,12 @@ internal sealed class CoreModule : BaseModule
         string fileName;
         string[] directory;
 
-        fileName = nameof(CoreFileNamesEnum.BuildDateTXT);
+        fileName = nameof(CoreFileNamesEnum.AzzyBotJSON);
         directory = [nameof(CoreFileDirectoriesEnum.None)];
-        BuildTimeLock = new(fileName, directory);
-
-        fileName = nameof(CoreFileNamesEnum.CommitTXT);
-        directory = [nameof(CoreFileDirectoriesEnum.None)];
-        CommitLock = new(fileName, directory);
+        AzzyBotLock = new(fileName, directory);
     }
 
-    internal override void DisposeFileLocks()
-    {
-        BuildTimeLock?.Dispose();
-        CommitLock?.Dispose();
-    }
+    internal override void DisposeFileLocks() => AzzyBotLock?.Dispose();
 
     protected override async void HandleModuleEvent(ModuleEvent evt)
     {

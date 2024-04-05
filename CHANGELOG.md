@@ -34,6 +34,7 @@
 - Better check for lavalink stuff implemented
 - `core info azzy` now includes the url to the commit
 - The exception embed now includes a callout to report the bug
+- The commit and compile date infos are now included in a AzzyBot.json file
 - Code and reliability improvements
 
 ### Fixes

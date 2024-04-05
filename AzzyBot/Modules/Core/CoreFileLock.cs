@@ -2,7 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
+using AzzyBot.Modules.Core.Enums;
+using AzzyBot.Modules.Core.Models;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.Core;
 
@@ -12,7 +15,7 @@ internal sealed class CoreFileLock(string FileName, string[] Directories) : IDis
 
     public void Dispose() => FileLock.Dispose();
 
-    internal async Task<string> GetFileContentAsync()
+    internal async Task<string> GetFileContentAsync(CoreFileValuesEnum value = CoreFileValuesEnum.None)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(FileName, nameof(FileName));
         ArgumentNullException.ThrowIfNull(Directories, nameof(Directories));
@@ -21,7 +24,20 @@ internal sealed class CoreFileLock(string FileName, string[] Directories) : IDis
         await FileLock.WaitAsync();
         try
         {
-            return await CoreFileOperations.GetFileContentAsync(FileName, Directories);
+            string content = await CoreFileOperations.GetFileContentAsync(FileName, Directories);
+
+            if (FileName is not nameof(CoreFileNamesEnum.AzzyBotJSON))
+                return content;
+
+            AzzyBotModel? azzyBot = JsonConvert.DeserializeObject<AzzyBotModel>(content) ?? throw new InvalidOperationException("AzzyBot model is null");
+
+            return value switch
+            {
+                CoreFileValuesEnum.CompileDate => azzyBot.CompileDate,
+                CoreFileValuesEnum.Commit => azzyBot.Commit,
+                CoreFileValuesEnum.LoC => azzyBot.LoC,
+                _ => content,
+            };
         }
         catch (Exception)
         {
