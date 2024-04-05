@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
@@ -43,13 +44,13 @@ internal static class AzzyBot
     {
         #region Add basic startup information
 
-        await Console.Out.WriteLineAsync($"Starting {CoreAzzyStatsGeneral.GetBotName} in version {CoreAzzyStatsGeneral.GetBotVersion}");
+        await Console.Out.WriteLineAsync($"Starting {CoreAzzyStatsGeneral.GetBotName} in version {CoreAzzyStatsGeneral.GetBotVersion} on {RuntimeInformation.OSDescription}-{RuntimeInformation.OSArchitecture}");
 
         #endregion Add basic startup information
 
         #region Add OS Architecture Check
 
-        await Console.Out.WriteLineAsync("Checking OS");
+        await Console.Out.WriteLineAsync("Checking OS architecture");
 
         if (!CoreMisc.CheckCorrectArchitecture())
         {
@@ -58,7 +59,7 @@ internal static class AzzyBot
             Environment.Exit(0);
         }
 
-        await Console.Out.WriteLineAsync("OS check passed");
+        await Console.Out.WriteLineAsync("OS architecture check passed");
 
         #endregion Add OS Architecture Check
 
