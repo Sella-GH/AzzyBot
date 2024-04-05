@@ -162,6 +162,10 @@ internal static class CoreEmbedBuilder
         string botEnvironment = CoreAzzyStatsGeneral.GetBotEnvironment;
         string activatedModules = CoreAzzyStatsGeneral.GetActivatedModules();
 
+        string formattedCommit = commit;
+        if (commit is not "Commit not found")
+            formattedCommit = $"[{commit}](https://github.com/Sella-GH/AzzyBot/commit/{commit})";
+
         Dictionary<string, DiscordEmbedStruct> fields = new()
         {
             [CoreStringBuilder.EmbedAzzyInfoBotName] = new(nameof(botName), botName, false),
@@ -169,7 +173,7 @@ internal static class CoreEmbedBuilder
             [CoreStringBuilder.EmbedAzzyInfoBotVersion] = new(nameof(botVersion), botVersion, true),
             [CoreStringBuilder.EmbedAzzyInfoNetVersion] = new(nameof(dotnetVersion), dotnetVersion, true),
             [CoreStringBuilder.EmbedAzzyInfoDspVersion] = new(nameof(libVersion), libVersion, true),
-            [CoreStringBuilder.EmbedAzzyInfoGitHubCommit] = new(nameof(commit), commit, false),
+            [CoreStringBuilder.EmbedAzzyInfoGitHubCommit] = new(nameof(formattedCommit), formattedCommit, false),
             [CoreStringBuilder.EmbedAzzyInfoCompDate] = new(nameof(compilationDate), compilationDate, false),
             [CoreStringBuilder.EmbedAzzyInfoEnv] = new(nameof(botEnvironment), botEnvironment, false),
             [CoreStringBuilder.EmbedAzzyInfoModules] = new(nameof(activatedModules), activatedModules, false)
