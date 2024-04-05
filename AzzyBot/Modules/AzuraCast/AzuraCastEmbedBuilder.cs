@@ -39,7 +39,7 @@ internal static class AzuraCastEmbedBuilder
             fields.Add(AzuraCastStringBuilder.GetEmbedMusicStatsNetworkTitle(networks[i]), new(nameof(AzuraCastStringBuilder.GetEmbedMusicStatsNetworkDesc), AzuraCastStringBuilder.GetEmbedMusicStatsNetworkDesc(networkRXspeed[i], networkTXspeed[i]), true));
         }
 
-        return CoreEmbedBuilder.CreateBasicEmbed(title, string.Empty, userName, userAvatarUrl, DiscordColor.Red, AzuraCastLogo, string.Empty, fields);
+        return CoreEmbedBuilder.CreateBasicEmbed(title, string.Empty, userName, userAvatarUrl, DiscordColor.Red, AzuraCastLogo, string.Empty, string.Empty, fields);
     }
 
     internal static DiscordEmbed BuildServerIsOfflineEmbed(string userName, string userAvatarUrl, bool isOnline)
@@ -205,7 +205,7 @@ internal static class AzuraCastEmbedBuilder
             fields.Add(data.Name, data);
         }
 
-        return CoreEmbedBuilder.CreateBasicEmbed(title, description, userName, userAvatarUrl, DiscordColor.IndianRed, AzuraCastLogo, string.Empty, fields);
+        return CoreEmbedBuilder.CreateBasicEmbed(title, description, userName, userAvatarUrl, DiscordColor.IndianRed, AzuraCastLogo, string.Empty, string.Empty, fields);
     }
 
     internal static DiscordEmbed BuildPlaylistChangesNotAllowedEmbed(string userName, string userAvatarUrl)
@@ -324,7 +324,7 @@ internal static class AzuraCastEmbedBuilder
             }
         }
 
-        return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.Aquamarine, thumbnailUrl, footerText, fields);
+        return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.Aquamarine, thumbnailUrl, footerText, string.Empty, fields);
     }
 
     internal static DiscordEmbed BuildSearchSongRequestsEmbed(string userName, string userAvatarUrl, List<SongRequestsModel> songRequests)
@@ -386,7 +386,7 @@ internal static class AzuraCastEmbedBuilder
             footerText = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsNotFooter;
         }
 
-        return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, color, thumbnailUrl, footerText, fields);
+        return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, color, thumbnailUrl, footerText, string.Empty, fields);
     }
 
     internal static DiscordEmbed BuildRequestNotAvailableEmbed(string userName, string userAvatarUrl, string songName, string songArtist = "")
@@ -408,7 +408,7 @@ internal static class AzuraCastEmbedBuilder
             fields.Add(data.Name, data);
         }
 
-        return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.Orange, string.Empty, string.Empty, fields);
+        return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.Orange, string.Empty, string.Empty, string.Empty, fields);
     }
 
     internal static DiscordEmbed BuildRequestSongEmbed(string userName, string userAvatarUrl, SongRequestsModel songRequest)
@@ -431,7 +431,7 @@ internal static class AzuraCastEmbedBuilder
         data = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsRequestAlbum(songRequest.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
         fields.Add(data.Name, data);
 
-        return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.SpringGreen, thumbnailUrl, string.Empty, fields);
+        return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.SpringGreen, thumbnailUrl, string.Empty, string.Empty, fields);
     }
 
     internal static DiscordEmbed BuildFavouriteSongEmbed(string userName, string userAvatarUrl, string songName, string songArtist, string songAlbum, string songArt, bool isUser, string favUser)
@@ -456,6 +456,6 @@ internal static class AzuraCastEmbedBuilder
         data = AzuraCastStringBuilder.GetEmbedAzuraFavoriteSongAlbum(songAlbum.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
         fields.Add(data.Name, data);
 
-        return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.SpringGreen, songArt, string.Empty, fields);
+        return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.SpringGreen, songArt, string.Empty, string.Empty, fields);
     }
 }
