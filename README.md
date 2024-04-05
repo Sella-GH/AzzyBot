@@ -65,9 +65,9 @@ The bot contains of the following features:
 ### Dependancies
 * [CsvHelper](https://github.com/JoshClose/CsvHelper)
 * [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus)
+* [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
 * [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
 * [Roslynator](https://github.com/dotnet/roslynator)
-* [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
 
 ## Getting Started
 
