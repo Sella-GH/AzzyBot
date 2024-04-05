@@ -35,7 +35,8 @@ internal sealed class CoreFileLock(string FileName, string[] Directories) : IDis
             {
                 CoreFileValuesEnum.CompileDate => azzyBot.CompileDate,
                 CoreFileValuesEnum.Commit => azzyBot.Commit,
-                CoreFileValuesEnum.LoC => azzyBot.LoC,
+                CoreFileValuesEnum.LoC_CS => azzyBot.LoC_CS,
+                CoreFileValuesEnum.LoC_JSON => azzyBot.LoC_JSON,
                 _ => content,
             };
         }

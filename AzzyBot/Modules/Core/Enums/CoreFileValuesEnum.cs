@@ -4,6 +4,7 @@ internal enum CoreFileValuesEnum
 {
     Commit,
     CompileDate,
-    LoC,
+    LoC_CS,
+    LoC_JSON,
     None
 }
