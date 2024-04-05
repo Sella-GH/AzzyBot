@@ -32,6 +32,8 @@
 - More logging in case something goes wrong
 - Useless checks removed
 - Better check for lavalink stuff implemented
+- `core info azzy` now includes the url to the commit
+- The exception embed now includes a callout to report the bug
 - Code and reliability improvements
 
 ### Fixes
