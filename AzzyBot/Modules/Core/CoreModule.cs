@@ -35,7 +35,7 @@ internal sealed class CoreModule : BaseModule
         CommitLock?.Dispose();
     }
 
-    protected override void HandleModuleEvent(ModuleEvent evt)
+    protected override async void HandleModuleEvent(ModuleEvent evt)
     {
         switch (evt.Type)
         {
@@ -48,10 +48,10 @@ internal sealed class CoreModule : BaseModule
                     break;
 
                 DateTime now = DateTime.Now;
-                if (now - LastUpdateCheck >= TimeSpan.FromDays(1) || (CoreSettings.UpdateCheckInterval == 2 && now - LastUpdateCheck >= TimeSpan.FromDays(7)))
+                if (now - LastUpdateCheck >= TimeSpan.FromDays(CoreSettings.UpdaterCheckInterval))
                 {
                     LastUpdateCheck = now;
-                    Task.Run(() => Updates.CheckForUpdatesAsync(true));
+                    await Updates.CheckForUpdatesAsync();
                 }
 
                 break;

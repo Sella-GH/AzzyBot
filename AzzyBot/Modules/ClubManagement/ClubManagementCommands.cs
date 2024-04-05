@@ -48,7 +48,7 @@ internal sealed class ClubManagementCommands : ApplicationCommandModule
             await CoreDiscordCommands.RemoveUserRoleAsync(ctx.Member, ClubManagementSettings.CloserRoleId);
             await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(ClubManagementStringBuilder.CommandCloseClubClubClosed));
 
-            await ClubControls.SendClubClosingStatisticsAsync(await AzzyBot.SendMessageAsync(ClubManagementSettings.ClubNotifyChannelId, string.Empty, ClubEmbedBuilder.BuildCloseClubEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, false)));
+            await ClubControls.SendClubClosingStatisticsAsync(await AzzyBot.SendMessageAsync(ClubManagementSettings.ClubNotifyChannelId, string.Empty, [ClubEmbedBuilder.BuildCloseClubEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, false)]));
         }
 
         [SlashCommand("open-club", "Select a playlist and open the club")]
@@ -72,7 +72,7 @@ internal sealed class ClubManagementCommands : ApplicationCommandModule
 
             await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(ClubManagementStringBuilder.CommandOpenClubClubOpened(await ClubControls.OpenClubAsync(playlistId))));
 
-            await AzzyBot.SendMessageAsync(ClubManagementSettings.ClubNotifyChannelId, CoreDiscordCommands.GetRole(ClubManagementSettings.EventsRoleId, ctx.Guild).Mention, ClubEmbedBuilder.BuildOpenClubEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, slogan.Trim()), true);
+            await AzzyBot.SendMessageAsync(ClubManagementSettings.ClubNotifyChannelId, CoreDiscordCommands.GetRole(ClubManagementSettings.EventsRoleId, ctx.Guild).Mention, [ClubEmbedBuilder.BuildOpenClubEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, slogan.Trim())], true);
         }
     }
 }

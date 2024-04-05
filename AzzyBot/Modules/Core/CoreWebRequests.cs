@@ -59,7 +59,7 @@ internal static class CoreWebRequests
             }
 
             if (content.Contains("You must be logged in to access this page.", StringComparison.OrdinalIgnoreCase))
-                throw new InvalidOperationException("Either you forgot your AzuraCast API key or the API key is wrong!");
+                throw new InvalidOperationException("Your AzuraCast API key is wrong!");
 
             return content;
         }

@@ -93,6 +93,6 @@ internal static class ClubEmbedBuilder
             playedLists += $"\n- {playlist}";
         }
 
-        return CoreEmbedBuilder.CreateBasicEmbed(title, string.Empty, userName, userAvatarUrl, null, string.Empty, string.Empty, ClubManagementStringBuilder.EmbedClubStatisticsFields(openingTime, closingTime, openingDuration, peakListeners, visitors, songHistory.Count, songRequestsNumber, playedLists));
+        return CoreEmbedBuilder.CreateBasicEmbed(title, string.Empty, userName, userAvatarUrl, null, string.Empty, string.Empty, string.Empty, ClubManagementStringBuilder.EmbedClubStatisticsFields(openingTime, closingTime, openingDuration, peakListeners, visitors, songHistory.Count, songRequestsNumber, playedLists));
     }
 }

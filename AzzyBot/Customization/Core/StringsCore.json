@@ -1,5 +1,4 @@
 ﻿{
-    "CommandsBotRestart": "Bot restarts now!",
     "EmbedAzzyHelpTitle": "All Commands And Descriptions",
     "EmbedAzzyHelpDesc": "Here you can find all commands and their respective descriptions.\nIf you want to know more about a command, add it using the optional parameter of this command.",
     "EmbedAzzyHelpOptionDesc": "\n\nUse these additional parameters to change the behaviour of the command:",
@@ -36,10 +35,16 @@
     "EmbedAzzyInfoCompDate": "Compilation Date",
     "EmbedAzzyInfoEnv": "Environment",
     "EmbedAzzyInfoModules": "Activated Modules",
+    "EmbedUpdatesAvailableTitle": "Azzy Updates Available",
+    "EmbedUpdatesAvailableDesc": "Update now to get the latest bug fixes, features and improvements!",
+    "EmbedUpdatesAvailableReleaseDate": "Release Date",
+    "EmbedUpdatesAvailableYourVersion": "Your Version",
+    "EmbedUpdatesAvailableUpdatedVersion": "Updated Version",
+    "EmbedUpdatesAvailableChangelogTitle": "Changelog",
+    "EmbedUpdatesAvailableChangelogTooBig": "The changelog is too big to display it in an Embed, you can view it [here](%URL%).",
     "ExceptionHandlingDefault": "Sorry my peep, you don't have the permission to use this command!",
     "ExceptionHandlingDiscordPermissions": "Have you checked if %USER% has the permission to do this in the channel?",
     "ExceptionHandlingErrorDiscovered": "Ooops something went wrong!\n\nPlease inform %USER%.",
     "ExceptionHandlingNotInGuild": "This command can only be executed inside a discord server!",
-    "ExceptionHandlingOnCooldown": "The server is busy, please wait a few minutes and try this command again!",
-    "UpdateAvailable": "There's an update for %PRODUCT% to version %VERSION% available!"
+    "ExceptionHandlingOnCooldown": "The server is busy, please wait a few minutes and try this command again!"
 }

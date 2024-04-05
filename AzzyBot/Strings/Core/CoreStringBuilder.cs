@@ -29,12 +29,6 @@ internal sealed class CoreStringBuilder : StringBuilding
         return Model is not null;
     }
 
-    #region CommandsBotRestart
-
-    internal static string GetCommandsBotRestart => Model.CommandsBotRestart;
-
-    #endregion CommandsBotRestart
-
     #region Embeds
 
     #region BuildAzzyHelpEmbed
@@ -107,6 +101,23 @@ internal sealed class CoreStringBuilder : StringBuilding
 
     #endregion BuildInfoAzzyEmbed
 
+    #region BuildUpdatesAvailableEmbed
+
+    internal static string GetEmbedUpdatesAvailableTitle => Model.EmbedUpdatesAvailableTitle;
+    internal static string GetEmbedUpdatesAvailableDesc => Model.EmbedUpdatesAvailableDesc;
+    internal static string GetEmbedUpdatesAvailableReleaseDate => Model.EmbedUpdatesAvailableReleaseDate;
+    internal static string GetEmbedUpdatesAvailableYourVersion => Model.EmbedUpdatesAvailableYourVersion;
+    internal static string GetEmbedUpdatesAvailableUpdatedVersion => Model.EmbedUpdatesAvailableUpdatedVersion;
+
+    #endregion BuildUpdatesAvailableEmbed
+
+    #region BuildUpdatesAvailableChangelogEmbed
+
+    internal static string GetEmbedUpdatesAvailableChangelogTitle => Model.EmbedUpdatesAvailableChangelogTitle;
+    internal static string GetEmbedUpdatesAvailableChangelogTooBig(string url) => BuildString(Model.EmbedUpdatesAvailableChangelogTooBig, "%URL%", url);
+
+    #endregion BuildUpdatesAvailableChangelogEmbed
+
     #endregion Embeds
 
     #region ExceptionHandling
@@ -132,10 +143,4 @@ internal sealed class CoreStringBuilder : StringBuilding
     #endregion SlashCommandError
 
     #endregion ExceptionHandling
-
-    #region Updater
-
-    internal static string GetUpdatesAvailable(string product, string version) => BuildString(BuildString(Model.UpdatesAvailable, "%PRODUCT%", product), "%VERSION%", version);
-
-    #endregion Updater
 }

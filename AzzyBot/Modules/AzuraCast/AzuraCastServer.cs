@@ -370,7 +370,7 @@ internal static class AzuraCastServer
             // If nothing is equal
             // Send message to channel
             //
-            await AzzyBot.SendMessageAsync(AzuraCastSettings.MusicRequestsChannelId, string.Empty, AzuraCastEmbedBuilder.BuildRequestNotAvailableEmbed(userName, userAvatarUrl, songName, songArtist));
+            await AzzyBot.SendMessageAsync(AzuraCastSettings.MusicRequestsChannelId, string.Empty, [AzuraCastEmbedBuilder.BuildRequestNotAvailableEmbed(userName, userAvatarUrl, songName, songArtist)]);
         }
 
         return AzuraCastEmbedBuilder.BuildSearchSongRequestsEmbed(userName, userAvatarUrl, matchingSongs);

@@ -10,7 +10,9 @@ namespace AzzyBot.Modules.Core;
 
 internal static class CoreEmbedBuilder
 {
-    internal static DiscordEmbedBuilder CreateBasicEmbed(string title, string description = "", string discordName = "", string discordAvatarUrl = "", DiscordColor? color = null, string thumbnailUrl = "", string footerText = "", Dictionary<string, DiscordEmbedStruct>? fields = null)
+    private const string GitHubReleaseUrl = "https://github.com/Sella-GH/AzzyBot/releases/latest";
+
+    internal static DiscordEmbedBuilder CreateBasicEmbed(string title, string description = "", string discordName = "", string discordAvatarUrl = "", DiscordColor? color = null, string thumbnailUrl = "", string footerText = "", string url = "", Dictionary<string, DiscordEmbedStruct>? fields = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title, nameof(title));
 
@@ -33,6 +35,9 @@ internal static class CoreEmbedBuilder
 
         if (!string.IsNullOrWhiteSpace(footerText))
             builder.Footer = new() { Text = footerText };
+
+        if (!string.IsNullOrWhiteSpace(url))
+            builder.Url = url;
 
         if (fields is not null)
         {
@@ -60,7 +65,7 @@ internal static class CoreEmbedBuilder
             fields.Add($"/{field.Name}", new(field.Name, field.Description, true));
         }
 
-        return CreateBasicEmbed(title, description, userName, userAvatarUrl, DiscordColor.Blurple, string.Empty, string.Empty, fields);
+        return CreateBasicEmbed(title, description, userName, userAvatarUrl, DiscordColor.Blurple, string.Empty, string.Empty, string.Empty, fields);
     }
 
     internal static DiscordEmbed BuildAzzyHelpCommandEmbed(string userName, string userAvatarUrl, AzzyHelpModel model)
@@ -79,7 +84,7 @@ internal static class CoreEmbedBuilder
             fields.Add(name, new(name, desc, false));
         }
 
-        return CreateBasicEmbed(title, description, userName, userAvatarUrl, DiscordColor.Blurple, string.Empty, string.Empty, fields);
+        return CreateBasicEmbed(title, description, userName, userAvatarUrl, DiscordColor.Blurple, string.Empty, string.Empty, string.Empty, fields);
     }
 
     internal static async Task<DiscordEmbed> BuildAzzyStatsEmbedAsync(string userName, string userAvatarUrl, int ping)
@@ -138,7 +143,7 @@ internal static class CoreEmbedBuilder
             footer = CoreStringBuilder.GetEmbedAzzyStatsMoreStats;
         }
 
-        return CreateBasicEmbed(title, string.Empty, userName, userAvatarUrl, DiscordColor.Red, userAvatarUrl, footer, fields);
+        return CreateBasicEmbed(title, string.Empty, userName, userAvatarUrl, DiscordColor.Red, userAvatarUrl, footer, string.Empty, fields);
     }
 
     internal static async Task<DiscordEmbed> BuildInfoAzzyEmbedAsync(string userName, string userAvatarUrl)
@@ -170,6 +175,57 @@ internal static class CoreEmbedBuilder
             [CoreStringBuilder.EmbedAzzyInfoModules] = new(nameof(activatedModules), activatedModules, false)
         };
 
-        return CreateBasicEmbed(title, string.Empty, userName, userAvatarUrl, DiscordColor.Red, userAvatarUrl, string.Empty, fields);
+        return CreateBasicEmbed(title, string.Empty, userName, userAvatarUrl, DiscordColor.Red, userAvatarUrl, string.Empty, string.Empty, fields);
+    }
+
+    internal static DiscordEmbed BuildUpdatesAvailableEmbed(Version version, in DateTime updateDate)
+    {
+        string title = CoreStringBuilder.GetEmbedUpdatesAvailableTitle;
+        string body = CoreStringBuilder.GetEmbedUpdatesAvailableDesc;
+
+        Dictionary<string, DiscordEmbedStruct> fields = new()
+        {
+            [CoreStringBuilder.GetEmbedUpdatesAvailableReleaseDate] = new(new(CoreStringBuilder.GetEmbedUpdatesAvailableReleaseDate), $"<t:{CoreMisc.ConvertToUnixTime(updateDate)}>", false),
+            [CoreStringBuilder.GetEmbedUpdatesAvailableYourVersion] = new(new(CoreStringBuilder.GetEmbedUpdatesAvailableYourVersion), CoreAzzyStatsGeneral.GetBotVersion, false),
+            [CoreStringBuilder.GetEmbedUpdatesAvailableUpdatedVersion] = new(new(CoreStringBuilder.GetEmbedUpdatesAvailableUpdatedVersion), version.ToString(), false)
+        };
+
+        return CreateBasicEmbed(title, body, AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, DiscordColor.White, string.Empty, string.Empty, GitHubReleaseUrl, fields);
+    }
+
+    internal static DiscordEmbed BuildUpdatesAvailableChangelogEmbed(string changelog)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(changelog, nameof(changelog));
+
+        string title = CoreStringBuilder.GetEmbedUpdatesAvailableChangelogTitle;
+        string body = changelog;
+
+        if (title.Length + body.Length > 6000)
+            body = CoreStringBuilder.GetEmbedUpdatesAvailableChangelogTooBig(GitHubReleaseUrl);
+
+        return CreateBasicEmbed(title, body, string.Empty, string.Empty, DiscordColor.White);
+    }
+
+    internal static DiscordEmbed BuildUpdatesInstructionEmbed()
+    {
+        bool isDocker = CoreAzzyStatsGeneral.GetBotName == "AzzyBot-Docker";
+        bool isLinux = CoreMisc.CheckIfLinuxOs();
+        const string title = "Update Instructions";
+        string description;
+
+        if (isDocker)
+        {
+            description = "To update the bot please go into the command line of the machine running the docker container and execute the following commands:\n- `docker compose down`\n- `docker compose pull`\n- `docker compose up -d`";
+        }
+        else if (isLinux)
+        {
+            description = "Please follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wiki/Linux-Update-Instructions).";
+        }
+        else
+        {
+            description = "Please follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wiki/Windows-Update-Instructions).";
+        }
+
+        return CreateBasicEmbed(title, description, string.Empty, string.Empty, DiscordColor.White);
     }
 }
