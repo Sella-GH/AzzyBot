@@ -10,6 +10,8 @@ namespace AzzyBot.Modules.Core;
 
 internal static class CoreEmbedBuilder
 {
+    private const string GitHubReleaseUrl = "https://github.com/Sella-GH/AzzyBot/releases/latest";
+
     internal static DiscordEmbedBuilder CreateBasicEmbed(string title, string description = "", string discordName = "", string discordAvatarUrl = "", DiscordColor? color = null, string thumbnailUrl = "", string footerText = "", string url = "", Dictionary<string, DiscordEmbedStruct>? fields = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title, nameof(title));
@@ -180,7 +182,6 @@ internal static class CoreEmbedBuilder
     {
         string title = CoreStringBuilder.GetEmbedUpdatesAvailableTitle;
         string body = CoreStringBuilder.GetEmbedUpdatesAvailableDesc;
-        const string releaseUrl = "https://github.com/Sella-GH/AzzyBot/releases/latest";
 
         Dictionary<string, DiscordEmbedStruct> fields = new()
         {
@@ -189,7 +190,7 @@ internal static class CoreEmbedBuilder
             [CoreStringBuilder.GetEmbedUpdatesAvailableUpdatedVersion] = new(new(CoreStringBuilder.GetEmbedUpdatesAvailableUpdatedVersion), version.ToString(), false)
         };
 
-        return CreateBasicEmbed(title, body, AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, DiscordColor.White, string.Empty, string.Empty, releaseUrl, fields);
+        return CreateBasicEmbed(title, body, AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, DiscordColor.White, string.Empty, string.Empty, GitHubReleaseUrl, fields);
     }
 
     internal static DiscordEmbed BuildUpdatesAvailableChangelogEmbed(string changelog)
@@ -198,6 +199,9 @@ internal static class CoreEmbedBuilder
 
         string title = CoreStringBuilder.GetEmbedUpdatesAvailableChangelogTitle;
         string body = changelog;
+
+        if (title.Length + body.Length > 6000)
+            body = CoreStringBuilder.GetEmbedUpdatesAvailableChangelogTooBig(GitHubReleaseUrl);
 
         return CreateBasicEmbed(title, body, string.Empty, string.Empty, DiscordColor.White);
     }

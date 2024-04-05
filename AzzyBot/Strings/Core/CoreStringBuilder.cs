@@ -114,6 +114,7 @@ internal sealed class CoreStringBuilder : StringBuilding
     #region BuildUpdatesAvailableChangelogEmbed
 
     internal static string GetEmbedUpdatesAvailableChangelogTitle => Model.EmbedUpdatesAvailableChangelogTitle;
+    internal static string GetEmbedUpdatesAvailableChangelogTooBig(string url) => BuildString(Model.EmbedUpdatesAvailableChangelogTooBig, "%URL%", url);
 
     #endregion BuildUpdatesAvailableChangelogEmbed
 

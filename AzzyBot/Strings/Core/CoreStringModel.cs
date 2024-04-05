@@ -68,6 +68,7 @@ internal sealed class CoreStringModel
     #region BuildUpdatesAvailableChangelogEmbed
 
     public string EmbedUpdatesAvailableChangelogTitle { get; set; } = string.Empty;
+    public string EmbedUpdatesAvailableChangelogTooBig { get; set; } = string.Empty;
 
     #endregion BuildUpdatesAvailableChangelogEmbed
 
