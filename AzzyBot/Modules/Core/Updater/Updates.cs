@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DSharpPlus.Entities;
 using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.Core.Updater;
@@ -69,6 +70,14 @@ internal static class Updates
         LastOnlineVersion = updateVersion;
         UpdateNotifyCounter++;
 
-        await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, string.Empty, [CoreEmbedBuilder.BuildUpdatesAvailableEmbed(updateVersion, releaseDate), CoreEmbedBuilder.BuildUpdatesAvailableChangelogEmbed(changelog), CoreEmbedBuilder.BuildUpdatesInstructionEmbed()]);
+        List<DiscordEmbed?> embeds = [CoreEmbedBuilder.BuildUpdatesAvailableEmbed(updateVersion, releaseDate)];
+
+        if (CoreSettings.UpdaterDisplayChangelog)
+            embeds.Add(CoreEmbedBuilder.BuildUpdatesAvailableChangelogEmbed(changelog));
+
+        if (CoreSettings.UpdaterDisplayInstructions)
+            embeds.Add(CoreEmbedBuilder.BuildUpdatesInstructionEmbed());
+
+        await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, string.Empty, embeds);
     }
 }

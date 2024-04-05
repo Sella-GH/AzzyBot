@@ -17,8 +17,11 @@ internal sealed class CoreSettings : BaseSettings
     internal static int BotActivity { get; private set; }
     internal static string BotDoing { get; private set; } = string.Empty;
     internal static string? BotStreamUrl { get; private set; } = string.Empty;
-    internal static int UpdateCheckInterval { get; private set; }
     internal static string LogoUrl { get; private set; } = string.Empty;
+    internal static int UpdaterCheckInterval { get; private set; }
+    internal static bool UpdaterDisplayChangelog { get; private set; }
+    internal static bool UpdaterDisplayInstructions { get; private set; }
+    internal static ulong UpdaterMessageChannelId { get; private set; }
 
     internal static bool LoadCore()
     {
@@ -41,11 +44,14 @@ internal sealed class CoreSettings : BaseSettings
         if (string.IsNullOrWhiteSpace(BotStreamUrl))
             BotStreamUrl = null;
 
-        UpdateCheckInterval = Convert.ToInt32(Config["Core:UpdateCheckInterval"], CultureInfo.InvariantCulture);
         LogoUrl = Config["Core:LogoUrl"] ?? string.Empty;
+        UpdaterCheckInterval = Convert.ToInt32(Config["Core:Updater:CheckInterval"], CultureInfo.InvariantCulture);
+        UpdaterDisplayChangelog = Convert.ToBoolean(Config["Core:Updater:DisplayChangelog"], CultureInfo.InvariantCulture);
+        UpdaterDisplayInstructions = Convert.ToBoolean(Config["Core:Updater:DisplayInstructions"], CultureInfo.InvariantCulture);
+        UpdaterMessageChannelId = Convert.ToUInt64(Config["Core:Updater:MessageChannelId"], CultureInfo.InvariantCulture);
 
         List<string> excludedStrings = [nameof(BotStreamUrl), nameof(LogoUrl)];
-        List<string> excludedInts = [nameof(ServerId)];
+        List<string> excludedInts = [nameof(ServerId), nameof(UpdaterCheckInterval), nameof(UpdaterMessageChannelId)];
         return CoreSettingsLoaded = CheckSettings(typeof(CoreSettings), excludedStrings, excludedInts);
     }
 }
