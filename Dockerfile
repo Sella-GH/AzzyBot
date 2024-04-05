@@ -25,10 +25,10 @@ ARG COMMIT
 ARG TIMESTAMP
 ARG LOC_CS
 ARG LOC_JSON
-RUN sed -i "s\Commit not found\$COMMIT\g" /app/AzzyBot.json
-RUN sed -i "s\Compile date not found\$TIMESTAMP\g" /app/AzzyBot.json
-RUN sed -i "s\Lines of source code not found\$LOC_CS\g" /app/AzzyBot.json
-RUN sed -i "s\Lines of JSON code not found\$LOC_JSON\g" /app/AzzyBot.json
+RUN sed -i "s\Commit not found\\$COMMIT\g" /app/AzzyBot.json
+RUN sed -i "s\Compile date not found\\$TIMESTAMP\g" /app/AzzyBot.json
+RUN sed -i "s\Lines of source code not found\\$LOC_CS\g" /app/AzzyBot.json
+RUN sed -i "s\Lines of JSON code not found\\$LOC_JSON\g" /app/AzzyBot.json
 
 # Add new user
 RUN groupadd azzy
