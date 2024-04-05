@@ -15,6 +15,22 @@ namespace AzzyBot.Modules.Core;
 /// </summary>
 internal static class CoreAzzyStatsGeneral
 {
+    #region EmbedAzzyStats
+
+    /// <summary>
+    /// Gets the memory usage only of the bot itself.
+    /// </summary>
+    /// <returns>The memory usage of the bot in GB.</returns>
+    internal static double GetBotMemoryUsage()
+    {
+        Process? process = Process.GetCurrentProcess();
+        double usedMemoryGB = process.WorkingSet64 / (1024.0 * 1024.0 * 1024.0);
+
+        process.Dispose();
+
+        return Math.Round(usedMemoryGB, 2);
+    }
+
     /// <summary>
     /// Gets the disk usage of the server.
     /// </summary>
@@ -54,6 +70,10 @@ internal static class CoreAzzyStatsGeneral
         return CoreMisc.ConvertToUnixTime(dateTime);
     }
 
+    #endregion EmbedAzzyStats
+
+    #region EmbedAzzyInfo
+
     internal static string GetActivatedModules()
     {
         string text = "- Core";
@@ -70,32 +90,12 @@ internal static class CoreAzzyStatsGeneral
         return text;
     }
 
-    internal static string GetBotName => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductName ?? "Bot name not found";
     internal static string GetBotAuthors => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).CompanyName ?? "Bot authors not found";
-
-    /// <summary>
-    /// Gets the memory usage only of the bot itself.
-    /// </summary>
-    /// <returns>The memory usage of the bot in GB.</returns>
-    internal static double GetBotMemoryUsage()
-    {
-        Process? process = Process.GetCurrentProcess();
-        double usedMemoryGB = process.WorkingSet64 / (1024.0 * 1024.0 * 1024.0);
-
-        process.Dispose();
-
-        return Math.Round(usedMemoryGB, 2);
-    }
-
-    internal static string GetBotUptime()
-    {
-        using Process azzy = Process.GetCurrentProcess();
-
-        return $"<t:{CoreMisc.ConvertToUnixTime(azzy.StartTime)}>";
-    }
-
+    internal static string GetDotNetVersion => Environment.Version.ToString() ?? ".NET version not found";
+    internal static string GetDSharpPlusVersion => AzzyBot.GetDiscordClientVersion;
     internal static string GetBotEnvironment => (AzzyBot.GetDiscordClientId == 1217214768159653978) ? "Development" : "Production";
     internal static string GetBotVersion => Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "Azzy version not found";
+    internal static string GetBotName => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductName ?? "Bot name not found";
 
     internal static async Task<string> GetBotCommitAsync()
     {
@@ -119,7 +119,12 @@ internal static class CoreAzzyStatsGeneral
 
         return $"<t:{CoreMisc.ConvertToUnixTime(dateTime)}>";
     }
+    internal static string GetBotUptime()
+    {
+        using Process azzy = Process.GetCurrentProcess();
 
-    internal static string GetDotNetVersion => Environment.Version.ToString() ?? ".NET version not found";
-    internal static string GetDSharpNetVersion => AzzyBot.GetDiscordClientVersion;
+        return $"<t:{CoreMisc.ConvertToUnixTime(azzy.StartTime)}>";
+    }
+
+    #endregion EmbedAzzyInfo
 }

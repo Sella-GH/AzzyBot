@@ -156,7 +156,7 @@ internal static class CoreEmbedBuilder
         string botUptime = CoreAzzyStatsGeneral.GetBotUptime();
         string botVersion = CoreAzzyStatsGeneral.GetBotVersion;
         string dotnetVersion = CoreAzzyStatsGeneral.GetDotNetVersion;
-        string libVersion = CoreAzzyStatsGeneral.GetDSharpNetVersion.Split('+')[0];
+        string libVersion = CoreAzzyStatsGeneral.GetDSharpPlusVersion.Split('+')[0];
         const string authorUrl = "https://github.com/Sella-GH";
         string[] authors = CoreAzzyStatsGeneral.GetBotAuthors.Split(',');
         const string repository = $"{authorUrl}/AzzyBot";
