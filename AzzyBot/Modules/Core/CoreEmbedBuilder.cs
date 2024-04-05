@@ -160,8 +160,10 @@ internal static class CoreEmbedBuilder
         const string authorUrl = "https://github.com/Sella-GH";
         string[] authors = CoreAzzyStatsGeneral.GetBotAuthors.Split(',');
         const string repository = $"{authorUrl}/AzzyBot";
-        string commit = await CoreAzzyStatsGeneral.GetBotCommitAsync();
-        string compilationDate = await CoreAzzyStatsGeneral.GetBotCompileDateAsync();
+        string locCS = await CoreAzzyStatsGeneral.GetBotFileInfoAsync(Enums.CoreFileValuesEnum.LoC_CS);
+        string locJson = await CoreAzzyStatsGeneral.GetBotFileInfoAsync(Enums.CoreFileValuesEnum.LoC_JSON);
+        string commit = await CoreAzzyStatsGeneral.GetBotFileInfoAsync(Enums.CoreFileValuesEnum.Commit);
+        string compilationDate = await CoreAzzyStatsGeneral.GetBotFileInfoAsync(Enums.CoreFileValuesEnum.CompileDate);
         string botEnvironment = CoreAzzyStatsGeneral.GetBotEnvironment;
         string activatedModules = CoreAzzyStatsGeneral.GetActivatedModules();
 
@@ -180,6 +182,8 @@ internal static class CoreEmbedBuilder
             ["Authors"] = new(nameof(formattedAuthors), formattedAuthors, true),
             ["Repository"] = new(nameof(repository), $"[On GitHub]({repository})", true),
             ["Language"] = new("language", "C#", true),
+            ["Source code"] = new(nameof(locCS), $"{locCS} lines", true),
+            ["Customization code"] = new(nameof(locJson), $"{locJson} lines", true),
             [CoreStringBuilder.EmbedAzzyInfoGitHubCommit] = new(nameof(formattedCommit), formattedCommit, false),
             [CoreStringBuilder.EmbedAzzyInfoCompDate] = new(nameof(compilationDate), compilationDate, false),
             [CoreStringBuilder.EmbedAzzyInfoEnv] = new(nameof(botEnvironment), botEnvironment, false),

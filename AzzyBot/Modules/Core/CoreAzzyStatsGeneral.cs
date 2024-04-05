@@ -97,28 +97,24 @@ internal static class CoreAzzyStatsGeneral
     internal static string GetBotVersion => Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "Azzy version not found";
     internal static string GetBotName => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductName ?? "Bot name not found";
 
-    internal static async Task<string> GetBotCommitAsync()
+    internal static async Task<string> GetBotFileInfoAsync(CoreFileValuesEnum file)
     {
         if (CoreModule.AzzyBotLock is null)
-            return "Commit not found";
+            return "Info not found";
 
-        string commit = await CoreModule.AzzyBotLock.GetFileContentAsync(CoreFileValuesEnum.Commit);
-        if (string.IsNullOrWhiteSpace(commit))
-            commit = "Commit not found";
+        if (file is CoreFileValuesEnum.CompileDate)
+        {
+            if (!DateTime.TryParse(await CoreModule.AzzyBotLock.GetFileContentAsync(file), out DateTime date))
+                return "CompileDate not found";
 
-        return commit;
+            return $"<t:{CoreMisc.ConvertToUnixTime(date)}>";
+        }
+
+        string value = await CoreModule.AzzyBotLock.GetFileContentAsync(file);
+
+        return (string.IsNullOrWhiteSpace(value)) ? "Info not found" : value;
     }
 
-    internal static async Task<string> GetBotCompileDateAsync()
-    {
-        if (CoreModule.AzzyBotLock is null)
-            return "CompileDate not found";
-
-        if (!DateTime.TryParse(await CoreModule.AzzyBotLock.GetFileContentAsync(CoreFileValuesEnum.CompileDate), out DateTime dateTime))
-            return "CompileDate not found";
-
-        return $"<t:{CoreMisc.ConvertToUnixTime(dateTime)}>";
-    }
     internal static string GetBotUptime()
     {
         using Process azzy = Process.GetCurrentProcess();
