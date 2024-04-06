@@ -147,49 +147,7 @@ internal static class AzzyBot
         #region Initialize Lavalink
 
         if (ModuleStates.MusicStreaming)
-        {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "Initializing Lavalink4NET");
-            ServiceCollection = new ServiceCollection().AddLavalink().AddSingleton(DiscordClient).ConfigureLavalink(config =>
-            {
-                config.BaseAddress = (CoreAzzyStatsGeneral.GetBotName is "AzzyBot-Docker") ? new Uri("http://lavalink:2333") : new Uri("http://localhost:2333");
-                config.ReadyTimeout = TimeSpan.FromSeconds(15);
-                config.ResumptionOptions = new(TimeSpan.Zero);
-                config.Label = "AzzyBot";
-            });
-
-            ServiceCollection.AddLogging(x => x.AddConsole().SetMinimumLevel((LogLevel)Enum.ToObject(typeof(LogLevel), CoreSettings.LogLevel)));
-
-            if (CoreModule.GetMusicStreamingInactivity())
-            {
-                ServiceCollection.AddInactivityTracking();
-                ServiceCollection.ConfigureInactivityTracking(config =>
-                {
-                    config.DefaultTimeout = TimeSpan.FromMinutes(CoreModule.GetMusicStreamingInactivityTime());
-                    config.TrackingMode = InactivityTrackingMode.Any;
-                    config.UseDefaultTrackers = true;
-                });
-                ServiceCollection.Configure<IdleInactivityTrackerOptions>(config => config.TrackNewPlayers = false);
-
-                ExceptionHandler.LogMessage(LogLevel.Debug, "Applied inactivity tracking to Lavalink4NET");
-            }
-
-            IServiceProvider serviceProvider = ServiceCollection.BuildServiceProvider();
-
-            foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
-            {
-                await hostedService.StartAsync(new CancellationToken());
-            }
-
-            AudioService = serviceProvider.GetRequiredService<IAudioService>();
-
-            if (CoreModule.GetMusicStreamingLyrics())
-            {
-                AudioService.UseLyricsJava();
-                ExceptionHandler.LogMessage(LogLevel.Debug, "Applied Lyrics.Java to Lavalink4NET");
-            }
-
-            ExceptionHandler.LogMessage(LogLevel.Debug, "Lavalink4NET loaded");
-        }
+            await InitializeLavalink4NetAsync();
 
         #endregion Initialize Lavalink
 
@@ -280,48 +238,6 @@ internal static class AzzyBot
         await BotShutdownAsync();
     }
 
-    private static async Task BotShutdownAsync()
-    {
-        if (ModuleStates.MusicStreaming)
-        {
-            IServiceProvider serviceProvider = ServiceCollection?.BuildServiceProvider() ?? throw new InvalidOperationException("No services started!");
-
-            foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
-            {
-                await hostedService.StopAsync(new CancellationToken());
-            }
-        }
-
-        BaseModule.StopAllTimers();
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all timers");
-
-        BaseModule.StopAllProcesses();
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all processes");
-
-        BaseModule.DisposeAllFileLocks();
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Disposed all file locks");
-
-        if (SlashCommands is not null)
-        {
-            SlashCommands.Dispose();
-            SlashCommands = null;
-
-            ExceptionHandler.LogMessage(LogLevel.Debug, "SlashCommands disposed");
-        }
-
-        if (DiscordClient is not null)
-        {
-            await DiscordClient.DisconnectAsync();
-            DiscordClient.Dispose();
-            DiscordClient = null;
-
-            await Console.Out.WriteLineAsync("DiscordClient disposed");
-        }
-
-        await Console.Out.WriteLineAsync("Ready for exit");
-        Environment.Exit(0);
-    }
-
     private static DiscordClient InitializeBot()
     {
         // DiscordBot config
@@ -388,6 +304,95 @@ internal static class AzzyBot
         ArgumentNullException.ThrowIfNull(DiscordClient);
 
         await DiscordClient.UpdateStatusAsync(activity, status);
+    }
+
+    private static async Task InitializeLavalink4NetAsync()
+    {
+        ArgumentNullException.ThrowIfNull(DiscordClient);
+
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Initializing Lavalink4NET");
+        ServiceCollection = new ServiceCollection().AddLavalink().AddSingleton(DiscordClient).ConfigureLavalink(config =>
+        {
+            config.BaseAddress = (CoreAzzyStatsGeneral.GetBotName is "AzzyBot-Docker") ? new Uri("http://lavalink:2333") : new Uri("http://localhost:2333");
+            config.ReadyTimeout = TimeSpan.FromSeconds(15);
+            config.ResumptionOptions = new(TimeSpan.Zero);
+            config.Label = "AzzyBot";
+        });
+
+        ServiceCollection.AddLogging(x => x.AddConsole().SetMinimumLevel((LogLevel)Enum.ToObject(typeof(LogLevel), CoreSettings.LogLevel)));
+
+        if (CoreModule.GetMusicStreamingInactivity())
+        {
+            ServiceCollection.AddInactivityTracking();
+            ServiceCollection.ConfigureInactivityTracking(config =>
+            {
+                config.DefaultTimeout = TimeSpan.FromMinutes(CoreModule.GetMusicStreamingInactivityTime());
+                config.TrackingMode = InactivityTrackingMode.Any;
+                config.UseDefaultTrackers = true;
+            });
+            ServiceCollection.Configure<IdleInactivityTrackerOptions>(config => config.TrackNewPlayers = false);
+
+            ExceptionHandler.LogMessage(LogLevel.Debug, "Applied inactivity tracking to Lavalink4NET");
+        }
+
+        IServiceProvider serviceProvider = ServiceCollection.BuildServiceProvider();
+
+        foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
+        {
+            await hostedService.StartAsync(new CancellationToken());
+        }
+
+        AudioService = serviceProvider.GetRequiredService<IAudioService>();
+
+        if (CoreModule.GetMusicStreamingLyrics())
+        {
+            AudioService.UseLyricsJava();
+            ExceptionHandler.LogMessage(LogLevel.Debug, "Applied Lyrics.Java to Lavalink4NET");
+        }
+
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Lavalink4NET loaded");
+    }
+
+    private static async Task BotShutdownAsync()
+    {
+        if (ModuleStates.MusicStreaming)
+        {
+            IServiceProvider serviceProvider = ServiceCollection?.BuildServiceProvider() ?? throw new InvalidOperationException("No services started!");
+
+            foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
+            {
+                await hostedService.StopAsync(new CancellationToken());
+            }
+        }
+
+        BaseModule.StopAllTimers();
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all timers");
+
+        BaseModule.StopAllProcesses();
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all processes");
+
+        BaseModule.DisposeAllFileLocks();
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Disposed all file locks");
+
+        if (SlashCommands is not null)
+        {
+            SlashCommands.Dispose();
+            SlashCommands = null;
+
+            ExceptionHandler.LogMessage(LogLevel.Debug, "SlashCommands disposed");
+        }
+
+        if (DiscordClient is not null)
+        {
+            await DiscordClient.DisconnectAsync();
+            DiscordClient.Dispose();
+            DiscordClient = null;
+
+            await Console.Out.WriteLineAsync("DiscordClient disposed");
+        }
+
+        await Console.Out.WriteLineAsync("Ready for exit");
+        Environment.Exit(0);
     }
 
     /// <summary>
