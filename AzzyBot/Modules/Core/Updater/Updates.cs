@@ -78,6 +78,31 @@ internal static class Updates
         if (CoreSettings.UpdaterDisplayInstructions)
             embeds.Add(CoreEmbedBuilder.BuildUpdatesInstructionEmbed());
 
-        await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, string.Empty, embeds);
+        IReadOnlyDictionary<ulong, DiscordGuild> guilds = AzzyBot.GetDiscordClientGuilds;
+        ulong channelId = CoreSettings.ErrorChannelId;
+
+        if (guilds.Count is 1)
+        {
+            bool channelSet = false;
+
+            DiscordGuild? wantedGuild = null;
+            foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds)
+            {
+                wantedGuild = guild.Value;
+            }
+
+            // First check if the proposed channel exists in the guild
+            if (wantedGuild is not null && CoreDiscordCommands.CheckIfChannelExists(wantedGuild, CoreSettings.UpdaterMessageChannelId))
+            {
+                channelId = CoreSettings.UpdaterMessageChannelId;
+                channelSet = true;
+            }
+
+            // If not then check if the guild updates one exists
+            if (!channelSet && wantedGuild is not null && CoreDiscordCommands.CheckIfChannelExists(wantedGuild, wantedGuild.PublicUpdatesChannel))
+                channelId = wantedGuild.PublicUpdatesChannel.Id;
+        }
+
+        await AzzyBot.SendMessageAsync(channelId, string.Empty, embeds);
     }
 }
