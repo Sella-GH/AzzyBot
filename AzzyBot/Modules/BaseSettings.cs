@@ -70,18 +70,24 @@ internal abstract class BaseSettings
     {
         bool core = CoreDiscordCommands.CheckIfChannelExists(guild, CoreSettings.ErrorChannelId);
         bool azuraCast = true;
-        bool clubManagement = CoreDiscordCommands.CheckIfChannelExists(guild, ClubManagementSettings.ClubNotifyChannelId);
+        bool clubManagement = true;
 
-        List<ulong> azuraCastChannels = CoreDiscordCommands.CheckIfChannelsExist(guild, [AzuraCastSettings.MusicRequestsChannelId, AzuraCastSettings.OutagesChannelId]);
-        if (azuraCastChannels.Count > 0)
+        if (ActivateAzuraCast)
         {
-            azuraCast = false;
-
-            foreach (ulong channel in azuraCastChannels)
+            List<ulong> azuraCastChannels = CoreDiscordCommands.CheckIfChannelsExist(guild, [AzuraCastSettings.MusicRequestsChannelId, AzuraCastSettings.OutagesChannelId]);
+            if (azuraCastChannels.Count > 0)
             {
-                ExceptionHandler.LogMessage(LogLevel.Error, $"Channel with ID **{channel}** does not exist in guild with ID **{guild.Id}** and name **{guild.Name}**!");
+                azuraCast = false;
+
+                foreach (ulong channel in azuraCastChannels)
+                {
+                    ExceptionHandler.LogMessage(LogLevel.Error, $"Channel with ID **{channel}** does not exist in guild with ID **{guild.Id}** and name **{guild.Name}**!");
+                }
             }
         }
+
+        if (ActivateClubManagement)
+            clubManagement = CoreDiscordCommands.CheckIfChannelExists(guild, ClubManagementSettings.ClubNotifyChannelId);
 
         return core && azuraCast && clubManagement;
     }

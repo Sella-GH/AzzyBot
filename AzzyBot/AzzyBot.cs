@@ -213,10 +213,15 @@ internal static class AzzyBot
     {
         if (e.Guilds.Count <= 1)
         {
+            bool channelsExist = true;
+
             foreach (KeyValuePair<ulong, DiscordGuild> guild in e.Guilds)
             {
-                BaseSettings.CheckIfChannelsExist(guild.Value);
+                channelsExist = BaseSettings.CheckIfChannelsExist(guild.Value);
             }
+
+            if (!channelsExist)
+                await BotShutdownAsync();
 
             return;
         }
