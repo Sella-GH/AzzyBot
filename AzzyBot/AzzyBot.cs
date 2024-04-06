@@ -124,14 +124,7 @@ internal static class AzzyBot
         #region Initialize Interactivity
 
         ExceptionHandler.LogMessage(LogLevel.Debug, "Configuring interactivity");
-        InteractivityConfiguration interactivityConfiguration = new()
-        {
-            ResponseBehavior = InteractionResponseBehavior.Ignore,
-            ResponseMessage = "This is not a valid option!",
-            Timeout = TimeSpan.FromMinutes(1)
-        };
-
-        DiscordClient.UseInteractivity(interactivityConfiguration);
+        DiscordClient.UseInteractivity(InitializeInteractivity());
 
         #endregion Initialize Interactivity
 
@@ -304,6 +297,18 @@ internal static class AzzyBot
         ArgumentNullException.ThrowIfNull(DiscordClient);
 
         await DiscordClient.UpdateStatusAsync(activity, status);
+    }
+
+    private static InteractivityConfiguration InitializeInteractivity()
+    {
+        InteractivityConfiguration interactivityConfiguration = new()
+        {
+            ResponseBehavior = InteractionResponseBehavior.Ignore,
+            ResponseMessage = "This is not a valid option!",
+            Timeout = TimeSpan.FromMinutes(1)
+        };
+
+        return new(interactivityConfiguration);
     }
 
     private static async Task InitializeLavalink4NetAsync()
