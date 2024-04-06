@@ -66,7 +66,7 @@ jobs:
         id: loc_json
         uses: PavanMudigonda/lines-of-code-reporter@v1.6
         with:
-          directory: "/home/runner/work/AzzyBot/AzzyBot/Customization/AzuraCast,/home/runner/work/AzzyBot/AzzyBot/Customization/ClubManagement,/home/runner/work/AzzyBot/AzzyBot/Customization/Core,/home/runner/work/AzzyBot/AzzyBot/Customization/MusicStreaming"
+          directory: "/home/runner/work/AzzyBot/AzzyBot/AzzyBot/Customization"
           include_lang: "JSON"
 
       - name: Add some basic information
