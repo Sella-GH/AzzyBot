@@ -146,9 +146,8 @@ internal static class AzzyBot
 
         #region Add ShutdownProcess
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Adding shutdown process");
-        AppDomain.CurrentDomain.ProcessExit += ProcessExit;
-        Console.CancelKeyPress += ConsoleKeyShutdown;
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Adding EventHandlers");
+        AddEventHandlers();
 
         #endregion Add ShutdownProcess
 
@@ -224,6 +223,18 @@ internal static class AzzyBot
 
         ExceptionHandler.LogMessage(LogLevel.Critical, "The bot is joined on more guilds than one. Please remove the bot out of every guild until only 1 is left!");
         await BotShutdownAsync();
+    }
+
+    private static void AddEventHandlers()
+    {
+        AppDomain.CurrentDomain.ProcessExit += ProcessExit;
+        Console.CancelKeyPress += ConsoleKeyShutdown;
+    }
+
+    private static void RemoveEventHandlers()
+    {
+        AppDomain.CurrentDomain.ProcessExit -= ProcessExit;
+        Console.CancelKeyPress -= ConsoleKeyShutdown;
     }
 
     private static async void ProcessExit(object? c, EventArgs e)
@@ -402,6 +413,9 @@ internal static class AzzyBot
 
             await Console.Out.WriteLineAsync("DiscordClient disposed");
         }
+
+        await Console.Out.WriteLineAsync("Removing EventHandlers");
+        RemoveEventHandlers();
 
         await Console.Out.WriteLineAsync("Ready for exit");
         Environment.Exit(0);
