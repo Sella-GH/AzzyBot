@@ -160,6 +160,7 @@ internal static class CoreEmbedBuilder
         const string authorUrl = "https://github.com/Sella-GH";
         string[] authors = CoreAzzyStatsGeneral.GetBotAuthors.Split(',');
         const string repository = $"{authorUrl}/AzzyBot";
+        const string language = "C#";
         string locCS = await CoreAzzyStatsGeneral.GetBotFileInfoAsync(Enums.CoreFileValuesEnum.LoC_CS);
         string locJson = await CoreAzzyStatsGeneral.GetBotFileInfoAsync(Enums.CoreFileValuesEnum.LoC_JSON);
         string commit = await CoreAzzyStatsGeneral.GetBotFileInfoAsync(Enums.CoreFileValuesEnum.Commit);
@@ -179,11 +180,11 @@ internal static class CoreEmbedBuilder
             [CoreStringBuilder.EmbedAzzyInfoBotVersion] = new(nameof(botVersion), botVersion, true),
             [CoreStringBuilder.EmbedAzzyInfoNetVersion] = new(nameof(dotnetVersion), dotnetVersion, true),
             [CoreStringBuilder.EmbedAzzyInfoDspVersion] = new(nameof(libVersion), libVersion, true),
-            ["Authors"] = new(nameof(formattedAuthors), formattedAuthors, true),
-            ["Repository"] = new(nameof(repository), $"[On GitHub]({repository})", true),
-            ["Language"] = new("language", "C#", true),
-            ["Source code"] = new(nameof(locCS), $"{locCS} lines", true),
-            ["Customization code"] = new(nameof(locJson), $"{locJson} lines", true),
+            [CoreStringBuilder.EmbedAzzyInfoAuthors] = new(nameof(formattedAuthors), formattedAuthors, true),
+            [CoreStringBuilder.EmbedAzzyInfoRepository] = new(nameof(repository), $"[On GitHub]({repository})", true),
+            [CoreStringBuilder.EmbedAzzyInfoLanguage] = new(nameof(language), language, true),
+            [CoreStringBuilder.EmbedAzzyInfoSourceCode] = new(nameof(locCS), $"{locCS} lines", true),
+            [CoreStringBuilder.EmbedAzzyInfoCustomizationCode] = new(nameof(locJson), $"{locJson} lines", true),
             [CoreStringBuilder.EmbedAzzyInfoGitHubCommit] = new(nameof(formattedCommit), formattedCommit, false),
             [CoreStringBuilder.EmbedAzzyInfoCompDate] = new(nameof(compilationDate), compilationDate, false),
             [CoreStringBuilder.EmbedAzzyInfoEnv] = new(nameof(botEnvironment), botEnvironment, false),

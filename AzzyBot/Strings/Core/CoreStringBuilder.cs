@@ -94,6 +94,11 @@ internal sealed class CoreStringBuilder : StringBuilding
     internal static string EmbedAzzyInfoBotVersion => Model.EmbedAzzyInfoBotVersion;
     internal static string EmbedAzzyInfoNetVersion => Model.EmbedAzzyInfoNetVersion;
     internal static string EmbedAzzyInfoDspVersion => Model.EmbedAzzyInfoDspVersion;
+    internal static string EmbedAzzyInfoAuthors => Model.EmbedAzzyInfoAuthors;
+    internal static string EmbedAzzyInfoRepository => Model.EmbedAzzyInfoRepository;
+    internal static string EmbedAzzyInfoLanguage => Model.EmbedAzzyInfoLanguage;
+    internal static string EmbedAzzyInfoSourceCode => Model.EmbedAzzyInfoSourceCode;
+    internal static string EmbedAzzyInfoCustomizationCode => Model.EmbedAzzyInfoCustomizationCode;
     internal static string EmbedAzzyInfoGitHubCommit => Model.EmbedAzzyInfoGitHubCommit;
     internal static string EmbedAzzyInfoCompDate => Model.EmbedAzzyInfoCompDate;
     internal static string EmbedAzzyInfoEnv => Model.EmbedAzzyInfoEnv;
