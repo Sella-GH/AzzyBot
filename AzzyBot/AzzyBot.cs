@@ -11,6 +11,7 @@ using AzzyBot.Modules.Core.Updater;
 using AzzyBot.Strings;
 using DSharpPlus;
 using DSharpPlus.Entities;
+using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
@@ -30,13 +31,15 @@ namespace AzzyBot;
 internal static class AzzyBot
 {
     private static DiscordClient? DiscordClient;
+    private static SlashCommandsExtension? SlashCommands;
     private static IAudioService? AudioService;
     private static IServiceCollection? ServiceCollection;
 
-    internal static ILogger<BaseDiscordClient> GetDiscordClientLogger => DiscordClient?.Logger ?? throw new InvalidOperationException("DiscordClient is null");
     internal static string GetDiscordClientAvatarUrl => DiscordClient?.CurrentUser.AvatarUrl ?? throw new InvalidOperationException("DiscordClient is null");
     internal static ulong GetDiscordClientId => DiscordClient?.CurrentUser.Id ?? throw new InvalidOperationException("DiscordClient is null");
     internal static string GetDiscordClientUserName => DiscordClient?.CurrentUser.Username ?? throw new InvalidOperationException("DiscordClient is null");
+    internal static IReadOnlyDictionary<ulong, DiscordGuild> GetDiscordClientGuilds => DiscordClient?.Guilds ?? throw new InvalidOperationException("DiscordClient is null");
+    internal static ILogger<BaseDiscordClient> GetDiscordClientLogger => DiscordClient?.Logger ?? throw new InvalidOperationException("DiscordClient is null");
     internal static string GetDiscordClientVersion => DiscordClient?.VersionString ?? throw new InvalidOperationException("DiscordClient is null");
     internal static IAudioService GetAudioService => AudioService ?? throw new InvalidOperationException("AudioService is null");
 
@@ -102,8 +105,8 @@ internal static class AzzyBot
         #region Initialize Slash Commands
 
         ExceptionHandler.LogMessage(LogLevel.Debug, "Initializing SlashCommands");
-        SlashCommandsExtension? slash = DiscordClient.UseSlashCommands();
-        BaseModule.RegisterAllCommands(slash, CoreSettings.ServerId);
+        SlashCommands = DiscordClient.UseSlashCommands();
+        BaseModule.RegisterAllCommands(SlashCommands, CoreSettings.ServerId);
 
         #endregion Initialize Slash Commands
 
@@ -111,8 +114,10 @@ internal static class AzzyBot
 
         ExceptionHandler.LogMessage(LogLevel.Debug, "Adding events");
         DiscordClient.ClientErrored += DiscordClientError.DiscordErrorAsync;
-        slash.SlashCommandErrored += SlashCommandError.SlashErrorAsync;
-        slash.AutocompleteErrored += SlashCommandError.AutocompleteErrorAsync;
+        DiscordClient.GuildDownloadCompleted += GuildDownloadedAsync;
+        DiscordClient.GuildCreated += GuildCreatedAsync;
+        SlashCommands.SlashCommandErrored += SlashCommandError.SlashErrorAsync;
+        SlashCommands.AutocompleteErrored += SlashCommandError.AutocompleteErrorAsync;
 
         #endregion Initialize Events
 
@@ -191,67 +196,8 @@ internal static class AzzyBot
         #region Add ShutdownProcess
 
         ExceptionHandler.LogMessage(LogLevel.Debug, "Adding shutdown process");
-        async Task BotShutdown()
-        {
-            if (ModuleStates.MusicStreaming)
-            {
-                IServiceProvider serviceProvider = ServiceCollection?.BuildServiceProvider() ?? throw new InvalidOperationException("No services started!");
-
-                foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
-                {
-                    await hostedService.StopAsync(new CancellationToken());
-                }
-            }
-
-            BaseModule.StopAllTimers();
-            ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all timers");
-
-            BaseModule.StopAllProcesses();
-            ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all processes");
-
-            BaseModule.DisposeAllFileLocks();
-            ExceptionHandler.LogMessage(LogLevel.Debug, "Disposed all file locks");
-
-            if (slash is not null)
-            {
-                slash.Dispose();
-                slash = null;
-
-                ExceptionHandler.LogMessage(LogLevel.Debug, "SlashCommands disposed");
-            }
-            else
-            {
-                ExceptionHandler.LogMessage(LogLevel.Debug, "SlashCommands are null");
-            }
-
-            if (DiscordClient is not null)
-            {
-                await DiscordClient.DisconnectAsync();
-                DiscordClient.Dispose();
-                DiscordClient = null;
-
-                await Console.Out.WriteLineAsync("DiscordClient disposed");
-            }
-            else
-            {
-                await Console.Out.WriteLineAsync("DiscordClient is null");
-            }
-
-            await Console.Out.WriteLineAsync("Ready for exit");
-            Environment.Exit(0);
-        }
-
-        AppDomain.CurrentDomain.ProcessExit += async (s, e) =>
-        {
-            ExceptionHandler.LogMessage(LogLevel.Information, "Process exit requested by AppDomain.CurrentDomain.ProcessExit");
-            await BotShutdown();
-        };
-
-        Console.CancelKeyPress += async (s, e) =>
-        {
-            ExceptionHandler.LogMessage(LogLevel.Information, "Process exit requested by Console.CancelKeyPress");
-            await BotShutdown();
-        };
+        AppDomain.CurrentDomain.ProcessExit += ProcessExit;
+        Console.CancelKeyPress += ConsoleKeyShutdown;
 
         #endregion Add ShutdownProcess
 
@@ -300,6 +246,80 @@ internal static class AzzyBot
         ExceptionHandler.LogMessage(LogLevel.Critical, "Global exception found!");
         ExceptionHandler.LogMessage(LogLevel.Critical, ex.Message);
         ExceptionHandler.LogMessage(LogLevel.Critical, ex.StackTrace ?? "No StackTrace available!");
+    }
+
+    private static async Task GuildCreatedAsync(DiscordClient c, GuildCreateEventArgs e)
+    {
+        ExceptionHandler.LogMessage(LogLevel.Information, "Bot joined a Guild!");
+
+        if (c.Guilds.Count <= 1)
+            return;
+
+        ExceptionHandler.LogMessage(LogLevel.Information, "The bot is now in 2 guilds, self-kick initiated.");
+        await e.Guild.LeaveAsync();
+    }
+
+    private static async Task GuildDownloadedAsync(DiscordClient c, GuildDownloadCompletedEventArgs e)
+    {
+        if (e.Guilds.Count <= 1)
+            return;
+
+        ExceptionHandler.LogMessage(LogLevel.Critical, "The bot is joined on more guilds than one. Please remove the bot out of every guild until only 1 is left!");
+        await BotShutdownAsync();
+    }
+
+    private static async void ProcessExit(object? c, EventArgs e)
+    {
+        ExceptionHandler.LogMessage(LogLevel.Information, "Process exit requested by AppDomain.CurrentDomain.ProcessExit");
+        await BotShutdownAsync();
+    }
+
+    private static async void ConsoleKeyShutdown(object? c, ConsoleCancelEventArgs e)
+    {
+        ExceptionHandler.LogMessage(LogLevel.Information, "Process exit requested by Console.CancelKeyPress");
+        await BotShutdownAsync();
+    }
+
+    private static async Task BotShutdownAsync()
+    {
+        if (ModuleStates.MusicStreaming)
+        {
+            IServiceProvider serviceProvider = ServiceCollection?.BuildServiceProvider() ?? throw new InvalidOperationException("No services started!");
+
+            foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
+            {
+                await hostedService.StopAsync(new CancellationToken());
+            }
+        }
+
+        BaseModule.StopAllTimers();
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all timers");
+
+        BaseModule.StopAllProcesses();
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all processes");
+
+        BaseModule.DisposeAllFileLocks();
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Disposed all file locks");
+
+        if (SlashCommands is not null)
+        {
+            SlashCommands.Dispose();
+            SlashCommands = null;
+
+            ExceptionHandler.LogMessage(LogLevel.Debug, "SlashCommands disposed");
+        }
+
+        if (DiscordClient is not null)
+        {
+            await DiscordClient.DisconnectAsync();
+            DiscordClient.Dispose();
+            DiscordClient = null;
+
+            await Console.Out.WriteLineAsync("DiscordClient disposed");
+        }
+
+        await Console.Out.WriteLineAsync("Ready for exit");
+        Environment.Exit(0);
     }
 
     private static DiscordClient InitializeBot()
