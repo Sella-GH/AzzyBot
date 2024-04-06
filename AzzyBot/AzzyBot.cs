@@ -112,12 +112,8 @@ internal static class AzzyBot
 
         #region Initialize Events
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Adding events");
-        DiscordClient.ClientErrored += DiscordClientError.DiscordErrorAsync;
-        DiscordClient.GuildDownloadCompleted += GuildDownloadedAsync;
-        DiscordClient.GuildCreated += GuildCreatedAsync;
-        SlashCommands.SlashCommandErrored += SlashCommandError.SlashErrorAsync;
-        SlashCommands.AutocompleteErrored += SlashCommandError.AutocompleteErrorAsync;
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Adding EventHandlers");
+        AddEventHandlers();
 
         #endregion Initialize Events
 
@@ -143,13 +139,6 @@ internal static class AzzyBot
             await InitializeLavalink4NetAsync();
 
         #endregion Initialize Lavalink
-
-        #region Add ShutdownProcess
-
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Adding EventHandlers");
-        AddEventHandlers();
-
-        #endregion Add ShutdownProcess
 
         #region Connecting to Gateway
 
@@ -232,12 +221,34 @@ internal static class AzzyBot
 
     private static void AddEventHandlers()
     {
+        if (DiscordClient is null)
+            throw new InvalidOperationException("DiscordClient is null!");
+
+        if (SlashCommands is null)
+            throw new InvalidOperationException("SlashCommands is null!");
+
+        DiscordClient.ClientErrored += DiscordClientError.DiscordErrorAsync;
+        DiscordClient.GuildDownloadCompleted += GuildDownloadedAsync;
+        DiscordClient.GuildCreated += GuildCreatedAsync;
+        SlashCommands.SlashCommandErrored += SlashCommandError.SlashErrorAsync;
+        SlashCommands.AutocompleteErrored += SlashCommandError.AutocompleteErrorAsync;
         AppDomain.CurrentDomain.ProcessExit += ProcessExit;
         Console.CancelKeyPress += ConsoleKeyShutdown;
     }
 
     private static void RemoveEventHandlers()
     {
+        if (DiscordClient is null)
+            throw new InvalidOperationException("DiscordClient is null!");
+
+        if (SlashCommands is null)
+            throw new InvalidOperationException("SlashCommands is null!");
+
+        DiscordClient.ClientErrored -= DiscordClientError.DiscordErrorAsync;
+        DiscordClient.GuildDownloadCompleted -= GuildDownloadedAsync;
+        DiscordClient.GuildCreated -= GuildCreatedAsync;
+        SlashCommands.SlashCommandErrored -= SlashCommandError.SlashErrorAsync;
+        SlashCommands.AutocompleteErrored -= SlashCommandError.AutocompleteErrorAsync;
         AppDomain.CurrentDomain.ProcessExit -= ProcessExit;
         Console.CancelKeyPress -= ConsoleKeyShutdown;
     }
@@ -402,6 +413,9 @@ internal static class AzzyBot
         BaseModule.DisposeAllFileLocks();
         ExceptionHandler.LogMessage(LogLevel.Debug, "Disposed all file locks");
 
+        RemoveEventHandlers();
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Removed EventHandlers");
+
         if (SlashCommands is not null)
         {
             SlashCommands.Dispose();
@@ -418,9 +432,6 @@ internal static class AzzyBot
 
             await Console.Out.WriteLineAsync("DiscordClient disposed");
         }
-
-        await Console.Out.WriteLineAsync("Removing EventHandlers");
-        RemoveEventHandlers();
 
         await Console.Out.WriteLineAsync("Ready for exit");
         Environment.Exit(0);
