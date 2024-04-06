@@ -10,6 +10,9 @@ internal sealed class AzzyBotModel
     [JsonProperty(nameof(Commit))]
     public string Commit { get; set; } = string.Empty;
 
-    [JsonProperty(nameof(LoC))]
-    public string LoC { get; set; } = string.Empty;
+    [JsonProperty(nameof(LoC_CS))]
+    public string LoC_CS { get; set; } = string.Empty;
+
+    [JsonProperty(nameof(LoC_JSON))]
+    public string LoC_JSON { get; set; } = string.Empty;
 }

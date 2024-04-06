@@ -40,6 +40,19 @@ jobs:
             echo "set-env=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Calculate Lines of Source Code
+        id: loc_cs
+        uses: PavanMudigonda/lines-of-code-reporter@v1.6
+        with:
+          include_lang: "C#,MSBuild script"
+
+      - name: Calculate Lines of JSON Code
+        id: loc_json
+        uses: PavanMudigonda/lines-of-code-reporter@v1.6
+        with:
+          directory: "/home/runner/work/AzzyBot/AzzyBot/AzzyBot/Customization"
+          include_lang: "JSON"
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -68,6 +81,8 @@ jobs:
             ARCH=${{ matrix.arch }}
             COMMIT=${{ github.sha }}
             TIMESTAMP=${{ github.event.head_commit.timestamp }}
+            LOC_CS=${{ steps.loc_cs.outputs.total_lines }}
+            LOC_JSON=${{ steps.loc_json.outputs.total_lines }}
           context: .
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ matrix.os }}/${{ matrix.arch }}
@@ -115,6 +130,19 @@ jobs:
             echo "set-env=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Calculate Lines of Source Code
+        id: loc_cs
+        uses: PavanMudigonda/lines-of-code-reporter@v1.6
+        with:
+          include_lang: "C#,MSBuild script"
+
+      - name: Calculate Lines of JSON Code
+        id: loc_json
+        uses: PavanMudigonda/lines-of-code-reporter@v1.6
+        with:
+          directory: "/home/runner/actions-runner/_work/AzzyBot/AzzyBot/AzzyBot/Customization"
+          include_lang: "JSON"
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -141,6 +169,10 @@ jobs:
         with:
           build-args: |
             ARCH=${{ matrix.arch }}
+            COMMIT=${{ github.sha }}
+            TIMESTAMP=${{ github.event.head_commit.timestamp }}
+            LOC_CS=${{ steps.loc_cs.outputs.total_lines }}
+            LOC_JSON=${{ steps.loc_json.outputs.total_lines }}
           context: .
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ matrix.os }}/${{ matrix.arch }}

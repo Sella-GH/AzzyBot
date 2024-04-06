@@ -1,4 +1,4 @@
-# BUILD
+# BUILD IMAGE
 ARG ARCH
 FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim-$ARCH AS build
 USER root
@@ -20,11 +20,15 @@ RUN apt install -y --no-install-recommends wget apt-transport-https gpg libicu72
 WORKDIR /app
 COPY --from=build /src/out .
 
-# Add commit and timestamp
+# Add commit, timestamp and lines of code
 ARG COMMIT
 ARG TIMESTAMP
-RUN sed -i 's\Commit not found\$COMMIT\g' /app/AzzyBot.json
-RUN sed -i 's\Compile date not found\$TIMESTAMP\g' /app/AzzyBot.json
+ARG LOC_CS
+ARG LOC_JSON
+RUN sed -i "s\Commit not found\\$COMMIT\g" /app/AzzyBot.json
+RUN sed -i "s\Compile date not found\\$TIMESTAMP\g" /app/AzzyBot.json
+RUN sed -i "s\Lines of source code not found\\$LOC_CS\g" /app/AzzyBot.json
+RUN sed -i "s\Lines of JSON code not found\\$LOC_JSON\g" /app/AzzyBot.json
 
 # Add new user
 RUN groupadd azzy

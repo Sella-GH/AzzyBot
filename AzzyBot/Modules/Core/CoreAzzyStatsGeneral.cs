@@ -15,6 +15,22 @@ namespace AzzyBot.Modules.Core;
 /// </summary>
 internal static class CoreAzzyStatsGeneral
 {
+    #region EmbedAzzyStats
+
+    /// <summary>
+    /// Gets the memory usage only of the bot itself.
+    /// </summary>
+    /// <returns>The memory usage of the bot in GB.</returns>
+    internal static double GetBotMemoryUsage()
+    {
+        Process? process = Process.GetCurrentProcess();
+        double usedMemoryGB = process.WorkingSet64 / (1024.0 * 1024.0 * 1024.0);
+
+        process.Dispose();
+
+        return Math.Round(usedMemoryGB, 2);
+    }
+
     /// <summary>
     /// Gets the disk usage of the server.
     /// </summary>
@@ -54,6 +70,10 @@ internal static class CoreAzzyStatsGeneral
         return CoreMisc.ConvertToUnixTime(dateTime);
     }
 
+    #endregion EmbedAzzyStats
+
+    #region EmbedAzzyInfo
+
     internal static string GetActivatedModules()
     {
         string text = "- Core";
@@ -70,20 +90,29 @@ internal static class CoreAzzyStatsGeneral
         return text;
     }
 
+    internal static string GetBotAuthors => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).CompanyName ?? "Bot authors not found";
+    internal static string GetDotNetVersion => Environment.Version.ToString() ?? ".NET version not found";
+    internal static string GetDSharpPlusVersion => AzzyBot.GetDiscordClientVersion;
+    internal static string GetBotEnvironment => (AzzyBot.GetDiscordClientId == 1217214768159653978) ? "Development" : "Production";
+    internal static string GetBotVersion => Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "Azzy version not found";
     internal static string GetBotName => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductName ?? "Bot name not found";
 
-    /// <summary>
-    /// Gets the memory usage only of the bot itself.
-    /// </summary>
-    /// <returns>The memory usage of the bot in GB.</returns>
-    internal static double GetBotMemoryUsage()
+    internal static async Task<string> GetBotFileInfoAsync(CoreFileValuesEnum file)
     {
-        Process? process = Process.GetCurrentProcess();
-        double usedMemoryGB = process.WorkingSet64 / (1024.0 * 1024.0 * 1024.0);
+        if (CoreModule.AzzyBotLock is null)
+            return "Info not found";
 
-        process.Dispose();
+        if (file is CoreFileValuesEnum.CompileDate)
+        {
+            if (!DateTime.TryParse(await CoreModule.AzzyBotLock.GetFileContentAsync(file), out DateTime date))
+                return "CompileDate not found";
 
-        return Math.Round(usedMemoryGB, 2);
+            return $"<t:{CoreMisc.ConvertToUnixTime(date)}>";
+        }
+
+        string value = await CoreModule.AzzyBotLock.GetFileContentAsync(file);
+
+        return (string.IsNullOrWhiteSpace(value)) ? "Info not found" : value;
     }
 
     internal static string GetBotUptime()
@@ -93,32 +122,5 @@ internal static class CoreAzzyStatsGeneral
         return $"<t:{CoreMisc.ConvertToUnixTime(azzy.StartTime)}>";
     }
 
-    internal static string GetBotEnvironment => (AzzyBot.GetDiscordClientId == 1217214768159653978) ? "Development" : "Production";
-    internal static string GetBotVersion => Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "Azzy version not found";
-
-    internal static async Task<string> GetBotCommitAsync()
-    {
-        if (CoreModule.AzzyBotLock is null)
-            return "Commit not found";
-
-        string commit = await CoreModule.AzzyBotLock.GetFileContentAsync(CoreFileValuesEnum.Commit);
-        if (string.IsNullOrWhiteSpace(commit))
-            commit = "Commit not found";
-
-        return commit;
-    }
-
-    internal static async Task<string> GetBotCompileDateAsync()
-    {
-        if (CoreModule.AzzyBotLock is null)
-            return "CompileDate not found";
-
-        if (!DateTime.TryParse(await CoreModule.AzzyBotLock.GetFileContentAsync(CoreFileValuesEnum.CompileDate), out DateTime dateTime))
-            return "CompileDate not found";
-
-        return $"<t:{CoreMisc.ConvertToUnixTime(dateTime)}>";
-    }
-
-    internal static string GetDotNetVersion => Environment.Version.ToString() ?? ".NET version not found";
-    internal static string GetDSharpNetVersion => AzzyBot.GetDiscordClientVersion;
+    #endregion EmbedAzzyInfo
 }

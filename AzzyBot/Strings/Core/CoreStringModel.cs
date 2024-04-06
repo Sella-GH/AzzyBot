@@ -48,6 +48,11 @@ internal sealed class CoreStringModel
     public string EmbedAzzyInfoBotVersion { get; set; } = string.Empty;
     public string EmbedAzzyInfoNetVersion { get; set; } = string.Empty;
     public string EmbedAzzyInfoDspVersion { get; set; } = string.Empty;
+    public string EmbedAzzyInfoAuthors { get; set; } = string.Empty;
+    public string EmbedAzzyInfoRepository { get; set; } = string.Empty;
+    public string EmbedAzzyInfoLanguage { get; set; } = string.Empty;
+    public string EmbedAzzyInfoSourceCode { get; set; } = string.Empty;
+    public string EmbedAzzyInfoCustomizationCode { get; set; } = string.Empty;
     public string EmbedAzzyInfoGitHubCommit { get; set; } = string.Empty;
     public string EmbedAzzyInfoCompDate { get; set; } = string.Empty;
     public string EmbedAzzyInfoEnv { get; set; } = string.Empty;
