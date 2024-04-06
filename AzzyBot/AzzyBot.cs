@@ -213,7 +213,14 @@ internal static class AzzyBot
     private static async Task GuildDownloadedAsync(DiscordClient c, GuildDownloadCompletedEventArgs e)
     {
         if (e.Guilds.Count <= 1)
+        {
+            foreach (KeyValuePair<ulong, DiscordGuild> guild in e.Guilds)
+            {
+                BaseSettings.CheckIfChannelsExist(guild.Value);
+            }
+
             return;
+        }
 
         ExceptionHandler.LogMessage(LogLevel.Critical, "The bot is joined on more guilds than one. Please remove the bot out of every guild until only 1 is left!");
         await BotShutdownAsync();

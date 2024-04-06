@@ -4,11 +4,14 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.ClubManagement;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.MusicStreaming;
+using DSharpPlus.Entities;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules;
 
@@ -61,6 +64,26 @@ internal abstract class BaseSettings
 
         if ((ActivateAzuraCast || ActivateClubManagement) && (AzuraCastSettings.AutomaticFileChangeCheck || AzuraCastSettings.AutomaticServerPing || AzuraCastSettings.AutomaticUpdateCheck || ClubManagementSettings.AutomaticClubClosingCheck))
             ActivateTimers = true;
+    }
+
+    internal static bool CheckIfChannelsExist(DiscordGuild guild)
+    {
+        bool core = CoreDiscordCommands.CheckIfChannelExists(guild, CoreSettings.ErrorChannelId);
+        bool azuraCast = true;
+        bool clubManagement = CoreDiscordCommands.CheckIfChannelExists(guild, ClubManagementSettings.ClubNotifyChannelId);
+
+        List<ulong> azuraCastChannels = CoreDiscordCommands.CheckIfChannelsExist(guild, [AzuraCastSettings.MusicRequestsChannelId, AzuraCastSettings.OutagesChannelId]);
+        if (azuraCastChannels.Count > 0)
+        {
+            azuraCast = false;
+
+            foreach (ulong channel in azuraCastChannels)
+            {
+                ExceptionHandler.LogMessage(LogLevel.Error, $"Channel with ID **{channel}** does not exist in guild with ID **{guild.Id}** and name **{guild.Name}**!");
+            }
+        }
+
+        return core && azuraCast && clubManagement;
     }
 
     protected static bool CheckSettings(Type type, List<string>? excludedStrings = null, List<string>? excludedInts = null)

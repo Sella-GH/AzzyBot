@@ -35,6 +35,21 @@ internal static class CoreDiscordCommands
         return channel is not null && guild == channel.Guild;
     }
 
+    internal static List<ulong> CheckIfChannelsExist(DiscordGuild guild, List<ulong> channels)
+    {
+        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
+        ArgumentOutOfRangeException.ThrowIfZero(channels.Count, nameof(channels));
+
+        List<ulong> notExisting = [];
+        foreach (ulong channel in channels)
+        {
+            if (guild.GetChannel(channel) is null)
+                notExisting.Add(channel);
+        }
+
+        return notExisting;
+    }
+
     internal static bool CheckIfUserHasRole(DiscordMember member, ulong roleId)
     {
         ArgumentNullException.ThrowIfNull(nameof(member));
