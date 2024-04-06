@@ -78,13 +78,13 @@ internal static class CoreAzzyStatsGeneral
     {
         string text = "- Core";
 
-        if (BaseSettings.ActivateAzuraCast)
+        if (ModuleStates.AzuraCast)
             text += "\n- AzuraCast";
 
-        if (BaseSettings.ActivateClubManagement)
+        if (ModuleStates.ClubManagement)
             text += "\n- ClubManagement";
 
-        if (BaseSettings.ActivateMusicStreaming)
+        if (ModuleStates.MusicStreaming)
             text += "\n- MusicStreaming";
 
         return text;
