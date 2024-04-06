@@ -1,7 +1,7 @@
 ﻿using System;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.MusicStreaming.Player;
-using AzzyBot.Strings.MusicStreaming;
+using AzzyBot.Modules.MusicStreaming.Strings;
 using DSharpPlus.Entities;
 using Lavalink4NET.Integrations.LyricsJava;
 using Lavalink4NET.Players;

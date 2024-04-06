@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AzzyBot.Modules.Core.Models;
+using AzzyBot.Modules.Core.Strings;
 using AzzyBot.Modules.Core.Structs;
-using AzzyBot.Strings.Core;
 using DSharpPlus.Entities;
 
 namespace AzzyBot.Modules.Core;

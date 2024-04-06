@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.AzuraCast.Enums;
 using AzzyBot.Modules.AzuraCast.Models;
+using AzzyBot.Modules.ClubManagement.Strings;
 using AzzyBot.Modules.Core;
-using AzzyBot.Strings.ClubManagement;
 using DSharpPlus.Entities;
 
 namespace AzzyBot.Modules.ClubManagement;

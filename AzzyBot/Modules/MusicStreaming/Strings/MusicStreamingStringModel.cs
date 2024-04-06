@@ -1,4 +1,4 @@
-﻿namespace AzzyBot.Strings.MusicStreaming;
+﻿namespace AzzyBot.Modules.MusicStreaming.Strings;
 
 internal sealed class MusicStreamingStringModel
 {

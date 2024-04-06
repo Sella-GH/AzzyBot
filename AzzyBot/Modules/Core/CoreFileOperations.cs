@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.Core.Enums;
-using AzzyBot.Modules.Core.Updater;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;

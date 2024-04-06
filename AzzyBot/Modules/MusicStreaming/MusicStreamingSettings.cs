@@ -2,8 +2,6 @@
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
-using AzzyBot.ExceptionHandling;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.MusicStreaming;
 

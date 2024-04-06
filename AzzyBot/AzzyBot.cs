@@ -151,7 +151,7 @@ internal static class AzzyBot
         #region Initialize Strings
 
         ExceptionHandler.LogMessage(LogLevel.Debug, "Loading strings");
-        await StringBuilding.LoadStringsAsync();
+        await BaseStringBuilder.LoadStringsAsync();
 
         #endregion Initialize Strings
 

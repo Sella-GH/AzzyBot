@@ -2,14 +2,14 @@ using System;
 using System.Globalization;
 using System.Threading.Tasks;
 using AzzyBot.Modules;
-using AzzyBot.Strings.AzuraCast;
-using AzzyBot.Strings.ClubManagement;
-using AzzyBot.Strings.Core;
-using AzzyBot.Strings.MusicStreaming;
+using AzzyBot.Modules.AzuraCast.Strings;
+using AzzyBot.Modules.ClubManagement.Strings;
+using AzzyBot.Modules.Core.Strings;
+using AzzyBot.Modules.MusicStreaming.Strings;
 
 namespace AzzyBot.Strings;
 
-internal abstract class StringBuilding
+internal abstract class BaseStringBuilder
 {
     internal static async Task LoadStringsAsync()
     {

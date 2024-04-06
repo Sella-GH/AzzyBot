@@ -1,4 +1,4 @@
-﻿namespace AzzyBot.Strings.ClubManagement;
+﻿namespace AzzyBot.Modules.ClubManagement.Strings;
 
 internal sealed class ClubManagementStringModel
 {

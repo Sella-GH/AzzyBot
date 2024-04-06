@@ -1,11 +1,12 @@
 ﻿using System.Threading.Tasks;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
+using AzzyBot.Strings;
 using Newtonsoft.Json;
 
-namespace AzzyBot.Strings.MusicStreaming;
+namespace AzzyBot.Modules.MusicStreaming.Strings;
 
-internal sealed class MusicStreamingStringBuilder : StringBuilding
+internal sealed class MusicStreamingStringBuilder : BaseStringBuilder
 {
     private static MusicStreamingStringModel Model = new();
 

@@ -1,4 +1,4 @@
-namespace AzzyBot.Strings.Core;
+namespace AzzyBot.Modules.Core.Strings;
 
 internal sealed class CoreStringModel
 {

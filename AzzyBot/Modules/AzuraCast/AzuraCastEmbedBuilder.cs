@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Modules.AzuraCast.Enums;
 using AzzyBot.Modules.AzuraCast.Models;
+using AzzyBot.Modules.AzuraCast.Strings;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Structs;
-using AzzyBot.Strings.AzuraCast;
 using DSharpPlus.Entities;
 
 namespace AzzyBot.Modules.AzuraCast;

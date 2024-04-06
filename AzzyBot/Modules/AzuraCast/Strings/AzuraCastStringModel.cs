@@ -1,4 +1,4 @@
-namespace AzzyBot.Strings.AzuraCast;
+namespace AzzyBot.Modules.AzuraCast.Strings;
 
 internal sealed class AzuraCastStringModel
 {

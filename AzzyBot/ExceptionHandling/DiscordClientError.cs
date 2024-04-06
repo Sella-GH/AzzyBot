@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using AzzyBot.Modules.Core;
-using AzzyBot.Strings.Core;
+using AzzyBot.Modules.Core.Strings;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Exceptions;

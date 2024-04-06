@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using AzzyBot.Strings.Core;
+using AzzyBot.Modules.Core.Strings;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;

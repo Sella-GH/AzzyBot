@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.Core.Structs;
+using AzzyBot.Strings;
 using Newtonsoft.Json;
 
-namespace AzzyBot.Strings.ClubManagement;
+namespace AzzyBot.Modules.ClubManagement.Strings;
 
-internal sealed class ClubManagementStringBuilder : StringBuilding
+internal sealed class ClubManagementStringBuilder : BaseStringBuilder
 {
     private static ClubManagementStringModel Model = new();
 
@@ -57,7 +58,7 @@ internal sealed class ClubManagementStringBuilder : StringBuilding
     #region BuildCloseClubEmbed
 
     internal static string EmbedCloseClubTitle => Model.EmbedCloseClubTitle;
-    internal static string EmbedCloseClubDesc(string user) => (string.IsNullOrWhiteSpace(user)) ? Model.EmbedCloseClubDescAzzy : BuildString(Model.EmbedCloseClubDescUser, "%USER%", user);
+    internal static string EmbedCloseClubDesc(string user) => string.IsNullOrWhiteSpace(user) ? Model.EmbedCloseClubDescAzzy : BuildString(Model.EmbedCloseClubDescUser, "%USER%", user);
     internal static string EmbedCloseClubDescInactivity => Model.EmbedCloseClubDescInactivity;
     internal static string EmbedCloseClubFooter => Model.EmbedCloseClubFooter;
 

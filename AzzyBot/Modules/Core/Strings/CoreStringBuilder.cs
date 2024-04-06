@@ -3,11 +3,12 @@ using System.Threading.Tasks;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.Core.Structs;
+using AzzyBot.Strings;
 using Newtonsoft.Json;
 
-namespace AzzyBot.Strings.Core;
+namespace AzzyBot.Modules.Core.Strings;
 
-internal sealed class CoreStringBuilder : StringBuilding
+internal sealed class CoreStringBuilder : BaseStringBuilder
 {
     private static CoreStringModel Model = new();
 

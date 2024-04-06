@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using AzzyBot.Strings.MusicStreaming;
+using AzzyBot.Modules.MusicStreaming.Strings;
 using DSharpPlus.Entities;
 using Lavalink4NET.InactivityTracking.Players;
 using Lavalink4NET.InactivityTracking.Trackers;

@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.Core.Enums;
-using AzzyBot.Strings.Core;
+using AzzyBot.Modules.Core.Strings;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.Core;
