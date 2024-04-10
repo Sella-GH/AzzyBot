@@ -130,9 +130,9 @@ internal sealed class AzuraCastStringBuilder : BaseStringBuilder
 
     internal static string GetEmbedFilesChangedTitle => Model.EmbedFilesChangedTitle;
 
-    internal static string GetEmbedFilesChangedAdded(int number) => number == 1 ? Model.EmbedFilesAddedSingle : BuildString(Model.EmbedFilesAddedMulti, "%NUMBER%", number);
+    internal static string GetEmbedFilesChangedAdded(int number) => (number == 1) ? Model.EmbedFilesAddedSingle : BuildString(Model.EmbedFilesAddedMulti, "%NUMBER%", number);
 
-    internal static string GetEmbedFilesChangedRemoved(int number) => number == 1 ? Model.EmbedFilesRemovedSingle : BuildString(Model.EmbedFilesRemovedMulti, "%NUMBER%", number);
+    internal static string GetEmbedFilesChangedRemoved(int number) => (number == 1) ? Model.EmbedFilesRemovedSingle : BuildString(Model.EmbedFilesRemovedMulti, "%NUMBER%", number);
 
     #endregion BuildFilesHaveChangedEmbed
 
@@ -145,8 +145,8 @@ internal sealed class AzuraCastStringBuilder : BaseStringBuilder
     internal static DiscordEmbedStruct GetEmbedAzuraMajorRelease => new(Model.EmbedAzuraUpdateMajorReleaseTitle, Model.EmbedAzuraUpdateMajorReleaseDesc, false);
     internal static DiscordEmbedStruct GetEmbedAzuraSwitch => new(Model.EmbedAzuraUpdateSwitchTitle, Model.EmbedAzuraUpdateSwitchDesc, false);
     internal static string GetEmbedAzuraChangelogPart(int number) => BuildString(Model.EmbedAzuraUpdateChangelogPart, "%NUMBER%", number);
-    internal static DiscordEmbedStruct GetEmbedAzuraChangelog(int number, string changelog) => new(number == 1 ? Model.EmbedAzuraUpdateChangelog : Model.EmbedAzuraUpdateChangelogPart, changelog, false);
-    internal static DiscordEmbedStruct GetEmbedAzuraTooBig(bool rolling) => new(Model.EmbedAzuraUpdateChangelog, BuildString(Model.EmbedAzuraUpdatesTooBig, "%URL%", rolling ? RollingUrl : StableUrl), false);
+    internal static DiscordEmbedStruct GetEmbedAzuraChangelog(int number, string changelog) => new((number == 1) ? Model.EmbedAzuraUpdateChangelog : Model.EmbedAzuraUpdateChangelogPart, changelog, false);
+    internal static DiscordEmbedStruct GetEmbedAzuraTooBig(bool rolling) => new(Model.EmbedAzuraUpdateChangelog, BuildString(Model.EmbedAzuraUpdatesTooBig, "%URL%", (rolling) ? RollingUrl : StableUrl), false);
 
     #endregion BuildUpdatesAvailableEmbed
 
@@ -192,13 +192,13 @@ internal sealed class AzuraCastStringBuilder : BaseStringBuilder
     internal static string GetEmbedAzuraSearchSongRequestsAvaDesc => Model.EmbedAzuraSearchSongRequestsAvaDesc;
     internal static DiscordEmbedStruct GetEmbedAzuraSearchSongRequestsAvaSong(string song) => new(Model.EmbedAzuraSearchSongRequestsAvaSong, song, true);
     internal static DiscordEmbedStruct GetEmbedAzuraSearchSongRequestsAvaArtist(string artist) => new(Model.EmbedAzuraSearchSongRequestsAvaArtist, artist, true);
-    internal static DiscordEmbedStruct GetEmbedAzuraSearchSongRequestsAvaAlbum(string album) => new(Model.EmbedAzuraSearchSongRequestsAvaAlbum, string.IsNullOrWhiteSpace(album) ? Model.EmbedAzuraSearchSongRequestsFoundAlbumNotAvailable : album, true);
+    internal static DiscordEmbedStruct GetEmbedAzuraSearchSongRequestsAvaAlbum(string album) => new(Model.EmbedAzuraSearchSongRequestsAvaAlbum, (string.IsNullOrWhiteSpace(album)) ? Model.EmbedAzuraSearchSongRequestsFoundAlbumNotAvailable : album, true);
     internal static string GetEmbedAzuraSearchSongRequestsFoundDesc => Model.EmbedAzuraSearchSongRequestsFoundDesc;
 
     internal static DiscordEmbedStruct GetEmbedAzuraSearchSongRequestsFoundInfo(int counter, string song, string artist, string album = "")
     {
         string text = $"**{song}**\n{Model.EmbedAzuraSearchSongRequestsFoundArtist} **{artist}**";
-        text += $"\n{Model.EmbedAzuraSearchSongRequestsFoundAlbum} **{(string.IsNullOrWhiteSpace(album) ? Model.EmbedAzuraSearchSongRequestsFoundAlbumNotAvailable : album)}**";
+        text += $"\n{Model.EmbedAzuraSearchSongRequestsFoundAlbum} **{((string.IsNullOrWhiteSpace(album)) ? Model.EmbedAzuraSearchSongRequestsFoundAlbumNotAvailable : album)}**";
 
         return new($"{Model.EmbedAzuraSearchSongRequestsFoundSong} {counter}", text, false);
     }
@@ -231,10 +231,10 @@ internal sealed class AzuraCastStringBuilder : BaseStringBuilder
     #region BuildFavouriteSongEmbed
 
     internal static string GetEmbedAzuraFavoriteSongTitle(string name) => BuildString(Model.EmbedAzuraFavoriteSongTitle, "%NAME%", name);
-    internal static string GetEmbedAzuraFavoriteSongDescUser(bool isUser, string name) => isUser ? Model.EmbedAzuraFavoriteSongDescIsUser : BuildString(Model.EmbedAzuraFavoriteSongDescIsNot, "%NAME%", name);
+    internal static string GetEmbedAzuraFavoriteSongDescUser(bool isUser, string name) => (isUser) ? Model.EmbedAzuraFavoriteSongDescIsUser : BuildString(Model.EmbedAzuraFavoriteSongDescIsNot, "%NAME%", name);
     internal static DiscordEmbedStruct GetEmbedAzuraFavoriteSongSong(string song) => new(Model.EmbedAzuraSearchSongRequestsRequestDesc, song, true);
     internal static DiscordEmbedStruct GetEmbedAzuraFavoriteSongArtist(string artist) => new(Model.EmbedAzuraSearchSongRequestsRequestArtist, artist, true);
-    internal static DiscordEmbedStruct GetEmbedAzuraFavoriteSongAlbum(string album) => new(Model.EmbedAzuraSearchSongRequestsRequestAlbum, string.IsNullOrWhiteSpace(album) ? Model.EmbedAzuraFavoriteSongAlbumNotAvailable : album, true);
+    internal static DiscordEmbedStruct GetEmbedAzuraFavoriteSongAlbum(string album) => new(Model.EmbedAzuraSearchSongRequestsRequestAlbum, (string.IsNullOrWhiteSpace(album)) ? Model.EmbedAzuraFavoriteSongAlbumNotAvailable : album, true);
 
     #endregion BuildFavouriteSongEmbed
 

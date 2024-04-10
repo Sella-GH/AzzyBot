@@ -58,7 +58,7 @@ internal sealed class ClubManagementStringBuilder : BaseStringBuilder
     #region BuildCloseClubEmbed
 
     internal static string EmbedCloseClubTitle => Model.EmbedCloseClubTitle;
-    internal static string EmbedCloseClubDesc(string user) => string.IsNullOrWhiteSpace(user) ? Model.EmbedCloseClubDescAzzy : BuildString(Model.EmbedCloseClubDescUser, "%USER%", user);
+    internal static string EmbedCloseClubDesc(string user) => (string.IsNullOrWhiteSpace(user)) ? Model.EmbedCloseClubDescAzzy : BuildString(Model.EmbedCloseClubDescUser, "%USER%", user);
     internal static string EmbedCloseClubDescInactivity => Model.EmbedCloseClubDescInactivity;
     internal static string EmbedCloseClubFooter => Model.EmbedCloseClubFooter;
 
