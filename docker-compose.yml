@@ -1,14 +1,17 @@
-include:
-  - ./AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
+## Remove the comments from the lines if you want to use the Music Streaming module
+## Do not forget to activate the Music Streaming module in the appsettings.json file then
+
+#include:
+#  - ./AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
 services:
   AzzyBot:
     container_name: AzzyBot
     image: sellagh/azzybot:latest
     restart: unless-stopped
-    depends_on:
-      - lavalink
-    networks:
-      - lavalink
+#    depends_on:
+#      - lavalink
+#    networks:
+#      - lavalink
     volumes:
       - ./AzzyBot/Settings:/app/Settings
       - ./AzzyBot/Customization:/app/Customization
