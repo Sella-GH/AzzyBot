@@ -4,12 +4,12 @@ namespace AzzyBot.Modules.Core.Updater;
 
 internal sealed class UpdaterModel
 {
-    [JsonProperty(nameof(name))]
-    public string name { get; set; } = string.Empty;
+    [JsonProperty("name")]
+    public string Name { get; set; } = string.Empty;
 
     [JsonProperty("created_at")]
-    public string createdAt { get; set; } = string.Empty;
+    public string CreatedAt { get; set; } = string.Empty;
 
-    [JsonProperty(nameof(body))]
-    public string body { get; set; } = string.Empty;
+    [JsonProperty("body")]
+    public string Body { get; set; } = string.Empty;
 }

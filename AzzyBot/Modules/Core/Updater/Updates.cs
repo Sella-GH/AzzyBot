@@ -27,14 +27,14 @@ internal static class Updates
 
         UpdaterModel? updaterModel = JsonConvert.DeserializeObject<UpdaterModel>(body) ?? throw new InvalidOperationException("UpdaterModel is null");
 
-        Version updateVersion = new(updaterModel.name);
+        Version updateVersion = new(updaterModel.Name);
         if (updateVersion == localVersion)
             return;
 
-        if (!DateTime.TryParse(updaterModel.createdAt, out DateTime releaseDate))
+        if (!DateTime.TryParse(updaterModel.CreatedAt, out DateTime releaseDate))
             releaseDate = DateTime.Now;
 
-        await SendUpdateMessageAsync(updateVersion, releaseDate, updaterModel.body);
+        await SendUpdateMessageAsync(updateVersion, releaseDate, updaterModel.Body);
     }
 
     private static async Task SendUpdateMessageAsync(Version updateVersion, DateTime releaseDate, string changelog)
