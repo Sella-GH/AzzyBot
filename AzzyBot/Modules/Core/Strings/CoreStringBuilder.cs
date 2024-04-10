@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.Core.Structs;
 using AzzyBot.Strings;
