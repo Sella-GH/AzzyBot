@@ -1,6 +1,6 @@
 namespace AzzyBot.Modules.AzuraCast.Strings;
 
-internal sealed class AzuraCastStringModel
+internal sealed class AcStringModel
 {
     #region Commands
 

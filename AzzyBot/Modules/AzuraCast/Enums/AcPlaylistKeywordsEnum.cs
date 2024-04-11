@@ -1,6 +1,6 @@
 namespace AzzyBot.Modules.AzuraCast.Enums;
 
-internal enum AzuraCastPlaylistKeywordsEnum
+internal enum AcPlaylistKeywordsEnum
 {
     NOREQUESTS
 }

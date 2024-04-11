@@ -71,7 +71,7 @@ internal abstract class BaseModule
             return;
 
         // Only activate them if Core is active and the settings are already loaded
-        if (BaseSettings.ActivateAzuraCast && AzuraCastSettings.AzuraCastSettingsLoaded)
+        if (BaseSettings.ActivateAzuraCast && AcSettings.AzuraCastSettingsLoaded)
             RegisterModule(new AzuraCastModule());
 
         if (ModuleStates.AzuraCast && BaseSettings.ActivateClubManagement && CmSettings.ClubManagementSettingsLoaded)

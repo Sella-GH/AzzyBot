@@ -103,19 +103,19 @@ internal sealed class CmModule : BaseModule
 
     internal static async Task<bool> CheckIfClubIsOpenAsync()
     {
-        List<PlaylistModel> playlists = await AzuraCastServer.GetPlaylistsAsync();
-        List<PlaylistModel> closed = await AzuraCastServer.GetPlaylistsAsync(CmSettings.AzuraClosedPlaylist);
+        List<AcPlaylistModel> playlists = await AcServer.GetPlaylistsAsync();
+        List<AcPlaylistModel> closed = await AcServer.GetPlaylistsAsync(CmSettings.AzuraClosedPlaylist);
 
         if (closed.Count != 1)
             return false;
 
-        foreach (PlaylistModel playlist in playlists)
+        foreach (AcPlaylistModel playlist in playlists)
         {
             if (playlist.Id != CmSettings.AzuraAllSongsPlaylist && playlist.Id != CmSettings.AzuraClosedPlaylist && playlist.Is_enabled)
                 return true;
         }
 
-        NowPlayingData nowPlaying = await AzuraCastServer.GetNowPlayingAsync();
+        NowPlayingData nowPlaying = await AcServer.GetNowPlayingAsync();
         string activePlaylist = nowPlaying.Now_Playing.Playlist;
 
         return activePlaylist != closed[0].Name;
@@ -164,7 +164,7 @@ internal sealed class CmModule : BaseModule
         if (!await CheckIfClubIsOpenAsync())
             return;
 
-        NowPlayingData data = await AzuraCastServer.GetNowPlayingAsync();
+        NowPlayingData data = await AcServer.GetNowPlayingAsync();
 
         if (data.Listeners.Current != 0)
             return;

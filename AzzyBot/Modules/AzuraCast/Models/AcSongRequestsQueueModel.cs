@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
-internal sealed class SongRequestsQueueModel
+internal sealed class AcSongRequestsQueueModel
 {
     [JsonProperty("timestamp")]
     public int Timestamp { get; set; }

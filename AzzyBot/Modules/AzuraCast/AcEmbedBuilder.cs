@@ -13,7 +13,7 @@ using DSharpPlus.Entities;
 
 namespace AzzyBot.Modules.AzuraCast;
 
-internal static class AzuraCastEmbedBuilder
+internal static class AcEmbedBuilder
 {
     private const string AzuraCastLogo = "https://avatars.githubusercontent.com/u/28115974?s=200&v=4";
 
@@ -28,16 +28,16 @@ internal static class AzuraCastEmbedBuilder
 
         for (int i = 0; i < cpuUsageCores.Length; i++)
         {
-            cpuUsageTotalDesc += AzuraCastStringBuilder.GetEmbedMusicStatsCpuUsageCore(i, cpuUsageCores[i]);
+            cpuUsageTotalDesc += AcStringBuilder.GetEmbedMusicStatsCpuUsageCore(i, cpuUsageCores[i]);
         }
 
-        cpuUsageTotalDesc += AzuraCastStringBuilder.GetEmbedMusicStatsCpuUsageAll(cpuUsageTotal);
+        cpuUsageTotalDesc += AcStringBuilder.GetEmbedMusicStatsCpuUsageAll(cpuUsageTotal);
 
-        string title = AzuraCastStringBuilder.GetEmbedMusicStatsTitle;
-        Dictionary<string, DiscordEmbedStruct> fields = AzuraCastStringBuilder.GetEmbedMusicStatsFields(ping, cpuUsageTotalDesc, cpuUsageTimes[0], cpuUsageTimes[1], cpuUsageTimes[2], memoryUsed, memoryCached, memoryUsedTotal, memoryTotal, diskUsed, diskTotal);
+        string title = AcStringBuilder.GetEmbedMusicStatsTitle;
+        Dictionary<string, DiscordEmbedStruct> fields = AcStringBuilder.GetEmbedMusicStatsFields(ping, cpuUsageTotalDesc, cpuUsageTimes[0], cpuUsageTimes[1], cpuUsageTimes[2], memoryUsed, memoryCached, memoryUsedTotal, memoryTotal, diskUsed, diskTotal);
         for (int i = 0; i < networks.Length; i++)
         {
-            fields.Add(AzuraCastStringBuilder.GetEmbedMusicStatsNetworkTitle(networks[i]), new(nameof(AzuraCastStringBuilder.GetEmbedMusicStatsNetworkDesc), AzuraCastStringBuilder.GetEmbedMusicStatsNetworkDesc(networkRXspeed[i], networkTXspeed[i]), true));
+            fields.Add(AcStringBuilder.GetEmbedMusicStatsNetworkTitle(networks[i]), new(nameof(AcStringBuilder.GetEmbedMusicStatsNetworkDesc), AcStringBuilder.GetEmbedMusicStatsNetworkDesc(networkRXspeed[i], networkTXspeed[i]), true));
         }
 
         return CoreEmbedBuilder.CreateBasicEmbed(title, string.Empty, userName, userAvatarUrl, DiscordColor.Red, AzuraCastLogo, string.Empty, string.Empty, fields);
@@ -53,12 +53,12 @@ internal static class AzuraCastEmbedBuilder
 
         if (!isOnline)
         {
-            title = AzuraCastStringBuilder.GetEmbedServerStatusOffline;
+            title = AcStringBuilder.GetEmbedServerStatusOffline;
             color = DiscordColor.Red;
         }
         else
         {
-            title = AzuraCastStringBuilder.GetEmbedServerStatusOnline;
+            title = AcStringBuilder.GetEmbedServerStatusOnline;
             color = DiscordColor.Green;
         }
 
@@ -70,8 +70,8 @@ internal static class AzuraCastEmbedBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
 
-        string title = AzuraCastStringBuilder.GetEmbedServerNotAvailableTitle;
-        string message = AzuraCastStringBuilder.GetEmbedServerNotAvailableDesc;
+        string title = AcStringBuilder.GetEmbedServerNotAvailableTitle;
+        string message = AcStringBuilder.GetEmbedServerNotAvailableDesc;
 
         return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.IndianRed, CoreSettings.LogoUrl);
     }
@@ -81,9 +81,9 @@ internal static class AzuraCastEmbedBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
 
-        string title = AzuraCastStringBuilder.GetEmbedFilesChangedTitle;
-        string addedText = AzuraCastStringBuilder.GetEmbedFilesChangedAdded(addedNumber);
-        string removedText = AzuraCastStringBuilder.GetEmbedFilesChangedRemoved(removedNumber);
+        string title = AcStringBuilder.GetEmbedFilesChangedTitle;
+        string addedText = AcStringBuilder.GetEmbedFilesChangedAdded(addedNumber);
+        string removedText = AcStringBuilder.GetEmbedFilesChangedRemoved(removedNumber);
         string message;
         DiscordColor color;
 
@@ -107,31 +107,31 @@ internal static class AzuraCastEmbedBuilder
         return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, color);
     }
 
-    internal static DiscordEmbed BuildUpdatesAvailableEmbed(string userName, string userAvatarUrl, AzuraCastUpdateModel model)
+    internal static DiscordEmbed BuildUpdatesAvailableEmbed(string userName, string userAvatarUrl, AcUpdateModel model)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
         ArgumentNullException.ThrowIfNull(model, nameof(model));
 
-        string title = AzuraCastStringBuilder.GetEmbedAzuraUpdateTitle;
-        string description = AzuraCastStringBuilder.GetEmbedAzuraUpdateDesc(model.RollingUpdatesList.Count);
+        string title = AcStringBuilder.GetEmbedAzuraUpdateTitle;
+        string description = AcStringBuilder.GetEmbedAzuraUpdateDesc(model.RollingUpdatesList.Count);
 
         Dictionary<string, DiscordEmbedStruct> fields = [];
-        DiscordEmbedStruct data = AzuraCastStringBuilder.GetEmbedAzuraCurrentRelease(model.CurrentRelease);
+        DiscordEmbedStruct data = AcStringBuilder.GetEmbedAzuraCurrentRelease(model.CurrentRelease);
         fields.Add(data.Name, data);
 
         if (model.CurrentRelease != model.LatestRelease && model.NeedsReleaseUpdate)
         {
-            data = AzuraCastStringBuilder.GetEmbedAzuraLatestRelease(model.LatestRelease);
+            data = AcStringBuilder.GetEmbedAzuraLatestRelease(model.LatestRelease);
             fields.Add(data.Name, data);
 
-            data = AzuraCastStringBuilder.GetEmbedAzuraMajorRelease;
+            data = AcStringBuilder.GetEmbedAzuraMajorRelease;
             fields.Add(data.Name, data);
         }
 
         if (model.CanSwitchToStable)
         {
-            data = AzuraCastStringBuilder.GetEmbedAzuraSwitch;
+            data = AcStringBuilder.GetEmbedAzuraSwitch;
             fields.Add(data.Name, data);
         }
 
@@ -163,7 +163,7 @@ internal static class AzuraCastEmbedBuilder
             // Check if adding the new line exceeds the character limit or maximum parts limit
             if (updateList.Length + newLine.Length < MaxCharacters || partNumber < MaxParts)
             {
-                string key = AzuraCastStringBuilder.GetEmbedAzuraChangelogPart(partNumber);
+                string key = AcStringBuilder.GetEmbedAzuraChangelogPart(partNumber);
                 string value = updateList.ToString();
                 kvp.Add(key, value);
                 updateList.Clear();
@@ -195,14 +195,14 @@ internal static class AzuraCastEmbedBuilder
                 fields.Add(field.Key, new(field.Key, field.Value, false));
             }
 
-            data = AzuraCastStringBuilder.GetEmbedAzuraChangelog(partNumber, updateList.ToString());
+            data = AcStringBuilder.GetEmbedAzuraChangelog(partNumber, updateList.ToString());
             fields.Add(data.Name, data);
         }
 
         // Check if length exceeds and display manual changelog message
         if (isTooBig)
         {
-            data = AzuraCastStringBuilder.GetEmbedAzuraTooBig(model.NeedsReleaseUpdate);
+            data = AcStringBuilder.GetEmbedAzuraTooBig(model.NeedsReleaseUpdate);
             fields.Add(data.Name, data);
         }
 
@@ -214,8 +214,8 @@ internal static class AzuraCastEmbedBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
 
-        string title = AzuraCastStringBuilder.GetEmbedAzuraPlaylistChangesTitle;
-        string message = AzuraCastStringBuilder.GetEmbedAzuraPlaylistChangesDesc;
+        string title = AcStringBuilder.GetEmbedAzuraPlaylistChangesTitle;
+        string message = AcStringBuilder.GetEmbedAzuraPlaylistChangesDesc;
 
         return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.IndianRed, CoreSettings.LogoUrl);
     }
@@ -225,8 +225,8 @@ internal static class AzuraCastEmbedBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
 
-        string title = AzuraCastStringBuilder.EmbedAzuraSongRequestsTitle;
-        string message = AzuraCastStringBuilder.EmbedAzuraSongRequestsDesc;
+        string title = AcStringBuilder.EmbedAzuraSongRequestsTitle;
+        string message = AcStringBuilder.EmbedAzuraSongRequestsDesc;
 
         return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.IndianRed, CoreSettings.LogoUrl);
     }
@@ -236,8 +236,8 @@ internal static class AzuraCastEmbedBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
 
-        string title = AzuraCastStringBuilder.EmbedAzuraSongInQueueTitle;
-        string message = AzuraCastStringBuilder.EmbedAzuraSongInQueueDesc;
+        string title = AcStringBuilder.EmbedAzuraSongInQueueTitle;
+        string message = AcStringBuilder.EmbedAzuraSongInQueueDesc;
 
         return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.IndianRed, CoreSettings.LogoUrl);
     }
@@ -248,29 +248,29 @@ internal static class AzuraCastEmbedBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
         ArgumentNullException.ThrowIfNull(data, nameof(data));
 
-        string title = AzuraCastStringBuilder.GetEmbedAzuraNowPlayingTitle;
+        string title = AcStringBuilder.GetEmbedAzuraNowPlayingTitle;
         string message = string.Empty;
         string thumbnailUrl = (!string.IsNullOrWhiteSpace(data.Live.Art)) ? data.Live.Art : data.Now_Playing.Song.Art;
         string footerText = string.Empty;
 
         Dictionary<string, DiscordEmbedStruct> fields = [];
-        DiscordEmbedStruct dataStruct = AzuraCastStringBuilder.GetEmbedAzuraNowPlayingSong(data.Now_Playing.Song.Title);
+        DiscordEmbedStruct dataStruct = AcStringBuilder.GetEmbedAzuraNowPlayingSong(data.Now_Playing.Song.Title);
         fields.Add(dataStruct.Name, dataStruct);
 
-        dataStruct = AzuraCastStringBuilder.GetEmbedAzuraNowPlayingArtist(data.Now_Playing.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
+        dataStruct = AcStringBuilder.GetEmbedAzuraNowPlayingArtist(data.Now_Playing.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
         fields.Add(dataStruct.Name, dataStruct);
 
         if (!string.IsNullOrWhiteSpace(data.Now_Playing.Song.Album))
         {
-            dataStruct = AzuraCastStringBuilder.GetEmbedAzuraNowPlayingAlbum(data.Now_Playing.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
+            dataStruct = AcStringBuilder.GetEmbedAzuraNowPlayingAlbum(data.Now_Playing.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
             fields.Add(dataStruct.Name, dataStruct);
         }
 
         // If there's a live stream
         if (data.Live.Is_live)
         {
-            message = AzuraCastStringBuilder.GetEmbedAzuraNowPlayingStreamMessage(data.Live.Streamer_Name);
-            dataStruct = AzuraCastStringBuilder.GetEmbedAzuraNowPlayingStreamSince(data.Live.Broadcast_Start ?? 0);
+            message = AcStringBuilder.GetEmbedAzuraNowPlayingStreamMessage(data.Live.Streamer_Name);
+            dataStruct = AcStringBuilder.GetEmbedAzuraNowPlayingStreamSince(data.Live.Broadcast_Start ?? 0);
             fields.Add(dataStruct.Name, dataStruct);
         }
         // And if not
@@ -281,19 +281,19 @@ internal static class AzuraCastEmbedBuilder
 
             string songDuration = timeSpanDuration.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
             string songElapsed = timeSpanElapsed.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
-            string duration = AzuraCastMisc.GetProgressBar(14, data.Now_Playing.Elapsed, data.Now_Playing.Duration);
+            string duration = AcMisc.GetProgressBar(14, data.Now_Playing.Elapsed, data.Now_Playing.Duration);
 
-            dataStruct = AzuraCastStringBuilder.GetEmbedAzuraNowPlayingDuration(duration, songElapsed, songDuration);
+            dataStruct = AcStringBuilder.GetEmbedAzuraNowPlayingDuration(duration, songElapsed, songDuration);
             fields.Add(dataStruct.Name, dataStruct);
 
-            List<PlaylistModel> playlists = await AzuraCastServer.GetPlaylistsAsync();
+            List<AcPlaylistModel> playlists = await AcServer.GetPlaylistsAsync();
             if (playlists.Count is not 0)
             {
-                foreach (PlaylistModel playlist in playlists)
+                foreach (AcPlaylistModel playlist in playlists)
                 {
                     if (playlist.Name == data.Now_Playing.Playlist && !AzuraCastModule.CheckIfDeniedPlaylist(playlist.Id))
                     {
-                        dataStruct = AzuraCastStringBuilder.GetEmbedAzuraNowPlayingPlaylist(data.Now_Playing.Playlist.Replace($"({AzuraCastPlaylistKeywordsEnum.NOREQUESTS})", string.Empty, StringComparison.InvariantCultureIgnoreCase).Trim());
+                        dataStruct = AcStringBuilder.GetEmbedAzuraNowPlayingPlaylist(data.Now_Playing.Playlist.Replace($"({AcPlaylistKeywordsEnum.NOREQUESTS})", string.Empty, StringComparison.InvariantCultureIgnoreCase).Trim());
                         fields.Add(dataStruct.Name, dataStruct);
 
                         break;
@@ -304,15 +304,15 @@ internal static class AzuraCastEmbedBuilder
 
         if (!AzuraCastModule.CheckIfNowPlayingSloganShouldChange())
         {
-            footerText = AzuraCastStringBuilder.GetEmbedAzuraNowPlayingFooterClosed;
+            footerText = AcStringBuilder.GetEmbedAzuraNowPlayingFooterClosed;
         }
         else
         {
-            PlaylistSloganStruct slogans = await AzuraCastServer.GetCurrentSloganAsync(data);
+            PlaylistSloganStruct slogans = await AcServer.GetCurrentSloganAsync(data);
 
             if (!string.IsNullOrWhiteSpace(slogans.Slogan))
             {
-                dataStruct = AzuraCastStringBuilder.GetEmbedAzuraNowPlayingSlogan(slogans.Slogan);
+                dataStruct = AcStringBuilder.GetEmbedAzuraNowPlayingSlogan(slogans.Slogan);
                 fields.Add(dataStruct.Name, dataStruct);
             }
 
@@ -328,12 +328,12 @@ internal static class AzuraCastEmbedBuilder
         return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.Aquamarine, thumbnailUrl, footerText, string.Empty, fields);
     }
 
-    internal static DiscordEmbed BuildSearchSongRequestsEmbed(string userName, string userAvatarUrl, List<SongRequestsModel> songRequests)
+    internal static DiscordEmbed BuildSearchSongRequestsEmbed(string userName, string userAvatarUrl, List<AcSongRequestsModel> songRequests)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
 
-        string title = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsTitle;
+        string title = AcStringBuilder.GetEmbedAzuraSearchSongRequestsTitle;
         string message;
         string thumbnailUrl = string.Empty;
         string footerText = string.Empty;
@@ -346,45 +346,45 @@ internal static class AzuraCastEmbedBuilder
         {
             SongDetailed song = songRequests[0].Song;
 
-            message = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsAvaDesc;
+            message = AcStringBuilder.GetEmbedAzuraSearchSongRequestsAvaDesc;
             thumbnailUrl = song.Art;
             color = DiscordColor.SpringGreen;
 
-            data = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsAvaSong(song.Title);
+            data = AcStringBuilder.GetEmbedAzuraSearchSongRequestsAvaSong(song.Title);
             fields.Add(data.Name, data);
 
-            data = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsAvaArtist(song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
+            data = AcStringBuilder.GetEmbedAzuraSearchSongRequestsAvaArtist(song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
             fields.Add(data.Name, data);
 
-            data = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsAvaAlbum(song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
+            data = AcStringBuilder.GetEmbedAzuraSearchSongRequestsAvaAlbum(song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
             fields.Add(data.Name, data);
         }
         // if explicit song is not found but some others
         else if (songRequests.Count > 1)
         {
-            message = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsFoundDesc;
+            message = AcStringBuilder.GetEmbedAzuraSearchSongRequestsFoundDesc;
             color = DiscordColor.Orange;
 
             int counter = 0;
-            foreach (SongRequestsModel songRequest in songRequests)
+            foreach (AcSongRequestsModel songRequest in songRequests)
             {
                 counter++;
                 SongDetailed song = songRequest.Song;
 
                 string artist = song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase);
                 string album = song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase);
-                data = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsFoundInfo(counter, song.Title, artist, album);
+                data = AcStringBuilder.GetEmbedAzuraSearchSongRequestsFoundInfo(counter, song.Title, artist, album);
                 fields.Add(data.Name, data);
             }
 
-            footerText = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsFoundFooter;
+            footerText = AcStringBuilder.GetEmbedAzuraSearchSongRequestsFoundFooter;
         }
         // if nothing is found
         else
         {
-            message = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsNotDesc;
+            message = AcStringBuilder.GetEmbedAzuraSearchSongRequestsNotDesc;
             color = DiscordColor.IndianRed;
-            footerText = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsNotFooter;
+            footerText = AcStringBuilder.GetEmbedAzuraSearchSongRequestsNotFooter;
         }
 
         return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, color, thumbnailUrl, footerText, string.Empty, fields);
@@ -396,40 +396,40 @@ internal static class AzuraCastEmbedBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
         ArgumentException.ThrowIfNullOrWhiteSpace(songName, nameof(songName));
 
-        string title = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsNotAvaTitle;
-        string message = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsNotAvaDesc(userName);
+        string title = AcStringBuilder.GetEmbedAzuraSearchSongRequestsNotAvaTitle;
+        string message = AcStringBuilder.GetEmbedAzuraSearchSongRequestsNotAvaDesc(userName);
 
         Dictionary<string, DiscordEmbedStruct> fields = [];
-        DiscordEmbedStruct data = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsNotAvaSong(songName);
+        DiscordEmbedStruct data = AcStringBuilder.GetEmbedAzuraSearchSongRequestsNotAvaSong(songName);
         fields.Add(data.Name, data);
 
         if (!string.IsNullOrWhiteSpace(songArtist))
         {
-            data = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsNotAvaArtist(songArtist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
+            data = AcStringBuilder.GetEmbedAzuraSearchSongRequestsNotAvaArtist(songArtist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
             fields.Add(data.Name, data);
         }
 
         return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.Orange, string.Empty, string.Empty, string.Empty, fields);
     }
 
-    internal static DiscordEmbed BuildRequestSongEmbed(string userName, string userAvatarUrl, SongRequestsModel songRequest)
+    internal static DiscordEmbed BuildRequestSongEmbed(string userName, string userAvatarUrl, AcSongRequestsModel songRequest)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
         ArgumentNullException.ThrowIfNull(songRequest, nameof(songRequest));
 
-        string title = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsRequestTitle;
-        string message = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsRequestDesc;
+        string title = AcStringBuilder.GetEmbedAzuraSearchSongRequestsRequestTitle;
+        string message = AcStringBuilder.GetEmbedAzuraSearchSongRequestsRequestDesc;
         string thumbnailUrl = songRequest.Song.Art;
 
         Dictionary<string, DiscordEmbedStruct> fields = [];
-        DiscordEmbedStruct data = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsRequestSong(songRequest.Song.Title);
+        DiscordEmbedStruct data = AcStringBuilder.GetEmbedAzuraSearchSongRequestsRequestSong(songRequest.Song.Title);
         fields.Add(data.Name, data);
 
-        data = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsRequestArtist(songRequest.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
+        data = AcStringBuilder.GetEmbedAzuraSearchSongRequestsRequestArtist(songRequest.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
         fields.Add(data.Name, data);
 
-        data = AzuraCastStringBuilder.GetEmbedAzuraSearchSongRequestsRequestAlbum(songRequest.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
+        data = AcStringBuilder.GetEmbedAzuraSearchSongRequestsRequestAlbum(songRequest.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
         fields.Add(data.Name, data);
 
         return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.SpringGreen, thumbnailUrl, string.Empty, string.Empty, fields);
@@ -444,17 +444,17 @@ internal static class AzuraCastEmbedBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(songArtist, nameof(songArtist));
         ArgumentException.ThrowIfNullOrWhiteSpace(favUser, nameof(favUser));
 
-        string title = AzuraCastStringBuilder.GetEmbedAzuraFavoriteSongTitle(userName);
-        string message = AzuraCastStringBuilder.GetEmbedAzuraFavoriteSongDescUser(isUser, favUser);
+        string title = AcStringBuilder.GetEmbedAzuraFavoriteSongTitle(userName);
+        string message = AcStringBuilder.GetEmbedAzuraFavoriteSongDescUser(isUser, favUser);
 
         Dictionary<string, DiscordEmbedStruct> fields = [];
-        DiscordEmbedStruct data = AzuraCastStringBuilder.GetEmbedAzuraFavoriteSongSong(songName);
+        DiscordEmbedStruct data = AcStringBuilder.GetEmbedAzuraFavoriteSongSong(songName);
         fields.Add(data.Name, data);
 
-        data = AzuraCastStringBuilder.GetEmbedAzuraFavoriteSongArtist(songArtist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
+        data = AcStringBuilder.GetEmbedAzuraFavoriteSongArtist(songArtist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
         fields.Add(data.Name, data);
 
-        data = AzuraCastStringBuilder.GetEmbedAzuraFavoriteSongAlbum(songAlbum.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
+        data = AcStringBuilder.GetEmbedAzuraFavoriteSongAlbum(songAlbum.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase));
         fields.Add(data.Name, data);
 
         return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.SpringGreen, songArt, string.Empty, string.Empty, fields);

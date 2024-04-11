@@ -10,20 +10,20 @@ using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.AzuraCast;
 
-internal static class AzuraCastStats
+internal static class AcStats
 {
     internal static async Task<DiscordEmbed> GetServerStatsAsync(string userName, string userAvatarUrl)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
 
-        string url = string.Join("/", AzuraCastSettings.AzuraApiUrl, AzuraCastApiEnum.admin, AzuraCastApiEnum.server, AzuraCastApiEnum.stats);
+        string url = string.Join("/", AcSettings.AzuraApiUrl, AcApiEnum.admin, AcApiEnum.server, AcApiEnum.stats);
 
-        string ping = await CoreWebRequests.TryPingAsync(AzuraCastSettings.AzuraApiUrl);
+        string ping = await CoreWebRequests.TryPingAsync(AcSettings.AzuraApiUrl);
         if (string.IsNullOrWhiteSpace(ping))
-            return AzuraCastEmbedBuilder.BuildServerIsOfflineEmbed(userName, userAvatarUrl, false);
+            return AcEmbedBuilder.BuildServerIsOfflineEmbed(userName, userAvatarUrl, false);
 
-        string body = await CoreWebRequests.GetWebAsync(url, AzuraCastServer.Headers, AzuraCastSettings.Ipv6Available);
+        string body = await CoreWebRequests.GetWebAsync(url, AcServer.Headers, AcSettings.Ipv6Available);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty!");
 
@@ -110,6 +110,6 @@ internal static class AzuraCastStats
             throw new InvalidOperationException("No networks found!");
         }
 
-        return AzuraCastEmbedBuilder.BuildMusicServerStatsEmbed(userName, userAvatarUrl, ping, cpuUsageTotal, cpuUsageCores, cpuUsageTimes, memoryTotal, memoryUsed, memoryCached, memoryUsedTotal, diskTotal, diskUsed, networks, networkRXspeed, networkTXspeed);
+        return AcEmbedBuilder.BuildMusicServerStatsEmbed(userName, userAvatarUrl, ping, cpuUsageTotal, cpuUsageCores, cpuUsageTimes, memoryTotal, memoryUsed, memoryCached, memoryUsedTotal, diskTotal, diskUsed, networks, networkRXspeed, networkTXspeed);
     }
 }

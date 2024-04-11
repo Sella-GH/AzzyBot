@@ -102,7 +102,7 @@ internal static class CoreAzzyHelp
         List<Type> allowedCommands = [typeof(CoreCommands)];
 
         if (ModuleStates.AzuraCast)
-            allowedCommands.Add(typeof(AzuraCastCommands));
+            allowedCommands.Add(typeof(AcCommands));
 
         if (ModuleStates.AzuraCast && ModuleStates.ClubManagement)
             allowedCommands.Add(typeof(CmCommands));

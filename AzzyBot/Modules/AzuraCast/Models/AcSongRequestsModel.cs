@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
-internal sealed class SongRequestsModel
+internal sealed class AcSongRequestsModel
 {
     [JsonProperty("request_id")]
     public string Request_Id { get; set; } = string.Empty;

@@ -54,16 +54,16 @@ internal static class CmEmbedBuilder
         long openingTime = CoreMisc.ConvertToUnixTime(opening);
         long closingTime = CoreMisc.ConvertToUnixTime(closing);
         TimeSpan openingDuration = CmModule.ClubClosing - CmModule.ClubOpening;
-        List<ListenerModel> listeners = await AzuraCastServer.GetListenersAsync(opening, closing);
-        List<SongHistory> songHistory = await AzuraCastServer.GetSongHistoryAsync(opening, closing);
-        List<PlaylistModel> playlists = await AzuraCastServer.GetPlaylistsAsync();
+        List<AcListenerModel> listeners = await AcServer.GetListenersAsync(opening, closing);
+        List<SongHistory> songHistory = await AcServer.GetSongHistoryAsync(opening, closing);
+        List<AcPlaylistModel> playlists = await AcServer.GetPlaylistsAsync();
         int peakListeners = listeners.Count;
         int visitors = 0;
         int songRequestsNumber = 0;
         List<string> playedPlaylists = [];
         //int outgoingTraffic = 0;
 
-        foreach (ListenerModel listener in listeners)
+        foreach (AcListenerModel listener in listeners)
         {
             // Only count visitors who stayed for at least 15 minutes
             if (listener.TimeConnected >= 300)
@@ -77,11 +77,11 @@ internal static class CmEmbedBuilder
 
             if (!string.IsNullOrWhiteSpace(item.Playlist) && !playedPlaylists.Contains(item.Playlist))
             {
-                foreach (PlaylistModel playlist in playlists)
+                foreach (AcPlaylistModel playlist in playlists)
                 {
                     if (playlist.Name == item.Playlist && !CmModule.CheckForDeniedPlaylist(playlist.Id))
                     {
-                        playedPlaylists.Add(playlist.Name.Replace($"({AzuraCastPlaylistKeywordsEnum.NOREQUESTS})", string.Empty, StringComparison.InvariantCultureIgnoreCase).Trim());
+                        playedPlaylists.Add(playlist.Name.Replace($"({AcPlaylistKeywordsEnum.NOREQUESTS})", string.Empty, StringComparison.InvariantCultureIgnoreCase).Trim());
                         break;
                     }
                 }

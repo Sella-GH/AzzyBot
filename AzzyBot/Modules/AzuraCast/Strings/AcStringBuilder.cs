@@ -11,9 +11,9 @@ using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.AzuraCast.Strings;
 
-internal sealed class AzuraCastStringBuilder : BaseStringBuilder
+internal sealed class AcStringBuilder : BaseStringBuilder
 {
-    private static AzuraCastStringModel Model = new();
+    private static AcStringModel Model = new();
     private const string RollingUrl = "https://github.com/AzuraCast/AzuraCast/commits/main/";
     private const string StableUrl = "https://github.com/AzuraCast/AzuraCast/commits/stable/";
 
@@ -26,7 +26,7 @@ internal sealed class AzuraCastStringBuilder : BaseStringBuilder
 
         if (!string.IsNullOrWhiteSpace(content))
         {
-            AzuraCastStringModel? newModel = JsonConvert.DeserializeObject<AzuraCastStringModel>(content);
+            AcStringModel? newModel = JsonConvert.DeserializeObject<AcStringModel>(content);
             if (newModel is not null)
             {
                 // Reference assignment is atomic in .NET, so this is thread safe.

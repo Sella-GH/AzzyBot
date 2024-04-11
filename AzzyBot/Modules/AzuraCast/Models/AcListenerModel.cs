@@ -2,7 +2,7 @@
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
-internal sealed class ListenerModel
+internal sealed class AcListenerModel
 {
     [JsonProperty("connected_time")]
     public int TimeConnected { get; set; }

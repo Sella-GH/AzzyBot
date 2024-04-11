@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
-internal sealed class FilesModel
+internal sealed class AcFilesModel
 {
     [JsonProperty("unique_id")]
     public string Unique_Id { get; set; } = string.Empty;

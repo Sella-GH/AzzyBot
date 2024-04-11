@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace AzzyBot.Modules.AzuraCast.Settings;
 
-internal sealed class AzuraCastSettings : BaseSettings
+internal sealed class AcSettings : BaseSettings
 {
     internal static bool AzuraCastSettingsLoaded { get; private set; }
     internal static bool Ipv6Available { get; private set; }
@@ -32,6 +32,6 @@ internal sealed class AzuraCastSettings : BaseSettings
         MusicRequestsChannelId = Convert.ToUInt64(Config["AzuraCast:MusicRequestsChannelId"], CultureInfo.InvariantCulture);
         OutagesChannelId = Convert.ToUInt64(Config["AzuraCast:OutagesChannelId"], CultureInfo.InvariantCulture);
 
-        return AzuraCastSettingsLoaded = CheckSettings(typeof(AzuraCastSettings));
+        return AzuraCastSettingsLoaded = CheckSettings(typeof(AcSettings));
     }
 }

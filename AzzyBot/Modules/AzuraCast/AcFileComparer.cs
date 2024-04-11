@@ -7,7 +7,7 @@ namespace AzzyBot.Modules.AzuraCast;
 /// <summary>
 /// Compares two FilesModel objects for equality.
 /// </summary>
-internal sealed class AzuraCastFileComparer : IEqualityComparer<FilesModel>
+internal sealed class AcFileComparer : IEqualityComparer<AcFilesModel>
 {
     /// <summary>
     /// Determines whether the specified FilesModel objects are equal.
@@ -15,7 +15,7 @@ internal sealed class AzuraCastFileComparer : IEqualityComparer<FilesModel>
     /// <param name="x">The first FilesModel object to compare.</param>
     /// <param name="y">The second FilesModel object to compare.</param>
     /// <returns>true if the specified FilesModel objects are equal; otherwise, false.</returns>
-    public bool Equals(FilesModel? x, FilesModel? y)
+    public bool Equals(AcFilesModel? x, AcFilesModel? y)
     {
         if (ReferenceEquals(x, y))
             return true;
@@ -31,7 +31,7 @@ internal sealed class AzuraCastFileComparer : IEqualityComparer<FilesModel>
     /// </summary>
     /// <param name="obj">The FilesModel object for which a hash code is to be returned.</param>
     /// <returns>A hash code for the specified object.</returns>
-    public int GetHashCode(FilesModel? obj)
+    public int GetHashCode(AcFilesModel? obj)
     {
         if (obj is null)
             return 0;

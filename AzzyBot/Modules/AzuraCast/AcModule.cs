@@ -24,7 +24,7 @@ internal sealed class AzuraCastModule : BaseModule
     internal static CoreFileLock? FileCacheLock;
     internal static CoreFileLock? PlaylistSlogansLock;
 
-    internal override void RegisterCommands(SlashCommandsExtension slashCommandsExtension, ulong? serverId) => slashCommandsExtension.RegisterCommands<AzuraCastCommands>(serverId);
+    internal override void RegisterCommands(SlashCommandsExtension slashCommandsExtension, ulong? serverId) => slashCommandsExtension.RegisterCommands<AcCommands>(serverId);
 
     internal override void RegisterFileLocks()
     {
@@ -63,11 +63,11 @@ internal sealed class AzuraCastModule : BaseModule
                 break;
 
             case ModuleEventType.GetAzuraCastApiUrl:
-                evt.ResultString = AzuraCastSettings.AzuraApiUrl;
+                evt.ResultString = AcSettings.AzuraApiUrl;
                 break;
 
             case ModuleEventType.GetAzuraCastIPv6Availability:
-                evt.ResultBool = AzuraCastSettings.Ipv6Available;
+                evt.ResultBool = AcSettings.Ipv6Available;
                 break;
         }
     }
@@ -166,7 +166,7 @@ internal sealed class AzuraCastModule : BaseModule
     internal static async Task CheckIfFilesWereModifiedAsync()
     {
         LastFileCheckRun = DateTime.Now;
-        await AzuraCastServer.CheckIfFilesWereModifiedAsync();
+        await AcServer.CheckIfFilesWereModifiedAsync();
     }
 
     internal static async Task<bool> CheckIfMusicServerIsOnlineAsync()
@@ -224,15 +224,15 @@ internal sealed class AzuraCastModule : BaseModule
             DateTime now = DateTime.Now;
 
             // 1 hour
-            if (AzuraCastSettings.AutomaticFileChangeCheck && now - LastFileCheckRun >= TimeSpan.FromHours(0.98))
+            if (AcSettings.AutomaticFileChangeCheck && now - LastFileCheckRun >= TimeSpan.FromHours(0.98))
             {
                 ExceptionHandler.LogMessage(LogLevel.Debug, "AzzyBotGlobalTimer checking for file changes");
                 LastFileCheckRun = now;
-                await AzuraCastServer.CheckIfFilesWereModifiedAsync();
+                await AcServer.CheckIfFilesWereModifiedAsync();
             }
 
             // 6 hours
-            if (AzuraCastSettings.AutomaticUpdateCheck && now - LastMusicServerUpdateCheck >= TimeSpan.FromHours(5.98))
+            if (AcSettings.AutomaticUpdateCheck && now - LastMusicServerUpdateCheck >= TimeSpan.FromHours(5.98))
             {
                 ExceptionHandler.LogMessage(LogLevel.Debug, "AzzyBotGlobalTimer checking for music server updates");
                 LastMusicServerUpdateCheck = now;
@@ -253,7 +253,7 @@ internal sealed class AzuraCastModule : BaseModule
         if (!IsMusicServerOnline)
             return;
 
-        AzuraCastUpdateModel updates = await AzuraCastServer.CheckIfMusicServerNeedsUpdatesAsync();
+        AcUpdateModel updates = await AcServer.CheckIfMusicServerNeedsUpdatesAsync();
 
         if (!updates.NeedsReleaseUpdate && !updates.NeedsRollingUpdate)
             return;
@@ -263,18 +263,18 @@ internal sealed class AzuraCastModule : BaseModule
             return;
 
         LastMusicServerUpdateNotify = now;
-        await AzzyBot.SendMessageAsync(AzuraCastSettings.OutagesChannelId, string.Empty, [AzuraCastEmbedBuilder.BuildUpdatesAvailableEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, updates)]);
+        await AzzyBot.SendMessageAsync(AcSettings.OutagesChannelId, string.Empty, [AcEmbedBuilder.BuildUpdatesAvailableEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, updates)]);
     }
 
     private static async Task PingMusicServerAsync()
     {
         // When empty the server is offline
-        if (string.IsNullOrWhiteSpace(await CoreWebRequests.TryPingAsync(AzuraCastSettings.AzuraApiUrl)))
+        if (string.IsNullOrWhiteSpace(await CoreWebRequests.TryPingAsync(AcSettings.AzuraApiUrl)))
         {
             IsMusicServerOnline = false;
 
-            if (AzuraCastSettings.AutomaticServerPing)
-                await AzzyBot.SendMessageAsync(AzuraCastSettings.OutagesChannelId, string.Empty, [AzuraCastEmbedBuilder.BuildServerIsOfflineEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, false)]);
+            if (AcSettings.AutomaticServerPing)
+                await AzzyBot.SendMessageAsync(AcSettings.OutagesChannelId, string.Empty, [AcEmbedBuilder.BuildServerIsOfflineEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, false)]);
         }
 
         // When the server was previously offline but is online again now
@@ -282,8 +282,8 @@ internal sealed class AzuraCastModule : BaseModule
         {
             IsMusicServerOnline = true;
 
-            if (AzuraCastSettings.AutomaticServerPing)
-                await AzzyBot.SendMessageAsync(AzuraCastSettings.OutagesChannelId, string.Empty, [AzuraCastEmbedBuilder.BuildServerIsOfflineEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, true)]);
+            if (AcSettings.AutomaticServerPing)
+                await AzzyBot.SendMessageAsync(AcSettings.OutagesChannelId, string.Empty, [AcEmbedBuilder.BuildServerIsOfflineEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, true)]);
         }
     }
 }

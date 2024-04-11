@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
-internal sealed class AzuraCastUpdateModel
+internal sealed class AcUpdateModel
 {
     [JsonProperty("currentRelease")]
     public string CurrentRelease { get; set; } = string.Empty;

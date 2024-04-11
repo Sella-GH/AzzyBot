@@ -110,11 +110,11 @@ internal static class MsLavalink
 
         if (hlsStream)
         {
-            url = string.Join("/", AzuraCastSettings.AzuraApiUrl.Replace("/api", string.Empty, StringComparison.OrdinalIgnoreCase), AzuraCastApiEnum.hls, MsSettings.MountPointStub);
+            url = string.Join("/", AcSettings.AzuraApiUrl.Replace("/api", string.Empty, StringComparison.OrdinalIgnoreCase), AcApiEnum.hls, MsSettings.MountPointStub);
         }
         else
         {
-            url = string.Join("/", AzuraCastSettings.AzuraApiUrl.Replace("/api", string.Empty, StringComparison.OrdinalIgnoreCase), AzuraCastApiEnum.listen, MsSettings.MountPointStub);
+            url = string.Join("/", AcSettings.AzuraApiUrl.Replace("/api", string.Empty, StringComparison.OrdinalIgnoreCase), AcApiEnum.listen, MsSettings.MountPointStub);
         }
 
         LavalinkTrack? track = await AzzyBot.GetAudioService.Tracks.LoadTrackAsync(url, trackLoadOptions);
@@ -163,7 +163,7 @@ internal static class MsLavalink
 
     internal static async Task<DiscordEmbed> GetSongLyricsAsync(InteractionContext ctx)
     {
-        NowPlayingData nowPlaying = await AzuraCastServer.GetNowPlayingAsync();
+        NowPlayingData nowPlaying = await AcServer.GetNowPlayingAsync();
 
         Lyrics lyrics = await GetLyricsFromGeniusAsync(nowPlaying.Now_Playing.Song.Text);
 

@@ -2,7 +2,7 @@ using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
-internal sealed class PlaylistModel
+internal sealed class AcPlaylistModel
 {
     [JsonProperty("name")]
     public string Name { get; set; } = string.Empty;

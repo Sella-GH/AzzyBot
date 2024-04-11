@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
-internal sealed class ConfigSlogansModel
+internal sealed class AcConfigSlogansModel
 {
     [JsonProperty(nameof(Slogans))]
     public Slogans Slogans { get; set; } = new();

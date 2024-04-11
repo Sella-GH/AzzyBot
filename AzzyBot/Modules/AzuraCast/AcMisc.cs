@@ -5,7 +5,7 @@ namespace AzzyBot.Modules.AzuraCast;
 /// <summary>
 /// Contains miscellaneous utility methods for AzuraCast.
 /// </summary>
-internal static class AzuraCastMisc
+internal static class AcMisc
 {
     /// <summary>
     /// Generates a progress bar string for a song.

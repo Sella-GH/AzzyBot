@@ -54,7 +54,7 @@ internal abstract class BaseSettings
             Environment.Exit(1);
         }
 
-        if (ActivateAzuraCast && !AzuraCastSettings.LoadAzuraCast())
+        if (ActivateAzuraCast && !AcSettings.LoadAzuraCast())
             throw new InvalidOperationException("AzuraCast settings can't be loaded");
 
         if (ActivateClubManagement && ActivateAzuraCast && !CmSettings.LoadClubManagement())
@@ -63,7 +63,7 @@ internal abstract class BaseSettings
         if (ActivateMusicStreaming && ActivateAzuraCast && !await MsSettings.LoadMusicStreamingAsync())
             throw new InvalidOperationException("MusicStreaming settings can't be loaded");
 
-        if ((ActivateAzuraCast || ActivateClubManagement) && (AzuraCastSettings.AutomaticFileChangeCheck || AzuraCastSettings.AutomaticServerPing || AzuraCastSettings.AutomaticUpdateCheck || CmSettings.AutomaticClubClosingCheck))
+        if ((ActivateAzuraCast || ActivateClubManagement) && (AcSettings.AutomaticFileChangeCheck || AcSettings.AutomaticServerPing || AcSettings.AutomaticUpdateCheck || CmSettings.AutomaticClubClosingCheck))
             ActivateTimers = true;
     }
 
@@ -75,7 +75,7 @@ internal abstract class BaseSettings
 
         if (ActivateAzuraCast)
         {
-            List<ulong> azuraCastChannels = CoreDiscordCommands.CheckIfChannelsExist(guild, [AzuraCastSettings.MusicRequestsChannelId, AzuraCastSettings.OutagesChannelId]);
+            List<ulong> azuraCastChannels = CoreDiscordCommands.CheckIfChannelsExist(guild, [AcSettings.MusicRequestsChannelId, AcSettings.OutagesChannelId]);
             if (azuraCastChannels.Count > 0)
             {
                 azuraCast = false;

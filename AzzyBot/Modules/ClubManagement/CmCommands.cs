@@ -29,7 +29,7 @@ internal sealed class CmCommands : ApplicationCommandModule
 
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AzuraCastEmbedBuilder.BuildServerIsOfflineEmbed(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl, false)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerIsOfflineEmbed(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl, false)));
                 return;
             }
 
@@ -53,7 +53,7 @@ internal sealed class CmCommands : ApplicationCommandModule
         }
 
         [SlashCommand("open-club", "Select a playlist and open the club")]
-        internal static async Task StaffOpenClubCommandAsync(InteractionContext ctx, [Autocomplete(typeof(PlaylistAutocomplete))][Option("playlist", "Select a playlist for the day")] string playlistId, [Option("custom-text", "Add some custom text to your opening message")] string slogan = "")
+        internal static async Task StaffOpenClubCommandAsync(InteractionContext ctx, [Autocomplete(typeof(AcPlaylistAutocomplete))][Option("playlist", "Select a playlist for the day")] string playlistId, [Option("custom-text", "Add some custom text to your opening message")] string slogan = "")
         {
             ExceptionHandler.LogMessage(LogLevel.Debug, "StaffOpenClubCommand requested");
 
@@ -61,7 +61,7 @@ internal sealed class CmCommands : ApplicationCommandModule
 
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AzuraCastEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
                 return;
             }
 

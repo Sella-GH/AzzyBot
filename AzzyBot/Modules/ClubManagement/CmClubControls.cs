@@ -23,19 +23,19 @@ internal static class CmClubControls
     internal static async Task CloseClubAsync()
     {
         // Get every playlist info
-        List<PlaylistModel>? playlists = await AzuraCastServer.GetPlaylistsAsync();
+        List<AcPlaylistModel>? playlists = await AcServer.GetPlaylistsAsync();
 
         if (playlists is null)
             throw new InvalidOperationException($"{nameof(playlists)} is null!");
 
-        foreach (PlaylistModel list in playlists)
+        foreach (AcPlaylistModel list in playlists)
         {
             //
             // Get the info about the specific playlist
             // IT'S ALWAYS playlist[0]!
             //
 
-            List<PlaylistModel> playlist = await AzuraCastServer.GetPlaylistsAsync(list.Id);
+            List<AcPlaylistModel> playlist = await AcServer.GetPlaylistsAsync(list.Id);
 
             //
             // Check the id of the playlist
@@ -52,16 +52,16 @@ internal static class CmClubControls
             {
                 if (!playlist[0].Is_enabled)
                 {
-                    await AzuraCastServer.TogglePlaylistAsync(playlist[0].Id);
+                    await AcServer.TogglePlaylistAsync(playlist[0].Id);
                 }
             }
             else if (playlist[0].Is_enabled)
             {
-                await AzuraCastServer.TogglePlaylistAsync(playlist[0].Id);
+                await AcServer.TogglePlaylistAsync(playlist[0].Id);
             }
         }
 
-        await AzuraCastServer.ChangeSongRequestAvailabilityAsync(false);
+        await AcServer.ChangeSongRequestAvailabilityAsync(false);
         CmModule.SetClubClosingInitiated(true);
         CmModule.SetClubClosing(DateTime.Now);
         CmModule.StartClubClosingTimer();
@@ -104,27 +104,27 @@ internal static class CmClubControls
         ArgumentException.ThrowIfNullOrWhiteSpace(playlistId, nameof(playlistId));
 
         int id = Convert.ToInt32(playlistId, CultureInfo.InvariantCulture);
-        List<PlaylistModel> playlist = await AzuraCastServer.GetPlaylistsAsync(id);
+        List<AcPlaylistModel> playlist = await AcServer.GetPlaylistsAsync(id);
 
         if (playlist.Count != 1)
             throw new InvalidOperationException("There are more playlists than one!");
 
         // Ensure that Closed is disabled and AllSongs is enabled
-        List<PlaylistModel> closed = await AzuraCastServer.GetPlaylistsAsync(CmSettings.AzuraClosedPlaylist);
-        List<PlaylistModel> allSongs = await AzuraCastServer.GetPlaylistsAsync(CmSettings.AzuraAllSongsPlaylist);
+        List<AcPlaylistModel> closed = await AcServer.GetPlaylistsAsync(CmSettings.AzuraClosedPlaylist);
+        List<AcPlaylistModel> allSongs = await AcServer.GetPlaylistsAsync(CmSettings.AzuraAllSongsPlaylist);
 
         if (closed.Count == 1 && closed[0].Is_enabled)
-            await AzuraCastServer.TogglePlaylistAsync(CmSettings.AzuraClosedPlaylist);
+            await AcServer.TogglePlaylistAsync(CmSettings.AzuraClosedPlaylist);
 
         if (allSongs.Count == 1 && !allSongs[0].Is_enabled)
-            await AzuraCastServer.TogglePlaylistAsync(CmSettings.AzuraAllSongsPlaylist);
+            await AcServer.TogglePlaylistAsync(CmSettings.AzuraAllSongsPlaylist);
 
         // Activate the playlist
-        await AzuraCastServer.TogglePlaylistAsync(id);
+        await AcServer.TogglePlaylistAsync(id);
 
         // Ensure that Song Requests are enabled
-        if (!await AzuraCastServer.CheckIfSongRequestsAreAllowedAsync())
-            await AzuraCastServer.ChangeSongRequestAvailabilityAsync(true);
+        if (!await AcServer.CheckIfSongRequestsAreAllowedAsync())
+            await AcServer.ChangeSongRequestAvailabilityAsync(true);
 
         CmModule.StopClubClosingTimer();
         CmModule.SetClubOpening(DateTime.Now);

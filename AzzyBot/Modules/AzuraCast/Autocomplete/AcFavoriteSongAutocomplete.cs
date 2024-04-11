@@ -13,7 +13,7 @@ namespace AzzyBot.Modules.AzuraCast.Autocomplete;
 /// <summary>
 /// Fills up the autocomplete for the FavoriteSong command.
 /// </summary>
-internal sealed class FavoriteSongAutocomplete : IAutocompleteProvider
+internal sealed class AcFavoriteSongAutocomplete : IAutocompleteProvider
 {
     public async Task<IEnumerable<DiscordAutoCompleteChoice>> Provider(AutocompleteContext ctx)
     {
@@ -25,7 +25,7 @@ internal sealed class FavoriteSongAutocomplete : IAutocompleteProvider
             throw new InvalidOperationException("json is empty");
 
         string? searchTerm = ctx.OptionValue.ToString();
-        FavoriteSongModel? userIds = JsonConvert.DeserializeObject<FavoriteSongModel>(json);
+        AcFavoriteSongModel? userIds = JsonConvert.DeserializeObject<AcFavoriteSongModel>(json);
 
         if (userIds is null)
             throw new InvalidOperationException($"{nameof(userIds)} is null");

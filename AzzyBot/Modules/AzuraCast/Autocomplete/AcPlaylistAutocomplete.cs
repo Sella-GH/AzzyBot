@@ -12,12 +12,12 @@ namespace AzzyBot.Modules.AzuraCast.Autocomplete;
 /// <summary>
 /// Fills up the autocomplete for the Commands responsible for playlists.
 /// </summary>
-internal sealed class PlaylistAutocomplete : IAutocompleteProvider
+internal sealed class AcPlaylistAutocomplete : IAutocompleteProvider
 {
     public async Task<IEnumerable<DiscordAutoCompleteChoice>> Provider(AutocompleteContext ctx)
     {
         // Fetch playlists and search term
-        List<PlaylistModel> playlists = await AzuraCastServer.GetPlaylistsAsync();
+        List<AcPlaylistModel> playlists = await AcServer.GetPlaylistsAsync();
         string? searchTerm = ctx.OptionValue.ToString();
         bool isAzuraCastCommand = ctx.Interaction.Data.Name == "azuracast";
         bool isStaffCommand = ctx.Interaction.Data.Name == "staff";
@@ -25,7 +25,7 @@ internal sealed class PlaylistAutocomplete : IAutocompleteProvider
         List<DiscordAutoCompleteChoice> choice = [];
 
         // Loop through all playlists
-        foreach (PlaylistModel playlist in playlists)
+        foreach (AcPlaylistModel playlist in playlists)
         {
             // Stop the counting if we're at 25
             if (choice.Count == 25)
@@ -48,7 +48,7 @@ internal sealed class PlaylistAutocomplete : IAutocompleteProvider
                     }
                     else
                     {
-                        choice.Add(new DiscordAutoCompleteChoice(playlist.Name.Replace($"({AzuraCastPlaylistKeywordsEnum.NOREQUESTS})", string.Empty, StringComparison.InvariantCultureIgnoreCase).Trim(), playlist.Short_name));
+                        choice.Add(new DiscordAutoCompleteChoice(playlist.Name.Replace($"({AcPlaylistKeywordsEnum.NOREQUESTS})", string.Empty, StringComparison.InvariantCultureIgnoreCase).Trim(), playlist.Short_name));
                     }
                 }
             }
@@ -61,7 +61,7 @@ internal sealed class PlaylistAutocomplete : IAutocompleteProvider
                 }
                 else
                 {
-                    choice.Add(new DiscordAutoCompleteChoice(playlist.Name.Replace($"({AzuraCastPlaylistKeywordsEnum.NOREQUESTS})", string.Empty, StringComparison.InvariantCultureIgnoreCase).Trim(), playlist.Short_name));
+                    choice.Add(new DiscordAutoCompleteChoice(playlist.Name.Replace($"({AcPlaylistKeywordsEnum.NOREQUESTS})", string.Empty, StringComparison.InvariantCultureIgnoreCase).Trim(), playlist.Short_name));
                 }
             }
         }

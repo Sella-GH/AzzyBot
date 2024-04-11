@@ -1,6 +1,6 @@
 namespace AzzyBot.Modules.AzuraCast.Enums;
 
-internal enum AzuraCastApiEnum
+internal enum AcApiEnum
 {
     admin,
     art,

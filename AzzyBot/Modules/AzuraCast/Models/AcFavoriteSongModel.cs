@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
-internal sealed class FavoriteSongModel
+internal sealed class AcFavoriteSongModel
 {
     [JsonProperty(nameof(UserSongList))]
     public List<UserSongList> UserSongList { get; set; } = [];
