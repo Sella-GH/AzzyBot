@@ -33,6 +33,9 @@ internal static class CoreWebRequests
         Timeout = TimeSpan.FromSeconds(15)
     };
 
+    /// <summary>
+    /// General HttpClient which prefers IPv6
+    /// </summary>
     private static readonly HttpClient Client = new()
     {
         DefaultRequestVersion = new(1, 1),
@@ -40,7 +43,27 @@ internal static class CoreWebRequests
         Timeout = TimeSpan.FromSeconds(30)
     };
 
-    internal static async Task<string> GetWebAsync(string url, Dictionary<string, string>? headers = null, bool ipv6 = true, bool apiKeyCheck = false)
+    internal static HttpClient GetHttpClientV4(Dictionary<string, string> headers)
+    {
+        if (headers.Count is 0)
+            return ClientV4;
+
+        AddHeaders(headers, false);
+
+        return ClientV4;
+    }
+
+    internal static HttpClient GetHttpClient(Dictionary<string, string> headers)
+    {
+        if (headers.Count is 0)
+            return Client;
+
+        AddHeaders(headers);
+
+        return Client;
+    }
+
+    internal static async Task<string> GetWebAsync(string url, Dictionary<string, string>? headers = null, bool ipv6 = true)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
 
@@ -54,9 +77,6 @@ internal static class CoreWebRequests
 
             using (HttpResponseMessage response = await client.GetAsync(new Uri(url)))
             {
-                if (apiKeyCheck && response.StatusCode == HttpStatusCode.Unauthorized)
-                    return string.Empty;
-
                 response.EnsureSuccessStatusCode();
                 content = await response.Content.ReadAsStringAsync();
             }

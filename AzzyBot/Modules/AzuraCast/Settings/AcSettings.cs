@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AzzyBot.Modules.AzuraCast.Enums;
 using AzzyBot.Modules.Core;
+using DSharpPlus.Entities;
 
 namespace AzzyBot.Modules.AzuraCast.Settings;
 
@@ -61,6 +63,22 @@ internal sealed class AcSettings : BaseSettings
 
         string url = string.Join("/", AzuraApiUrl, AcApiEnum.station, AzuraStationKey, AcApiEnum.files);
 
-        return !string.IsNullOrWhiteSpace(await CoreWebRequests.GetWebAsync(url, headers, Ipv6Available, true));
+        try
+        {
+            HttpClient client = (Ipv6Available) ? CoreWebRequests.GetHttpClient(headers) : CoreWebRequests.GetHttpClientV4(headers);
+
+            using (HttpResponseMessage response = await client.GetAsync(new Uri(url)))
+            {
+                if (response.StatusCode is System.Net.HttpStatusCode.Unauthorized)
+                    return false;
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            await Console.Error.WriteLineAsync(ex.Message);
+            throw;
+        }
     }
 }
