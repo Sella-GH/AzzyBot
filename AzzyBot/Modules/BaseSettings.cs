@@ -63,7 +63,7 @@ internal abstract class BaseSettings
         if (ActivateMusicStreaming && ActivateAzuraCast && !await MsSettings.LoadMusicStreamingAsync())
             throw new InvalidOperationException("MusicStreaming settings can't be loaded");
 
-        if ((ActivateAzuraCast || ActivateClubManagement) && (AcSettings.AutomaticFileChangeCheck || AcSettings.AutomaticServerPing || AcSettings.AutomaticUpdateCheck || CmSettings.AutomaticClubClosingCheck))
+        if ((ActivateAzuraCast || ActivateClubManagement) && (AcSettings.AutomaticChecksFileChanges || AcSettings.AutomaticChecksServerPing || AcSettings.AutomaticChecksUpdates || CmSettings.AutomaticClubClosingCheck))
             ActivateTimers = true;
     }
 

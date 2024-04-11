@@ -224,7 +224,7 @@ internal sealed class AzuraCastModule : BaseModule
             DateTime now = DateTime.Now;
 
             // 1 hour
-            if (AcSettings.AutomaticFileChangeCheck && now - LastFileCheckRun >= TimeSpan.FromHours(0.98))
+            if (AcSettings.AutomaticChecksFileChanges && now - LastFileCheckRun >= TimeSpan.FromHours(0.98))
             {
                 ExceptionHandler.LogMessage(LogLevel.Debug, "AzzyBotGlobalTimer checking for file changes");
                 LastFileCheckRun = now;
@@ -232,7 +232,7 @@ internal sealed class AzuraCastModule : BaseModule
             }
 
             // 6 hours
-            if (AcSettings.AutomaticUpdateCheck && now - LastMusicServerUpdateCheck >= TimeSpan.FromHours(5.98))
+            if (AcSettings.AutomaticChecksUpdates && now - LastMusicServerUpdateCheck >= TimeSpan.FromHours(5.98))
             {
                 ExceptionHandler.LogMessage(LogLevel.Debug, "AzzyBotGlobalTimer checking for music server updates");
                 LastMusicServerUpdateCheck = now;
@@ -273,7 +273,7 @@ internal sealed class AzuraCastModule : BaseModule
         {
             IsMusicServerOnline = false;
 
-            if (AcSettings.AutomaticServerPing)
+            if (AcSettings.AutomaticChecksServerPing)
                 await AzzyBot.SendMessageAsync(AcSettings.OutagesChannelId, string.Empty, [AcEmbedBuilder.BuildServerIsOfflineEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, false)]);
         }
 
@@ -282,7 +282,7 @@ internal sealed class AzuraCastModule : BaseModule
         {
             IsMusicServerOnline = true;
 
-            if (AcSettings.AutomaticServerPing)
+            if (AcSettings.AutomaticChecksServerPing)
                 await AzzyBot.SendMessageAsync(AcSettings.OutagesChannelId, string.Empty, [AcEmbedBuilder.BuildServerIsOfflineEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, true)]);
         }
     }
