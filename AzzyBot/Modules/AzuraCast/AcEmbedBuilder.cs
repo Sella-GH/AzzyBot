@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Modules.AzuraCast.Enums;
 using AzzyBot.Modules.AzuraCast.Models;
+using AzzyBot.Modules.AzuraCast.Settings;
 using AzzyBot.Modules.AzuraCast.Strings;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Settings;
@@ -135,75 +136,78 @@ internal static class AcEmbedBuilder
             fields.Add(data.Name, data);
         }
 
-        // Reverse to be historically correct
-        model.RollingUpdatesList.Reverse();
-
-        // Split the changelog if it's too big
-        const int MaxCharacters = 1024;
-        const int MaxParts = 20;
-        const int MaxEmbedLength = 6000;
-        StringBuilder updateList = new();
-        int partNumber = 1;
-
-        // Count the length of every item in the embed
-        bool isTooBig = false;
-        int embedLength = title.Length + description.Length;
-        foreach (KeyValuePair<string, DiscordEmbedStruct> field in fields)
+        if (AcSettings.AutomaticChecksUpdatesShowChangelog)
         {
-            embedLength += field.Key.Length + field.Value.Description.Length;
-        }
+            // Reverse to be historically correct
+            model.RollingUpdatesList.Reverse();
 
-        // Create new dictionary because we need the ability to delete it afterwards
-        Dictionary<string, string> kvp = [];
+            // Split the changelog if it's too big
+            const int MaxCharacters = 1024;
+            const int MaxParts = 20;
+            const int MaxEmbedLength = 6000;
+            StringBuilder updateList = new();
+            int partNumber = 1;
 
-        foreach (string update in model.RollingUpdatesList)
-        {
-            string newLine = $"- {update}\n";
-
-            // Check if adding the new line exceeds the character limit or maximum parts limit
-            if (updateList.Length + newLine.Length < MaxCharacters || partNumber < MaxParts)
+            // Count the length of every item in the embed
+            bool isTooBig = false;
+            int embedLength = title.Length + description.Length;
+            foreach (KeyValuePair<string, DiscordEmbedStruct> field in fields)
             {
-                string key = AcStringBuilder.GetEmbedAzuraChangelogPart(partNumber);
-                string value = updateList.ToString();
-                kvp.Add(key, value);
-                updateList.Clear();
-                partNumber++;
+                embedLength += field.Key.Length + field.Value.Description.Length;
+            }
 
-                embedLength += key.Length + value.Length;
+            // Create new dictionary because we need the ability to delete it afterwards
+            Dictionary<string, string> kvp = [];
 
-                if (partNumber > MaxParts || embedLength > MaxEmbedLength || value.Length == 0)
+            foreach (string update in model.RollingUpdatesList)
+            {
+                string newLine = $"- {update}\n";
+
+                // Check if adding the new line exceeds the character limit or maximum parts limit
+                if (updateList.Length + newLine.Length < MaxCharacters || partNumber < MaxParts)
+                {
+                    string key = AcStringBuilder.GetEmbedAzuraChangelogPart(partNumber);
+                    string value = updateList.ToString();
+                    kvp.Add(key, value);
+                    updateList.Clear();
+                    partNumber++;
+
+                    embedLength += key.Length + value.Length;
+
+                    if (partNumber > MaxParts || embedLength > MaxEmbedLength || value.Length == 0)
+                    {
+                        isTooBig = true;
+                        break;
+                    }
+                }
+                else
                 {
                     isTooBig = true;
                     break;
                 }
+
+                // Add the new line to the current part
+                updateList.Append(newLine);
             }
-            else
+
+            // Add the last part if there's any content left and within the max parts limit
+            if (updateList.Length > 0 && partNumber <= MaxParts && !isTooBig)
             {
-                isTooBig = true;
-                break;
+                foreach (KeyValuePair<string, string> field in kvp)
+                {
+                    fields.Add(field.Key, new(field.Key, field.Value, false));
+                }
+
+                data = AcStringBuilder.GetEmbedAzuraChangelog(partNumber, updateList.ToString());
+                fields.Add(data.Name, data);
             }
 
-            // Add the new line to the current part
-            updateList.Append(newLine);
-        }
-
-        // Add the last part if there's any content left and within the max parts limit
-        if (updateList.Length > 0 && partNumber <= MaxParts && !isTooBig)
-        {
-            foreach (KeyValuePair<string, string> field in kvp)
+            // Check if length exceeds and display manual changelog message
+            if (isTooBig)
             {
-                fields.Add(field.Key, new(field.Key, field.Value, false));
+                data = AcStringBuilder.GetEmbedAzuraTooBig(model.NeedsReleaseUpdate);
+                fields.Add(data.Name, data);
             }
-
-            data = AcStringBuilder.GetEmbedAzuraChangelog(partNumber, updateList.ToString());
-            fields.Add(data.Name, data);
-        }
-
-        // Check if length exceeds and display manual changelog message
-        if (isTooBig)
-        {
-            data = AcStringBuilder.GetEmbedAzuraTooBig(model.NeedsReleaseUpdate);
-            fields.Add(data.Name, data);
         }
 
         return CoreEmbedBuilder.CreateBasicEmbed(title, description, userName, userAvatarUrl, DiscordColor.IndianRed, AzuraCastLogo, string.Empty, string.Empty, fields);
