@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace AzzyBot.Modules.Core;
+namespace AzzyBot.Modules.Core.Settings;
 
 internal sealed class CoreSettings : BaseSettings
 {

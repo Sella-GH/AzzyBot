@@ -3,6 +3,7 @@ using AzzyBot.Commands.Attributes;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.AzuraCast.Autocomplete;
+using AzzyBot.Modules.ClubManagement.Settings;
 using AzzyBot.Modules.ClubManagement.Strings;
 using AzzyBot.Modules.Core;
 using DSharpPlus;

@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.AzuraCast.Models;
+using AzzyBot.Modules.AzuraCast.Settings;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
 using DSharpPlus.SlashCommands;

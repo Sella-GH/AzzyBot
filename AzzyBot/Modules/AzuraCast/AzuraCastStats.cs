@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Threading.Tasks;
 using AzzyBot.Modules.AzuraCast.Enums;
 using AzzyBot.Modules.AzuraCast.Models;
+using AzzyBot.Modules.AzuraCast.Settings;
 using AzzyBot.Modules.Core;
 using DSharpPlus.Entities;
 using Newtonsoft.Json;

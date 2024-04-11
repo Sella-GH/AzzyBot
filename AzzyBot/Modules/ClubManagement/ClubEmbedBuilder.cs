@@ -6,6 +6,7 @@ using AzzyBot.Modules.AzuraCast.Enums;
 using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.ClubManagement.Strings;
 using AzzyBot.Modules.Core;
+using AzzyBot.Modules.Core.Settings;
 using DSharpPlus.Entities;
 
 namespace AzzyBot.Modules.ClubManagement;

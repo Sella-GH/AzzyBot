@@ -3,7 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace AzzyBot.Modules.MusicStreaming;
+namespace AzzyBot.Modules.MusicStreaming.Settings;
 
 internal sealed class MusicStreamingSettings : BaseSettings
 {

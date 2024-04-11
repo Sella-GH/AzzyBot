@@ -1,8 +1,12 @@
 using System;
 using AzzyBot.Modules.AzuraCast;
+using AzzyBot.Modules.AzuraCast.Settings;
 using AzzyBot.Modules.ClubManagement;
+using AzzyBot.Modules.ClubManagement.Settings;
 using AzzyBot.Modules.Core;
+using AzzyBot.Modules.Core.Settings;
 using AzzyBot.Modules.MusicStreaming;
+using AzzyBot.Modules.MusicStreaming.Settings;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 

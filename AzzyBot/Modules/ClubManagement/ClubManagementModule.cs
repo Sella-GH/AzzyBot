@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.AzuraCast.Models;
+using AzzyBot.Modules.ClubManagement.Settings;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
 using DSharpPlus.SlashCommands;

@@ -1,5 +1,6 @@
 using System;
 using AzzyBot.Modules.Core.Enums;
+using AzzyBot.Modules.Core.Settings;
 using AzzyBot.Modules.Core.Updater;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;

@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 
-namespace AzzyBot.Modules.ClubManagement;
+namespace AzzyBot.Modules.ClubManagement.Settings;
 
 internal sealed class ClubManagementSettings : BaseSettings
 {

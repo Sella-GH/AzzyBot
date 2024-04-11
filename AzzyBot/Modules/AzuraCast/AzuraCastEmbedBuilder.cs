@@ -7,6 +7,7 @@ using AzzyBot.Modules.AzuraCast.Enums;
 using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.AzuraCast.Strings;
 using AzzyBot.Modules.Core;
+using AzzyBot.Modules.Core.Settings;
 using AzzyBot.Modules.Core.Structs;
 using DSharpPlus.Entities;
 
