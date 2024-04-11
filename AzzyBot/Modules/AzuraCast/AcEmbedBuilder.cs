@@ -290,17 +290,20 @@ internal static class AcEmbedBuilder
             dataStruct = AcStringBuilder.GetEmbedAzuraNowPlayingDuration(duration, songElapsed, songDuration);
             fields.Add(dataStruct.Name, dataStruct);
 
-            List<AcPlaylistModel> playlists = await AcServer.GetPlaylistsAsync();
-            if (playlists.Count is not 0)
+            if (AcSettings.ShowPlaylistsInNowPlaying)
             {
-                foreach (AcPlaylistModel playlist in playlists)
+                List<AcPlaylistModel> playlists = await AcServer.GetPlaylistsAsync();
+                if (playlists.Count is not 0)
                 {
-                    if (playlist.Name == data.Now_Playing.Playlist && !AzuraCastModule.CheckIfDeniedPlaylist(playlist.Id))
+                    foreach (AcPlaylistModel playlist in playlists)
                     {
-                        dataStruct = AcStringBuilder.GetEmbedAzuraNowPlayingPlaylist(data.Now_Playing.Playlist.Replace($"({AcPlaylistKeywordsEnum.NOREQUESTS})", string.Empty, StringComparison.InvariantCultureIgnoreCase).Trim());
-                        fields.Add(dataStruct.Name, dataStruct);
+                        if (playlist.Name == data.Now_Playing.Playlist && !AzuraCastModule.CheckIfDeniedPlaylist(playlist.Id))
+                        {
+                            dataStruct = AcStringBuilder.GetEmbedAzuraNowPlayingPlaylist(data.Now_Playing.Playlist.Replace($"({AcPlaylistKeywordsEnum.NOREQUESTS})", string.Empty, StringComparison.InvariantCultureIgnoreCase).Trim());
+                            fields.Add(dataStruct.Name, dataStruct);
 
-                        break;
+                            break;
+                        }
                     }
                 }
             }
