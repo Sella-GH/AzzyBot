@@ -129,7 +129,7 @@ internal static class AzzyBot
 
         ExceptionHandler.LogMessage(LogLevel.Debug, "Starting all processes");
         BaseModule.StartAllProcesses();
-        await Task.Delay(1000);
+        await Task.Delay(3000);
         ExceptionHandler.LogMessage(LogLevel.Debug, "Started all processes");
 
         #endregion Initialize Processes
