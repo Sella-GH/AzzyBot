@@ -5,7 +5,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AzzyBot.Modules.AzuraCast.Enums;
 using AzzyBot.Modules.Core;
-using DSharpPlus.Entities;
 
 namespace AzzyBot.Modules.AzuraCast.Settings;
 
