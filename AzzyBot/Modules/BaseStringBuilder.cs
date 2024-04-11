@@ -16,13 +16,13 @@ internal abstract class BaseStringBuilder
         if (!await CoreStringBuilder.LoadCoreStringsAsync())
             throw new InvalidOperationException("Core strings can't be loaded");
 
-        if (BaseSettings.ActivateAzuraCast && !await AzuraCastStringBuilder.LoadAzuraCastStringsAsync())
+        if (ModuleStates.AzuraCast && !await AzuraCastStringBuilder.LoadAzuraCastStringsAsync())
             throw new InvalidOperationException("AzuraCast strings can't be loaded");
 
-        if (BaseSettings.ActivateClubManagement && !await ClubManagementStringBuilder.LoadClubManagementStringsAsync())
+        if (ModuleStates.ClubManagement && !await ClubManagementStringBuilder.LoadClubManagementStringsAsync())
             throw new InvalidOperationException("ClubManagement strings can't be loaded");
 
-        if (BaseSettings.ActivateMusicStreaming && !await MusicStreamingStringBuilder.LoadMusicStreamingStringsAsync())
+        if (ModuleStates.MusicStreaming && !await MusicStreamingStringBuilder.LoadMusicStreamingStringsAsync())
             throw new InvalidOperationException("MusicStreaming strings can't be loaded");
     }
 
