@@ -221,11 +221,8 @@ internal static class AzzyBot
 
     private static void AddEventHandlers()
     {
-        if (DiscordClient is null)
-            throw new InvalidOperationException("DiscordClient is null!");
-
-        if (SlashCommands is null)
-            throw new InvalidOperationException("SlashCommands is null!");
+        ArgumentNullException.ThrowIfNull(DiscordClient);
+        ArgumentNullException.ThrowIfNull(SlashCommands);
 
         DiscordClient.ClientErrored += DiscordClientError.DiscordErrorAsync;
         DiscordClient.GuildDownloadCompleted += GuildDownloadedAsync;
@@ -238,11 +235,8 @@ internal static class AzzyBot
 
     private static void RemoveEventHandlers()
     {
-        if (DiscordClient is null)
-            throw new InvalidOperationException("DiscordClient is null!");
-
-        if (SlashCommands is null)
-            throw new InvalidOperationException("SlashCommands is null!");
+        ArgumentNullException.ThrowIfNull(DiscordClient);
+        ArgumentNullException.ThrowIfNull(SlashCommands);
 
         DiscordClient.ClientErrored -= DiscordClientError.DiscordErrorAsync;
         DiscordClient.GuildDownloadCompleted -= GuildDownloadedAsync;
@@ -478,12 +472,12 @@ internal static class AzzyBot
     /// <exception cref="IOException">Throws when the file can not be deleted.</exception>
     internal static async Task<bool> SendMessageAsync(ulong channelId, string content, DiscordEmbed embed, string fileName, bool mention = false)
     {
+        ArgumentNullException.ThrowIfNull(DiscordClient);
+        ArgumentOutOfRangeException.ThrowIfZero(channelId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+
         try
         {
-            ArgumentNullException.ThrowIfNull(DiscordClient);
-            ArgumentOutOfRangeException.ThrowIfZero(channelId);
-            ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
-
             FileStream stream = new(fileName, FileMode.Open, FileAccess.Read);
 
             DiscordMessageBuilder builder = new();
@@ -525,13 +519,13 @@ internal static class AzzyBot
     /// <exception cref="IOException">Throws when the file can not be deleted.</exception>
     internal static async Task<bool> SendMessageAsync(ulong channelId, string content, DiscordEmbed embed, string[] fileNames)
     {
+        ArgumentNullException.ThrowIfNull(DiscordClient);
+        ArgumentOutOfRangeException.ThrowIfZero(channelId);
+        ArgumentNullException.ThrowIfNull(fileNames);
+        ArgumentOutOfRangeException.ThrowIfZero(fileNames.Length);
+
         try
         {
-            ArgumentNullException.ThrowIfNull(DiscordClient);
-            ArgumentOutOfRangeException.ThrowIfZero(channelId);
-            ArgumentNullException.ThrowIfNull(fileNames);
-            ArgumentOutOfRangeException.ThrowIfZero(fileNames.Length);
-
             DiscordMessageBuilder builder = new();
             if (!string.IsNullOrWhiteSpace(content))
                 builder.WithContent(content);
