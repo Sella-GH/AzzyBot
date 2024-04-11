@@ -44,7 +44,7 @@ internal sealed class AcSettings : BaseSettings
 
         AzuraCastApiKeyIsValid = await CheckIfApiKeyIsValidAsync();
         if (!AzuraCastApiKeyIsValid)
-            await Console.Out.WriteLineAsync("AzuraCast api key is not valid!");
+            await Console.Error.WriteLineAsync("AzuraCast api key is not valid!");
 
         return AzuraCastSettingsLoaded = CheckSettings(typeof(AcSettings));
     }
@@ -68,7 +68,7 @@ internal sealed class AcSettings : BaseSettings
 
             using (HttpResponseMessage response = await client.GetAsync(new Uri(url)))
             {
-                if (response.StatusCode is System.Net.HttpStatusCode.Unauthorized)
+                if (response.StatusCode is System.Net.HttpStatusCode.Forbidden)
                     return false;
             }
 
