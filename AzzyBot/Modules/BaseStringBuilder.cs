@@ -22,7 +22,7 @@ internal abstract class BaseStringBuilder
         if (ModuleStates.ClubManagement && !await ClubManagementStringBuilder.LoadClubManagementStringsAsync())
             throw new InvalidOperationException("ClubManagement strings can't be loaded");
 
-        if (ModuleStates.MusicStreaming && !await MusicStreamingStringBuilder.LoadMusicStreamingStringsAsync())
+        if (ModuleStates.MusicStreaming && !await MsStringBuilder.LoadMusicStreamingStringsAsync())
             throw new InvalidOperationException("MusicStreaming strings can't be loaded");
     }
 

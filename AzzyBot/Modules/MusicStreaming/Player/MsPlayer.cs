@@ -9,9 +9,9 @@ using Lavalink4NET.Players;
 
 namespace AzzyBot.Modules.MusicStreaming.Player;
 
-internal sealed class MusicStreamingPlayer : LavalinkPlayer, IInactivityPlayerListener
+internal sealed class MsPlayer : LavalinkPlayer, IInactivityPlayerListener
 {
-    internal MusicStreamingPlayer(IPlayerProperties<MusicStreamingPlayer, MusicStreamingPlayerOptions> properties) : base(properties)
+    internal MsPlayer(IPlayerProperties<MsPlayer, MsPlayerOptions> properties) : base(properties)
     { }
 
     public async ValueTask NotifyPlayerActiveAsync(PlayerTrackingState trackingState, CancellationToken cancellationToken = default)
@@ -19,12 +19,12 @@ internal sealed class MusicStreamingPlayer : LavalinkPlayer, IInactivityPlayerLi
         // This method is called when the player was previously inactive and is now active again.
         cancellationToken.ThrowIfCancellationRequested();
 
-        DiscordChannel? channel = MusicStreamingLavalink.GetRequestChannel;
+        DiscordChannel? channel = MsLavalink.GetRequestChannel;
 
         if (channel is null)
             return;
 
-        await channel.SendMessageAsync(MusicStreamingStringBuilder.GetCustomPlayerIsActiveAgain);
+        await channel.SendMessageAsync(MsStringBuilder.GetCustomPlayerIsActiveAgain);
     }
 
     public async ValueTask NotifyPlayerInactiveAsync(PlayerTrackingState trackingState, CancellationToken cancellationToken = default)
@@ -32,12 +32,12 @@ internal sealed class MusicStreamingPlayer : LavalinkPlayer, IInactivityPlayerLi
         // This method is called when the player reached the inactivity deadline.
         cancellationToken.ThrowIfCancellationRequested();
 
-        DiscordChannel? channel = MusicStreamingLavalink.GetRequestChannel;
+        DiscordChannel? channel = MsLavalink.GetRequestChannel;
 
         if (channel is null)
             return;
 
-        await channel.SendMessageAsync(MusicStreamingStringBuilder.GetCustomPlayerLeaves);
+        await channel.SendMessageAsync(MsStringBuilder.GetCustomPlayerLeaves);
     }
 
     public async ValueTask NotifyPlayerTrackedAsync(PlayerTrackingState trackingState, CancellationToken cancellationToken = default)
@@ -45,18 +45,18 @@ internal sealed class MusicStreamingPlayer : LavalinkPlayer, IInactivityPlayerLi
         // This method is called when the player was previously active and is now inactive.
         cancellationToken.ThrowIfCancellationRequested();
 
-        DiscordChannel? channel = MusicStreamingLavalink.GetRequestChannel;
-        DiscordChannel? voiceChannel = MusicStreamingLavalink.GetVoiceChannel;
+        DiscordChannel? channel = MsLavalink.GetRequestChannel;
+        DiscordChannel? voiceChannel = MsLavalink.GetVoiceChannel;
 
         if (channel is null || voiceChannel is null)
             return;
 
         if (voiceChannel.Users.Count == 1)
         {
-            await channel.SendMessageAsync(MusicStreamingStringBuilder.GetCustomPlayerIsInactiveUsers(MusicStreamingSettings.AutoDisconnectTime));
+            await channel.SendMessageAsync(MsStringBuilder.GetCustomPlayerIsInactiveUsers(MsSettings.AutoDisconnectTime));
             return;
         }
 
-        await channel.SendMessageAsync(MusicStreamingStringBuilder.GetCustomPlayerIsInactivePlaying(MusicStreamingSettings.AutoDisconnectTime));
+        await channel.SendMessageAsync(MsStringBuilder.GetCustomPlayerIsInactivePlaying(MsSettings.AutoDisconnectTime));
     }
 }

@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.MusicStreaming;
 
-internal static class MusicStreamingLavalinkHandler
+internal static class MsLavalinkHandler
 {
     private static Process? LavalinkProcess;
 
@@ -105,7 +105,7 @@ internal static class MusicStreamingLavalinkHandler
                 return false;
             }
 
-            if (MusicStreamingSettings.ActivateLyrics && !await CheckIfLavalinkConfigIsRightAsync())
+            if (MsSettings.ActivateLyrics && !await CheckIfLavalinkConfigIsRightAsync())
                 return false;
 
             ProcessStartInfo processStartInfo = new()
@@ -150,7 +150,7 @@ internal static class MusicStreamingLavalinkHandler
             LavalinkProcess.Dispose();
 
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files", "logs");
-            if (MusicStreamingSettings.DeleteLavalinkLogs && Directory.Exists(path))
+            if (MsSettings.DeleteLavalinkLogs && Directory.Exists(path))
                 Directory.Delete(path, true);
 
             return true;

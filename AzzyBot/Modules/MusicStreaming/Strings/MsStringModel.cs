@@ -1,6 +1,6 @@
 ﻿namespace AzzyBot.Modules.MusicStreaming.Strings;
 
-internal sealed class MusicStreamingStringModel
+internal sealed class MsStringModel
 {
     #region Commands
 

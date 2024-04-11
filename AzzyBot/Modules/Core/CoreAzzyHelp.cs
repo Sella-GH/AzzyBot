@@ -108,7 +108,7 @@ internal static class CoreAzzyHelp
             allowedCommands.Add(typeof(ClubManagementCommands));
 
         if (ModuleStates.AzuraCast && ModuleStates.MusicStreaming)
-            allowedCommands.Add(typeof(MusicStreamingCommands));
+            allowedCommands.Add(typeof(MsCommands));
 
         return allowedCommands;
     }

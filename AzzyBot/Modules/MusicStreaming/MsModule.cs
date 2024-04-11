@@ -4,24 +4,24 @@ using DSharpPlus.SlashCommands;
 
 namespace AzzyBot.Modules.MusicStreaming;
 
-internal sealed class MusicStreamingModule : BaseModule
+internal sealed class MsModule : BaseModule
 {
-    internal override void RegisterCommands(SlashCommandsExtension slashCommandsExtension, ulong? serverId) => slashCommandsExtension.RegisterCommands<MusicStreamingCommands>(serverId);
+    internal override void RegisterCommands(SlashCommandsExtension slashCommandsExtension, ulong? serverId) => slashCommandsExtension.RegisterCommands<MsCommands>(serverId);
 
     protected override void HandleModuleEvent(ModuleEvent evt)
     {
         switch (evt.Type)
         {
             case ModuleEventType.GetMusicStreamingInactivity:
-                evt.ResultBool = MusicStreamingSettings.AutoDisconnect;
+                evt.ResultBool = MsSettings.AutoDisconnect;
                 break;
 
             case ModuleEventType.GetMusicStreamingInactivityTime:
-                evt.ResultInt = MusicStreamingSettings.AutoDisconnectTime;
+                evt.ResultInt = MsSettings.AutoDisconnectTime;
                 break;
 
             case ModuleEventType.GetMusicStreamingLyrics:
-                evt.ResultBool = MusicStreamingSettings.ActivateLyrics;
+                evt.ResultBool = MsSettings.ActivateLyrics;
                 break;
         }
     }
@@ -31,10 +31,10 @@ internal sealed class MusicStreamingModule : BaseModule
         if (GetAzzyBotName() is "AzzyBot-Docker")
             return;
 
-        if (!await MusicStreamingLavalinkHandler.CheckIfJavaIsInstalledAsync())
+        if (!await MsLavalinkHandler.CheckIfJavaIsInstalledAsync())
             throw new InvalidOperationException("You have to install Java/OpenJDK Runtime 17 or 21 first!");
 
-        if (!await MusicStreamingLavalinkHandler.StartLavalinkAsync())
+        if (!await MsLavalinkHandler.StartLavalinkAsync())
             throw new InvalidOperationException("Lavalink failed to start!");
     }
 
@@ -43,7 +43,7 @@ internal sealed class MusicStreamingModule : BaseModule
         if (GetAzzyBotName() is "AzzyBot-Docker")
             return;
 
-        await MusicStreamingLavalinkHandler.StopLavalinkAsync();
+        await MsLavalinkHandler.StopLavalinkAsync();
     }
 
     internal override void Activate() => ModuleStates.ActivateMusicStreaming();

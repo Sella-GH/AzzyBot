@@ -60,7 +60,7 @@ internal abstract class BaseSettings
         if (ActivateClubManagement && ActivateAzuraCast && !ClubManagementSettings.LoadClubManagement())
             throw new InvalidOperationException("ClubManagement settings can't be loaded");
 
-        if (ActivateMusicStreaming && ActivateAzuraCast && !await MusicStreamingSettings.LoadMusicStreamingAsync())
+        if (ActivateMusicStreaming && ActivateAzuraCast && !await MsSettings.LoadMusicStreamingAsync())
             throw new InvalidOperationException("MusicStreaming settings can't be loaded");
 
         if ((ActivateAzuraCast || ActivateClubManagement) && (AzuraCastSettings.AutomaticFileChangeCheck || AzuraCastSettings.AutomaticServerPing || AzuraCastSettings.AutomaticUpdateCheck || ClubManagementSettings.AutomaticClubClosingCheck))

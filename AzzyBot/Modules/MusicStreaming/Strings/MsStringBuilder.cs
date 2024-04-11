@@ -8,9 +8,9 @@ using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.MusicStreaming.Strings;
 
-internal sealed class MusicStreamingStringBuilder : BaseStringBuilder
+internal sealed class MsStringBuilder : BaseStringBuilder
 {
-    private static MusicStreamingStringModel Model = new();
+    private static MsStringModel Model = new();
 
     internal static async Task<bool> LoadMusicStreamingStringsAsync()
     {
@@ -21,7 +21,7 @@ internal sealed class MusicStreamingStringBuilder : BaseStringBuilder
 
         if (!string.IsNullOrWhiteSpace(content))
         {
-            MusicStreamingStringModel? newModel = JsonConvert.DeserializeObject<MusicStreamingStringModel>(content);
+            MsStringModel? newModel = JsonConvert.DeserializeObject<MsStringModel>(content);
             if (newModel is not null)
             {
                 // Reference assignment is atomic in .NET, so this is thread safe.

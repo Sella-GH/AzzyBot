@@ -2,6 +2,6 @@
 
 namespace AzzyBot.Modules.MusicStreaming.Player;
 
-internal sealed record class MusicStreamingPlayerOptions : LavalinkPlayerOptions
+internal sealed record class MsPlayerOptions : LavalinkPlayerOptions
 {
 }

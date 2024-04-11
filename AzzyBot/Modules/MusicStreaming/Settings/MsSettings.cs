@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AzzyBot.Modules.MusicStreaming.Settings;
 
-internal sealed class MusicStreamingSettings : BaseSettings
+internal sealed class MsSettings : BaseSettings
 {
     internal static bool MusicStreamingSettingsLoaded { get; private set; }
     internal static bool ActivateLyrics { get; private set; }
@@ -28,7 +28,7 @@ internal sealed class MusicStreamingSettings : BaseSettings
         MountPointStub = Config["MusicStreaming:MountPointStub"] ?? string.Empty;
         DeleteLavalinkLogs = Convert.ToBoolean(Config["MusicStreaming:DeleteLavalinkLogs"], CultureInfo.InvariantCulture);
 
-        return MusicStreamingSettingsLoaded = CheckSettings(typeof(MusicStreamingSettings));
+        return MusicStreamingSettingsLoaded = CheckSettings(typeof(MsSettings));
     }
 
     private static async Task<string> GetGeniusApiKeyAsync()
