@@ -27,6 +27,8 @@ internal sealed class CoreSettings : BaseSettings
     {
         ArgumentNullException.ThrowIfNull(Config);
 
+        Console.Out.WriteLine("Loading Core Settings");
+
         // Core config
         LogLevel = Convert.ToInt32(Config["Core:LogLevel"], CultureInfo.InvariantCulture);
         BotToken = Config["Core:BotToken"] ?? string.Empty;

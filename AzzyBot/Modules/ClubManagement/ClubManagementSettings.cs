@@ -20,6 +20,8 @@ internal sealed class ClubManagementSettings : BaseSettings
     {
         ArgumentNullException.ThrowIfNull(Config);
 
+        Console.Out.WriteLine("Loading ClubManagement Settings");
+
         AutomaticClubClosingCheck = Convert.ToBoolean(Config["ClubManagement:AutomaticClubClosingCheck"], CultureInfo.InvariantCulture);
 
         if (TimeSpan.TryParse(Config["ClubManagement:ClubClosingTimeStart"], out TimeSpan closeStart))

@@ -19,6 +19,8 @@ internal sealed class MusicStreamingSettings : BaseSettings
     {
         ArgumentNullException.ThrowIfNull(Config);
 
+        await Console.Out.WriteLineAsync("Loading MusicStreaming Settings");
+
         ActivateLyrics = Convert.ToBoolean(Config["MusicStreaming:ActivateLyrics"], CultureInfo.InvariantCulture);
         GeniusApiKey = await GetGeniusApiKeyAsync();
         AutoDisconnect = Convert.ToBoolean(Config["MusicStreaming:AutoDisconnect"], CultureInfo.InvariantCulture);

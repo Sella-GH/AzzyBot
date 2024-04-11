@@ -20,6 +20,8 @@ internal sealed class AzuraCastSettings : BaseSettings
     {
         ArgumentNullException.ThrowIfNull(Config);
 
+        Console.Out.WriteLine("Loading AzuraCast Settings");
+
         Ipv6Available = Convert.ToBoolean(Config["AzuraCast:Ipv6Available"], CultureInfo.InvariantCulture);
         AutomaticFileChangeCheck = Convert.ToBoolean(Config["AzuraCast:AutomaticFileChangeCheck"], CultureInfo.InvariantCulture);
         AutomaticServerPing = Convert.ToBoolean(Config["AzuraCast:AutomaticServerPing"], CultureInfo.InvariantCulture);
