@@ -1,6 +1,6 @@
 ﻿namespace AzzyBot.Modules.ClubManagement.Strings;
 
-internal sealed class ClubManagementStringModel
+internal sealed class CmStringModel
 {
     #region Commands
 

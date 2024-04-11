@@ -74,8 +74,8 @@ internal abstract class BaseModule
         if (BaseSettings.ActivateAzuraCast && AzuraCastSettings.AzuraCastSettingsLoaded)
             RegisterModule(new AzuraCastModule());
 
-        if (ModuleStates.AzuraCast && BaseSettings.ActivateClubManagement && ClubManagementSettings.ClubManagementSettingsLoaded)
-            RegisterModule(new ClubManagementModule());
+        if (ModuleStates.AzuraCast && BaseSettings.ActivateClubManagement && CmSettings.ClubManagementSettingsLoaded)
+            RegisterModule(new CmModule());
 
         if (ModuleStates.AzuraCast && BaseSettings.ActivateMusicStreaming && MsSettings.MusicStreamingSettingsLoaded)
             RegisterModule(new MsModule());

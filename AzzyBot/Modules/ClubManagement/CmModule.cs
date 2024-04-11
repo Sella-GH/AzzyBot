@@ -14,11 +14,11 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.ClubManagement;
 
-internal sealed class ClubManagementModule : BaseModule
+internal sealed class CmModule : BaseModule
 {
     private static Timer? ClubClosingTimer;
-    private readonly TimeSpan ClubCloseTimeStart = ClubManagementSettings.ClubClosingTimeStart;
-    private readonly TimeSpan ClubCloseTimeEnd = ClubManagementSettings.ClubClosingTimeEnd;
+    private readonly TimeSpan ClubCloseTimeStart = CmSettings.ClubClosingTimeStart;
+    private readonly TimeSpan ClubCloseTimeEnd = CmSettings.ClubClosingTimeEnd;
     private static CoreFileLock? ClubBotStatusLock;
 
     internal static DateTime ClubOpening { get; private set; } = DateTime.MinValue;
@@ -27,7 +27,7 @@ internal sealed class ClubManagementModule : BaseModule
     internal static DateTime SetClubOpening(in DateTime time) => ClubOpening = time;
     internal static DateTime SetClubClosing(in DateTime time) => ClubClosing = time;
     internal static void SetClubClosingInitiated(bool value) => ClubClosingInitiated = value;
-    internal override void RegisterCommands(SlashCommandsExtension slashCommandsExtension, ulong? serverId) => slashCommandsExtension.RegisterCommands<ClubManagementCommands>(serverId);
+    internal override void RegisterCommands(SlashCommandsExtension slashCommandsExtension, ulong? serverId) => slashCommandsExtension.RegisterCommands<CmCommands>(serverId);
 
     internal override void RegisterFileLocks()
     {
@@ -55,11 +55,11 @@ internal sealed class ClubManagementModule : BaseModule
                 if (evt.ResultMember is null)
                     throw new InvalidOperationException("Can't check if user has staff role, evt.ResultMember is null");
 
-                evt.ResultBool = CoreDiscordCommands.CheckIfUserHasRole(evt.ResultMember, ClubManagementSettings.StaffRoleId);
+                evt.ResultBool = CoreDiscordCommands.CheckIfUserHasRole(evt.ResultMember, CmSettings.StaffRoleId);
                 break;
 
             case ModuleEventType.GlobalTimerTick:
-                if (ClubManagementSettings.AutomaticClubClosingCheck)
+                if (CmSettings.AutomaticClubClosingCheck)
                 {
                     DateTime now = DateTime.Now;
                     TimeSpan nowTod = now.TimeOfDay;
@@ -104,14 +104,14 @@ internal sealed class ClubManagementModule : BaseModule
     internal static async Task<bool> CheckIfClubIsOpenAsync()
     {
         List<PlaylistModel> playlists = await AzuraCastServer.GetPlaylistsAsync();
-        List<PlaylistModel> closed = await AzuraCastServer.GetPlaylistsAsync(ClubManagementSettings.AzuraClosedPlaylist);
+        List<PlaylistModel> closed = await AzuraCastServer.GetPlaylistsAsync(CmSettings.AzuraClosedPlaylist);
 
         if (closed.Count != 1)
             return false;
 
         foreach (PlaylistModel playlist in playlists)
         {
-            if (playlist.Id != ClubManagementSettings.AzuraAllSongsPlaylist && playlist.Id != ClubManagementSettings.AzuraClosedPlaylist && playlist.Is_enabled)
+            if (playlist.Id != CmSettings.AzuraAllSongsPlaylist && playlist.Id != CmSettings.AzuraClosedPlaylist && playlist.Is_enabled)
                 return true;
         }
 
@@ -169,10 +169,10 @@ internal sealed class ClubManagementModule : BaseModule
         if (data.Listeners.Current != 0)
             return;
 
-        await ClubControls.CloseClubAsync();
-        await ClubControls.SendClubClosingStatisticsAsync(await AzzyBot.SendMessageAsync(ClubManagementSettings.ClubNotifyChannelId, string.Empty, [ClubEmbedBuilder.BuildCloseClubEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, true)]));
+        await CmClubControls.CloseClubAsync();
+        await CmClubControls.SendClubClosingStatisticsAsync(await AzzyBot.SendMessageAsync(CmSettings.ClubNotifyChannelId, string.Empty, [CmEmbedBuilder.BuildCloseClubEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, true)]));
     }
 
-    internal static bool CheckForSystemGeneratedPlaylist(int playlistId) => playlistId == ClubManagementSettings.AzuraAllSongsPlaylist;
-    internal static bool CheckForDeniedPlaylist(int playlistId) => playlistId == ClubManagementSettings.AzuraAllSongsPlaylist || playlistId == ClubManagementSettings.AzuraClosedPlaylist;
+    internal static bool CheckForSystemGeneratedPlaylist(int playlistId) => playlistId == CmSettings.AzuraAllSongsPlaylist;
+    internal static bool CheckForDeniedPlaylist(int playlistId) => playlistId == CmSettings.AzuraAllSongsPlaylist || playlistId == CmSettings.AzuraClosedPlaylist;
 }

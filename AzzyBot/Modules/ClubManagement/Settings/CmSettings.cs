@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace AzzyBot.Modules.ClubManagement.Settings;
 
-internal sealed class ClubManagementSettings : BaseSettings
+internal sealed class CmSettings : BaseSettings
 {
     internal static bool ClubManagementSettingsLoaded { get; private set; }
     internal static bool AutomaticClubClosingCheck { get; private set; }
@@ -37,6 +37,6 @@ internal sealed class ClubManagementSettings : BaseSettings
         CloserRoleId = Convert.ToUInt64(Config["ClubManagement:CloserRoleId"], CultureInfo.InvariantCulture);
         EventsRoleId = Convert.ToUInt64(Config["ClubManagement:EventsRoleId"], CultureInfo.InvariantCulture);
 
-        return ClubManagementSettingsLoaded = CheckSettings(typeof(ClubManagementSettings));
+        return ClubManagementSettingsLoaded = CheckSettings(typeof(CmSettings));
     }
 }

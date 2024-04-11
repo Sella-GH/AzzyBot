@@ -17,7 +17,7 @@ using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.ClubManagement;
 
-internal static class ClubControls
+internal static class CmClubControls
 {
     [SuppressMessage("Security", "CA5394:Do not use insecure randomness", Justification = "This is not security relevant as it's a simple random generated number")]
     internal static async Task CloseClubAsync()
@@ -48,7 +48,7 @@ internal static class ClubControls
             if (playlist is null)
                 throw new InvalidOperationException($"{nameof(playlist)} is null!");
 
-            if (playlist[0].Id == ClubManagementSettings.AzuraAllSongsPlaylist || playlist[0].Id == ClubManagementSettings.AzuraClosedPlaylist)
+            if (playlist[0].Id == CmSettings.AzuraAllSongsPlaylist || playlist[0].Id == CmSettings.AzuraClosedPlaylist)
             {
                 if (!playlist[0].Is_enabled)
                 {
@@ -62,9 +62,9 @@ internal static class ClubControls
         }
 
         await AzuraCastServer.ChangeSongRequestAvailabilityAsync(false);
-        ClubManagementModule.SetClubClosingInitiated(true);
-        ClubManagementModule.SetClubClosing(DateTime.Now);
-        ClubManagementModule.StartClubClosingTimer();
+        CmModule.SetClubClosingInitiated(true);
+        CmModule.SetClubClosing(DateTime.Now);
+        CmModule.StartClubClosingTimer();
 
         // Set the right bot status
         string[] directories = [nameof(CoreFileDirectoriesEnum.Customization), nameof(CoreFileDirectoriesEnum.ClubManagement)];
@@ -110,14 +110,14 @@ internal static class ClubControls
             throw new InvalidOperationException("There are more playlists than one!");
 
         // Ensure that Closed is disabled and AllSongs is enabled
-        List<PlaylistModel> closed = await AzuraCastServer.GetPlaylistsAsync(ClubManagementSettings.AzuraClosedPlaylist);
-        List<PlaylistModel> allSongs = await AzuraCastServer.GetPlaylistsAsync(ClubManagementSettings.AzuraAllSongsPlaylist);
+        List<PlaylistModel> closed = await AzuraCastServer.GetPlaylistsAsync(CmSettings.AzuraClosedPlaylist);
+        List<PlaylistModel> allSongs = await AzuraCastServer.GetPlaylistsAsync(CmSettings.AzuraAllSongsPlaylist);
 
         if (closed.Count == 1 && closed[0].Is_enabled)
-            await AzuraCastServer.TogglePlaylistAsync(ClubManagementSettings.AzuraClosedPlaylist);
+            await AzuraCastServer.TogglePlaylistAsync(CmSettings.AzuraClosedPlaylist);
 
         if (allSongs.Count == 1 && !allSongs[0].Is_enabled)
-            await AzuraCastServer.TogglePlaylistAsync(ClubManagementSettings.AzuraAllSongsPlaylist);
+            await AzuraCastServer.TogglePlaylistAsync(CmSettings.AzuraAllSongsPlaylist);
 
         // Activate the playlist
         await AzuraCastServer.TogglePlaylistAsync(id);
@@ -126,9 +126,9 @@ internal static class ClubControls
         if (!await AzuraCastServer.CheckIfSongRequestsAreAllowedAsync())
             await AzuraCastServer.ChangeSongRequestAvailabilityAsync(true);
 
-        ClubManagementModule.StopClubClosingTimer();
-        ClubManagementModule.SetClubOpening(DateTime.Now);
-        ClubManagementModule.SetClubClosingInitiated(false);
+        CmModule.StopClubClosingTimer();
+        CmModule.SetClubOpening(DateTime.Now);
+        CmModule.SetClubClosingInitiated(false);
 
         // Set the right bot status
         string[] directories = [nameof(CoreFileDirectoriesEnum.Customization), nameof(CoreFileDirectoriesEnum.ClubManagement)];
@@ -164,7 +164,7 @@ internal static class ClubControls
     {
         ArgumentNullException.ThrowIfNull(message, nameof(message));
 
-        DiscordThreadChannel threadChannel = await message.CreateThreadAsync(ClubManagementStringBuilder.CommandCloseClubThreadTitle, AutoArchiveDuration.Hour, ClubManagementStringBuilder.CommandCloseClubThreadReason);
-        await threadChannel.SendMessageAsync(string.Empty, await ClubEmbedBuilder.BuildClubStatisticsEmbedAsync(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl));
+        DiscordThreadChannel threadChannel = await message.CreateThreadAsync(CmStringBuilder.CommandCloseClubThreadTitle, AutoArchiveDuration.Hour, CmStringBuilder.CommandCloseClubThreadReason);
+        await threadChannel.SendMessageAsync(string.Empty, await CmEmbedBuilder.BuildClubStatisticsEmbedAsync(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl));
     }
 }

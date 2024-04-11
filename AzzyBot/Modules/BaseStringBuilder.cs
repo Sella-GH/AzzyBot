@@ -19,7 +19,7 @@ internal abstract class BaseStringBuilder
         if (ModuleStates.AzuraCast && !await AzuraCastStringBuilder.LoadAzuraCastStringsAsync())
             throw new InvalidOperationException("AzuraCast strings can't be loaded");
 
-        if (ModuleStates.ClubManagement && !await ClubManagementStringBuilder.LoadClubManagementStringsAsync())
+        if (ModuleStates.ClubManagement && !await CmStringBuilder.LoadClubManagementStringsAsync())
             throw new InvalidOperationException("ClubManagement strings can't be loaded");
 
         if (ModuleStates.MusicStreaming && !await MsStringBuilder.LoadMusicStreamingStringsAsync())

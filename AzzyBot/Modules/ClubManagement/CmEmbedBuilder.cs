@@ -11,20 +11,20 @@ using DSharpPlus.Entities;
 
 namespace AzzyBot.Modules.ClubManagement;
 
-internal static class ClubEmbedBuilder
+internal static class CmEmbedBuilder
 {
     internal static DiscordEmbed BuildCloseClubEmbed(string userName, string userAvatarUrl, bool inactivity)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
 
-        string title = ClubManagementStringBuilder.EmbedCloseClubTitle;
-        string message = ClubManagementStringBuilder.EmbedCloseClubDesc(userName);
+        string title = CmStringBuilder.EmbedCloseClubTitle;
+        string message = CmStringBuilder.EmbedCloseClubDesc(userName);
 
         if (inactivity)
-            message += $"\n{ClubManagementStringBuilder.EmbedCloseClubDescInactivity}";
+            message += $"\n{CmStringBuilder.EmbedCloseClubDescInactivity}";
 
-        string footerText = ClubManagementStringBuilder.EmbedCloseClubFooter;
+        string footerText = CmStringBuilder.EmbedCloseClubFooter;
 
         return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.IndianRed, CoreSettings.LogoUrl, footerText);
     }
@@ -34,11 +34,11 @@ internal static class ClubEmbedBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(userName);
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl);
 
-        string title = ClubManagementStringBuilder.EmbedOpenClubTitle;
-        string message = ClubManagementStringBuilder.EmbedOpenClubDesc(userName);
+        string title = CmStringBuilder.EmbedOpenClubTitle;
+        string message = CmStringBuilder.EmbedOpenClubDesc(userName);
 
         // Use user-defined slogan otherwise use default one
-        string footerText = (!string.IsNullOrWhiteSpace(slogan)) ? slogan : ClubManagementStringBuilder.EmbedOpenClubFooter;
+        string footerText = (!string.IsNullOrWhiteSpace(slogan)) ? slogan : CmStringBuilder.EmbedOpenClubFooter;
 
         return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.SpringGreen, CoreSettings.LogoUrl, footerText);
     }
@@ -48,12 +48,12 @@ internal static class ClubEmbedBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(userName);
         ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl);
 
-        string title = ClubManagementStringBuilder.EmbedClubStatisticsTitle;
-        DateTime opening = ClubManagementModule.ClubOpening;
-        DateTime closing = ClubManagementModule.ClubClosing;
+        string title = CmStringBuilder.EmbedClubStatisticsTitle;
+        DateTime opening = CmModule.ClubOpening;
+        DateTime closing = CmModule.ClubClosing;
         long openingTime = CoreMisc.ConvertToUnixTime(opening);
         long closingTime = CoreMisc.ConvertToUnixTime(closing);
-        TimeSpan openingDuration = ClubManagementModule.ClubClosing - ClubManagementModule.ClubOpening;
+        TimeSpan openingDuration = CmModule.ClubClosing - CmModule.ClubOpening;
         List<ListenerModel> listeners = await AzuraCastServer.GetListenersAsync(opening, closing);
         List<SongHistory> songHistory = await AzuraCastServer.GetSongHistoryAsync(opening, closing);
         List<PlaylistModel> playlists = await AzuraCastServer.GetPlaylistsAsync();
@@ -79,7 +79,7 @@ internal static class ClubEmbedBuilder
             {
                 foreach (PlaylistModel playlist in playlists)
                 {
-                    if (playlist.Name == item.Playlist && !ClubManagementModule.CheckForDeniedPlaylist(playlist.Id))
+                    if (playlist.Name == item.Playlist && !CmModule.CheckForDeniedPlaylist(playlist.Id))
                     {
                         playedPlaylists.Add(playlist.Name.Replace($"({AzuraCastPlaylistKeywordsEnum.NOREQUESTS})", string.Empty, StringComparison.InvariantCultureIgnoreCase).Trim());
                         break;
@@ -94,6 +94,6 @@ internal static class ClubEmbedBuilder
             playedLists += $"\n- {playlist}";
         }
 
-        return CoreEmbedBuilder.CreateBasicEmbed(title, string.Empty, userName, userAvatarUrl, null, string.Empty, string.Empty, string.Empty, ClubManagementStringBuilder.EmbedClubStatisticsFields(openingTime, closingTime, openingDuration, peakListeners, visitors, songHistory.Count, songRequestsNumber, playedLists));
+        return CoreEmbedBuilder.CreateBasicEmbed(title, string.Empty, userName, userAvatarUrl, null, string.Empty, string.Empty, string.Empty, CmStringBuilder.EmbedClubStatisticsFields(openingTime, closingTime, openingDuration, peakListeners, visitors, songHistory.Count, songRequestsNumber, playedLists));
     }
 }

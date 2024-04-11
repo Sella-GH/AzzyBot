@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.ClubManagement;
 
-internal sealed class ClubManagementCommands : ApplicationCommandModule
+internal sealed class CmCommands : ApplicationCommandModule
 {
     [SlashCommandGroup("staff", "Staff Commands")]
     [SlashRequireGuild]
@@ -33,23 +33,23 @@ internal sealed class ClubManagementCommands : ApplicationCommandModule
                 return;
             }
 
-            if (ClubManagementModule.ClubClosingInitiated)
+            if (CmModule.ClubClosingInitiated)
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(ClubManagementStringBuilder.CommandCloseClubAlreadyInitiated));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(CmStringBuilder.CommandCloseClubAlreadyInitiated));
                 return;
             }
 
-            if (!await ClubManagementModule.CheckIfClubIsOpenAsync())
+            if (!await CmModule.CheckIfClubIsOpenAsync())
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(ClubManagementStringBuilder.CommandCloseClubClubIsAlreadyClosed));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(CmStringBuilder.CommandCloseClubClubIsAlreadyClosed));
                 return;
             }
 
-            await ClubControls.CloseClubAsync();
-            await CoreDiscordCommands.RemoveUserRoleAsync(ctx.Member, ClubManagementSettings.CloserRoleId);
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(ClubManagementStringBuilder.CommandCloseClubClubClosed));
+            await CmClubControls.CloseClubAsync();
+            await CoreDiscordCommands.RemoveUserRoleAsync(ctx.Member, CmSettings.CloserRoleId);
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(CmStringBuilder.CommandCloseClubClubClosed));
 
-            await ClubControls.SendClubClosingStatisticsAsync(await AzzyBot.SendMessageAsync(ClubManagementSettings.ClubNotifyChannelId, string.Empty, [ClubEmbedBuilder.BuildCloseClubEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, false)]));
+            await CmClubControls.SendClubClosingStatisticsAsync(await AzzyBot.SendMessageAsync(CmSettings.ClubNotifyChannelId, string.Empty, [CmEmbedBuilder.BuildCloseClubEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, false)]));
         }
 
         [SlashCommand("open-club", "Select a playlist and open the club")]
@@ -65,15 +65,15 @@ internal sealed class ClubManagementCommands : ApplicationCommandModule
                 return;
             }
 
-            if (await ClubManagementModule.CheckIfClubIsOpenAsync() && !ClubManagementModule.ClubClosingInitiated)
+            if (await CmModule.CheckIfClubIsOpenAsync() && !CmModule.ClubClosingInitiated)
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(ClubManagementStringBuilder.CommandOpenClubAlreadyOpen));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(CmStringBuilder.CommandOpenClubAlreadyOpen));
                 return;
             }
 
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(ClubManagementStringBuilder.CommandOpenClubClubOpened(await ClubControls.OpenClubAsync(playlistId))));
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(CmStringBuilder.CommandOpenClubClubOpened(await CmClubControls.OpenClubAsync(playlistId))));
 
-            await AzzyBot.SendMessageAsync(ClubManagementSettings.ClubNotifyChannelId, CoreDiscordCommands.GetRole(ClubManagementSettings.EventsRoleId, ctx.Guild).Mention, [ClubEmbedBuilder.BuildOpenClubEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, slogan.Trim())], true);
+            await AzzyBot.SendMessageAsync(CmSettings.ClubNotifyChannelId, CoreDiscordCommands.GetRole(CmSettings.EventsRoleId, ctx.Guild).Mention, [CmEmbedBuilder.BuildOpenClubEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, slogan.Trim())], true);
         }
     }
 }

@@ -12,9 +12,9 @@ using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.ClubManagement.Strings;
 
-internal sealed class ClubManagementStringBuilder : BaseStringBuilder
+internal sealed class CmStringBuilder : BaseStringBuilder
 {
-    private static ClubManagementStringModel Model = new();
+    private static CmStringModel Model = new();
 
     internal static async Task<bool> LoadClubManagementStringsAsync()
     {
@@ -25,7 +25,7 @@ internal sealed class ClubManagementStringBuilder : BaseStringBuilder
 
         if (!string.IsNullOrWhiteSpace(content))
         {
-            ClubManagementStringModel? newModel = JsonConvert.DeserializeObject<ClubManagementStringModel>(content);
+            CmStringModel? newModel = JsonConvert.DeserializeObject<CmStringModel>(content);
             if (newModel is not null)
             {
                 // Reference assignment is atomic in .NET, so this is thread safe.

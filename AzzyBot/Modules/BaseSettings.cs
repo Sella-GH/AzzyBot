@@ -57,13 +57,13 @@ internal abstract class BaseSettings
         if (ActivateAzuraCast && !AzuraCastSettings.LoadAzuraCast())
             throw new InvalidOperationException("AzuraCast settings can't be loaded");
 
-        if (ActivateClubManagement && ActivateAzuraCast && !ClubManagementSettings.LoadClubManagement())
+        if (ActivateClubManagement && ActivateAzuraCast && !CmSettings.LoadClubManagement())
             throw new InvalidOperationException("ClubManagement settings can't be loaded");
 
         if (ActivateMusicStreaming && ActivateAzuraCast && !await MsSettings.LoadMusicStreamingAsync())
             throw new InvalidOperationException("MusicStreaming settings can't be loaded");
 
-        if ((ActivateAzuraCast || ActivateClubManagement) && (AzuraCastSettings.AutomaticFileChangeCheck || AzuraCastSettings.AutomaticServerPing || AzuraCastSettings.AutomaticUpdateCheck || ClubManagementSettings.AutomaticClubClosingCheck))
+        if ((ActivateAzuraCast || ActivateClubManagement) && (AzuraCastSettings.AutomaticFileChangeCheck || AzuraCastSettings.AutomaticServerPing || AzuraCastSettings.AutomaticUpdateCheck || CmSettings.AutomaticClubClosingCheck))
             ActivateTimers = true;
     }
 
@@ -88,7 +88,7 @@ internal abstract class BaseSettings
         }
 
         if (ActivateClubManagement)
-            clubManagement = CoreDiscordCommands.CheckIfChannelExists(guild, ClubManagementSettings.ClubNotifyChannelId);
+            clubManagement = CoreDiscordCommands.CheckIfChannelExists(guild, CmSettings.ClubNotifyChannelId);
 
         return core && azuraCast && clubManagement;
     }

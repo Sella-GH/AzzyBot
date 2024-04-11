@@ -43,8 +43,8 @@ internal sealed class RequireUserRoleAttribute : SlashCheckBaseAttribute
 
             case string value when value.Equals(nameof(CommandsEnum.staff), StringComparison.OrdinalIgnoreCase):
                 allowedRoles.Add(CoreSettings.AdminRoleId);
-                allowedRoles.Add(ClubManagementSettings.StaffRoleId);
-                allowedRoles.Add(ClubManagementSettings.CloserRoleId);
+                allowedRoles.Add(CmSettings.StaffRoleId);
+                allowedRoles.Add(CmSettings.CloserRoleId);
                 break;
 
             default:
