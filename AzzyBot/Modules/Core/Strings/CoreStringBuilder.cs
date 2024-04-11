@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.Core.Structs;
 using AzzyBot.Strings;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.Core.Strings;
@@ -13,6 +15,8 @@ internal sealed class CoreStringBuilder : BaseStringBuilder
 
     internal static async Task<bool> LoadCoreStringsAsync()
     {
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Loading Core Strings");
+
         string[] directories = [nameof(CoreFileDirectoriesEnum.Customization), nameof(CoreFileDirectoriesEnum.Core)];
         string content = await CoreFileOperations.GetFileContentAsync(nameof(CoreFileNamesEnum.StringsCoreJSON), directories);
 

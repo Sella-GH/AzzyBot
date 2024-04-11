@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.Core.Structs;
 using AzzyBot.Strings;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.AzuraCast.Strings;
@@ -17,6 +19,8 @@ internal sealed class AzuraCastStringBuilder : BaseStringBuilder
 
     internal static async Task<bool> LoadAzuraCastStringsAsync()
     {
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Loading AzuraCast Strings");
+
         string[] directories = [nameof(CoreFileDirectoriesEnum.Customization), nameof(CoreFileDirectoriesEnum.AzuraCast)];
         string content = await CoreFileOperations.GetFileContentAsync(nameof(CoreFileNamesEnum.StringsAzuraCastJSON), directories);
 

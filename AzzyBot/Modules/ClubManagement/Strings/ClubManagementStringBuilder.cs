@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
+using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.Core.Structs;
 using AzzyBot.Strings;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.ClubManagement.Strings;
@@ -16,6 +18,8 @@ internal sealed class ClubManagementStringBuilder : BaseStringBuilder
 
     internal static async Task<bool> LoadClubManagementStringsAsync()
     {
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Loading ClubManagement Strings");
+
         string[] directories = [nameof(CoreFileDirectoriesEnum.Customization), nameof(CoreFileDirectoriesEnum.ClubManagement)];
         string content = await CoreFileOperations.GetFileContentAsync(nameof(CoreFileNamesEnum.StringsClubManagementJSON), directories);
 
