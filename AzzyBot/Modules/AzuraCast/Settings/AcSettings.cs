@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
-using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.AzuraCast.Enums;
 using AzzyBot.Modules.Core;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.AzuraCast.Settings;
 
@@ -45,7 +43,7 @@ internal sealed class AcSettings : BaseSettings
 
         AzuraCastApiKeyIsValid = await CheckIfApiKeyIsValidAsync();
         if (!AzuraCastApiKeyIsValid)
-            ExceptionHandler.LogMessage(LogLevel.Warning, "AzuraCast api key is not valid!");
+            await Console.Out.WriteLineAsync("AzuraCast api key is not valid!");
 
         return AzuraCastSettingsLoaded = CheckSettings(typeof(AcSettings));
     }
