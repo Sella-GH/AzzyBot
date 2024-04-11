@@ -105,7 +105,7 @@ internal static class CoreWebRequests
             HttpResponseMessage response = await client.GetAsync(new Uri(url));
             response.EnsureSuccessStatusCode();
 
-            return await response.Content.ReadAsStreamAsync();
+            return new CoreWebRequestsStream(response);
         }
         catch (HttpRequestException e)
         {
