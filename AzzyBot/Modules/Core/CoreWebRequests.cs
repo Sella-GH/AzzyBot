@@ -40,7 +40,7 @@ internal static class CoreWebRequests
         Timeout = TimeSpan.FromSeconds(30)
     };
 
-    internal static async Task<string> GetWebAsync(string url, Dictionary<string, string>? headers = null, bool ipv6 = true)
+    internal static async Task<string> GetWebAsync(string url, Dictionary<string, string>? headers = null, bool ipv6 = true, bool apiKeyCheck = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
 
@@ -54,6 +54,9 @@ internal static class CoreWebRequests
 
             using (HttpResponseMessage response = await client.GetAsync(new Uri(url)))
             {
+                if (apiKeyCheck && response.StatusCode == HttpStatusCode.Unauthorized)
+                    return string.Empty;
+
                 response.EnsureSuccessStatusCode();
                 content = await response.Content.ReadAsStringAsync();
             }

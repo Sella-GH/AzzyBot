@@ -54,7 +54,7 @@ internal abstract class BaseSettings
             Environment.Exit(1);
         }
 
-        if (ActivateAzuraCast && !AcSettings.LoadAzuraCast())
+        if (ActivateAzuraCast && !await AcSettings.LoadAzuraCastAsync())
             throw new InvalidOperationException("AzuraCast settings can't be loaded");
 
         if (ActivateClubManagement && ActivateAzuraCast && !CmSettings.LoadClubManagement())
