@@ -78,6 +78,7 @@ internal static class CoreFileOperations
             string path = GetFileNameAndPath(fileName, directories, directory);
             await using FileStream fs = new(path, FileMode.Create, FileAccess.Write, FileShare.None);
             await stream.CopyToAsync(fs);
+
             return true;
         }
         catch (DirectoryNotFoundException)
@@ -94,6 +95,10 @@ internal static class CoreFileOperations
         {
             ExceptionHandler.LogMessage(LogLevel.Warning, $"Can't access file: {fileName} - invalid permissions");
             throw;
+        }
+        finally
+        {
+            await stream.DisposeAsync();
         }
     }
 

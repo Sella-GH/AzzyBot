@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AzzyBot.Modules.AzuraCast.Enums;
 using AzzyBot.Modules.AzuraCast.Models;
@@ -764,12 +765,13 @@ internal static class AcServer
                 continue;
 
             string url = string.Join("/", AcSettings.AzuraApiUrl, AcApiEnum.station, AcSettings.AzuraStationKey, AcApiEnum.playlist, playlist.Id, AcApiEnum.export, AcApiEnum.m3u);
-            Stream stream = await CoreWebRequests.GetWebDownloadAsync(url, Headers, AcSettings.Ipv6Available);
-            await using (stream)
-            {
-                if (!await CoreFileOperations.WriteFileContentAsync($"{playlist.Short_name}.m3u", directory, "ZipFile", stream))
-                    throw new InvalidOperationException("File can't be written");
-            }
+            HttpResponseMessage response = await CoreWebRequests.GetWebDownloadAsync(url, Headers, AcSettings.Ipv6Available);
+            Stream stream = await response.Content.ReadAsStreamAsync();
+
+            if (!await CoreFileOperations.WriteFileContentAsync($"{playlist.Short_name}.m3u", directory, "ZipFile", stream))
+                throw new InvalidOperationException("File can't be written");
+
+            response.Dispose();
         }
 
         return CoreFileOperations.CreateZipFile($"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}-playlists.zip", directory);

@@ -93,7 +93,7 @@ internal static class CoreWebRequests
         }
     }
 
-    internal static async Task<Stream> GetWebDownloadAsync(string url, Dictionary<string, string> headers, bool ipv6 = true)
+    internal static async Task<HttpResponseMessage> GetWebDownloadAsync(string url, Dictionary<string, string> headers, bool ipv6 = true)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
 
@@ -105,7 +105,7 @@ internal static class CoreWebRequests
             HttpResponseMessage response = await client.GetAsync(new Uri(url));
             response.EnsureSuccessStatusCode();
 
-            return await response.Content.ReadAsStreamAsync();
+            return response;
         }
         catch (HttpRequestException e)
         {
