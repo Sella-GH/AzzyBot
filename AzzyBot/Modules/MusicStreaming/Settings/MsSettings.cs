@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
@@ -28,7 +29,11 @@ internal sealed class MsSettings : BaseSettings
         MountPointStub = Config["MusicStreaming:MountPointStub"] ?? string.Empty;
         DeleteLavalinkLogs = Convert.ToBoolean(Config["MusicStreaming:DeleteLavalinkLogs"], CultureInfo.InvariantCulture);
 
-        return MusicStreamingSettingsLoaded = CheckSettings(typeof(MsSettings));
+        List<string> excluded = [];
+        if (!ActivateLyrics)
+            excluded.Add(nameof(GeniusApiKey));
+
+        return MusicStreamingSettingsLoaded = CheckSettings(typeof(MsSettings), excluded);
     }
 
     private static async Task<string> GetGeniusApiKeyAsync()
