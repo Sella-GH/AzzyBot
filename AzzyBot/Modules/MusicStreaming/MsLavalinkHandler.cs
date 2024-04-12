@@ -151,7 +151,10 @@ internal static class MsLavalinkHandler
 
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files", "logs");
             if (MsSettings.DeleteLavalinkLogs && Directory.Exists(path))
+            {
+                await Task.Delay(3000);
                 Directory.Delete(path, true);
+            }
 
             return true;
         }
