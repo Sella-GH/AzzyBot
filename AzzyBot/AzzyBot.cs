@@ -464,63 +464,16 @@ internal static class AzzyBot
     }
 
     /// <summary>
-    /// Sends a message with an attached file to a specific channel asynchronously.
-    /// </summary>
-    /// <param name="channelId">The ID of the channel to send the message to.</param>
-    /// <param name="content">The text content of the message.</param>
-    /// <param name="embed">A DiscordEmbed to include in the message.</param>
-    /// <param name="fileName">The name of the file to attach to the message.</param>
-    /// <param name="mention">A boolean indicating whether to allow mentions in this message. This is optional.</param>
-    /// <returns>A Task representing the asynchronous operation. The task result is a boolean indicating whether the operation was successful.</returns>
-    /// <exception cref="IOException">Throws when the file can not be deleted.</exception>
-    internal static async Task<bool> SendMessageAsync(ulong channelId, string content, DiscordEmbed embed, string fileName, bool mention = false)
-    {
-        ArgumentNullException.ThrowIfNull(DiscordClient);
-        ArgumentOutOfRangeException.ThrowIfZero(channelId);
-        ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
-
-        try
-        {
-            FileStream stream = new(fileName, FileMode.Open, FileAccess.Read);
-
-            DiscordMessageBuilder builder = new();
-            if (!string.IsNullOrWhiteSpace(content))
-                builder.WithContent(content);
-
-            if (mention)
-                builder.WithAllowedMentions([EveryoneMention.All, RepliedUserMention.All, RoleMention.All, UserMention.All]);
-
-            builder.AddEmbed(embed);
-            builder.AddFile(Path.GetFileName(fileName), stream);
-
-            DiscordChannel channel = await DiscordClient.GetChannelAsync(channelId);
-            await channel.SendMessageAsync(builder);
-            await stream.DisposeAsync();
-
-            return (!CoreFileOperations.DeleteTempFile(fileName))
-                ? throw new IOException($"{fileName} couldn't be deleted!")
-                : true;
-        }
-        catch (DirectoryNotFoundException)
-        { }
-        catch (FileNotFoundException)
-        { }
-        catch (UnauthorizedAccessException)
-        { }
-
-        return false;
-    }
-
-    /// <summary>
     /// Sends a message with multiple attached files to a specific channel asynchronously.
     /// </summary>
     /// <param name="channelId">The ID of the channel to send the message to.</param>
     /// <param name="content">The text content of the message.</param>
     /// <param name="embed">A DiscordEmbed to include in the message.</param>
     /// <param name="fileNames">An array of file names to attach to the message.</param>
+    /// <param name="mention">A boolean indicating whether to allow mentions in this message. This is optional.</param>
     /// <returns>A Task representing the asynchronous operation. The task result is a boolean indicating whether the operation was successful.</returns>
     /// <exception cref="IOException">Throws when the file can not be deleted.</exception>
-    internal static async Task<bool> SendMessageAsync(ulong channelId, string content, DiscordEmbed embed, string[] fileNames)
+    internal static async Task<bool> SendMessageAsync(ulong channelId, string content, DiscordEmbed embed, string[] fileNames, bool mention = false)
     {
         ArgumentNullException.ThrowIfNull(DiscordClient);
         ArgumentOutOfRangeException.ThrowIfZero(channelId);
@@ -532,6 +485,9 @@ internal static class AzzyBot
             DiscordMessageBuilder builder = new();
             if (!string.IsNullOrWhiteSpace(content))
                 builder.WithContent(content);
+
+            if (mention)
+                builder.WithAllowedMentions([EveryoneMention.All, RepliedUserMention.All, RoleMention.All, UserMention.All]);
 
             builder.AddEmbed(embed);
 
