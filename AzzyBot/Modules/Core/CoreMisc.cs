@@ -49,11 +49,11 @@ internal static class CoreMisc
     /// Gets the operation system.
     /// </summary>
     /// <returns>The operating system.</returns>
-    internal static string GetOperatingSystem() => RuntimeInformation.OSDescription;
+    internal static string GetOperatingSystem => RuntimeInformation.OSDescription;
 
     /// <summary>
     /// Gets the operating system architecture.
     /// </summary>
     /// <returns>The operating system architecture.</returns>
-    internal static string GetOperatingSystemArch() => RuntimeInformation.OSArchitecture.ToString();
+    internal static string GetOperatingSystemArch => RuntimeInformation.OSArchitecture.ToString();
 }
