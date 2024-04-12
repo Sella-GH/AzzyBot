@@ -28,7 +28,7 @@ internal static class MsLavalink
     internal static DiscordChannel? GetRequestChannel { get; private set; }
     internal static DiscordChannel? GetVoiceChannel { get; private set; }
 
-    private static async ValueTask<MsPlayer?> GetPlayerAsync(InteractionContext ctx, bool allowConnect = false, bool requireChannel = true, ImmutableArray<IPlayerPrecondition> preconditions = default, CancellationToken cancellationToken = default)
+    private static async ValueTask<MsPlayer?> GetPlayerAsync(InteractionContext ctx, bool allowConnect = false, bool requireChannel = true, bool firstTimeJoin = false, ImmutableArray<IPlayerPrecondition> preconditions = default, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -48,7 +48,7 @@ internal static class MsLavalink
         if (result.IsSuccess)
         {
             GetRequestChannel = ctx.Channel;
-            result.Player.FirstTimeJoining = true;
+            result.Player.FirstTimeJoining = firstTimeJoin;
 
             return result.Player;
         }
@@ -74,7 +74,7 @@ internal static class MsLavalink
 
     internal static async Task<bool> JoinMusicAsync(InteractionContext ctx)
     {
-        MsPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying]);
+        MsPlayer? player = await GetPlayerAsync(ctx, true, true, true, [PlayerPrecondition.NotPlaying]);
 
         if (player is null)
             return false;
@@ -89,7 +89,7 @@ internal static class MsLavalink
 
     internal static async Task<bool> PlayMusicAsync(InteractionContext ctx)
     {
-        MsPlayer? player = await GetPlayerAsync(ctx, true, true, [PlayerPrecondition.NotPlaying]);
+        MsPlayer? player = await GetPlayerAsync(ctx, true, true, true, [PlayerPrecondition.NotPlaying]);
 
         if (player is null)
             return false;
@@ -149,7 +149,7 @@ internal static class MsLavalink
     internal static async Task<bool> StopMusicAsync(InteractionContext ctx, bool disconnect)
     {
         IPlayerPrecondition precondition = PlayerPrecondition.Any(PlayerPrecondition.Playing, PlayerPrecondition.Paused);
-        MsPlayer? player = await GetPlayerAsync(ctx, false, true, [precondition]);
+        MsPlayer? player = await GetPlayerAsync(ctx, false, true, false, [precondition]);
 
         if (player is null)
             return false;
