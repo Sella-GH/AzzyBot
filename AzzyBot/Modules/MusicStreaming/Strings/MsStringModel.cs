@@ -50,7 +50,8 @@ internal sealed class MsStringModel
 
     #region CustomPlayerMessages
 
-    public string CustomPlayerIsActiveAgain { get; set; } = string.Empty;
+    public string CustomPlayerIsActivePlayingAgain { get; set; } = string.Empty;
+    public string CustomPlayerIsActiveUsersAgain { get; set; } = string.Empty;
     public string CustomPlayerIsInactivePlaying { get; set; } = string.Empty;
     public string CustomPlayerIsInactiveUsers { get; set; } = string.Empty;
     public string CustomPlayerLeaves { get; set; } = string.Empty;

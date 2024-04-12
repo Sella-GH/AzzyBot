@@ -11,8 +11,10 @@ namespace AzzyBot.Modules.MusicStreaming.Player;
 
 internal sealed class MsPlayer : LavalinkPlayer, IInactivityPlayerListener
 {
-    internal MsPlayer(IPlayerProperties<MsPlayer, MsPlayerOptions> properties) : base(properties)
-    { }
+    private bool IsUserInactive;
+    private bool FirstTimeJoining;
+
+    internal MsPlayer(IPlayerProperties<MsPlayer, MsPlayerOptions> properties) : base(properties) => FirstTimeJoining = true;
 
     public async ValueTask NotifyPlayerActiveAsync(PlayerTrackingState trackingState, CancellationToken cancellationToken = default)
     {
@@ -24,7 +26,19 @@ internal sealed class MsPlayer : LavalinkPlayer, IInactivityPlayerListener
         if (channel is null)
             return;
 
-        await channel.SendMessageAsync(MsStringBuilder.GetCustomPlayerIsActiveAgain);
+        if (!FirstTimeJoining && !IsUserInactive)
+        {
+            await channel.SendMessageAsync(MsStringBuilder.GetCustomPlayerIsActivePlayingAgain);
+            return;
+        }
+        else if (IsUserInactive)
+        {
+            await channel.SendMessageAsync(MsStringBuilder.GetCustomPlayerIsActiveUsersAgain(channel.Mention));
+            IsUserInactive = false;
+            return;
+        }
+
+        FirstTimeJoining = false;
     }
 
     public async ValueTask NotifyPlayerInactiveAsync(PlayerTrackingState trackingState, CancellationToken cancellationToken = default)
