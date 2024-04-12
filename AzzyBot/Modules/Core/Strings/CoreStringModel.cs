@@ -15,6 +15,8 @@ internal sealed class CoreStringModel
     #region BuildAzzyStatsEmbed
 
     public string EmbedAzzyStatsTitle { get; set; } = string.Empty;
+    public string EmbedAzzyStatsOperatingSystem { get; set; } = string.Empty;
+    public string EmbedAzzyStatsOperatingSystemArchitecture { get; set; } = string.Empty;
     public string EmbedAzzyStatsSystemUptimeTitle { get; set; } = string.Empty;
     public string EmbedAzzyStatsSystemUptimeDesc { get; set; } = string.Empty;
     public string EmbedAzzyStatsPingTitle { get; set; } = string.Empty;

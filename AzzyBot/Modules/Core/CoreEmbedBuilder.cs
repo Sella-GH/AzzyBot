@@ -94,6 +94,8 @@ internal static class CoreEmbedBuilder
 
         string title = CoreStringBuilder.GetEmbedAzzyStatsTitle;
         string footer = string.Empty;
+        string os = CoreMisc.GetOperatingSystem();
+        string osArch = CoreMisc.GetOperatingSystemArch();
         long uptime = CoreAzzyStatsGeneral.GetSystemUptime(); // is incorrect on windows systems without administative privileges
         string coreUsage = string.Empty;
         double processMem = CoreAzzyStatsGeneral.GetBotMemoryUsage();
@@ -128,7 +130,7 @@ internal static class CoreEmbedBuilder
             cpuLoad = await CoreAzzyStatsLinux.GetCpuLoadAsync();
         }
 
-        Dictionary<string, DiscordEmbedStruct> fields = CoreStringBuilder.GetEmbedAzzyStatsFields(uptime, ping, coreUsage, cpuLoad.OneMin, cpuLoad.FiveMin, cpuLoad.FifteenMin, memory.Used, processMem, memory.Total, diskUsage);
+        Dictionary<string, DiscordEmbedStruct> fields = CoreStringBuilder.GetEmbedAzzyStatsFields(os, osArch, uptime, ping, coreUsage, cpuLoad.OneMin, cpuLoad.FiveMin, cpuLoad.FifteenMin, memory.Used, processMem, memory.Total, diskUsage);
 
         if (CoreMisc.CheckIfLinuxOs())
         {

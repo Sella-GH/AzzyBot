@@ -50,9 +50,15 @@ internal sealed class CoreStringBuilder : BaseStringBuilder
     internal static string GetEmbedAzzyStatsCpuUsageCore(int counter, double value) => BuildString(BuildString(Model.EmbedAzzyStatsCpuUsageCore, "%COUNTER%", counter), "%VALUE%", value);
     internal static string GetEmbedAzzyStatsDiskUsageDesc(double used, double total) => BuildString(BuildString(Model.EmbedAzzyStatsDiskUsageDesc, "%USED%", used), "%TOTAL%", total);
 
-    internal static Dictionary<string, DiscordEmbedStruct> GetEmbedAzzyStatsFields(long uptime, int ping, string coreUsage, double oneMinLoad, double fiveMinLoad, double fifteenMinLoad, double memUsage, double azzyMem, double memTotal, string diskUsage)
+    internal static Dictionary<string, DiscordEmbedStruct> GetEmbedAzzyStatsFields(string os, string osArch, long uptime, int ping, string coreUsage, double oneMinLoad, double fiveMinLoad, double fifteenMinLoad, double memUsage, double azzyMem, double memTotal, string diskUsage)
     {
         Dictionary<string, DiscordEmbedStruct> fields = [];
+
+        if (!string.IsNullOrWhiteSpace(os))
+            fields.Add(Model.EmbedAzzyStatsOperatingSystem, new(Model.EmbedAzzyStatsOperatingSystem, os, true));
+
+        if (!string.IsNullOrWhiteSpace(osArch))
+            fields.Add(Model.EmbedAzzyStatsOperatingSystemArchitecture, new(Model.EmbedAzzyStatsOperatingSystemArchitecture, osArch, true));
 
         if (uptime is not 0)
             fields.Add(Model.EmbedAzzyStatsSystemUptimeTitle, new(Model.EmbedAzzyStatsSystemUptimeTitle, BuildString(Model.EmbedAzzyStatsSystemUptimeDesc, "%VALUE%", $"<t:{uptime}>"), false));
