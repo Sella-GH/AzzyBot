@@ -23,15 +23,20 @@ internal sealed class MsSettings : BaseSettings
         await Console.Out.WriteLineAsync("Loading MusicStreaming Settings");
 
         ActivateLyrics = Convert.ToBoolean(Config["MusicStreaming:ActivateLyrics"], CultureInfo.InvariantCulture);
-        GeniusApiKey = await GetGeniusApiKeyAsync();
         AutoDisconnect = Convert.ToBoolean(Config["MusicStreaming:AutoDisconnect"], CultureInfo.InvariantCulture);
         AutoDisconnectTime = Convert.ToInt32(Config["MusicStreaming:AutoDisconnectTime"], CultureInfo.InvariantCulture);
         MountPointStub = Config["MusicStreaming:MountPointStub"] ?? string.Empty;
         DeleteLavalinkLogs = Convert.ToBoolean(Config["MusicStreaming:DeleteLavalinkLogs"], CultureInfo.InvariantCulture);
 
         List<string> excluded = [];
-        if (!ActivateLyrics)
+        if (ActivateLyrics)
+        {
+            GeniusApiKey = await GetGeniusApiKeyAsync();
+        }
+        else
+        {
             excluded.Add(nameof(GeniusApiKey));
+        }
 
         return MusicStreamingSettingsLoaded = CheckSettings(typeof(MsSettings), excluded);
     }
