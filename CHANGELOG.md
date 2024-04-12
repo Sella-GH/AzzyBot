@@ -15,13 +15,22 @@
 ### Additions
 - Messages added if the music streaming plugin is not used for the specific amount of time OR if no users are in the voice channel anymore
 - Support for AzuraCast HLS streams
+- `core info azzy` and `core ping azzy` now include more details about the bot
 - `appsettings.json` now supports an ip address as value for the `AzuraApiUrl` setting
+- `AzuraApiKey` is not required anymore
 - A few new settings:
   - Core/Updater
     - `DisplayChangelog`: bool
 	- `DisplayInstructions`: bool
 	- `UpdateCheckInterval`: int
 	- `UpdateMessageChannelId`: int
+  - AzuarCast/AutomaticChecks
+    - `FileChanges` (before AutomaticFileChangeCheck) : bool
+    - `ServerPing` (before AutomaticServerPing) : bool
+    - `Updates` (before AutomaticUpdateCheck) : bool
+    - `UpdatesShowChangelog` : bool
+  - AzuraCast
+    - `ShowPlaylistsInNowPlaying` : bool
 
 ### Removements
 - `config bot-restart` command
@@ -32,7 +41,6 @@
 - More logging in case something goes wrong
 - Useless checks removed
 - Better check for lavalink stuff implemented
-- `core info azzy` now includes more details about the bot
 - The exception embed now includes a callout to report the bug
 - The commit and compile date infos are now included in a AzzyBot.json file
 - Code and reliability improvements

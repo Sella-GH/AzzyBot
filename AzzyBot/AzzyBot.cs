@@ -48,7 +48,7 @@ internal static class AzzyBot
     {
         #region Add basic startup information
 
-        await Console.Out.WriteLineAsync($"Starting {CoreAzzyStatsGeneral.GetBotName} in version {CoreAzzyStatsGeneral.GetBotVersion} on {RuntimeInformation.OSDescription}-{RuntimeInformation.OSArchitecture}");
+        await Console.Out.WriteLineAsync($"Starting {CoreAzzyStatsGeneral.GetBotName} in version {CoreAzzyStatsGeneral.GetBotVersion} on {CoreMisc.GetOperatingSystem}-{CoreMisc.GetOperatingSystemArch}");
 
         #endregion Add basic startup information
 
