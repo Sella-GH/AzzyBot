@@ -94,8 +94,8 @@ internal static class CoreEmbedBuilder
 
         string title = CoreStringBuilder.GetEmbedAzzyStatsTitle;
         string footer = string.Empty;
-        string os = CoreMisc.GetOperatingSystem();
-        string osArch = CoreMisc.GetOperatingSystemArch();
+        string os = CoreMisc.GetOperatingSystem;
+        string osArch = CoreMisc.GetOperatingSystemArch;
         long uptime = CoreAzzyStatsGeneral.GetSystemUptime(); // is incorrect on windows systems without administative privileges
         string coreUsage = string.Empty;
         double processMem = CoreAzzyStatsGeneral.GetBotMemoryUsage();
