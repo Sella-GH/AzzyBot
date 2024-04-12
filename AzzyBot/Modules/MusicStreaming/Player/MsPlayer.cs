@@ -31,10 +31,10 @@ internal sealed class MsPlayer : LavalinkPlayer, IInactivityPlayerListener
             await channel.SendMessageAsync(MsStringBuilder.GetCustomPlayerIsActivePlayingAgain);
             return;
         }
-        else if (IsUserInactive)
+        else if (!FirstTimeJoining && IsUserInactive)
         {
-            await channel.SendMessageAsync(MsStringBuilder.GetCustomPlayerIsActiveUsersAgain(channel.Mention));
             IsUserInactive = false;
+            await channel.SendMessageAsync(MsStringBuilder.GetCustomPlayerIsActiveUsersAgain(channel.Mention));
             return;
         }
 
@@ -67,6 +67,7 @@ internal sealed class MsPlayer : LavalinkPlayer, IInactivityPlayerListener
 
         if (voiceChannel.Users.Count == 1)
         {
+            IsUserInactive = true;
             await channel.SendMessageAsync(MsStringBuilder.GetCustomPlayerIsInactiveUsers(MsSettings.AutoDisconnectTime));
             return;
         }

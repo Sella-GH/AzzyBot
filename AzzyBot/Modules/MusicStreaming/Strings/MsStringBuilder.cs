@@ -81,9 +81,9 @@ internal sealed class MsStringBuilder : BaseStringBuilder
     #region CustomPlayerMessages
 
     internal static string GetCustomPlayerIsActivePlayingAgain => Model.CustomPlayerIsActivePlayingAgain;
-    internal static string GetCustomPlayerIsActiveUsersAgain(string channel) => BuildString(Model.CustomPlayerIsActiveUsersAgain, "%CHANNEL%", channel);
+    internal static string GetCustomPlayerIsActiveUsersAgain() => Model.CustomPlayerIsActiveUsersAgain;
     internal static string GetCustomPlayerIsInactivePlaying(int minutes) => BuildString(Model.CustomPlayerIsInactivePlaying, "%MINUTES%", minutes);
-    internal static string GetCustomPlayerIsInactiveUsers(int minutes) => BuildString(Model.CustomPlayerIsInactiveUsers, "%MINUTES%", minutes);
+    internal static string GetCustomPlayerIsInactiveUsers(int minutes, string channel) => BuildString(BuildString(Model.CustomPlayerIsInactiveUsers, "%MINUTES%", minutes), "%CHANNEL%", channel);
     internal static string GetCustomPlayerLeaves => Model.CustomPlayerLeaves;
 
     #endregion CustomPlayerMessages
