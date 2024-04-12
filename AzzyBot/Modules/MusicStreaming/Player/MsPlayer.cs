@@ -11,8 +11,8 @@ namespace AzzyBot.Modules.MusicStreaming.Player;
 
 internal sealed class MsPlayer : LavalinkPlayer, IInactivityPlayerListener
 {
+    internal bool FirstTimeJoining { get; set; }
     private bool IsUserInactive;
-    private bool FirstTimeJoining;
 
     internal MsPlayer(IPlayerProperties<MsPlayer, MsPlayerOptions> properties) : base(properties) => FirstTimeJoining = true;
 
