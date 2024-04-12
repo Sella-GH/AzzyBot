@@ -218,7 +218,7 @@ internal sealed class AzuraCastModule : BaseModule
                 PingLock.Release();
             }
 
-            if (!IsMusicServerOnline)
+            if (!IsMusicServerOnline || !AcSettings.AzuraCastApiKeyIsValid)
                 return;
 
             DateTime now = DateTime.Now;

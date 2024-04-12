@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 using AzzyBot.Commands.Attributes;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.AzuraCast.Autocomplete;
+using AzzyBot.Modules.AzuraCast.Settings;
 using AzzyBot.Modules.AzuraCast.Strings;
 using AzzyBot.Modules.Core;
+using AzzyBot.Modules.Core.Settings;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
@@ -35,6 +37,12 @@ internal sealed class AcCommands : ApplicationCommandModule
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                return;
+            }
+
+            if (!AcSettings.AzuraCastApiKeyIsValid)
+            {
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
                 return;
             }
 
@@ -67,6 +75,12 @@ internal sealed class AcCommands : ApplicationCommandModule
                 return;
             }
 
+            if (!AcSettings.AzuraCastApiKeyIsValid)
+            {
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
+                return;
+            }
+
             await AzuraCastModule.CheckIfFilesWereModifiedAsync();
 
             await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(AcStringBuilder.GetCommandsForceCacheRefresh));
@@ -78,6 +92,13 @@ internal sealed class AcCommands : ApplicationCommandModule
         {
             ExceptionHandler.LogMessage(LogLevel.Debug, "AzuraCastPingCommand requested");
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
+
+            if (!AcSettings.AzuraCastApiKeyIsValid)
+            {
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
+                return;
+            }
+
             await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(await AcStats.GetServerStatsAsync(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl)));
         }
 
@@ -91,6 +112,12 @@ internal sealed class AcCommands : ApplicationCommandModule
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                return;
+            }
+
+            if (!AcSettings.AzuraCastApiKeyIsValid)
+            {
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
                 return;
             }
 
@@ -113,28 +140,34 @@ internal sealed class AcCommands : ApplicationCommandModule
         {
             ExceptionHandler.LogMessage(LogLevel.Debug, "MusicGetSongsInPlaylistCommand requested");
 
-            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
-
             DateTime dateTime;
             if (string.IsNullOrWhiteSpace(date))
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(AcStringBuilder.GetCommandsGetSongHistoryForgotDate));
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(AcStringBuilder.GetCommandsGetSongHistoryForgotDate));
                 return;
             }
             else if (!DateTime.TryParse(date, out dateTime))
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(AcStringBuilder.GetCommandsGetSongHistoryWrongDate));
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(AcStringBuilder.GetCommandsGetSongHistoryWrongDate));
                 return;
             }
             else if (dateTime < DateTime.Today.AddDays(-14))
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(AcStringBuilder.GetCommandsGetSongHistoryTooEarly));
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(AcStringBuilder.GetCommandsGetSongHistoryTooEarly));
                 return;
             }
 
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                return;
+            }
+
+            await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
+
+            if (!AcSettings.AzuraCastApiKeyIsValid)
+            {
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
                 return;
             }
 
@@ -172,6 +205,12 @@ internal sealed class AcCommands : ApplicationCommandModule
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                return;
+            }
+
+            if (!AcSettings.AzuraCastApiKeyIsValid)
+            {
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
                 return;
             }
 
@@ -230,6 +269,12 @@ internal sealed class AcCommands : ApplicationCommandModule
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                return;
+            }
+
+            if (!AcSettings.AzuraCastApiKeyIsValid)
+            {
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
                 return;
             }
 

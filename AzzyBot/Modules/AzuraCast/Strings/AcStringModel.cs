@@ -93,6 +93,13 @@ internal sealed class AcStringModel
 
     #endregion BuildServerNotAvailableEmbed
 
+    #region BuildApiKeyIsNotValidEmbed
+
+    public string EmbedApiKeyIsNotValidTitle { get; set; } = string.Empty;
+    public string EmbedApiKeyIsNotValidDesc { get; set; } = string.Empty;
+
+    #endregion BuildApiKeyIsNotValidEmbed
+
     #region BuildFilesHaveChangedEmbed
 
     public string EmbedFilesChangedTitle { get; set; } = string.Empty;

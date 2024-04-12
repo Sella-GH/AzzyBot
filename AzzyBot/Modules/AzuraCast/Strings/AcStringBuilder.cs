@@ -130,6 +130,13 @@ internal sealed class AcStringBuilder : BaseStringBuilder
 
     #endregion BuildServerNotAvailableEmbed
 
+    #region BuildApiKeyIsNotValidEmbed
+
+    internal static string GetEmbedApiKeyIsNotValidTitle => Model.EmbedApiKeyIsNotValidTitle;
+    internal static string GetEmbedApiKeyIsNotValidDesc(string owner) => BuildString(Model.EmbedApiKeyIsNotValidDesc, "%OWNER%", owner);
+
+    #endregion BuildApiKeyIsNotValidEmbed
+
     #region BuildFilesHaveChangedEmbed
 
     internal static string GetEmbedFilesChangedTitle => Model.EmbedFilesChangedTitle;

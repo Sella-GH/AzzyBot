@@ -77,6 +77,18 @@ internal static class AcEmbedBuilder
         return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, DiscordColor.IndianRed, CoreSettings.LogoUrl);
     }
 
+    internal static DiscordEmbed BuildApiKeyNotValidEmbed(string owner)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(owner, nameof(owner));
+
+        string userName = AzzyBot.GetDiscordClientUserName;
+        string userAvatarUrl = AzzyBot.GetDiscordClientAvatarUrl;
+        string title = AcStringBuilder.GetEmbedApiKeyIsNotValidTitle;
+        string description = AcStringBuilder.GetEmbedApiKeyIsNotValidDesc(owner);
+
+        return CoreEmbedBuilder.CreateBasicEmbed(title, description, userName, userAvatarUrl, DiscordColor.IndianRed);
+    }
+
     internal static DiscordEmbed BuildFilesHaveChangedEmbed(string userName, string userAvatarUrl, int addedNumber, int removedNumber)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));

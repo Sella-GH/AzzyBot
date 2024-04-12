@@ -3,9 +3,11 @@ using AzzyBot.Commands.Attributes;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.AzuraCast.Autocomplete;
+using AzzyBot.Modules.AzuraCast.Settings;
 using AzzyBot.Modules.ClubManagement.Settings;
 using AzzyBot.Modules.ClubManagement.Strings;
 using AzzyBot.Modules.Core;
+using AzzyBot.Modules.Core.Settings;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
@@ -25,11 +27,18 @@ internal sealed class CmCommands : ApplicationCommandModule
         internal static async Task StaffCloseClubCommandAsync(InteractionContext ctx)
         {
             ExceptionHandler.LogMessage(LogLevel.Debug, "StaffCloseClubCommand requested");
+
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerIsOfflineEmbed(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl, false)));
+                return;
+            }
+
+            if (!AcSettings.AzuraCastApiKeyIsValid)
+            {
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
                 return;
             }
 
@@ -62,6 +71,12 @@ internal sealed class CmCommands : ApplicationCommandModule
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                return;
+            }
+
+            if (!AcSettings.AzuraCastApiKeyIsValid)
+            {
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
                 return;
             }
 

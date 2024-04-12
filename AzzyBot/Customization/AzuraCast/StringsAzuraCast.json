@@ -34,6 +34,8 @@
     "EmbedServerIsOnlineTitle": "AzuraCast Is Back Online!",
     "EmbedServerNotAvailableTitle": "Connection Issues",
     "EmbedServerNotAvailableDesc": "AzuraCast is currently not available!",
+    "EmbedApiKeyIsNotValidTitle": "The Given AzuraCast Api Key Is Not Valid!",
+    "EmbedApiKeyIsNotValidDesc": "Please check the given Api Key and try again!\nPlease contact the owner of the server: %OWNER%",
     "EmbedFilesChangedTitle": "Changes On The File Server Happened!",
     "EmbedFilesAddedSingle": "**One** file was added",
     "EmbedFilesAddedMulti": "**%NUMBER%** files were added",
