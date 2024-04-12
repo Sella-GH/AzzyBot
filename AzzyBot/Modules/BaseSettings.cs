@@ -106,26 +106,31 @@ internal abstract class BaseSettings
         {
             object? value = property.GetValue(null);
 
-            if (property.PropertyType == typeof(string))
+            switch (property.PropertyType)
             {
-                if (excludedStrings?.Contains(property.Name) == true)
-                    continue;
+                case Type t when t == typeof(string):
+                    if (excludedStrings?.Contains(property.Name) == true)
+                        continue;
 
-                if (string.IsNullOrWhiteSpace(value as string))
-                    failed.Add(property.Name);
-            }
-            else if (property.PropertyType == typeof(ulong) || property.PropertyType == typeof(int))
-            {
-                if (excludedInts?.Contains(property.Name) == true)
-                    continue;
+                    if (string.IsNullOrWhiteSpace(value as string))
+                        failed.Add(property.Name);
 
-                if (Convert.ToInt64(value, CultureInfo.InvariantCulture) == 0)
-                    failed.Add(property.Name);
-            }
-            else if (property.PropertyType == typeof(TimeSpan))
-            {
-                if (value is TimeSpan timeSpan && timeSpan == TimeSpan.Zero)
-                    failed.Add(property.Name);
+                    break;
+
+                case Type t when t == typeof(ulong) || t == typeof(int):
+                    if (excludedInts?.Contains(property.Name) == true)
+                        continue;
+
+                    if (Convert.ToInt64(value, CultureInfo.InvariantCulture) == 0)
+                        failed.Add(property.Name);
+
+                    break;
+
+                case Type t when t == typeof(TimeSpan):
+                    if (value is TimeSpan timeSpan && timeSpan == TimeSpan.Zero)
+                        failed.Add(property.Name);
+
+                    break;
             }
         }
 
