@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AzzyBot.Modules.AzuraCast.Enums;
@@ -68,7 +69,7 @@ internal sealed class AcSettings : BaseSettings
 
             using (HttpResponseMessage response = await client.GetAsync(new Uri(url)))
             {
-                if (response.StatusCode is System.Net.HttpStatusCode.Forbidden)
+                if (response.StatusCode is HttpStatusCode.Forbidden)
                     return false;
             }
 
