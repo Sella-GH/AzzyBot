@@ -34,6 +34,8 @@ internal sealed class CmModule : BaseModule
         const string fileName = nameof(CoreFileNamesEnum.ClubBotStatusJSON);
         string[] directories = [nameof(CoreFileDirectoriesEnum.Customization)];
         ClubBotStatusLock = new(fileName, directories);
+
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Registered ClubManagement File Locks");
     }
 
     internal override void DisposeFileLocks() => ClubBotStatusLock?.Dispose();

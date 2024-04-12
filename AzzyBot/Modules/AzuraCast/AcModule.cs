@@ -42,6 +42,8 @@ internal sealed class AzuraCastModule : BaseModule
         fileName = nameof(CoreFileNamesEnum.PlaylistSlogansJSON);
         directory = [nameof(CoreFileDirectoriesEnum.Customization)];
         PlaylistSlogansLock = new(fileName, directory);
+
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Registered AzuraCast File Locks");
     }
 
     internal override void DisposeFileLocks()

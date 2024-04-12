@@ -85,7 +85,7 @@ internal static class AzzyBot
 
         await Console.Out.WriteLineAsync("Creating DiscordClient");
         DiscordClient = InitializeBot();
-        ExceptionHandler.LogMessage(LogLevel.Debug, "DiscordClient loaded");
+        ExceptionHandler.LogMessage(LogLevel.Information, "DiscordClient loaded");
 
         #endregion Initialize client
 
@@ -127,7 +127,7 @@ internal static class AzzyBot
 
         #region Initialize Processes
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Starting all processes");
+        ExceptionHandler.LogMessage(LogLevel.Information, "Starting all processes");
         BaseModule.StartAllProcesses();
         await Task.Delay(3000);
         ExceptionHandler.LogMessage(LogLevel.Debug, "Started all processes");
@@ -195,7 +195,7 @@ internal static class AzzyBot
         if (c.Guilds.Count <= 1)
             return;
 
-        ExceptionHandler.LogMessage(LogLevel.Information, "The bot is now in 2 guilds, self-kick initiated.");
+        ExceptionHandler.LogMessage(LogLevel.Warning, "The bot is now in 2 guilds, self-kick initiated.");
         await e.Guild.LeaveAsync();
     }
 
