@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.Core;
+using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.MusicStreaming.Settings;
 using Microsoft.Extensions.Logging;
 
@@ -14,6 +15,7 @@ namespace AzzyBot.Modules.MusicStreaming;
 internal static class MsLavalinkHandler
 {
     private static Process? LavalinkProcess;
+    private static string LavalinkPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, nameof(CoreFileDirectoriesEnum.Modules), nameof(CoreFileDirectoriesEnum.MusicStreaming), nameof(CoreFileDirectoriesEnum.Files));
 
     internal static async Task<bool> CheckIfJavaIsInstalledAsync()
     {
@@ -53,7 +55,7 @@ internal static class MsLavalinkHandler
     {
         ExceptionHandler.LogMessage(LogLevel.Debug, "Checking if Lavalink config is correct");
 
-        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files", "application.yml");
+        string path = Path.Combine(LavalinkPath, "application.yml");
 
         if (!File.Exists(path))
             return false;
@@ -84,11 +86,9 @@ internal static class MsLavalinkHandler
     {
         ExceptionHandler.LogMessage(LogLevel.Debug, "Checking if Lavalink files are present");
 
-        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files");
-
-        bool directoryExists = Directory.Exists(path);
-        bool lavalinkJarExists = File.Exists(Path.Combine(path, "Lavalink.jar"));
-        bool applicationYmlExists = File.Exists(Path.Combine(path, "application.yml"));
+        bool directoryExists = Directory.Exists(LavalinkPath);
+        bool lavalinkJarExists = File.Exists(Path.Combine(LavalinkPath, "Lavalink.jar"));
+        bool applicationYmlExists = File.Exists(Path.Combine(LavalinkPath, "application.yml"));
 
         return directoryExists && lavalinkJarExists && applicationYmlExists;
     }
@@ -111,8 +111,8 @@ internal static class MsLavalinkHandler
             ProcessStartInfo processStartInfo = new()
             {
                 FileName = "java",
-                Arguments = $"-jar {Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files", "Lavalink.jar")}",
-                WorkingDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files"),
+                Arguments = $"-jar {Path.Combine(LavalinkPath, "Lavalink.jar")}",
+                WorkingDirectory = Path.Combine(LavalinkPath),
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
@@ -149,7 +149,7 @@ internal static class MsLavalinkHandler
             await LavalinkProcess.WaitForExitAsync();
             LavalinkProcess.Dispose();
 
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files", "logs");
+            string path = Path.Combine(LavalinkPath, nameof(CoreFileDirectoriesEnum.logs));
             if (MsSettings.DeleteLavalinkLogs && Directory.Exists(path))
             {
                 await Task.Delay(3000);
