@@ -21,6 +21,7 @@ using Lavalink4NET.Extensions;
 using Lavalink4NET.InactivityTracking;
 using Lavalink4NET.InactivityTracking.Extensions;
 using Lavalink4NET.InactivityTracking.Trackers.Idle;
+using Lavalink4NET.InactivityTracking.Trackers.Users;
 using Lavalink4NET.Integrations.LyricsJava.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -363,6 +364,8 @@ internal static class AzzyBot
                 config.TrackingMode = InactivityTrackingMode.Any;
                 config.UseDefaultTrackers = true;
             });
+            ServiceCollection.AddInactivityTracker<IdleInactivityTracker>();
+            ServiceCollection.AddInactivityTracker<UsersInactivityTracker>();
             ServiceCollection.Configure<IdleInactivityTrackerOptions>(config => config.TrackNewPlayers = false);
 
             ExceptionHandler.LogMessage(LogLevel.Debug, "Applied inactivity tracking to Lavalink4NET");
