@@ -48,7 +48,7 @@ internal static class MsLavalink
         if (result.IsSuccess)
         {
             GetRequestChannel = ctx.Channel;
-            result.Player.FirstTimeJoining = false;
+            result.Player.FirstTimeJoining = true;
 
             return result.Player;
         }
