@@ -69,7 +69,7 @@ internal sealed class AcSettings : BaseSettings
 
             using (HttpResponseMessage response = await client.GetAsync(new Uri(url)))
             {
-                if (response.StatusCode is HttpStatusCode.Forbidden)
+                if (response.StatusCode is not HttpStatusCode.OK)
                     return false;
             }
 
