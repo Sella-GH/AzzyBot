@@ -615,10 +615,7 @@ internal static class AcServer
         ArgumentException.ThrowIfNullOrWhiteSpace(playlistId, nameof(playlistId));
 
         int id = Convert.ToInt32(playlistId, CultureInfo.InvariantCulture);
-        List<AcPlaylistModel> newPlaylist = await GetPlaylistsAsync(id);
-
-        if (newPlaylist.Count != 1)
-            throw new InvalidOperationException("There are more playlists than one");
+        AcPlaylistModel newPlaylist = (await GetPlaylistsAsync(id))[0] ?? throw new InvalidOperationException("Playlist not found!");
 
         // Get all the playlist names
         List<AcPlaylistModel> playlists = await GetPlaylistsAsync();
@@ -632,7 +629,7 @@ internal static class AcServer
 
         // Switch the playlist
         await TogglePlaylistAsync(id);
-        return newPlaylist[0].Name;
+        return newPlaylist.Name;
     }
 
     internal static async Task ChangeSongRequestAvailabilityAsync(bool enabled)
