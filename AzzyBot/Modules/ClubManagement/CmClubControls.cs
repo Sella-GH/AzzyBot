@@ -35,7 +35,7 @@ internal static class CmClubControls
             // IT'S ALWAYS playlist[0]!
             //
 
-            List<AcPlaylistModel> playlist = await AcServer.GetPlaylistsAsync(list.Id);
+            AcPlaylistModel playlist = (await AcServer.GetPlaylistsAsync(list.Id))[0] ?? throw new InvalidOperationException("No playlist found!");
 
             //
             // Check the id of the playlist
@@ -45,19 +45,14 @@ internal static class CmClubControls
             // check if enabled, if yes disable
             //
 
-            if (playlist is null)
-                throw new InvalidOperationException($"{nameof(playlist)} is null!");
-
-            if (playlist[0].Id == CmSettings.AzuraAllSongsPlaylist || playlist[0].Id == CmSettings.AzuraClosedPlaylist)
+            if (playlist.Id == CmSettings.AzuraAllSongsPlaylist || playlist.Id == CmSettings.AzuraClosedPlaylist)
             {
-                if (!playlist[0].Is_enabled)
-                {
-                    await AcServer.TogglePlaylistAsync(playlist[0].Id);
-                }
+                if (!playlist.Is_enabled)
+                    await AcServer.TogglePlaylistAsync(playlist.Id);
             }
-            else if (playlist[0].Is_enabled)
+            else if (playlist.Is_enabled)
             {
-                await AcServer.TogglePlaylistAsync(playlist[0].Id);
+                await AcServer.TogglePlaylistAsync(playlist.Id);
             }
         }
 
@@ -104,19 +99,16 @@ internal static class CmClubControls
         ArgumentException.ThrowIfNullOrWhiteSpace(playlistId, nameof(playlistId));
 
         int id = Convert.ToInt32(playlistId, CultureInfo.InvariantCulture);
-        List<AcPlaylistModel> playlist = await AcServer.GetPlaylistsAsync(id);
-
-        if (playlist.Count != 1)
-            throw new InvalidOperationException("There are more playlists than one!");
+        AcPlaylistModel playlist = (await AcServer.GetPlaylistsAsync(id))[0] ?? throw new InvalidOperationException("No playlist found!");
 
         // Ensure that Closed is disabled and AllSongs is enabled
-        List<AcPlaylistModel> closed = await AcServer.GetPlaylistsAsync(CmSettings.AzuraClosedPlaylist);
-        List<AcPlaylistModel> allSongs = await AcServer.GetPlaylistsAsync(CmSettings.AzuraAllSongsPlaylist);
+        AcPlaylistModel closed = (await AcServer.GetPlaylistsAsync(CmSettings.AzuraClosedPlaylist))[0] ?? throw new InvalidOperationException("Closed playlist not found!");
+        AcPlaylistModel allSongs = (await AcServer.GetPlaylistsAsync(CmSettings.AzuraAllSongsPlaylist))[0] ?? throw new InvalidOperationException("All songs playlist not found!");
 
-        if (closed.Count == 1 && closed[0].Is_enabled)
+        if (closed.Is_enabled)
             await AcServer.TogglePlaylistAsync(CmSettings.AzuraClosedPlaylist);
 
-        if (allSongs.Count == 1 && !allSongs[0].Is_enabled)
+        if (!allSongs.Is_enabled)
             await AcServer.TogglePlaylistAsync(CmSettings.AzuraAllSongsPlaylist);
 
         // Activate the playlist
@@ -157,7 +149,7 @@ internal static class CmClubControls
 
         await AzzyBot.SetBotStatusAsync(status, type, doing, streamUrl);
 
-        return playlist[0].Name;
+        return playlist.Name;
     }
 
     internal static async Task SendClubClosingStatisticsAsync(DiscordMessage message)
