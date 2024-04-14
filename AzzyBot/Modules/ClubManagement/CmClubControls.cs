@@ -64,7 +64,7 @@ internal static class CmClubControls
         await AcServer.ChangeSongRequestAvailabilityAsync(false);
         CmModule.SetClubClosingInitiated(true);
         CmModule.SetClubClosing(DateTime.Now);
-        CmModule.StartClubClosingTimer();
+        CmTimer.StartClubClosingTimer();
 
         // Set the right bot status
         string[] directories = [nameof(CoreFileDirectoriesEnum.Customization), nameof(CoreFileDirectoriesEnum.ClubManagement)];
@@ -126,7 +126,7 @@ internal static class CmClubControls
         if (!await AcServer.CheckIfSongRequestsAreAllowedAsync())
             await AcServer.ChangeSongRequestAvailabilityAsync(true);
 
-        CmModule.StopClubClosingTimer();
+        CmTimer.StopClubClosingTimer();
         CmModule.SetClubOpening(DateTime.Now);
         CmModule.SetClubClosingInitiated(false);
 

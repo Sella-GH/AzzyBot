@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.AzuraCast;
@@ -14,11 +12,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.ClubManagement;
 
-internal sealed class CmModule : BaseModule
+internal class CmModule : BaseModule
 {
-    private static Timer? ClubClosingTimer;
-    private static readonly TimeSpan ClubCloseTimeStart = CmSettings.ClubClosingTimeStart;
-    private static readonly TimeSpan ClubCloseTimeEnd = CmSettings.ClubClosingTimeEnd;
+    protected static readonly TimeSpan ClubCloseTimeStart = CmSettings.ClubClosingTimeStart;
+    protected static readonly TimeSpan ClubCloseTimeEnd = CmSettings.ClubClosingTimeEnd;
     private static CoreFileLock? ClubBotStatusLock;
 
     internal static DateTime ClubOpening { get; private set; } = DateTime.MinValue;
@@ -39,7 +36,7 @@ internal sealed class CmModule : BaseModule
     }
 
     internal override void DisposeFileLocks() => ClubBotStatusLock?.Dispose();
-    internal override void StopTimers() => StopClubClosingTimer();
+    internal override void StopTimers() => CmTimer.StopClubClosingTimer();
 
     protected override async void HandleModuleEvent(ModuleEvent evt)
     {
@@ -92,12 +89,6 @@ internal sealed class CmModule : BaseModule
 
     internal override void Activate() => ModuleStates.ActivateClubManagement();
 
-    internal static void StartClubClosingTimer()
-    {
-        ClubClosingTimer = new(new TimerCallback(ClubClosingTimerTimeout), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
-        ExceptionHandler.LogMessage(LogLevel.Information, "ClubClosingTimer started!");
-    }
-
     internal static async Task<bool> CheckIfClubIsOpenAsync()
     {
         List<AcPlaylistModel> playlists = await AcServer.GetPlaylistsAsync();
@@ -118,47 +109,12 @@ internal sealed class CmModule : BaseModule
         return activePlaylist != closed[0].Name;
     }
 
-    internal static void StopClubClosingTimer()
-    {
-        if (ClubClosingTimer is null)
-            return;
-
-        ClubClosingTimer.Change(Timeout.Infinite, Timeout.Infinite);
-        ClubClosingTimer.Dispose();
-        ClubClosingTimer = null;
-        ExceptionHandler.LogMessage(LogLevel.Information, "ClubClosingTimer stopped");
-    }
-
     private static async Task ClubClosingCheckAsync()
     {
         DateTime now = DateTime.Now;
         TimeSpan nowTod = now.TimeOfDay;
         if (nowTod >= ClubCloseTimeStart && nowTod <= ClubCloseTimeEnd)
             await NotifyUserIfClubIsClosedAsync();
-    }
-
-    [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "General Exception is there to log unkown exceptions")]
-    private static async void ClubClosingTimerTimeout(object? o)
-    {
-        try
-        {
-            if (!IsMusicServerOnline())
-                return;
-
-            if (!await CheckIfClubIsOpenAsync())
-            {
-                if (ClubClosingTimer is null)
-                    throw new InvalidOperationException("ClubClosingTimer is null");
-
-                StopClubClosingTimer();
-                SetClubClosingInitiated(false);
-            }
-        }
-        catch (Exception ex)
-        {
-            // System.Threading.Timer just eats exceptions as far as I know so best to log them here.
-            await ExceptionHandler.LogErrorAsync(ex);
-        }
     }
 
     private static async Task NotifyUserIfClubIsClosedAsync()
