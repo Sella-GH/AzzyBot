@@ -7,7 +7,6 @@ using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Settings;
-using AzzyBot.Modules.Core.Updater;
 using AzzyBot.Strings;
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -159,17 +158,9 @@ internal static class AzzyBot
         #region Initialize Timers
 
         ExceptionHandler.LogMessage(LogLevel.Debug, "Starting timers");
-        if (BaseSettings.ActivateTimers)
-            BaseModule.StartAllGlobalTimers();
+        BaseModule.StartAllTimers();
 
         #endregion Initialize Timers
-
-        #region Check for updates
-
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Checking for updates");
-        await Updates.CheckForUpdatesAsync();
-
-        #endregion Check for updates
 
         #region Finalizing
 

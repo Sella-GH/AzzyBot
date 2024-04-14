@@ -15,7 +15,7 @@ namespace AzzyBot.Modules.MusicStreaming;
 internal static class MsLavalinkHandler
 {
     private static Process? LavalinkProcess;
-    private static string LavalinkPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, nameof(CoreFileDirectoriesEnum.Modules), nameof(CoreFileDirectoriesEnum.MusicStreaming), nameof(CoreFileDirectoriesEnum.Files));
+    private static readonly string LavalinkPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, nameof(CoreFileDirectoriesEnum.Modules), nameof(CoreFileDirectoriesEnum.MusicStreaming), nameof(CoreFileDirectoriesEnum.Files));
 
     internal static async Task<bool> CheckIfJavaIsInstalledAsync()
     {

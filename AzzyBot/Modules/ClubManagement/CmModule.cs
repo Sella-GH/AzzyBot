@@ -17,8 +17,8 @@ namespace AzzyBot.Modules.ClubManagement;
 internal sealed class CmModule : BaseModule
 {
     private static Timer? ClubClosingTimer;
-    private readonly TimeSpan ClubCloseTimeStart = CmSettings.ClubClosingTimeStart;
-    private readonly TimeSpan ClubCloseTimeEnd = CmSettings.ClubClosingTimeEnd;
+    private static readonly TimeSpan ClubCloseTimeStart = CmSettings.ClubClosingTimeStart;
+    private static readonly TimeSpan ClubCloseTimeEnd = CmSettings.ClubClosingTimeEnd;
     private static CoreFileLock? ClubBotStatusLock;
 
     internal static DateTime ClubOpening { get; private set; } = DateTime.MinValue;
@@ -41,7 +41,7 @@ internal sealed class CmModule : BaseModule
     internal override void DisposeFileLocks() => ClubBotStatusLock?.Dispose();
     internal override void StopTimers() => StopClubClosingTimer();
 
-    protected override void HandleModuleEvent(ModuleEvent evt)
+    protected override async void HandleModuleEvent(ModuleEvent evt)
     {
         switch (evt.Type)
         {
@@ -62,12 +62,7 @@ internal sealed class CmModule : BaseModule
 
             case ModuleEventType.GlobalTimerTick:
                 if (CmSettings.AutomaticClubClosingCheck)
-                {
-                    DateTime now = DateTime.Now;
-                    TimeSpan nowTod = now.TimeOfDay;
-                    if (nowTod >= ClubCloseTimeStart && nowTod <= ClubCloseTimeEnd)
-                        Task.Run(NotifyUserIfClubIsClosedAsync);
-                }
+                    await ClubClosingCheckAsync();
 
                 break;
 
@@ -132,6 +127,14 @@ internal sealed class CmModule : BaseModule
         ClubClosingTimer.Dispose();
         ClubClosingTimer = null;
         ExceptionHandler.LogMessage(LogLevel.Information, "ClubClosingTimer stopped");
+    }
+
+    private static async Task ClubClosingCheckAsync()
+    {
+        DateTime now = DateTime.Now;
+        TimeSpan nowTod = now.TimeOfDay;
+        if (nowTod >= ClubCloseTimeStart && nowTod <= ClubCloseTimeEnd)
+            await NotifyUserIfClubIsClosedAsync();
     }
 
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "General Exception is there to log unkown exceptions")]

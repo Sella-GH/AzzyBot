@@ -14,7 +14,6 @@ namespace AzzyBot.Modules.AzuraCast;
 
 internal sealed class AzuraCastModule : BaseModule
 {
-    private static Timer? AzzyBotGlobalTimer;
     private static bool IsMusicServerOnline = true;
     private static DateTime LastFileCheckRun = DateTime.MinValue;
     private static DateTime LastMusicServerUpdateCheck = DateTime.MinValue;
@@ -53,10 +52,7 @@ internal sealed class AzuraCastModule : BaseModule
         PlaylistSlogansLock?.Dispose();
     }
 
-    internal override void StartGlobalTimers() => StartGlobalTimer();
-    internal override void StopTimers() => StopGlobalTimer();
-
-    protected override void HandleModuleEvent(ModuleEvent evt)
+    protected override async void HandleModuleEvent(ModuleEvent evt)
     {
         switch (evt.Type)
         {
@@ -70,6 +66,10 @@ internal sealed class AzuraCastModule : BaseModule
 
             case ModuleEventType.GetAzuraCastIPv6Availability:
                 evt.ResultBool = AcSettings.Ipv6Available;
+                break;
+
+            case ModuleEventType.GlobalTimerTick:
+                await AcModuleTimerAsync();
                 break;
         }
     }
@@ -185,68 +185,39 @@ internal sealed class AzuraCastModule : BaseModule
         }
     }
 
-    private static void StartGlobalTimer()
+    [SuppressMessage("Roslynator", "RCS1208:Reduce 'if' nesting", Justification = "Code clarity")]
+    private static async Task AcModuleTimerAsync()
     {
-        AzzyBotGlobalTimer = new(new TimerCallback(AzzyBotGlobalTimerTimeout), null, TimeSpan.Zero, TimeSpan.FromMinutes(15));
-        ExceptionHandler.LogMessage(LogLevel.Information, "AzzyBotGlobalTimer started");
-    }
-
-    private static void StopGlobalTimer()
-    {
-        if (AzzyBotGlobalTimer is null)
-            return;
-
-        AzzyBotGlobalTimer.Change(Timeout.Infinite, Timeout.Infinite);
-        AzzyBotGlobalTimer.Dispose();
-        AzzyBotGlobalTimer = null;
-        ExceptionHandler.LogMessage(LogLevel.Information, "AzzyBotGlobalTimer stopped");
-    }
-
-    [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "General Exception is there to log unkown exceptions")]
-    private static async void AzzyBotGlobalTimerTimeout(object? o)
-    {
+        await PingLock.WaitAsync();
         try
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "AzzyBotGlobalTimer tick");
-
-            await PingLock.WaitAsync();
-            try
-            {
-                ExceptionHandler.LogMessage(LogLevel.Debug, "AzzyBotGlobalTimer ping check for music server");
-                await PingMusicServerAsync();
-            }
-            finally
-            {
-                PingLock.Release();
-            }
-
-            if (!IsMusicServerOnline || !AcSettings.AzuraCastApiKeyIsValid)
-                return;
-
-            DateTime now = DateTime.Now;
-
-            // 1 hour
-            if (AcSettings.AutomaticChecksFileChanges && now - LastFileCheckRun >= TimeSpan.FromHours(0.98))
-            {
-                ExceptionHandler.LogMessage(LogLevel.Debug, "AzzyBotGlobalTimer checking for file changes");
-                LastFileCheckRun = now;
-                await AcServer.CheckIfFilesWereModifiedAsync();
-            }
-
-            // 6 hours
-            if (AcSettings.AutomaticChecksUpdates && now - LastMusicServerUpdateCheck >= TimeSpan.FromHours(5.98))
-            {
-                ExceptionHandler.LogMessage(LogLevel.Debug, "AzzyBotGlobalTimer checking for music server updates");
-                LastMusicServerUpdateCheck = now;
-                await CheckForMusicServerUpdatesAsync();
-            }
-
-            BroadcastModuleEvent(new ModuleEvent(ModuleEventType.GlobalTimerTick));
+            ExceptionHandler.LogMessage(LogLevel.Debug, "AzzyBotGlobalTimer ping check for music server");
+            await PingMusicServerAsync();
         }
-        catch (Exception ex)
+        finally
         {
-            // System.Threading.Timer just eats exceptions as far as I know so best to log them here.
-            await ExceptionHandler.LogErrorAsync(ex);
+            PingLock.Release();
+        }
+
+        if (!IsMusicServerOnline || !AcSettings.AzuraCastApiKeyIsValid)
+            return;
+
+        DateTime now = DateTime.Now;
+
+        // 1 hour
+        if (AcSettings.AutomaticChecksFileChanges && now - LastFileCheckRun >= TimeSpan.FromHours(0.98))
+        {
+            ExceptionHandler.LogMessage(LogLevel.Debug, "AzzyBotGlobalTimer checking for file changes");
+            LastFileCheckRun = now;
+            await AcServer.CheckIfFilesWereModifiedAsync();
+        }
+
+        // 6 hours
+        if (AcSettings.AutomaticChecksUpdates && now - LastMusicServerUpdateCheck >= TimeSpan.FromHours(5.98))
+        {
+            ExceptionHandler.LogMessage(LogLevel.Debug, "AzzyBotGlobalTimer checking for music server updates");
+            LastMusicServerUpdateCheck = now;
+            await CheckForMusicServerUpdatesAsync();
         }
     }
 

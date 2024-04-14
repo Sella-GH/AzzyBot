@@ -21,7 +21,6 @@ internal abstract class BaseSettings
     internal static bool ActivateAzuraCast { get; private set; }
     internal static bool ActivateClubManagement { get; private set; }
     internal static bool ActivateMusicStreaming { get; private set; }
-    internal static bool ActivateTimers { get; private set; }
     protected static readonly IConfigurationBuilder builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Settings", "appsettings.json"), true, false);
     protected static IConfiguration? Config { get; private set; }
 
@@ -62,9 +61,6 @@ internal abstract class BaseSettings
 
         if (ActivateMusicStreaming && ActivateAzuraCast && !await MsSettings.LoadMusicStreamingAsync())
             throw new InvalidOperationException("MusicStreaming settings can't be loaded");
-
-        if ((ActivateAzuraCast || ActivateClubManagement) && (AcSettings.AutomaticChecksFileChanges || AcSettings.AutomaticChecksServerPing || AcSettings.AutomaticChecksUpdates || CmSettings.AutomaticClubClosingCheck))
-            ActivateTimers = true;
     }
 
     internal static bool CheckIfChannelsExist(DiscordGuild guild)

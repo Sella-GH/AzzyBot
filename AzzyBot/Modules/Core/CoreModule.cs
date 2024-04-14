@@ -1,17 +1,13 @@
-using System;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules.Core.Enums;
-using AzzyBot.Modules.Core.Settings;
-using AzzyBot.Modules.Core.Updater;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.Core;
 
-internal sealed class CoreModule : BaseModule
+internal class CoreModule : BaseModule
 {
-    private static DateTime LastUpdateCheck = DateTime.MinValue;
     internal static CoreFileLock? AzzyBotLock;
 
     internal override void RegisterCommands(SlashCommandsExtension slashCommandsExtension, ulong? serverId) => slashCommandsExtension.RegisterCommands<CoreCommands>(serverId);
@@ -29,26 +25,15 @@ internal sealed class CoreModule : BaseModule
     }
 
     internal override void DisposeFileLocks() => AzzyBotLock?.Dispose();
+    internal override void StartGlobalTimers() => CoreTimer.StartGlobalTimer();
+    internal override void StopTimers() => CoreTimer.StopGlobalTimer();
 
-    protected override async void HandleModuleEvent(ModuleEvent evt)
+    protected override void HandleModuleEvent(ModuleEvent evt)
     {
         switch (evt.Type)
         {
             case ModuleEventType.GetAzzyBotName:
                 evt.ResultString = CoreAzzyStatsGeneral.GetBotName;
-                break;
-
-            case ModuleEventType.GlobalTimerTick:
-                if (CoreAzzyStatsGeneral.GetBotEnvironment == "Development")
-                    break;
-
-                DateTime now = DateTime.Now;
-                if (now - LastUpdateCheck >= TimeSpan.FromDays(CoreSettings.UpdaterCheckInterval))
-                {
-                    LastUpdateCheck = now;
-                    await Updates.CheckForUpdatesAsync();
-                }
-
                 break;
         }
     }
