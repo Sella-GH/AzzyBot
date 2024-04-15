@@ -40,7 +40,7 @@
 ### Improvements
 - CI Updates for better processability
 - Some settings now have a default value
-- More logging in case something goes wrong
+- More and better logging in case something goes wrong
 - Useless checks removed
 - Better check for lavalink stuff implemented
 - The commit and compile date infos are now included in a AzzyBot.json file
