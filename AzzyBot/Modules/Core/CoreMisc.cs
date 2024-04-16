@@ -44,4 +44,16 @@ internal static class CoreMisc
         DateTime offset = DateTimeOffset.FromUnixTimeSeconds(unixTime).DateTime.ToLocalTime();
         return new(offset.Hour, offset.Minute, offset.Second);
     }
+
+    /// <summary>
+    /// Gets the operation system.
+    /// </summary>
+    /// <returns>The operating system.</returns>
+    internal static string GetOperatingSystem => RuntimeInformation.OSDescription;
+
+    /// <summary>
+    /// Gets the operating system architecture.
+    /// </summary>
+    /// <returns>The operating system architecture.</returns>
+    internal static string GetOperatingSystemArch => RuntimeInformation.OSArchitecture.ToString();
 }

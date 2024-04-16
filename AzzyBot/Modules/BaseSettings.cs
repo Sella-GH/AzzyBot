@@ -4,11 +4,15 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using AzzyBot.Modules.AzuraCast;
-using AzzyBot.Modules.ClubManagement;
+using AzzyBot.ExceptionHandling;
+using AzzyBot.Modules.AzuraCast.Settings;
+using AzzyBot.Modules.ClubManagement.Settings;
 using AzzyBot.Modules.Core;
-using AzzyBot.Modules.MusicStreaming;
+using AzzyBot.Modules.Core.Settings;
+using AzzyBot.Modules.MusicStreaming.Settings;
+using DSharpPlus.Entities;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules;
 
@@ -17,7 +21,6 @@ internal abstract class BaseSettings
     internal static bool ActivateAzuraCast { get; private set; }
     internal static bool ActivateClubManagement { get; private set; }
     internal static bool ActivateMusicStreaming { get; private set; }
-    internal static bool ActivateTimers { get; private set; }
     protected static readonly IConfigurationBuilder builder = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory()).AddJsonFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Settings", "appsettings.json"), true, false);
     protected static IConfiguration? Config { get; private set; }
 
@@ -50,17 +53,40 @@ internal abstract class BaseSettings
             Environment.Exit(1);
         }
 
-        if (ActivateAzuraCast && !AzuraCastSettings.LoadAzuraCast())
+        if (ActivateAzuraCast && !await AcSettings.LoadAzuraCastAsync())
             throw new InvalidOperationException("AzuraCast settings can't be loaded");
 
-        if (ActivateClubManagement && !ClubManagementSettings.LoadClubManagement())
+        if (ActivateClubManagement && ActivateAzuraCast && !CmSettings.LoadClubManagement())
             throw new InvalidOperationException("ClubManagement settings can't be loaded");
 
-        if (ActivateMusicStreaming && !await MusicStreamingSettings.LoadMusicStreamingAsync())
+        if (ActivateMusicStreaming && ActivateAzuraCast && !await MsSettings.LoadMusicStreamingAsync())
             throw new InvalidOperationException("MusicStreaming settings can't be loaded");
+    }
 
-        if ((ActivateAzuraCast || ActivateClubManagement) && (AzuraCastSettings.AutomaticFileChangeCheck || AzuraCastSettings.AutomaticServerPing || AzuraCastSettings.AutomaticUpdateCheck || ClubManagementSettings.AutomaticClubClosingCheck))
-            ActivateTimers = true;
+    internal static bool CheckIfChannelsExist(DiscordGuild guild)
+    {
+        bool core = CoreDiscordCommands.CheckIfChannelExists(guild, CoreSettings.ErrorChannelId);
+        bool azuraCast = true;
+        bool clubManagement = true;
+
+        if (ActivateAzuraCast)
+        {
+            List<ulong> azuraCastChannels = CoreDiscordCommands.CheckIfChannelsExist(guild, [AcSettings.MusicRequestsChannelId, AcSettings.OutagesChannelId]);
+            if (azuraCastChannels.Count > 0)
+            {
+                azuraCast = false;
+
+                foreach (ulong channel in azuraCastChannels)
+                {
+                    ExceptionHandler.LogMessage(LogLevel.Error, $"Channel with ID **{channel}** does not exist in guild with ID **{guild.Id}** and name **{guild.Name}**!");
+                }
+            }
+        }
+
+        if (ActivateClubManagement)
+            clubManagement = CoreDiscordCommands.CheckIfChannelExists(guild, CmSettings.ClubNotifyChannelId);
+
+        return core && azuraCast && clubManagement;
     }
 
     protected static bool CheckSettings(Type type, List<string>? excludedStrings = null, List<string>? excludedInts = null)
@@ -76,26 +102,31 @@ internal abstract class BaseSettings
         {
             object? value = property.GetValue(null);
 
-            if (property.PropertyType == typeof(string))
+            switch (property.PropertyType)
             {
-                if (excludedStrings?.Contains(property.Name) == true)
-                    continue;
+                case Type t when t == typeof(string):
+                    if (excludedStrings?.Contains(property.Name) == true)
+                        continue;
 
-                if (string.IsNullOrWhiteSpace(value as string))
-                    failed.Add(property.Name);
-            }
-            else if (property.PropertyType == typeof(ulong) || property.PropertyType == typeof(int))
-            {
-                if (excludedInts?.Contains(property.Name) == true)
-                    continue;
+                    if (string.IsNullOrWhiteSpace(value as string))
+                        failed.Add(property.Name);
 
-                if (Convert.ToInt64(value, CultureInfo.InvariantCulture) == 0)
-                    failed.Add(property.Name);
-            }
-            else if (property.PropertyType == typeof(TimeSpan))
-            {
-                if (value is TimeSpan timeSpan && timeSpan == TimeSpan.Zero)
-                    failed.Add(property.Name);
+                    break;
+
+                case Type t when t == typeof(ulong) || t == typeof(int):
+                    if (excludedInts?.Contains(property.Name) == true)
+                        continue;
+
+                    if (Convert.ToInt64(value, CultureInfo.InvariantCulture) == 0)
+                        failed.Add(property.Name);
+
+                    break;
+
+                case Type t when t == typeof(TimeSpan):
+                    if (value is TimeSpan timeSpan && timeSpan == TimeSpan.Zero)
+                        failed.Add(property.Name);
+
+                    break;
             }
         }
 

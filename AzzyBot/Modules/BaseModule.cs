@@ -1,8 +1,12 @@
 using System;
 using AzzyBot.Modules.AzuraCast;
+using AzzyBot.Modules.AzuraCast.Settings;
 using AzzyBot.Modules.ClubManagement;
+using AzzyBot.Modules.ClubManagement.Settings;
 using AzzyBot.Modules.Core;
+using AzzyBot.Modules.Core.Settings;
 using AzzyBot.Modules.MusicStreaming;
+using AzzyBot.Modules.MusicStreaming.Settings;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 
@@ -67,14 +71,14 @@ internal abstract class BaseModule
             return;
 
         // Only activate them if Core is active and the settings are already loaded
-        if (BaseSettings.ActivateAzuraCast && AzuraCastSettings.AzuraCastSettingsLoaded)
+        if (BaseSettings.ActivateAzuraCast && AcSettings.AzuraCastSettingsLoaded)
             RegisterModule(new AzuraCastModule());
 
-        if (ModuleStates.AzuraCast && BaseSettings.ActivateClubManagement && ClubManagementSettings.ClubManagementSettingsLoaded)
-            RegisterModule(new ClubManagementModule());
+        if (ModuleStates.AzuraCast && BaseSettings.ActivateClubManagement && CmSettings.ClubManagementSettingsLoaded)
+            RegisterModule(new CmModule());
 
-        if (ModuleStates.AzuraCast && BaseSettings.ActivateMusicStreaming && MusicStreamingSettings.MusicStreamingSettingsLoaded)
-            RegisterModule(new MusicStreamingModule());
+        if (ModuleStates.AzuraCast && BaseSettings.ActivateMusicStreaming && MsSettings.MusicStreamingSettingsLoaded)
+            RegisterModule(new MsModule());
     }
 
     private static void ForEachModuleDo(Action<BaseModule> action)
@@ -97,7 +101,7 @@ internal abstract class BaseModule
     internal static void RegisterAllCommands(SlashCommandsExtension slashCommandsExtension, ulong? serverId) => ForEachModuleDo(module => module.RegisterCommands(slashCommandsExtension, serverId));
     internal static void RegisterAllFileLocks() => ForEachModuleDo(module => module.RegisterFileLocks());
     internal static void DisposeAllFileLocks() => ForEachModuleDo(module => module.DisposeFileLocks());
-    internal static void StartAllGlobalTimers() => ForEachModuleDo(module => module.StartGlobalTimers());
+    internal static void StartAllTimers() => ForEachModuleDo(module => module.StartGlobalTimers());
     internal static void StartAllProcesses() => ForEachModuleDo(module => module.StartProcesses());
     internal static void StopAllTimers() => ForEachModuleDo(module => module.StopTimers());
     internal static void StopAllProcesses() => ForEachModuleDo(module => module.StopProcesses());

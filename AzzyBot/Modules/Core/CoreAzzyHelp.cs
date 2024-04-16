@@ -4,6 +4,7 @@ using System.Reflection;
 using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.ClubManagement;
 using AzzyBot.Modules.Core.Models;
+using AzzyBot.Modules.Core.Settings;
 using AzzyBot.Modules.MusicStreaming;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
@@ -101,13 +102,13 @@ internal static class CoreAzzyHelp
         List<Type> allowedCommands = [typeof(CoreCommands)];
 
         if (ModuleStates.AzuraCast)
-            allowedCommands.Add(typeof(AzuraCastCommands));
+            allowedCommands.Add(typeof(AcCommands));
 
         if (ModuleStates.AzuraCast && ModuleStates.ClubManagement)
-            allowedCommands.Add(typeof(ClubManagementCommands));
+            allowedCommands.Add(typeof(CmCommands));
 
         if (ModuleStates.AzuraCast && ModuleStates.MusicStreaming)
-            allowedCommands.Add(typeof(MusicStreamingCommands));
+            allowedCommands.Add(typeof(MsCommands));
 
         return allowedCommands;
     }

@@ -33,12 +33,35 @@ internal static class CoreWebRequests
         Timeout = TimeSpan.FromSeconds(15)
     };
 
+    /// <summary>
+    /// General HttpClient which prefers IPv6
+    /// </summary>
     private static readonly HttpClient Client = new()
     {
         DefaultRequestVersion = new(1, 1),
         DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher,
         Timeout = TimeSpan.FromSeconds(30)
     };
+
+    internal static HttpClient GetHttpClientV4(Dictionary<string, string> headers)
+    {
+        if (headers.Count is 0)
+            return ClientV4;
+
+        AddHeaders(headers, false);
+
+        return ClientV4;
+    }
+
+    internal static HttpClient GetHttpClient(Dictionary<string, string> headers)
+    {
+        if (headers.Count is 0)
+            return Client;
+
+        AddHeaders(headers);
+
+        return Client;
+    }
 
     internal static async Task<string> GetWebAsync(string url, Dictionary<string, string>? headers = null, bool ipv6 = true)
     {
@@ -70,7 +93,7 @@ internal static class CoreWebRequests
         }
     }
 
-    internal static async Task<Stream> GetWebDownloadAsync(string url, Dictionary<string, string> headers, bool ipv6 = true)
+    internal static async Task<HttpResponseMessage> GetWebDownloadAsync(string url, Dictionary<string, string> headers, bool ipv6 = true)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
 
@@ -82,7 +105,7 @@ internal static class CoreWebRequests
             HttpResponseMessage response = await client.GetAsync(new Uri(url));
             response.EnsureSuccessStatusCode();
 
-            return await response.Content.ReadAsStreamAsync();
+            return response;
         }
         catch (HttpRequestException e)
         {

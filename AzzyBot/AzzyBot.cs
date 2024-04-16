@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
 using AzzyBot.Modules;
 using AzzyBot.Modules.Core;
-using AzzyBot.Modules.Core.Updater;
+using AzzyBot.Modules.Core.Settings;
 using AzzyBot.Strings;
 using DSharpPlus;
 using DSharpPlus.Entities;
+using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
@@ -20,6 +20,7 @@ using Lavalink4NET.Extensions;
 using Lavalink4NET.InactivityTracking;
 using Lavalink4NET.InactivityTracking.Extensions;
 using Lavalink4NET.InactivityTracking.Trackers.Idle;
+using Lavalink4NET.InactivityTracking.Trackers.Users;
 using Lavalink4NET.Integrations.LyricsJava.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -30,13 +31,15 @@ namespace AzzyBot;
 internal static class AzzyBot
 {
     private static DiscordClient? DiscordClient;
+    private static SlashCommandsExtension? SlashCommands;
     private static IAudioService? AudioService;
     private static IServiceCollection? ServiceCollection;
 
-    internal static ILogger<BaseDiscordClient> GetDiscordClientLogger => DiscordClient?.Logger ?? throw new InvalidOperationException("DiscordClient is null");
     internal static string GetDiscordClientAvatarUrl => DiscordClient?.CurrentUser.AvatarUrl ?? throw new InvalidOperationException("DiscordClient is null");
     internal static ulong GetDiscordClientId => DiscordClient?.CurrentUser.Id ?? throw new InvalidOperationException("DiscordClient is null");
     internal static string GetDiscordClientUserName => DiscordClient?.CurrentUser.Username ?? throw new InvalidOperationException("DiscordClient is null");
+    internal static IReadOnlyDictionary<ulong, DiscordGuild> GetDiscordClientGuilds => DiscordClient?.Guilds ?? throw new InvalidOperationException("DiscordClient is null");
+    internal static ILogger<BaseDiscordClient> GetDiscordClientLogger => DiscordClient?.Logger ?? throw new InvalidOperationException("DiscordClient is null");
     internal static string GetDiscordClientVersion => DiscordClient?.VersionString ?? throw new InvalidOperationException("DiscordClient is null");
     internal static IAudioService GetAudioService => AudioService ?? throw new InvalidOperationException("AudioService is null");
 
@@ -44,7 +47,7 @@ internal static class AzzyBot
     {
         #region Add basic startup information
 
-        await Console.Out.WriteLineAsync($"Starting {CoreAzzyStatsGeneral.GetBotName} in version {CoreAzzyStatsGeneral.GetBotVersion} on {RuntimeInformation.OSDescription}-{RuntimeInformation.OSArchitecture}");
+        await Console.Out.WriteLineAsync($"Starting {CoreAzzyStatsGeneral.GetBotName} in version {CoreAzzyStatsGeneral.GetBotVersion} on {CoreMisc.GetOperatingSystem}-{CoreMisc.GetOperatingSystemArch}");
 
         #endregion Add basic startup information
 
@@ -81,7 +84,7 @@ internal static class AzzyBot
 
         await Console.Out.WriteLineAsync("Creating DiscordClient");
         DiscordClient = InitializeBot();
-        ExceptionHandler.LogMessage(LogLevel.Debug, "DiscordClient loaded");
+        ExceptionHandler.LogMessage(LogLevel.Information, "DiscordClient loaded");
 
         #endregion Initialize client
 
@@ -102,39 +105,30 @@ internal static class AzzyBot
         #region Initialize Slash Commands
 
         ExceptionHandler.LogMessage(LogLevel.Debug, "Initializing SlashCommands");
-        SlashCommandsExtension? slash = DiscordClient.UseSlashCommands();
-        BaseModule.RegisterAllCommands(slash, CoreSettings.ServerId);
+        SlashCommands = DiscordClient.UseSlashCommands();
+        BaseModule.RegisterAllCommands(SlashCommands, CoreSettings.ServerId);
 
         #endregion Initialize Slash Commands
 
         #region Initialize Events
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Adding events");
-        DiscordClient.ClientErrored += DiscordClientError.DiscordErrorAsync;
-        slash.SlashCommandErrored += SlashCommandError.SlashErrorAsync;
-        slash.AutocompleteErrored += SlashCommandError.AutocompleteErrorAsync;
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Adding EventHandlers");
+        AddEventHandlers();
 
         #endregion Initialize Events
 
         #region Initialize Interactivity
 
         ExceptionHandler.LogMessage(LogLevel.Debug, "Configuring interactivity");
-        InteractivityConfiguration interactivityConfiguration = new()
-        {
-            ResponseBehavior = InteractionResponseBehavior.Ignore,
-            ResponseMessage = "This is not a valid option!",
-            Timeout = TimeSpan.FromMinutes(1)
-        };
-
-        DiscordClient.UseInteractivity(interactivityConfiguration);
+        DiscordClient.UseInteractivity(InitializeInteractivity());
 
         #endregion Initialize Interactivity
 
         #region Initialize Processes
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Starting all processes");
+        ExceptionHandler.LogMessage(LogLevel.Information, "Starting all processes");
         BaseModule.StartAllProcesses();
-        await Task.Delay(1000);
+        await Task.Delay(3000);
         ExceptionHandler.LogMessage(LogLevel.Debug, "Started all processes");
 
         #endregion Initialize Processes
@@ -142,118 +136,9 @@ internal static class AzzyBot
         #region Initialize Lavalink
 
         if (ModuleStates.MusicStreaming)
-        {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "Initializing Lavalink4NET");
-            ServiceCollection = new ServiceCollection().AddLavalink().AddSingleton(DiscordClient).ConfigureLavalink(config =>
-            {
-                config.BaseAddress = (CoreAzzyStatsGeneral.GetBotName is "AzzyBot-Docker") ? new Uri("http://lavalink:2333") : new Uri("http://localhost:2333");
-                config.ReadyTimeout = TimeSpan.FromSeconds(15);
-                config.ResumptionOptions = new(TimeSpan.Zero);
-                config.Label = "AzzyBot";
-            });
-
-            ServiceCollection.AddLogging(x => x.AddConsole().SetMinimumLevel((LogLevel)Enum.ToObject(typeof(LogLevel), CoreSettings.LogLevel)));
-
-            if (CoreModule.GetMusicStreamingInactivity())
-            {
-                ServiceCollection.AddInactivityTracking();
-                ServiceCollection.ConfigureInactivityTracking(config =>
-                {
-                    config.DefaultTimeout = TimeSpan.FromMinutes(CoreModule.GetMusicStreamingInactivityTime());
-                    config.TrackingMode = InactivityTrackingMode.Any;
-                    config.UseDefaultTrackers = true;
-                });
-                ServiceCollection.Configure<IdleInactivityTrackerOptions>(config => config.TrackNewPlayers = false);
-
-                ExceptionHandler.LogMessage(LogLevel.Debug, "Applied inactivity tracking to Lavalink4NET");
-            }
-
-            IServiceProvider serviceProvider = ServiceCollection.BuildServiceProvider();
-
-            foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
-            {
-                await hostedService.StartAsync(new CancellationToken());
-            }
-
-            AudioService = serviceProvider.GetRequiredService<IAudioService>();
-
-            if (CoreModule.GetMusicStreamingLyrics())
-            {
-                AudioService.UseLyricsJava();
-                ExceptionHandler.LogMessage(LogLevel.Debug, "Applied Lyrics.Java to Lavalink4NET");
-            }
-
-            ExceptionHandler.LogMessage(LogLevel.Debug, "Lavalink4NET loaded");
-        }
+            await InitializeLavalink4NetAsync();
 
         #endregion Initialize Lavalink
-
-        #region Add ShutdownProcess
-
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Adding shutdown process");
-        async Task BotShutdown()
-        {
-            if (ModuleStates.MusicStreaming)
-            {
-                IServiceProvider serviceProvider = ServiceCollection?.BuildServiceProvider() ?? throw new InvalidOperationException("No services started!");
-
-                foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
-                {
-                    await hostedService.StopAsync(new CancellationToken());
-                }
-            }
-
-            BaseModule.StopAllTimers();
-            ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all timers");
-
-            BaseModule.StopAllProcesses();
-            ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all processes");
-
-            BaseModule.DisposeAllFileLocks();
-            ExceptionHandler.LogMessage(LogLevel.Debug, "Disposed all file locks");
-
-            if (slash is not null)
-            {
-                slash.Dispose();
-                slash = null;
-
-                ExceptionHandler.LogMessage(LogLevel.Debug, "SlashCommands disposed");
-            }
-            else
-            {
-                ExceptionHandler.LogMessage(LogLevel.Debug, "SlashCommands are null");
-            }
-
-            if (DiscordClient is not null)
-            {
-                await DiscordClient.DisconnectAsync();
-                DiscordClient.Dispose();
-                DiscordClient = null;
-
-                await Console.Out.WriteLineAsync("DiscordClient disposed");
-            }
-            else
-            {
-                await Console.Out.WriteLineAsync("DiscordClient is null");
-            }
-
-            await Console.Out.WriteLineAsync("Ready for exit");
-            Environment.Exit(0);
-        }
-
-        AppDomain.CurrentDomain.ProcessExit += async (s, e) =>
-        {
-            ExceptionHandler.LogMessage(LogLevel.Information, "Process exit requested by AppDomain.CurrentDomain.ProcessExit");
-            await BotShutdown();
-        };
-
-        Console.CancelKeyPress += async (s, e) =>
-        {
-            ExceptionHandler.LogMessage(LogLevel.Information, "Process exit requested by Console.CancelKeyPress");
-            await BotShutdown();
-        };
-
-        #endregion Add ShutdownProcess
 
         #region Connecting to Gateway
 
@@ -266,24 +151,16 @@ internal static class AzzyBot
         #region Initialize Strings
 
         ExceptionHandler.LogMessage(LogLevel.Debug, "Loading strings");
-        await StringBuilding.LoadStringsAsync();
+        await BaseStringBuilder.LoadStringsAsync();
 
         #endregion Initialize Strings
 
         #region Initialize Timers
 
         ExceptionHandler.LogMessage(LogLevel.Debug, "Starting timers");
-        if (BaseSettings.ActivateTimers)
-            BaseModule.StartAllGlobalTimers();
+        BaseModule.StartAllTimers();
 
         #endregion Initialize Timers
-
-        #region Check for updates
-
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Checking for updates");
-        await Updates.CheckForUpdatesAsync();
-
-        #endregion Check for updates
 
         #region Finalizing
 
@@ -300,6 +177,78 @@ internal static class AzzyBot
         ExceptionHandler.LogMessage(LogLevel.Critical, "Global exception found!");
         ExceptionHandler.LogMessage(LogLevel.Critical, ex.Message);
         ExceptionHandler.LogMessage(LogLevel.Critical, ex.StackTrace ?? "No StackTrace available!");
+    }
+
+    private static async Task GuildCreatedAsync(DiscordClient c, GuildCreateEventArgs e)
+    {
+        ExceptionHandler.LogMessage(LogLevel.Information, "Bot joined a Guild!");
+
+        if (c.Guilds.Count <= 1)
+            return;
+
+        ExceptionHandler.LogMessage(LogLevel.Warning, "The bot is now in 2 guilds, self-kick initiated.");
+        await e.Guild.LeaveAsync();
+    }
+
+    private static async Task GuildDownloadedAsync(DiscordClient c, GuildDownloadCompletedEventArgs e)
+    {
+        if (e.Guilds.Count <= 1)
+        {
+            bool channelsExist = true;
+
+            foreach (KeyValuePair<ulong, DiscordGuild> guild in e.Guilds)
+            {
+                channelsExist = BaseSettings.CheckIfChannelsExist(guild.Value);
+            }
+
+            if (!channelsExist)
+                await BotShutdownAsync();
+
+            return;
+        }
+
+        ExceptionHandler.LogMessage(LogLevel.Critical, "The bot is joined on more guilds than one. Please remove the bot out of every guild until only 1 is left!");
+        await BotShutdownAsync();
+    }
+
+    private static void AddEventHandlers()
+    {
+        ArgumentNullException.ThrowIfNull(DiscordClient);
+        ArgumentNullException.ThrowIfNull(SlashCommands);
+
+        DiscordClient.ClientErrored += DiscordClientError.DiscordErrorAsync;
+        DiscordClient.GuildDownloadCompleted += GuildDownloadedAsync;
+        DiscordClient.GuildCreated += GuildCreatedAsync;
+        SlashCommands.SlashCommandErrored += SlashCommandError.SlashErrorAsync;
+        SlashCommands.AutocompleteErrored += SlashCommandError.AutocompleteErrorAsync;
+        AppDomain.CurrentDomain.ProcessExit += ProcessExit;
+        Console.CancelKeyPress += ConsoleKeyShutdown;
+    }
+
+    private static void RemoveEventHandlers()
+    {
+        ArgumentNullException.ThrowIfNull(DiscordClient);
+        ArgumentNullException.ThrowIfNull(SlashCommands);
+
+        DiscordClient.ClientErrored -= DiscordClientError.DiscordErrorAsync;
+        DiscordClient.GuildDownloadCompleted -= GuildDownloadedAsync;
+        DiscordClient.GuildCreated -= GuildCreatedAsync;
+        SlashCommands.SlashCommandErrored -= SlashCommandError.SlashErrorAsync;
+        SlashCommands.AutocompleteErrored -= SlashCommandError.AutocompleteErrorAsync;
+        AppDomain.CurrentDomain.ProcessExit -= ProcessExit;
+        Console.CancelKeyPress -= ConsoleKeyShutdown;
+    }
+
+    private static async void ProcessExit(object? c, EventArgs e)
+    {
+        ExceptionHandler.LogMessage(LogLevel.Information, "Process exit requested by AppDomain.CurrentDomain.ProcessExit");
+        await BotShutdownAsync();
+    }
+
+    private static async void ConsoleKeyShutdown(object? c, ConsoleCancelEventArgs e)
+    {
+        ExceptionHandler.LogMessage(LogLevel.Information, "Process exit requested by Console.CancelKeyPress");
+        await BotShutdownAsync();
     }
 
     private static DiscordClient InitializeBot()
@@ -370,6 +319,112 @@ internal static class AzzyBot
         await DiscordClient.UpdateStatusAsync(activity, status);
     }
 
+    private static InteractivityConfiguration InitializeInteractivity()
+    {
+        InteractivityConfiguration interactivityConfiguration = new()
+        {
+            ResponseBehavior = InteractionResponseBehavior.Ignore,
+            ResponseMessage = "This is not a valid option!",
+            Timeout = TimeSpan.FromMinutes(1)
+        };
+
+        return new(interactivityConfiguration);
+    }
+
+    private static async Task InitializeLavalink4NetAsync()
+    {
+        ArgumentNullException.ThrowIfNull(DiscordClient);
+
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Initializing Lavalink4NET");
+        ServiceCollection = new ServiceCollection().AddLavalink().AddSingleton(DiscordClient).ConfigureLavalink(config =>
+        {
+            config.BaseAddress = (CoreAzzyStatsGeneral.GetBotName is "AzzyBot-Docker") ? new Uri("http://lavalink:2333") : new Uri("http://localhost:2333");
+            config.ReadyTimeout = TimeSpan.FromSeconds(15);
+            config.ResumptionOptions = new(TimeSpan.Zero);
+            config.Label = "AzzyBot";
+        });
+
+        ServiceCollection.AddLogging(x => x.AddConsole().SetMinimumLevel((LogLevel)Enum.ToObject(typeof(LogLevel), CoreSettings.LogLevel)));
+
+        if (CoreModule.GetMusicStreamingInactivity())
+        {
+            ServiceCollection.AddInactivityTracking();
+            ServiceCollection.ConfigureInactivityTracking(config =>
+            {
+                config.DefaultTimeout = TimeSpan.FromMinutes(CoreModule.GetMusicStreamingInactivityTime());
+                config.TrackingMode = InactivityTrackingMode.Any;
+                config.UseDefaultTrackers = true;
+            });
+            ServiceCollection.AddInactivityTracker<IdleInactivityTracker>();
+            ServiceCollection.AddInactivityTracker<UsersInactivityTracker>();
+            ServiceCollection.Configure<IdleInactivityTrackerOptions>(config => config.TrackNewPlayers = false);
+
+            ExceptionHandler.LogMessage(LogLevel.Debug, "Applied inactivity tracking to Lavalink4NET");
+        }
+
+        IServiceProvider serviceProvider = ServiceCollection.BuildServiceProvider();
+
+        foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
+        {
+            await hostedService.StartAsync(new CancellationToken());
+        }
+
+        AudioService = serviceProvider.GetRequiredService<IAudioService>();
+
+        if (CoreModule.GetMusicStreamingLyrics())
+        {
+            AudioService.UseLyricsJava();
+            ExceptionHandler.LogMessage(LogLevel.Debug, "Applied Lyrics.Java to Lavalink4NET");
+        }
+
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Lavalink4NET loaded");
+    }
+
+    private static async Task BotShutdownAsync()
+    {
+        if (ModuleStates.MusicStreaming)
+        {
+            IServiceProvider serviceProvider = ServiceCollection?.BuildServiceProvider() ?? throw new InvalidOperationException("No services started!");
+
+            foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
+            {
+                await hostedService.StopAsync(new CancellationToken());
+            }
+        }
+
+        BaseModule.StopAllTimers();
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all timers");
+
+        BaseModule.StopAllProcesses();
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all processes");
+
+        BaseModule.DisposeAllFileLocks();
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Disposed all file locks");
+
+        RemoveEventHandlers();
+        ExceptionHandler.LogMessage(LogLevel.Debug, "Removed EventHandlers");
+
+        if (SlashCommands is not null)
+        {
+            SlashCommands.Dispose();
+            SlashCommands = null;
+
+            ExceptionHandler.LogMessage(LogLevel.Debug, "SlashCommands disposed");
+        }
+
+        if (DiscordClient is not null)
+        {
+            await DiscordClient.DisconnectAsync();
+            DiscordClient.Dispose();
+            DiscordClient = null;
+
+            await Console.Out.WriteLineAsync("DiscordClient disposed");
+        }
+
+        await Console.Out.WriteLineAsync("Ready for exit");
+        Environment.Exit(0);
+    }
+
     /// <summary>
     /// Sends a message to a specific channel asynchronously.
     /// </summary>
@@ -400,74 +455,30 @@ internal static class AzzyBot
     }
 
     /// <summary>
-    /// Sends a message with an attached file to a specific channel asynchronously.
-    /// </summary>
-    /// <param name="channelId">The ID of the channel to send the message to.</param>
-    /// <param name="content">The text content of the message.</param>
-    /// <param name="embed">A DiscordEmbed to include in the message.</param>
-    /// <param name="fileName">The name of the file to attach to the message.</param>
-    /// <param name="mention">A boolean indicating whether to allow mentions in this message. This is optional.</param>
-    /// <returns>A Task representing the asynchronous operation. The task result is a boolean indicating whether the operation was successful.</returns>
-    /// <exception cref="IOException">Throws when the file can not be deleted.</exception>
-    internal static async Task<bool> SendMessageAsync(ulong channelId, string content, DiscordEmbed embed, string fileName, bool mention = false)
-    {
-        try
-        {
-            ArgumentNullException.ThrowIfNull(DiscordClient);
-            ArgumentOutOfRangeException.ThrowIfZero(channelId);
-            ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
-
-            FileStream stream = new(fileName, FileMode.Open, FileAccess.Read);
-
-            DiscordMessageBuilder builder = new();
-            if (!string.IsNullOrWhiteSpace(content))
-                builder.WithContent(content);
-
-            if (mention)
-                builder.WithAllowedMentions([EveryoneMention.All, RepliedUserMention.All, RoleMention.All, UserMention.All]);
-
-            builder.AddEmbed(embed);
-            builder.AddFile(Path.GetFileName(fileName), stream);
-
-            DiscordChannel channel = await DiscordClient.GetChannelAsync(channelId);
-            await channel.SendMessageAsync(builder);
-            await stream.DisposeAsync();
-
-            return (!CoreFileOperations.DeleteTempFile(fileName))
-                ? throw new IOException($"{fileName} couldn't be deleted!")
-                : true;
-        }
-        catch (DirectoryNotFoundException)
-        { }
-        catch (FileNotFoundException)
-        { }
-        catch (UnauthorizedAccessException)
-        { }
-
-        return false;
-    }
-
-    /// <summary>
     /// Sends a message with multiple attached files to a specific channel asynchronously.
     /// </summary>
     /// <param name="channelId">The ID of the channel to send the message to.</param>
     /// <param name="content">The text content of the message.</param>
     /// <param name="embed">A DiscordEmbed to include in the message.</param>
     /// <param name="fileNames">An array of file names to attach to the message.</param>
+    /// <param name="mention">A boolean indicating whether to allow mentions in this message. This is optional.</param>
     /// <returns>A Task representing the asynchronous operation. The task result is a boolean indicating whether the operation was successful.</returns>
     /// <exception cref="IOException">Throws when the file can not be deleted.</exception>
-    internal static async Task<bool> SendMessageAsync(ulong channelId, string content, DiscordEmbed embed, string[] fileNames)
+    internal static async Task<bool> SendMessageAsync(ulong channelId, string content, DiscordEmbed embed, string[] fileNames, bool mention = false)
     {
+        ArgumentNullException.ThrowIfNull(DiscordClient);
+        ArgumentOutOfRangeException.ThrowIfZero(channelId);
+        ArgumentNullException.ThrowIfNull(fileNames);
+        ArgumentOutOfRangeException.ThrowIfZero(fileNames.Length);
+
         try
         {
-            ArgumentNullException.ThrowIfNull(DiscordClient);
-            ArgumentOutOfRangeException.ThrowIfZero(channelId);
-            ArgumentNullException.ThrowIfNull(fileNames);
-            ArgumentOutOfRangeException.ThrowIfZero(fileNames.Length);
-
             DiscordMessageBuilder builder = new();
             if (!string.IsNullOrWhiteSpace(content))
                 builder.WithContent(content);
+
+            if (mention)
+                builder.WithAllowedMentions([EveryoneMention.All, RepliedUserMention.All, RoleMention.All, UserMention.All]);
 
             builder.AddEmbed(embed);
 

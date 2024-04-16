@@ -6,6 +6,7 @@ internal enum CoreFileDirectoriesEnum
     ClubManagement,
     Core,
     Customization,
+    logs,
     Modules,
     MusicStreaming,
     Files,

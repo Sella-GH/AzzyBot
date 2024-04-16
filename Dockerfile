@@ -1,6 +1,5 @@
 # BUILD IMAGE
-ARG ARCH
-FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim-$ARCH AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim AS build
 USER root
 RUN apt update && apt upgrade -y && apt autoremove -y
 WORKDIR /src
@@ -9,12 +8,12 @@ RUN dotnet restore ./AzzyBot.csproj
 RUN dotnet publish ./AzzyBot.csproj -c Docker -o out
 
 # RUNNER IMAGE
-FROM mcr.microsoft.com/dotnet/runtime:8.0-bookworm-slim-$ARCH
+FROM mcr.microsoft.com/dotnet/runtime:8.0-bookworm-slim
 
 # Upgrade internal tools and packages first
 USER root
 RUN apt update && apt upgrade -y && apt autoremove -y
-RUN apt install -y --no-install-recommends wget apt-transport-https gpg libicu72 iputils-ping
+RUN apt install -y --no-install-recommends iputils-ping
 
 # Copy the built app
 WORKDIR /app

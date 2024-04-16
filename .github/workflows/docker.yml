@@ -112,7 +112,7 @@ jobs:
       matrix:
         include:
           - os: linux
-            arch: arm64v8
+            arch: arm64
             
     steps:       
       - name: Checkout

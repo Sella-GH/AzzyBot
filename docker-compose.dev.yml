@@ -4,6 +4,7 @@ services:
   AzzyBot:
     container_name: AzzyBot
     image: sellagh/azzybot:dev
+    pull_policy: always
     restart: unless-stopped
     depends_on:
       - lavalink

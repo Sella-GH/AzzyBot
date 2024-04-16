@@ -389,7 +389,7 @@ dotnet_diagnostic.rcs1016.severity = suggestion
 dotnet_diagnostic.rcs1018.severity = suggestion
 
 # Order modifiers
-dotnet_diagnostic.rcs1019.severity = suggestion
+dotnet_diagnostic.rcs1019.severity = none
 
 # Simplify Nullable<T> to T?
 dotnet_diagnostic.rcs1020.severity = suggestion
