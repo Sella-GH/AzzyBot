@@ -63,6 +63,13 @@ updates:
         update-types:
         - "minor"
         - "patch"
+      Roslynator:
+        applies-to: version-updates
+        patterns:
+        - "Roslynator*"
+        update-types:
+        - "minor"
+        - "patch"
       System:
         applies-to: version-updates
         patterns:
