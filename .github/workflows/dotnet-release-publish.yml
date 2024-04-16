@@ -72,7 +72,7 @@ jobs:
       - name: Add some basic information
         run: |
           sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
-          sed -i 's\Compile date not found\${{ github.event.head_commit.timestamp }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
+          sed -i 's\Compile date not found\${{ github.event.created_at }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
           sed -i 's\Lines of source code not found\${{ steps.loc_cs.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
           sed -i 's\Lines of JSON code not found\${{ steps.loc_json.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
         env:
@@ -106,8 +106,8 @@ jobs:
       - name: Set version
         id: set-version
         run: |
-          echo "version=v${{steps.get-version.outputs.version}}" >> "$GITHUB_OUTPUT"
-          echo "clean_version=${{steps.get-version.outputs.version}}" >> "$GITHUB_OUTPUT"
+          echo "version=v${{ steps.get-version.outputs.version }}" >> "$GITHUB_OUTPUT"
+          echo "clean_version=${{ steps.get-version.outputs.version }}" >> "$GITHUB_OUTPUT"
 
   create_release:
     name: Create GitHub Release
