@@ -39,6 +39,12 @@ jobs:
           else
             echo "set-env=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
+          
+      - name: Get Date and Time
+        id: dateTime
+        uses: Kaven-Universe/github-action-current-date-time@v1
+        with:
+          format: "YYYY-MM-DDTHH:mm:ss"
 
       - name: Calculate Lines of Source Code
         id: loc_cs
@@ -80,7 +86,7 @@ jobs:
           build-args: |
             ARCH=${{ matrix.arch }}
             COMMIT=${{ github.sha }}
-            TIMESTAMP=${{ github.event.repository.updated_at }}
+            TIMESTAMP=${{ steps.dateTime.outputs.time }}
             LOC_CS=${{ steps.loc_cs.outputs.total_lines }}
             LOC_JSON=${{ steps.loc_json.outputs.total_lines }}
           context: .
@@ -130,6 +136,12 @@ jobs:
           else
             echo "set-env=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
+          
+      - name: Get Date and Time
+        id: dateTime
+        uses: Kaven-Universe/github-action-current-date-time@v1
+        with:
+          format: "YYYY-MM-DDTHH:mm:ss"
 
       - name: Calculate Lines of Source Code
         id: loc_cs
@@ -171,7 +183,7 @@ jobs:
           build-args: |
             ARCH=${{ matrix.arch }}
             COMMIT=${{ github.sha }}
-            TIMESTAMP=${{ github.event.repository.updated_at }}
+            TIMESTAMP=${{ steps.dateTime.outputs.time }}
             LOC_CS=${{ steps.loc_cs.outputs.total_lines }}
             LOC_JSON=${{ steps.loc_json.outputs.total_lines }}
           context: .

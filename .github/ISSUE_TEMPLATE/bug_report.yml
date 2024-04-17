@@ -54,6 +54,17 @@ body :
      render : shell
 
   - type : dropdown
+    id : deploy-version
+    attributes :
+      label : "Deployement version"
+      description : "Which deployement version are you using?"
+      options :
+        - Docker
+        - Native
+    validations :
+      required : true
+
+  - type : dropdown
     id : operating-system
     attributes :
       label : "Operating system"
