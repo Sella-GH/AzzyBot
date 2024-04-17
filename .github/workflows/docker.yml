@@ -17,7 +17,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       environment: ${{ steps.environment.outputs.set-env }}
-      dateTime: ${{ steps.dateTime.outputs.dateTime }}
     strategy:
       matrix:
         include:
@@ -43,8 +42,9 @@ jobs:
           
       - name: Get Date and Time
         id: dateTime
-        run: |
-          echo "set-env=$(date +'%Y-%m-%dT%H:%M:%S')" >> "$GITHUB_OUTPUT"
+        uses: Kaven-Universe/github-action-current-date-time@v1
+        with:
+          format: "YYYY-MM-DDTHH:mm:ss"
 
       - name: Calculate Lines of Source Code
         id: loc_cs
@@ -114,7 +114,6 @@ jobs:
     runs-on: self-hosted
     outputs:
       environment: ${{ steps.environment.outputs.set-env }}
-      dateTime: ${{ steps.dateTime.outputs.dateTime }}
     strategy:
       matrix:
         include:
@@ -140,8 +139,9 @@ jobs:
           
       - name: Get Date and Time
         id: dateTime
-        run: |
-          echo "set-env=$(date +'%Y-%m-%dT%H:%M:%S')" >> "$GITHUB_OUTPUT"
+        uses: Kaven-Universe/github-action-current-date-time@v1
+        with:
+          format: "YYYY-MM-DDTHH:mm:ss"
 
       - name: Calculate Lines of Source Code
         id: loc_cs

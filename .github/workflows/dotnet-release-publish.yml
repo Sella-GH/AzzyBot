@@ -22,8 +22,6 @@ jobs:
     needs: check_for_tag
     if: ${{ needs.check_for_tag.outputs.tag_created }} == "true"
     runs-on: ubuntu-latest
-    outputs:
-      dateTime: ${{ steps.dateTime.outputs.dateTime }}
     strategy:
       matrix:
         include:
@@ -73,8 +71,9 @@ jobs:
           
       - name: Get Date and Time
         id: dateTime
-        run: |
-          echo "set-env=$(date +'%Y-%m-%dT%H:%M:%S')" >> "$GITHUB_OUTPUT"
+        uses: Kaven-Universe/github-action-current-date-time@v1
+        with:
+          format: "YYYY-MM-DDTHH:mm:ss"
 
       - name: Add some basic information
         run: |
