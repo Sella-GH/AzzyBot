@@ -22,8 +22,6 @@ jobs:
     needs: check_for_tag
     if: ${{ needs.check_for_tag.outputs.tag_created }} == "true"
     runs-on: ubuntu-latest
-    outputs:
-      dateTime: ${{ steps.dateTime.outputs.dateTime }}
     strategy:
       matrix:
         include:
@@ -70,16 +68,11 @@ jobs:
         with:
           directory: "/home/runner/work/AzzyBot/AzzyBot/AzzyBot/Customization"
           include_lang: "JSON"
-          
-      - name: Get Date and Time
-        id: dateTime
-        run: |
-          echo "set-env=$(date -Is)" >> "$GITHUB_OUTPUT"
 
       - name: Add some basic information
         run: |
           sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
-          sed -i 's\Compile date not found\${{ steps.dateTime.outputs.dateTime }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
+          sed -i 's\Compile date not found\${{ github.event.created_at }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
           sed -i 's\Lines of source code not found\${{ steps.loc_cs.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
           sed -i 's\Lines of JSON code not found\${{ steps.loc_json.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
         env:
