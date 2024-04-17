@@ -80,7 +80,7 @@ jobs:
           build-args: |
             ARCH=${{ matrix.arch }}
             COMMIT=${{ github.sha }}
-            TIMESTAMP=${{ github.event.created_at }}
+            TIMESTAMP=${{ github.event.repository.updated_at }}
             LOC_CS=${{ steps.loc_cs.outputs.total_lines }}
             LOC_JSON=${{ steps.loc_json.outputs.total_lines }}
           context: .
@@ -171,7 +171,7 @@ jobs:
           build-args: |
             ARCH=${{ matrix.arch }}
             COMMIT=${{ github.sha }}
-            TIMESTAMP=${{ github.event.created_at }}
+            TIMESTAMP=${{ github.event.repository.updated_at }}
             LOC_CS=${{ steps.loc_cs.outputs.total_lines }}
             LOC_JSON=${{ steps.loc_json.outputs.total_lines }}
           context: .
