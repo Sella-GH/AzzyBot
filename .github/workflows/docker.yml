@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       environment: ${{ steps.environment.outputs.set-env }}
+      dateTime: ${{ steps.dateTime.outputs.dateTime }}
     strategy:
       matrix:
         include:
@@ -39,6 +40,11 @@ jobs:
           else
             echo "set-env=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
+          
+      - name: Get Date and Time
+        id: dateTime
+        run: |
+          echo "set-env=$(date -Is)" >> "$GITHUB_OUTPUT"
 
       - name: Calculate Lines of Source Code
         id: loc_cs
@@ -80,7 +86,7 @@ jobs:
           build-args: |
             ARCH=${{ matrix.arch }}
             COMMIT=${{ github.sha }}
-            TIMESTAMP=${{ github.event.created_at }}
+            TIMESTAMP=${{ steps.dateTime.outputs.dateTime }}
             LOC_CS=${{ steps.loc_cs.outputs.total_lines }}
             LOC_JSON=${{ steps.loc_json.outputs.total_lines }}
           context: .
@@ -108,6 +114,7 @@ jobs:
     runs-on: self-hosted
     outputs:
       environment: ${{ steps.environment.outputs.set-env }}
+      dateTime: ${{ steps.dateTime.outputs.dateTime }}
     strategy:
       matrix:
         include:
@@ -130,6 +137,11 @@ jobs:
           else
             echo "set-env=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
+          
+      - name: Get Date and Time
+        id: dateTime
+        run: |
+          echo "set-env=$(date -Is)" >> "$GITHUB_OUTPUT"
 
       - name: Calculate Lines of Source Code
         id: loc_cs
@@ -171,7 +183,7 @@ jobs:
           build-args: |
             ARCH=${{ matrix.arch }}
             COMMIT=${{ github.sha }}
-            TIMESTAMP=${{ github.event.created_at }}
+            TIMESTAMP=${{ steps.dateTime.outputs.dateTime }}
             LOC_CS=${{ steps.loc_cs.outputs.total_lines }}
             LOC_JSON=${{ steps.loc_json.outputs.total_lines }}
           context: .
