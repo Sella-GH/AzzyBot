@@ -78,7 +78,7 @@ jobs:
       - name: Add some basic information
         run: |
           sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
-          sed -i 's\Compile date not found\${{ steps.dateTime.outputs.dateTime }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
+          sed -i 's\Compile date not found\${{ steps.dateTime.outputs.time }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
           sed -i 's\Lines of source code not found\${{ steps.loc_cs.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
           sed -i 's\Lines of JSON code not found\${{ steps.loc_json.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/AzzyBot.json
         env:
