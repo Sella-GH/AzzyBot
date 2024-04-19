@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.ClubManagement;
 
-internal class CmTimer : CmModule
+internal sealed class CmTimer : CmModule
 {
     private static Timer? ClubClosingTimer;
 
