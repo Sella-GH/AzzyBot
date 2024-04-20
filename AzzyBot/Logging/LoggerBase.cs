@@ -34,6 +34,7 @@ internal static class LoggerBase
             options.TimestampFormat = "yyyy-MM-dd HH:mm:ss ";
             options.UseUtcTimestamp = true;
         }));
+
         Logger = Factory.CreateLogger<AzzyBot>();
 
         LogDebug(Logger, "Logger created!", null);

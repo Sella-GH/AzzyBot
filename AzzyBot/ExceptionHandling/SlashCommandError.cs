@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using AzzyBot.Logging;
 using AzzyBot.Modules.Core.Strings;
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -61,11 +62,11 @@ internal static class SlashCommandError
         }
         else if (e.Exception is not DiscordException)
         {
-            await ExceptionHandler.LogErrorAsync(e.Exception, e.Context);
+            await LoggerExceptions.LogErrorAsync(e.Exception, e.Context);
         }
         else
         {
-            await ExceptionHandler.LogErrorAsync(e.Exception, e.Context, ((DiscordException)e.Exception).JsonMessage);
+            await LoggerExceptions.LogErrorAsync(e.Exception, e.Context, ((DiscordException)e.Exception).JsonMessage);
         }
     }
 
@@ -75,11 +76,11 @@ internal static class SlashCommandError
 
         if (e.Exception is not DiscordException)
         {
-            await ExceptionHandler.LogErrorAsync(e.Exception, e.Context);
+            await LoggerExceptions.LogErrorAsync(e.Exception, e.Context);
         }
         else
         {
-            await ExceptionHandler.LogErrorAsync(e.Exception, e.Context, ((DiscordException)e.Exception).JsonMessage);
+            await LoggerExceptions.LogErrorAsync(e.Exception, e.Context, ((DiscordException)e.Exception).JsonMessage);
         }
     }
 }

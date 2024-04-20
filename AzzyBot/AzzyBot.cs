@@ -265,7 +265,7 @@ internal sealed class AzzyBot
             Token = CoreSettings.BotToken,
             TokenType = TokenType.Bot,
             Intents = DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers,
-            LoggerFactory = LoggerBase.GetLoggerFactory,
+            LoggerFactory = LoggerBase.GetLoggerFactory
         };
 
         return new(config);

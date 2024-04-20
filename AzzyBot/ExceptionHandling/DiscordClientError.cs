@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using AzzyBot.Logging;
 using AzzyBot.Modules.Core.Settings;
 using AzzyBot.Modules.Core.Strings;
 using DSharpPlus;
@@ -26,18 +27,18 @@ internal static class DiscordClientError
             case RequestSizeException:
             case ServerErrorException:
             case UnauthorizedException:
-                await ExceptionHandler.LogErrorAsync(ex, ((DiscordException)e.Exception).JsonMessage);
+                await LoggerExceptions.LogErrorAsync(ex, ((DiscordException)e.Exception).JsonMessage);
                 await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, CoreStringBuilder.GetExceptionHandlingDiscordPermissions(c.CurrentUser.Username));
                 break;
 
             default:
                 if (e.Exception is not DiscordException)
                 {
-                    await ExceptionHandler.LogErrorAsync(ex);
+                    await LoggerExceptions.LogErrorAsync(ex);
                     break;
                 }
 
-                await ExceptionHandler.LogErrorAsync(ex, ((DiscordException)e.Exception).JsonMessage);
+                await LoggerExceptions.LogErrorAsync(ex, ((DiscordException)e.Exception).JsonMessage);
                 break;
         }
     }

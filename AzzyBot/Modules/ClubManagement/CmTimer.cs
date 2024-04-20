@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using AzzyBot.ExceptionHandling;
+using AzzyBot.Logging;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.ClubManagement;
@@ -47,7 +48,7 @@ internal sealed class CmTimer : CmModule
         catch (Exception ex)
         {
             // System.Threading.Timer just eats exceptions as far as I know so best to log them here.
-            await ExceptionHandler.LogErrorAsync(ex);
+            await LoggerExceptions.LogErrorAsync(ex);
         }
     }
 }
