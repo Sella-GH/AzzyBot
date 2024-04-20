@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
-using AzzyBot.ExceptionHandling;
 using AzzyBot.Logging;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.ClubManagement;
 
@@ -14,7 +12,7 @@ internal sealed class CmTimer : CmModule
     internal static void StartClubClosingTimer()
     {
         ClubClosingTimer = new(new TimerCallback(ClubClosingTimerTimeout), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
-        ExceptionHandler.LogMessage(LogLevel.Information, "ClubClosingTimer started!");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "ClubClosingTimer started!", null);
     }
 
     internal static void StopClubClosingTimer()
@@ -25,7 +23,7 @@ internal sealed class CmTimer : CmModule
         ClubClosingTimer.Change(Timeout.Infinite, Timeout.Infinite);
         ClubClosingTimer.Dispose();
         ClubClosingTimer = null;
-        ExceptionHandler.LogMessage(LogLevel.Information, "ClubClosingTimer stopped");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "ClubClosingTimer stopped", null);
     }
 
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "General Exception is there to log unkown exceptions")]

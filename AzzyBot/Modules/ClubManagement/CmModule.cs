@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AzzyBot.ExceptionHandling;
+using AzzyBot.Logging;
 using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.ClubManagement.Settings;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
 using DSharpPlus.SlashCommands;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.ClubManagement;
 
@@ -32,7 +31,7 @@ internal class CmModule : BaseModule
         string[] directories = [nameof(CoreFileDirectoriesEnum.Customization)];
         ClubBotStatusLock = new(fileName, directories);
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Registered ClubManagement File Locks");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Registered ClubManagement File Locks", null);
     }
 
     internal override void DisposeFileLocks() => ClubBotStatusLock?.Dispose();
