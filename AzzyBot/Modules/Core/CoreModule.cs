@@ -1,8 +1,7 @@
-using AzzyBot.ExceptionHandling;
+using AzzyBot.Logging;
 using AzzyBot.Modules.Core.Enums;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.Core;
 
@@ -21,7 +20,7 @@ internal class CoreModule : BaseModule
         directory = [nameof(CoreFileDirectoriesEnum.None)];
         AzzyBotLock = new(fileName, directory);
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Registered Core File Locks");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Registered Core File Locks", null);
     }
 
     internal override void DisposeFileLocks() => AzzyBotLock?.Dispose();

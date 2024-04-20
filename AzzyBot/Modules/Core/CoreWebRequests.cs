@@ -1,15 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-using AzzyBot.ExceptionHandling;
-using Microsoft.Extensions.Logging;
+using AzzyBot.Logging;
 
 namespace AzzyBot.Modules.Core;
 
@@ -88,7 +86,7 @@ internal static class CoreWebRequests
         }
         catch (HttpRequestException e)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, $"GET request for {url} failed with error {e.Message}");
+            LoggerBase.LogError(LoggerBase.GetLogger, $"GET request for {url} failed with error {e.Message}", null);
             throw;
         }
     }
@@ -109,7 +107,7 @@ internal static class CoreWebRequests
         }
         catch (HttpRequestException e)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, $"GET request for {url} failed with error {e.Message}");
+            LoggerBase.LogError(LoggerBase.GetLogger, $"GET request for {url} failed with error {e.Message}", null);
             throw;
         }
     }
@@ -148,7 +146,7 @@ internal static class CoreWebRequests
         }
         catch (HttpRequestException e)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, $"POST request for {url} failed with error {e.Message}");
+            LoggerBase.LogError(LoggerBase.GetLogger, $"POST request for {url} failed with error {e.Message}", null);
             throw;
         }
     }
@@ -179,7 +177,7 @@ internal static class CoreWebRequests
         }
         catch (HttpRequestException e)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, $"PUT request for {url} failed with error {e.Message}");
+            LoggerBase.LogError(LoggerBase.GetLogger, $"PUT request for {url} failed with error {e.Message}", null);
             throw;
         }
     }
@@ -211,7 +209,7 @@ internal static class CoreWebRequests
             {
                 if (isIPaddress && iPAddress?.AddressFamily is not AddressFamily.InterNetworkV6)
                 {
-                    ExceptionHandler.LogMessage(LogLevel.Warning, "Host address is no IPv6 address!");
+                    LoggerBase.LogWarn(LoggerBase.GetLogger, "Host address is no IPv6 address!", null);
                     result = "down";
                 }
 
@@ -219,30 +217,30 @@ internal static class CoreWebRequests
                 {
                     if (!await CheckLocalConnectionAsync(AddressFamily.InterNetworkV6))
                     {
-                        ExceptionHandler.LogMessage(LogLevel.Warning, "IPv6 is down!");
+                        LoggerBase.LogWarn(LoggerBase.GetLogger, "IPv6 is down!", null);
                     }
                     else
                     {
                         result = await PingServerAsync(host, AddressFamily.InterNetworkV6, isIPaddress);
                         if (string.IsNullOrWhiteSpace(result))
-                            ExceptionHandler.LogMessage(LogLevel.Debug, "Server not reachable over IPv6");
+                            LoggerBase.LogWarn(LoggerBase.GetLogger, "Server not reachable over IPv6", null);
                     }
                 }
             }
 
             if (!await CheckLocalConnectionAsync(AddressFamily.InterNetwork))
             {
-                ExceptionHandler.LogMessage(LogLevel.Warning, "IPv4 is down!");
+                LoggerBase.LogWarn(LoggerBase.GetLogger, "IPv4 is down!", null);
             }
             else if (string.IsNullOrWhiteSpace(result))
             {
                 result = await PingServerAsync(host, AddressFamily.InterNetwork, isIPaddress);
                 if (string.IsNullOrWhiteSpace(result))
-                    ExceptionHandler.LogMessage(LogLevel.Debug, "Server not reachable over IPv4");
+                    LoggerBase.LogWarn(LoggerBase.GetLogger, "Server not reachable over IPv4", null);
             }
 
             if (string.IsNullOrWhiteSpace(result))
-                ExceptionHandler.LogMessage(LogLevel.Critical, "No internet connection available!");
+                LoggerBase.LogCrit(LoggerBase.GetLogger, "No internet connection available!", null);
         }
         catch (HttpRequestException)
         { }

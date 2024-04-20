@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
-using AzzyBot.ExceptionHandling;
 using AzzyBot.Logging;
 using AzzyBot.Modules.Core.Settings;
 using AzzyBot.Modules.Core.Updater;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.Core;
 
@@ -17,7 +15,7 @@ internal sealed class CoreTimer : CoreModule
     internal static void StartGlobalTimer()
     {
         AzzyBotGlobalTimer = new(new TimerCallback(AzzyBotGlobalTimerTimeout), null, TimeSpan.Zero, TimeSpan.FromMinutes(15));
-        ExceptionHandler.LogMessage(LogLevel.Information, "AzzyBotGlobalTimer started");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "AzzyBotGlobalTimer started", null);
     }
 
     internal static void StopGlobalTimer()
@@ -28,7 +26,7 @@ internal sealed class CoreTimer : CoreModule
         AzzyBotGlobalTimer.Change(Timeout.Infinite, Timeout.Infinite);
         AzzyBotGlobalTimer.Dispose();
         AzzyBotGlobalTimer = null;
-        ExceptionHandler.LogMessage(LogLevel.Information, "AzzyBotGlobalTimer stopped");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "AzzyBotGlobalTimer stopped", null);
     }
 
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "General Exception is there to log unkown exceptions")]
@@ -36,14 +34,14 @@ internal sealed class CoreTimer : CoreModule
     {
         try
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "AzzyBotGlobalTimer tick");
+            LoggerBase.LogDebug(LoggerBase.GetLogger, "AzzyBotGlobalTimer tick", null);
 
             if (CoreAzzyStatsGeneral.GetBotEnvironment != "Development")
             {
                 DateTime now = DateTime.Now;
                 if (now - LastUpdateCheck >= TimeSpan.FromDays(CoreSettings.UpdaterCheckInterval))
                 {
-                    ExceptionHandler.LogMessage(LogLevel.Debug, "AzzyBotGlobalTimer checking for AzzyBot Updates");
+                    LoggerBase.LogDebug(LoggerBase.GetLogger, "AzzyBotGlobalTimer checking for AzzyBot Updates", null);
                     LastUpdateCheck = now;
                     await Updates.CheckForUpdatesAsync();
                 }

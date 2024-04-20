@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using AzzyBot.ExceptionHandling;
+using AzzyBot.Logging;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.Core.Models;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.Core;
@@ -42,7 +41,7 @@ internal sealed class CoreFileLock(string FileName, string[] Directories) : IDis
         }
         catch (Exception)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, "Can not get file content");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, "Can not get file content", null);
             throw;
         }
         finally
@@ -66,7 +65,7 @@ internal sealed class CoreFileLock(string FileName, string[] Directories) : IDis
         }
         catch (Exception)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, "Can not set file content");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, "Can not set file content", null);
             throw;
         }
         finally
