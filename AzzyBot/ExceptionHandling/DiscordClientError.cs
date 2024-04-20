@@ -6,7 +6,6 @@ using AzzyBot.Modules.Core.Strings;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Exceptions;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.ExceptionHandling;
 
@@ -19,7 +18,7 @@ internal static class DiscordClientError
         switch (ex)
         {
             case RateLimitException:
-                ExceptionHandler.LogMessage(LogLevel.Critical, ex.ToString(), ((DiscordException)e.Exception).JsonMessage);
+                LoggerBase.LogCrit(LoggerBase.GetLogger, $"{ex}\n{((DiscordException)e.Exception).JsonMessage}", null);
                 break;
 
             case BadRequestException:
