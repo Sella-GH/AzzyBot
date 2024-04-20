@@ -53,6 +53,13 @@ internal sealed class AzzyBot
 
         #endregion Add Logging
 
+        #region Add Exception Handler
+
+        LoggerBase.LogDebug(Logger, "Adding Exception Handler", null);
+        AppDomain.CurrentDomain.UnhandledException += GlobalExceptionHandler;
+
+        #endregion Add Exception Handler
+
         #region Add basic startup information
 
         LoggerBase.LogDebug(Logger, $"Starting {CoreAzzyStatsGeneral.GetBotName} in version {CoreAzzyStatsGeneral.GetBotVersion} on {CoreMisc.GetOperatingSystem}-{CoreMisc.GetOperatingSystemArch}", null);
@@ -65,8 +72,7 @@ internal sealed class AzzyBot
 
         if (!CoreMisc.CheckCorrectArchitecture())
         {
-            await Console.Error.WriteLineAsync("You can only run this bot with a 64-bit architecture OS!");
-            await Console.Error.WriteLineAsync("Use either an ARM64 or x64 based processor!");
+            LoggerBase.LogError(Logger, "You can only run this bot with a 64-bit architecture OS!\nUse either an ARM64 or x64 based processor.", null);
             Environment.Exit(0);
         }
 
@@ -74,45 +80,38 @@ internal sealed class AzzyBot
 
         #endregion Add OS Architecture Check
 
-        #region Add Exception Handler
-
-        await Console.Out.WriteLineAsync("Adding Exception Handler");
-        AppDomain.CurrentDomain.UnhandledException += GlobalExceptionHandler;
-
-        #endregion Add Exception Handler
-
         #region Initialize .json Settings
 
-        await Console.Out.WriteLineAsync("Loading settings");
+        LoggerBase.LogDebug(Logger, "Loading settings", null);
         await BaseSettings.LoadSettingsAsync();
 
         #endregion Initialize .json Settings
 
         #region Initialize client
 
-        await Console.Out.WriteLineAsync("Creating DiscordClient");
+        LoggerBase.LogDebug(Logger, "Creating DiscordClient", null);
         DiscordClient = InitializeBot();
-        ExceptionHandler.LogMessage(LogLevel.Information, "DiscordClient loaded");
+        LoggerBase.LogInfo(Logger, "DiscordClient loaded", null);
 
         #endregion Initialize client
 
         #region Initialize the modules
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Adding modules");
+        LoggerBase.LogDebug(Logger, "Adding modules", null);
         BaseModule.RegisterAllModules();
 
         #endregion Initialize the modules
 
         #region Initialize file lockings
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Registering all file locks");
+        LoggerBase.LogDebug(Logger, "Registering all file locks", null);
         BaseModule.RegisterAllFileLocks();
 
         #endregion Initialize file lockings
 
         #region Initialize Slash Commands
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Initializing SlashCommands");
+        LoggerBase.LogDebug(Logger, "Initializing SlashCommands", null);
         SlashCommands = DiscordClient.UseSlashCommands();
         BaseModule.RegisterAllCommands(SlashCommands, CoreSettings.ServerId);
 
@@ -120,24 +119,24 @@ internal sealed class AzzyBot
 
         #region Initialize Events
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Adding EventHandlers");
+        LoggerBase.LogDebug(Logger, "Adding EventHandlers", null);
         AddEventHandlers();
 
         #endregion Initialize Events
 
         #region Initialize Interactivity
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Configuring interactivity");
+        LoggerBase.LogDebug(Logger, "Configuring interactivity", null);
         DiscordClient.UseInteractivity(InitializeInteractivity());
 
         #endregion Initialize Interactivity
 
         #region Initialize Processes
 
-        ExceptionHandler.LogMessage(LogLevel.Information, "Starting all processes");
+        LoggerBase.LogInfo(Logger, "Starting all processes", null);
         BaseModule.StartAllProcesses();
         await Task.Delay(3000);
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Started all processes");
+        LoggerBase.LogInfo(Logger, "Started all processes", null);
 
         #endregion Initialize Processes
 
@@ -150,7 +149,7 @@ internal sealed class AzzyBot
 
         #region Connecting to Gateway
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Connecting to Discord Gateway");
+        LoggerBase.LogDebug(Logger, "Connecting to Discord Gateway", null);
         (UserStatus status, DiscordActivity activity) = InitBotStatus(CoreSettings.BotStatus, CoreSettings.BotActivity, CoreSettings.BotDoing, CoreSettings.BotStreamUrl);
         await DiscordClient.ConnectAsync(activity, status);
 
@@ -158,21 +157,21 @@ internal sealed class AzzyBot
 
         #region Initialize Strings
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Loading strings");
+        LoggerBase.LogDebug(Logger, "Initializing strings", null);
         await BaseStringBuilder.LoadStringsAsync();
 
         #endregion Initialize Strings
 
         #region Initialize Timers
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Starting timers");
+        LoggerBase.LogDebug(Logger, "Starting timers", null);
         BaseModule.StartAllTimers();
 
         #endregion Initialize Timers
 
         #region Finalizing
 
-        ExceptionHandler.LogMessage(LogLevel.Information, "Bot is ready");
+        LoggerBase.LogInfo(Logger, $"{nameof(AzzyBot)} is ready", null);
         await Task.Delay(-1);
 
         #endregion Finalizing
@@ -182,9 +181,7 @@ internal sealed class AzzyBot
     {
         Exception ex = (Exception)e.ExceptionObject;
 
-        ExceptionHandler.LogMessage(LogLevel.Critical, "Global exception found!");
-        ExceptionHandler.LogMessage(LogLevel.Critical, ex.Message);
-        ExceptionHandler.LogMessage(LogLevel.Critical, ex.StackTrace ?? "No StackTrace available!");
+        LoggerBase.LogCrit(Logger, "Global exception found!", ex);
     }
 
     private static async Task GuildCreatedAsync(DiscordClient c, GuildCreateEventArgs e)
