@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using AzzyBot.ExceptionHandling;
+using AzzyBot.Logging;
 using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.MusicStreaming.Settings;
@@ -9,7 +9,6 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using DSharpPlus.SlashCommands.Attributes;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.MusicStreaming;
 
@@ -22,7 +21,7 @@ internal sealed class MsCommands : ApplicationCommandModule
         [SlashCommand("disconnect", "Disconnect the bot from your voice channel")]
         internal static async Task PlayerDisconnectCommandAsync(InteractionContext ctx)
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerDisconnectCommandAsync requested");
+            LoggerBase.LogInfo(LoggerBase.GetLogger, "PlayerDisconnectCommandAsync requested", null);
 
             DiscordMember member = ctx.Member;
 
@@ -47,7 +46,7 @@ internal sealed class MsCommands : ApplicationCommandModule
         [SlashCommand("join", "Joins the bot into your voice channel")]
         internal static async Task PlayerJoinCommandAsync(InteractionContext ctx)
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerJoinCommandAsync requested");
+            LoggerBase.LogInfo(LoggerBase.GetLogger, "PlayerJoinCommandAsync requested", null);
 
             DiscordMember member = ctx.Member;
 
@@ -73,7 +72,8 @@ internal sealed class MsCommands : ApplicationCommandModule
         internal static async Task PlayerSetVolumeCommandAsync(InteractionContext ctx, [Option("volume", "The new volume value between 0 and 100")] double volume, [Option("reset", "Resets the volume to 100%")] bool reset = false)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(volume, nameof(volume));
-            ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerSetVolumeCommandAsync requested");
+
+            LoggerBase.LogInfo(LoggerBase.GetLogger, "PlayerSetVolumeCommandAsync requested", null);
 
             if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(ctx.Member))
             {
@@ -93,7 +93,7 @@ internal sealed class MsCommands : ApplicationCommandModule
         [SlashCommand("show-lyrics", "Shows you the lyrics of the current played song")]
         internal static async Task PlayerShowLyricsCommandAsync(InteractionContext ctx)
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerShowLyricsCommandAsync requested");
+            LoggerBase.LogInfo(LoggerBase.GetLogger, "PlayerShowLyricsCommandAsync requested", null);
 
             if (!MsSettings.ActivateLyrics || string.IsNullOrWhiteSpace(MsSettings.GeniusApiKey) || MsSettings.GeniusApiKey is "empty")
             {
@@ -115,7 +115,7 @@ internal sealed class MsCommands : ApplicationCommandModule
         [SlashCommand("start", "Starts the music stream into your voice channel")]
         internal static async Task PlayerStartCommandAsync(InteractionContext ctx)
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerStartCommandAsync requested");
+            LoggerBase.LogInfo(LoggerBase.GetLogger, "PlayerStartCommandAsync requested", null);
 
             if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(ctx.Member))
             {
@@ -138,7 +138,7 @@ internal sealed class MsCommands : ApplicationCommandModule
         [SlashCommand("stop", "Stops the music stream from playing")]
         internal static async Task PlayerStopCommandAsync(InteractionContext ctx, [Option("disconnect", "Should the bot disconnect after?")] bool disconnect = false)
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "PlayerStopCommandAsync requested");
+            LoggerBase.LogInfo(LoggerBase.GetLogger, "PlayerStopCommandAsync requested", null);
 
             if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(ctx.Member))
             {

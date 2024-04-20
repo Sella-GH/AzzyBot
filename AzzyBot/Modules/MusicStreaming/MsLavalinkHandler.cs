@@ -4,11 +4,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using AzzyBot.ExceptionHandling;
+using AzzyBot.Logging;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.MusicStreaming.Settings;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.MusicStreaming;
 
@@ -19,7 +18,7 @@ internal static class MsLavalinkHandler
 
     internal static async Task<bool> CheckIfJavaIsInstalledAsync()
     {
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Checking if OpenJDK JRE is installed");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Checking if OpenJDK JRE is installed", null);
 
         try
         {
@@ -53,7 +52,7 @@ internal static class MsLavalinkHandler
 
     private static async Task<bool> CheckIfLavalinkConfigIsRightAsync()
     {
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Checking if Lavalink config is correct");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Checking if Lavalink config is correct", null);
 
         string path = Path.Combine(LavalinkPath, "application.yml");
 
@@ -69,7 +68,7 @@ internal static class MsLavalinkHandler
                 string newLine = line.Trim();
                 if (newLine.StartsWith("geniusApiKey:", StringComparison.OrdinalIgnoreCase) && newLine.Contains("\"Your Genius Client Access Token\"", StringComparison.OrdinalIgnoreCase))
                 {
-                    ExceptionHandler.LogMessage(LogLevel.Critical, "You forgot to set your genius api key!");
+                    LoggerBase.LogError(LoggerBase.GetLogger, "You forgot to set your genius api key!", null);
                     return false;
                 }
             }
@@ -84,7 +83,7 @@ internal static class MsLavalinkHandler
 
     private static bool CheckIfLavalinkIsThere()
     {
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Checking if Lavalink files are present");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Checking if Lavalink files are present", null);
 
         bool directoryExists = Directory.Exists(LavalinkPath);
         bool lavalinkJarExists = File.Exists(Path.Combine(LavalinkPath, "Lavalink.jar"));
@@ -95,13 +94,13 @@ internal static class MsLavalinkHandler
 
     internal static async Task<bool> StartLavalinkAsync()
     {
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Starting Lavalink");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Starting Lavalink", null);
 
         try
         {
             if (!CheckIfLavalinkIsThere())
             {
-                ExceptionHandler.LogMessage(LogLevel.Critical, "Lavalink files are missing!");
+                LoggerBase.LogCrit(LoggerBase.GetLogger, "Lavalink files are missing!", null);
                 return false;
             }
 
@@ -129,7 +128,7 @@ internal static class MsLavalinkHandler
 
     internal static async Task<bool> StopLavalinkAsync()
     {
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Stopping Lavalink");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Stopping Lavalink", null);
 
         try
         {
@@ -160,7 +159,7 @@ internal static class MsLavalinkHandler
         }
         catch (IOException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, "Could not delete lavalink log path");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, "Could not delete lavalink log path", null);
             return true;
         }
         catch (Exception)
