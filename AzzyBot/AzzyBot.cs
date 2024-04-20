@@ -187,12 +187,12 @@ internal sealed class AzzyBot
 
     private static async Task GuildCreatedAsync(DiscordClient c, GuildCreateEventArgs e)
     {
-        ExceptionHandler.LogMessage(LogLevel.Information, "Bot joined a Guild!");
+        LoggerBase.LogInfo(Logger, "Bot joined a Guild!", null);
 
         if (c.Guilds.Count <= 1)
             return;
 
-        ExceptionHandler.LogMessage(LogLevel.Warning, "The bot is now in 2 guilds, self-kick initiated.");
+        LoggerBase.LogWarn(Logger, "The bot is now in 2 guilds, self-kick initiated.", null);
         await e.Guild.LeaveAsync();
     }
 
@@ -213,7 +213,7 @@ internal sealed class AzzyBot
             return;
         }
 
-        ExceptionHandler.LogMessage(LogLevel.Critical, "The bot is joined on more guilds than one. Please remove the bot out of every guild until only 1 is left!");
+        LoggerBase.LogCrit(Logger, "The bot is joined on more guilds than one. Please remove the bot out of every guild until only 1 is left!", null);
         await BotShutdownAsync();
     }
 
@@ -247,13 +247,13 @@ internal sealed class AzzyBot
 
     private static async void ProcessExit(object? c, EventArgs e)
     {
-        ExceptionHandler.LogMessage(LogLevel.Information, "Process exit requested by AppDomain.CurrentDomain.ProcessExit");
+        LoggerBase.LogInfo(Logger, "Process exit requested by AppDomain.CurrentDomain.ProcessExit", null);
         await BotShutdownAsync();
     }
 
     private static async void ConsoleKeyShutdown(object? c, ConsoleCancelEventArgs e)
     {
-        ExceptionHandler.LogMessage(LogLevel.Information, "Process exit requested by Console.CancelKeyPress");
+        LoggerBase.LogInfo(Logger, "Process exit requested by Console.CancelKeyPress", null);
         await BotShutdownAsync();
     }
 
@@ -340,7 +340,8 @@ internal sealed class AzzyBot
     {
         ArgumentNullException.ThrowIfNull(DiscordClient);
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Initializing Lavalink4NET");
+        LoggerBase.LogDebug(Logger, "Initializing Lavalink4NET", null);
+
         ServiceCollection = new ServiceCollection().AddLavalink().AddSingleton(DiscordClient).ConfigureLavalink(config =>
         {
             config.BaseAddress = (CoreAzzyStatsGeneral.GetBotName is "AzzyBot-Docker") ? new Uri("http://lavalink:2333") : new Uri("http://localhost:2333");
@@ -371,7 +372,7 @@ internal sealed class AzzyBot
             ServiceCollection.AddInactivityTracker<UsersInactivityTracker>();
             ServiceCollection.Configure<IdleInactivityTrackerOptions>(config => config.TrackNewPlayers = false);
 
-            ExceptionHandler.LogMessage(LogLevel.Debug, "Applied inactivity tracking to Lavalink4NET");
+            LoggerBase.LogDebug(Logger, "Applied inactivity tracking to Lavalink4NET", null);
         }
 
         IServiceProvider serviceProvider = ServiceCollection.BuildServiceProvider();
@@ -386,10 +387,10 @@ internal sealed class AzzyBot
         if (CoreModule.GetMusicStreamingLyrics())
         {
             AudioService.UseLyricsJava();
-            ExceptionHandler.LogMessage(LogLevel.Debug, "Applied Lyrics.Java to Lavalink4NET");
+            LoggerBase.LogDebug(Logger, "Applied Lyrics.Java to Lavalink4NET", null);
         }
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Lavalink4NET loaded");
+        LoggerBase.LogDebug(Logger, "Lavalink4NET loaded", null);
     }
 
     private static async Task BotShutdownAsync()
@@ -405,23 +406,23 @@ internal sealed class AzzyBot
         }
 
         BaseModule.StopAllTimers();
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all timers");
+        LoggerBase.LogDebug(Logger, "Stopped all timers", null);
 
         BaseModule.StopAllProcesses();
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all processes");
+        LoggerBase.LogDebug(Logger, "Stopped all processes", null);
 
         BaseModule.DisposeAllFileLocks();
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Disposed all file locks");
+        LoggerBase.LogDebug(Logger, "Disposed all file locks", null);
 
         RemoveEventHandlers();
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Removed EventHandlers");
+        LoggerBase.LogDebug(Logger, "Removed EventHandlers", null);
 
         if (SlashCommands is not null)
         {
             SlashCommands.Dispose();
             SlashCommands = null;
 
-            ExceptionHandler.LogMessage(LogLevel.Debug, "SlashCommands disposed");
+            LoggerBase.LogDebug(Logger, "SlashCommands disposed", null);
         }
 
         if (DiscordClient is not null)
@@ -430,7 +431,7 @@ internal sealed class AzzyBot
             DiscordClient.Dispose();
             DiscordClient = null;
 
-            await Console.Out.WriteLineAsync("DiscordClient disposed");
+            LoggerBase.LogDebug(Logger, "DiscordClient disposed", null);
         }
 
         LoggerBase.DisposeLogger();
