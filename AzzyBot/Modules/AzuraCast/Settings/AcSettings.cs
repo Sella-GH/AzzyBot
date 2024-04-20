@@ -46,7 +46,7 @@ internal sealed class AcSettings : BaseSettings
 
         AzuraCastApiKeyIsValid = await CheckIfApiKeyIsValidAsync();
         if (!AzuraCastApiKeyIsValid)
-            await Console.Error.WriteLineAsync("AzuraCast api key is not valid!");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, "AzuraCast api key is not valid!", null);
 
         return AzuraCastSettingsLoaded = CheckSettings(typeof(AcSettings));
     }
