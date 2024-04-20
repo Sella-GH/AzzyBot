@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
+using AzzyBot.Logging;
 using AzzyBot.Modules;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Settings;
@@ -28,12 +29,13 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot;
 
-internal static class AzzyBot
+internal sealed class AzzyBot
 {
     private static DiscordClient? DiscordClient;
     private static SlashCommandsExtension? SlashCommands;
     private static IAudioService? AudioService;
     private static IServiceCollection? ServiceCollection;
+    private static readonly ILogger<AzzyBot> Logger = LoggerBase.GetLogger;
 
     internal static string GetDiscordClientAvatarUrl => DiscordClient?.CurrentUser.AvatarUrl ?? throw new InvalidOperationException("DiscordClient is null");
     internal static ulong GetDiscordClientId => DiscordClient?.CurrentUser.Id ?? throw new InvalidOperationException("DiscordClient is null");
@@ -45,15 +47,21 @@ internal static class AzzyBot
 
     private static async Task Main()
     {
+        #region Add Logging
+
+        LoggerBase.CreateLogger(CoreAzzyStatsGeneral.GetBotName);
+
+        #endregion Add Logging
+
         #region Add basic startup information
 
-        await Console.Out.WriteLineAsync($"Starting {CoreAzzyStatsGeneral.GetBotName} in version {CoreAzzyStatsGeneral.GetBotVersion} on {CoreMisc.GetOperatingSystem}-{CoreMisc.GetOperatingSystemArch}");
+        LoggerBase.LogDebug(Logger, $"Starting {CoreAzzyStatsGeneral.GetBotName} in version {CoreAzzyStatsGeneral.GetBotVersion} on {CoreMisc.GetOperatingSystem}-{CoreMisc.GetOperatingSystemArch}", null);
 
         #endregion Add basic startup information
 
         #region Add OS Architecture Check
 
-        await Console.Out.WriteLineAsync("Checking OS architecture");
+        LoggerBase.LogDebug(Logger, "Checking OS architecture", null);
 
         if (!CoreMisc.CheckCorrectArchitecture())
         {
@@ -62,7 +70,7 @@ internal static class AzzyBot
             Environment.Exit(0);
         }
 
-        await Console.Out.WriteLineAsync("OS architecture check passed");
+        LoggerBase.LogDebug(Logger, "OS architecture check passed", null);
 
         #endregion Add OS Architecture Check
 
@@ -259,8 +267,7 @@ internal static class AzzyBot
             Token = CoreSettings.BotToken,
             TokenType = TokenType.Bot,
             Intents = DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers,
-            MinimumLogLevel = (LogLevel)Enum.ToObject(typeof(LogLevel), CoreSettings.LogLevel),
-            LogTimestampFormat = "yyyy-MM-dd HH:mm:ss"
+            LoggerFactory = LoggerBase.GetLoggerFactory,
         };
 
         return new(config);
@@ -421,7 +428,7 @@ internal static class AzzyBot
             await Console.Out.WriteLineAsync("DiscordClient disposed");
         }
 
-        await Console.Out.WriteLineAsync("Ready for exit");
+        LoggerBase.DisposeLogger();
         Environment.Exit(0);
     }
 
