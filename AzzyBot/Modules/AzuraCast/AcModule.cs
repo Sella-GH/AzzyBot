@@ -2,13 +2,12 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using AzzyBot.ExceptionHandling;
+using AzzyBot.Logging;
 using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.AzuraCast.Settings;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
 using DSharpPlus.SlashCommands;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.AzuraCast;
 
@@ -42,7 +41,7 @@ internal sealed class AzuraCastModule : BaseModule
         directory = [nameof(CoreFileDirectoriesEnum.Customization)];
         PlaylistSlogansLock = new(fileName, directory);
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Registered AzuraCast File Locks");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Registered AzuraCast File Locks", null);
     }
 
     internal override void DisposeFileLocks()
@@ -191,7 +190,7 @@ internal sealed class AzuraCastModule : BaseModule
         await PingLock.WaitAsync();
         try
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "AzzyBotGlobalTimer ping check for music server");
+            LoggerBase.LogDebug(LoggerBase.GetLogger, "AzzyBotGlobalTimer ping check for music server", null);
             await PingMusicServerAsync();
         }
         finally
@@ -207,7 +206,7 @@ internal sealed class AzuraCastModule : BaseModule
         // 1 hour
         if (AcSettings.AutomaticChecksFileChanges && now - LastFileCheckRun >= TimeSpan.FromHours(0.98))
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "AzzyBotGlobalTimer checking for file changes");
+            LoggerBase.LogDebug(LoggerBase.GetLogger, "AzzyBotGlobalTimer checking for file changes", null);
             LastFileCheckRun = now;
             await AcServer.CheckIfFilesWereModifiedAsync();
         }
@@ -215,7 +214,7 @@ internal sealed class AzuraCastModule : BaseModule
         // 6 hours
         if (AcSettings.AutomaticChecksUpdates && now - LastMusicServerUpdateCheck >= TimeSpan.FromHours(5.98))
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "AzzyBotGlobalTimer checking for music server updates");
+            LoggerBase.LogDebug(LoggerBase.GetLogger, "AzzyBotGlobalTimer checking for music server updates", null);
             LastMusicServerUpdateCheck = now;
             await CheckForMusicServerUpdatesAsync();
         }

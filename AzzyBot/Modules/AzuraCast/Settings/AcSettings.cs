@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AzzyBot.Logging;
 using AzzyBot.Modules.AzuraCast.Enums;
 using AzzyBot.Modules.Core;
 
@@ -29,7 +30,7 @@ internal sealed class AcSettings : BaseSettings
     {
         ArgumentNullException.ThrowIfNull(Config);
 
-        await Console.Out.WriteLineAsync("Loading AzuraCast Settings");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Loading AzuraCast Settings", null);
 
         Ipv6Available = Convert.ToBoolean(Config["AzuraCast:Ipv6Available"], CultureInfo.InvariantCulture);
         AutomaticChecksFileChanges = Convert.ToBoolean(Config["AzuraCast:AutomaticChecks:FileChanges"], CultureInfo.InvariantCulture);
@@ -77,7 +78,7 @@ internal sealed class AcSettings : BaseSettings
         }
         catch (Exception ex)
         {
-            await Console.Error.WriteLineAsync(ex.Message);
+            LoggerBase.LogError(LoggerBase.GetLogger, ex.Message, null);
             throw;
         }
     }
