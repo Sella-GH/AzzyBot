@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 namespace AzzyBot.Logging;
 
@@ -25,7 +26,14 @@ internal static class LoggerBase
         if (botName is "AzzyBot-Dev")
             level = LogLevel.Debug;
 
-        Factory = LoggerFactory.Create(builder => builder.AddConsole().AddFilter(string.Empty, level));
+        Factory = LoggerFactory.Create(builder => builder.AddConsole().AddFilter(string.Empty, level).AddSimpleConsole(options =>
+        {
+            options.ColorBehavior = LoggerColorBehavior.Enabled;
+            options.IncludeScopes = true;
+            options.SingleLine = true;
+            options.TimestampFormat = "yyyy-MM-dd HH:mm:ss ";
+            options.UseUtcTimestamp = true;
+        }));
         Logger = Factory.CreateLogger<AzzyBot>();
 
         LogDebug(Logger, "Logger created!", null);

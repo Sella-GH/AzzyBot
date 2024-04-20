@@ -26,6 +26,7 @@ using Lavalink4NET.Integrations.LyricsJava.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 namespace AzzyBot;
 
@@ -343,12 +344,19 @@ internal sealed class AzzyBot
         ServiceCollection = new ServiceCollection().AddLavalink().AddSingleton(DiscordClient).ConfigureLavalink(config =>
         {
             config.BaseAddress = (CoreAzzyStatsGeneral.GetBotName is "AzzyBot-Docker") ? new Uri("http://lavalink:2333") : new Uri("http://localhost:2333");
+            config.Label = "AzzyBot";
             config.ReadyTimeout = TimeSpan.FromSeconds(15);
             config.ResumptionOptions = new(TimeSpan.Zero);
-            config.Label = "AzzyBot";
         });
 
-        ServiceCollection.AddLogging(x => x.AddConsole().SetMinimumLevel((LogLevel)Enum.ToObject(typeof(LogLevel), CoreSettings.LogLevel)));
+        ServiceCollection.AddLogging(x => x.AddConsole().SetMinimumLevel((LogLevel)Enum.ToObject(typeof(LogLevel), CoreSettings.LogLevel)).AddSimpleConsole(options =>
+        {
+            options.ColorBehavior = LoggerColorBehavior.Enabled;
+            options.IncludeScopes = true;
+            options.SingleLine = true;
+            options.TimestampFormat = "yyyy-MM-dd HH:mm:ss ";
+            options.UseUtcTimestamp = true;
+        }));
 
         if (CoreModule.GetMusicStreamingInactivity())
         {
