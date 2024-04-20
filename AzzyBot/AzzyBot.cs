@@ -393,7 +393,7 @@ internal sealed class AzzyBot
         LoggerBase.LogDebug(Logger, "Lavalink4NET loaded", null);
     }
 
-    private static async Task BotShutdownAsync()
+    internal static async Task BotShutdownAsync()
     {
         if (ModuleStates.MusicStreaming)
         {

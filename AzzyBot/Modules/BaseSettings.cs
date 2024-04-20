@@ -50,7 +50,7 @@ internal abstract class BaseSettings
         if (!CoreSettings.CoreSettingsLoaded)
         {
             await Console.Error.WriteLineAsync("Core settings aren't loaded");
-            Environment.Exit(1);
+            await AzzyBot.BotShutdownAsync();
         }
 
         if (ActivateAzuraCast && !await AcSettings.LoadAzuraCastAsync())
