@@ -11,5 +11,6 @@ services:
     networks:
       - lavalink
     volumes:
-      - ./AzzyBot/Settings:/app/Settings
       - ./AzzyBot/Customization:/app/Customization
+      - ./AzzyBot/Modules/AzuraCast/Files:/app/Modules/AzuraCast/Files
+      - ./AzzyBot/Settings:/app/Settings
