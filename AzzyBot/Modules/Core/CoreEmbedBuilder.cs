@@ -178,7 +178,7 @@ internal static class CoreEmbedBuilder
         Dictionary<string, DiscordEmbedStruct> fields = new()
         {
             [CoreStringBuilder.EmbedAzzyInfoBotName] = new(nameof(botName), botName, false),
-            [CoreStringBuilder.EmbedAzzyInfoBotUptime] = new(nameof(botUptime), botUptime, false),
+            [CoreStringBuilder.EmbedAzzyInfoBotUptime] = new(nameof(botUptime), $"Since {botUptime}", false),
             [CoreStringBuilder.EmbedAzzyInfoBotVersion] = new(nameof(botVersion), botVersion, true),
             [CoreStringBuilder.EmbedAzzyInfoNetVersion] = new(nameof(dotnetVersion), dotnetVersion, true),
             [CoreStringBuilder.EmbedAzzyInfoDspVersion] = new(nameof(libVersion), libVersion, true),
