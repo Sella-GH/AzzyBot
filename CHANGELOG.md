@@ -5,6 +5,7 @@
   - `StringsAzuraCast.json`
   - `StringsClubManagement.json`
   - `StringsCore.json`
+  - `StringsMusicStreaming.json`
 
 ### General
 - The updater is now included instead of an own application and only provides notifications. You have to update the bot manually
