@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
-using AzzyBot.ExceptionHandling;
-using Microsoft.Extensions.Logging;
+using AzzyBot.Logging;
 
 namespace AzzyBot.Modules.ClubManagement;
 
-internal class CmTimer : CmModule
+internal sealed class CmTimer : CmModule
 {
     private static Timer? ClubClosingTimer;
 
     internal static void StartClubClosingTimer()
     {
         ClubClosingTimer = new(new TimerCallback(ClubClosingTimerTimeout), null, TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(1));
-        ExceptionHandler.LogMessage(LogLevel.Information, "ClubClosingTimer started!");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "ClubClosingTimer started!", null);
     }
 
     internal static void StopClubClosingTimer()
@@ -24,7 +23,7 @@ internal class CmTimer : CmModule
         ClubClosingTimer.Change(Timeout.Infinite, Timeout.Infinite);
         ClubClosingTimer.Dispose();
         ClubClosingTimer = null;
-        ExceptionHandler.LogMessage(LogLevel.Information, "ClubClosingTimer stopped");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "ClubClosingTimer stopped", null);
     }
 
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "General Exception is there to log unkown exceptions")]
@@ -47,7 +46,7 @@ internal class CmTimer : CmModule
         catch (Exception ex)
         {
             // System.Threading.Timer just eats exceptions as far as I know so best to log them here.
-            await ExceptionHandler.LogErrorAsync(ex);
+            await LoggerExceptions.LogErrorAsync(ex);
         }
     }
 }

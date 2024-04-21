@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
-using AzzyBot.ExceptionHandling;
+using AzzyBot.Logging;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Strings;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.MusicStreaming.Strings;
@@ -14,7 +13,7 @@ internal sealed class MsStringBuilder : BaseStringBuilder
 
     internal static async Task<bool> LoadMusicStreamingStringsAsync()
     {
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Loading MusicStreaming Strings");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Loading MusicStreaming Strings", null);
 
         string[] directories = [nameof(CoreFileDirectoriesEnum.Customization), nameof(CoreFileDirectoriesEnum.MusicStreaming)];
         string content = await CoreFileOperations.GetFileContentAsync(nameof(CoreFileNamesEnum.StringsMusicStreamingJSON), directories);

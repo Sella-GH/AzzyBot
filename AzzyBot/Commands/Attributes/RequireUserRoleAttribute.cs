@@ -2,12 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AzzyBot.Commands.Enums;
-using AzzyBot.ExceptionHandling;
+using AzzyBot.Logging;
 using AzzyBot.Modules.ClubManagement.Settings;
 using AzzyBot.Modules.Core.Settings;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands.Attributes;
 
@@ -60,7 +59,7 @@ internal sealed class RequireUserRoleAttribute : SlashCheckBaseAttribute
                 return Task.FromResult(true);
         }
 
-        ExceptionHandler.LogMessage(LogLevel.Warning, $"User **{ctx.User.Username}** is not allowed to use the command **{ctx.QualifiedName}** !");
+        LoggerBase.LogWarn(LoggerBase.GetLogger, $"User **{ctx.User.Username}** is not allowed to use the command **{ctx.QualifiedName}** !", null);
         return Task.FromResult(false);
     }
 }

@@ -5,11 +5,10 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
-using AzzyBot.ExceptionHandling;
+using AzzyBot.Logging;
 using AzzyBot.Modules.Core.Enums;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.Core;
 
@@ -43,7 +42,7 @@ internal static class CoreFileOperations
         }
         catch (DirectoryNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"Directory not found: {directory}");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, $"Directory not found: {directory}", null);
 
             if (CreateDirectory(directory[^1], directory[..^1]))
                 return await GetFileContentAsync(fileName, directory);
@@ -52,7 +51,7 @@ internal static class CoreFileOperations
         }
         catch (FileNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"File not found: {fileName}");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, $"File not found: {fileName}", null);
 
             if (await CreateTemplateFileAsync(fileName, directory))
                 return await GetFileContentAsync(fileName, directory);
@@ -61,7 +60,7 @@ internal static class CoreFileOperations
         }
         catch (UnauthorizedAccessException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"Can't access file: {fileName} - invalid permissions");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, $"Can't access file: {fileName} - invalid permissions", null);
             throw;
         }
     }
@@ -83,17 +82,17 @@ internal static class CoreFileOperations
         }
         catch (DirectoryNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"Directory not found: {directory}");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, $"Directory not found: {directory}", null);
             throw;
         }
         catch (FileNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"File not found: {fileName}");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, $"File not found: {fileName}", null);
             throw;
         }
         catch (UnauthorizedAccessException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"Can't access file: {fileName} - invalid permissions");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, $"Can't access file: {fileName} - invalid permissions", null);
             throw;
         }
         finally
@@ -115,17 +114,17 @@ internal static class CoreFileOperations
         }
         catch (DirectoryNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"Directory not found: {directory}");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, $"Directory not found: {directory}", null);
             throw;
         }
         catch (FileNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"File not found: {fileName}");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, $"File not found: {fileName}", null);
             throw;
         }
         catch (UnauthorizedAccessException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"Can't access file: {fileName} - invalid permissions");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, $"Can't access file: {fileName} - invalid permissions", null);
             throw;
         }
     }
@@ -150,17 +149,17 @@ internal static class CoreFileOperations
         }
         catch (DirectoryNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"Directory not found: {directory}");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, $"Directory not found: {directory}", null);
             throw;
         }
         catch (FileNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"Could not create file: {fileName}");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, $"Could not create file: {fileName}", null);
             throw;
         }
         catch (UnauthorizedAccessException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"Can't access file: {fileName} - invalid permissions");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, $"Can't access file: {fileName} - invalid permissions", null);
             throw;
         }
     }
@@ -186,7 +185,7 @@ internal static class CoreFileOperations
         }
         catch (UnauthorizedAccessException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, "Error while creating tempfile: invalid permissions");
+            LoggerBase.LogError(LoggerBase.GetLogger, "Error while creating tempfile: invalid permissions", null);
             throw;
         }
     }
@@ -202,17 +201,17 @@ internal static class CoreFileOperations
         }
         catch (DirectoryNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"Directory not found: {path}");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, $"Directory not found: {path}", null);
             throw;
         }
         catch (FileNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"File not found: {path}");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, $"File not found: {path}", null);
             throw;
         }
         catch (UnauthorizedAccessException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"Can't access file: {path} - invalid permissions");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, $"Can't access file: {path} - invalid permissions", null);
             throw;
         }
     }
@@ -246,7 +245,7 @@ internal static class CoreFileOperations
         }
         catch (UnauthorizedAccessException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, "Error while creating csv tempfile: invalid permissions");
+            LoggerBase.LogError(LoggerBase.GetLogger, "Error while creating csv tempfile: invalid permissions", null);
             throw;
         }
     }
@@ -271,17 +270,17 @@ internal static class CoreFileOperations
         }
         catch (DirectoryNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, "Directory not found");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, "Directory not found", null);
             throw;
         }
         catch (FileNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"File not found: {fileName}");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, $"File not found: {fileName}", null);
             throw;
         }
         catch (UnauthorizedAccessException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Warning, $"Can't access file: {fileName} - invalid permissions");
+            LoggerBase.LogWarn(LoggerBase.GetLogger, $"Can't access file: {fileName} - invalid permissions", null);
             throw;
         }
     }

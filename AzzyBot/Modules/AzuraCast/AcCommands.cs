@@ -3,7 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using AzzyBot.Commands.Attributes;
-using AzzyBot.ExceptionHandling;
+using AzzyBot.Logging;
 using AzzyBot.Modules.AzuraCast.Autocomplete;
 using AzzyBot.Modules.AzuraCast.Settings;
 using AzzyBot.Modules.AzuraCast.Strings;
@@ -16,7 +16,6 @@ using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.SlashCommands;
 using DSharpPlus.SlashCommands.Attributes;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.AzuraCast;
 
@@ -30,7 +29,7 @@ internal sealed class AcCommands : ApplicationCommandModule
         [SlashCommand("export-playlists", "Exports all available playlists into a .zip file")]
         internal static async Task AzuraCastExportPlaylistsCommandAsync(InteractionContext ctx)
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "SwitchPlaylistsCommand requested");
+            LoggerBase.LogInfo(LoggerBase.GetLogger, "SwitchPlaylistsCommand requested", null);
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
@@ -65,7 +64,7 @@ internal sealed class AcCommands : ApplicationCommandModule
         [SlashCommand("force-cache-refresh", "Forces a refresh of the internal AzzyBot Music cache")]
         internal static async Task AzuraCastForceCacheRefreshCommandAsync(InteractionContext ctx)
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "AzuraCastForceCacheRefreshCommand requested");
+            LoggerBase.LogInfo(LoggerBase.GetLogger, "AzuraCastForceCacheRefreshCommand requested", null);
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
@@ -90,7 +89,7 @@ internal sealed class AcCommands : ApplicationCommandModule
         [SlashCommand("ping", "Pings AzuraCast and returns general information")]
         internal static async Task AzuraCastPingCommandAsync(InteractionContext ctx)
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "AzuraCastPingCommand requested");
+            LoggerBase.LogInfo(LoggerBase.GetLogger, "AzuraCastPingCommand requested", null);
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
             if (!AcSettings.AzuraCastApiKeyIsValid)
@@ -105,7 +104,7 @@ internal sealed class AcCommands : ApplicationCommandModule
         [SlashCommand("switch-Playlists", "Switch the playlists according to your likes!")]
         internal static async Task AzuraCastSwitchPlaylistsCommandAsync(InteractionContext ctx, [Autocomplete(typeof(AcPlaylistAutocomplete))][Option("playlist", "Select a playlist to switch to")] string playlistId)
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "SwitchPlaylistsCommand requested");
+            LoggerBase.LogInfo(LoggerBase.GetLogger, "SwitchPlaylistsCommand requested", null);
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
@@ -138,7 +137,7 @@ internal sealed class AcCommands : ApplicationCommandModule
         [SlashCommand("get-played-song-history", "Gets all songs played at the specified date and returns them as a .csv file.")]
         internal static async Task MusicGetPlayedSongHistoryCommandAsync(InteractionContext ctx, [Option("date", "Set the date in the following format YYYY-MM-DD. You can only go back up to 14 days")] string date)
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "MusicGetSongsInPlaylistCommand requested");
+            LoggerBase.LogInfo(LoggerBase.GetLogger, "MusicGetSongsInPlaylistCommand requested", null);
 
             DateTime dateTime;
             if (string.IsNullOrWhiteSpace(date))
@@ -192,7 +191,7 @@ internal sealed class AcCommands : ApplicationCommandModule
         [SlashCommand("get-songs-in-playlist", "Gets all songs from the given playlist and returns them as a .csv file")]
         internal static async Task MusicGetSongsInPlaylistCommandAsync(InteractionContext ctx, [Autocomplete(typeof(AcPlaylistAutocomplete))][Option("playlist", "Select the playlist to get songs from")] string playlist)
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "MusicGetSongsInPlaylistCommand requested");
+            LoggerBase.LogInfo(LoggerBase.GetLogger, "MusicGetSongsInPlaylistCommand requested", null);
 
             if (string.IsNullOrWhiteSpace(playlist))
             {
@@ -235,7 +234,7 @@ internal sealed class AcCommands : ApplicationCommandModule
         [SlashCommand("now-playing", "Shows the current played song")]
         internal static async Task MusicNowPlayingCommandAsync(InteractionContext ctx)
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "MusicNowPlayingCommand requested");
+            LoggerBase.LogInfo(LoggerBase.GetLogger, "MusicNowPlayingCommand requested", null);
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
@@ -256,7 +255,7 @@ internal sealed class AcCommands : ApplicationCommandModule
         [SlashCommand("check", "Checks if the song is available on the server")]
         internal static async Task MusicRequestsCheckCommandAsync(InteractionContext ctx, [Option("song-name", "Song name to search for")] string songName, [Option("artist-name", "Artist name for better results")] string artistName = "")
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "MusicRequestsCheckCommand requested");
+            LoggerBase.LogInfo(LoggerBase.GetLogger, "MusicRequestsCheckCommand requested", null);
 
             if (string.IsNullOrWhiteSpace(songName))
             {
@@ -311,7 +310,7 @@ internal sealed class AcCommands : ApplicationCommandModule
         [SlashCommand("favorite-songs", "Choose and request a user's favourite song")]
         internal static async Task MusicRequestsFavoriteSongsCommandAsync(InteractionContext ctx, [Autocomplete(typeof(AcFavoriteSongAutocomplete))][Option("User", "Select the user you want to hear the song from", true)] string user)
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "MusicRequestsFavoriteSongsCommand requested");
+            LoggerBase.LogInfo(LoggerBase.GetLogger, "MusicRequestsFavoriteSongsCommand requested", null);
 
             if (string.IsNullOrWhiteSpace(user))
             {

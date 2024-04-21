@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.ExceptionHandling;
+using AzzyBot.Logging;
 using AzzyBot.Modules;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Settings;
@@ -25,15 +26,17 @@ using Lavalink4NET.Integrations.LyricsJava.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 namespace AzzyBot;
 
-internal static class AzzyBot
+internal sealed class AzzyBot
 {
     private static DiscordClient? DiscordClient;
     private static SlashCommandsExtension? SlashCommands;
     private static IAudioService? AudioService;
     private static IServiceCollection? ServiceCollection;
+    private static readonly ILogger<AzzyBot> Logger = LoggerBase.GetLogger;
 
     internal static string GetDiscordClientAvatarUrl => DiscordClient?.CurrentUser.AvatarUrl ?? throw new InvalidOperationException("DiscordClient is null");
     internal static ulong GetDiscordClientId => DiscordClient?.CurrentUser.Id ?? throw new InvalidOperationException("DiscordClient is null");
@@ -45,66 +48,71 @@ internal static class AzzyBot
 
     private static async Task Main()
     {
+        #region Add Logging
+
+        LoggerBase.CreateLogger(CoreAzzyStatsGeneral.GetBotName);
+
+        #endregion Add Logging
+
+        #region Add Exception Handler
+
+        LoggerBase.LogDebug(Logger, "Adding Exception Handler", null);
+        AppDomain.CurrentDomain.UnhandledException += GlobalExceptionHandler;
+
+        #endregion Add Exception Handler
+
         #region Add basic startup information
 
-        await Console.Out.WriteLineAsync($"Starting {CoreAzzyStatsGeneral.GetBotName} in version {CoreAzzyStatsGeneral.GetBotVersion} on {CoreMisc.GetOperatingSystem}-{CoreMisc.GetOperatingSystemArch}");
+        LoggerBase.LogDebug(Logger, $"Starting {CoreAzzyStatsGeneral.GetBotName} in version {CoreAzzyStatsGeneral.GetBotVersion} on {CoreMisc.GetOperatingSystem}-{CoreMisc.GetOperatingSystemArch}", null);
 
         #endregion Add basic startup information
 
         #region Add OS Architecture Check
 
-        await Console.Out.WriteLineAsync("Checking OS architecture");
+        LoggerBase.LogDebug(Logger, "Checking OS architecture", null);
 
         if (!CoreMisc.CheckCorrectArchitecture())
         {
-            await Console.Error.WriteLineAsync("You can only run this bot with a 64-bit architecture OS!");
-            await Console.Error.WriteLineAsync("Use either an ARM64 or x64 based processor!");
+            LoggerBase.LogError(Logger, "You can only run this bot with a 64-bit architecture OS!\nUse either an ARM64 or x64 based processor.", null);
             Environment.Exit(0);
         }
 
-        await Console.Out.WriteLineAsync("OS architecture check passed");
+        LoggerBase.LogDebug(Logger, "OS architecture check passed", null);
 
         #endregion Add OS Architecture Check
 
-        #region Add Exception Handler
-
-        await Console.Out.WriteLineAsync("Adding Exception Handler");
-        AppDomain.CurrentDomain.UnhandledException += GlobalExceptionHandler;
-
-        #endregion Add Exception Handler
-
         #region Initialize .json Settings
 
-        await Console.Out.WriteLineAsync("Loading settings");
+        LoggerBase.LogDebug(Logger, "Loading settings", null);
         await BaseSettings.LoadSettingsAsync();
 
         #endregion Initialize .json Settings
 
         #region Initialize client
 
-        await Console.Out.WriteLineAsync("Creating DiscordClient");
+        LoggerBase.LogDebug(Logger, "Creating DiscordClient", null);
         DiscordClient = InitializeBot();
-        ExceptionHandler.LogMessage(LogLevel.Information, "DiscordClient loaded");
+        LoggerBase.LogInfo(Logger, "DiscordClient loaded", null);
 
         #endregion Initialize client
 
         #region Initialize the modules
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Adding modules");
+        LoggerBase.LogDebug(Logger, "Adding modules", null);
         BaseModule.RegisterAllModules();
 
         #endregion Initialize the modules
 
         #region Initialize file lockings
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Registering all file locks");
+        LoggerBase.LogDebug(Logger, "Registering all file locks", null);
         BaseModule.RegisterAllFileLocks();
 
         #endregion Initialize file lockings
 
         #region Initialize Slash Commands
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Initializing SlashCommands");
+        LoggerBase.LogDebug(Logger, "Initializing SlashCommands", null);
         SlashCommands = DiscordClient.UseSlashCommands();
         BaseModule.RegisterAllCommands(SlashCommands, CoreSettings.ServerId);
 
@@ -112,24 +120,24 @@ internal static class AzzyBot
 
         #region Initialize Events
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Adding EventHandlers");
+        LoggerBase.LogDebug(Logger, "Adding EventHandlers", null);
         AddEventHandlers();
 
         #endregion Initialize Events
 
         #region Initialize Interactivity
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Configuring interactivity");
+        LoggerBase.LogDebug(Logger, "Configuring interactivity", null);
         DiscordClient.UseInteractivity(InitializeInteractivity());
 
         #endregion Initialize Interactivity
 
         #region Initialize Processes
 
-        ExceptionHandler.LogMessage(LogLevel.Information, "Starting all processes");
+        LoggerBase.LogInfo(Logger, "Starting all processes", null);
         BaseModule.StartAllProcesses();
         await Task.Delay(3000);
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Started all processes");
+        LoggerBase.LogInfo(Logger, "Started all processes", null);
 
         #endregion Initialize Processes
 
@@ -142,7 +150,7 @@ internal static class AzzyBot
 
         #region Connecting to Gateway
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Connecting to Discord Gateway");
+        LoggerBase.LogDebug(Logger, "Connecting to Discord Gateway", null);
         (UserStatus status, DiscordActivity activity) = InitBotStatus(CoreSettings.BotStatus, CoreSettings.BotActivity, CoreSettings.BotDoing, CoreSettings.BotStreamUrl);
         await DiscordClient.ConnectAsync(activity, status);
 
@@ -150,21 +158,21 @@ internal static class AzzyBot
 
         #region Initialize Strings
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Loading strings");
+        LoggerBase.LogDebug(Logger, "Initializing strings", null);
         await BaseStringBuilder.LoadStringsAsync();
 
         #endregion Initialize Strings
 
         #region Initialize Timers
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Starting timers");
+        LoggerBase.LogDebug(Logger, "Starting timers", null);
         BaseModule.StartAllTimers();
 
         #endregion Initialize Timers
 
         #region Finalizing
 
-        ExceptionHandler.LogMessage(LogLevel.Information, "Bot is ready");
+        LoggerBase.LogInfo(Logger, $"{nameof(AzzyBot)} is ready", null);
         await Task.Delay(-1);
 
         #endregion Finalizing
@@ -174,19 +182,17 @@ internal static class AzzyBot
     {
         Exception ex = (Exception)e.ExceptionObject;
 
-        ExceptionHandler.LogMessage(LogLevel.Critical, "Global exception found!");
-        ExceptionHandler.LogMessage(LogLevel.Critical, ex.Message);
-        ExceptionHandler.LogMessage(LogLevel.Critical, ex.StackTrace ?? "No StackTrace available!");
+        LoggerBase.LogCrit(Logger, "Global exception found!", ex);
     }
 
     private static async Task GuildCreatedAsync(DiscordClient c, GuildCreateEventArgs e)
     {
-        ExceptionHandler.LogMessage(LogLevel.Information, "Bot joined a Guild!");
+        LoggerBase.LogInfo(Logger, "Bot joined a Guild!", null);
 
         if (c.Guilds.Count <= 1)
             return;
 
-        ExceptionHandler.LogMessage(LogLevel.Warning, "The bot is now in 2 guilds, self-kick initiated.");
+        LoggerBase.LogWarn(Logger, "The bot is now in 2 guilds, self-kick initiated.", null);
         await e.Guild.LeaveAsync();
     }
 
@@ -207,7 +213,7 @@ internal static class AzzyBot
             return;
         }
 
-        ExceptionHandler.LogMessage(LogLevel.Critical, "The bot is joined on more guilds than one. Please remove the bot out of every guild until only 1 is left!");
+        LoggerBase.LogCrit(Logger, "The bot is joined on more guilds than one. Please remove the bot out of every guild until only 1 is left!", null);
         await BotShutdownAsync();
     }
 
@@ -241,13 +247,13 @@ internal static class AzzyBot
 
     private static async void ProcessExit(object? c, EventArgs e)
     {
-        ExceptionHandler.LogMessage(LogLevel.Information, "Process exit requested by AppDomain.CurrentDomain.ProcessExit");
+        LoggerBase.LogInfo(Logger, "Process exit requested by AppDomain.CurrentDomain.ProcessExit", null);
         await BotShutdownAsync();
     }
 
     private static async void ConsoleKeyShutdown(object? c, ConsoleCancelEventArgs e)
     {
-        ExceptionHandler.LogMessage(LogLevel.Information, "Process exit requested by Console.CancelKeyPress");
+        LoggerBase.LogInfo(Logger, "Process exit requested by Console.CancelKeyPress", null);
         await BotShutdownAsync();
     }
 
@@ -259,8 +265,7 @@ internal static class AzzyBot
             Token = CoreSettings.BotToken,
             TokenType = TokenType.Bot,
             Intents = DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers,
-            MinimumLogLevel = (LogLevel)Enum.ToObject(typeof(LogLevel), CoreSettings.LogLevel),
-            LogTimestampFormat = "yyyy-MM-dd HH:mm:ss"
+            LoggerFactory = LoggerBase.GetLoggerFactory
         };
 
         return new(config);
@@ -335,16 +340,24 @@ internal static class AzzyBot
     {
         ArgumentNullException.ThrowIfNull(DiscordClient);
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Initializing Lavalink4NET");
+        LoggerBase.LogDebug(Logger, "Initializing Lavalink4NET", null);
+
         ServiceCollection = new ServiceCollection().AddLavalink().AddSingleton(DiscordClient).ConfigureLavalink(config =>
         {
             config.BaseAddress = (CoreAzzyStatsGeneral.GetBotName is "AzzyBot-Docker") ? new Uri("http://lavalink:2333") : new Uri("http://localhost:2333");
+            config.Label = "AzzyBot";
             config.ReadyTimeout = TimeSpan.FromSeconds(15);
             config.ResumptionOptions = new(TimeSpan.Zero);
-            config.Label = "AzzyBot";
         });
 
-        ServiceCollection.AddLogging(x => x.AddConsole().SetMinimumLevel((LogLevel)Enum.ToObject(typeof(LogLevel), CoreSettings.LogLevel)));
+        ServiceCollection.AddLogging(x => x.AddConsole().SetMinimumLevel((LogLevel)Enum.ToObject(typeof(LogLevel), CoreSettings.LogLevel)).AddSimpleConsole(options =>
+        {
+            options.ColorBehavior = LoggerColorBehavior.Enabled;
+            options.IncludeScopes = true;
+            options.SingleLine = true;
+            options.TimestampFormat = "yyyy-MM-dd HH:mm:ss ";
+            options.UseUtcTimestamp = true;
+        }));
 
         if (CoreModule.GetMusicStreamingInactivity())
         {
@@ -359,7 +372,7 @@ internal static class AzzyBot
             ServiceCollection.AddInactivityTracker<UsersInactivityTracker>();
             ServiceCollection.Configure<IdleInactivityTrackerOptions>(config => config.TrackNewPlayers = false);
 
-            ExceptionHandler.LogMessage(LogLevel.Debug, "Applied inactivity tracking to Lavalink4NET");
+            LoggerBase.LogDebug(Logger, "Applied inactivity tracking to Lavalink4NET", null);
         }
 
         IServiceProvider serviceProvider = ServiceCollection.BuildServiceProvider();
@@ -374,13 +387,13 @@ internal static class AzzyBot
         if (CoreModule.GetMusicStreamingLyrics())
         {
             AudioService.UseLyricsJava();
-            ExceptionHandler.LogMessage(LogLevel.Debug, "Applied Lyrics.Java to Lavalink4NET");
+            LoggerBase.LogDebug(Logger, "Applied Lyrics.Java to Lavalink4NET", null);
         }
 
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Lavalink4NET loaded");
+        LoggerBase.LogDebug(Logger, "Lavalink4NET loaded", null);
     }
 
-    private static async Task BotShutdownAsync()
+    internal static async Task BotShutdownAsync()
     {
         if (ModuleStates.MusicStreaming)
         {
@@ -393,23 +406,23 @@ internal static class AzzyBot
         }
 
         BaseModule.StopAllTimers();
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all timers");
+        LoggerBase.LogDebug(Logger, "Stopped all timers", null);
 
         BaseModule.StopAllProcesses();
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Stopped all processes");
+        LoggerBase.LogDebug(Logger, "Stopped all processes", null);
 
         BaseModule.DisposeAllFileLocks();
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Disposed all file locks");
+        LoggerBase.LogDebug(Logger, "Disposed all file locks", null);
 
         RemoveEventHandlers();
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Removed EventHandlers");
+        LoggerBase.LogDebug(Logger, "Removed EventHandlers", null);
 
         if (SlashCommands is not null)
         {
             SlashCommands.Dispose();
             SlashCommands = null;
 
-            ExceptionHandler.LogMessage(LogLevel.Debug, "SlashCommands disposed");
+            LoggerBase.LogDebug(Logger, "SlashCommands disposed", null);
         }
 
         if (DiscordClient is not null)
@@ -418,10 +431,10 @@ internal static class AzzyBot
             DiscordClient.Dispose();
             DiscordClient = null;
 
-            await Console.Out.WriteLineAsync("DiscordClient disposed");
+            LoggerBase.LogDebug(Logger, "DiscordClient disposed", null);
         }
 
-        await Console.Out.WriteLineAsync("Ready for exit");
+        LoggerBase.DisposeLogger();
         Environment.Exit(0);
     }
 

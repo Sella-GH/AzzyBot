@@ -3,10 +3,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using AzzyBot.ExceptionHandling;
+using AzzyBot.Logging;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.Core.Strings;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.Core;
 
@@ -57,7 +56,7 @@ internal static class CoreAzzyStatsGeneral
         }
         catch (DriveNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, "Main drive not found");
+            LoggerBase.LogError(LoggerBase.GetLogger, "Main drive not found", null);
             throw;
         }
     }

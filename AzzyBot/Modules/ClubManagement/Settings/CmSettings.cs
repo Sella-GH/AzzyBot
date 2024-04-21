@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using AzzyBot.Logging;
 
 namespace AzzyBot.Modules.ClubManagement.Settings;
 
@@ -20,7 +21,7 @@ internal sealed class CmSettings : BaseSettings
     {
         ArgumentNullException.ThrowIfNull(Config);
 
-        Console.Out.WriteLine("Loading ClubManagement Settings");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Loading ClubManagement Settings", null);
 
         AutomaticClubClosingCheck = Convert.ToBoolean(Config["ClubManagement:AutomaticClubClosingCheck"], CultureInfo.InvariantCulture);
 

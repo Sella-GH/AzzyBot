@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
+using AzzyBot.Logging;
 
 namespace AzzyBot.Modules.MusicStreaming.Settings;
 
@@ -20,7 +21,7 @@ internal sealed class MsSettings : BaseSettings
     {
         ArgumentNullException.ThrowIfNull(Config);
 
-        await Console.Out.WriteLineAsync("Loading MusicStreaming Settings");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Loading MusicStreaming Settings", null);
 
         ActivateLyrics = Convert.ToBoolean(Config["MusicStreaming:ActivateLyrics"], CultureInfo.InvariantCulture);
         AutoDisconnect = Convert.ToBoolean(Config["MusicStreaming:AutoDisconnect"], CultureInfo.InvariantCulture);
@@ -43,7 +44,7 @@ internal sealed class MsSettings : BaseSettings
 
     private static async Task<string> GetGeniusApiKeyAsync()
     {
-        await Console.Out.WriteLineAsync("Getting Genius API key");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Getting Genius API key", null);
         string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "MusicStreaming", "Files", "application.yml");
 
         if (!File.Exists(path))

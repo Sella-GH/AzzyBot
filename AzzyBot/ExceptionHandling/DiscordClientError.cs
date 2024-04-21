@@ -1,11 +1,11 @@
 using System;
 using System.Threading.Tasks;
+using AzzyBot.Logging;
 using AzzyBot.Modules.Core.Settings;
 using AzzyBot.Modules.Core.Strings;
 using DSharpPlus;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Exceptions;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.ExceptionHandling;
 
@@ -18,7 +18,7 @@ internal static class DiscordClientError
         switch (ex)
         {
             case RateLimitException:
-                ExceptionHandler.LogMessage(LogLevel.Critical, ex.ToString(), ((DiscordException)e.Exception).JsonMessage);
+                LoggerBase.LogCrit(LoggerBase.GetLogger, $"{ex}\n{((DiscordException)e.Exception).JsonMessage}", null);
                 break;
 
             case BadRequestException:
@@ -26,18 +26,18 @@ internal static class DiscordClientError
             case RequestSizeException:
             case ServerErrorException:
             case UnauthorizedException:
-                await ExceptionHandler.LogErrorAsync(ex, ((DiscordException)e.Exception).JsonMessage);
+                await LoggerExceptions.LogErrorAsync(ex, ((DiscordException)e.Exception).JsonMessage);
                 await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, CoreStringBuilder.GetExceptionHandlingDiscordPermissions(c.CurrentUser.Username));
                 break;
 
             default:
                 if (e.Exception is not DiscordException)
                 {
-                    await ExceptionHandler.LogErrorAsync(ex);
+                    await LoggerExceptions.LogErrorAsync(ex);
                     break;
                 }
 
-                await ExceptionHandler.LogErrorAsync(ex, ((DiscordException)e.Exception).JsonMessage);
+                await LoggerExceptions.LogErrorAsync(ex, ((DiscordException)e.Exception).JsonMessage);
                 break;
         }
     }

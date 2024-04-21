@@ -1,12 +1,11 @@
 using System.Threading.Tasks;
 using AzzyBot.Commands.Attributes;
-using AzzyBot.ExceptionHandling;
+using AzzyBot.Logging;
 using AzzyBot.Modules.Core.Autocomplete;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using DSharpPlus.SlashCommands.Attributes;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.Core;
 
@@ -19,7 +18,7 @@ internal sealed class CoreCommands : ApplicationCommandModule
         [SlashCommand("help", "Shows you all available commands with their descriptions and the options")]
         internal static async Task AzzyHelpCommandAsync(InteractionContext ctx, [Autocomplete(typeof(AzzyHelpAutocomplete))][Option("command", "Shows a detailed overview of the selected command")] string command = "")
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "AzzyHelpCommand requsted");
+            LoggerBase.LogInfo(LoggerBase.GetLogger, "AzzyHelpCommand requsted", null);
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
             if (string.IsNullOrWhiteSpace(command))
@@ -44,7 +43,7 @@ internal sealed class CoreCommands : ApplicationCommandModule
             [SlashCommand("azzy", "Shows basic information about Azzy")]
             internal static async Task CoreInfoAzzyCommandAsync(InteractionContext ctx)
             {
-                ExceptionHandler.LogMessage(LogLevel.Debug, "CoreInfoAzzyCommand requsted");
+                LoggerBase.LogInfo(LoggerBase.GetLogger, "CoreInfoAzzyCommand requsted", null);
                 await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(await CoreEmbedBuilder.BuildInfoAzzyEmbedAsync(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl)));
             }
@@ -56,9 +55,8 @@ internal sealed class CoreCommands : ApplicationCommandModule
             [SlashCommand("azzy", "Pings Azzy and returns general information")]
             internal static async Task CorePingAzzyCommandAsync(InteractionContext ctx)
             {
-                ExceptionHandler.LogMessage(LogLevel.Debug, "CorePingAzzyCommand requested");
+                LoggerBase.LogInfo(LoggerBase.GetLogger, "CorePingAzzyCommand requested", null);
                 await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
-
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(await CoreEmbedBuilder.BuildAzzyStatsEmbedAsync(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl, ctx.Client.Ping)));
             }
         }

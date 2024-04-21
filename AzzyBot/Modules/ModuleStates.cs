@@ -1,5 +1,4 @@
-using AzzyBot.ExceptionHandling;
-using Microsoft.Extensions.Logging;
+using AzzyBot.Logging;
 
 namespace AzzyBot.Modules;
 
@@ -13,24 +12,24 @@ internal static class ModuleStates
     internal static void ActivateAzuraCast()
     {
         AzuraCast = true;
-        ExceptionHandler.LogMessage(LogLevel.Information, "Module AzuraCast activated");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Module AzuraCast activated", null);
     }
 
     internal static void ActivateClubManagement()
     {
         ClubManagement = true;
-        ExceptionHandler.LogMessage(LogLevel.Information, "Module ClubManagement activated");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Module ClubManagement activated", null);
     }
 
     internal static void ActivateCore()
     {
         Core = true;
-        ExceptionHandler.LogMessage(LogLevel.Information, "Module Core activated");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Module Core activated", null);
     }
 
     internal static void ActivateMusicStreaming()
     {
         MusicStreaming = true;
-        ExceptionHandler.LogMessage(LogLevel.Information, "Module MusicStreaming activated");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Module MusicStreaming activated", null);
     }
 }

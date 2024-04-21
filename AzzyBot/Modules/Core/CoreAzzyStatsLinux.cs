@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
-using AzzyBot.ExceptionHandling;
+using AzzyBot.Logging;
 using AzzyBot.Modules.Core.Structs;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.Core;
 
@@ -107,17 +106,17 @@ internal static class CoreAzzyStatsLinux
         }
         catch (DirectoryNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, "Directory not found: /proc");
+            LoggerBase.LogError(LoggerBase.GetLogger, "Directory not found: /proc", null);
             throw;
         }
         catch (FileNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, "File not found: /proc/stat");
+            LoggerBase.LogError(LoggerBase.GetLogger, "File not found: /proc/stat", null);
             throw;
         }
         catch (UnauthorizedAccessException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, "Can't access file: /proc/stat - invalid permissions");
+            LoggerBase.LogError(LoggerBase.GetLogger, "Can't access file: /proc/stat - invalid permissions", null);
             throw;
         }
     }
@@ -140,17 +139,17 @@ internal static class CoreAzzyStatsLinux
         }
         catch (DirectoryNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, "/proc not found");
+            LoggerBase.LogError(LoggerBase.GetLogger, "/proc not found", null);
             throw;
         }
         catch (FileNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, "/proc/loadavg not found");
+            LoggerBase.LogError(LoggerBase.GetLogger, "/proc/loadavg not found", null);
             throw;
         }
         catch (UnauthorizedAccessException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, "Can't access file: /proc/loadavg - invalid permissions");
+            LoggerBase.LogError(LoggerBase.GetLogger, "Can't access file: /proc/loadavg - invalid permissions", null);
             throw;
         }
     }
@@ -199,17 +198,17 @@ internal static class CoreAzzyStatsLinux
         }
         catch (DirectoryNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, "Directory not found: /proc");
+            LoggerBase.LogError(LoggerBase.GetLogger, "Directory not found: /proc", null);
             throw;
         }
         catch (FileNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, "File not found: /proc/meminfo");
+            LoggerBase.LogError(LoggerBase.GetLogger, "File not found: /proc/meminfo", null);
             throw;
         }
         catch (UnauthorizedAccessException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, "Can't access file: /proc/meminfo - invalid permissions");
+            LoggerBase.LogError(LoggerBase.GetLogger, "Can't access file: /proc/meminfo - invalid permissions", null);
             throw;
         }
     }
@@ -271,17 +270,17 @@ internal static class CoreAzzyStatsLinux
         }
         catch (DirectoryNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, "/proc/net not found!");
+            LoggerBase.LogError(LoggerBase.GetLogger, "/proc/net not found!", null);
             throw;
         }
         catch (FileNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, "/proc/net/dev not found!");
+            LoggerBase.LogError(LoggerBase.GetLogger, "/proc/net/dev not found!", null);
             throw;
         }
         catch (UnauthorizedAccessException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, "Sudo permissions required!");
+            LoggerBase.LogError(LoggerBase.GetLogger, "Sudo permissions required!", null);
             throw;
         }
     }
@@ -302,17 +301,17 @@ internal static class CoreAzzyStatsLinux
         }
         catch (DirectoryNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, "/proc not found!");
+            LoggerBase.LogError(LoggerBase.GetLogger, "/proc not found!", null);
             throw;
         }
         catch (FileNotFoundException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, "/proc/uptime not found!");
+            LoggerBase.LogError(LoggerBase.GetLogger, "/proc/uptime not found!", null);
             throw;
         }
         catch (UnauthorizedAccessException)
         {
-            ExceptionHandler.LogMessage(LogLevel.Error, "Sudo permissions required!");
+            LoggerBase.LogError(LoggerBase.GetLogger, "Sudo permissions required!", null);
             throw;
         }
     }

@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using AzzyBot.Commands.Attributes;
-using AzzyBot.ExceptionHandling;
+using AzzyBot.Logging;
 using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.AzuraCast.Autocomplete;
 using AzzyBot.Modules.AzuraCast.Settings;
@@ -12,7 +12,6 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 using DSharpPlus.SlashCommands.Attributes;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules.ClubManagement;
 
@@ -26,7 +25,7 @@ internal sealed class CmCommands : ApplicationCommandModule
         [SlashCommand("close-club", "Removes all active playlists and closes the club")]
         internal static async Task StaffCloseClubCommandAsync(InteractionContext ctx)
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "StaffCloseClubCommand requested");
+            LoggerBase.LogInfo(LoggerBase.GetLogger, "StaffCloseClubCommand requested", null);
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
@@ -64,7 +63,7 @@ internal sealed class CmCommands : ApplicationCommandModule
         [SlashCommand("open-club", "Select a playlist and open the club")]
         internal static async Task StaffOpenClubCommandAsync(InteractionContext ctx, [Autocomplete(typeof(AcPlaylistAutocomplete))][Option("playlist", "Select a playlist for the day")] string playlistId, [Option("custom-text", "Add some custom text to your opening message")] string slogan = "")
         {
-            ExceptionHandler.LogMessage(LogLevel.Debug, "StaffOpenClubCommand requested");
+            LoggerBase.LogInfo(LoggerBase.GetLogger, "StaffOpenClubCommand requested", null);
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 

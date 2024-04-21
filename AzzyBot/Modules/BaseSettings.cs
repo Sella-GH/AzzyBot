@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using AzzyBot.ExceptionHandling;
+using AzzyBot.Logging;
 using AzzyBot.Modules.AzuraCast.Settings;
 using AzzyBot.Modules.ClubManagement.Settings;
 using AzzyBot.Modules.Core;
@@ -12,7 +12,6 @@ using AzzyBot.Modules.Core.Settings;
 using AzzyBot.Modules.MusicStreaming.Settings;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Modules;
 
@@ -49,8 +48,8 @@ internal abstract class BaseSettings
         // Ensure core is activated first
         if (!CoreSettings.CoreSettingsLoaded)
         {
-            await Console.Error.WriteLineAsync("Core settings aren't loaded");
-            Environment.Exit(1);
+            LoggerBase.LogError(LoggerBase.GetLogger, "Core settings aren't loaded", null);
+            await AzzyBot.BotShutdownAsync();
         }
 
         if (ActivateAzuraCast && !await AcSettings.LoadAzuraCastAsync())
@@ -78,7 +77,7 @@ internal abstract class BaseSettings
 
                 foreach (ulong channel in azuraCastChannels)
                 {
-                    ExceptionHandler.LogMessage(LogLevel.Error, $"Channel with ID **{channel}** does not exist in guild with ID **{guild.Id}** and name **{guild.Name}**!");
+                    LoggerBase.LogError(LoggerBase.GetLogger, $"Channel with ID **{channel}** does not exist in guild with ID **{guild.Id}** and name **{guild.Name}**!", null);
                 }
             }
         }
@@ -135,13 +134,13 @@ internal abstract class BaseSettings
 
         foreach (string item in failed)
         {
-            Console.Error.WriteLine($"{item} has to be filled out!");
+            LoggerBase.LogError(LoggerBase.GetLogger, $"{item} has to be filled out!", null);
         }
 
         if (CoreMisc.CheckIfLinuxOs())
             return false;
 
-        Console.Out.WriteLine("Press any key to acknowledge...");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Press any key to acknowledge...", null);
         Console.ReadKey();
 
         return false;

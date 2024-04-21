@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using AzzyBot.Logging;
 
 namespace AzzyBot.Modules.Core.Settings;
 
@@ -27,7 +28,7 @@ internal sealed class CoreSettings : BaseSettings
     {
         ArgumentNullException.ThrowIfNull(Config);
 
-        Console.Out.WriteLine("Loading Core Settings");
+        LoggerBase.LogInfo(LoggerBase.GetLogger, "Loading Core Settings", null);
 
         // Core config
         LogLevel = Convert.ToInt32(Config["Core:LogLevel"], CultureInfo.InvariantCulture);

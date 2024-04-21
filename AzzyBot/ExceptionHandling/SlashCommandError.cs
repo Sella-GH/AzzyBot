@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using AzzyBot.Logging;
 using AzzyBot.Modules.Core.Strings;
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -6,7 +7,6 @@ using DSharpPlus.Exceptions;
 using DSharpPlus.SlashCommands;
 using DSharpPlus.SlashCommands.Attributes;
 using DSharpPlus.SlashCommands.EventArgs;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.ExceptionHandling;
 
@@ -14,7 +14,7 @@ internal static class SlashCommandError
 {
     internal static async Task SlashErrorAsync(SlashCommandsExtension _, SlashCommandErrorEventArgs e)
     {
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Slash error occured!");
+        LoggerBase.LogWarn(LoggerBase.GetLogger, "Slash error occured!", null);
 
         if (e.Exception is SlashExecutionChecksFailedException ex)
         {
@@ -43,7 +43,7 @@ internal static class SlashCommandError
             if (isGuildCheck)
             {
                 await e.Context.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(CoreStringBuilder.GetExceptionHandlingNotInGuild).AsEphemeral(true));
-                ExceptionHandler.LogMessage(LogLevel.Information, $"User **{e.Context.User.Username}** tried to access the command **{e.Context.QualifiedName}** outside of a server!");
+                LoggerBase.LogInfo(LoggerBase.GetLogger, $"User **{e.Context.User.Username}** tried to access the command **{e.Context.QualifiedName}** outside of a server!", null);
                 return;
             }
 
@@ -61,25 +61,25 @@ internal static class SlashCommandError
         }
         else if (e.Exception is not DiscordException)
         {
-            await ExceptionHandler.LogErrorAsync(e.Exception, e.Context);
+            await LoggerExceptions.LogErrorAsync(e.Exception, e.Context);
         }
         else
         {
-            await ExceptionHandler.LogErrorAsync(e.Exception, e.Context, ((DiscordException)e.Exception).JsonMessage);
+            await LoggerExceptions.LogErrorAsync(e.Exception, e.Context, ((DiscordException)e.Exception).JsonMessage);
         }
     }
 
     internal static async Task AutocompleteErrorAsync(SlashCommandsExtension _, AutocompleteErrorEventArgs e)
     {
-        ExceptionHandler.LogMessage(LogLevel.Debug, "Autocomplete error occured!");
+        LoggerBase.LogWarn(LoggerBase.GetLogger, "Autocomplete error occured!", null);
 
         if (e.Exception is not DiscordException)
         {
-            await ExceptionHandler.LogErrorAsync(e.Exception, e.Context);
+            await LoggerExceptions.LogErrorAsync(e.Exception, e.Context);
         }
         else
         {
-            await ExceptionHandler.LogErrorAsync(e.Exception, e.Context, ((DiscordException)e.Exception).JsonMessage);
+            await LoggerExceptions.LogErrorAsync(e.Exception, e.Context, ((DiscordException)e.Exception).JsonMessage);
         }
     }
 }
