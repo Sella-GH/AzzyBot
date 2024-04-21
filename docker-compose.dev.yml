@@ -6,6 +6,7 @@ services:
     image: sellagh/azzybot:dev
     pull_policy: always
     restart: unless-stopped
+    user: ${CURRENT_UID}
     depends_on:
       - lavalink
     networks:
