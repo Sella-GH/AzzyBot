@@ -6,10 +6,12 @@ services:
     image: sellagh/azzybot:dev
     pull_policy: always
     restart: unless-stopped
+    user: ${CURRENT_UID}
     depends_on:
       - lavalink
     networks:
       - lavalink
     volumes:
-      - ./AzzyBot/Settings:/app/Settings
       - ./AzzyBot/Customization:/app/Customization
+      - ./AzzyBot/Modules/AzuraCast/Files:/app/Modules/AzuraCast/Files
+      - ./AzzyBot/Settings:/app/Settings
