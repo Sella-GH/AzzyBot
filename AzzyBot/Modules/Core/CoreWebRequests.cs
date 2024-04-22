@@ -209,7 +209,7 @@ internal static class CoreWebRequests
             {
                 if (isIPaddress && iPAddress?.AddressFamily is not AddressFamily.InterNetworkV6)
                 {
-                    LoggerBase.LogWarn(LoggerBase.GetLogger, "Host address is no IPv6 address!", null);
+                    LoggerBase.LogWarn(LoggerBase.GetLogger, "Host address is no IPv6 address! But according to settings it should", null);
                     result = "down";
                 }
 
@@ -230,13 +230,13 @@ internal static class CoreWebRequests
 
             if (!await CheckLocalConnectionAsync(AddressFamily.InterNetwork))
             {
-                LoggerBase.LogWarn(LoggerBase.GetLogger, "IPv4 is down!", null);
+                LoggerBase.LogError(LoggerBase.GetLogger, "IPv4 is down!", null);
             }
             else if (string.IsNullOrWhiteSpace(result))
             {
                 result = await PingServerAsync(host, AddressFamily.InterNetwork, isIPaddress);
                 if (string.IsNullOrWhiteSpace(result))
-                    LoggerBase.LogWarn(LoggerBase.GetLogger, "Server not reachable over IPv4", null);
+                    LoggerBase.LogError(LoggerBase.GetLogger, "Server not reachable over IPv4", null);
             }
 
             if (string.IsNullOrWhiteSpace(result))
