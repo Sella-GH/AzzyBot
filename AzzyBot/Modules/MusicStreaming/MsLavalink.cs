@@ -117,7 +117,7 @@ internal static class MsLavalink
         }
         else if (streamingPort is not 0)
         {
-            url = string.Join("/", $"{azuraUrl}:{streamingPort}", MsSettings.MountPointStub);
+            url = string.Join("/", $"{azuraUrl}:{streamingPort}", MsSettings.MountPointStub.Split("/")[^1]);
         }
         else
         {
