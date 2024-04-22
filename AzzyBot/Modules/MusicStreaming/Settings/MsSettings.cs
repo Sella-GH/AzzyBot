@@ -31,17 +31,18 @@ internal sealed class MsSettings : BaseSettings
         MountPointStub = Config["MusicStreaming:MountPointStub"] ?? string.Empty;
         StreamingPort = Convert.ToInt32(Config["MusicStreaming:StreamingPort"], CultureInfo.InvariantCulture);
 
-        List<string> excluded = [];
+        List<string> excludedInts = [nameof(StreamingPort)];
+        List<string> excludedStrings = [];
         if (ActivateLyrics)
         {
             GeniusApiKey = await GetGeniusApiKeyAsync();
         }
         else
         {
-            excluded.Add(nameof(GeniusApiKey));
+            excludedStrings.Add(nameof(GeniusApiKey));
         }
 
-        return MusicStreamingSettingsLoaded = CheckSettings(typeof(MsSettings), excluded);
+        return MusicStreamingSettingsLoaded = CheckSettings(typeof(MsSettings), excludedStrings, excludedInts);
     }
 
     private static async Task<string> GetGeniusApiKeyAsync()
