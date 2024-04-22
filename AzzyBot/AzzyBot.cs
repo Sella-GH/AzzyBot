@@ -63,7 +63,7 @@ internal sealed class AzzyBot
 
         #region Add basic startup information
 
-        LoggerBase.LogDebug(Logger, $"Starting {CoreAzzyStatsGeneral.GetBotName} in version {CoreAzzyStatsGeneral.GetBotVersion} on {CoreMisc.GetOperatingSystem}-{CoreMisc.GetOperatingSystemArch}", null);
+        LoggerBase.LogInfo(Logger, $"Starting {CoreAzzyStatsGeneral.GetBotName} in version {CoreAzzyStatsGeneral.GetBotVersion} on {CoreMisc.GetOperatingSystem}-{CoreMisc.GetOperatingSystemArch}", null);
 
         #endregion Add basic startup information
 
