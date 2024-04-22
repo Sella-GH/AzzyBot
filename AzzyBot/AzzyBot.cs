@@ -115,6 +115,7 @@ internal sealed class AzzyBot
         LoggerBase.LogDebug(Logger, "Initializing SlashCommands", null);
         SlashCommands = DiscordClient.UseSlashCommands();
         BaseModule.RegisterAllCommands(SlashCommands, CoreSettings.ServerId);
+        LoggerBase.LogInfo(Logger, "SlashCommands added", null);
 
         #endregion Initialize Slash Commands
 
@@ -127,17 +128,20 @@ internal sealed class AzzyBot
 
         #region Initialize Interactivity
 
-        LoggerBase.LogDebug(Logger, "Configuring interactivity", null);
-        DiscordClient.UseInteractivity(InitializeInteractivity());
+        if (ModuleStates.AzuraCast)
+        {
+            LoggerBase.LogDebug(Logger, "Configuring interactivity", null);
+            DiscordClient.UseInteractivity(InitializeInteractivity());
+        }
 
         #endregion Initialize Interactivity
 
         #region Initialize Processes
 
-        LoggerBase.LogInfo(Logger, "Starting all processes", null);
+        LoggerBase.LogDebug(Logger, "Starting all processes", null);
         BaseModule.StartAllProcesses();
         await Task.Delay(3000);
-        LoggerBase.LogInfo(Logger, "Started all processes", null);
+        LoggerBase.LogInfo(Logger, "All processes started", null);
 
         #endregion Initialize Processes
 
@@ -153,6 +157,7 @@ internal sealed class AzzyBot
         LoggerBase.LogDebug(Logger, "Connecting to Discord Gateway", null);
         (UserStatus status, DiscordActivity activity) = InitBotStatus(CoreSettings.BotStatus, CoreSettings.BotActivity, CoreSettings.BotDoing, CoreSettings.BotStreamUrl);
         await DiscordClient.ConnectAsync(activity, status);
+        LoggerBase.LogInfo(Logger, "Discord Gateway connection established", null);
 
         #endregion Connecting to Gateway
 
@@ -208,7 +213,10 @@ internal sealed class AzzyBot
             }
 
             if (!channelsExist)
+            {
+                LoggerBase.LogError(Logger, "At least one of the specificied channels in the settings file does not exist!", null);
                 await BotShutdownAsync();
+            }
 
             return;
         }
@@ -390,7 +398,7 @@ internal sealed class AzzyBot
             LoggerBase.LogDebug(Logger, "Applied Lyrics.Java to Lavalink4NET", null);
         }
 
-        LoggerBase.LogDebug(Logger, "Lavalink4NET loaded", null);
+        LoggerBase.LogInfo(Logger, "Lavalink4NET loaded", null);
     }
 
     internal static async Task BotShutdownAsync()
@@ -409,7 +417,7 @@ internal sealed class AzzyBot
         LoggerBase.LogDebug(Logger, "Stopped all timers", null);
 
         BaseModule.StopAllProcesses();
-        LoggerBase.LogDebug(Logger, "Stopped all processes", null);
+        LoggerBase.LogInfo(Logger, "Stopped all processes", null);
 
         BaseModule.DisposeAllFileLocks();
         LoggerBase.LogDebug(Logger, "Disposed all file locks", null);
@@ -422,7 +430,7 @@ internal sealed class AzzyBot
             SlashCommands.Dispose();
             SlashCommands = null;
 
-            LoggerBase.LogDebug(Logger, "SlashCommands disposed", null);
+            LoggerBase.LogInfo(Logger, "SlashCommands disposed", null);
         }
 
         if (DiscordClient is not null)
@@ -431,7 +439,7 @@ internal sealed class AzzyBot
             DiscordClient.Dispose();
             DiscordClient = null;
 
-            LoggerBase.LogDebug(Logger, "DiscordClient disposed", null);
+            LoggerBase.LogInfo(Logger, "DiscordClient disposed", null);
         }
 
         LoggerBase.DisposeLogger();
