@@ -123,7 +123,7 @@ jobs:
       - name: Archive docker-zip artifact
         uses: actions/upload-artifact@v4
         with:
-          name: debug-docker
+          name: release-docker
           path: ./docker-zip
 
   extract_version:
