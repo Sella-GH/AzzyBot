@@ -107,15 +107,21 @@ internal static class MsLavalink
         };
 
         bool hlsStream = MsSettings.MountPointStub.EndsWith("m3u8", StringComparison.OrdinalIgnoreCase);
+        int streamingPort = MsSettings.StreamingPort;
+        string azuraUrl = AcSettings.AzuraApiUrl.Replace("/api", string.Empty, StringComparison.OrdinalIgnoreCase);
         string url;
 
         if (hlsStream)
         {
-            url = string.Join("/", AcSettings.AzuraApiUrl.Replace("/api", string.Empty, StringComparison.OrdinalIgnoreCase), AcApiEnum.hls, MsSettings.MountPointStub);
+            url = string.Join("/", azuraUrl, AcApiEnum.hls, MsSettings.MountPointStub);
+        }
+        else if (streamingPort is not 0)
+        {
+            url = string.Join("/", $"{azuraUrl}:{streamingPort}", MsSettings.MountPointStub);
         }
         else
         {
-            url = string.Join("/", AcSettings.AzuraApiUrl.Replace("/api", string.Empty, StringComparison.OrdinalIgnoreCase), AcApiEnum.listen, MsSettings.MountPointStub);
+            url = string.Join("/", azuraUrl, AcApiEnum.listen, MsSettings.MountPointStub);
         }
 
         LavalinkTrack? track = await AzzyBot.GetAudioService.Tracks.LoadTrackAsync(url, trackLoadOptions);
