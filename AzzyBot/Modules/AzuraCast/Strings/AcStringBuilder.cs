@@ -33,7 +33,7 @@ internal sealed class AcStringBuilder : BaseStringBuilder
             }
         }
 
-        return Model is not null;
+        return Model is not null && CheckStrings(Model);
     }
 
     #region Commands

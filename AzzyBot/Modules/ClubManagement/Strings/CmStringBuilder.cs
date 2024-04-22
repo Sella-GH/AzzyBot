@@ -32,7 +32,7 @@ internal sealed class CmStringBuilder : BaseStringBuilder
             }
         }
 
-        return Model is not null;
+        return Model is not null && CheckStrings(Model);
     }
 
     #region Commands
