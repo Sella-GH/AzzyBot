@@ -14,8 +14,9 @@ internal sealed class MsSettings : BaseSettings
     internal static string GeniusApiKey { get; private set; } = string.Empty;
     internal static bool AutoDisconnect { get; private set; }
     internal static int AutoDisconnectTime { get; private set; }
-    internal static string MountPointStub { get; private set; } = string.Empty;
     internal static bool DeleteLavalinkLogs { get; private set; }
+    internal static string MountPointStub { get; private set; } = string.Empty;
+    internal static int StreamingPort { get; private set; }
 
     internal static async Task<bool> LoadMusicStreamingAsync()
     {
@@ -26,20 +27,22 @@ internal sealed class MsSettings : BaseSettings
         ActivateLyrics = Convert.ToBoolean(Config["MusicStreaming:ActivateLyrics"], CultureInfo.InvariantCulture);
         AutoDisconnect = Convert.ToBoolean(Config["MusicStreaming:AutoDisconnect"], CultureInfo.InvariantCulture);
         AutoDisconnectTime = Convert.ToInt32(Config["MusicStreaming:AutoDisconnectTime"], CultureInfo.InvariantCulture);
-        MountPointStub = Config["MusicStreaming:MountPointStub"] ?? string.Empty;
         DeleteLavalinkLogs = Convert.ToBoolean(Config["MusicStreaming:DeleteLavalinkLogs"], CultureInfo.InvariantCulture);
+        MountPointStub = Config["MusicStreaming:MountPointStub"] ?? string.Empty;
+        StreamingPort = Convert.ToInt32(Config["MusicStreaming:StreamingPort"], CultureInfo.InvariantCulture);
 
-        List<string> excluded = [];
+        List<string> excludedInts = [nameof(StreamingPort)];
+        List<string> excludedStrings = [];
         if (ActivateLyrics)
         {
             GeniusApiKey = await GetGeniusApiKeyAsync();
         }
         else
         {
-            excluded.Add(nameof(GeniusApiKey));
+            excludedStrings.Add(nameof(GeniusApiKey));
         }
 
-        return MusicStreamingSettingsLoaded = CheckSettings(typeof(MsSettings), excluded);
+        return MusicStreamingSettingsLoaded = CheckSettings(typeof(MsSettings), excludedStrings, excludedInts);
     }
 
     private static async Task<string> GetGeniusApiKeyAsync()

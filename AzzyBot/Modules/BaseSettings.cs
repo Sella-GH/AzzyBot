@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -32,6 +33,7 @@ internal abstract class BaseSettings
         builder.AddJsonFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Settings", "appsettings.development.json"), true, false);
     }
 
+    [SuppressMessage("Roslynator", "RCS1208:Reduce 'if' nesting", Justification = "Code Style")]
     internal static async Task LoadSettingsAsync()
     {
         SetDevConfig();
@@ -42,24 +44,30 @@ internal abstract class BaseSettings
         ActivateClubManagement = Convert.ToBoolean(Config["ClubManagement:ActivateClubManagement"], CultureInfo.InvariantCulture);
         ActivateMusicStreaming = Convert.ToBoolean(Config["MusicStreaming:ActivateMusicStreaming"], CultureInfo.InvariantCulture);
 
-        if (!CoreSettings.LoadCore())
-            throw new InvalidOperationException("Core settings can't be loaded");
-
         // Ensure core is activated first
-        if (!CoreSettings.CoreSettingsLoaded)
+        if (!CoreSettings.LoadCore() || !CoreSettings.CoreSettingsLoaded)
         {
             LoggerBase.LogError(LoggerBase.GetLogger, "Core settings aren't loaded", null);
             await AzzyBot.BotShutdownAsync();
         }
 
         if (ActivateAzuraCast && !await AcSettings.LoadAzuraCastAsync())
-            throw new InvalidOperationException("AzuraCast settings can't be loaded");
+        {
+            LoggerBase.LogError(LoggerBase.GetLogger, "AzuraCast settings aren't loaded", null);
+            await AzzyBot.BotShutdownAsync();
+        }
 
         if (ActivateClubManagement && ActivateAzuraCast && !CmSettings.LoadClubManagement())
-            throw new InvalidOperationException("ClubManagement settings can't be loaded");
+        {
+            LoggerBase.LogError(LoggerBase.GetLogger, "ClubManagement settings aren't loaded", null);
+            await AzzyBot.BotShutdownAsync();
+        }
 
         if (ActivateMusicStreaming && ActivateAzuraCast && !await MsSettings.LoadMusicStreamingAsync())
-            throw new InvalidOperationException("MusicStreaming settings can't be loaded");
+        {
+            LoggerBase.LogError(LoggerBase.GetLogger, "MusicStreaming settings aren't loaded", null);
+            await AzzyBot.BotShutdownAsync();
+        }
     }
 
     internal static bool CheckIfChannelsExist(DiscordGuild guild)
