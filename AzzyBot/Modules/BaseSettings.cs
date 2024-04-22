@@ -98,7 +98,7 @@ internal abstract class BaseSettings
 
     protected static bool CheckSettings(Type type, List<string>? excludedStrings = null, List<string>? excludedInts = null)
     {
-        // Get all Properties of this class
+        // Get all Properties of the class
         PropertyInfo[] properties = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Static);
 
         List<string> failed = [];

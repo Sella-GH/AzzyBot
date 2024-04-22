@@ -103,6 +103,13 @@ internal sealed class AzzyBot
 
         #endregion Initialize the modules
 
+        #region Initialize Strings
+
+        LoggerBase.LogDebug(Logger, "Initializing strings", null);
+        await BaseStringBuilder.LoadStringsAsync();
+
+        #endregion Initialize Strings
+
         #region Initialize file lockings
 
         LoggerBase.LogDebug(Logger, "Registering all file locks", null);
@@ -160,13 +167,6 @@ internal sealed class AzzyBot
         LoggerBase.LogInfo(Logger, "Discord Gateway connection established", null);
 
         #endregion Connecting to Gateway
-
-        #region Initialize Strings
-
-        LoggerBase.LogDebug(Logger, "Initializing strings", null);
-        await BaseStringBuilder.LoadStringsAsync();
-
-        #endregion Initialize Strings
 
         #region Initialize Timers
 
@@ -403,9 +403,9 @@ internal sealed class AzzyBot
 
     internal static async Task BotShutdownAsync()
     {
-        if (ModuleStates.MusicStreaming)
+        if (ModuleStates.MusicStreaming && ServiceCollection is not null)
         {
-            IServiceProvider serviceProvider = ServiceCollection?.BuildServiceProvider() ?? throw new InvalidOperationException("No services started!");
+            IServiceProvider serviceProvider = ServiceCollection.BuildServiceProvider();
 
             foreach (IHostedService hostedService in serviceProvider.GetServices<IHostedService>())
             {
