@@ -44,24 +44,25 @@ internal abstract class BaseStringBuilder
         }
     }
 
-    protected static bool CheckStrings(Type type)
+    protected static bool CheckStrings<T>(T instance)
     {
-        // Get all Properties of the class
-        PropertyInfo[] properties = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Static);
+        // Get all Fields of the type
+        FieldInfo[] fields = typeof(T).GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
 
         List<string> failed = [];
 
-        // Loop through all properties and check if they are null, whitespace or 0
+        // Loop through all fields and check if they are null or whitespace
         // If yes add them to the list
-        foreach (PropertyInfo property in properties)
+        foreach (FieldInfo field in fields)
         {
-            if (property.PropertyType != typeof(string))
+            if (field.FieldType != typeof(string))
                 continue;
 
-            string? value = property.GetValue(null) as string;
+            string? value = field.GetValue(instance) as string;
 
+            // Cut the string to only get the full name of the property
             if (string.IsNullOrWhiteSpace(value))
-                failed.Add(property.Name);
+                failed.Add(field.Name.Substring(1, field.Name.IndexOf('>', StringComparison.OrdinalIgnoreCase) - 1));
         }
 
         if (failed.Count == 0)
@@ -69,7 +70,7 @@ internal abstract class BaseStringBuilder
 
         foreach (string item in failed)
         {
-            LoggerBase.LogError(LoggerBase.GetLogger, $"String {item} has to be filled out!", null);
+            LoggerBase.LogError(LoggerBase.GetLogger, $"Field {item} has to be filled out!", null);
         }
 
         if (CoreMisc.CheckIfLinuxOs())
