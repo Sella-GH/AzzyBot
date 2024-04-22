@@ -21,6 +21,7 @@
 - `AzuraApiKey` is not required anymore
 - A check if the given `AzuraApiKey` is valid
   - This requires you to give the bot API key access to the "Station Media" permission
+- The use of the MusicStreaming module without an AzuraCast Web Proxy
 - A few new settings:
   - Core/Updater
     - `DisplayChangelog`: bool
@@ -34,6 +35,8 @@
     - `UpdatesShowChangelog` : bool
   - AzuraCast
     - `ShowPlaylistsInNowPlaying` : bool
+  - MusicStreaming
+    - `StreamingPort` : int
 
 ### Removements
 - `config bot-restart` command
