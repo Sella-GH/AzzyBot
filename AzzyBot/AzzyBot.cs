@@ -358,7 +358,11 @@ internal sealed class AzzyBot
             config.ResumptionOptions = new(TimeSpan.Zero);
         });
 
-        ServiceCollection.AddLogging(x => x.AddConsole().SetMinimumLevel((LogLevel)Enum.ToObject(typeof(LogLevel), CoreSettings.LogLevel)).AddSimpleConsole(options =>
+        LogLevel level = LogLevel.Information;
+        if (CoreAzzyStatsGeneral.GetBotName is "AzzyBot-Dev")
+            level = LogLevel.Debug;
+
+        ServiceCollection.AddLogging(x => x.AddConsole().SetMinimumLevel(level).AddSimpleConsole(options =>
         {
             options.ColorBehavior = LoggerColorBehavior.Enabled;
             options.IncludeScopes = true;
