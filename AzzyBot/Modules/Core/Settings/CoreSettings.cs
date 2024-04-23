@@ -8,7 +8,6 @@ namespace AzzyBot.Modules.Core.Settings;
 internal sealed class CoreSettings : BaseSettings
 {
     internal static bool CoreSettingsLoaded { get; private set; }
-    internal static int LogLevel { get; private set; }
     internal static string BotToken { get; private set; } = string.Empty;
     internal static ulong? ServerId { get; private set; }
     internal static ulong OwnerUserId { get; private set; }
@@ -31,7 +30,6 @@ internal sealed class CoreSettings : BaseSettings
         LoggerBase.LogInfo(LoggerBase.GetLogger, "Loading Core Settings", null);
 
         // Core config
-        LogLevel = Convert.ToInt32(Config["Core:LogLevel"], CultureInfo.InvariantCulture);
         BotToken = Config["Core:BotToken"] ?? string.Empty;
         ServerId = Convert.ToUInt64(Config["Core:ServerId"], CultureInfo.InvariantCulture);
         if (ServerId == 0)

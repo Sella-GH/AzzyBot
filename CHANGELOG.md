@@ -1,6 +1,7 @@
 ## 1.9.0
 ### Breaking changes
 - `appsettings.json` is now located in the `Settings` folder
+- `appsettings.json` was restructured and extended
 - Some strings in the following files were updated
   - `StringsAzuraCast.json`
   - `StringsClubManagement.json`
@@ -21,7 +22,8 @@
 - `AzuraApiKey` is not required anymore
 - A check if the given `AzuraApiKey` is valid
   - This requires you to give the bot API key access to the "Station Media" permission
-- The use of the MusicStreaming module without an AzuraCast Web Proxy
+- The use of the MusicStreaming module without an enabled AzuraCast Web Proxy
+- String checking in `Customization` to prevent empty string and NullReferenceExceptions
 - A few new settings:
   - Core/Updater
     - `DisplayChangelog`: bool
@@ -40,6 +42,8 @@
 
 ### Removements
 - `config bot-restart` command
+- Core Settings
+  - `LogLevel`: int - Replaced by setting the log based on the exec file
  
 ### Improvements
 - CI Updates for better processability
