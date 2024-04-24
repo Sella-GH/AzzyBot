@@ -221,7 +221,7 @@ internal static class CoreWebRequests
                     }
                     else
                     {
-                        result = await PingServerAsync(host, AddressFamily.InterNetworkV6, isIPaddress);
+                        result = await CheckServerConnectionAsync(host, AddressFamily.InterNetworkV6, isIPaddress);
                         if (string.IsNullOrWhiteSpace(result))
                             LoggerBase.LogWarn(LoggerBase.GetLogger, "Server not reachable over IPv6", null);
                     }
@@ -234,7 +234,7 @@ internal static class CoreWebRequests
             }
             else if (string.IsNullOrWhiteSpace(result))
             {
-                result = await PingServerAsync(host, AddressFamily.InterNetwork, isIPaddress);
+                result = await CheckServerConnectionAsync(host, AddressFamily.InterNetwork, isIPaddress);
                 if (string.IsNullOrWhiteSpace(result))
                     LoggerBase.LogError(LoggerBase.GetLogger, "Server not reachable over IPv4", null);
             }
@@ -265,7 +265,7 @@ internal static class CoreWebRequests
         return false;
     }
 
-    private static async Task<string> PingServerAsync(string url, AddressFamily family, bool isIpAddress)
+    private static async Task<string> CheckServerConnectionAsync(string url, AddressFamily family, bool isIpAddress)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
 
