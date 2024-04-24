@@ -202,6 +202,7 @@ internal static class CoreWebRequests
         string result = string.Empty;
         try
         {
+            bool isHttps = url.StartsWith("https", StringComparison.OrdinalIgnoreCase);
             string host = new Uri(url).Host;
             bool isIPaddress = IPAddress.TryParse(host, out IPAddress? iPAddress);
 
@@ -221,7 +222,7 @@ internal static class CoreWebRequests
                     }
                     else
                     {
-                        result = await CheckServerConnectionAsync(host, AddressFamily.InterNetworkV6, isIPaddress);
+                        result = await CheckServerConnectionAsync(host, AddressFamily.InterNetworkV6, isIPaddress, isHttps);
                         if (string.IsNullOrWhiteSpace(result))
                             LoggerBase.LogWarn(LoggerBase.GetLogger, "Server not reachable over IPv6", null);
                     }
@@ -234,7 +235,7 @@ internal static class CoreWebRequests
             }
             else if (string.IsNullOrWhiteSpace(result))
             {
-                result = await CheckServerConnectionAsync(host, AddressFamily.InterNetwork, isIPaddress);
+                result = await CheckServerConnectionAsync(host, AddressFamily.InterNetwork, isIPaddress, isHttps);
                 if (string.IsNullOrWhiteSpace(result))
                     LoggerBase.LogError(LoggerBase.GetLogger, "Server not reachable over IPv4", null);
             }
@@ -242,8 +243,10 @@ internal static class CoreWebRequests
             if (string.IsNullOrWhiteSpace(result))
                 LoggerBase.LogCrit(LoggerBase.GetLogger, "No internet connection available!", null);
         }
-        catch (HttpRequestException)
-        { }
+        catch (HttpRequestException ex)
+        {
+            await LoggerExceptions.LogErrorAsync(ex);
+        }
 
         return result;
     }
@@ -254,50 +257,65 @@ internal static class CoreWebRequests
         {
             // Choose the right address based on the family
             HttpClient client = (family == AddressFamily.InterNetworkV6) ? Client : ClientV4;
-            string host = (family == AddressFamily.InterNetworkV6) ? "2a01:4f8:0:a232::2" : "78.46.170.2";
-            using HttpResponseMessage? response = await client.GetAsync(new Uri(host));
+            string host = (family == AddressFamily.InterNetworkV6) ? "[2a01:4f8:0:a232::2]" : "78.46.170.2";
+            using HttpResponseMessage? response = await client.GetAsync(new Uri($"http://{host}"));
 
             return response.IsSuccessStatusCode;
         }
-        catch (HttpRequestException)
-        { }
+        catch (HttpRequestException ex)
+        {
+            await LoggerExceptions.LogErrorAsync(ex);
+        }
 
         return false;
     }
 
-    private static async Task<string> CheckServerConnectionAsync(string url, AddressFamily family, bool isIpAddress)
+    private static async Task<string> CheckServerConnectionAsync(string url, AddressFamily family, bool isIpAddress, bool isHttps)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
 
         try
         {
             // Check if the provided url is a IP address or a domain
-            IPAddress[] addresses = (isIpAddress) ? [IPAddress.Parse(url)] : await Dns.GetHostAddressesAsync(url);
+            IPAddress[] addresses = (isIpAddress) ? [IPAddress.Parse(url)] : [];
             IPAddress address = IPAddress.Parse("0.0.0.0");
+            string addr = string.Empty;
 
-            foreach (IPAddress ipAdr in addresses)
+            if (isIpAddress)
             {
-                if (ipAdr.AddressFamily == family)
+                foreach (IPAddress ipAdr in addresses)
                 {
-                    address = ipAdr;
-                    break;
+                    if (ipAdr.AddressFamily == family)
+                    {
+                        address = ipAdr;
+                        break;
+                    }
                 }
+
+                if (address.ToString() is "0.0.0.0" or "::0")
+                    throw new InvalidOperationException($"{nameof(address)} is zero!");
+
+                addr = (family == AddressFamily.InterNetworkV6) ? $"[{address}]" : address.ToString();
             }
 
-            if (address.ToString() is "0.0.0.0" or "::0")
-                throw new InvalidOperationException($"{nameof(address)} is zero!");
-
+            // Choose between IP Address or Domain and protocol
             HttpClient client = (family == AddressFamily.InterNetworkV6) ? Client : ClientV4;
+            string protocol = (isHttps) ? $"https://" : "http://";
+            Uri finalUrl = new(protocol + ((isIpAddress) ? addr : url));
 
+            // Stop the roundtrip time
             Stopwatch time = Stopwatch.StartNew();
-            using HttpResponseMessage? response = await client.GetAsync(new Uri(address.ToString()));
-            response.EnsureSuccessStatusCode();
+            using HttpResponseMessage? response = await client.GetAsync(finalUrl);
             time.Stop();
+
+            response.EnsureSuccessStatusCode();
 
             return time.ElapsedMilliseconds.ToString(CultureInfo.InvariantCulture);
         }
-        catch (HttpRequestException)
-        { }
+        catch (HttpRequestException ex)
+        {
+            await LoggerExceptions.LogErrorAsync(ex);
+        }
 
         return string.Empty;
     }
