@@ -253,12 +253,11 @@ internal static class CoreWebRequests
         try
         {
             // Choose the right address based on the family
+            HttpClient client = (family == AddressFamily.InterNetworkV6) ? Client : ClientV4;
             string host = (family == AddressFamily.InterNetworkV6) ? "2a01:4f8:0:a232::2" : "78.46.170.2";
+            using HttpResponseMessage? response = await client.GetAsync(new Uri(host));
 
-            using Ping? ping = new();
-            PingReply reply = await ping.SendPingAsync(host);
-
-            return reply.Status == IPStatus.Success;
+            return response.IsSuccessStatusCode;
         }
         catch (HttpRequestException)
         { }
