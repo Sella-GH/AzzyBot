@@ -287,11 +287,14 @@ internal static class CoreWebRequests
             if (address.ToString() is "0.0.0.0" or "::0")
                 throw new InvalidOperationException($"{nameof(address)} is zero!");
 
-            using Ping? ping = new();
-            PingReply reply = await ping.SendPingAsync(address);
+            HttpClient client = (family == AddressFamily.InterNetworkV6) ? Client : ClientV4;
 
-            if (reply.Status == IPStatus.Success)
-                return reply.RoundtripTime.ToString(CultureInfo.InvariantCulture);
+            Stopwatch time = Stopwatch.StartNew();
+            using HttpResponseMessage? response = await client.GetAsync(new Uri(address.ToString()));
+            response.EnsureSuccessStatusCode();
+            time.Stop();
+
+            return time.ElapsedMilliseconds.ToString(CultureInfo.InvariantCulture);
         }
         catch (HttpRequestException)
         { }
