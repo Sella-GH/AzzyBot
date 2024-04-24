@@ -34,6 +34,18 @@ internal sealed class AcSettings : BaseSettings
 
         AzuraApiKey = Config["AzuraCast:AzuraApiKey"] ?? string.Empty;
         AzuraApiUrl = Config["AzuraCast:AzuraApiUrl"] ?? string.Empty;
+
+        if (AzuraApiUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            string host = new Uri(AzuraApiUrl).Host;
+            if (IPAddress.TryParse(host, out IPAddress? addr) && addr is not null)
+            {
+                LoggerBase.LogError(LoggerBase.GetLogger, "You cannot use an IP-Address if you enabled HTTPS!", null);
+
+                return false;
+            }
+        }
+
         AzuraStationKey = Convert.ToInt32(Config["AzuraCast:AzuraStationKey"], CultureInfo.InvariantCulture);
         Ipv6Available = Convert.ToBoolean(Config["AzuraCast:Ipv6Available"], CultureInfo.InvariantCulture);
         MusicRequestsChannelId = Convert.ToUInt64(Config["AzuraCast:MusicRequestsChannelId"], CultureInfo.InvariantCulture);
