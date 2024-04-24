@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Net;
 using System.Net.Http;
-using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
@@ -195,7 +195,7 @@ internal static class CoreWebRequests
         }
     }
 
-    internal static async Task<string> TryPingAsync(string url)
+    internal static async Task<string> GetPingTimeAsync(string url)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
 
