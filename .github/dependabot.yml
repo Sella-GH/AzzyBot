@@ -45,45 +45,46 @@ updates:
       DSharpPlus:
         applies-to: version-updates
         patterns:
-        - "DSharpPlus*"
+        - "DSharpPlus.*"
         update-types:
         - "minor"
         - "patch"
       Lavalink4NET:
         applies-to: version-updates
         patterns:
-        - "Lavalink4NET*"
+        - "Lavalink4NET.*"
         update-types:
         - "minor"
         - "patch"
       Microsoft:
         applies-to: version-updates
         patterns:
-        - "Microsoft*"
+        - "Microsoft.*"
         update-types:
         - "minor"
         - "patch"
       Roslynator:
         applies-to: version-updates
         patterns:
-        - "Roslynator*"
+        - "Roslynator.*"
         update-types:
         - "minor"
         - "patch"
       System:
         applies-to: version-updates
         patterns:
-        - "System*"
+        - "System.*"
         update-types:
         - "minor"
         - "patch"
       Others:
         applies-to: version-updates
         exclude-patterns:
-        - "DSharpPlus*"
-        - "Lavalink4NET*"
-        - "Microsoft*"
-        - "System*"
+        - "DSharpPlus.*"
+        - "Lavalink4NET.*"
+        - "Microsoft.*"
+        - "Roslynator.*"
+        - "System.*"
         update-types:
         - "minor"
         - "patch"
