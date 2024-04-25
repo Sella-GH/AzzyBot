@@ -225,6 +225,19 @@ internal static class AcEmbedBuilder
         return CoreEmbedBuilder.CreateBasicEmbed(title, description, userName, userAvatarUrl, DiscordColor.IndianRed, AzuraCastLogo, string.Empty, string.Empty, fields);
     }
 
+    internal static DiscordEmbed BuildUpdatesAvailableChangelogEmbed(string changelog, bool rolling)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(changelog, nameof(changelog));
+
+        string title = AcStringBuilder.GetEmbedAzuraChangelogTitle;
+        string body = changelog;
+
+        if (title.Length + body.Length > 6000)
+            AcStringBuilder.GetEmbedAzuraChangelogTooBig(rolling);
+
+        return CoreEmbedBuilder.CreateBasicEmbed(title, body, string.Empty, string.Empty, DiscordColor.White, AzuraCastLogo);
+    }
+
     internal static DiscordEmbed BuildPlaylistChangesNotAllowedEmbed(string userName, string userAvatarUrl)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
