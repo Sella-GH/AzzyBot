@@ -80,6 +80,7 @@ To get a local copy up and running follow these simple example steps.
   - Windows (not all features available)
   - ARM64 or x64 (no ARM32 or x86 support!)
 - The latest release from [here](https://github.com/Sella-GH/AzzyBot/releases)
+- Docker, if you want to use the image (optional)
 
 ### Installation
 
