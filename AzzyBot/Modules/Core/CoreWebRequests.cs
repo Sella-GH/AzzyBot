@@ -199,6 +199,8 @@ internal static class CoreWebRequests
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
 
+        await GetLocalIpAdressAsync();
+
         string result = string.Empty;
         try
         {
@@ -318,5 +320,15 @@ internal static class CoreWebRequests
         }
 
         return string.Empty;
+    }
+
+    private static async Task GetLocalIpAdressAsync()
+    {
+        IPHostEntry host = await Dns.GetHostEntryAsync(Dns.GetHostName());
+
+        foreach (IPAddress ip in host.AddressList)
+        {
+            LoggerBase.LogInfo(LoggerBase.GetLogger, ip.ToString(), null);
+        }
     }
 }
