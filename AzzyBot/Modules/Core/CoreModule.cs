@@ -17,7 +17,7 @@ internal class CoreModule : BaseModule
         string[] directory;
 
         fileName = nameof(CoreFileNamesEnum.AzzyBotJSON);
-        directory = [nameof(CoreFileDirectoriesEnum.None)];
+        directory = [nameof(CoreFileDirectoriesEnum.Modules), nameof(CoreFileDirectoriesEnum.Core), nameof(CoreFileDirectoriesEnum.Files)];
         AzzyBotLock = new(fileName, directory);
 
         LoggerBase.LogInfo(LoggerBase.GetLogger, "Registered Core File Locks", null);
