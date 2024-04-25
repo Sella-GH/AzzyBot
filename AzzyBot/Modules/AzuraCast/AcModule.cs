@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.AzuraCast.Settings;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
+using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 
 namespace AzzyBot.Modules.AzuraCast;
@@ -235,7 +237,12 @@ internal sealed class AzuraCastModule : BaseModule
             return;
 
         LastMusicServerUpdateNotify = now;
-        await AzzyBot.SendMessageAsync(AcSettings.OutagesChannelId, string.Empty, [AcEmbedBuilder.BuildUpdatesAvailableEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, updates)]);
+
+        List<DiscordEmbed?> embeds = [AcEmbedBuilder.BuildUpdatesAvailableEmbed(updates)];
+        if (AcSettings.AutomaticChecksUpdatesShowChangelog)
+            embeds.Add(AcEmbedBuilder.BuildUpdatesAvailableChangelogEmbed(updates.RollingUpdatesList, updates.NeedsRollingUpdate));
+
+        await AzzyBot.SendMessageAsync(AcSettings.OutagesChannelId, string.Empty, embeds);
     }
 
     private static async Task PingMusicServerAsync()
