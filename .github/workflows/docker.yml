@@ -9,6 +9,7 @@ on:
       - "**.sln"
       - "**.yml"
       - "Dockerfile"
+      - "**.md"
   workflow_dispatch:
 
 jobs:
