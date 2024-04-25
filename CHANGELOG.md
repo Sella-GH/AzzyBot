@@ -11,7 +11,7 @@
 ### General
 - The updater is now included instead of an own application and only provides notifications. You have to update the bot manually
 - Now available as a docker image too!
-  - Follow the instructions in the wiki if you want to get it up and running
+  - Follow the instructions in the [wiki](https://github.com/Sella-GH/AzzyBot/wiki/Docker-Install-Instructions) if you want to get it up and running
   - The bot is still available as a base arm64 or x64 dedicated executable if you prefer this one
 
 ### Additions
