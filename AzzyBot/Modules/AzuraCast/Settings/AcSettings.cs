@@ -34,7 +34,6 @@ internal sealed class AcSettings : BaseSettings
 
         AzuraApiKey = Config["AzuraCast:AzuraApiKey"] ?? string.Empty;
         AzuraApiUrl = Config["AzuraCast:AzuraApiUrl"] ?? string.Empty;
-
         if (AzuraApiUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
         {
             string host = new Uri(AzuraApiUrl).Host;
@@ -48,6 +47,13 @@ internal sealed class AcSettings : BaseSettings
 
         AzuraStationKey = Convert.ToInt32(Config["AzuraCast:AzuraStationKey"], CultureInfo.InvariantCulture);
         Ipv6Available = Convert.ToBoolean(Config["AzuraCast:Ipv6Available"], CultureInfo.InvariantCulture);
+        if (Ipv6Available && CoreAzzyStatsGeneral.GetBotName is "AzzyBot-Docker")
+        {
+            LoggerBase.LogError(LoggerBase.GetLogger, "IPv6 is not supported in Docker!", null);
+
+            return false;
+        }
+
         MusicRequestsChannelId = Convert.ToUInt64(Config["AzuraCast:MusicRequestsChannelId"], CultureInfo.InvariantCulture);
         OutagesChannelId = Convert.ToUInt64(Config["AzuraCast:OutagesChannelId"], CultureInfo.InvariantCulture);
         ShowPlaylistsInNowPlaying = Convert.ToBoolean(Config["AzuraCast:ShowPlaylistsInNowPlaying"], CultureInfo.InvariantCulture);
