@@ -120,10 +120,8 @@ internal static class AcEmbedBuilder
         return CoreEmbedBuilder.CreateBasicEmbed(title, message, userName, userAvatarUrl, color);
     }
 
-    internal static DiscordEmbed BuildUpdatesAvailableEmbed(string userName, string userAvatarUrl, AcUpdateModel model)
+    internal static DiscordEmbed BuildUpdatesAvailableEmbed(AcUpdateModel model)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(userName, nameof(userName));
-        ArgumentException.ThrowIfNullOrWhiteSpace(userAvatarUrl, nameof(userAvatarUrl));
         ArgumentNullException.ThrowIfNull(model, nameof(model));
 
         string title = AcStringBuilder.GetEmbedAzuraUpdateTitle;
@@ -133,7 +131,7 @@ internal static class AcEmbedBuilder
         DiscordEmbedStruct data = AcStringBuilder.GetEmbedAzuraCurrentRelease(model.CurrentRelease);
         fields.Add(data.Name, data);
 
-        if (model.CurrentRelease != model.LatestRelease && model.NeedsReleaseUpdate)
+        if ((model.CurrentRelease != model.LatestRelease) && model.NeedsReleaseUpdate)
         {
             data = AcStringBuilder.GetEmbedAzuraLatestRelease(model.LatestRelease);
             fields.Add(data.Name, data);
@@ -148,89 +146,21 @@ internal static class AcEmbedBuilder
             fields.Add(data.Name, data);
         }
 
-        if (AcSettings.AutomaticChecksUpdatesShowChangelog)
-        {
-            // Reverse to be historically correct
-            model.RollingUpdatesList.Reverse();
-
-            // Split the changelog if it's too big
-            const int MaxCharacters = 1024;
-            const int MaxParts = 20;
-            const int MaxEmbedLength = 6000;
-            StringBuilder updateList = new();
-            int partNumber = 1;
-
-            // Count the length of every item in the embed
-            bool isTooBig = false;
-            int embedLength = title.Length + description.Length;
-            foreach (KeyValuePair<string, DiscordEmbedStruct> field in fields)
-            {
-                embedLength += field.Key.Length + field.Value.Description.Length;
-            }
-
-            // Create new dictionary because we need the ability to delete it afterwards
-            Dictionary<string, string> kvp = [];
-
-            foreach (string update in model.RollingUpdatesList)
-            {
-                string newLine = $"- {update}\n";
-
-                // Check if adding the new line exceeds the character limit or maximum parts limit
-                if (updateList.Length + newLine.Length < MaxCharacters || partNumber < MaxParts)
-                {
-                    string key = AcStringBuilder.GetEmbedAzuraChangelogPart(partNumber);
-                    string value = updateList.ToString();
-                    kvp.Add(key, value);
-                    updateList.Clear();
-                    partNumber++;
-
-                    embedLength += key.Length + value.Length;
-
-                    if (partNumber > MaxParts || embedLength > MaxEmbedLength || value.Length == 0)
-                    {
-                        isTooBig = true;
-                        break;
-                    }
-                }
-                else
-                {
-                    isTooBig = true;
-                    break;
-                }
-
-                // Add the new line to the current part
-                updateList.Append(newLine);
-            }
-
-            // Add the last part if there's any content left and within the max parts limit
-            if (updateList.Length > 0 && partNumber <= MaxParts && !isTooBig)
-            {
-                foreach (KeyValuePair<string, string> field in kvp)
-                {
-                    fields.Add(field.Key, new(field.Key, field.Value, false));
-                }
-
-                data = AcStringBuilder.GetEmbedAzuraChangelog(partNumber, updateList.ToString());
-                fields.Add(data.Name, data);
-            }
-
-            // Check if length exceeds and display manual changelog message
-            if (isTooBig)
-            {
-                data = AcStringBuilder.GetEmbedAzuraTooBig(model.NeedsReleaseUpdate);
-                fields.Add(data.Name, data);
-            }
-        }
-
-        return CoreEmbedBuilder.CreateBasicEmbed(title, description, userName, userAvatarUrl, DiscordColor.IndianRed, AzuraCastLogo, string.Empty, string.Empty, fields);
+        return CoreEmbedBuilder.CreateBasicEmbed(title, description, AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, DiscordColor.White, AzuraCastLogo, string.Empty, string.Empty, fields);
     }
 
-    internal static DiscordEmbed BuildUpdatesAvailableChangelogEmbed(string changelog, bool rolling)
+    internal static DiscordEmbed BuildUpdatesAvailableChangelogEmbed(List<string> changelog, bool rolling)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(changelog, nameof(changelog));
+        ArgumentOutOfRangeException.ThrowIfZero(changelog.Count, nameof(changelog));
 
         string title = AcStringBuilder.GetEmbedAzuraChangelogTitle;
-        string body = changelog;
+        string body = string.Empty;
+
+        changelog.Reverse();
+        foreach (string entry in changelog)
+        {
+            body += $"- {entry}\n";
+        }
 
         if (title.Length + body.Length > 6000)
             AcStringBuilder.GetEmbedAzuraChangelogTooBig(rolling);
