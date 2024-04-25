@@ -145,10 +145,13 @@ internal sealed class AzzyBot
 
         #region Initialize Processes
 
-        LoggerBase.LogDebug(Logger, "Starting all processes", null);
-        BaseModule.StartAllProcesses();
-        await Task.Delay(3000);
-        LoggerBase.LogInfo(Logger, "All processes started", null);
+        if (ModuleStates.MusicStreaming)
+        {
+            LoggerBase.LogDebug(Logger, "Starting all processes", null);
+            BaseModule.StartAllProcesses();
+            await Task.Delay(3000);
+            LoggerBase.LogInfo(Logger, "All processes started", null);
+        }
 
         #endregion Initialize Processes
 
@@ -426,24 +429,22 @@ internal sealed class AzzyBot
         BaseModule.DisposeAllFileLocks();
         LoggerBase.LogDebug(Logger, "Disposed all file locks", null);
 
-        RemoveEventHandlers();
-        LoggerBase.LogDebug(Logger, "Removed EventHandlers", null);
-
-        if (SlashCommands is not null)
-        {
-            SlashCommands.Dispose();
-            SlashCommands = null;
-
-            LoggerBase.LogInfo(Logger, "SlashCommands disposed", null);
-        }
-
         if (DiscordClient is not null)
         {
             await DiscordClient.DisconnectAsync();
             DiscordClient.Dispose();
             DiscordClient = null;
-
             LoggerBase.LogInfo(Logger, "DiscordClient disposed", null);
+
+            RemoveEventHandlers();
+            LoggerBase.LogDebug(Logger, "Removed EventHandlers", null);
+        }
+
+        if (SlashCommands is not null)
+        {
+            SlashCommands.Dispose();
+            SlashCommands = null;
+            LoggerBase.LogInfo(Logger, "SlashCommands disposed", null);
         }
 
         LoggerBase.DisposeLogger();

@@ -19,7 +19,7 @@ internal static class AcStats
 
         string url = string.Join("/", AcSettings.AzuraApiUrl, AcApiEnum.admin, AcApiEnum.server, AcApiEnum.stats);
 
-        string ping = await CoreWebRequests.TryPingAsync(AcSettings.AzuraApiUrl);
+        string ping = await CoreWebRequests.GetPingTimeAsync(AcSettings.AzuraApiUrl);
         if (string.IsNullOrWhiteSpace(ping))
             return AcEmbedBuilder.BuildServerIsOfflineEmbed(userName, userAvatarUrl, false);
 

@@ -241,7 +241,7 @@ internal sealed class AzuraCastModule : BaseModule
     private static async Task PingMusicServerAsync()
     {
         // When empty the server is offline
-        if (string.IsNullOrWhiteSpace(await CoreWebRequests.TryPingAsync(AcSettings.AzuraApiUrl)))
+        if (string.IsNullOrWhiteSpace(await CoreWebRequests.GetPingTimeAsync(AcSettings.AzuraApiUrl)))
         {
             IsMusicServerOnline = false;
 

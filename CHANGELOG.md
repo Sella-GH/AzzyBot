@@ -53,6 +53,7 @@
 - Better check for lavalink stuff implemented
 - The commit and compile date infos are now included in a AzzyBot.json file
 - `appsettings.json` now supports an ip address as value for the `AzuraApiUrl` setting
+- Reworked the way how the bot checks if the server is reachable
 - Caching improvements of settings and string files
 - Code and reliability improvements
 
