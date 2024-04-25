@@ -120,11 +120,15 @@ internal sealed class AcStringModel
     public string EmbedAzuraUpdateMajorReleaseDesc { get; set; } = string.Empty;
     public string EmbedAzuraUpdateSwitchTitle { get; set; } = string.Empty;
     public string EmbedAzuraUpdateSwitchDesc { get; set; } = string.Empty;
-    public string EmbedAzuraUpdatesTooBig { get; set; } = string.Empty;
-    public string EmbedAzuraUpdateChangelogPart { get; set; } = string.Empty;
-    public string EmbedAzuraUpdateChangelog { get; set; } = string.Empty;
 
     #endregion BuildUpdatesAvailableEmbed
+
+    #region BuildUpdatesAvailableChangelogEmbed
+
+    public string EmbedAzuraUpdatesChangelogTitle { get; set; } = string.Empty;
+    public string EmbedAzuraUpdatesTooBig { get; set; } = string.Empty;
+
+    #endregion BuildUpdatesAvailableChangelogEmbed
 
     #region BuildPlaylistChangesNotAllowedEmbed
 

@@ -153,7 +153,7 @@ internal static class AcEmbedBuilder
     {
         ArgumentOutOfRangeException.ThrowIfZero(changelog.Count, nameof(changelog));
 
-        string title = AcStringBuilder.GetEmbedAzuraChangelogTitle;
+        string title = AcStringBuilder.GetEmbedAzuraUpdatesChangelogTitle;
         string body = string.Empty;
 
         changelog.Reverse();
@@ -163,7 +163,7 @@ internal static class AcEmbedBuilder
         }
 
         if (title.Length + body.Length > 6000)
-            AcStringBuilder.GetEmbedAzuraChangelogTooBig(rolling);
+            AcStringBuilder.GetEmbedAzuraUpdatesTooBig(rolling);
 
         return CoreEmbedBuilder.CreateBasicEmbed(title, body, string.Empty, string.Empty, DiscordColor.White, AzuraCastLogo);
     }

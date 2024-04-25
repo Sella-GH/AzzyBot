@@ -154,11 +154,15 @@ internal sealed class AcStringBuilder : BaseStringBuilder
     internal static DiscordEmbedStruct GetEmbedAzuraLatestRelease(string latest) => new(Model.EmbedAzuraUpdateLatestRelease, latest, false);
     internal static DiscordEmbedStruct GetEmbedAzuraMajorRelease => new(Model.EmbedAzuraUpdateMajorReleaseTitle, Model.EmbedAzuraUpdateMajorReleaseDesc, false);
     internal static DiscordEmbedStruct GetEmbedAzuraSwitch => new(Model.EmbedAzuraUpdateSwitchTitle, Model.EmbedAzuraUpdateSwitchDesc, false);
-    internal static string GetEmbedAzuraChangelogPart(int number) => BuildString(Model.EmbedAzuraUpdateChangelogPart, "%NUMBER%", number);
-    internal static DiscordEmbedStruct GetEmbedAzuraChangelog(int number, string changelog) => new((number == 1) ? Model.EmbedAzuraUpdateChangelog : Model.EmbedAzuraUpdateChangelogPart, changelog, false);
-    internal static DiscordEmbedStruct GetEmbedAzuraTooBig(bool rolling) => new(Model.EmbedAzuraUpdateChangelog, BuildString(Model.EmbedAzuraUpdatesTooBig, "%URL%", (rolling) ? RollingUrl : StableUrl), false);
 
     #endregion BuildUpdatesAvailableEmbed
+
+    #region BuildUpdatesAvailableChangelogEmbed
+
+    internal static string GetEmbedAzuraUpdatesChangelogTitle => Model.EmbedAzuraUpdatesChangelogTitle;
+    internal static DiscordEmbedStruct GetEmbedAzuraUpdatesTooBig(bool rolling) => new(Model.EmbedAzuraUpdatesTooBig, BuildString(Model.EmbedAzuraUpdatesTooBig, "%URL%", (rolling) ? RollingUrl : StableUrl), false);
+
+    #endregion BuildUpdatesAvailableChangelogEmbed
 
     #region BuildPlaylistChangesNotAllowedEmbed
 
