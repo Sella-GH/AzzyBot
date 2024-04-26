@@ -18,7 +18,7 @@ lavalink:
 #  pluginsDir: "./plugins" # optional, defaults to "./plugins"
 #  defaultPluginRepository: "https://maven.lavalink.dev/releases" # optional, defaults to the Lavalink release repository
 #  defaultPluginSnapshotRepository: "https://maven.lavalink.dev/snapshots" # optional, defaults to the Lavalink snapshot repository
-    - dependency: "me.duncte123:java-lyrics-plugin:1.6.3"
+    - dependency: "me.duncte123:java-lyrics-plugin:1.6.4"
       repository: "https://maven.lavalink.dev/releases"
   server:
   #######################################
