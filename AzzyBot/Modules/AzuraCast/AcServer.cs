@@ -752,7 +752,7 @@ internal static class AcServer
     {
         List<AcPlaylistModel> playlists = await GetPlaylistsAsync();
 
-        string[] directory = [nameof(CoreFileDirectoriesEnum.Modules), nameof(CoreFileDirectoriesEnum.AzuraCast), nameof(CoreFileDirectoriesEnum)];
+        string[] directory = [nameof(CoreFileDirectoriesEnum.Modules), nameof(CoreFileDirectoriesEnum.AzuraCast), nameof(CoreFileDirectoriesEnum.Files)];
         if (!CoreFileOperations.CreateDirectory("ZipFile", directory))
             throw new InvalidOperationException("Can't create directory");
 
