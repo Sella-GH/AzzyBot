@@ -5,11 +5,12 @@ on:
     paths:
       - "**.cs"
       - "**.csproj"
+      - "**.json"
+      - "**.md"
       - "**.props"
       - "**.sln"
       - "**.yml"
       - "Dockerfile"
-      - "**.md"
   workflow_dispatch:
 
 jobs:

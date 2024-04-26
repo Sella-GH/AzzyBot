@@ -9,6 +9,7 @@ on:
       - "**.cs"
       - "**.csproj"
       - "**.json"
+      - "**.md"
       - "**.props"
       - "**.sln"
       - "**.yml"
