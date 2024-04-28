@@ -40,34 +40,16 @@ internal static class Updates
 
     private static async Task SendUpdateMessageAsync(Version updateVersion, DateTime releaseDate, string changelog)
     {
-        DateTime now = DateTime.Now;
-        bool dayNotification = false;
-        bool halfDayNotification = false;
-        bool quarterDayNotification = false;
-
         if (LastOnlineVersion != updateVersion)
         {
             LastNotificationTime = DateTime.MinValue;
             UpdateNotifyCounter = 0;
         }
 
-        if (UpdateNotifyCounter < 3 && now > LastNotificationTime.AddHours(23).AddMinutes(59))
-        {
-            dayNotification = true;
-        }
-        else if (UpdateNotifyCounter < 7 && now > LastNotificationTime.AddHours(11).AddMinutes(59))
-        {
-            halfDayNotification = true;
-        }
-        else if (UpdateNotifyCounter > 7 && now > LastNotificationTime.AddHours(5).AddMinutes(59))
-        {
-            quarterDayNotification = true;
-        }
-
-        if (!dayNotification && !halfDayNotification && !quarterDayNotification)
+        if (!CoreMisc.CheckUpdateNotification(UpdateNotifyCounter, LastNotificationTime))
             return;
 
-        LastNotificationTime = now;
+        LastNotificationTime = DateTime.Now;
         LastOnlineVersion = updateVersion;
         UpdateNotifyCounter++;
 

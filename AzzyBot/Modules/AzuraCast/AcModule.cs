@@ -19,6 +19,7 @@ internal sealed class AzuraCastModule : BaseModule
     private static DateTime LastFileCheckRun = DateTime.MinValue;
     private static DateTime LastMusicServerUpdateCheck = DateTime.MinValue;
     private static DateTime LastMusicServerUpdateNotify = DateTime.MinValue;
+    private static int UpdateNotifyCounter;
     private static readonly SemaphoreSlim PingLock = new(1, 1);
     internal static CoreFileLock? FavoriteSongsLock;
     internal static CoreFileLock? FileCacheLock;
@@ -232,11 +233,11 @@ internal sealed class AzuraCastModule : BaseModule
         if (!updates.NeedsReleaseUpdate && !updates.NeedsRollingUpdate)
             return;
 
-        DateTime now = DateTime.Now;
-        if (now - LastMusicServerUpdateNotify <= TimeSpan.FromMinutes(14))
+        if (!CoreMisc.CheckUpdateNotification(UpdateNotifyCounter, LastMusicServerUpdateNotify))
             return;
 
-        LastMusicServerUpdateNotify = now;
+        LastMusicServerUpdateNotify = DateTime.Now;
+        UpdateNotifyCounter++;
 
         List<DiscordEmbed?> embeds = [AcEmbedBuilder.BuildUpdatesAvailableEmbed(updates)];
         if (AcSettings.AutomaticChecksUpdatesShowChangelog)
