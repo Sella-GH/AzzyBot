@@ -21,23 +21,18 @@ namespace AzzyBot.Modules.AzuraCast;
 
 internal sealed class AcCommands : ApplicationCommandModule
 {
-    [SlashCommandGroup("azuraCast", "AzuraCast admin commands")]
+    [SlashCommandGroup("azuracast", "AzuraCast admin commands")]
     [SlashRequireGuild]
     internal sealed class AzuraCastCommandGroup : ApplicationCommandModule
     {
         [RequireUserRole]
+        [RequireMusicServerUp]
         [SlashCommand("export-playlists", "Exports all available playlists into a .zip file")]
         internal static async Task AzuraCastExportPlaylistsCommandAsync(InteractionContext ctx)
         {
             LoggerBase.LogInfo(LoggerBase.GetLogger, "SwitchPlaylistsCommand requested", null);
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
-
-            if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
-            {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
-                return;
-            }
 
             if (!AcSettings.AzuraCastApiKeyIsValid)
             {
@@ -61,18 +56,13 @@ internal sealed class AcCommands : ApplicationCommandModule
         }
 
         [RequireUserRole]
+        [RequireMusicServerUp]
         [SlashCommand("force-cache-refresh", "Forces a refresh of the internal AzzyBot Music cache")]
         internal static async Task AzuraCastForceCacheRefreshCommandAsync(InteractionContext ctx)
         {
             LoggerBase.LogInfo(LoggerBase.GetLogger, "AzuraCastForceCacheRefreshCommand requested", null);
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
-
-            if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
-            {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
-                return;
-            }
 
             if (!AcSettings.AzuraCastApiKeyIsValid)
             {
@@ -101,18 +91,14 @@ internal sealed class AcCommands : ApplicationCommandModule
             await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(await AcStats.GetServerStatsAsync(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl)));
         }
 
+        [RequireUserRole]
+        [RequireMusicServerUp]
         [SlashCommand("switch-Playlists", "Switch the playlists according to your likes!")]
         internal static async Task AzuraCastSwitchPlaylistsCommandAsync(InteractionContext ctx, [Autocomplete(typeof(AcPlaylistAutocomplete))][Option("playlist", "Select a playlist to switch to")] string playlistId)
         {
             LoggerBase.LogInfo(LoggerBase.GetLogger, "SwitchPlaylistsCommand requested", null);
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
-
-            if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
-            {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
-                return;
-            }
 
             if (!AcSettings.AzuraCastApiKeyIsValid)
             {
@@ -134,6 +120,7 @@ internal sealed class AcCommands : ApplicationCommandModule
     [SlashRequireGuild]
     internal sealed class MusicCommandGroup : ApplicationCommandModule
     {
+        [RequireMusicServerUp]
         [SlashCommand("get-played-song-history", "Gets all songs played at the specified date and returns them as a .csv file.")]
         internal static async Task MusicGetPlayedSongHistoryCommandAsync(InteractionContext ctx, [Option("date", "Set the date in the following format YYYY-MM-DD. You can only go back up to 14 days")] string date)
         {
@@ -153,12 +140,6 @@ internal sealed class AcCommands : ApplicationCommandModule
             else if (dateTime < DateTime.Today.AddDays(-14))
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(AcStringBuilder.GetCommandsGetSongHistoryTooEarly));
-                return;
-            }
-
-            if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
-            {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
                 return;
             }
 
@@ -188,6 +169,7 @@ internal sealed class AcCommands : ApplicationCommandModule
                 throw new IOException($"{fileName} couldn't be deleted!");
         }
 
+        [RequireMusicServerUp]
         [SlashCommand("get-songs-in-playlist", "Gets all songs from the given playlist and returns them as a .csv file")]
         internal static async Task MusicGetSongsInPlaylistCommandAsync(InteractionContext ctx, [Autocomplete(typeof(AcPlaylistAutocomplete))][Option("playlist", "Select the playlist to get songs from")] string playlist)
         {
@@ -200,12 +182,6 @@ internal sealed class AcCommands : ApplicationCommandModule
             }
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
-
-            if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
-            {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
-                return;
-            }
 
             if (!AcSettings.AzuraCastApiKeyIsValid)
             {
@@ -231,17 +207,12 @@ internal sealed class AcCommands : ApplicationCommandModule
                 throw new IOException($"{fileName} couldn't be deleted!");
         }
 
+        [RequireMusicServerUp]
         [SlashCommand("now-playing", "Shows the current played song")]
         internal static async Task MusicNowPlayingCommandAsync(InteractionContext ctx)
         {
             LoggerBase.LogInfo(LoggerBase.GetLogger, "MusicNowPlayingCommand requested", null);
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
-
-            if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
-            {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
-                return;
-            }
 
             await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(await AcEmbedBuilder.BuildNowPlayingEmbedAsync(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, await AcServer.GetNowPlayingAsync())));
         }
@@ -252,6 +223,7 @@ internal sealed class AcCommands : ApplicationCommandModule
     [SlashCooldown(1, 15, SlashCooldownBucketType.Global)]
     internal sealed class MusicRequestsCommandGroup : ApplicationCommandModule
     {
+        [RequireMusicServerUp]
         [SlashCommand("check", "Checks if the song is available on the server")]
         internal static async Task MusicRequestsCheckCommandAsync(InteractionContext ctx, [Option("song-name", "Song name to search for")] string songName, [Option("artist-name", "Artist name for better results")] string artistName = "")
         {
@@ -264,12 +236,6 @@ internal sealed class AcCommands : ApplicationCommandModule
             }
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
-
-            if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
-            {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
-                return;
-            }
 
             if (!AcSettings.AzuraCastApiKeyIsValid)
             {
@@ -307,6 +273,7 @@ internal sealed class AcCommands : ApplicationCommandModule
             await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed));
         }
 
+        [RequireMusicServerUp]
         [SlashCommand("favorite-songs", "Choose and request a user's favourite song")]
         internal static async Task MusicRequestsFavoriteSongsCommandAsync(InteractionContext ctx, [Autocomplete(typeof(AcFavoriteSongAutocomplete))][Option("User", "Select the user you want to hear the song from", true)] string user)
         {
@@ -319,12 +286,6 @@ internal sealed class AcCommands : ApplicationCommandModule
             }
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
-
-            if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
-            {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
-                return;
-            }
 
             if (!AzuraCastModule.CheckIfSongRequestsAreAppropriate() || !await AcServer.CheckIfSongRequestsAreAllowedAsync())
             {

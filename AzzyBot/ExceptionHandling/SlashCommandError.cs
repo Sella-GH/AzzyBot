@@ -1,5 +1,9 @@
+using System;
 using System.Threading.Tasks;
+using AzzyBot.Commands.Attributes;
 using AzzyBot.Logging;
+using AzzyBot.Modules.AzuraCast;
+using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Strings;
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -16,13 +20,20 @@ internal static class SlashCommandError
     {
         LoggerBase.LogWarn(LoggerBase.GetLogger, "Slash error occured!", null);
 
-        if (e.Exception is SlashExecutionChecksFailedException ex)
+        Exception ex = e.Exception;
+        InteractionContext ctx = e.Context;
+
+        if (e.Exception is SlashExecutionChecksFailedException slashEx)
         {
+            string userName = CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname);
+            string userAvatarUrl = ctx.Member.AvatarUrl;
+
             bool isGuildCheck = false;
             bool isCooldown = false;
+            bool isMusicServerUp = false;
             bool isDefault = false;
 
-            foreach (SlashCheckBaseAttribute check in ex.FailedChecks)
+            foreach (SlashCheckBaseAttribute check in slashEx.FailedChecks)
             {
                 switch (check)
                 {
@@ -34,6 +45,10 @@ internal static class SlashCommandError
                         isCooldown = true;
                         break;
 
+                    case RequireMusicServerUp:
+                        isMusicServerUp = true;
+                        break;
+
                     default:
                         isDefault = true;
                         break;
@@ -42,30 +57,36 @@ internal static class SlashCommandError
 
             if (isGuildCheck)
             {
-                await e.Context.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(CoreStringBuilder.GetExceptionHandlingNotInGuild).AsEphemeral(true));
-                LoggerBase.LogInfo(LoggerBase.GetLogger, $"User **{e.Context.User.Username}** tried to access the command **{e.Context.QualifiedName}** outside of a server!", null);
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(CoreStringBuilder.GetExceptionHandlingNotInGuild).AsEphemeral(true));
+                LoggerBase.LogInfo(LoggerBase.GetLogger, $"User **{ctx.User.Username}** tried to access the command **{e.Context.QualifiedName}** outside of a server!", null);
                 return;
             }
 
             if (isCooldown)
             {
-                await e.Context.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(CoreStringBuilder.GetExceptionHandlingOnCooldown).AsEphemeral(true));
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(CoreStringBuilder.GetExceptionHandlingOnCooldown).AsEphemeral(true));
+                return;
+            }
+
+            if (isMusicServerUp)
+            {
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(userName, userAvatarUrl)).AsEphemeral(true));
                 return;
             }
 
             if (isDefault)
             {
-                await e.Context.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(CoreStringBuilder.GetExceptionHandlingDefault).AsEphemeral(true));
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(CoreStringBuilder.GetExceptionHandlingDefault).AsEphemeral(true));
                 return;
             }
         }
-        else if (e.Exception is not DiscordException)
+        else if (ex is not DiscordException)
         {
-            await LoggerExceptions.LogErrorAsync(e.Exception, e.Context);
+            await LoggerExceptions.LogErrorAsync(ex, ctx);
         }
         else
         {
-            await LoggerExceptions.LogErrorAsync(e.Exception, e.Context, ((DiscordException)e.Exception).JsonMessage);
+            await LoggerExceptions.LogErrorAsync(ex, ctx, ((DiscordException)ex).JsonMessage);
         }
     }
 
@@ -73,13 +94,16 @@ internal static class SlashCommandError
     {
         LoggerBase.LogWarn(LoggerBase.GetLogger, "Autocomplete error occured!", null);
 
-        if (e.Exception is not DiscordException)
+        Exception ex = e.Exception;
+        AutocompleteContext ctx = e.Context;
+
+        if (ex is not DiscordException)
         {
-            await LoggerExceptions.LogErrorAsync(e.Exception, e.Context);
+            await LoggerExceptions.LogErrorAsync(ex, ctx);
         }
         else
         {
-            await LoggerExceptions.LogErrorAsync(e.Exception, e.Context, ((DiscordException)e.Exception).JsonMessage);
+            await LoggerExceptions.LogErrorAsync(ex, ctx, ((DiscordException)ex).JsonMessage);
         }
     }
 }
