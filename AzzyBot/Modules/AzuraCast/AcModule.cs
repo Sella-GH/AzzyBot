@@ -177,7 +177,7 @@ internal sealed class AzuraCastModule : BaseModule
         await PingLock.WaitAsync();
         try
         {
-            await PingMusicServerAsync();
+            await CheckMusicServerAsync();
             return IsMusicServerOnline;
         }
         finally
@@ -193,7 +193,7 @@ internal sealed class AzuraCastModule : BaseModule
         try
         {
             LoggerBase.LogDebug(LoggerBase.GetLogger, "AzzyBotGlobalTimer ping check for music server", null);
-            await PingMusicServerAsync();
+            await CheckMusicServerAsync();
         }
         finally
         {
@@ -245,7 +245,7 @@ internal sealed class AzuraCastModule : BaseModule
         await AzzyBot.SendMessageAsync(AcSettings.OutagesChannelId, string.Empty, embeds);
     }
 
-    private static async Task PingMusicServerAsync()
+    private static async Task CheckMusicServerAsync()
     {
         // When empty the server is offline
         if (string.IsNullOrWhiteSpace(await CoreWebRequests.GetPingTimeAsync(AcSettings.AzuraApiUrl)))
