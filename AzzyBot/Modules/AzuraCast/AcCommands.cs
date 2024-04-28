@@ -30,7 +30,6 @@ internal sealed class AcCommands : ApplicationCommandModule
         internal static async Task AzuraCastExportPlaylistsCommandAsync(InteractionContext ctx)
         {
             LoggerBase.LogInfo(LoggerBase.GetLogger, "SwitchPlaylistsCommand requested", null);
-
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
             string fileName = await AcServer.ExportPlaylistsAsFileAsync();
@@ -55,7 +54,6 @@ internal sealed class AcCommands : ApplicationCommandModule
         internal static async Task AzuraCastForceCacheRefreshCommandAsync(InteractionContext ctx)
         {
             LoggerBase.LogInfo(LoggerBase.GetLogger, "AzuraCastForceCacheRefreshCommand requested", null);
-
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
             await AzuraCastModule.CheckIfFilesWereModifiedAsync();
@@ -81,7 +79,6 @@ internal sealed class AcCommands : ApplicationCommandModule
         internal static async Task AzuraCastSwitchPlaylistsCommandAsync(InteractionContext ctx, [Autocomplete(typeof(AcPlaylistAutocomplete))][Option("playlist", "Select a playlist to switch to")] string playlistId)
         {
             LoggerBase.LogInfo(LoggerBase.GetLogger, "SwitchPlaylistsCommand requested", null);
-
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
             if (!AzuraCastModule.CheckIfPlaylistChangesAreAppropriate())

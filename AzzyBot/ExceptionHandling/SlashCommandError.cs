@@ -24,7 +24,7 @@ internal static class SlashCommandError
         Exception ex = e.Exception;
         InteractionContext ctx = e.Context;
 
-        if (e.Exception is SlashExecutionChecksFailedException slashEx)
+        if (ex is SlashExecutionChecksFailedException slashEx)
         {
             string userName = CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname);
             string userAvatarUrl = ctx.Member.AvatarUrl;
