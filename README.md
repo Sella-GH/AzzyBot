@@ -19,7 +19,7 @@
   </p>
 </p>
 
-![Downloads](https://img.shields.io/github/downloads/Sella-GH/AzzyBot/total) ![Contributors](https://img.shields.io/github/contributors/Sella-GH/AzzyBot?color=dark-green) ![Issues](https://img.shields.io/github/issues/Sella-GH/AzzyBot)
+![Downloads](https://img.shields.io/github/downloads/Sella-GH/AzzyBot/total) ![DownloadsLatest](https://img.shields.io/github/downloads/sella-gh/azzybot/latest/total) ![DockerPulls](https://img.shields.io/docker/pulls/sellagh/azzybot) ![Contributors](https://img.shields.io/github/contributors/Sella-GH/AzzyBot?color=dark-green) ![Issues](https://img.shields.io/github/issues/Sella-GH/AzzyBot) ![PullRequests](https://img.shields.io/github/issues-pr/sella-gh/azzybot)
 
 ## Table Of Contents
 
