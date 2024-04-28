@@ -4,6 +4,7 @@ using AzzyBot.Commands.Attributes;
 using AzzyBot.Logging;
 using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.Core;
+using AzzyBot.Modules.Core.Settings;
 using AzzyBot.Modules.Core.Strings;
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -31,6 +32,7 @@ internal static class SlashCommandError
             bool isGuildCheck = false;
             bool isCooldown = false;
             bool isMusicServerUp = false;
+            bool isAzuraApiKeyValid = false;
             bool isDefault = false;
 
             foreach (SlashCheckBaseAttribute check in slashEx.FailedChecks)
@@ -47,6 +49,10 @@ internal static class SlashCommandError
 
                     case RequireMusicServerUp:
                         isMusicServerUp = true;
+                        break;
+
+                    case RequireAzuraApiKeyValid:
+                        isAzuraApiKeyValid = true;
                         break;
 
                     default:
@@ -71,6 +77,12 @@ internal static class SlashCommandError
             if (isMusicServerUp)
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(userName, userAvatarUrl)).AsEphemeral(true));
+                return;
+            }
+
+            if (isAzuraApiKeyValid)
+            {
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordChecks.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)).AsEphemeral(true));
                 return;
             }
 
