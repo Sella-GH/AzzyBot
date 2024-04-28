@@ -75,14 +75,14 @@ internal static class Updates
             }
 
             // First check if the proposed channel exists in the guild
-            if (wantedGuild is not null && CoreDiscordCommands.CheckIfChannelExists(wantedGuild, CoreSettings.UpdaterMessageChannelId))
+            if (wantedGuild is not null && CoreDiscordChecks.CheckIfChannelExists(wantedGuild, CoreSettings.UpdaterMessageChannelId))
             {
                 channelId = CoreSettings.UpdaterMessageChannelId;
                 channelSet = true;
             }
 
             // If not then check if the guild updates one exists
-            if (!channelSet && wantedGuild is not null && CoreDiscordCommands.CheckIfChannelExists(wantedGuild, wantedGuild.PublicUpdatesChannel))
+            if (!channelSet && wantedGuild is not null && CoreDiscordChecks.CheckIfChannelExists(wantedGuild, wantedGuild.PublicUpdatesChannel))
                 channelId = wantedGuild.PublicUpdatesChannel.Id;
         }
 

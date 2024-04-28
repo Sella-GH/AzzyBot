@@ -5,7 +5,7 @@ using DSharpPlus.Entities;
 
 namespace AzzyBot.Modules.Core;
 
-internal static class CoreDiscordCommands
+internal static class CoreDiscordChecks
 {
     internal static bool CheckIfUserIsInVoiceChannel(DiscordMember member) => member.VoiceState is not null;
     internal static bool CheckUserId(ulong checkUserId, ulong againstUserId) => checkUserId == againstUserId;

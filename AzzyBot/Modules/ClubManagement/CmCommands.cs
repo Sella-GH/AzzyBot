@@ -37,7 +37,7 @@ internal sealed class CmCommands : ApplicationCommandModule
 
             if (!AcSettings.AzuraCastApiKeyIsValid)
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordChecks.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
                 return;
             }
 
@@ -54,10 +54,10 @@ internal sealed class CmCommands : ApplicationCommandModule
             }
 
             await CmClubControls.CloseClubAsync();
-            await CoreDiscordCommands.RemoveUserRoleAsync(ctx.Member, CmSettings.CloserRoleId);
+            await CoreDiscordChecks.RemoveUserRoleAsync(ctx.Member, CmSettings.CloserRoleId);
             await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(CmStringBuilder.CommandCloseClubClubClosed));
 
-            await CmClubControls.SendClubClosingStatisticsAsync(await AzzyBot.SendMessageAsync(CmSettings.ClubNotifyChannelId, string.Empty, [CmEmbedBuilder.BuildCloseClubEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, false)]));
+            await CmClubControls.SendClubClosingStatisticsAsync(await AzzyBot.SendMessageAsync(CmSettings.ClubNotifyChannelId, string.Empty, [CmEmbedBuilder.BuildCloseClubEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, false)]));
         }
 
         [SlashCommand("open-club", "Select a playlist and open the club")]
@@ -69,13 +69,13 @@ internal sealed class CmCommands : ApplicationCommandModule
 
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
                 return;
             }
 
             if (!AcSettings.AzuraCastApiKeyIsValid)
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordChecks.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
                 return;
             }
 
@@ -87,7 +87,7 @@ internal sealed class CmCommands : ApplicationCommandModule
 
             await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(CmStringBuilder.CommandOpenClubClubOpened(await CmClubControls.OpenClubAsync(playlistId))));
 
-            await AzzyBot.SendMessageAsync(CmSettings.ClubNotifyChannelId, CoreDiscordCommands.GetRole(CmSettings.EventsRoleId, ctx.Guild).Mention, [CmEmbedBuilder.BuildOpenClubEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, slogan.Trim())], true);
+            await AzzyBot.SendMessageAsync(CmSettings.ClubNotifyChannelId, CoreDiscordChecks.GetRole(CmSettings.EventsRoleId, ctx.Guild).Mention, [CmEmbedBuilder.BuildOpenClubEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, slogan.Trim())], true);
         }
     }
 }

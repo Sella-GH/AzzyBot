@@ -54,7 +54,7 @@ internal static class MsLavalink
         }
 
         DiscordMember member = await ctx.Guild.GetMemberAsync(ctx.User.Id);
-        await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddEmbed(MsEmbedBuilder.BuildPreconditionErrorEmbed(CoreDiscordCommands.GetBestUsername(member.Username, member.Nickname), member.AvatarUrl, result)).AsEphemeral());
+        await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddEmbed(MsEmbedBuilder.BuildPreconditionErrorEmbed(CoreDiscordChecks.GetBestUsername(member.Username, member.Nickname), member.AvatarUrl, result)).AsEphemeral());
 
         return null;
     }
@@ -175,7 +175,7 @@ internal static class MsLavalink
         Lyrics lyrics = await GetLyricsFromGeniusAsync(nowPlaying.Now_Playing.Song.Text);
 
         DiscordMember member = await ctx.Guild.GetMemberAsync(ctx.User.Id);
-        return MsEmbedBuilder.BuildLyricsEmbed(CoreDiscordCommands.GetBestUsername(member.Username, member.Nickname), member.AvatarUrl, lyrics, nowPlaying.Now_Playing.Song.Artist, nowPlaying.Now_Playing.Song.Title);
+        return MsEmbedBuilder.BuildLyricsEmbed(CoreDiscordChecks.GetBestUsername(member.Username, member.Nickname), member.AvatarUrl, lyrics, nowPlaying.Now_Playing.Song.Artist, nowPlaying.Now_Playing.Song.Title);
     }
 
     private static async Task<Lyrics> GetLyricsFromGeniusAsync(string search)

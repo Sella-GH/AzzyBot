@@ -153,7 +153,7 @@ internal static class LoggerExceptions
     /// <returns>The ID of the message acknowledging the error.</returns>
     private static async Task<ulong> AcknowledgeErrorAsync(InteractionContext ctx)
     {
-        DiscordMessage message = await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(CoreStringBuilder.GetExceptionHandlingErrorDiscovered((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)).AddMention(UserMention.All));
+        DiscordMessage message = await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(CoreStringBuilder.GetExceptionHandlingErrorDiscovered((await CoreDiscordChecks.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)).AddMention(UserMention.All));
         return message.Id;
     }
 

@@ -25,13 +25,13 @@ internal sealed class MsCommands : ApplicationCommandModule
 
             DiscordMember member = ctx.Member;
 
-            if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(member))
+            if (!CoreDiscordChecks.CheckIfUserIsInVoiceChannel(member))
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MsStringBuilder.GetCommandsDisconnectVoiceRequired).AsEphemeral());
                 return;
             }
 
-            if (!CoreDiscordCommands.CheckIfBotIsInVoiceChannel(member, ctx.Client.CurrentUser.Id))
+            if (!CoreDiscordChecks.CheckIfBotIsInVoiceChannel(member, ctx.Client.CurrentUser.Id))
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MsStringBuilder.GetCommandsDisconnectVoiceBotIsDisc).AsEphemeral());
                 return;
@@ -50,13 +50,13 @@ internal sealed class MsCommands : ApplicationCommandModule
 
             DiscordMember member = ctx.Member;
 
-            if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(member))
+            if (!CoreDiscordChecks.CheckIfUserIsInVoiceChannel(member))
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MsStringBuilder.GetCommandsJoinVoiceRequired).AsEphemeral());
                 return;
             }
 
-            if (CoreDiscordCommands.CheckIfBotIsInVoiceChannel(member, ctx.Client.CurrentUser.Id))
+            if (CoreDiscordChecks.CheckIfBotIsInVoiceChannel(member, ctx.Client.CurrentUser.Id))
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MsStringBuilder.GetCommandsJoinVoiceBotIsThere).AsEphemeral());
                 return;
@@ -75,7 +75,7 @@ internal sealed class MsCommands : ApplicationCommandModule
 
             LoggerBase.LogInfo(LoggerBase.GetLogger, "PlayerSetVolumeCommandAsync requested", null);
 
-            if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(ctx.Member))
+            if (!CoreDiscordChecks.CheckIfUserIsInVoiceChannel(ctx.Member))
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MsStringBuilder.GetCommandsSetVolumeVoiceRequired).AsEphemeral());
                 return;
@@ -117,7 +117,7 @@ internal sealed class MsCommands : ApplicationCommandModule
         {
             LoggerBase.LogInfo(LoggerBase.GetLogger, "PlayerStartCommandAsync requested", null);
 
-            if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(ctx.Member))
+            if (!CoreDiscordChecks.CheckIfUserIsInVoiceChannel(ctx.Member))
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MsStringBuilder.GetCommandsStartVoiceRequired).AsEphemeral());
                 return;
@@ -140,7 +140,7 @@ internal sealed class MsCommands : ApplicationCommandModule
         {
             LoggerBase.LogInfo(LoggerBase.GetLogger, "PlayerStopCommandAsync requested", null);
 
-            if (!CoreDiscordCommands.CheckIfUserIsInVoiceChannel(ctx.Member))
+            if (!CoreDiscordChecks.CheckIfUserIsInVoiceChannel(ctx.Member))
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MsStringBuilder.GetCommandsStopVoiceRequired).AsEphemeral());
                 return;

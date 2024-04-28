@@ -35,13 +35,13 @@ internal sealed class AcCommands : ApplicationCommandModule
 
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
                 return;
             }
 
             if (!AcSettings.AzuraCastApiKeyIsValid)
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordChecks.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
                 return;
             }
 
@@ -70,13 +70,13 @@ internal sealed class AcCommands : ApplicationCommandModule
 
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
                 return;
             }
 
             if (!AcSettings.AzuraCastApiKeyIsValid)
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordChecks.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
                 return;
             }
 
@@ -94,7 +94,7 @@ internal sealed class AcCommands : ApplicationCommandModule
 
             if (!AcSettings.AzuraCastApiKeyIsValid)
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordChecks.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
                 return;
             }
 
@@ -110,19 +110,19 @@ internal sealed class AcCommands : ApplicationCommandModule
 
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
                 return;
             }
 
             if (!AcSettings.AzuraCastApiKeyIsValid)
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordChecks.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
                 return;
             }
 
             if (!AzuraCastModule.CheckIfPlaylistChangesAreAppropriate())
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildPlaylistChangesNotAllowedEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildPlaylistChangesNotAllowedEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
                 return;
             }
 
@@ -158,7 +158,7 @@ internal sealed class AcCommands : ApplicationCommandModule
 
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
                 return;
             }
 
@@ -166,7 +166,7 @@ internal sealed class AcCommands : ApplicationCommandModule
 
             if (!AcSettings.AzuraCastApiKeyIsValid)
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordChecks.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
                 return;
             }
 
@@ -203,13 +203,13 @@ internal sealed class AcCommands : ApplicationCommandModule
 
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
                 return;
             }
 
             if (!AcSettings.AzuraCastApiKeyIsValid)
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordChecks.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
                 return;
             }
 
@@ -239,11 +239,11 @@ internal sealed class AcCommands : ApplicationCommandModule
 
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
                 return;
             }
 
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(await AcEmbedBuilder.BuildNowPlayingEmbedAsync(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, await AcServer.GetNowPlayingAsync())));
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(await AcEmbedBuilder.BuildNowPlayingEmbedAsync(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, await AcServer.GetNowPlayingAsync())));
         }
     }
 
@@ -267,18 +267,18 @@ internal sealed class AcCommands : ApplicationCommandModule
 
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
                 return;
             }
 
             if (!AcSettings.AzuraCastApiKeyIsValid)
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordCommands.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordChecks.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)));
                 return;
             }
 
             bool useOnline = await AcServer.CheckIfSongRequestsAreAllowedAsync();
-            DiscordEmbed embed = await AcServer.CheckIfSongExistsAsync(songName.Trim(), artistName.Trim(), CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, useOnline);
+            DiscordEmbed embed = await AcServer.CheckIfSongExistsAsync(songName.Trim(), artistName.Trim(), CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, useOnline);
 
             if (embed.Description != AcStringBuilder.GetEmbedAzuraSearchSongRequestsAvaDesc || !useOnline)
             {
@@ -294,11 +294,11 @@ internal sealed class AcCommands : ApplicationCommandModule
             {
                 if (!AzuraCastModule.CheckIfSongRequestsAreAppropriate() || !await AcServer.CheckIfSongRequestsAreAllowedAsync())
                 {
-                    await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildSongRequestsNotAllowedEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                    await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildSongRequestsNotAllowedEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
                     return;
                 }
 
-                embed = await AcServer.CheckIfSongIsRequestableAsync(songName.Trim(), artistName.Trim(), CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl);
+                embed = await AcServer.CheckIfSongIsRequestableAsync(songName.Trim(), artistName.Trim(), CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl);
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed));
 
                 return;
@@ -322,17 +322,17 @@ internal sealed class AcCommands : ApplicationCommandModule
 
             if (!await AzuraCastModule.CheckIfMusicServerIsOnlineAsync())
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
                 return;
             }
 
             if (!AzuraCastModule.CheckIfSongRequestsAreAppropriate() || !await AcServer.CheckIfSongRequestsAreAllowedAsync())
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildSongRequestsNotAllowedEmbed(CoreDiscordCommands.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildSongRequestsNotAllowedEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
                 return;
             }
 
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(await AcServer.RequestFavouriteSongAsync(ctx.Member, await CoreDiscordCommands.GetMemberAsync(Convert.ToUInt64(user, CultureInfo.InvariantCulture), ctx.Guild))));
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(await AcServer.RequestFavouriteSongAsync(ctx.Member, await CoreDiscordChecks.GetMemberAsync(Convert.ToUInt64(user, CultureInfo.InvariantCulture), ctx.Guild))));
         }
     }
 }

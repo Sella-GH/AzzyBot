@@ -53,7 +53,7 @@ internal class CmModule : BaseModule
                 if (evt.ResultMember is null)
                     throw new InvalidOperationException("Can't check if user has staff role, evt.ResultMember is null");
 
-                evt.ResultBool = CoreDiscordCommands.CheckIfUserHasRole(evt.ResultMember, CmSettings.StaffRoleId);
+                evt.ResultBool = CoreDiscordChecks.CheckIfUserHasRole(evt.ResultMember, CmSettings.StaffRoleId);
                 break;
 
             case ModuleEventType.GlobalTimerTick:

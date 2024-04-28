@@ -41,18 +41,18 @@ internal sealed class AcFavoriteSongAutocomplete : IAutocompleteProvider
             if (string.IsNullOrWhiteSpace(userIds.UserSongList[i].SongId) || userIds.UserSongList[i].UserId == 0)
                 continue;
 
-            DiscordMember member = await CoreDiscordCommands.GetMemberAsync(userIds.UserSongList[i].UserId, ctx.Guild);
+            DiscordMember member = await CoreDiscordChecks.GetMemberAsync(userIds.UserSongList[i].UserId, ctx.Guild);
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
                 if (member.DisplayName.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase) || member.Nickname.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase) || member.Username.Contains(searchTerm, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    choice.Add(new DiscordAutoCompleteChoice(CoreDiscordCommands.GetBestUsername(member.Username, member.Nickname), member.Id.ToString(CultureInfo.InvariantCulture)));
+                    choice.Add(new DiscordAutoCompleteChoice(CoreDiscordChecks.GetBestUsername(member.Username, member.Nickname), member.Id.ToString(CultureInfo.InvariantCulture)));
                 }
             }
             else
             {
-                choice.Add(new DiscordAutoCompleteChoice(CoreDiscordCommands.GetBestUsername(member.Username, member.Nickname), member.Id.ToString(CultureInfo.InvariantCulture)));
+                choice.Add(new DiscordAutoCompleteChoice(CoreDiscordChecks.GetBestUsername(member.Username, member.Nickname), member.Id.ToString(CultureInfo.InvariantCulture)));
             }
         }
 

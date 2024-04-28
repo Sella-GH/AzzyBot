@@ -455,19 +455,19 @@ internal static class AcServer
         songArt = favoriteSong[0].Song.Art;
 
         if (await CheckIfSongIsQueuedAsync(songId, songName))
-            return AcEmbedBuilder.BuildCantRequestThisSong(CoreDiscordCommands.GetBestUsername(requester.Username, requester.Nickname), requester.AvatarUrl);
+            return AcEmbedBuilder.BuildCantRequestThisSong(CoreDiscordChecks.GetBestUsername(requester.Username, requester.Nickname), requester.AvatarUrl);
 
         string url = string.Join("/", AcSettings.AzuraApiUrl, AcApiEnum.station, AcSettings.AzuraStationKey, AcApiEnum.request, requestId);
 
         // Request the song and save the state inside a variable
         bool isRequested = await CoreWebRequests.PostWebAsync(url, string.Empty, null, AcSettings.Ipv6Available);
-        bool isFavUser = CoreDiscordCommands.CheckUserId(requester.Id, favUser.Id);
+        bool isFavUser = CoreDiscordChecks.CheckUserId(requester.Id, favUser.Id);
 
         // If song was successfully requested by Azzy send the embed
         // Otherwise send unable to request embed
         return (isRequested)
-            ? AcEmbedBuilder.BuildFavouriteSongEmbed(CoreDiscordCommands.GetBestUsername(requester.Username, requester.Nickname), requester.AvatarUrl, songName, songArtist, songAlbum, songArt, isFavUser, favUser.Mention)
-            : AcEmbedBuilder.BuildCantRequestThisSong(CoreDiscordCommands.GetBestUsername(requester.Username, requester.Nickname), requester.AvatarUrl);
+            ? AcEmbedBuilder.BuildFavouriteSongEmbed(CoreDiscordChecks.GetBestUsername(requester.Username, requester.Nickname), requester.AvatarUrl, songName, songArtist, songAlbum, songArt, isFavUser, favUser.Mention)
+            : AcEmbedBuilder.BuildCantRequestThisSong(CoreDiscordChecks.GetBestUsername(requester.Username, requester.Nickname), requester.AvatarUrl);
     }
 
     internal static async Task<List<AcPlaylistModel>> GetPlaylistsAsync(int playlistId = -1)

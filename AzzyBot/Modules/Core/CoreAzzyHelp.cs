@@ -126,8 +126,8 @@ internal static class CoreAzzyHelp
 
         return commandName switch
         {
-            "azuracast ping" or "config bot-restart" or "core info azzy" or "core ping azzy" => CoreDiscordCommands.CheckIfUserHasRole(member, CoreSettings.AdminRoleId),
-            "azuracast switch-playlists" or "staff close-club" or "staff open-club" => CoreDiscordCommands.CheckIfUserHasRole(member, CoreSettings.AdminRoleId) || CoreModule.CheckIfUserHasStaffRole(member),
+            "azuracast ping" or "config bot-restart" or "core info azzy" or "core ping azzy" => CoreDiscordChecks.CheckIfUserHasRole(member, CoreSettings.AdminRoleId),
+            "azuracast switch-playlists" or "staff close-club" or "staff open-club" => CoreDiscordChecks.CheckIfUserHasRole(member, CoreSettings.AdminRoleId) || CoreModule.CheckIfUserHasStaffRole(member),
             _ => true,
         };
     }
