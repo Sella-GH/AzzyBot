@@ -62,20 +62,14 @@ internal sealed class CoreStringBuilder : BaseStringBuilder
         if (uptime is not 0)
             fields.Add(Model.EmbedAzzyStatsSystemUptimeTitle, new(Model.EmbedAzzyStatsSystemUptimeTitle, BuildString(Model.EmbedAzzyStatsSystemUptimeDesc, "%VALUE%", $"<t:{uptime}>"), false));
 
-        if (ping is not 0)
-            fields.Add(Model.EmbedAzzyStatsPingTitle, new(Model.EmbedAzzyStatsPingTitle, BuildString(Model.EmbedAzzyStatsPingDesc, "%VALUE%", ping), false));
+        fields.Add(Model.EmbedAzzyStatsPingTitle, new(Model.EmbedAzzyStatsPingTitle, BuildString(Model.EmbedAzzyStatsPingDesc, "%VALUE%", ping), false));
 
         if (!string.IsNullOrWhiteSpace(coreUsage))
             fields.Add(Model.EmbedAzzyStatsCpuUsageTitle, new(Model.EmbedAzzyStatsCpuUsageTitle, coreUsage, false));
 
-        if (oneMinLoad is not 0)
-            fields.Add(Model.EmbedAzzyStats1MinLoadTitle, new(Model.EmbedAzzyStats1MinLoadTitle, BuildString(Model.EmbedAzzyStats1MinLoadDesc, "%VALUE%", oneMinLoad), true));
-
-        if (fiveMinLoad is not 0)
-            fields.Add(Model.EmbedAzzyStats5MinLoadTitle, new(Model.EmbedAzzyStats5MinLoadTitle, BuildString(Model.EmbedAzzyStats5MinLoadDesc, "%VALUE%", fiveMinLoad), true));
-
-        if (fifteenMinLoad is not 0)
-            fields.Add(Model.EmbedAzzyStats15MinLoadTitle, new(Model.EmbedAzzyStats15MinLoadTitle, BuildString(Model.EmbedAzzyStats15MinLoadDesc, "%VALUE%", fifteenMinLoad), true));
+        fields.Add(Model.EmbedAzzyStats1MinLoadTitle, new(Model.EmbedAzzyStats1MinLoadTitle, BuildString(Model.EmbedAzzyStats1MinLoadDesc, "%VALUE%", oneMinLoad), true));
+        fields.Add(Model.EmbedAzzyStats5MinLoadTitle, new(Model.EmbedAzzyStats5MinLoadTitle, BuildString(Model.EmbedAzzyStats5MinLoadDesc, "%VALUE%", fiveMinLoad), true));
+        fields.Add(Model.EmbedAzzyStats15MinLoadTitle, new(Model.EmbedAzzyStats15MinLoadTitle, BuildString(Model.EmbedAzzyStats15MinLoadDesc, "%VALUE%", fifteenMinLoad), true));
 
         if (memUsage is not 0 && memTotal is not 0)
             fields.Add(Model.EmbedAzzyStatsRamUsageTitle, new(Model.EmbedAzzyStatsRamUsageTitle, BuildString(BuildString(Model.EmbedAzzyStatsRamUsageDesc, "%USED%", memUsage), "%TOTAL%", memTotal), false));
