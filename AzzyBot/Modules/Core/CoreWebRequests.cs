@@ -300,7 +300,7 @@ internal static class CoreWebRequests
 
             // Choose between IP Address or Domain and protocol
             HttpClient client = (family == AddressFamily.InterNetworkV6) ? Client : ClientV4;
-            string protocol = (isHttps) ? $"https://" : "http://";
+            string protocol = (isHttps) ? "https://" : "http://";
             Uri finalUrl = new(protocol + ((isIpAddress) ? addr : url));
 
             // Stop the roundtrip time
