@@ -1,28 +1,28 @@
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
 internal sealed class AcUpdateModel
 {
-    [JsonProperty("currentRelease")]
+    [JsonPropertyName("currentRelease")]
     public string CurrentRelease { get; set; } = string.Empty;
 
-    [JsonProperty("latestRelease")]
+    [JsonPropertyName("latestRelease")]
     public string LatestRelease { get; set; } = string.Empty;
 
-    [JsonProperty("needs_rolling_update")]
+    [JsonPropertyName("needs_rolling_update")]
     public bool NeedsRollingUpdate { get; set; }
 
-    [JsonProperty("rolling_updates_available")]
+    [JsonPropertyName("rolling_updates_available")]
     public int RollingUpdatesAvailable { get; set; }
 
-    [JsonProperty("rolling_updates_list")]
+    [JsonPropertyName("rolling_updates_list")]
     public List<string> RollingUpdatesList { get; set; } = [];
 
-    [JsonProperty("needs_release_update")]
+    [JsonPropertyName("needs_release_update")]
     public bool NeedsReleaseUpdate { get; set; }
 
-    [JsonProperty("can_switch_to_stable")]
+    [JsonPropertyName("can_switch_to_stable")]
     public bool CanSwitchToStable { get; set; }
 }

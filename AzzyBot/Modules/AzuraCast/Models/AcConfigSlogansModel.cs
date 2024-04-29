@@ -1,58 +1,58 @@
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
 internal sealed class AcConfigSlogansModel
 {
-    [JsonProperty(nameof(Slogans))]
+    [JsonPropertyName(nameof(Slogans))]
     public Slogans Slogans { get; set; } = new();
 }
 
 internal sealed class Slogans
 {
-    [JsonProperty(nameof(DefaultSlogan))]
+    [JsonPropertyName(nameof(DefaultSlogan))]
     public string DefaultSlogan { get; set; } = string.Empty;
 
-    [JsonProperty(nameof(DefaultSloganListener))]
+    [JsonPropertyName(nameof(DefaultSloganListener))]
     public SloganContent DefaultSloganListener { get; set; } = new();
 
-    [JsonProperty(nameof(LiveStream))]
+    [JsonPropertyName(nameof(LiveStream))]
     public string LiveStream { get; set; } = string.Empty;
 
-    [JsonProperty(nameof(LiveStreamListener))]
+    [JsonPropertyName(nameof(LiveStreamListener))]
     public SloganContent LiveStreamListener { get; set; } = new();
 
-    [JsonProperty(nameof(SongRequests))]
+    [JsonPropertyName(nameof(SongRequests))]
     public string SongRequests { get; set; } = string.Empty;
 
-    [JsonProperty(nameof(SongRequestListener))]
+    [JsonPropertyName(nameof(SongRequestListener))]
     public SloganContent SongRequestListener { get; set; } = new();
 
-    [JsonProperty(nameof(UserDefined))]
+    [JsonPropertyName(nameof(UserDefined))]
     public List<UserDefined> UserDefined { get; set; } = [];
 }
 
 internal class SloganContent
 {
-    [JsonProperty(nameof(None))]
+    [JsonPropertyName(nameof(None))]
     public string None { get; set; } = string.Empty;
 
-    [JsonProperty(nameof(OnePerson))]
+    [JsonPropertyName(nameof(OnePerson))]
     public string OnePerson { get; set; } = string.Empty;
 
-    [JsonProperty(nameof(TwoPersons))]
+    [JsonPropertyName(nameof(TwoPersons))]
     public string TwoPersons { get; set; } = string.Empty;
 
-    [JsonProperty(nameof(Multiple))]
+    [JsonPropertyName(nameof(Multiple))]
     public string Multiple { get; set; } = string.Empty;
 }
 
 internal sealed class UserDefined : SloganContent
 {
-    [JsonProperty(nameof(Name))]
+    [JsonPropertyName(nameof(Name))]
     public string Name { get; set; } = string.Empty;
 
-    [JsonProperty(nameof(Slogan))]
+    [JsonPropertyName(nameof(Slogan))]
     public string Slogan { get; set; } = string.Empty;
 }

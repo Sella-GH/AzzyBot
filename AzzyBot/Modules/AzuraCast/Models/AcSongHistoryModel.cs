@@ -1,23 +1,23 @@
 ﻿using System;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
 internal sealed class SongHistory
 {
-    [JsonProperty("played_at")]
+    [JsonPropertyName("played_at")]
     public int PlayedAt { get; set; }
 
-    [JsonProperty("playlist")]
+    [JsonPropertyName("playlist")]
     public string Playlist { get; set; } = string.Empty;
 
-    [JsonProperty("streamer")]
+    [JsonPropertyName("streamer")]
     public string Streamer { get; set; } = string.Empty;
 
-    [JsonProperty("is_request")]
+    [JsonPropertyName("is_request")]
     public bool IsRequest { get; set; }
 
-    [JsonProperty("song")]
+    [JsonPropertyName("song")]
     public SongSimple Song { get; set; } = new();
 }
 

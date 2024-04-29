@@ -1,19 +1,19 @@
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
 internal sealed class AcFavoriteSongModel
 {
-    [JsonProperty(nameof(UserSongList))]
+    [JsonPropertyName(nameof(UserSongList))]
     public List<UserSongList> UserSongList { get; set; } = [];
 }
 
 internal sealed class UserSongList
 {
-    [JsonProperty(nameof(SongId))]
+    [JsonPropertyName(nameof(SongId))]
     public string SongId { get; set; } = string.Empty;
 
-    [JsonProperty(nameof(UserId))]
+    [JsonPropertyName(nameof(UserId))]
     public ulong UserId { get; set; }
 }

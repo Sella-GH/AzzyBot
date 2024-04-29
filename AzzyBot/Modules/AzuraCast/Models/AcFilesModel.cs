@@ -1,24 +1,24 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
 internal sealed class AcFilesModel
 {
-    [JsonProperty("unique_id")]
+    [JsonPropertyName("unique_id")]
     public string Unique_Id { get; set; } = string.Empty;
 
-    [JsonProperty("album")]
+    [JsonPropertyName("album")]
     public string Album { get; set; } = string.Empty;
 
-    [JsonProperty("path")]
+    [JsonPropertyName("path")]
     public string Path { get; set; } = string.Empty;
 
-    [JsonProperty("song_id")]
+    [JsonPropertyName("song_id")]
     public string Song_Id { get; set; } = string.Empty;
 
-    [JsonProperty("artist")]
+    [JsonPropertyName("artist")]
     public string Artist { get; set; } = string.Empty;
 
-    [JsonProperty("title")]
+    [JsonPropertyName("title")]
     public string Title { get; set; } = string.Empty;
 }

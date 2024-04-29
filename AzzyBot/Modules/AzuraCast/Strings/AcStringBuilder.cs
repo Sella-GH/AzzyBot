@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AzzyBot.Logging;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.Core.Structs;
 using AzzyBot.Strings;
-using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.AzuraCast.Strings;
 
@@ -25,7 +25,7 @@ internal sealed class AcStringBuilder : BaseStringBuilder
 
         if (!string.IsNullOrWhiteSpace(content))
         {
-            AcStringModel? newModel = JsonConvert.DeserializeObject<AcStringModel>(content);
+            AcStringModel? newModel = JsonSerializer.Deserialize<AcStringModel>(content);
             if (newModel is not null)
             {
                 // Reference assignment is atomic in .NET, so this is thread safe.
