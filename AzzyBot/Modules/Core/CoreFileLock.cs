@@ -28,7 +28,7 @@ internal sealed class CoreFileLock(string FileName, string[] Directories) : IDis
             if (FileName is not nameof(CoreFileNamesEnum.AzzyBotJSON))
                 return content;
 
-            AzzyBotModel? azzyBot = JsonSerializer.Deserialize<AzzyBotModel>(content) ?? throw new InvalidOperationException("AzzyBot model is null");
+            AzzyBotModel azzyBot = JsonSerializer.Deserialize<AzzyBotModel>(content) ?? throw new InvalidOperationException("AzzyBot model is null");
 
             return value switch
             {
