@@ -3,8 +3,9 @@ services:
     # pin the image version to Lavalink v4
     image: ghcr.io/lavalink-devs/lavalink:4
     container_name: lavalink
-    restart: unless-stopped
     pull_policy: always
+    restart: unless-stopped
+    user: ${CURRENT_UID}
     environment:
       # set lavalink server port
       - SERVER_PORT=2333
