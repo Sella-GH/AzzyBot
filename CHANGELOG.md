@@ -16,3 +16,4 @@
 ### Fixes
 - 1-Min-Load not showing when it's 0 in `core ping`
 - Update notifications not firing properly
+- Lavalink not being able to load the current version of the Dependancy [Lyrics.Java](https://github.com/DuncteBot/java-timed-lyrics)
