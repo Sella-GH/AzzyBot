@@ -1,10 +1,10 @@
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AzzyBot.Logging;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.Core.Structs;
 using AzzyBot.Strings;
-using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.Core.Strings;
 
@@ -21,7 +21,7 @@ internal sealed class CoreStringBuilder : BaseStringBuilder
 
         if (!string.IsNullOrWhiteSpace(content))
         {
-            CoreStringModel? newModel = JsonConvert.DeserializeObject<CoreStringModel>(content);
+            CoreStringModel? newModel = JsonSerializer.Deserialize<CoreStringModel>(content);
             if (newModel is not null)
             {
                 // Reference assignment is atomic in .NET, so this is thread safe.

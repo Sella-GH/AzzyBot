@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AzzyBot.Modules.Core.Settings;
 using DSharpPlus.Entities;
-using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.Core.Updater;
 
@@ -26,7 +26,7 @@ internal static class Updates
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("GitHub release version body is empty");
 
-        UpdaterModel? updaterModel = JsonConvert.DeserializeObject<UpdaterModel>(body) ?? throw new InvalidOperationException("UpdaterModel is null");
+        UpdaterModel updaterModel = JsonSerializer.Deserialize<UpdaterModel>(body) ?? throw new InvalidOperationException("UpdaterModel is null");
 
         Version updateVersion = new(updaterModel.Name);
         if (updateVersion == localVersion)

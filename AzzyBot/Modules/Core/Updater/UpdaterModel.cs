@@ -1,15 +1,15 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace AzzyBot.Modules.Core.Updater;
 
 internal sealed class UpdaterModel
 {
-    [JsonProperty("name")]
+    [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
 
-    [JsonProperty("created_at")]
+    [JsonPropertyName("created_at")]
     public string CreatedAt { get; set; } = string.Empty;
 
-    [JsonProperty("body")]
+    [JsonPropertyName("body")]
     public string Body { get; set; } = string.Empty;
 }

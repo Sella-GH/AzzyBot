@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Logging;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.Core.Models;
-using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.Core;
 
@@ -28,7 +28,7 @@ internal sealed class CoreFileLock(string FileName, string[] Directories) : IDis
             if (FileName is not nameof(CoreFileNamesEnum.AzzyBotJSON))
                 return content;
 
-            AzzyBotModel? azzyBot = JsonConvert.DeserializeObject<AzzyBotModel>(content) ?? throw new InvalidOperationException("AzzyBot model is null");
+            AzzyBotModel? azzyBot = JsonSerializer.Deserialize<AzzyBotModel>(content) ?? throw new InvalidOperationException("AzzyBot model is null");
 
             return value switch
             {
