@@ -62,11 +62,11 @@ internal static class CoreMisc
         {
             dayNotification = true;
         }
-        else if (counter < 7 && now > lastCheck.AddHours(11).AddMinutes(59))
+        else if ((counter >= 3 && counter < 7) && now > lastCheck.AddHours(11).AddMinutes(59))
         {
             halfDayNotification = true;
         }
-        else if (counter > 7 && now > lastCheck.AddHours(5).AddMinutes(59))
+        else if (counter >= 7 && now > lastCheck.AddHours(5).AddMinutes(59))
         {
             quarterDayNotification = true;
         }
