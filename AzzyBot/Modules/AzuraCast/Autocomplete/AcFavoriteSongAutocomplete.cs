@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.Core;
 using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
-using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.AzuraCast.Autocomplete;
 
@@ -25,10 +25,7 @@ internal sealed class AcFavoriteSongAutocomplete : IAutocompleteProvider
             throw new InvalidOperationException("json is empty");
 
         string? searchTerm = ctx.OptionValue.ToString();
-        AcFavoriteSongModel? userIds = JsonConvert.DeserializeObject<AcFavoriteSongModel>(json);
-
-        if (userIds is null)
-            throw new InvalidOperationException($"{nameof(userIds)} is null");
+        AcFavoriteSongModel? userIds = JsonSerializer.Deserialize<AcFavoriteSongModel>(json) ?? throw new InvalidOperationException($"{nameof(userIds)} is null");
 
         List<DiscordAutoCompleteChoice> choice = [];
 

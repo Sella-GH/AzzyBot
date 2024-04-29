@@ -1,38 +1,38 @@
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
 internal sealed class SystemData
 {
-    [JsonProperty("cpu")]
+    [JsonPropertyName("cpu")]
     public CpuData Cpu { get; set; } = new();
 
-    [JsonProperty("memory")]
+    [JsonPropertyName("memory")]
     public MemoryData Memory { get; set; } = new();
 
-    [JsonProperty("disk")]
+    [JsonPropertyName("disk")]
     public DiskData Disk { get; set; } = new();
 
-    [JsonProperty("network")]
+    [JsonPropertyName("network")]
     public List<NetworkData> Network { get; set; } = [];
 }
 
 internal sealed class CpuData
 {
-    [JsonProperty("total")]
+    [JsonPropertyName("total")]
     public TotalData Total { get; set; } = new();
 
-    [JsonProperty("cores")]
+    [JsonPropertyName("cores")]
     public List<CoreData> Cores { get; set; } = [];
 
-    [JsonProperty("load")]
+    [JsonPropertyName("load")]
     public List<double> Load { get; set; } = [];
 }
 
 internal class TotalData
 {
-    [JsonProperty("usage")]
+    [JsonPropertyName("usage")]
     public string Usage { get; set; } = string.Empty;
 }
 
@@ -40,48 +40,48 @@ internal sealed class CoreData : TotalData;
 
 internal sealed class ByteData
 {
-    [JsonProperty("total")]
+    [JsonPropertyName("total")]
     public string Total { get; set; } = string.Empty;
 
-    [JsonProperty("cached")]
+    [JsonPropertyName("cached")]
     public string Cached { get; set; } = string.Empty;
 
-    [JsonProperty("used")]
+    [JsonPropertyName("used")]
     public string Used { get; set; } = string.Empty;
 }
 
 internal sealed class MemoryData
 {
-    [JsonProperty("bytes")]
+    [JsonPropertyName("bytes")]
     public ByteData Bytes { get; set; } = new();
 }
 
 internal sealed class DiskData
 {
-    [JsonProperty("bytes")]
+    [JsonPropertyName("bytes")]
     public ByteData Bytes { get; set; } = new();
 }
 
 internal sealed class SpeedData
 {
-    [JsonProperty("bytes")]
+    [JsonPropertyName("bytes")]
     public string Bytes { get; set; } = string.Empty;
 }
 
 internal sealed class TransmissionData
 {
-    [JsonProperty("speed")]
+    [JsonPropertyName("speed")]
     public SpeedData Speed { get; set; } = new();
 }
 
 internal sealed class NetworkData
 {
-    [JsonProperty("interface_name")]
+    [JsonPropertyName("interface_name")]
     public string InterfaceName { get; set; } = string.Empty;
 
-    [JsonProperty("received")]
+    [JsonPropertyName("received")]
     public TransmissionData Received { get; set; } = new();
 
-    [JsonProperty("transmitted")]
+    [JsonPropertyName("transmitted")]
     public TransmissionData Transmitted { get; set; } = new();
 }

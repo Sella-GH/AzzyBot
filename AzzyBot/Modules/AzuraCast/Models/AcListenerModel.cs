@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json.Serialization;
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
 internal sealed class AcListenerModel
 {
-    [JsonProperty("connected_time")]
+    [JsonPropertyName("connected_time")]
     public int TimeConnected { get; set; }
 }

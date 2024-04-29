@@ -1,12 +1,12 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
 internal sealed class AcSongRequestsModel
 {
-    [JsonProperty("request_id")]
+    [JsonPropertyName("request_id")]
     public string Request_Id { get; set; } = string.Empty;
 
-    [JsonProperty("song")]
+    [JsonPropertyName("song")]
     public SongDetailed Song { get; set; } = new();
 }

@@ -1,9 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text.Json;
+using System.Threading.Tasks;
 using AzzyBot.Logging;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Strings;
-using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.MusicStreaming.Strings;
 
@@ -20,7 +20,7 @@ internal sealed class MsStringBuilder : BaseStringBuilder
 
         if (!string.IsNullOrWhiteSpace(content))
         {
-            MsStringModel? newModel = JsonConvert.DeserializeObject<MsStringModel>(content);
+            MsStringModel? newModel = JsonSerializer.Deserialize<MsStringModel>(content);
             if (newModel is not null)
             {
                 // Reference assignment is atomic in .NET, so this is thread safe.

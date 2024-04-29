@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AzzyBot.Logging;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.Core.Structs;
 using AzzyBot.Strings;
-using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.ClubManagement.Strings;
 
@@ -24,7 +24,7 @@ internal sealed class CmStringBuilder : BaseStringBuilder
 
         if (!string.IsNullOrWhiteSpace(content))
         {
-            CmStringModel? newModel = JsonConvert.DeserializeObject<CmStringModel>(content);
+            CmStringModel? newModel = JsonSerializer.Deserialize<CmStringModel>(content);
             if (newModel is not null)
             {
                 // Reference assignment is atomic in .NET, so this is thread safe.

@@ -1,12 +1,12 @@
 using System;
 using System.Globalization;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AzzyBot.Modules.AzuraCast.Enums;
 using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.AzuraCast.Settings;
 using AzzyBot.Modules.Core;
 using DSharpPlus.Entities;
-using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.AzuraCast;
 
@@ -27,10 +27,7 @@ internal static class AcStats
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty!");
 
-        SystemData? data = JsonConvert.DeserializeObject<SystemData>(body);
-
-        if (data is null)
-            throw new InvalidOperationException($"{nameof(data)} is null!");
+        SystemData data = JsonSerializer.Deserialize<SystemData>(body) ?? throw new InvalidOperationException($"{nameof(data)} is null!");
 
         string cpuUsageTotal = data.Cpu.Total.Usage;
         string[] cpuUsageCores;

@@ -1,42 +1,42 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
 internal sealed class NowPlayingData
 {
-    [JsonProperty("now_playing")]
+    [JsonPropertyName("now_playing")]
     public NowPlaying Now_Playing { get; set; } = new();
 
-    [JsonProperty("listeners")]
+    [JsonPropertyName("listeners")]
     public Listeners Listeners { get; set; } = new();
 
-    [JsonProperty("live")]
+    [JsonPropertyName("live")]
     public Live Live { get; set; } = new();
 }
 
 internal sealed class Listeners
 {
-    [JsonProperty("unique")]
+    [JsonPropertyName("unique")]
     public int Current { get; set; }
 }
 
 internal sealed class Live
 {
-    [JsonProperty("is_live")]
+    [JsonPropertyName("is_live")]
     public bool Is_live { get; set; }
 
-    [JsonProperty("streamer_name")]
+    [JsonPropertyName("streamer_name")]
     public string Streamer_Name { get; set; } = string.Empty;
 
-    [JsonProperty("broadcast_start")]
+    [JsonPropertyName("broadcast_start")]
     public int? Broadcast_Start { get; set; }
 
-    [JsonProperty("broadcast_end")]
+    [JsonPropertyName("broadcast_end")]
     public string Art { get; set; } = string.Empty;
 }
 
 internal sealed class NowPlaying : SongData
 {
-    [JsonProperty("elapsed")]
+    [JsonPropertyName("elapsed")]
     public int Elapsed { get; set; }
 }

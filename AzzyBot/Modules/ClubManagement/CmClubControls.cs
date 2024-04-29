@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.AzuraCast.Models;
@@ -13,7 +14,6 @@ using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.Core.Settings;
 using DSharpPlus;
 using DSharpPlus.Entities;
-using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.ClubManagement;
 
@@ -67,16 +67,13 @@ internal static class CmClubControls
         if (string.IsNullOrWhiteSpace(json))
             throw new InvalidOperationException("json is empty!");
 
-        BotStatus? botStatus = JsonConvert.DeserializeObject<BotStatus>(json);
+        BotStatus botStatus = JsonSerializer.Deserialize<BotStatus>(json) ?? throw new InvalidOperationException($"{nameof(botStatus)} is null!");
 
         int status = CoreSettings.BotStatus;
         int type = CoreSettings.BotActivity;
         string doing = CoreSettings.BotDoing;
         string? streamUrl = CoreSettings.BotStreamUrl;
         bool set = false;
-
-        if (botStatus is null)
-            throw new InvalidOperationException($"{nameof(botStatus)} is null!");
 
         int number = new Random().Next(0, botStatus.ClubBotStatusList.Count);
 
@@ -128,24 +125,12 @@ internal static class CmClubControls
         if (string.IsNullOrWhiteSpace(json))
             throw new InvalidOperationException("json is empty!");
 
-        BotStatus? botStatus = JsonConvert.DeserializeObject<BotStatus>(json);
+        BotStatus botStatus = JsonSerializer.Deserialize<BotStatus>(json) ?? throw new InvalidOperationException($"{nameof(botStatus)} is null!");
 
-        int status;
-        int type;
-        string doing;
-        string streamUrl;
-
-        if (botStatus is not null)
-        {
-            status = botStatus.BotStatus;
-            type = botStatus.BotActivity;
-            doing = botStatus.BotDoing;
-            streamUrl = botStatus.BotStreamUrl;
-        }
-        else
-        {
-            throw new InvalidOperationException($"{nameof(botStatus)} is null!");
-        }
+        int status = botStatus.BotStatus;
+        int type = botStatus.BotActivity;
+        string doing = botStatus.BotDoing;
+        string streamUrl = botStatus.BotStreamUrl;
 
         await AzzyBot.SetBotStatusAsync(status, type, doing, streamUrl);
 

@@ -1,18 +1,18 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
 internal sealed class AcSongRequestsQueueModel
 {
-    [JsonProperty("timestamp")]
+    [JsonPropertyName("timestamp")]
     public int Timestamp { get; set; }
 
-    [JsonProperty("track")]
+    [JsonPropertyName("track")]
     public Track Track { get; set; } = new();
 }
 
 internal sealed class Track
 {
-    [JsonProperty("song_id")]
+    [JsonPropertyName("song_id")]
     public string Song_Id { get; set; } = string.Empty;
 }

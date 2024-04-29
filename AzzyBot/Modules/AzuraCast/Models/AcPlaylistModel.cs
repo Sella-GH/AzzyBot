@@ -1,18 +1,18 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace AzzyBot.Modules.AzuraCast.Models;
 
 internal sealed class AcPlaylistModel
 {
-    [JsonProperty("name")]
+    [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
 
-    [JsonProperty("is_enabled")]
+    [JsonPropertyName("is_enabled")]
     public bool Is_enabled { get; set; }
 
-    [JsonProperty("id")]
+    [JsonPropertyName("id")]
     public int Id { get; set; }
 
-    [JsonProperty("short_name")]
+    [JsonPropertyName("short_name")]
     public string Short_name { get; set; } = string.Empty;
 }

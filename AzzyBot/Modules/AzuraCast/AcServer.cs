@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AzzyBot.Modules.AzuraCast.Enums;
 using AzzyBot.Modules.AzuraCast.Models;
@@ -11,7 +13,6 @@ using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
 using AzzyBot.Modules.Core.Structs;
 using DSharpPlus.Entities;
-using Newtonsoft.Json;
 
 namespace AzzyBot.Modules.AzuraCast;
 
@@ -23,6 +24,12 @@ internal static class AcServer
         ["X-API-Key"] = AcSettings.AzuraApiKey
     };
 
+    private static readonly JsonSerializerOptions SerializerOptions = new()
+    {
+        WriteIndented = true
+    };
+
+    [SuppressMessage("Roslynator", "RCS1124:Inline local variable", Justification = "Code Style")]
     internal static async Task<NowPlayingData> GetNowPlayingAsync()
     {
         string url = string.Join("/", AcSettings.AzuraApiUrl, AcApiEnum.nowplaying, AcSettings.AzuraStationKey);
@@ -30,10 +37,7 @@ internal static class AcServer
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
-        NowPlayingData? data = JsonConvert.DeserializeObject<NowPlayingData>(body);
-
-        if (data is null)
-            throw new InvalidOperationException($"{nameof(data)} is null");
+        NowPlayingData data = JsonSerializer.Deserialize<NowPlayingData>(body) ?? throw new InvalidOperationException($"{nameof(data)} is null");
 
         return data;
     }
@@ -47,10 +51,7 @@ internal static class AcServer
         if (string.IsNullOrWhiteSpace(configBody))
             throw new InvalidOperationException("configBody is empty");
 
-        AcConfigSlogansModel? playlistSlogan = JsonConvert.DeserializeObject<AcConfigSlogansModel>(configBody);
-
-        if (playlistSlogan is null)
-            throw new InvalidOperationException($"{nameof(playlistSlogan)} & {nameof(nowPlaying)} are null");
+        AcConfigSlogansModel playlistSlogan = JsonSerializer.Deserialize<AcConfigSlogansModel>(configBody) ?? throw new InvalidOperationException($"{nameof(playlistSlogan)} & {nameof(nowPlaying)} are null");
 
         bool isLive = nowPlaying.Live.Is_live;
         string playlist = nowPlaying.Now_Playing.Playlist;
@@ -105,10 +106,7 @@ internal static class AcServer
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
-        AcStationConfigModel? config = JsonConvert.DeserializeObject<AcStationConfigModel>(body);
-
-        if (config is null)
-            throw new InvalidOperationException($"{nameof(config)} is null");
+        AcStationConfigModel config = JsonSerializer.Deserialize<AcStationConfigModel>(body) ?? throw new InvalidOperationException($"{nameof(config)} is null");
 
         if (!config.Enable_requests)
             return false;
@@ -163,6 +161,7 @@ internal static class AcServer
         return false;
     }
 
+    [SuppressMessage("Roslynator", "RCS1124:Inline local variable", Justification = "Code Style")]
     private static async Task<List<AcSongRequestsQueueModel>> GetSongRequestsQueuesAsync()
     {
         string url = string.Join("/", AcSettings.AzuraApiUrl, AcApiEnum.station, AcSettings.AzuraStationKey, AcApiEnum.reports, AcApiEnum.requests);
@@ -170,14 +169,12 @@ internal static class AcServer
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
-        List<AcSongRequestsQueueModel>? requestQueue = JsonConvert.DeserializeObject<List<AcSongRequestsQueueModel>>(body);
-
-        if (requestQueue is null)
-            throw new InvalidOperationException($"{nameof(requestQueue)} is null");
+        List<AcSongRequestsQueueModel> requestQueue = JsonSerializer.Deserialize<List<AcSongRequestsQueueModel>>(body) ?? throw new InvalidOperationException($"{nameof(requestQueue)} is null");
 
         return requestQueue;
     }
 
+    [SuppressMessage("Roslynator", "RCS1124:Inline local variable", Justification = "Code Style")]
     private static async Task<List<AcQueueItemModel>> GetQueueAsync()
     {
         string url = string.Join("/", AcSettings.AzuraApiUrl, AcApiEnum.station, AcSettings.AzuraStationKey, AcApiEnum.queue);
@@ -185,14 +182,12 @@ internal static class AcServer
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
-        List<AcQueueItemModel>? queue = JsonConvert.DeserializeObject<List<AcQueueItemModel>>(body);
-
-        if (queue is null)
-            throw new InvalidOperationException($"{nameof(queue)} is null");
+        List<AcQueueItemModel> queue = JsonSerializer.Deserialize<List<AcQueueItemModel>>(body) ?? throw new InvalidOperationException($"{nameof(queue)} is null");
 
         return queue;
     }
 
+    [SuppressMessage("Roslynator", "RCS1124:Inline local variable", Justification = "Code Style")]
     private static async Task<List<AcSongRequestsQueueModel>> GetSongRequestsHistoryAsync(string songName = "")
     {
         string url = $"{string.Join("/", AcSettings.AzuraApiUrl, AcApiEnum.station, AcSettings.AzuraStationKey, AcApiEnum.reports, AcApiEnum.requests)}?{AcApiEnum.type}={AcApiEnum.history}&{AcApiEnum.searchPhrase}={songName.Replace(" ", "+", StringComparison.InvariantCultureIgnoreCase)}";
@@ -200,14 +195,12 @@ internal static class AcServer
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
-        List<AcSongRequestsQueueModel>? history = JsonConvert.DeserializeObject<List<AcSongRequestsQueueModel>>(body);
-
-        if (history is null)
-            throw new InvalidOperationException($"{nameof(history)} is null");
+        List<AcSongRequestsQueueModel> history = JsonSerializer.Deserialize<List<AcSongRequestsQueueModel>>(body) ?? throw new InvalidOperationException($"{nameof(history)} is null");
 
         return history;
     }
 
+    [SuppressMessage("Roslynator", "RCS1124:Inline local variable", Justification = "Code Style")]
     internal static async Task<List<SongHistory>> GetSongHistoryAsync(DateTime startTime, DateTime endTime)
     {
         string url = $"{string.Join("/", AcSettings.AzuraApiUrl, AcApiEnum.station, AcSettings.AzuraStationKey, AcApiEnum.history)}?{AcApiEnum.start}={startTime.ToString("yyyy-MM-dd_HH:mm:ss.fff", CultureInfo.InvariantCulture)}&{AcApiEnum.end}={endTime.ToString("yyyy-MM-dd_HH:mm:ss.fff", CultureInfo.InvariantCulture)}".Replace("_", "T", StringComparison.OrdinalIgnoreCase);
@@ -215,14 +208,12 @@ internal static class AcServer
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
-        List<SongHistory>? history = JsonConvert.DeserializeObject<List<SongHistory>>(body);
-
-        if (history is null)
-            throw new InvalidOperationException($"{nameof(history)} is null");
+        List<SongHistory> history = JsonSerializer.Deserialize<List<SongHistory>>(body) ?? throw new InvalidOperationException($"{nameof(history)} is null");
 
         return history;
     }
 
+    [SuppressMessage("Roslynator", "RCS1124:Inline local variable", Justification = "Code Style")]
     internal static async Task<List<AcListenerModel>> GetListenersAsync(DateTime startTime, DateTime endTime)
     {
         string url = $"{string.Join("/", AcSettings.AzuraApiUrl, AcApiEnum.station, AcSettings.AzuraStationKey, AcApiEnum.listeners)}?{AcApiEnum.start}={startTime.ToString("yyyy-MM-dd_HH:mm:ss.fff", CultureInfo.InvariantCulture)}&{AcApiEnum.end}={endTime.ToString("yyyy-MM-dd_HH:mm:ss.fff", CultureInfo.InvariantCulture)}".Replace("_", "T", StringComparison.OrdinalIgnoreCase);
@@ -230,10 +221,7 @@ internal static class AcServer
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
-        List<AcListenerModel>? listenerList = JsonConvert.DeserializeObject<List<AcListenerModel>>(body);
-
-        if (listenerList is null)
-            throw new InvalidOperationException($"{nameof(listenerList)} is null");
+        List<AcListenerModel> listenerList = JsonSerializer.Deserialize<List<AcListenerModel>>(body) ?? throw new InvalidOperationException($"{nameof(listenerList)} is null");
 
         return listenerList;
     }
@@ -247,11 +235,8 @@ internal static class AcServer
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
-        List<AcSongRequestsModel>? songRequests = JsonConvert.DeserializeObject<List<AcSongRequestsModel>>(body);
+        List<AcSongRequestsModel> songRequests = JsonSerializer.Deserialize<List<AcSongRequestsModel>>(body) ?? throw new InvalidOperationException("Could not retrieve the list of requestable songs from the server");
         List<AcSongRequestsModel> matchingSongs = [];
-
-        if (songRequests is null)
-            throw new InvalidOperationException("Could not retrieve the list of requestable songs from the server");
 
         foreach (AcSongRequestsModel songRequest in songRequests)
         {
@@ -287,11 +272,8 @@ internal static class AcServer
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
-        List<AcSongRequestsModel>? songRequests = JsonConvert.DeserializeObject<List<AcSongRequestsModel>>(body);
+        List<AcSongRequestsModel> songRequests = JsonSerializer.Deserialize<List<AcSongRequestsModel>>(body) ?? throw new InvalidOperationException("Could not retrieve the list of requestable songs from the server");
         List<AcSongRequestsModel> matchingSongs = [];
-
-        if (songRequests is null)
-            throw new InvalidOperationException("Could not retrieve the list of requestable songs from the server");
 
         foreach (AcSongRequestsModel songRequest in songRequests)
         {
@@ -318,11 +300,8 @@ internal static class AcServer
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
-        List<AcFilesModel>? songs = JsonConvert.DeserializeObject<List<AcFilesModel>>(body);
+        List<AcFilesModel> songs = JsonSerializer.Deserialize<List<AcFilesModel>>(body) ?? throw new InvalidOperationException("Could not retrieve the list of requestable songs from the filesystem");
         List<AcSongRequestsModel> matchingSongs = [];
-
-        if (songs is null)
-            throw new InvalidOperationException("Could not retrieve the list of requestable songs from the filesystem");
 
         foreach (AcFilesModel songRequest in songs)
         {
@@ -425,10 +404,7 @@ internal static class AcServer
         if (string.IsNullOrWhiteSpace(json))
             throw new InvalidOperationException("json is empty");
 
-        AcFavoriteSongModel? favSong = JsonConvert.DeserializeObject<AcFavoriteSongModel>(json);
-
-        if (favSong is null)
-            throw new InvalidOperationException($"{nameof(favSong)} is null");
+        AcFavoriteSongModel favSong = JsonSerializer.Deserialize<AcFavoriteSongModel>(json) ?? throw new InvalidOperationException($"{nameof(favSong)} is null");
 
         string requestId = string.Empty;
         string songId = string.Empty;
@@ -437,10 +413,7 @@ internal static class AcServer
         string songAlbum = string.Empty;
         string songArt = string.Empty;
 
-        UserSongList? relation = favSong.UserSongList.Find(element => Convert.ToUInt64(element.UserId, CultureInfo.InvariantCulture) == favUser.Id);
-
-        if (relation is null)
-            throw new InvalidOperationException($"{nameof(relation)} is null");
+        UserSongList relation = favSong.UserSongList.Find(element => Convert.ToUInt64(element.UserId, CultureInfo.InvariantCulture) == favUser.Id) ?? throw new InvalidOperationException($"{nameof(relation)} is null");
 
         songId = relation.SongId;
         List<AcSongRequestsModel> favoriteSong = await FindAllMatchingSongsForRequestAsync(songId);
@@ -485,24 +458,18 @@ internal static class AcServer
         if (body.Contains("You must be logged in to access this page.", StringComparison.OrdinalIgnoreCase))
             return [];
 
-        List<AcPlaylistModel>? playlists = [];
+        List<AcPlaylistModel> playlists = [];
 
         if (playlistId == -1)
         {
-            playlists = JsonConvert.DeserializeObject<List<AcPlaylistModel>>(body);
+            playlists = JsonSerializer.Deserialize<List<AcPlaylistModel>>(body) ?? throw new InvalidOperationException($"{nameof(playlists)} is null");
         }
         else
         {
-            AcPlaylistModel? playlist = JsonConvert.DeserializeObject<AcPlaylistModel>(body);
-
-            if (playlist is null)
-                throw new InvalidOperationException($"{nameof(playlist)} is null");
+            AcPlaylistModel playlist = JsonSerializer.Deserialize<AcPlaylistModel>(body) ?? throw new InvalidOperationException($"{nameof(playlist)} is null");
 
             playlists.Add(playlist);
         }
-
-        if (playlists is null)
-            throw new InvalidOperationException($"{nameof(playlists)} is null");
 
         return playlists;
     }
@@ -530,13 +497,11 @@ internal static class AcServer
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
-        List<AcPlaylistItemModel>? songs = JsonConvert.DeserializeObject<List<AcPlaylistItemModel>>(body);
+        List<AcPlaylistItemModel> songs = JsonSerializer.Deserialize<List<AcPlaylistItemModel>>(body) ?? throw new InvalidOperationException("songs are empty");
 
         playlistName = playlistName.Replace($"_({nameof(AcPlaylistKeywordsEnum.NOREQUESTS)})", string.Empty, StringComparison.OrdinalIgnoreCase);
 
-        return (songs is null)
-            ? throw new InvalidOperationException("songs are empty")
-            : await CoreFileOperations.CreateTempCsvFileAsync(songs, $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}-{playlistName}.csv");
+        return await CoreFileOperations.CreateTempCsvFileAsync(songs, $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}-{playlistName}.csv");
     }
 
     internal static async Task<string> GetSongsPlayedAtDateAsync(DateTime dateTime)
@@ -640,14 +605,11 @@ internal static class AcServer
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
-        AcStationConfigModel? config = JsonConvert.DeserializeObject<AcStationConfigModel>(body);
-
-        if (config is null)
-            throw new InvalidOperationException($"{nameof(config)} is null");
+        AcStationConfigModel config = JsonSerializer.Deserialize<AcStationConfigModel>(body) ?? throw new InvalidOperationException($"{nameof(config)} is null");
 
         config.Enable_requests = enabled;
 
-        string payload = JsonConvert.SerializeObject(config, Formatting.Indented);
+        string payload = JsonSerializer.Serialize(config, SerializerOptions);
 
         if (!await CoreWebRequests.PutWebAsync(url, payload, Headers, AcSettings.Ipv6Available))
             throw new InvalidOperationException("Unable to change song request availability");
@@ -664,7 +626,7 @@ internal static class AcServer
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
-        List<AcFilesModel>? onlineFiles = JsonConvert.DeserializeObject<List<AcFilesModel>>(body);
+        List<AcFilesModel> onlineFiles = JsonSerializer.Deserialize<List<AcFilesModel>>(body) ?? throw new InvalidOperationException($"{nameof(onlineFiles)} is null");
 
         // Get the local files from the bot and write into list
         if (AzuraCastModule.FileCacheLock is null)
@@ -674,21 +636,13 @@ internal static class AcServer
         if (string.IsNullOrWhiteSpace(body))
             noCache = true;
 
-        List<AcFilesModel>? localFiles = (!noCache) ? JsonConvert.DeserializeObject<List<AcFilesModel>>(body) : [];
+        List<AcFilesModel> localFiles = (!noCache) ? JsonSerializer.Deserialize<List<AcFilesModel>>(body) ?? throw new InvalidOperationException($"{nameof(localFiles)} is null") : [];
 
         // Create a HashSet for the online files
-        HashSet<AcFilesModel> onlineHashSet;
-        if (onlineFiles is null)
-            throw new InvalidOperationException($"{nameof(onlineFiles)} is null");
-
-        onlineHashSet = new(onlineFiles, new AcFileComparer());
+        HashSet<AcFilesModel> onlineHashSet = new(onlineFiles, new AcFileComparer());
 
         // Create a HashSet for the local files
-        HashSet<AcFilesModel> localHashSet;
-        if (localFiles is null)
-            throw new InvalidOperationException($"{nameof(localFiles)} is null");
-
-        localHashSet = new(localFiles, new AcFileComparer());
+        HashSet<AcFilesModel> localHashSet = new(localFiles, new AcFileComparer());
 
         List<AcFilesModel> addedFiles = [];
         List<AcFilesModel> removedFiles = [];
@@ -744,7 +698,7 @@ internal static class AcServer
         }
 
         await AzzyBot.SendMessageAsync(AcSettings.MusicRequestsChannelId, string.Empty, AcEmbedBuilder.BuildFilesHaveChangedEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, addedFiles.Count, removedFiles.Count), fileNames);
-        if (!await AzuraCastModule.FileCacheLock.SetFileContentAsync(JsonConvert.SerializeObject(onlineFiles, Formatting.Indented)))
+        if (!await AzuraCastModule.FileCacheLock.SetFileContentAsync(JsonSerializer.Serialize(onlineFiles, SerializerOptions)))
             throw new InvalidOperationException("File couldn't be modified");
     }
 
@@ -774,6 +728,7 @@ internal static class AcServer
         return CoreFileOperations.CreateZipFile($"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}-playlists.zip", directory);
     }
 
+    [SuppressMessage("Roslynator", "RCS1124:Inline local variable", Justification = "Code Style")]
     internal static async Task<AcUpdateModel> CheckIfMusicServerNeedsUpdatesAsync()
     {
         // Get the details from the music server and write into model
@@ -782,11 +737,8 @@ internal static class AcServer
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException("body is empty");
 
-        AcUpdateModel? model = JsonConvert.DeserializeObject<AcUpdateModel>(body);
+        AcUpdateModel model = JsonSerializer.Deserialize<AcUpdateModel>(body) ?? throw new InvalidOperationException($"{nameof(model)} is null");
 
-        if (model is not null)
-            return model;
-
-        throw new InvalidOperationException($"{nameof(model)} is null");
+        return model;
     }
 }
