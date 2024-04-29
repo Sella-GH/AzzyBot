@@ -1,25 +1,25 @@
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace AzzyBot.Modules.ClubManagement.Models;
 
 internal sealed class BotStatus : ClubBotStatus
 {
-    [JsonProperty(nameof(ClubBotStatusList))]
+    [JsonPropertyName(nameof(ClubBotStatusList))]
     public List<ClubBotStatus> ClubBotStatusList { get; set; } = [];
 }
 
 internal class ClubBotStatus
 {
-    [JsonProperty(nameof(BotStatus))]
+    [JsonPropertyName(nameof(BotStatus))]
     public int BotStatus { get; set; }
 
-    [JsonProperty(nameof(BotActivity))]
+    [JsonPropertyName(nameof(BotActivity))]
     public int BotActivity { get; set; }
 
-    [JsonProperty(nameof(BotDoing))]
+    [JsonPropertyName(nameof(BotDoing))]
     public string BotDoing { get; set; } = string.Empty;
 
-    [JsonProperty(nameof(BotStreamUrl))]
+    [JsonPropertyName(nameof(BotStreamUrl))]
     public string BotStreamUrl { get; set; } = string.Empty;
 }
