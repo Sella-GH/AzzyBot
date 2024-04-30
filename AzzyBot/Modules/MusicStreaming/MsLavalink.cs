@@ -106,22 +106,23 @@ internal static class MsLavalink
             CacheMode = CacheMode.Bypass
         };
 
-        bool hlsStream = MsSettings.MountPointStub.EndsWith("m3u8", StringComparison.OrdinalIgnoreCase);
+        string mountPoint = MsSettings.MountPointStub;
+        bool hlsStream = mountPoint.EndsWith("m3u8", StringComparison.OrdinalIgnoreCase);
         int streamingPort = MsSettings.StreamingPort;
         string azuraUrl = AcSettings.AzuraApiUrl.Replace("/api", string.Empty, StringComparison.OrdinalIgnoreCase);
         string url;
 
         if (hlsStream)
         {
-            url = string.Join("/", azuraUrl, AcApiEnum.hls, MsSettings.MountPointStub);
+            url = string.Join("/", azuraUrl, AcApiEnum.hls, mountPoint);
         }
         else if (streamingPort is not 0)
         {
-            url = string.Join("/", $"{azuraUrl}:{streamingPort}", MsSettings.MountPointStub.Split("/")[^1]);
+            url = string.Join("/", $"{azuraUrl}:{streamingPort}", mountPoint.Split("/")[^1]);
         }
         else
         {
-            url = string.Join("/", azuraUrl, AcApiEnum.listen, MsSettings.MountPointStub);
+            url = string.Join("/", azuraUrl, AcApiEnum.listen, mountPoint);
         }
 
         LavalinkTrack? track = await AzzyBot.GetAudioService.Tracks.LoadTrackAsync(url, trackLoadOptions);
@@ -171,10 +172,9 @@ internal static class MsLavalink
     internal static async Task<DiscordEmbed> GetSongLyricsAsync(InteractionContext ctx)
     {
         NowPlayingData nowPlaying = await AcServer.GetNowPlayingAsync();
-
         Lyrics lyrics = await GetLyricsFromGeniusAsync(nowPlaying.Now_Playing.Song.Text);
-
         DiscordMember member = await ctx.Guild.GetMemberAsync(ctx.User.Id);
+
         return MsEmbedBuilder.BuildLyricsEmbed(CoreDiscordChecks.GetBestUsername(member.Username, member.Nickname), member.AvatarUrl, lyrics, nowPlaying.Now_Playing.Song.Artist, nowPlaying.Now_Playing.Song.Title);
     }
 

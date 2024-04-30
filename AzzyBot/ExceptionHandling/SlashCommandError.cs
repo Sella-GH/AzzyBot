@@ -33,6 +33,7 @@ internal static class SlashCommandError
             bool isCooldown = false;
             bool isMusicServerUp = false;
             bool isAzuraApiKeyValid = false;
+            bool isStationUp = false;
             bool isDefault = false;
 
             foreach (SlashCheckBaseAttribute check in slashEx.FailedChecks)
@@ -55,6 +56,10 @@ internal static class SlashCommandError
                         isAzuraApiKeyValid = true;
                         break;
 
+                    case RequireMusicStationUp:
+                        isStationUp = true;
+                        break;
+
                     default:
                         isDefault = true;
                         break;
@@ -64,31 +69,35 @@ internal static class SlashCommandError
             if (isGuildCheck)
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(CoreStringBuilder.GetExceptionHandlingNotInGuild).AsEphemeral(true));
-                LoggerBase.LogInfo(LoggerBase.GetLogger, $"User **{ctx.User.Username}** tried to access the command **{e.Context.QualifiedName}** outside of a server!", null);
+                LoggerBase.LogInfo(LoggerBase.GetLogger, $"User **{ctx.User.Username}** tried to execute the command **{ctx.QualifiedName}** outside of a server!", null);
                 return;
             }
 
             if (isCooldown)
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(CoreStringBuilder.GetExceptionHandlingOnCooldown).AsEphemeral(true));
+                LoggerBase.LogInfo(LoggerBase.GetLogger, $"User **{ctx.User.Username}** tried to execute the command **{ctx.QualifiedName}** but it's on cooldown!", null);
                 return;
             }
 
-            if (isMusicServerUp)
+            if (isMusicServerUp || isStationUp)
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(userName, userAvatarUrl)).AsEphemeral(true));
+                LoggerBase.LogInfo(LoggerBase.GetLogger, $"User **{ctx.User.Username}** tried to execute the command **{ctx.QualifiedName}** but the music server seems to be offline!", null);
                 return;
             }
 
             if (isAzuraApiKeyValid)
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed((await CoreDiscordChecks.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)).AsEphemeral(true));
+                LoggerBase.LogInfo(LoggerBase.GetLogger, $"User **{ctx.User.Username}** tried to execute the command **{ctx.QualifiedName}** but your AzuraCast API key seems to be invalid!", null);
                 return;
             }
 
             if (isDefault)
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(CoreStringBuilder.GetExceptionHandlingDefault).AsEphemeral(true));
+                LoggerBase.LogInfo(LoggerBase.GetLogger, $"User **{ctx.User.Username}** tried to execute the command **{ctx.QualifiedName}** but doesn't have the permission for it!", null);
                 return;
             }
         }
