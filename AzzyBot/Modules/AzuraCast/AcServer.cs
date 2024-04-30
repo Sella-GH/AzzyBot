@@ -42,6 +42,19 @@ internal static class AcServer
         return data;
     }
 
+    [SuppressMessage("Roslynator", "RCS1124:Inline local variable", Justification = "Code Style")]
+    internal static async Task<AcStationModel> GetStationDataAsync()
+    {
+        string url = string.Join("/", AcSettings.AzuraApiUrl, AcApiEnum.station, AcSettings.AzuraStationKey);
+        string body = await CoreWebRequests.GetWebAsync(url, null, AcSettings.Ipv6Available);
+        if (string.IsNullOrEmpty(body))
+            throw new InvalidOperationException("body is empty");
+
+        AcStationModel station = JsonSerializer.Deserialize<AcStationModel>(body) ?? throw new InvalidOperationException($"{nameof(station)} is null");
+
+        return station;
+    }
+
     internal static async Task<PlaylistSloganStruct> GetCurrentSloganAsync(NowPlayingData nowPlaying)
     {
         ArgumentNullException.ThrowIfNull(nowPlaying, nameof(nowPlaying));
