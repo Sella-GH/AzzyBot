@@ -19,7 +19,12 @@
   </p>
 </p>
 
-![Downloads](https://img.shields.io/github/downloads/Sella-GH/AzzyBot/total) ![DownloadsLatest](https://img.shields.io/github/downloads/sella-gh/azzybot/latest/total) ![DockerPulls](https://img.shields.io/docker/pulls/sellagh/azzybot) ![Contributors](https://img.shields.io/github/contributors/Sella-GH/AzzyBot?color=dark-green) ![Issues](https://img.shields.io/github/issues/Sella-GH/AzzyBot) ![PullRequests](https://img.shields.io/github/issues-pr/sella-gh/azzybot)
+[![Downloads](https://img.shields.io/github/downloads/Sella-GH/AzzyBot/total)](https://github.com/Sella-GH/AzzyBot/releases)
+[![DownloadsLatest](https://img.shields.io/github/downloads/Sella-GH/AzzyBot/latest/total)](https://github.com/Sella-GH/AzzyBot/releases/latest)
+[![DockerPulls](https://img.shields.io/docker/pulls/sellagh/azzybot)](https://hub.docker.com/r/sellagh/azzybot)
+[![Contributors](https://img.shields.io/github/contributors/Sella-GH/AzzyBot?color=dark-green)](https://github.com/Sella-GH/AzzyBot/graphs/contributors)
+[![Issues](https://img.shields.io/github/issues/Sella-GH/AzzyBot)](https://github.com/Sella-GH/AzzyBot/issues)
+[![PullRequests](https://img.shields.io/github/issues-pr/Sella-GH/AzzyBot)](https://github.com/Sella-GH/AzzyBot/pulls)
 
 ## Table Of Contents
 
