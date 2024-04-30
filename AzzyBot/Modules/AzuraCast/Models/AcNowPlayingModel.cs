@@ -12,6 +12,9 @@ internal sealed class NowPlayingData
 
     [JsonPropertyName("live")]
     public Live Live { get; set; } = new();
+
+    [JsonPropertyName("is_online")]
+    public bool IsOnline { get; set; }
 }
 
 internal sealed class Listeners

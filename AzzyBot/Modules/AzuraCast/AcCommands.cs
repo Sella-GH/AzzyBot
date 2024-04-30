@@ -173,6 +173,7 @@ internal sealed class AcCommands : ApplicationCommandModule
         }
 
         [RequireMusicServerUp]
+        [RequireMusicStationUp]
         [SlashCommand("now-playing", "Shows the current played song")]
         internal static async Task MusicNowPlayingCommandAsync(InteractionContext ctx)
         {
