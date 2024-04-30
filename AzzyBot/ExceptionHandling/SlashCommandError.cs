@@ -33,6 +33,7 @@ internal static class SlashCommandError
             bool isCooldown = false;
             bool isMusicServerUp = false;
             bool isAzuraApiKeyValid = false;
+            bool isStationUp = false;
             bool isDefault = false;
 
             foreach (SlashCheckBaseAttribute check in slashEx.FailedChecks)
@@ -55,6 +56,10 @@ internal static class SlashCommandError
                         isAzuraApiKeyValid = true;
                         break;
 
+                    case RequireMusicStationUp:
+                        isStationUp = true;
+                        break;
+
                     default:
                         isDefault = true;
                         break;
@@ -74,7 +79,7 @@ internal static class SlashCommandError
                 return;
             }
 
-            if (isMusicServerUp)
+            if (isMusicServerUp || isStationUp)
             {
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(AcEmbedBuilder.BuildServerNotAvailableEmbed(userName, userAvatarUrl)).AsEphemeral(true));
                 return;

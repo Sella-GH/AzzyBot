@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AzzyBot.Logging;
 using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.AzuraCast.Settings;
@@ -20,10 +21,18 @@ internal sealed class RequireMusicStationUp : SlashCheckBaseAttribute
     {
         AcStationModel station = await AcServer.GetStationDataAsync();
 
-        HttpClient client = (AcSettings.Ipv6Available) ? CoreWebRequests.GetHttpClient(AcServer.Headers) : CoreWebRequests.GetHttpClientV4(AcServer.Headers);
-        using HttpResponseMessage response = await client.GetAsync(new Uri(station.ListenUrl));
-        if (response.StatusCode != HttpStatusCode.OK)
-            return false;
+        try
+        {
+            HttpClient client = (AcSettings.Ipv6Available) ? CoreWebRequests.GetHttpClient(AcServer.Headers) : CoreWebRequests.GetHttpClientV4(AcServer.Headers);
+            using HttpResponseMessage response = await client.GetAsync(new Uri(station.ListenUrl));
+            if (response.StatusCode != HttpStatusCode.OK)
+                return false;
+        }
+        catch (Exception ex)
+        {
+            await LoggerExceptions.LogErrorAsync(ex);
+            throw;
+        }
 
         NowPlayingData nowPlaying = await AcServer.GetNowPlayingAsync();
 
