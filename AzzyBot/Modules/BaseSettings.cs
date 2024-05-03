@@ -30,7 +30,9 @@ internal abstract class BaseSettings
             return;
 
         builder.Sources.Clear();
-        builder.AddJsonFile(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Settings", "appsettings.development.json"), true, false);
+
+        string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Settings", "appsettings.development.json");
+        builder.AddJsonFile(path, true, false);
     }
 
     [SuppressMessage("Roslynator", "RCS1208:Reduce 'if' nesting", Justification = "Code Style")]
