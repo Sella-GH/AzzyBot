@@ -48,9 +48,18 @@ internal sealed class AzzyBot
 
     private static async Task Main()
     {
+        #region Declare variables
+
+        string botName = CoreAzzyStatsGeneral.GetBotName;
+        string botVersion = CoreAzzyStatsGeneral.GetBotVersion;
+        string sysOs = CoreMisc.GetOperatingSystem;
+        string sysArch = CoreMisc.GetOperatingSystemArch;
+
+        #endregion Declare variables
+
         #region Add Logging
 
-        LoggerBase.CreateLogger(CoreAzzyStatsGeneral.GetBotName);
+        LoggerBase.CreateLogger(botName);
 
         #endregion Add Logging
 
@@ -63,7 +72,7 @@ internal sealed class AzzyBot
 
         #region Add basic startup information
 
-        LoggerBase.LogInfo(Logger, $"Starting {CoreAzzyStatsGeneral.GetBotName} in version {CoreAzzyStatsGeneral.GetBotVersion} on {CoreMisc.GetOperatingSystem}-{CoreMisc.GetOperatingSystemArch}", null);
+        LoggerBase.LogInfo(Logger, $"Starting {botName} in version {botVersion} on {sysOs}-{sysArch}", null);
 
         #endregion Add basic startup information
 
@@ -180,7 +189,7 @@ internal sealed class AzzyBot
 
         #region Finalizing
 
-        LoggerBase.LogInfo(Logger, $"{nameof(AzzyBot)} is ready", null);
+        LoggerBase.LogInfo(Logger, $"{botName} is ready", null);
         await Task.Delay(-1);
 
         #endregion Finalizing
@@ -353,16 +362,18 @@ internal sealed class AzzyBot
 
         LoggerBase.LogDebug(Logger, "Initializing Lavalink4NET", null);
 
+        string botName = CoreAzzyStatsGeneral.GetBotName;
+
         ServiceCollection = new ServiceCollection().AddLavalink().AddSingleton(DiscordClient).ConfigureLavalink(config =>
         {
-            config.BaseAddress = (CoreAzzyStatsGeneral.GetBotName is "AzzyBot-Docker") ? new Uri("http://lavalink:2333") : new Uri("http://localhost:2333");
+            config.BaseAddress = (botName is "AzzyBot-Docker") ? new Uri("http://lavalink:2333") : new Uri("http://localhost:2333");
             config.Label = "AzzyBot";
             config.ReadyTimeout = TimeSpan.FromSeconds(15);
             config.ResumptionOptions = new(TimeSpan.Zero);
         });
 
         LogLevel level = LogLevel.Information;
-        if (CoreAzzyStatsGeneral.GetBotName is "AzzyBot-Dev")
+        if (botName is "AzzyBot-Dev")
             level = LogLevel.Debug;
 
         ServiceCollection.AddLogging(x => x.AddConsole().SetMinimumLevel(level).AddSimpleConsole(options =>
