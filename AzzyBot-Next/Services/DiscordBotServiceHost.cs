@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using AzzyBot.Commands;
 using AzzyBot.Logging;
+using AzzyBot.Services.Modules;
 using AzzyBot.Settings;
 using DSharpPlus;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.Processors.SlashCommands;
+using DSharpPlus.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-internal sealed class DiscordBotServiceHost : IHostedService
+internal sealed class DiscordBotServiceHost : BaseServiceHost, IHostedService
 {
     private readonly ILogger<DiscordBotServiceHost> _logger;
     private readonly ILoggerFactory _loggerFactory;
@@ -37,6 +38,58 @@ internal sealed class DiscordBotServiceHost : IHostedService
 
         _shardedClient = new(GetDiscordConfig());
     }
+
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(_settings, nameof(_settings));
+
+        cancellationToken.ThrowIfCancellationRequested();
+        await RegisterCommandsAsync();
+        await _shardedClient.StartAsync();
+
+        // Wait 3 Seconds to let the client boot up
+        await Task.Delay(3000, cancellationToken);
+
+        int activity = _settings.DiscordStatus.Activity;
+        string doing = _settings.DiscordStatus.Doing;
+        int status = _settings.DiscordStatus.Status;
+        string? url = _settings.DiscordStatus.StreamUrl?.ToString();
+
+        await SetBotStatusAsync(status, activity, doing, url);
+    }
+
+    public async Task StopAsync(CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        await _shardedClient.StopAsync();
+    }
+
+    internal async Task SetBotStatusAsync(int status, int activityType, string doing, string? url = null)
+    {
+        DiscordActivity activity = GetDiscordAtivity(activityType, doing, url);
+        DiscordUserStatus userStatus = GetDiscordUserStatus(status);
+
+        await ChangeBotStatusAsync(activity, userStatus);
+    }
+
+    private async Task ChangeBotStatusAsync(DiscordActivity activity, DiscordUserStatus userStatus) => await _shardedClient.UpdateStatusAsync(activity, userStatus);
+
+    private static DiscordActivity GetDiscordAtivity(int type, string doing, string? url = null)
+    {
+        DiscordActivityType activityType = (DiscordActivityType)Enum.ToObject(typeof(DiscordActivityType), type);
+
+        if (activityType.Equals(DiscordActivityType.Streaming) && string.IsNullOrWhiteSpace(url))
+            activityType = DiscordActivityType.Playing;
+
+        DiscordActivity activity = new(doing, activityType);
+
+        if (activityType.Equals(DiscordActivityType.Streaming) && !string.IsNullOrWhiteSpace(url) && (url.Contains("twitch", StringComparison.OrdinalIgnoreCase) || url.Contains("youtube", StringComparison.OrdinalIgnoreCase)))
+            activity.StreamUrl = url;
+
+        return activity;
+    }
+
+    private static DiscordUserStatus GetDiscordUserStatus(int status) => (DiscordUserStatus)Enum.ToObject(typeof(DiscordUserStatus), status);
 
     private DiscordConfiguration GetDiscordConfig()
     {
@@ -67,24 +120,15 @@ internal sealed class DiscordBotServiceHost : IHostedService
                 ServiceProvider = _serviceProvider
             });
 
+        bool coreService = CheckIfServiceIsRegistered<CoreServiceHost>(_serviceProvider);
+
         foreach (CommandsExtension commandsExtension in commandsExtensions.Values)
         {
-            commandsExtension.AddCommands(typeof(AzzyBot).Assembly);
+            if (coreService)
+                commandsExtension.AddCommands(typeof(AzzyBot).Assembly);
+
             SlashCommandProcessor slashCommandProcessor = new();
             await commandsExtension.AddProcessorsAsync(slashCommandProcessor);
         }
-    }
-
-    public async Task StartAsync(CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        await RegisterCommandsAsync();
-        await _shardedClient.StartAsync();
-    }
-
-    public async Task StopAsync(CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        await _shardedClient.StopAsync();
     }
 }

@@ -1,3 +1,9 @@
 {
-    "BotToken": ""
+    "BotToken": "",
+    "DiscordStatus": {
+        "Activity": 2,
+        "Doing": "Music",
+        "Status": 1,
+        "StreamUrl": ""
+    }
 }
