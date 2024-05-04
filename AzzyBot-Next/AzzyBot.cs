@@ -23,7 +23,14 @@ internal sealed class AzzyBot
         builder.ConfigureAppConfiguration(config =>
         {
             config.Sources.Clear();
-            config.AddJsonFile(Path.Combine("Settings", "AzzyBotSettings.json"), false, false);
+            if (environment is "Production")
+            {
+                config.AddJsonFile(Path.Combine("Settings", "AzzyBotSettings.json"), false, false);
+            }
+            else
+            {
+                config.AddJsonFile(Path.Combine("Settings", "AzzyBotSettings-Dev.json"), false, false);
+            }
         });
 
         builder.ConfigureLogging(logging =>

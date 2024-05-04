@@ -124,6 +124,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Settings\AzzyBotSettings-Dev.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Settings\AzzyBotSettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
