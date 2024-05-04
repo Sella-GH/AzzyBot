@@ -41,11 +41,13 @@ internal sealed class DiscordBotServiceHost : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         await _shardedClient.StartAsync();
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         await _shardedClient.StopAsync();
     }
 }
