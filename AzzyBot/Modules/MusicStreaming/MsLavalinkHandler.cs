@@ -50,40 +50,6 @@ internal static class MsLavalinkHandler
         }
     }
 
-    private static async Task<bool> CheckIfLavalinkConfigIsRightAsync()
-    {
-        LoggerBase.LogInfo(LoggerBase.GetLogger, "Checking if Lavalink config is correct", null);
-
-        string path = Path.Combine(LavalinkPath, "application.yml");
-
-        if (!File.Exists(path))
-            return false;
-
-        try
-        {
-            string[] lines = await File.ReadAllLinesAsync(path);
-
-            const string lineStarts = "geniusApiKey:";
-            const string lineContains = "\"Your Genius Client Access Token\"";
-
-            foreach (string line in lines)
-            {
-                string newLine = line.Trim();
-                if (newLine.StartsWith(lineStarts, StringComparison.OrdinalIgnoreCase) && newLine.Contains(lineContains, StringComparison.OrdinalIgnoreCase))
-                {
-                    LoggerBase.LogError(LoggerBase.GetLogger, "You forgot to set your genius api key!", null);
-                    return false;
-                }
-            }
-
-            return true;
-        }
-        catch (Exception)
-        {
-            throw;
-        }
-    }
-
     private static bool CheckIfLavalinkIsThere()
     {
         LoggerBase.LogInfo(LoggerBase.GetLogger, "Checking if Lavalink files are present", null);
@@ -95,7 +61,7 @@ internal static class MsLavalinkHandler
         return directoryExists && lavalinkJarExists && applicationYmlExists;
     }
 
-    internal static async Task<bool> StartLavalinkAsync()
+    internal static bool StartLavalink()
     {
         LoggerBase.LogInfo(LoggerBase.GetLogger, "Starting Lavalink", null);
 
@@ -107,7 +73,7 @@ internal static class MsLavalinkHandler
                 return false;
             }
 
-            if (MsSettings.ActivateLyrics && !await CheckIfLavalinkConfigIsRightAsync())
+            if (MsSettings.ActivateLyrics && string.IsNullOrWhiteSpace(MsSettings.GeniusApiKey))
                 return false;
 
             ProcessStartInfo processStartInfo = new()

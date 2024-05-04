@@ -34,7 +34,7 @@ internal sealed class MsModule : BaseModule
         if (!await MsLavalinkHandler.CheckIfJavaIsInstalledAsync())
             throw new InvalidOperationException("You have to install Java/OpenJDK Runtime 17 or 21 first!");
 
-        if (!await MsLavalinkHandler.StartLavalinkAsync())
+        if (!MsLavalinkHandler.StartLavalink())
             throw new InvalidOperationException("Lavalink failed to start!");
     }
 
