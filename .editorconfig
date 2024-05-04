@@ -815,7 +815,7 @@ dotnet_diagnostic.rcs1221.severity = suggestion
 dotnet_diagnostic.rcs1222.severity = suggestion
 
 # Mark publicly visible type with DebuggerDisplay attribute
-dotnet_diagnostic.rcs1223.severity = suggestion
+dotnet_diagnostic.rcs1223.severity = none
 
 # Make method an extension method
 dotnet_diagnostic.rcs1224.severity = suggestion
