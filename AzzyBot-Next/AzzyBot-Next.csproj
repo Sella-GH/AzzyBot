@@ -63,7 +63,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker-debug|AnyCPU'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Docker-Dev</AssemblyName>
-    <Product>AzzyBot-Next-Dev</Product>
+    <Product>AzzyBot-Next-Docker-Dev</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker-debug|ARM64'">
