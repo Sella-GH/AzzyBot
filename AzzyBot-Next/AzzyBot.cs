@@ -2,7 +2,7 @@
 
 namespace AzzyBot;
 
-internal class Program
+internal class AzzyBot
 {
     static void Main(string[] args)
     {
