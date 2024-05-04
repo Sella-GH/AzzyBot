@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using AzzyBot.Services;
+using AzzyBot.Services.Modules;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -49,6 +50,7 @@ internal sealed class AzzyBot
 
         builder.ConfigureServices(services =>
         {
+            services.AddHostedService<CoreServiceHost>();
             services.AddHostedService<DiscordBotServiceHost>();
         });
 
