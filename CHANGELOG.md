@@ -1,9 +1,9 @@
 ## 1.10.0
-### Dependancies
-- Updated [CsvHelper](https://github.com/JoshClose/CsvHelper) to 32.0.1
-
 ### Breaking Changes
 - `StringsMusicStreaming.json` was changed
+
+### Dependancies
+- Updated [CsvHelper](https://github.com/JoshClose/CsvHelper) to 32.0.1
 
 ### General
 - `core info azzy` was renamed to `core info`
