@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AzzyBot.Commands.Attributes;
 using AzzyBot.Logging;
 using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.Core;
@@ -19,17 +20,12 @@ internal sealed class MsCommands : ApplicationCommandModule
     internal sealed class PlayerCommandGroup : ApplicationCommandModule
     {
         [SlashCommand("disconnect", "Disconnect the bot from your voice channel")]
+        [RequireUserInVoice]
         internal static async Task PlayerDisconnectCommandAsync(InteractionContext ctx)
         {
             LoggerBase.LogInfo(LoggerBase.GetLogger, "PlayerDisconnectCommandAsync requested", null);
 
             DiscordMember member = ctx.Member;
-
-            if (!CoreDiscordChecks.CheckIfUserIsInVoiceChannel(member))
-            {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MsStringBuilder.GetCommandsDisconnectVoiceRequired).AsEphemeral());
-                return;
-            }
 
             if (!CoreDiscordChecks.CheckIfBotIsInVoiceChannel(member, ctx.Client.CurrentUser.Id))
             {
@@ -44,17 +40,12 @@ internal sealed class MsCommands : ApplicationCommandModule
         }
 
         [SlashCommand("join", "Joins the bot into your voice channel")]
+        [RequireUserInVoice]
         internal static async Task PlayerJoinCommandAsync(InteractionContext ctx)
         {
             LoggerBase.LogInfo(LoggerBase.GetLogger, "PlayerJoinCommandAsync requested", null);
 
             DiscordMember member = ctx.Member;
-
-            if (!CoreDiscordChecks.CheckIfUserIsInVoiceChannel(member))
-            {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MsStringBuilder.GetCommandsJoinVoiceRequired).AsEphemeral());
-                return;
-            }
 
             if (CoreDiscordChecks.CheckIfBotIsInVoiceChannel(member, ctx.Client.CurrentUser.Id))
             {
@@ -69,20 +60,15 @@ internal sealed class MsCommands : ApplicationCommandModule
         }
 
         [SlashCommand("set-volume", "Changes the volume of the player")]
+        [RequireUserInVoice]
         internal static async Task PlayerSetVolumeCommandAsync(InteractionContext ctx, [Option("volume", "The new volume value between 0 and 100")] double volume, [Option("reset", "Resets the volume to 100%")] bool reset = false)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(volume, nameof(volume));
 
             LoggerBase.LogInfo(LoggerBase.GetLogger, "PlayerSetVolumeCommandAsync requested", null);
 
-            if (!CoreDiscordChecks.CheckIfUserIsInVoiceChannel(ctx.Member))
-            {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MsStringBuilder.GetCommandsSetVolumeVoiceRequired).AsEphemeral());
-                return;
-            }
-
             if (volume is > 100 or < 0)
-                await ctx.CreateResponseAsync(MsStringBuilder.GetCommandsSetVolumeVoiceInvalid, true);
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MsStringBuilder.GetCommandsSetVolumeVoiceInvalid).AsEphemeral());
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
@@ -113,15 +99,10 @@ internal sealed class MsCommands : ApplicationCommandModule
         }
 
         [SlashCommand("start", "Starts the music stream into your voice channel")]
+        [RequireUserInVoice]
         internal static async Task PlayerStartCommandAsync(InteractionContext ctx)
         {
             LoggerBase.LogInfo(LoggerBase.GetLogger, "PlayerStartCommandAsync requested", null);
-
-            if (!CoreDiscordChecks.CheckIfUserIsInVoiceChannel(ctx.Member))
-            {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MsStringBuilder.GetCommandsStartVoiceRequired).AsEphemeral());
-                return;
-            }
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
@@ -136,15 +117,10 @@ internal sealed class MsCommands : ApplicationCommandModule
         }
 
         [SlashCommand("stop", "Stops the music stream from playing")]
+        [RequireUserInVoice]
         internal static async Task PlayerStopCommandAsync(InteractionContext ctx, [Option("disconnect", "Should the bot disconnect after?")] bool disconnect = false)
         {
             LoggerBase.LogInfo(LoggerBase.GetLogger, "PlayerStopCommandAsync requested", null);
-
-            if (!CoreDiscordChecks.CheckIfUserIsInVoiceChannel(ctx.Member))
-            {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MsStringBuilder.GetCommandsStopVoiceRequired).AsEphemeral());
-                return;
-            }
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 

@@ -59,6 +59,10 @@ internal sealed class MsSettings : BaseSettings
             string lineBefore = string.Empty;
             string lineAfter = string.Empty;
             string password = string.Empty;
+            const string lineStarts = "geniusApiKey:";
+            const string lineContains = "\"Your Genius Client Access Token\"";
+            const string lineBeforeStarts = "countryCode:";
+            const string lineAfterStarts = "lavalink:";
 
             for (int i = 0; lines.Length > i; i++)
             {
@@ -72,8 +76,14 @@ internal sealed class MsSettings : BaseSettings
 
                 lineAfter = lines[i + 1].Trim();
 
-                if (line.StartsWith("geniusApiKey:", StringComparison.OrdinalIgnoreCase) && lineBefore.StartsWith("countryCode:", StringComparison.OrdinalIgnoreCase) && lineAfter.StartsWith("lavalink:", StringComparison.OrdinalIgnoreCase))
+                if (line.StartsWith(lineStarts, StringComparison.OrdinalIgnoreCase) && lineBefore.StartsWith(lineBeforeStarts, StringComparison.OrdinalIgnoreCase) && lineAfter.StartsWith(lineAfterStarts, StringComparison.OrdinalIgnoreCase))
                 {
+                    if (line.Contains(lineContains, StringComparison.OrdinalIgnoreCase))
+                    {
+                        LoggerBase.LogError(LoggerBase.GetLogger, "You forgot to set your genius api key!", null);
+                        break;
+                    }
+
                     password = line.Split(':')[1].Trim().Trim('\"');
                     break;
                 }

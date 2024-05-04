@@ -69,7 +69,10 @@ internal sealed class AcCommands : ApplicationCommandModule
             LoggerBase.LogInfo(LoggerBase.GetLogger, "AzuraCastPingCommand requested", null);
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(await AcStats.GetServerStatsAsync(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl)));
+            string userName = ctx.Client.CurrentUser.Username;
+            string avatarUrl = ctx.Client.CurrentUser.AvatarUrl;
+
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(await AcStats.GetServerStatsAsync(userName, avatarUrl)));
         }
 
         [RequireUserRole]
@@ -83,7 +86,10 @@ internal sealed class AcCommands : ApplicationCommandModule
 
             if (!AzuraCastModule.CheckIfPlaylistChangesAreAppropriate())
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildPlaylistChangesNotAllowedEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                string userName = CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname);
+                string avatarUrl = ctx.Client.CurrentUser.AvatarUrl;
+
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildPlaylistChangesNotAllowedEmbed(userName, avatarUrl)));
                 return;
             }
 
@@ -105,17 +111,17 @@ internal sealed class AcCommands : ApplicationCommandModule
             DateTime dateTime;
             if (string.IsNullOrWhiteSpace(date))
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(AcStringBuilder.GetCommandsGetSongHistoryForgotDate));
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(AcStringBuilder.GetCommandsGetSongHistoryForgotDate).AsEphemeral());
                 return;
             }
             else if (!DateTime.TryParse(date, out dateTime))
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(AcStringBuilder.GetCommandsGetSongHistoryWrongDate));
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(AcStringBuilder.GetCommandsGetSongHistoryWrongDate).AsEphemeral());
                 return;
             }
             else if (dateTime < DateTime.Today.AddDays(-14))
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(AcStringBuilder.GetCommandsGetSongHistoryTooEarly));
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(AcStringBuilder.GetCommandsGetSongHistoryTooEarly).AsEphemeral());
                 return;
             }
 
@@ -148,7 +154,7 @@ internal sealed class AcCommands : ApplicationCommandModule
 
             if (string.IsNullOrWhiteSpace(playlist))
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(AcStringBuilder.GetCommandsExportPlaylistContentForgotPlaylist).AsEphemeral(true));
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(AcStringBuilder.GetCommandsExportPlaylistContentForgotPlaylist).AsEphemeral());
                 return;
             }
 
@@ -180,7 +186,10 @@ internal sealed class AcCommands : ApplicationCommandModule
             LoggerBase.LogInfo(LoggerBase.GetLogger, "MusicNowPlayingCommand requested", null);
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(await AcEmbedBuilder.BuildNowPlayingEmbedAsync(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, await AcServer.GetNowPlayingAsync())));
+            string userName = CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname);
+            string avatarUrl = ctx.Client.CurrentUser.AvatarUrl;
+
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(await AcEmbedBuilder.BuildNowPlayingEmbedAsync(userName, avatarUrl, await AcServer.GetNowPlayingAsync())));
         }
     }
 
@@ -198,14 +207,16 @@ internal sealed class AcCommands : ApplicationCommandModule
 
             if (string.IsNullOrWhiteSpace(songName))
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(AcStringBuilder.GetCommandsFindSongForgotSong).AsEphemeral(true));
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(AcStringBuilder.GetCommandsFindSongForgotSong).AsEphemeral());
                 return;
             }
 
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
             bool useOnline = await AcServer.CheckIfSongRequestsAreAllowedAsync();
-            DiscordEmbed embed = await AcServer.CheckIfSongExistsAsync(songName.Trim(), artistName.Trim(), CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl, useOnline);
+            string userName = CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname);
+            string avatarUrl = ctx.Client.CurrentUser.AvatarUrl;
+            DiscordEmbed embed = await AcServer.CheckIfSongExistsAsync(songName.Trim(), artistName.Trim(), userName, avatarUrl, useOnline);
 
             if (embed.Description != AcStringBuilder.GetEmbedAzuraSearchSongRequestsAvaDesc || !useOnline)
             {
@@ -221,11 +232,11 @@ internal sealed class AcCommands : ApplicationCommandModule
             {
                 if (!AzuraCastModule.CheckIfSongRequestsAreAppropriate() || !await AcServer.CheckIfSongRequestsAreAllowedAsync())
                 {
-                    await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildSongRequestsNotAllowedEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                    await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildSongRequestsNotAllowedEmbed(userName, avatarUrl)));
                     return;
                 }
 
-                embed = await AcServer.CheckIfSongIsRequestableAsync(songName.Trim(), artistName.Trim(), CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl);
+                embed = await AcServer.CheckIfSongIsRequestableAsync(songName.Trim(), artistName.Trim(), userName, avatarUrl);
                 await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed));
 
                 return;
@@ -242,7 +253,7 @@ internal sealed class AcCommands : ApplicationCommandModule
 
             if (string.IsNullOrWhiteSpace(user))
             {
-                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(AcStringBuilder.GetCommandsFavoriteSongForgotUser).AsEphemeral(true));
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(AcStringBuilder.GetCommandsFavoriteSongForgotUser).AsEphemeral());
                 return;
             }
 
@@ -250,7 +261,10 @@ internal sealed class AcCommands : ApplicationCommandModule
 
             if (!AzuraCastModule.CheckIfSongRequestsAreAppropriate() || !await AcServer.CheckIfSongRequestsAreAllowedAsync())
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildSongRequestsNotAllowedEmbed(CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname), ctx.Member.AvatarUrl)));
+                string userName = CoreDiscordChecks.GetBestUsername(ctx.Member.Username, ctx.Member.Nickname);
+                string avatarUrl = ctx.Client.CurrentUser.AvatarUrl;
+
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(AcEmbedBuilder.BuildSongRequestsNotAllowedEmbed(userName, avatarUrl)));
                 return;
             }
 

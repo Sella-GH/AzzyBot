@@ -77,6 +77,7 @@ internal static class LoggerExceptions
 
         string timestamp = ctx.Interaction.CreationTimestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
         string exMessage = ex.Message;
+        string exName = ex.GetType().Name;
 
         LoggerBase.LogError(LoggerBase.GetLogger, ex.ToString(), null);
 
@@ -86,7 +87,7 @@ internal static class LoggerExceptions
             if (string.IsNullOrWhiteSpace(tempFilePath))
                 throw new IOException("Couldn't create temp file for StackTrace!");
 
-            if (!await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, $"<@{CoreSettings.OwnerUserId}> new error dropped in!", BuildErrorEmbed(ex.GetType().Name, exMessage, timestamp, jsonMessage, message, user, slashCommandName, slashCommandOptions), [tempFilePath], true))
+            if (!await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, $"<@{CoreSettings.OwnerUserId}> new error dropped in!", BuildErrorEmbed(exName, exMessage, timestamp, jsonMessage, message, user, slashCommandName, slashCommandOptions), [tempFilePath], true))
                 throw new InvalidOperationException("Exception message couldn't be sent!");
 
             if (!CoreFileOperations.DeleteTempFile(tempFilePath))
@@ -122,6 +123,7 @@ internal static class LoggerExceptions
 
         string timestamp = ctx.Interaction.CreationTimestamp.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
         string exMessage = ex.Message;
+        string exName = ex.GetType().Name;
 
         LoggerBase.LogError(LoggerBase.GetLogger, ex.ToString(), null);
 
@@ -131,7 +133,7 @@ internal static class LoggerExceptions
             if (string.IsNullOrWhiteSpace(tempFilePath))
                 throw new IOException("Couldn't create temp file for StackTrace!");
 
-            if (!await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, $"<@{CoreSettings.OwnerUserId}> new error dropped in!", BuildErrorEmbed(ex.GetType().Name, exMessage, timestamp, jsonMessage, string.Empty, user, string.Empty, slashCommandOptions), [tempFilePath], true))
+            if (!await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, $"<@{CoreSettings.OwnerUserId}> new error dropped in!", BuildErrorEmbed(exName, exMessage, timestamp, jsonMessage, string.Empty, user, string.Empty, slashCommandOptions), [tempFilePath], true))
                 throw new InvalidOperationException("Exception message couldn't be sent!");
 
             if (!CoreFileOperations.DeleteTempFile(tempFilePath))
@@ -153,7 +155,10 @@ internal static class LoggerExceptions
     /// <returns>The ID of the message acknowledging the error.</returns>
     private static async Task<ulong> AcknowledgeErrorAsync(InteractionContext ctx)
     {
-        DiscordMessage message = await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(CoreStringBuilder.GetExceptionHandlingErrorDiscovered((await CoreDiscordChecks.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild)).Mention)).AddMention(UserMention.All));
+        DiscordMember member = await CoreDiscordChecks.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild);
+        string stringMessage = CoreStringBuilder.GetExceptionHandlingErrorDiscovered(member.Mention);
+        DiscordMessage message = await ctx.EditResponseAsync(new DiscordWebhookBuilder().WithContent(stringMessage).AddMention(UserMention.All));
+
         return message.Id;
     }
 

@@ -2,6 +2,9 @@
 ### Dependancies
 - Updated [CsvHelper](https://github.com/JoshClose/CsvHelper) to 32.0.1
 
+### Breaking Changes
+- `StringsMusicStreaming.json` was changed
+
 ### General
 - `core info azzy` was renamed to `core info`
 - `core ping azzy` was renamed to `core ping`

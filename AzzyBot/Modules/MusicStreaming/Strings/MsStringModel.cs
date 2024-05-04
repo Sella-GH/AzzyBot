@@ -6,7 +6,6 @@ internal sealed class MsStringModel
 
     #region CommandsDisconnect
 
-    public string CommandsDisconnectVoiceRequired { get; set; } = string.Empty;
     public string CommandsDisconnectVoiceBotIsDisc { get; set; } = string.Empty;
     public string CommandsDisconnectVoiceSuccess { get; set; } = string.Empty;
 
@@ -14,7 +13,6 @@ internal sealed class MsStringModel
 
     #region CommandsJoin
 
-    public string CommandsJoinVoiceRequired { get; set; } = string.Empty;
     public string CommandsJoinVoiceBotIsThere { get; set; } = string.Empty;
     public string CommandsJoinVoiceSuccess { get; set; } = string.Empty;
 
@@ -22,7 +20,6 @@ internal sealed class MsStringModel
 
     #region CommandsSetVolume
 
-    public string CommandsSetVolumeVoiceRequired { get; set; } = string.Empty;
     public string CommandsSetVolumeVoiceSuccess { get; set; } = string.Empty;
     public string CommandsSetVolumeVoiceInvalid { get; set; } = string.Empty;
 
@@ -36,14 +33,12 @@ internal sealed class MsStringModel
 
     #region CommandsStart
 
-    public string CommandsStartVoiceRequired { get; set; } = string.Empty;
     public string CommandsStartVoiceMusicPlaying { get; set; } = string.Empty;
 
     #endregion CommandsStart
 
     #region CommandsStop
 
-    public string CommandsStopVoiceRequired { get; set; } = string.Empty;
     public string CommandsStopVoiceMusicPlaying { get; set; } = string.Empty;
 
     #endregion CommandsStop

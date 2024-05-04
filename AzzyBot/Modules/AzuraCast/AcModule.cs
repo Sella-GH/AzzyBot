@@ -254,16 +254,21 @@ internal sealed class AzuraCastModule : BaseModule
             IsMusicServerOnline = false;
 
             if (AcSettings.AutomaticChecksServerPing)
-                await AzzyBot.SendMessageAsync(AcSettings.OutagesChannelId, string.Empty, [AcEmbedBuilder.BuildServerIsOfflineEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, false)]);
+            {
+                DiscordEmbed embed = AcEmbedBuilder.BuildServerIsOfflineEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, false);
+                await AzzyBot.SendMessageAsync(AcSettings.OutagesChannelId, string.Empty, [embed]);
+            }
         }
-
         // When the server was previously offline but is online again now
         else if (!IsMusicServerOnline)
         {
             IsMusicServerOnline = true;
 
             if (AcSettings.AutomaticChecksServerPing)
-                await AzzyBot.SendMessageAsync(AcSettings.OutagesChannelId, string.Empty, [AcEmbedBuilder.BuildServerIsOfflineEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, true)]);
+            {
+                DiscordEmbed embed = AcEmbedBuilder.BuildServerIsOfflineEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, true);
+                await AzzyBot.SendMessageAsync(AcSettings.OutagesChannelId, string.Empty, [embed]);
+            }
         }
     }
 }

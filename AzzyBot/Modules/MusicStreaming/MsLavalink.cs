@@ -43,7 +43,9 @@ internal static class MsLavalink
             return ValueTask.FromResult(new MsPlayer(properties));
         }
 
-        PlayerResult<MsPlayer> result = await AzzyBot.GetAudioService.Players.RetrieveAsync<MsPlayer, MsPlayerOptions>(ctx.Guild.Id, ctx.Member?.VoiceState.Channel.Id, CreatePlayerAsync, Options.Create(playerOptions), retrieveOptions, cancellationToken);
+        ulong guildId = ctx.Guild.Id;
+        ulong channelId = ctx.Member?.VoiceState.Channel.Id ?? 0;
+        PlayerResult<MsPlayer> result = await AzzyBot.GetAudioService.Players.RetrieveAsync<MsPlayer, MsPlayerOptions>(guildId, channelId, CreatePlayerAsync, Options.Create(playerOptions), retrieveOptions, cancellationToken);
 
         if (result.IsSuccess)
         {
@@ -54,7 +56,9 @@ internal static class MsLavalink
         }
 
         DiscordMember member = await ctx.Guild.GetMemberAsync(ctx.User.Id);
-        await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddEmbed(MsEmbedBuilder.BuildPreconditionErrorEmbed(CoreDiscordChecks.GetBestUsername(member.Username, member.Nickname), member.AvatarUrl, result)).AsEphemeral());
+        string userName = CoreDiscordChecks.GetBestUsername(member.Username, member.Nickname);
+        string avatarUrl = member.AvatarUrl;
+        await ctx.FollowUpAsync(new DiscordFollowupMessageBuilder().AddEmbed(MsEmbedBuilder.BuildPreconditionErrorEmbed(userName, avatarUrl, result)).AsEphemeral());
 
         return null;
     }
@@ -174,8 +178,10 @@ internal static class MsLavalink
         NowPlayingData nowPlaying = await AcServer.GetNowPlayingAsync();
         Lyrics lyrics = await GetLyricsFromGeniusAsync(nowPlaying.Now_Playing.Song.Text);
         DiscordMember member = await ctx.Guild.GetMemberAsync(ctx.User.Id);
+        string userName = CoreDiscordChecks.GetBestUsername(member.Username, member.Nickname);
+        string avatarUrl = member.AvatarUrl;
 
-        return MsEmbedBuilder.BuildLyricsEmbed(CoreDiscordChecks.GetBestUsername(member.Username, member.Nickname), member.AvatarUrl, lyrics, nowPlaying.Now_Playing.Song.Artist, nowPlaying.Now_Playing.Song.Title);
+        return MsEmbedBuilder.BuildLyricsEmbed(userName, avatarUrl, lyrics, nowPlaying.Now_Playing.Song.Artist, nowPlaying.Now_Playing.Song.Title);
     }
 
     private static async Task<Lyrics> GetLyricsFromGeniusAsync(string search)

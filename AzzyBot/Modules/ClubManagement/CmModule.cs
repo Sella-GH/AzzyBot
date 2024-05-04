@@ -7,6 +7,7 @@ using AzzyBot.Modules.AzuraCast.Models;
 using AzzyBot.Modules.ClubManagement.Settings;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Enums;
+using DSharpPlus.Entities;
 using DSharpPlus.SlashCommands;
 
 namespace AzzyBot.Modules.ClubManagement;
@@ -130,7 +131,9 @@ internal class CmModule : BaseModule
             return;
 
         await CmClubControls.CloseClubAsync();
-        await CmClubControls.SendClubClosingStatisticsAsync(await AzzyBot.SendMessageAsync(CmSettings.ClubNotifyChannelId, string.Empty, [CmEmbedBuilder.BuildCloseClubEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, true)]));
+
+        DiscordEmbed embed = CmEmbedBuilder.BuildCloseClubEmbed(AzzyBot.GetDiscordClientUserName, AzzyBot.GetDiscordClientAvatarUrl, true);
+        await CmClubControls.SendClubClosingStatisticsAsync(await AzzyBot.SendMessageAsync(CmSettings.ClubNotifyChannelId, string.Empty, [embed]));
     }
 
     internal static bool CheckForSystemGeneratedPlaylist(int playlistId) => playlistId == CmSettings.AzuraAllSongsPlaylist;

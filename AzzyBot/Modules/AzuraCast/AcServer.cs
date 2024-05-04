@@ -360,10 +360,7 @@ internal static class AcServer
 
         if (matchingSongs.Count == 0)
         {
-            //
-            // If nothing is equal
-            // Send message to channel
-            //
+            // If nothing is equal send message to channel
             await AzzyBot.SendMessageAsync(AcSettings.MusicRequestsChannelId, string.Empty, [AcEmbedBuilder.BuildRequestNotAvailableEmbed(userName, userAvatarUrl, songName, songArtist)]);
         }
 

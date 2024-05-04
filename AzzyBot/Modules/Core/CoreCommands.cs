@@ -21,13 +21,20 @@ internal sealed class CoreCommands : ApplicationCommandModule
             LoggerBase.LogInfo(LoggerBase.GetLogger, "AzzyHelpCommand requsted", null);
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
 
+            string userName = ctx.Client.CurrentUser.Username;
+            string avatarUrl = ctx.Client.CurrentUser.AvatarUrl;
+            DiscordMember member = ctx.Member;
+            DiscordEmbed embed;
+
             if (string.IsNullOrWhiteSpace(command))
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(CoreEmbedBuilder.BuildAzzyHelpEmbed(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl, CoreAzzyHelp.GetCommandsAndDescriptions(ctx.Member))));
+                embed = CoreEmbedBuilder.BuildAzzyHelpEmbed(userName, avatarUrl, CoreAzzyHelp.GetCommandsAndDescriptions(member));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed));
             }
             else
             {
-                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(CoreEmbedBuilder.BuildAzzyHelpCommandEmbed(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl, CoreAzzyHelp.GetSingleCommandDetails(ctx.Member, command))));
+                embed = CoreEmbedBuilder.BuildAzzyHelpCommandEmbed(userName, avatarUrl, CoreAzzyHelp.GetSingleCommandDetails(member, command));
+                await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed));
             }
         }
     }
@@ -42,7 +49,12 @@ internal sealed class CoreCommands : ApplicationCommandModule
         {
             LoggerBase.LogInfo(LoggerBase.GetLogger, "CoreInfoCommand requsted", null);
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(await CoreEmbedBuilder.BuildInfoAzzyEmbedAsync(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl)));
+
+            string userName = ctx.Client.CurrentUser.Username;
+            string avatarUrl = ctx.Client.CurrentUser.AvatarUrl;
+            DiscordEmbed embed = await CoreEmbedBuilder.BuildInfoAzzyEmbedAsync(userName, avatarUrl);
+
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed));
         }
 
         [SlashCommand("ping", "Pings Azzy and returns general information")]
@@ -50,7 +62,12 @@ internal sealed class CoreCommands : ApplicationCommandModule
         {
             LoggerBase.LogInfo(LoggerBase.GetLogger, "CorePingCommand requested", null);
             await ctx.CreateResponseAsync(InteractionResponseType.DeferredChannelMessageWithSource);
-            await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(await CoreEmbedBuilder.BuildAzzyStatsEmbedAsync(ctx.Client.CurrentUser.Username, ctx.Client.CurrentUser.AvatarUrl, ctx.Client.Ping)));
+
+            string userName = ctx.Client.CurrentUser.Username;
+            string avatarUrl = ctx.Client.CurrentUser.AvatarUrl;
+            DiscordEmbed embed = await CoreEmbedBuilder.BuildAzzyStatsEmbedAsync(userName, avatarUrl, ctx.Client.Ping);
+
+            await ctx.EditResponseAsync(new DiscordWebhookBuilder().AddEmbed(embed));
         }
     }
 }
