@@ -63,10 +63,13 @@ internal static class MsLavalinkHandler
         {
             string[] lines = await File.ReadAllLinesAsync(path);
 
+            const string lineStarts = "geniusApiKey:";
+            const string lineContains = "\"Your Genius Client Access Token\"";
+
             foreach (string line in lines)
             {
                 string newLine = line.Trim();
-                if (newLine.StartsWith("geniusApiKey:", StringComparison.OrdinalIgnoreCase) && newLine.Contains("\"Your Genius Client Access Token\"", StringComparison.OrdinalIgnoreCase))
+                if (newLine.StartsWith(lineStarts, StringComparison.OrdinalIgnoreCase) && newLine.Contains(lineContains, StringComparison.OrdinalIgnoreCase))
                 {
                     LoggerBase.LogError(LoggerBase.GetLogger, "You forgot to set your genius api key!", null);
                     return false;
