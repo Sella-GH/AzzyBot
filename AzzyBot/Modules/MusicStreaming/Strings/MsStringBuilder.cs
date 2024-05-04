@@ -35,7 +35,6 @@ internal sealed class MsStringBuilder : BaseStringBuilder
 
     #region CommandsDisconnect
 
-    internal static string GetCommandsDisconnectVoiceRequired => Model.CommandsDisconnectVoiceRequired;
     internal static string GetCommandsDisconnectVoiceBotIsDisc => Model.CommandsDisconnectVoiceBotIsDisc;
     internal static string GetCommandsDisconnectVoiceSuccess => Model.CommandsDisconnectVoiceSuccess;
 
@@ -43,7 +42,6 @@ internal sealed class MsStringBuilder : BaseStringBuilder
 
     #region CommandsJoin
 
-    internal static string GetCommandsJoinVoiceRequired => Model.CommandsJoinVoiceRequired;
     internal static string GetCommandsJoinVoiceBotIsThere => Model.CommandsJoinVoiceBotIsThere;
     internal static string GetCommandsJoinVoiceSuccess => Model.CommandsJoinVoiceSuccess;
 
@@ -51,7 +49,6 @@ internal sealed class MsStringBuilder : BaseStringBuilder
 
     #region CommandsSetVolume
 
-    internal static string GetCommandsSetVolumeVoiceRequired => Model.CommandsSetVolumeVoiceRequired;
     internal static string GetCommandsSetVolumeVoiceSuccess(double volume) => BuildString(Model.CommandsSetVolumeVoiceSuccess, "%VALUE%", volume);
     internal static string GetCommandsSetVolumeVoiceInvalid => Model.CommandsSetVolumeVoiceInvalid;
 
@@ -65,14 +62,12 @@ internal sealed class MsStringBuilder : BaseStringBuilder
 
     #region CommandsStart
 
-    internal static string GetCommandsStartVoiceRequired => Model.CommandsStartVoiceRequired;
     internal static string GetCommandsStartVoiceMusicPlaying => Model.CommandsStartVoiceMusicPlaying;
 
     #endregion CommandsStart
 
     #region CommandsStop
 
-    internal static string GetCommandsStopVoiceRequired => Model.CommandsStopVoiceRequired;
     internal static string GetCommandsStopVoiceMusicPlaying => Model.CommandsStopVoiceMusicPlaying;
 
     #endregion CommandsStop

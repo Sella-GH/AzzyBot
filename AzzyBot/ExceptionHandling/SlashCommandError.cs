@@ -6,6 +6,7 @@ using AzzyBot.Modules.AzuraCast;
 using AzzyBot.Modules.Core;
 using AzzyBot.Modules.Core.Settings;
 using AzzyBot.Modules.Core.Strings;
+using AzzyBot.Modules.MusicStreaming.Strings;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
@@ -35,6 +36,7 @@ internal static class SlashCommandError
             bool isMusicServerUp = false;
             bool isAzuraApiKeyValid = false;
             bool isStationUp = false;
+            bool isUserInVoice = false;
             bool isDefault = false;
 
             foreach (SlashCheckBaseAttribute check in slashEx.FailedChecks)
@@ -59,6 +61,10 @@ internal static class SlashCommandError
 
                     case RequireMusicStationUp:
                         isStationUp = true;
+                        break;
+
+                    case RequireUserInVoice:
+                        isUserInVoice = true;
                         break;
 
                     default:
@@ -96,6 +102,14 @@ internal static class SlashCommandError
                 DiscordMember member = await CoreDiscordChecks.GetMemberAsync(CoreSettings.OwnerUserId, ctx.Guild);
                 await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().AddEmbed(AcEmbedBuilder.BuildApiKeyNotValidEmbed(member.Mention)).AsEphemeral(true));
                 LoggerBase.LogInfo(LoggerBase.GetLogger, $"User **{userName}** tried to execute the command **{commandName}** but your AzuraCast API key seems to be invalid!", null);
+
+                return;
+            }
+
+            if (isUserInVoice)
+            {
+                await ctx.CreateResponseAsync(InteractionResponseType.ChannelMessageWithSource, new DiscordInteractionResponseBuilder().WithContent(MsStringBuilder.GetEmbedsPreconditionNotInVoice).AsEphemeral(true));
+                LoggerBase.LogInfo(LoggerBase.GetLogger, $"User **{userName}** tried to execute the command **{commandName}** but is not in a voice channel!", null);
 
                 return;
             }
