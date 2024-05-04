@@ -13,13 +13,19 @@ internal sealed class DiscordBotServiceHost : IHostedService
 {
     private readonly IConfiguration _configuration;
     private readonly ILogger<DiscordBotServiceHost> _logger;
+    private readonly ILoggerFactory _loggerFactory;
     private readonly DiscordShardedClient _shardedClient;
 
     public DiscordBotServiceHost(IConfiguration config, ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory)
     {
         _configuration = config;
         _logger = logger;
+        _loggerFactory = loggerFactory;
+        _shardedClient = new(GetDiscordConfig());
+    }
 
+    private DiscordConfiguration GetDiscordConfig()
+    {
         string botToken = _configuration["BotToken"] ?? string.Empty;
 
         if (string.IsNullOrWhiteSpace(botToken))
@@ -28,15 +34,13 @@ internal sealed class DiscordBotServiceHost : IHostedService
             Environment.Exit(1);
         }
 
-        DiscordConfiguration discordConfig = new()
+        return new()
         {
-            Intents = DiscordIntents.AllUnprivileged,
-            LoggerFactory = loggerFactory,
+            Intents = DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers,
+            LoggerFactory = _loggerFactory,
             Token = botToken,
             TokenType = TokenType.Bot
         };
-
-        _shardedClient = new(discordConfig);
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
