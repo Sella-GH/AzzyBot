@@ -1,4 +1,4 @@
-﻿using System;
+﻿using AzzyBot.Utilities;
 using Microsoft.Extensions.Hosting;
 
 namespace AzzyBot;
@@ -7,8 +7,11 @@ internal sealed class AzzyBot
 {
     private static void Main()
     {
-        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+        HostApplicationBuilderSettings builderSettings = new()
+        {
+            EnvironmentName = Misc.GetAppEnvironment()
+        };
 
-
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder(builderSettings);
     }
 }
