@@ -48,7 +48,8 @@ internal sealed class AcPlaylistAutocomplete : IAutocompleteProvider
                     }
                     else
                     {
-                        choice.Add(new DiscordAutoCompleteChoice(playlist.Name.Replace($"({AcPlaylistKeywordsEnum.NOREQUESTS})", string.Empty, StringComparison.InvariantCultureIgnoreCase).Trim(), playlist.Short_name));
+                        string playlistName = playlist.Name.Replace($"({AcPlaylistKeywordsEnum.NOREQUESTS})", string.Empty, StringComparison.InvariantCultureIgnoreCase).Trim();
+                        choice.Add(new DiscordAutoCompleteChoice(playlistName, playlist.Short_name));
                     }
                 }
             }
@@ -61,7 +62,8 @@ internal sealed class AcPlaylistAutocomplete : IAutocompleteProvider
                 }
                 else
                 {
-                    choice.Add(new DiscordAutoCompleteChoice(playlist.Name.Replace($"({AcPlaylistKeywordsEnum.NOREQUESTS})", string.Empty, StringComparison.InvariantCultureIgnoreCase).Trim(), playlist.Short_name));
+                    string playlistName = playlist.Name.Replace($"({AcPlaylistKeywordsEnum.NOREQUESTS})", string.Empty, StringComparison.InvariantCultureIgnoreCase).Trim();
+                    choice.Add(new DiscordAutoCompleteChoice(playlistName, playlist.Short_name));
                 }
             }
         }
