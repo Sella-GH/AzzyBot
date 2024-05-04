@@ -1,11 +1,14 @@
 ﻿using System;
+using Microsoft.Extensions.Hosting;
 
 namespace AzzyBot;
 
-internal class AzzyBot
+internal sealed class AzzyBot
 {
-    static void Main(string[] args)
+    private static void Main()
     {
-        Console.WriteLine("Hello, World!");
+        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+
+
     }
 }

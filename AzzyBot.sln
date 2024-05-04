@@ -14,6 +14,9 @@ Global
 		Docker|Any CPU = Docker|Any CPU
 		Docker|ARM64 = Docker|ARM64
 		Docker|x64 = Docker|x64
+		Docker-debug|Any CPU = Docker-debug|Any CPU
+		Docker-debug|ARM64 = Docker-debug|ARM64
+		Docker-debug|x64 = Docker-debug|x64
 		Release|Any CPU = Release|Any CPU
 		Release|ARM64 = Release|ARM64
 		Release|x64 = Release|x64
@@ -31,6 +34,12 @@ Global
 		{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}.Docker|ARM64.Build.0 = Docker|Any CPU
 		{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}.Docker|x64.ActiveCfg = Docker|Any CPU
 		{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}.Docker|x64.Build.0 = Docker|Any CPU
+		{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}.Docker-debug|Any CPU.ActiveCfg = Docker-debug|Any CPU
+		{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}.Docker-debug|Any CPU.Build.0 = Docker-debug|Any CPU
+		{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}.Docker-debug|ARM64.ActiveCfg = Docker-debug|ARM64
+		{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}.Docker-debug|ARM64.Build.0 = Docker-debug|ARM64
+		{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}.Docker-debug|x64.ActiveCfg = Docker-debug|x64
+		{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}.Docker-debug|x64.Build.0 = Docker-debug|x64
 		{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}.Release|ARM64.ActiveCfg = Release|Any CPU
@@ -49,6 +58,12 @@ Global
 		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Docker|ARM64.Build.0 = Docker|ARM64
 		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Docker|x64.ActiveCfg = Docker|x64
 		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Docker|x64.Build.0 = Docker|x64
+		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Docker-debug|Any CPU.ActiveCfg = Docker-debug|Any CPU
+		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Docker-debug|Any CPU.Build.0 = Docker-debug|Any CPU
+		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Docker-debug|ARM64.ActiveCfg = Docker-debug|ARM64
+		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Docker-debug|ARM64.Build.0 = Docker-debug|ARM64
+		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Docker-debug|x64.ActiveCfg = Docker-debug|x64
+		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Docker-debug|x64.Build.0 = Docker-debug|x64
 		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Release|ARM64.ActiveCfg = Release|ARM64
@@ -63,4 +78,3 @@ Global
 		SolutionGuid = {6B9C81DB-85AE-4DBE-8FCC-6796CC402B49}
 	EndGlobalSection
 EndGlobal
-Global
