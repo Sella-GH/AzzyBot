@@ -64,32 +64,20 @@ internal sealed class DiscordBotService : BaseService, IHostedService
         await _shardedClient.StopAsync();
     }
 
-    internal async Task SetBotStatusAsync(int status, int activityType, string doing, string? url = null)
-    {
-        DiscordActivity activity = GetDiscordAtivity(activityType, doing, url);
-        DiscordUserStatus userStatus = GetDiscordUserStatus(status);
-
-        await ChangeBotStatusAsync(activity, userStatus);
-    }
-
-    private async Task ChangeBotStatusAsync(DiscordActivity activity, DiscordUserStatus userStatus) => await _shardedClient.UpdateStatusAsync(activity, userStatus);
-
-    private static DiscordActivity GetDiscordAtivity(int type, string doing, string? url = null)
+    internal async Task SetBotStatusAsync(int status, int type, string doing, string? url = null)
     {
         DiscordActivityType activityType = (DiscordActivityType)Enum.ToObject(typeof(DiscordActivityType), type);
-
         if (activityType.Equals(DiscordActivityType.Streaming) && string.IsNullOrWhiteSpace(url))
             activityType = DiscordActivityType.Playing;
 
         DiscordActivity activity = new(doing, activityType);
-
         if (activityType.Equals(DiscordActivityType.Streaming) && !string.IsNullOrWhiteSpace(url) && (url.Contains("twitch", StringComparison.OrdinalIgnoreCase) || url.Contains("youtube", StringComparison.OrdinalIgnoreCase)))
             activity.StreamUrl = url;
 
-        return activity;
-    }
+        DiscordUserStatus userStatus = (DiscordUserStatus)Enum.ToObject(typeof(DiscordUserStatus), status);
 
-    private static DiscordUserStatus GetDiscordUserStatus(int status) => (DiscordUserStatus)Enum.ToObject(typeof(DiscordUserStatus), status);
+        await _shardedClient.UpdateStatusAsync(activity, userStatus);
+    }
 
     private DiscordConfiguration GetDiscordConfig()
     {
