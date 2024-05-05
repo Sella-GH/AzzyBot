@@ -15,15 +15,15 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-internal sealed class DiscordBotServiceHost : BaseServiceHost, IHostedService
+internal sealed class DiscordBotService : BaseService, IHostedService
 {
-    private readonly ILogger<DiscordBotServiceHost> _logger;
+    private readonly ILogger<DiscordBotService> _logger;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IServiceProvider _serviceProvider;
     private readonly AzzyBotSettings? _settings;
     private readonly DiscordShardedClient _shardedClient;
 
-    public DiscordBotServiceHost(IConfiguration config, ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
+    public DiscordBotService(IConfiguration config, ILogger<DiscordBotService> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
     {
         _settings = config.Get<AzzyBotSettings>();
         _logger = logger;
@@ -120,11 +120,11 @@ internal sealed class DiscordBotServiceHost : BaseServiceHost, IHostedService
                 ServiceProvider = _serviceProvider
             });
 
-        bool coreService = CheckIfServiceIsRegistered<CoreServiceHost>(_serviceProvider);
+        bool coreService = CheckIfServiceIsRegistered<CoreService>(_serviceProvider);
 
         foreach (CommandsExtension commandsExtension in commandsExtensions.Values)
         {
-            if (coreService)
+            //if (coreService)
                 commandsExtension.AddCommands(typeof(AzzyBot).Assembly);
 
             SlashCommandProcessor slashCommandProcessor = new();

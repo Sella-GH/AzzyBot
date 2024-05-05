@@ -6,12 +6,12 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services.Modules;
 
-internal sealed class CoreServiceHost : IHostedService
+internal sealed class CoreService : IHostedService
 {
     private readonly IConfiguration _configuration;
-    private readonly ILogger<CoreServiceHost> _logger;
+    private readonly ILogger<CoreService> _logger;
 
-    public CoreServiceHost(IConfiguration config, ILogger<CoreServiceHost> logger)
+    public CoreService(IConfiguration config, ILogger<CoreService> logger)
     {
         _configuration = config;
         _logger = logger;

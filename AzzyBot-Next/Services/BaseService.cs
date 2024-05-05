@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AzzyBot.Services;
 
-internal class BaseServiceHost
+internal class BaseService
 {
     /// <summary>
     /// Checks if a service is registered in the service provider

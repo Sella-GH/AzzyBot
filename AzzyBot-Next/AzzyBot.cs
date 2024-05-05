@@ -48,10 +48,15 @@ internal sealed class AzzyBot
             logging.SetMinimumLevel((environment is "Production") ? LogLevel.Information : LogLevel.Debug);
         });
 
+        // Need to register as Singleton first
+        // Otherwise DI doesn't work properly
         builder.ConfigureServices(services =>
         {
-            services.AddHostedService<CoreServiceHost>();
-            services.AddHostedService<DiscordBotServiceHost>();
+            services.AddSingleton<CoreService>();
+            services.AddHostedService(s => s.GetRequiredService<CoreService>());
+
+            services.AddSingleton<DiscordBotService>();
+            services.AddHostedService(s => s.GetRequiredService<DiscordBotService>());
         });
 
         builder.UseConsoleLifetime();
