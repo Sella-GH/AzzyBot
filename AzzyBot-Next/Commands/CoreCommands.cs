@@ -18,7 +18,7 @@ internal sealed class CoreCommands
         {
             await context.DeferResponseAsync();
             DiscordBotService discordBot = context.ServiceProvider.GetRequiredService<DiscordBotService>();
-            await discordBot.SetBotStatusAsync(activity, status, doing, url);
+            await discordBot.SetBotStatusAsync(status, activity, doing, url);
             await context.EditResponseAsync("Bot status has been updated!");
         }
 
