@@ -94,10 +94,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02232" />
-    <PackageReference Include="DSharpPlus.Commands" Version="5.0.0-nightly-02232" />
+    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02234" />
+    <PackageReference Include="DSharpPlus.Commands" Version="5.0.0-nightly-02234" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
