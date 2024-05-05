@@ -15,7 +15,7 @@ namespace AzzyBot;
 
 internal sealed class AzzyBot
 {
-    private static async Task Main()
+    private static async Task Main(string[] args)
     {
         string environment = (Assembly.GetExecutingAssembly().GetName().Name?.ToString().EndsWith("Dev", StringComparison.Ordinal) ?? throw new InvalidOperationException("App has no name")) ? "Development" : "Production";
         IHostBuilder builder = Host.CreateDefaultBuilder();
@@ -24,13 +24,14 @@ internal sealed class AzzyBot
         builder.ConfigureAppConfiguration(config =>
         {
             config.Sources.Clear();
-            if (environment is "Production")
+
+            if (environment is "Development")
             {
-                config.AddJsonFile(Path.Combine("Settings", "AzzyBotSettings.json"), false, false);
+                config.AddJsonFile(Path.Combine("Settings", "AzzyBotSettings-Dev.json"), false, false);
             }
             else
             {
-                config.AddJsonFile(Path.Combine("Settings", "AzzyBotSettings-Dev.json"), false, false);
+                config.AddJsonFile(Path.Combine("Settings", "AzzyBotSettings.json"), false, false);
             }
         });
 
@@ -47,7 +48,7 @@ internal sealed class AzzyBot
                 config.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
                 config.UseUtcTimestamp = true;
             });
-            logging.SetMinimumLevel((environment is "Production") ? LogLevel.Information : LogLevel.Debug);
+            logging.SetMinimumLevel((environment is "Development" || args[0] is "-forceDebug") ? LogLevel.Debug: LogLevel.Information);
         });
 
         // Need to register as Singleton first
