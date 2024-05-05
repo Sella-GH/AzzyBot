@@ -22,6 +22,12 @@ internal sealed class CoreCommands
             await context.EditResponseAsync("Bot status has been updated!");
         }
 
+        [Command("info")]
+        public static async ValueTask CoreInfoAsync(SlashCommandContext context)
+        {
+            await context.DeferResponseAsync();
+        }
+
         [Command("ping")]
         public static ValueTask CorePingAsync(SlashCommandContext context) => context.RespondAsync($"Pong! {context.Client.Ping}ms");
     }
