@@ -47,6 +47,9 @@ internal sealed class DiscordBotService : BaseService, IHostedService
         await RegisterCommandsAsync();
         await _shardedClient.StartAsync();
 
+        _logger.BotReady();
+        _logger.InviteUrl(_shardedClient.CurrentApplication.Id);
+
         // Wait 3 Seconds to let the client boot up
         await Task.Delay(3000, cancellationToken);
 
@@ -112,7 +115,7 @@ internal sealed class DiscordBotService : BaseService, IHostedService
 
         foreach (CommandsExtension commandsExtension in commandsExtensions.Values)
         {
-            //if (coreService)
+            if (coreService)
                 commandsExtension.AddCommands(typeof(AzzyBot).Assembly);
 
             SlashCommandProcessor slashCommandProcessor = new();

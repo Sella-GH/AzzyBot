@@ -37,6 +37,8 @@ internal sealed class AzzyBot
         builder.ConfigureLogging(logging =>
         {
             logging.AddConsole();
+            logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.Warning);
+            logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Warning);
             logging.AddSimpleConsole(config =>
             {
                 config.ColorBehavior = LoggerColorBehavior.Enabled;
