@@ -1,125 +1,214 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Security;
 using System.Threading.Tasks;
 using AzzyBot.Logging;
-using AzzyBot.Services.Modules;
 using AzzyBot.Settings;
+using AzzyBot.Utilities;
 using DSharpPlus;
 using DSharpPlus.Commands;
-using DSharpPlus.Commands.Processors.SlashCommands;
+using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-internal sealed class DiscordBotService : BaseService, IHostedService
+internal sealed class DiscordBotService
 {
     private readonly ILogger<DiscordBotService> _logger;
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly IServiceProvider _serviceProvider;
     private readonly AzzyBotSettings? _settings;
     private readonly DiscordShardedClient _shardedClient;
 
-    public DiscordBotService(IConfiguration config, ILogger<DiscordBotService> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
+    [SuppressMessage("Style", "IDE0290:Use primary constructor", Justification = "Otherwise it throws CS9124")]
+    public DiscordBotService(IConfiguration config, ILogger<DiscordBotService> logger, DiscordBotServiceHost botServiceHost)
     {
         _settings = config.Get<AzzyBotSettings>();
         _logger = logger;
-        _loggerFactory = loggerFactory;
-        _serviceProvider = serviceProvider;
+        _shardedClient = botServiceHost._shardedClient;
+    }
 
-        if (_settings is null)
+    internal async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, string? info = null)
+    {
+        string exMessage = ex.Message;
+        string stackTrace = ex.StackTrace ?? string.Empty;
+        string exInfo = (string.IsNullOrWhiteSpace(stackTrace)) ? exMessage : $"{exMessage}\n{stackTrace}";
+        string timestampString = timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+
+        _logger.LogCritical("{Ex}", ex.ToString());
+
+        try
         {
-            _logger.UnableToParseSettings();
-            Environment.Exit(1);
+            string tempFilePath = await FileOperations.CreateTempFileAsync(exInfo, $"StackTrace_{timestampString}.log");
+
+            const string message = "A new error happend!";
+            DiscordEmbed embed = EmbedBuilder.CreateExceptionEmbed(ex, timestampString, info);
+            bool messageSent = await SendMessageAsync(_settings?.ErrorChannelId ?? 0, message, [embed], [tempFilePath]);
+
+            if (!messageSent)
+                _logger.UnableToSendMessage("Error message was not sent");
+
+            FileOperations.DeleteTempFilePath(tempFilePath);
+
+            return true;
+        }
+        catch (IOException e)
+        {
+            _logger.UnableToLogException(e.ToString());
+        }
+        catch (SecurityException e)
+        {
+            _logger.UnableToLogException(e.ToString());
         }
 
-        _shardedClient = new(GetDiscordConfig());
+        return false;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    internal async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, CommandContext ctx, string? info = null)
     {
-        ArgumentNullException.ThrowIfNull(_settings, nameof(_settings));
+        DiscordMessage discordMessage = await AcknowledgeExceptionAsync(ctx);
+        DiscordUser discordUser = ctx.User;
+        string exMessage = ex.Message;
+        string stackTrace = ex.StackTrace ?? string.Empty;
+        string exInfo = (string.IsNullOrWhiteSpace(stackTrace)) ? exMessage : $"{exMessage}\n{stackTrace}";
+        string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
+        string commandName = ctx.Command.FullName;
+        Dictionary<string, string> commandOptions = [];
+        ProcessOptions(ctx.Arguments, commandOptions);
 
-        cancellationToken.ThrowIfCancellationRequested();
-        await RegisterCommandsAsync();
-        await _shardedClient.StartAsync();
+        _logger.LogCritical("{Ex}", ex.ToString());
 
-        _logger.BotReady();
-        _logger.InviteUrl(_shardedClient.CurrentApplication.Id);
-
-        // Wait 3 Seconds to let the client boot up
-        await Task.Delay(3000, cancellationToken);
-
-        int activity = _settings.DiscordStatus?.Activity ?? 2;
-        string doing = _settings.DiscordStatus?.Doing ?? "Music";
-        int status = _settings.DiscordStatus?.Status ?? 1;
-        string? url = _settings.DiscordStatus?.StreamUrl?.ToString();
-
-        await SetBotStatusAsync(status, activity, doing, url);
-    }
-
-    public async Task StopAsync(CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        await _shardedClient.StopAsync();
-    }
-
-    internal async Task SetBotStatusAsync(int status = 1, int type = 2, string doing = "Music", string? url = null)
-    {
-        DiscordActivityType activityType = (DiscordActivityType)Enum.ToObject(typeof(DiscordActivityType), type);
-        if (activityType.Equals(DiscordActivityType.Streaming) && string.IsNullOrWhiteSpace(url))
-            activityType = DiscordActivityType.Playing;
-
-        DiscordActivity activity = new(doing, activityType);
-        if (activityType.Equals(DiscordActivityType.Streaming) && !string.IsNullOrWhiteSpace(url) && (url.Contains("twitch", StringComparison.OrdinalIgnoreCase) || url.Contains("youtube", StringComparison.OrdinalIgnoreCase)))
-            activity.StreamUrl = url;
-
-        DiscordUserStatus userStatus = (DiscordUserStatus)Enum.ToObject(typeof(DiscordUserStatus), status);
-
-        await _shardedClient.UpdateStatusAsync(activity, userStatus);
-    }
-
-    private DiscordConfiguration GetDiscordConfig()
-    {
-        ArgumentNullException.ThrowIfNull(_settings, nameof(_settings));
-
-        if (string.IsNullOrWhiteSpace(_settings.BotToken))
+        try
         {
-            _logger.BotTokenInvalid();
-            Environment.Exit(1);
+            string tempFilePath = await FileOperations.CreateTempFileAsync(exInfo, $"StackTrace_{timestampString}.log");
+
+            const string message = "A new error happend!";
+            DiscordEmbed embed = EmbedBuilder.CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), info, discordMessage, discordUser, commandName, commandOptions);
+            bool messageSent = await SendMessageAsync(_settings?.ErrorChannelId ?? 0, message, [embed], [tempFilePath]);
+
+            if (!messageSent)
+                _logger.UnableToSendMessage("Error message was not sent");
+
+            FileOperations.DeleteTempFilePath(tempFilePath);
+
+            return true;
+        }
+        catch (IOException e)
+        {
+            _logger.UnableToLogException(e.ToString());
+        }
+        catch (SecurityException e)
+        {
+            _logger.UnableToLogException(e.ToString());
         }
 
-        return new()
-        {
-            Intents = DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers,
-            LoggerFactory = _loggerFactory,
-            Token = _settings.BotToken,
-            TokenType = TokenType.Bot
-        };
+        return true;
     }
 
-    private async Task RegisterCommandsAsync()
+    internal async Task<bool> SendMessageAsync(ulong channelId, string content = "", List<DiscordEmbed>? embeds = null, List<string>? filePaths = null, IMention[]? mentions = null)
     {
-        ArgumentNullException.ThrowIfNull(_settings, nameof(_settings));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
 
-        IReadOnlyDictionary<int, CommandsExtension> commandsExtensions = await _shardedClient.UseCommandsAsync(new()
+        await using DiscordMessageBuilder builder = new();
+
+        if (!string.IsNullOrWhiteSpace(content))
+            builder.WithContent(content);
+
+        if (embeds?.Count > 0 && embeds.Count <= 10)
+            builder.AddEmbeds(embeds);
+
+        if (mentions is not null)
+            builder.WithAllowedMentions(mentions);
+
+        List<FileStream> streams = [];
+        if (filePaths?.Count > 0 && filePaths.Count <= 10)
+        {
+            const long maxFileSize = 26214400; // 25 MB
+            long allFileSize = 0;
+
+            foreach (string path in filePaths)
             {
-                RegisterDefaultCommandProcessors = false,
-                ServiceProvider = _serviceProvider
-            });
+                FileInfo fileInfo = new(path);
+                if (fileInfo.Length > maxFileSize || allFileSize > maxFileSize)
+                    break;
 
-        bool coreService = CheckIfServiceIsRegistered<CoreService>(_serviceProvider);
+                allFileSize += fileInfo.Length;
 
-        foreach (CommandsExtension commandsExtension in commandsExtensions.Values)
+                FileStream stream = new(path, FileMode.Open, FileAccess.Read);
+                streams.Add(stream);
+                builder.AddFile(Path.GetFileName(path), stream);
+            }
+        }
+
+        DiscordChannel? channel = null;
+        foreach (KeyValuePair<int, DiscordClient> kvp in _shardedClient.ShardClients)
         {
-            if (coreService)
-                commandsExtension.AddCommands(typeof(AzzyBot).Assembly);
+            await foreach (DiscordGuild guild in kvp.Value.GetGuildsAsync())
+            {
+                if (guild.Id == _settings?.ServerId)
+                    channel = await kvp.Value.GetChannelAsync(channelId);
+            }
+        }
 
-            SlashCommandProcessor slashCommandProcessor = new();
-            await commandsExtension.AddProcessorsAsync(slashCommandProcessor);
+        DiscordMessage? message = null;
+        if (channel is null)
+        {
+            _logger.UnableToSendMessage($"{nameof(channel)} is null");
+        }
+        else
+        {
+            message = await channel.SendMessageAsync(builder);
+        }
+
+        if (streams.Count > 0 && filePaths?.Count > 0)
+        {
+            foreach (FileStream stream in streams)
+            {
+                await stream.DisposeAsync();
+            }
+
+            foreach (string path in filePaths)
+            {
+                FileOperations.DeleteTempFilePath(path);
+            }
+        }
+
+        return message is not null;
+    }
+
+    private static async Task<DiscordMessage> AcknowledgeExceptionAsync(CommandContext ctx)
+    {
+        DiscordMember? member = ctx.Guild?.Owner;
+        string errorMessage = "Ooops something went wrong!\n\nPlease inform the owner of this server.";
+        if (member is not null)
+            errorMessage = errorMessage.Replace("the owner of this server", member.Mention, StringComparison.Ordinal);
+
+        await using DiscordMessageBuilder builder = new()
+        {
+            Content = errorMessage
+        };
+        builder.WithAllowedMention(UserMention.All);
+
+        return await ctx.EditResponseAsync(builder);
+    }
+
+    private static void ProcessOptions(IReadOnlyDictionary<CommandParameter, object?> paramaters, Dictionary<string, string> commandParameters)
+    {
+        if (paramaters is null)
+            return;
+
+        foreach (KeyValuePair<CommandParameter, object?> pair in paramaters)
+        {
+            string name = pair.Key.Name;
+            string value = pair.Value?.ToString() ?? "undefined";
+
+            if (!string.IsNullOrWhiteSpace(name) && value is not "undefined")
+            {
+                commandParameters.Add(name, value);
+            }
         }
     }
 }

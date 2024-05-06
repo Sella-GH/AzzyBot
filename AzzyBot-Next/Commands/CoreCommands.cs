@@ -17,7 +17,7 @@ internal sealed class CoreCommands
         public static async ValueTask CoreChangeStatusAsync(SlashCommandContext context, [SlashChoiceProvider<BotActivityProvider>] int activity, [SlashChoiceProvider<BotStatusProvider>] int status, string doing, string? url = null)
         {
             await context.DeferResponseAsync();
-            DiscordBotService discordBot = context.ServiceProvider.GetRequiredService<DiscordBotService>();
+            DiscordBotServiceHost discordBot = context.ServiceProvider.GetRequiredService<DiscordBotServiceHost>();
             await discordBot.SetBotStatusAsync(status, activity, doing, url);
             await context.EditResponseAsync("Bot status has been updated!");
         }

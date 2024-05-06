@@ -56,10 +56,10 @@ internal sealed class AzzyBot
         builder.ConfigureServices(services =>
         {
             services.AddSingleton<CoreService>();
-            services.AddHostedService(s => s.GetRequiredService<CoreService>());
-
             services.AddSingleton<DiscordBotService>();
-            services.AddHostedService(s => s.GetRequiredService<DiscordBotService>());
+
+            services.AddSingleton<DiscordBotServiceHost>();
+            services.AddHostedService(s => s.GetRequiredService<DiscordBotServiceHost>());
         });
 
         builder.UseConsoleLifetime();
