@@ -53,10 +53,10 @@ internal sealed class DiscordBotService : BaseService, IHostedService
         // Wait 3 Seconds to let the client boot up
         await Task.Delay(3000, cancellationToken);
 
-        int activity = _settings.DiscordStatus.Activity;
-        string doing = _settings.DiscordStatus.Doing;
-        int status = _settings.DiscordStatus.Status;
-        string? url = _settings.DiscordStatus.StreamUrl?.ToString();
+        int activity = _settings.DiscordStatus?.Activity ?? 2;
+        string doing = _settings.DiscordStatus?.Doing ?? "Music";
+        int status = _settings.DiscordStatus?.Status ?? 1;
+        string? url = _settings.DiscordStatus?.StreamUrl?.ToString();
 
         await SetBotStatusAsync(status, activity, doing, url);
     }
@@ -67,7 +67,7 @@ internal sealed class DiscordBotService : BaseService, IHostedService
         await _shardedClient.StopAsync();
     }
 
-    internal async Task SetBotStatusAsync(int status, int type, string doing, string? url = null)
+    internal async Task SetBotStatusAsync(int status = 1, int type = 2, string doing = "Music", string? url = null)
     {
         DiscordActivityType activityType = (DiscordActivityType)Enum.ToObject(typeof(DiscordActivityType), type);
         if (activityType.Equals(DiscordActivityType.Streaming) && string.IsNullOrWhiteSpace(url))
