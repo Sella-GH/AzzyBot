@@ -1,5 +1,7 @@
 {
     "BotToken": "",
+    "ServerId": 0,
+    "ErrorChannelId": 0,
     "DiscordStatus": {
         "Activity": 2,
         "Doing": "Music",

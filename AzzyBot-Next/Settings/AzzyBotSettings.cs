@@ -5,6 +5,8 @@ namespace AzzyBot.Settings;
 public sealed record AzzyBotSettings
 {
     public required string BotToken { get; init; }
+    public required ulong ServerId { get; init; }
+    public required ulong ErrorChannelId { get; init; }
     public DiscordStatus? DiscordStatus { get; init; }
 }
 

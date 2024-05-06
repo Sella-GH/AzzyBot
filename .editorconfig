@@ -752,7 +752,7 @@ dotnet_diagnostic.rcs1199.severity = suggestion
 dotnet_diagnostic.rcs1200.severity = suggestion
 
 # Use method chaining
-dotnet_diagnostic.rcs1201.severity = suggestion
+dotnet_diagnostic.rcs1201.severity = none
 
 # Avoid NullReferenceException
 dotnet_diagnostic.rcs1202.severity = suggestion
