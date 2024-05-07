@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using AzzyBot.Services;
 using AzzyBot.Services.Modules;
+using AzzyBot.Settings;
 using AzzyBot.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,17 +22,7 @@ internal static class AzzyBot
         IHostBuilder builder = Host.CreateDefaultBuilder();
         List<string> requestedModules = [];
 
-        builder.ConfigureAppConfiguration(config =>
-        {
-            config.Sources.Clear();
-            string settingsFile = "AzzyBotSettings.json";
-
-            if (environment is "Development")
-                settingsFile= "AzzyBotSettings-Dev.json";
-
-            config.AddJsonFile(Path.Combine("Settings", settingsFile), false, false);
-        });
-
+        // Add logging
         builder.ConfigureLogging(logging =>
         {
             logging.AddConsole();
@@ -51,6 +43,32 @@ internal static class AzzyBot
         // Otherwise DI doesn't work properly
         builder.ConfigureServices(services =>
         {
+            // Configure the settings
+            services.AddSingleton(_ =>
+            {
+                ConfigurationBuilder builder = new();
+                builder.Sources.Clear();
+                string settingsFile = "AzzyBotSettings.json";
+                if (environment is "Development")
+                    settingsFile = "AzzyBotSettings-Dev.json";
+
+                builder.AddJsonFile(Path.Combine("Settings", settingsFile), false, false);
+
+                IConfiguration config = builder.Build();
+                AzzyBotSettings? settings = config.Get<AzzyBotSettings>();
+                if (settings is null)
+                {
+                    Console.WriteLine("No bot configuration found! Please set your settings.");
+                    Environment.Exit(1);
+                }
+
+                return settings;
+            });
+
+            // Enable or disable modules based on the settings
+            //IServiceProvider serviceProvider = services.BuildServiceProvider();
+            //AzzyBotSettings settings = serviceProvider.GetRequiredService<AzzyBotSettings>();
+
             services.AddSingleton<CoreService>();
             services.AddSingleton<DiscordBotService>();
 

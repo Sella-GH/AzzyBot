@@ -14,7 +14,6 @@ using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Exceptions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -26,23 +25,16 @@ internal sealed class DiscordBotServiceHost : BaseService, IHostedService
     private readonly ILogger<DiscordBotServiceHost> _logger;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IServiceProvider _serviceProvider;
-    private readonly AzzyBotSettings? _settings;
+    private readonly AzzyBotSettings _settings;
     internal readonly DiscordShardedClient _shardedClient;
+    private DiscordBotService? _botService;
 
-    private DiscordBotService? _botService { get; set; }
-
-    public DiscordBotServiceHost(IConfiguration config, ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
+    public DiscordBotServiceHost(AzzyBotSettings settings, ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
     {
-        _settings = config.Get<AzzyBotSettings>();
+        _settings = settings;
         _logger = logger;
         _loggerFactory = loggerFactory;
         _serviceProvider = serviceProvider;
-
-        if (_settings is null)
-        {
-            _logger.UnableToParseSettings();
-            Environment.Exit(1);
-        }
 
         _shardedClient = new(GetDiscordConfig());
     }
@@ -156,11 +148,11 @@ internal sealed class DiscordBotServiceHost : BaseService, IHostedService
         }
         else if (ex is not DiscordException)
         {
-            await _botService.LogExceptionAsync(ex, now, e.Context);
+            await _botService.LogExceptionAsync(ex, now, ctx);
         }
         else
         {
-            await _botService.LogExceptionAsync(ex, now, e.Context, ((DiscordException)e.Exception).JsonMessage);
+            await _botService.LogExceptionAsync(ex, now, ctx, ((DiscordException)e.Exception).JsonMessage);
         }
     }
 

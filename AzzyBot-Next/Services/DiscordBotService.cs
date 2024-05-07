@@ -12,7 +12,6 @@ using DSharpPlus;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
@@ -20,13 +19,13 @@ namespace AzzyBot.Services;
 internal sealed class DiscordBotService
 {
     private readonly ILogger<DiscordBotService> _logger;
-    private readonly AzzyBotSettings? _settings;
+    private readonly AzzyBotSettings _settings;
     private readonly DiscordShardedClient _shardedClient;
 
     [SuppressMessage("Style", "IDE0290:Use primary constructor", Justification = "Otherwise it throws CS9124")]
-    public DiscordBotService(IConfiguration config, ILogger<DiscordBotService> logger, DiscordBotServiceHost botServiceHost)
+    public DiscordBotService(AzzyBotSettings settings, ILogger<DiscordBotService> logger, DiscordBotServiceHost botServiceHost)
     {
-        _settings = config.Get<AzzyBotSettings>();
+        _settings = settings;
         _logger = logger;
         _shardedClient = botServiceHost._shardedClient;
     }
@@ -87,7 +86,7 @@ internal sealed class DiscordBotService
 
             const string message = "A new error happend!";
             DiscordEmbed embed = EmbedBuilder.CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), info, discordMessage, discordUser, commandName, commandOptions);
-            bool messageSent = await SendMessageAsync(_settings?.ErrorChannelId ?? 0, message, [embed], [tempFilePath]);
+            bool messageSent = await SendMessageAsync(_settings.ErrorChannelId, message, [embed], [tempFilePath]);
 
             if (!messageSent)
                 _logger.UnableToSendMessage("Error message was not sent");
@@ -148,7 +147,7 @@ internal sealed class DiscordBotService
         {
             await foreach (DiscordGuild guild in kvp.Value.GetGuildsAsync())
             {
-                if (guild.Id == _settings?.ServerId)
+                if (guild.Id == _settings.ServerId)
                     channel = await kvp.Value.GetChannelAsync(channelId);
             }
         }

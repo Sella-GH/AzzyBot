@@ -15,16 +15,8 @@ internal class BaseService
     {
         // notnull has to be used because otherwise
         // the compiler will complain about the type being nullable
+        object? service = serviceProvider.GetService<T>();
 
-        try
-        {
-            serviceProvider.GetRequiredService<T>();
-
-            return true;
-        }
-        catch (InvalidOperationException)
-        {
-            return false;
-        }
+        return service is null;
     }
 }

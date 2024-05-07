@@ -17,6 +17,7 @@ internal static class AzzyStatsGeneral
     internal static double GetBotMemoryUsage()
     {
         using Process? process = Process.GetCurrentProcess();
+
         return process.WorkingSet64 / (1024.0 * 1024.0 * 1024.0);
     }
 
