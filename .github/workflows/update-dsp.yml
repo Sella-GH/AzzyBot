@@ -2,12 +2,12 @@ name: Update DSharpPlus Nightly version
 
 on:
   push:
-    path:
-      - "**update-dsp.yml"
-  schedule:
-    - cron: "00 12 * * 0"
-    - cron: "00 16 * * 1-5"
-    - cron: "00 12 * * 6"
+    #path:
+     # - "**update-dsp.yml"
+  #schedule:
+    #- cron: "00 12 * * 0"
+    #- cron: "00 16 * * 1-5"
+    #- cron: "00 12 * * 6"
 
 jobs:
   CheckForUpdates:
