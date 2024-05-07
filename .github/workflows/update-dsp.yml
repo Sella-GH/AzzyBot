@@ -2,7 +2,7 @@ name: Update DSharpPlus Nightly version
 
 on:
   push:
-    path:
+    paths:
       - "**update-dsp.yml"
   schedule:
     - cron: "0 */6 * * *"
@@ -12,17 +12,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v3
+      - name: Set up .NET 8.0.x
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
       - name: Extract current NuGet package version
         id: current_version
         run: |
           VERSION=$(grep -Po '(?<=<PackageReference Include="DSharpPlus" Version=")[^"]*' AzzyBot-Next/AzzyBot-Next.csproj)
           echo "Current package version is $VERSION"
-          echo "::set-output name=VERSION::$VERSION"
+          echo "current_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Fetch the latest package version from NuGet
         id: nuget_version
@@ -34,7 +38,7 @@ jobs:
             # Extract the latest version
             LATEST_VERSION=$(jq -r '.versions[-2]' nuget_data.json)
             echo "Latest NuGet package version is $LATEST_VERSION"
-            echo "::set-output name=LATEST_VERSION::$LATEST_VERSION"
+            echo "LATEST_VERSION=$LATEST_VERSION" >> "$GITHUB_OUTPUT"
           else
             echo "No versions found in the NuGet package data."
           fi
