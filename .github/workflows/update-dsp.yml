@@ -13,13 +13,36 @@ jobs:
   CheckForUpdates:
   runs-on: ubuntu-latest
   steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Get version from project
-      id: extracted_version
-      run: |
-        VERSION=$(grep -Po '(?<=<PackageReference Include="DSharpPlus" Version=")[^"]*' AzzyBot-Next/AzzyBot-Next.csproj)
-        echo "Current version is $VERSION"
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v3
+
+      - name: Extract current NuGet package version
+        id: current_version
+        run: |
+          VERSION=$(grep -Po '(?<=<PackageReference Include="DSharpPlus" Version=")[^"]*' AzzyBot-Next/AzzyBot-Next.csproj)
+          echo "Current package version is $VERSION"
+          echo "::set-output name=VERSION::$VERSION"
+
+      - name: Fetch the latest package version from NuGet
+        id: nuget_version
+        run: |
+          LATEST_VERSION=$(curl -s "https://api.nuget.org/v3/registration5-gz-semver2/dsharpplus/index.json" | jq -r '.items[-1].upper')
+          echo "Latest NuGet package version is $LATEST_VERSION"
+          echo "::set-output name=LATEST_VERSION::$LATEST_VERSION"
+
+      - name: Update .csproj file if versions differ
+        if: steps.current_version.outputs.VERSION != steps.nuget_version.outputs.LATEST_VERSION
+        run: |
+          sed -i 's/<PackageReference Include="DSharpPlus" Version="'${{ steps.current_version.outputs.VERSION }}'"/<PackageReference Include="DSharpPlus" Version="'${{ steps.nuget_version.outputs.LATEST_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
+
+      - name: Commit and push if there was a change
+        if: steps.current_version.outputs.VERSION != steps.nuget_version.outputs.LATEST_VERSION
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git add AzzyBot-Next/AzzyBot-Next.csproj
+          git commit -m "Update MyPackage to ${{ steps.nuget_version.outputs.LATEST_VERSION }}"
+          git push
