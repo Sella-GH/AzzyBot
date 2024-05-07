@@ -27,22 +27,30 @@ jobs:
           echo "::set-output name=VERSION::$VERSION"
 
       - name: Fetch the latest package version from NuGet
-        id: nuget_version
-        run: |
-          LATEST_VERSION=$(curl "https://api.nuget.org/v3/registration5-gz-semver2/dsharpplus/index.json" | jq -r '.items[-1].upper')
-          echo "Latest NuGet package version is $LATEST_VERSION"
-          echo "::set-output name=LATEST_VERSION::$LATEST_VERSION"
+          id: nuget_version
+          run: |
+            # Fetch data from NuGet API and save to a JSON file
+            curl -s "https://api.nuget.org/v3-flatcontainer/dsharpplus/index.json" -o nuget_data.json
+            # Check if the JSON file contains any versions
+            if jq .versions nuget_data.json | jq -e 'length > 0' > /dev/null; then
+              # Extract the latest version
+              LATEST_VERSION=$(jq -r '.versions[-1]' nuget_data.json)
+              echo "Latest NuGet package version is $LATEST_VERSION"
+              echo "::set-output name=LATEST_VERSION::$LATEST_VERSION"
+            else
+              echo "No versions found in the NuGet package data."
+            fi
 
-      - name: Update .csproj file if versions differ
-        if: steps.current_version.outputs.VERSION != steps.nuget_version.outputs.LATEST_VERSION
-        run: |
-          sed -i 's/<PackageReference Include="DSharpPlus" Version="'${{ steps.current_version.outputs.VERSION }}'"/<PackageReference Include="DSharpPlus" Version="'${{ steps.nuget_version.outputs.LATEST_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
+      #- name: Update .csproj file if versions differ
+        #if: steps.current_version.outputs.VERSION != steps.nuget_version.outputs.LATEST_VERSION
+        #run: |
+          #sed -i 's/<PackageReference Include="DSharpPlus" Version="'${{ steps.current_version.outputs.VERSION }}'"/<PackageReference Include="DSharpPlus" Version="'${{ steps.nuget_version.outputs.LATEST_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
 
-      - name: Commit and push if there was a change
-        if: steps.current_version.outputs.VERSION != steps.nuget_version.outputs.LATEST_VERSION
-        run: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
-          git add AzzyBot-Next/AzzyBot-Next.csproj
-          git commit -m "Update MyPackage to ${{ steps.nuget_version.outputs.LATEST_VERSION }}"
-          git push
+      #- name: Commit and push if there was a change
+        #if: steps.current_version.outputs.VERSION != steps.nuget_version.outputs.LATEST_VERSION
+        #run: |
+          #git config --global user.email "action@github.com"
+          #git config --global user.name "GitHub Action"
+          #git add AzzyBot-Next/AzzyBot-Next.csproj
+          #git commit -m "Update DSharpPlus Nightly to ${{ steps.nuget_version.outputs.LATEST_VERSION }}"
+          #git push
