@@ -16,11 +16,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up .NET 8.0.x
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
-
       - name: Extract current NuGet package version
         id: current_version
         run: |
@@ -44,13 +39,13 @@ jobs:
           fi
 
       - name: Update .csproj file if versions differ
-        if: steps.current_version.outputs.VERSION != steps.nuget_version.outputs.LATEST_VERSION
+        if: ${{ steps.current_version.outputs.VERSION != steps.nuget_version.outputs.LATEST_VERSION }}
         run: |
           sed -i 's/<PackageReference Include="DSharpPlus" Version="'${{ steps.current_version.outputs.VERSION }}'"/<PackageReference Include="DSharpPlus" Version="'${{ steps.nuget_version.outputs.LATEST_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
           sed -i 's/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.current_version.outputs.VERSION }}'"/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.nuget_version.outputs.LATEST_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
 
       - name: Commit and push if there was a change
-        if: steps.current_version.outputs.VERSION != steps.nuget_version.outputs.LATEST_VERSION
+        if: ${{ steps.current_version.outputs.VERSION != steps.nuget_version.outputs.LATEST_VERSION }}
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
