@@ -27,19 +27,19 @@ jobs:
           echo "::set-output name=VERSION::$VERSION"
 
       - name: Fetch the latest package version from NuGet
-          id: nuget_version
-          run: |
-            # Fetch data from NuGet API and save to a JSON file
-            curl -s "https://api.nuget.org/v3-flatcontainer/dsharpplus/index.json" -o nuget_data.json
-            # Check if the JSON file contains any versions
-            if jq .versions nuget_data.json | jq -e 'length > 0' > /dev/null; then
-              # Extract the latest version
-              LATEST_VERSION=$(jq -r '.versions[-1]' nuget_data.json)
-              echo "Latest NuGet package version is $LATEST_VERSION"
-              echo "::set-output name=LATEST_VERSION::$LATEST_VERSION"
-            else
-              echo "No versions found in the NuGet package data."
-            fi
+        id: nuget_version
+        run: |
+          # Fetch data from NuGet API and save to a JSON file
+          curl -s "https://api.nuget.org/v3-flatcontainer/dsharpplus/index.json" -o nuget_data.json
+          # Check if the JSON file contains any versions
+          if jq .versions nuget_data.json | jq -e 'length > 0' > /dev/null; then
+            # Extract the latest version
+            LATEST_VERSION=$(jq -r '.versions[-1]' nuget_data.json)
+            echo "Latest NuGet package version is $LATEST_VERSION"
+            echo "::set-output name=LATEST_VERSION::$LATEST_VERSION"
+          else
+            echo "No versions found in the NuGet package data."
+          fi
 
       #- name: Update .csproj file if versions differ
         #if: steps.current_version.outputs.VERSION != steps.nuget_version.outputs.LATEST_VERSION
