@@ -9,7 +9,7 @@ on:
       - "**.md"
       - "**.props"
       - "**.sln"
-      - "**.yml"
+      - "**dotnet.yml"
   workflow_dispatch:
 
 jobs:
