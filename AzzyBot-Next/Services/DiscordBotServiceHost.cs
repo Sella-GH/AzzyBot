@@ -20,7 +20,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-internal sealed class DiscordBotServiceHost : BaseService, IHostedService
+internal sealed class DiscordBotServiceHost : IHostedService
 {
     private readonly ILogger<DiscordBotServiceHost> _logger;
     private readonly ILoggerFactory _loggerFactory;
@@ -115,13 +115,12 @@ internal sealed class DiscordBotServiceHost : BaseService, IHostedService
                 UseDefaultCommandErrorHandler = false
             });
 
-        bool coreService = CheckIfServiceIsRegistered<CoreService>(_serviceProvider);
-
         foreach (CommandsExtension commandsExtension in commandsExtensions.Values)
         {
             commandsExtension.CommandErrored += CommandErroredAsync;
 
-            //if (coreService)
+            // Activate commands based on the modules
+            if (_serviceProvider.GetRequiredService<CoreService>().IsActivated)
                 commandsExtension.AddCommands(typeof(CoreCommands).Assembly);
 
             SlashCommandProcessor slashCommandProcessor = new();

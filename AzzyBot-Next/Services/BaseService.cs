@@ -1,22 +1,69 @@
 ﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Reflection;
+using AzzyBot.Logging;
+using AzzyBot.Utilities;
+using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-internal class BaseService
+internal abstract class BaseService
 {
-    /// <summary>
-    /// Checks if a service is registered in the service provider
-    /// </summary>
-    /// <typeparam name="T">The type of the service to check.</typeparam>
-    /// <param name="serviceProvider">The service provider to check.</param>
-    /// <returns><see langword="true"/> if the service was found, otherwise <see langword="false"/>.</returns>
-    protected static bool CheckIfServiceIsRegistered<T>(IServiceProvider serviceProvider) where T : notnull
+    protected static void CheckSettings<T>(T? type, ILogger logger, List<string>? excluded = null)
     {
-        // notnull has to be used because otherwise
-        // the compiler will complain about the type being nullable
-        object? service = serviceProvider.GetService<T>();
+        if (type is null)
+            throw new InvalidOperationException("Settings can't be checked");
 
-        return service is null;
+        PropertyInfo[] properties = type.GetType().GetProperties();
+
+        List<string> missingSettings = [];
+        foreach (PropertyInfo property in properties)
+        {
+            object? value = property.GetValue(type);
+
+            switch (property.PropertyType)
+            {
+                case Type t when t.Equals(typeof(string)):
+                    if (excluded?.Contains(property.Name) == true)
+                        break;
+
+                    if (string.IsNullOrWhiteSpace((string?)value))
+                        missingSettings.Add(property.Name);
+
+                    break;
+
+                case Type t when t.Equals(typeof(ulong)) || t.Equals(typeof(int)):
+                    if (excluded?.Contains(property.Name) == true)
+                        break;
+
+                    if (Convert.ToInt64(value, CultureInfo.InvariantCulture) is 0)
+                        missingSettings.Add(property.Name);
+
+                    break;
+
+                case Type t when t.Equals(typeof(TimeSpan)):
+                    if (excluded?.Contains(property.Name) == true)
+                        break;
+
+                    if (value is TimeSpan timespan && timespan.Equals(TimeSpan.Zero))
+                        missingSettings.Add(property.Name);
+
+                    break;
+            }
+        }
+
+        if (missingSettings.Count <= 0)
+            return;
+
+        foreach (string missingSetting in missingSettings)
+        {
+            logger.SettingNotFilled(missingSetting);
+        }
+
+        if (!AzzyStatsGeneral.GetBotName.Contains("Docker", StringComparison.Ordinal))
+            Console.ReadKey();
+
+        Environment.Exit(1);
     }
 }
