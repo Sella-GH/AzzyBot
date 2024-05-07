@@ -49,6 +49,8 @@ internal sealed class EmbedBuilder
 
         builder.AddField("Bug report", $"Send a [bug report]({bugReportUrl}) to help us fixing this issue!\nYour Contribution is very welcome.");
 
+        builder.WithFooter($"Version: {AzzyStatsGeneral.GetBotVersion} * Name: {AzzyStatsGeneral.GetBotName}");
+
         return builder;
     }
 }
