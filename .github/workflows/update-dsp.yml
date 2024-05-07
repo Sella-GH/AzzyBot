@@ -29,7 +29,7 @@ jobs:
       - name: Fetch the latest package version from NuGet
         id: nuget_version
         run: |
-          LATEST_VERSION=$(curl -s "https://api.nuget.org/v3/registration5-gz-semver2/dsharpplus/index.json" | jq -r '.items[-1].upper')
+          LATEST_VERSION=$(curl "https://api.nuget.org/v3/registration5-gz-semver2/dsharpplus/index.json" | jq -r '.items[-1].upper')
           echo "Latest NuGet package version is $LATEST_VERSION"
           echo "::set-output name=LATEST_VERSION::$LATEST_VERSION"
 
