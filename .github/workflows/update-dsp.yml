@@ -41,17 +41,17 @@ jobs:
             echo "No versions found in the NuGet package data."
           fi
 
-      #- name: Update .csproj file if versions differ
-        #if: steps.current_version.outputs.VERSION != steps.nuget_version.outputs.LATEST_VERSION
-        #run: |
-          #sed -i 's/<PackageReference Include="DSharpPlus" Version="'${{ steps.current_version.outputs.VERSION }}'"/<PackageReference Include="DSharpPlus" Version="'${{ steps.nuget_version.outputs.LATEST_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
-          #sed -i 's/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.current_version.outputs.VERSION }}'"/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.nuget_version.outputs.LATEST_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
+      - name: Update .csproj file if versions differ
+        if: steps.current_version.outputs.VERSION != steps.nuget_version.outputs.LATEST_VERSION
+        run: |
+          sed -i 's/<PackageReference Include="DSharpPlus" Version="'${{ steps.current_version.outputs.VERSION }}'"/<PackageReference Include="DSharpPlus" Version="'${{ steps.nuget_version.outputs.LATEST_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
+          sed -i 's/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.current_version.outputs.VERSION }}'"/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.nuget_version.outputs.LATEST_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
 
-      #- name: Commit and push if there was a change
-        #if: steps.current_version.outputs.VERSION != steps.nuget_version.outputs.LATEST_VERSION
-        #run: |
-          #git config --global user.email "action@github.com"
-          #git config --global user.name "GitHub Action"
-          #git add AzzyBot-Next/AzzyBot-Next.csproj
-          #git commit -m "Update DSharpPlus Nightly to ${{ steps.nuget_version.outputs.LATEST_VERSION }}"
-          #git push
+      - name: Commit and push if there was a change
+        if: steps.current_version.outputs.VERSION != steps.nuget_version.outputs.LATEST_VERSION
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git add AzzyBot-Next/AzzyBot-Next.csproj
+          git commit -m "Update DSharpPlus Nightly to ${{ steps.nuget_version.outputs.LATEST_VERSION }}"
+          git push
