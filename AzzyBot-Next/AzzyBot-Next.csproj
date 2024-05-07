@@ -94,8 +94,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02236" />
-    <PackageReference Include="DSharpPlus.Commands" Version="5.0.0-nightly-02236" />
+    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02237" />
+    <PackageReference Include="DSharpPlus.Commands" Version="5.0.0-nightly-02237" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
