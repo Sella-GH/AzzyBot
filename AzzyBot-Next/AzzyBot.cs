@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
 using AzzyBot.Services;
 using AzzyBot.Services.Modules;
+using AzzyBot.Utilities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -13,26 +12,23 @@ using Microsoft.Extensions.Logging.Console;
 
 namespace AzzyBot;
 
-internal sealed class AzzyBot
+internal static class AzzyBot
 {
     private static async Task Main(string[] args)
     {
-        string environment = (Assembly.GetExecutingAssembly().GetName().Name?.ToString().EndsWith("Dev", StringComparison.Ordinal) ?? throw new InvalidOperationException("App has no name")) ? "Development" : "Production";
+        string environment = AzzyStatsGeneral.GetBotEnvironment;
         IHostBuilder builder = Host.CreateDefaultBuilder();
         List<string> requestedModules = [];
 
         builder.ConfigureAppConfiguration(config =>
         {
             config.Sources.Clear();
+            string settingsFile = "AzzyBotSettings.json";
 
             if (environment is "Development")
-            {
-                config.AddJsonFile(Path.Combine("Settings", "AzzyBotSettings-Dev.json"), false, false);
-            }
-            else
-            {
-                config.AddJsonFile(Path.Combine("Settings", "AzzyBotSettings.json"), false, false);
-            }
+                settingsFile= "AzzyBotSettings-Dev.json";
+
+            config.AddJsonFile(Path.Combine("Settings", settingsFile), false, false);
         });
 
         builder.ConfigureLogging(logging =>
