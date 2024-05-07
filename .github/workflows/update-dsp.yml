@@ -21,7 +21,7 @@ jobs:
         run: |
           VERSION=$(grep -Po '(?<=<PackageReference Include="DSharpPlus" Version=")[^"]*' AzzyBot-Next/AzzyBot-Next.csproj)
           echo "Current package version is $VERSION"
-          echo "current_version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "CURRENT_VERSION=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Fetch the latest package version from NuGet
         id: nuget_version
@@ -33,19 +33,19 @@ jobs:
             # Extract the latest version
             LATEST_VERSION=$(jq -r '.versions[-2]' nuget_data.json)
             echo "Latest NuGet package version is $LATEST_VERSION"
-            echo "LATEST_VERSION=$LATEST_VERSION" >> "$GITHUB_OUTPUT"
+            echo "NUGET_VERSION=$LATEST_VERSION" >> "$GITHUB_OUTPUT"
           else
             echo "No versions found in the NuGet package data."
           fi
 
       - name: Update .csproj file if versions differ
-        if: ${{ steps.current_version.outputs.VERSION != steps.nuget_version.outputs.LATEST_VERSION }}
+        if: ${{ steps.current_version.outputs.CURRENT_VERSION != steps.nuget_version.outputs.NUGET_VERSION }}
         run: |
           sed -i 's/<PackageReference Include="DSharpPlus" Version="'${{ steps.current_version.outputs.VERSION }}'"/<PackageReference Include="DSharpPlus" Version="'${{ steps.nuget_version.outputs.LATEST_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
           sed -i 's/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.current_version.outputs.VERSION }}'"/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.nuget_version.outputs.LATEST_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
 
       - name: Commit and push if there was a change
-        if: ${{ steps.current_version.outputs.VERSION != steps.nuget_version.outputs.LATEST_VERSION }}
+        if: ${{ steps.current_version.outputs.CURRENT_VERSION != steps.nuget_version.outputs.NUGET_VERSION }}
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
