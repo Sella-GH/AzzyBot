@@ -6,6 +6,7 @@ using AzzyBot.Commands;
 using AzzyBot.Logging;
 using AzzyBot.Services.Modules;
 using AzzyBot.Settings;
+using AzzyBot.Utilities;
 using DSharpPlus;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.EventArgs;
@@ -120,8 +121,12 @@ internal sealed class DiscordBotServiceHost : IHostedService
             commandsExtension.CommandErrored += CommandErroredAsync;
 
             // Activate commands based on the modules
-            if (_serviceProvider.GetRequiredService<CoreService>().IsActivated)
-                commandsExtension.AddCommands(typeof(CoreCommands).Assembly);
+            if (_serviceProvider.GetRequiredService<CoreServiceHost>()._isActivated)
+                commandsExtension.AddCommands(typeof(CoreCommands.Core));
+
+            // Only add debug commands if it's a dev build
+            if (AzzyStatsGeneral.GetBotName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase))
+                commandsExtension.AddCommands(typeof(CoreCommands.Debug));
 
             SlashCommandProcessor slashCommandProcessor = new();
             await commandsExtension.AddProcessorsAsync(slashCommandProcessor);
@@ -144,6 +149,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
 
         if (ex is ChecksFailedException checksFailed)
         {
+            await _botService.LogExceptionAsync(ex, now, ctx);
         }
         else if (ex is not DiscordException)
         {

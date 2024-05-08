@@ -53,7 +53,7 @@ internal abstract class BaseService
             }
         }
 
-        if (missingSettings.Count <= 0)
+        if (missingSettings.Count == 0)
             return;
 
         foreach (string missingSetting in missingSettings)

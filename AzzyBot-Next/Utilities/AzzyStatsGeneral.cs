@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using AzzyBot.Utilities.Records;
 
 namespace AzzyBot.Utilities;
@@ -44,6 +45,9 @@ internal static class AzzyStatsGeneral
 
         return new(0, 0, 0);
     }
+
+    internal static string GetOperatingSystem => RuntimeInformation.OSDescription;
+    internal static string GetOsArchitecture => RuntimeInformation.OSArchitecture.ToString();
 
     internal static DateTime GetSystemUptime()
     {

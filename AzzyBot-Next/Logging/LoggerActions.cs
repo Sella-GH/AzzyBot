@@ -1,15 +1,25 @@
 ﻿using AzzyBot.Services;
+using AzzyBot.Services.Modules;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Logging;
 
 internal static partial class LoggerActions
 {
-    [LoggerMessage(100, LogLevel.Information, "AzzyBot is ready to accept commands")]
+    [LoggerMessage(100, LogLevel.Information, "Starting {name} in version {version} on {os}-{arch}")]
+    public static partial void BotStarting(this ILogger<CoreServiceHost> logger, string name, string version, string os, string arch);
+
+    [LoggerMessage(101, LogLevel.Information, "AzzyBot is ready to accept commands")]
     public static partial void BotReady(this ILogger<DiscordBotServiceHost> logger);
 
-    [LoggerMessage(101, LogLevel.Information, "https://discord.com/api/oauth2/authorize?client_id={id}&permissions=268438528&scope=applications.commands%20bot")]
+    [LoggerMessage(102, LogLevel.Information, "Invite me using the following url: https://discord.com/api/oauth2/authorize?client_id={id}&permissions=268438528&scope=applications.commands%20bot")]
     public static partial void InviteUrl(this ILogger<DiscordBotServiceHost> logger, ulong id);
+
+    [LoggerMessage(103, LogLevel.Information, "Command {command} requested by {user} to execute")]
+    public static partial void CommandRequested(this ILogger logger, string command, string user);
+
+    [LoggerMessage(199, LogLevel.Information, "Stopping AzzyBot")]
+    public static partial void BotStopping(this ILogger<CoreServiceHost> logger);
 
     [LoggerMessage(200, LogLevel.Warning, "Commands error occured!")]
     public static partial void CommandsError(this ILogger<DiscordBotServiceHost> logger);
