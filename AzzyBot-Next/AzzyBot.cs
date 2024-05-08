@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using AzzyBot.Services;
@@ -20,7 +19,6 @@ internal static class AzzyBot
     {
         string environment = AzzyStatsGeneral.GetBotEnvironment;
         IHostBuilder builder = Host.CreateDefaultBuilder();
-        List<string> requestedModules = [];
 
         // Add logging
         builder.ConfigureLogging(logging =>
@@ -69,8 +67,8 @@ internal static class AzzyBot
             //IServiceProvider serviceProvider = services.BuildServiceProvider();
             //AzzyBotSettings settings = serviceProvider.GetRequiredService<AzzyBotSettings>();
 
-            services.AddSingleton<CoreService>();
-            services.AddHostedService(s => s.GetRequiredService<CoreService>());
+            services.AddSingleton<CoreServiceHost>();
+            services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
 
             services.AddSingleton<DiscordBotService>();
 

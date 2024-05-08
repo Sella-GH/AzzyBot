@@ -120,7 +120,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
             commandsExtension.CommandErrored += CommandErroredAsync;
 
             // Activate commands based on the modules
-            if (_serviceProvider.GetRequiredService<CoreService>().IsActivated)
+            if (_serviceProvider.GetRequiredService<CoreServiceHost>()._isActivated)
                 commandsExtension.AddCommands(typeof(CoreCommands).Assembly);
 
             SlashCommandProcessor slashCommandProcessor = new();
