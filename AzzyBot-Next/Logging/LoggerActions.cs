@@ -1,4 +1,5 @@
-﻿using AzzyBot.Services;
+﻿using System;
+using AzzyBot.Services;
 using AzzyBot.Services.Modules;
 using Microsoft.Extensions.Logging;
 
@@ -35,6 +36,12 @@ internal static partial class LoggerActions
 
     [LoggerMessage(302, LogLevel.Error, "An error happend while sending a message to discord: {ex}")]
     public static partial void UnableToSendMessage(this ILogger logger, string ex);
+
+    [LoggerMessage(303, LogLevel.Error, "The provided uri is invalid: {uri}")]
+    public static partial void WebInvalidUri(this ILogger logger, Uri uri);
+
+    [LoggerMessage(304, LogLevel.Error, "The {type} request failed with error: {ex}")]
+    public static partial void WebRequestFailed(this ILogger logger, string type, string ex);
 
     [LoggerMessage(400, LogLevel.Critical, "The given settings can't be parsed, are they filled out?")]
     public static partial void UnableToParseSettings(this ILogger<DiscordBotServiceHost> logger);
