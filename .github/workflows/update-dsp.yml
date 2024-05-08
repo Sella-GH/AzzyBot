@@ -5,7 +5,7 @@ on:
     paths:
       - "**update-dsp.yml"
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: '0 */6 * * *'
 
 jobs:
   CheckForUpdates:
