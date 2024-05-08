@@ -19,8 +19,7 @@ internal sealed class EmbedBuilder
 
         DiscordEmbedBuilder builder = new()
         {
-            Color = DiscordColor.Red,
-            Title = "Exception occurred"
+            Color = DiscordColor.Red
         };
 
         builder.AddField("Exception", ex.GetType().Name);
@@ -53,7 +52,7 @@ internal sealed class EmbedBuilder
 
         builder.AddField("OS", os);
         builder.AddField("Arch", arch);
-        builder.AddField("Bug report", $"Send a [bug report]({bugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the StackTrace file.\nYour Contribution is very welcome.");
+        builder.AddField("Bug report", $"Send a [bug report]({bugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.");
         builder.WithAuthor(botName, bugReportUrl);
         builder.WithFooter($"Version: {botVersion}");
 
