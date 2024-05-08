@@ -48,8 +48,8 @@ jobs:
       - name: Commit and push if there was a change
         if: ${{ steps.current_version.outputs.CURRENT_VERSION != steps.nuget_version.outputs.NUGET_VERSION }}
         run: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add AzzyBot-Next/AzzyBot-Next.csproj
           git commit -m "Update DSharpPlus Nightly to ${{ steps.nuget_version.outputs.NUGET_VERSION }}"
           git push
