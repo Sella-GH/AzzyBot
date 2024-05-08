@@ -47,6 +47,8 @@ internal static class AzzyStatsGeneral
         return new(0, 0, 0);
     }
 
+    internal static bool CheckIfLinuxOs => RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+    internal static bool CheckIfWindowsOs => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
     internal static string GetOperatingSystem => RuntimeInformation.OSDescription;
     internal static string GetOsArchitecture => RuntimeInformation.OSArchitecture.ToString();
 
