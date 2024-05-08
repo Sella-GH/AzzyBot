@@ -14,10 +14,13 @@ internal static partial class LoggerActions
     [LoggerMessage(200, LogLevel.Warning, "Commands error occured!")]
     public static partial void CommandsError(this ILogger<DiscordBotServiceHost> logger);
 
-    [LoggerMessage(300, LogLevel.Error, "An error happend while logging the exception to discord: {ex}")]
+    [LoggerMessage(300, LogLevel.Error, "{setting} has to be filled out!")]
+    public static partial void SettingNotFilled(this ILogger logger, string setting);
+
+    [LoggerMessage(301, LogLevel.Error, "An error happend while logging the exception to discord: {ex}")]
     public static partial void UnableToLogException(this ILogger logger, string ex);
 
-    [LoggerMessage(301, LogLevel.Error, "An error happend while sending a message to discord: {ex}")]
+    [LoggerMessage(302, LogLevel.Error, "An error happend while sending a message to discord: {ex}")]
     public static partial void UnableToSendMessage(this ILogger logger, string ex);
 
     [LoggerMessage(400, LogLevel.Critical, "The given settings can't be parsed, are they filled out?")]

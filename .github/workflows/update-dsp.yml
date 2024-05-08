@@ -5,7 +5,7 @@ on:
     paths:
       - "**update-dsp.yml"
   schedule:
-    - cron: "0 */6 * * *"
+    - cron: '0 */6 * * *'
 
 jobs:
   CheckForUpdates:
@@ -15,6 +15,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: dev-next
 
       - name: Extract current NuGet package version
         id: current_version
@@ -41,8 +42,8 @@ jobs:
       - name: Update .csproj file if versions differ
         if: ${{ steps.current_version.outputs.CURRENT_VERSION != steps.nuget_version.outputs.NUGET_VERSION }}
         run: |
-          sed -i 's/<PackageReference Include="DSharpPlus" Version="'${{ steps.current_version.outputs.VERSION }}'"/<PackageReference Include="DSharpPlus" Version="'${{ steps.nuget_version.outputs.LATEST_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
-          sed -i 's/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.current_version.outputs.VERSION }}'"/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.nuget_version.outputs.LATEST_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
+          sed -i 's/<PackageReference Include="DSharpPlus" Version="'${{ steps.current_version.outputs.CURRENT_VERSION }}'"/<PackageReference Include="DSharpPlus" Version="'${{ steps.nuget_version.outputs.NUGET_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
+          sed -i 's/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.current_version.outputs.CURRENT_VERSION }}'"/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.nuget_version.outputs.NUGET_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
 
       - name: Commit and push if there was a change
         if: ${{ steps.current_version.outputs.CURRENT_VERSION != steps.nuget_version.outputs.NUGET_VERSION }}
@@ -50,5 +51,5 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           git add AzzyBot-Next/AzzyBot-Next.csproj
-          git commit -m "Update DSharpPlus Nightly to ${{ steps.nuget_version.outputs.LATEST_VERSION }}"
+          git commit -m "Update DSharpPlus Nightly to ${{ steps.nuget_version.outputs.NUGET_VERSION }}"
           git push
