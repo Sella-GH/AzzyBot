@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using AzzyBot.Commands.Choices;
 using AzzyBot.Logging;
 using AzzyBot.Services;
@@ -36,5 +37,17 @@ internal sealed class CoreCommands
 
         [Command("ping")]
         public static ValueTask CorePingAsync(SlashCommandContext context) => context.RespondAsync($"Pong! {context.Client.Ping}ms");
+    }
+
+    [Command("debug")]
+    internal sealed class Debug
+    {
+        [Command("trigger-exception")]
+        public static async ValueTask TriggerExceptionAsync(SlashCommandContext context)
+        {
+            await context.DeferResponseAsync();
+
+            throw new InvalidOperationException("This is a debug exception");
+        }
     }
 }
