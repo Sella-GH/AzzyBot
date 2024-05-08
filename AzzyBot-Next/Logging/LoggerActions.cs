@@ -18,6 +18,9 @@ internal static partial class LoggerActions
     [LoggerMessage(103, LogLevel.Information, "Command {command} requested by {user} to execute")]
     public static partial void CommandRequested(this ILogger logger, string command, string user);
 
+    [LoggerMessage(198, LogLevel.Information, "Press any key to stop the bot...")]
+    public static partial void PressAnyKeyToStop(this ILogger logger);
+
     [LoggerMessage(199, LogLevel.Information, "Stopping AzzyBot")]
     public static partial void BotStopping(this ILogger<CoreServiceHost> logger);
 

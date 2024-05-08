@@ -10,60 +10,66 @@ namespace AzzyBot.Services;
 
 internal abstract class BaseService
 {
-    protected static void CheckSettings<T>(T? type, ILogger logger, List<string>? excluded = null)
+    protected static int CheckSettings<T>(T? settings, ILogger logger, List<string>? excluded = null, bool isClass = false)
     {
-        if (type is null)
-            throw new InvalidOperationException("Settings can't be checked");
+        ArgumentNullException.ThrowIfNull(settings, nameof(settings));
 
-        PropertyInfo[] properties = type.GetType().GetProperties();
+        PropertyInfo[] properties = settings.GetType().GetProperties();
+        int missingSettings = 0;
 
-        List<string> missingSettings = [];
+        void LogAndIncrement(string settingName)
+        {
+            logger.SettingNotFilled(settingName);
+            missingSettings++;
+        }
+
         foreach (PropertyInfo property in properties)
         {
-            object? value = property.GetValue(type);
+            if (excluded?.Contains(property.Name) == true)
+                continue;
+
+            object? value = property.GetValue(settings);
+            Type propertyType = property.PropertyType;
+
+            if (propertyType.IsClass)
+            {
+                missingSettings = CheckSettings(value, logger, excluded, true);
+                continue;
+            }
 
             switch (property.PropertyType)
             {
                 case Type t when t.Equals(typeof(string)):
-                    if (excluded?.Contains(property.Name) == true)
-                        break;
-
                     if (string.IsNullOrWhiteSpace((string?)value))
-                        missingSettings.Add(property.Name);
+                        LogAndIncrement(property.Name);
 
                     break;
 
                 case Type t when t.Equals(typeof(ulong)) || t.Equals(typeof(int)):
-                    if (excluded?.Contains(property.Name) == true)
-                        break;
-
                     if (Convert.ToInt64(value, CultureInfo.InvariantCulture) is 0)
-                        missingSettings.Add(property.Name);
+                        LogAndIncrement(property.Name);
 
                     break;
 
                 case Type t when t.Equals(typeof(TimeSpan)):
-                    if (excluded?.Contains(property.Name) == true)
-                        break;
-
                     if (value is TimeSpan timespan && timespan.Equals(TimeSpan.Zero))
-                        missingSettings.Add(property.Name);
+                        LogAndIncrement(property.Name);
 
                     break;
             }
         }
 
-        if (missingSettings.Count == 0)
-            return;
+        if (missingSettings == 0 || isClass)
+            return missingSettings;
 
-        foreach (string missingSetting in missingSettings)
+        if (!AzzyStatsGeneral.GetBotName.Contains("Docker", StringComparison.OrdinalIgnoreCase))
         {
-            logger.SettingNotFilled(missingSetting);
+            logger.PressAnyKeyToStop();
+            Console.ReadKey();
         }
 
-        if (!AzzyStatsGeneral.GetBotName.Contains("Docker", StringComparison.Ordinal))
-            Console.ReadKey();
-
         Environment.Exit(1);
+
+        return 0;
     }
 }

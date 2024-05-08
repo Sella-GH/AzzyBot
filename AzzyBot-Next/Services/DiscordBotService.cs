@@ -183,7 +183,7 @@ internal sealed class DiscordBotService
         DiscordMember? member = ctx.Guild?.Owner;
         string errorMessage = "Ooops something went wrong!\n\nPlease inform the owner of this server.";
         if (member is not null)
-            errorMessage = errorMessage.Replace("the owner of this server", member.Mention, StringComparison.Ordinal);
+            errorMessage = errorMessage.Replace("the owner of this server", member.Mention, StringComparison.OrdinalIgnoreCase);
 
         await using DiscordMessageBuilder builder = new()
         {
