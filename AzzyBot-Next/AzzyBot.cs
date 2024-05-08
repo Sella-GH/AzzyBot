@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using AzzyBot.Enums;
 using AzzyBot.Services;
 using AzzyBot.Services.Modules;
 using AzzyBot.Settings;
@@ -17,8 +18,8 @@ internal static class AzzyBot
 {
     private static async Task Main(string[] args)
     {
-        string environment = AzzyStatsGeneral.GetBotEnvironment;
-        bool isDev = environment is "Development";
+        EnvironmentEnum environment = AzzyStatsGeneral.GetBotEnvironment;
+        bool isDev = environment is EnvironmentEnum.Development;
         bool forceDebug = args.Length > 0 && args[0] is "-forceDebug";
         IHostBuilder builder = Host.CreateDefaultBuilder();
 
@@ -77,7 +78,7 @@ internal static class AzzyBot
         });
 
         builder.UseConsoleLifetime();
-        builder.UseEnvironment(environment);
+        builder.UseEnvironment(environment.ToString());
 
         await builder.RunConsoleAsync();
     }
