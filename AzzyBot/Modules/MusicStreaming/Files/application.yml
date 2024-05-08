@@ -34,6 +34,7 @@ lavalink:
       soundcloud: false
       twitch: false
       vimeo: false
+      nico: false
       http: true
       local: false
     filters: # All filters are enabled by default
