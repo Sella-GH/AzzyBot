@@ -1,60 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
+using AzzyBot.Utilities.Records;
 using DSharpPlus.Entities;
 
 namespace AzzyBot.Utilities;
 
 internal sealed class EmbedBuilder
 {
-    internal static DiscordEmbedBuilder CreateExceptionEmbed(Exception ex, string timestamp, string? jsonMessage = null, DiscordMessage? message = null, DiscordUser? user = null, string? commandName = null, Dictionary<string, string>? commandOptions = null)
+    internal static DiscordEmbedBuilder CreateBasicEmbed(string title, string? description = null, DiscordColor? color = null, Uri? thumbnailUrl = null, string? footerText = null, Uri? url = null,  Dictionary<string, DiscordEmbedRecord>? fields = null)
     {
-        ArgumentNullException.ThrowIfNull(ex, nameof(ex));
-        ArgumentNullException.ThrowIfNull(timestamp, nameof(timestamp));
-
-        const string bugReportUrl = "https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D";
-        string os = AzzyStatsGeneral.GetOperatingSystem;
-        string arch = AzzyStatsGeneral.GetOsArchitecture;
-        string botName = AzzyStatsGeneral.GetBotName;
-        string botVersion = AzzyStatsGeneral.GetBotVersion;
+        ArgumentException.ThrowIfNullOrWhiteSpace(title, nameof(title));
 
         DiscordEmbedBuilder builder = new()
         {
-            Color = DiscordColor.Red
+            Title = title
         };
 
-        builder.AddField("Exception", ex.GetType().Name);
-        builder.AddField("Description", ex.Message);
+        if (!string.IsNullOrWhiteSpace(description))
+            builder.Description = description;
 
-        if (!string.IsNullOrWhiteSpace(jsonMessage))
-            builder.AddField("Advanced Error", jsonMessage);
+        if (color is not null)
+            builder.Color = color.Value;
 
-        builder.AddField("Timestamp", timestamp);
+        if (thumbnailUrl is not null)
+            builder.WithThumbnail(thumbnailUrl);
 
-        if (message is not null)
-            builder.AddField("Message", message.JumpLink.ToString());
+        if (!string.IsNullOrWhiteSpace(footerText))
+            builder.WithFooter(footerText);
 
-        if (user is not null)
-            builder.AddField("User", user.Mention);
+        if (url is not null)
+            builder.WithUrl(url);
 
-        if (!string.IsNullOrWhiteSpace(commandName))
-            builder.AddField("Command", commandName);
-
-        if (commandOptions?.Count > 0)
+        if (fields is not null)
         {
-            string values = string.Empty;
-            foreach (KeyValuePair<string, string> kvp in commandOptions)
+            foreach (KeyValuePair<string, DiscordEmbedRecord> field in fields)
             {
-                values += $"**{kvp.Key}**: {kvp.Value}";
+                builder.AddField(field.Key, field.Value.Description, field.Value.IsInline);
             }
-
-            builder.AddField("Options", values);
         }
-
-        builder.AddField("OS", os);
-        builder.AddField("Arch", arch);
-        builder.AddField("Bug report", $"Send a [bug report]({bugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.");
-        builder.WithAuthor(botName, bugReportUrl);
-        builder.WithFooter($"Version: {botVersion}");
 
         return builder;
     }
