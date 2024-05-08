@@ -42,8 +42,8 @@ jobs:
       - name: Update .csproj file if versions differ
         if: ${{ steps.current_version.outputs.CURRENT_VERSION != steps.nuget_version.outputs.NUGET_VERSION }}
         run: |
-          sed -i 's/<PackageReference Include="DSharpPlus" Version="'${{ steps.current_version.outputs.VERSION }}'"/<PackageReference Include="DSharpPlus" Version="'${{ steps.nuget_version.outputs.LATEST_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
-          sed -i 's/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.current_version.outputs.VERSION }}'"/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.nuget_version.outputs.LATEST_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
+          sed -i 's/<PackageReference Include="DSharpPlus" Version="'${{ steps.current_version.outputs.CURRENT_VERSION }}'"/<PackageReference Include="DSharpPlus" Version="'${{ steps.nuget_version.outputs.NUGET_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
+          sed -i 's/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.current_version.outputs.CURRENT_VERSION }}'"/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.nuget_version.outputs.NUGET_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
 
       - name: Commit and push if there was a change
         if: ${{ steps.current_version.outputs.CURRENT_VERSION != steps.nuget_version.outputs.NUGET_VERSION }}
