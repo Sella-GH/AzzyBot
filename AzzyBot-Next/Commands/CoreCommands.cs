@@ -55,21 +55,13 @@ internal sealed class CoreCommands
         }
 
         [Command("webservice-tests")]
-        public async ValueTask DebugWebServiceTestsAsync(SlashCommandContext context, string url)
+        public async ValueTask DebugWebServiceTestsAsync(SlashCommandContext context, Uri url)
         {
             _logger.CommandRequested(nameof(DebugWebServiceTestsAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
-
-            ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
-
-            if (!url.Contains("https://", StringComparison.OrdinalIgnoreCase) || !url.Contains("http://", StringComparison.OrdinalIgnoreCase))
-                url = $"http://{url}";
-
-            Uri uri = new(url);
-            await _webRequestService.GetWebAsync(uri);
-
-            await context.EditResponseAsync($"Web service test for *{uri}* was successful!");
+            await _webRequestService.GetWebAsync(url);
+            await context.EditResponseAsync($"Web service test for *{url}* was successful!");
         }
     }
 }
