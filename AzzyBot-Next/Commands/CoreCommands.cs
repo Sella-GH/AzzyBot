@@ -45,7 +45,7 @@ internal sealed class CoreCommands
         private readonly WebRequestService _webRequestService = webRequestService;
 
         [Command("trigger-exception")]
-        public static async ValueTask DebugTriggerExceptionAsync(SlashCommandContext context)
+        public async ValueTask DebugTriggerExceptionAsync(SlashCommandContext context)
         {
             _logger.CommandRequested(nameof(DebugTriggerExceptionAsync), context.User.GlobalName);
 
