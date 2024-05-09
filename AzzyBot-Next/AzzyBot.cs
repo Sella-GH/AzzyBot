@@ -77,7 +77,7 @@ internal static class AzzyBot
             services.AddHostedService(s => s.GetRequiredService<DiscordBotServiceHost>());
 
             services.AddSingleton<WebRequestService>();
-            services.AddHostedService(s => s.GetRequiredService<TimerService>());
+            services.AddSingleton<UpdaterService>();
             services.AddSingleton<TimerServiceHost>();
             services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());
         });

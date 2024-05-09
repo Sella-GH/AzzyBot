@@ -50,7 +50,7 @@ internal sealed class TimerServiceHost(AzzyBotSettings settings, DiscordBotServi
 
         try
         {
-            if (_isDev)
+            if (!_isDev)
             {
                 DateTime now = DateTime.Now;
 
