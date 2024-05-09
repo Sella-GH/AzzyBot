@@ -30,12 +30,31 @@ internal sealed class DiscordBotService
         _shardedClient = botServiceHost._shardedClient;
     }
 
+    internal async Task<DiscordGuild?> GetDiscordGuildAsync(ulong guildId = 0)
+    {
+        if (guildId is 0)
+            guildId = _settings.ServerId;
+
+        DiscordGuild? guild = null;
+
+        foreach (KeyValuePair<int, DiscordClient> kvp in _shardedClient.ShardClients)
+        {
+            DiscordClient discordClient = kvp.Value;
+            guild = await discordClient.GetGuildAsync(guildId);
+
+            if (guild is not null)
+                break;
+        }
+
+        return guild;
+    }
+
     internal async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, string? info = null)
     {
         string exMessage = ex.Message;
         string stackTrace = ex.StackTrace ?? string.Empty;
         string exInfo = (string.IsNullOrWhiteSpace(stackTrace)) ? exMessage : $"{exMessage}\n{stackTrace}";
-        string timestampString = timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+        string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
 
         _logger.LogCritical("{Ex}", ex.ToString());
 
@@ -44,7 +63,7 @@ internal sealed class DiscordBotService
             string tempFilePath = await FileOperations.CreateTempFileAsync(exInfo, $"StackTrace_{timestampString}.log");
 
             const string message = "A new error happend!";
-            DiscordEmbed embed = CreateExceptionEmbed(ex, timestampString, info);
+            DiscordEmbed embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), info);
             bool messageSent = await SendMessageAsync(_settings?.ErrorChannelId ?? 0, message, [embed], [tempFilePath]);
 
             if (!messageSent)
@@ -107,7 +126,7 @@ internal sealed class DiscordBotService
         return true;
     }
 
-    internal async Task<bool> SendMessageAsync(ulong channelId, string content = "", List<DiscordEmbed>? embeds = null, List<string>? filePaths = null, IMention[]? mentions = null)
+    internal async Task<bool> SendMessageAsync(ulong channelId, string? content = null, List<DiscordEmbed>? embeds = null, List<string>? filePaths = null, IMention[]? mentions = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
 
