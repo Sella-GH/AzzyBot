@@ -21,6 +21,8 @@ internal sealed class DiscordBotService
     private readonly ILogger<DiscordBotService> _logger;
     private readonly AzzyBotSettings _settings;
     private readonly DiscordShardedClient _shardedClient;
+    private const string BugReportUrl = "https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D";
+    private const string BugReportMessage = $"Send a [bug report]({BugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
 
     [SuppressMessage("Style", "IDE0290:Use primary constructor", Justification = "Otherwise it throws CS9124")]
     public DiscordBotService(AzzyBotSettings settings, ILogger<DiscordBotService> logger, DiscordBotServiceHost botServiceHost)
@@ -62,9 +64,8 @@ internal sealed class DiscordBotService
         {
             string tempFilePath = await FileOperations.CreateTempFileAsync(exInfo, $"StackTrace_{timestampString}.log");
 
-            const string message = "A new error happend!";
             DiscordEmbed embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), info);
-            bool messageSent = await SendMessageAsync(_settings?.ErrorChannelId ?? 0, message, [embed], [tempFilePath]);
+            bool messageSent = await SendMessageAsync(_settings?.ErrorChannelId ?? 0, BugReportMessage, [embed], [tempFilePath]);
 
             if (!messageSent)
                 _logger.UnableToSendMessage("Error message was not sent");
@@ -103,9 +104,8 @@ internal sealed class DiscordBotService
         {
             string tempFilePath = await FileOperations.CreateTempFileAsync(exInfo, $"StackTrace_{timestampString}.log");
 
-            const string message = "A new error happend!";
             DiscordEmbed embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), info, discordMessage, discordUser, commandName, commandOptions);
-            bool messageSent = await SendMessageAsync(_settings.ErrorChannelId, message, [embed], [tempFilePath]);
+            bool messageSent = await SendMessageAsync(_settings.ErrorChannelId, BugReportMessage, [embed], [tempFilePath]);
 
             if (!messageSent)
                 _logger.UnableToSendMessage("Error message was not sent");
@@ -235,7 +235,6 @@ internal sealed class DiscordBotService
         ArgumentNullException.ThrowIfNull(ex, nameof(ex));
         ArgumentNullException.ThrowIfNull(timestamp, nameof(timestamp));
 
-        const string bugReportUrl = "https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D";
         string os = AzzyStatsGeneral.GetOperatingSystem;
         string arch = AzzyStatsGeneral.GetOsArchitecture;
         string botName = AzzyStatsGeneral.GetBotName;
@@ -276,8 +275,7 @@ internal sealed class DiscordBotService
 
         builder.AddField("OS", os);
         builder.AddField("Arch", arch);
-        builder.AddField("Bug report", $"Send a [bug report]({bugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.");
-        builder.WithAuthor(botName, bugReportUrl);
+        builder.WithAuthor(botName, BugReportUrl);
         builder.WithFooter($"Version: {botVersion}");
 
         return builder;

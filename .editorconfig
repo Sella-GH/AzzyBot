@@ -659,7 +659,8 @@ dotnet_diagnostic.rcs1161.severity = none
 dotnet_diagnostic.rcs1162.severity = suggestion
 
 # Unused parameter
-dotnet_diagnostic.rcs1163.severity = suggestion
+# This one is doubled
+dotnet_diagnostic.rcs1163.severity = none
 
 # Unused type parameter
 dotnet_diagnostic.rcs1164.severity = suggestion
