@@ -788,7 +788,8 @@ dotnet_diagnostic.rcs1211.severity = suggestion
 dotnet_diagnostic.rcs1212.severity = suggestion
 
 # Remove unused member declaration
-dotnet_diagnostic.rcs1213.severity = suggestion
+# This one is doubled
+dotnet_diagnostic.rcs1213.severity = none
 
 # Unnecessary interpolated string
 dotnet_diagnostic.rcs1214.severity = suggestion
