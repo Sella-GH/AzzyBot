@@ -13,9 +13,9 @@ namespace AzzyBot.Commands;
 internal sealed class CoreCommands
 {
     [Command("core")]
-    internal sealed class Core(DiscordBotServiceHost discordBotServiceHost, ILogger<CoreCommands> logger)
+    internal sealed class Core(DiscordBotServiceHost discordBotServiceHost, ILogger<Core> logger)
     {
-        private readonly ILogger<CoreCommands> _logger = logger;
+        private readonly ILogger<Core> _logger = logger;
         private readonly DiscordBotServiceHost _discordBotServiceHost = discordBotServiceHost;
 
         [Command("change-bot-status")]
@@ -39,9 +39,9 @@ internal sealed class CoreCommands
     }
 
     [Command("debug")]
-    internal sealed class Debug(WebRequestService webRequestService, ILogger<CoreCommands> logger)
+    internal sealed class Debug(WebRequestService webRequestService, ILogger<Debug> logger)
     {
-        private readonly ILogger<CoreCommands> _logger = logger;
+        private readonly ILogger<Debug> _logger = logger;
         private readonly WebRequestService _webRequestService = webRequestService;
 
         [Command("trigger-exception")]
@@ -62,6 +62,9 @@ internal sealed class CoreCommands
             await context.DeferResponseAsync();
 
             ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
+
+            if (!url.Contains("https://", StringComparison.OrdinalIgnoreCase) || !url.Contains("http://", StringComparison.OrdinalIgnoreCase))
+                url = $"http://{url}";
 
             Uri uri = new(url);
             await _webRequestService.GetWebAsync(uri);
