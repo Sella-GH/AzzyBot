@@ -7,7 +7,7 @@ namespace AzzyBot.Utilities;
 
 internal static class EmbedBuilder
 {
-    private static DiscordEmbedBuilder CreateBasicEmbed(string title, string? description = null, DiscordColor? color = null, Uri? thumbnailUrl = null, string? footerText = null, Uri? url = null,  Dictionary<string, DiscordEmbedRecord>? fields = null)
+    private static DiscordEmbedBuilder CreateBasicEmbed(string title, string? description = null, DiscordColor? color = null, Uri? thumbnailUrl = null, string? footerText = null, Uri? url = null, Dictionary<string, DiscordEmbedRecord>? fields = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title, nameof(title));
 

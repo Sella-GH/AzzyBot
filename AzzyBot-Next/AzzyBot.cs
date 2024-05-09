@@ -37,7 +37,7 @@ internal static class AzzyBot
                 config.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
                 config.UseUtcTimestamp = true;
             });
-            logging.SetMinimumLevel((isDev || forceDebug) ? LogLevel.Debug: LogLevel.Information);
+            logging.SetMinimumLevel((isDev || forceDebug) ? LogLevel.Debug : LogLevel.Information);
         });
 
         // Need to register as Singleton first

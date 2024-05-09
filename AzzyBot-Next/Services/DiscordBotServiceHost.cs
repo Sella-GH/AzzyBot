@@ -110,11 +110,11 @@ internal sealed class DiscordBotServiceHost : IHostedService
         ArgumentNullException.ThrowIfNull(_settings, nameof(_settings));
 
         IReadOnlyDictionary<int, CommandsExtension> commandsExtensions = await _shardedClient.UseCommandsAsync(new()
-            {
-                RegisterDefaultCommandProcessors = false,
-                ServiceProvider = _serviceProvider,
-                UseDefaultCommandErrorHandler = false
-            });
+        {
+            RegisterDefaultCommandProcessors = false,
+            ServiceProvider = _serviceProvider,
+            UseDefaultCommandErrorHandler = false
+        });
 
         foreach (CommandsExtension commandsExtension in commandsExtensions.Values)
         {
