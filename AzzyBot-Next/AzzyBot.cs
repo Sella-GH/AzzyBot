@@ -72,7 +72,6 @@ internal static class AzzyBot
             services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
 
             services.AddSingleton<DiscordBotService>();
-
             services.AddSingleton<DiscordBotServiceHost>();
             services.AddHostedService(s => s.GetRequiredService<DiscordBotServiceHost>());
 

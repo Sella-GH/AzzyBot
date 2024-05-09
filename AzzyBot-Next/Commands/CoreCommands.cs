@@ -24,7 +24,6 @@ internal sealed class CoreCommands
             _logger.CommandRequested(nameof(CoreChangeStatusAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
-            //DiscordBotServiceHost discordBot = context.ServiceProvider.GetRequiredService<DiscordBotServiceHost>();
             await _discordBotServiceHost.SetBotStatusAsync(status, activity, doing, url);
             await context.EditResponseAsync("Bot status has been updated!");
         }
