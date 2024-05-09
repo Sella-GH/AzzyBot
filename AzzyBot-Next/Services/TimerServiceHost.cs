@@ -11,11 +11,12 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-internal sealed class TimerService(AzzyBotSettings settings, DiscordBotService discordBotService, ILogger<TimerService> logger) : IDisposable, IHostedService
+internal sealed class TimerServiceHost(AzzyBotSettings settings, DiscordBotService discordBotService, UpdaterService updaterService, ILogger<TimerServiceHost> logger) : IDisposable, IHostedService
 {
-    private readonly ILogger<TimerService> _logger = logger;
+    private readonly ILogger<TimerServiceHost> _logger = logger;
     private readonly AzzyBotSettings _settings = settings;
     private readonly DiscordBotService _discordBotService = discordBotService;
+    private readonly UpdaterService _updaterService = updaterService;
     private readonly bool _isDev = AzzyStatsGeneral.GetBotEnvironment is EnvironmentEnum.Development;
     private Timer? _timer;
     private DateTime _lastBotUpdateCheck = DateTime.MinValue;
@@ -49,7 +50,7 @@ internal sealed class TimerService(AzzyBotSettings settings, DiscordBotService d
 
         try
         {
-            if (!_isDev)
+            if (_isDev)
             {
                 DateTime now = DateTime.Now;
 
@@ -57,6 +58,8 @@ internal sealed class TimerService(AzzyBotSettings settings, DiscordBotService d
                 {
                     _logger.GlobalTimerCheckForUpdates();
                     _lastBotUpdateCheck = now;
+
+                    await _updaterService.CheckForAzzyUpdatesAsync();
                 }
             }
         }

@@ -8,16 +8,16 @@ namespace AzzyBot.Logging;
 internal static partial class LoggerActions
 {
     [LoggerMessage(0, LogLevel.Debug, "Starting global timer")]
-    public static partial void GlobalTimerStart(this ILogger<TimerService> logger);
+    public static partial void GlobalTimerStart(this ILogger<TimerServiceHost> logger);
 
     [LoggerMessage(1, LogLevel.Debug, "Global timer ticked")]
-    public static partial void GlobalTimerTicked(this ILogger<TimerService> logger);
+    public static partial void GlobalTimerTicked(this ILogger<TimerServiceHost> logger);
 
     [LoggerMessage(2, LogLevel.Debug, "Global timer checking for bot updates")]
-    public static partial void GlobalTimerCheckForUpdates(this ILogger<TimerService> logger);
+    public static partial void GlobalTimerCheckForUpdates(this ILogger<TimerServiceHost> logger);
 
     [LoggerMessage(9, LogLevel.Debug, "Stopping global timer")]
-    public static partial void GlobalTimerStop(this ILogger<TimerService> logger);
+    public static partial void GlobalTimerStop(this ILogger<TimerServiceHost> logger);
 
     [LoggerMessage(100, LogLevel.Information, "Starting {name} in version {version} on {os}-{arch}")]
     public static partial void BotStarting(this ILogger<CoreServiceHost> logger, string name, string version, string os, string arch);

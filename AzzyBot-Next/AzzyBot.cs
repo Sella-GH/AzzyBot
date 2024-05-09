@@ -76,8 +76,10 @@ internal static class AzzyBot
             services.AddSingleton<DiscordBotServiceHost>();
             services.AddHostedService(s => s.GetRequiredService<DiscordBotServiceHost>());
 
-            services.AddSingleton<TimerService>();
+            services.AddSingleton<WebRequestService>();
             services.AddHostedService(s => s.GetRequiredService<TimerService>());
+            services.AddSingleton<TimerServiceHost>();
+            services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());
         });
 
         builder.UseConsoleLifetime();
