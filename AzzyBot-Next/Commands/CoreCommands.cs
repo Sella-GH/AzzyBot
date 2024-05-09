@@ -39,14 +39,34 @@ internal sealed class CoreCommands
     }
 
     [Command("debug")]
-    internal sealed class Debug
+    internal sealed class Debug(WebRequestService webRequestService, ILogger<CoreCommands> logger)
     {
+        private readonly ILogger<CoreCommands> _logger = logger;
+        private readonly WebRequestService _webRequestService = webRequestService;
+
         [Command("trigger-exception")]
-        public static async ValueTask TriggerExceptionAsync(SlashCommandContext context)
+        public static async ValueTask DebugTriggerExceptionAsync(SlashCommandContext context)
         {
+            _logger.CommandRequested(nameof(DebugTriggerExceptionAsync), context.User.GlobalName);
+
             await context.DeferResponseAsync();
 
             throw new InvalidOperationException("This is a debug exception");
+        }
+
+        [Command("webservice-tests")]
+        public async ValueTask DebugWebServiceTestsAsync(SlashCommandContext context, string url)
+        {
+            _logger.CommandRequested(nameof(DebugWebServiceTestsAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            ArgumentException.ThrowIfNullOrWhiteSpace(url, nameof(url));
+
+            Uri uri = new(url);
+            await _webRequestService.GetWebAsync(uri);
+
+            await context.EditResponseAsync($"Web service test for *{uri}* was successful!");
         }
     }
 }
