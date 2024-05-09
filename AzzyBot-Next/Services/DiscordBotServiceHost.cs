@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Commands;
+using AzzyBot.Commands.Converters;
 using AzzyBot.Logging;
 using AzzyBot.Services.Modules;
 using AzzyBot.Settings;
@@ -129,7 +130,9 @@ internal sealed class DiscordBotServiceHost : IHostedService
                 commandsExtension.AddCommands(typeof(CoreCommands.Debug));
 
             SlashCommandProcessor slashCommandProcessor = new();
-            await commandsExtension.AddProcessorsAsync(slashCommandProcessor);
+            slashCommandProcessor.AddConverter<Uri>(new UriArgumentConverter());
+
+            await commandsExtension.AddProcessorAsync(slashCommandProcessor);
         }
     }
 

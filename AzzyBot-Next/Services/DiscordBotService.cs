@@ -21,6 +21,8 @@ internal sealed class DiscordBotService
     private readonly ILogger<DiscordBotService> _logger;
     private readonly AzzyBotSettings _settings;
     private readonly DiscordShardedClient _shardedClient;
+    private const string BugReportUrl = "https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D";
+    private const string BugReportMessage = $"Send a [bug report]({BugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
 
     [SuppressMessage("Style", "IDE0290:Use primary constructor", Justification = "Otherwise it throws CS9124")]
     public DiscordBotService(AzzyBotSettings settings, ILogger<DiscordBotService> logger, DiscordBotServiceHost botServiceHost)
@@ -30,12 +32,31 @@ internal sealed class DiscordBotService
         _shardedClient = botServiceHost._shardedClient;
     }
 
+    internal async Task<DiscordGuild?> GetDiscordGuildAsync(ulong guildId = 0)
+    {
+        if (guildId is 0)
+            guildId = _settings.ServerId;
+
+        DiscordGuild? guild = null;
+
+        foreach (KeyValuePair<int, DiscordClient> kvp in _shardedClient.ShardClients)
+        {
+            DiscordClient discordClient = kvp.Value;
+            guild = await discordClient.GetGuildAsync(guildId);
+
+            if (guild is not null)
+                break;
+        }
+
+        return guild;
+    }
+
     internal async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, string? info = null)
     {
         string exMessage = ex.Message;
         string stackTrace = ex.StackTrace ?? string.Empty;
         string exInfo = (string.IsNullOrWhiteSpace(stackTrace)) ? exMessage : $"{exMessage}\n{stackTrace}";
-        string timestampString = timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+        string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
 
         _logger.LogCritical("{Ex}", ex.ToString());
 
@@ -43,9 +64,8 @@ internal sealed class DiscordBotService
         {
             string tempFilePath = await FileOperations.CreateTempFileAsync(exInfo, $"StackTrace_{timestampString}.log");
 
-            const string message = "A new error happend!";
-            DiscordEmbed embed = EmbedBuilder.CreateExceptionEmbed(ex, timestampString, info);
-            bool messageSent = await SendMessageAsync(_settings?.ErrorChannelId ?? 0, message, [embed], [tempFilePath]);
+            DiscordEmbed embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), info);
+            bool messageSent = await SendMessageAsync(_settings?.ErrorChannelId ?? 0, BugReportMessage, [embed], [tempFilePath]);
 
             if (!messageSent)
                 _logger.UnableToSendMessage("Error message was not sent");
@@ -84,9 +104,8 @@ internal sealed class DiscordBotService
         {
             string tempFilePath = await FileOperations.CreateTempFileAsync(exInfo, $"StackTrace_{timestampString}.log");
 
-            const string message = "A new error happend!";
-            DiscordEmbed embed = EmbedBuilder.CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), info, discordMessage, discordUser, commandName, commandOptions);
-            bool messageSent = await SendMessageAsync(_settings.ErrorChannelId, message, [embed], [tempFilePath]);
+            DiscordEmbed embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), info, discordMessage, discordUser, commandName, commandOptions);
+            bool messageSent = await SendMessageAsync(_settings.ErrorChannelId, BugReportMessage, [embed], [tempFilePath]);
 
             if (!messageSent)
                 _logger.UnableToSendMessage("Error message was not sent");
@@ -107,7 +126,7 @@ internal sealed class DiscordBotService
         return true;
     }
 
-    internal async Task<bool> SendMessageAsync(ulong channelId, string content = "", List<DiscordEmbed>? embeds = null, List<string>? filePaths = null, IMention[]? mentions = null)
+    internal async Task<bool> SendMessageAsync(ulong channelId, string? content = null, List<DiscordEmbed>? embeds = null, List<string>? filePaths = null, IMention[]? mentions = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
 
@@ -183,7 +202,7 @@ internal sealed class DiscordBotService
         DiscordMember? member = ctx.Guild?.Owner;
         string errorMessage = "Ooops something went wrong!\n\nPlease inform the owner of this server.";
         if (member is not null)
-            errorMessage = errorMessage.Replace("the owner of this server", member.Mention, StringComparison.Ordinal);
+            errorMessage = errorMessage.Replace("the owner of this server", member.Mention, StringComparison.OrdinalIgnoreCase);
 
         await using DiscordMessageBuilder builder = new()
         {
@@ -209,5 +228,56 @@ internal sealed class DiscordBotService
                 commandParameters.Add(name, value);
             }
         }
+    }
+
+    private static DiscordEmbedBuilder CreateExceptionEmbed(Exception ex, string timestamp, string? jsonMessage = null, DiscordMessage? message = null, DiscordUser? user = null, string? commandName = null, Dictionary<string, string>? commandOptions = null)
+    {
+        ArgumentNullException.ThrowIfNull(ex, nameof(ex));
+        ArgumentNullException.ThrowIfNull(timestamp, nameof(timestamp));
+
+        string os = AzzyStatsGeneral.GetOperatingSystem;
+        string arch = AzzyStatsGeneral.GetOsArchitecture;
+        string botName = AzzyStatsGeneral.GetBotName;
+        string botVersion = AzzyStatsGeneral.GetBotVersion;
+
+        DiscordEmbedBuilder builder = new()
+        {
+            Color = DiscordColor.Red
+        };
+
+        builder.AddField("Exception", ex.GetType().Name);
+        builder.AddField("Description", ex.Message);
+
+        if (!string.IsNullOrWhiteSpace(jsonMessage))
+            builder.AddField("Advanced Error", jsonMessage);
+
+        builder.AddField("Timestamp", timestamp);
+
+        if (message is not null)
+            builder.AddField("Message", message.JumpLink.ToString());
+
+        if (user is not null)
+            builder.AddField("User", user.Mention);
+
+        if (!string.IsNullOrWhiteSpace(commandName))
+            builder.AddField("Command", commandName);
+
+        if (commandOptions?.Count > 0)
+        {
+            string values = string.Empty;
+            foreach (KeyValuePair<string, string> kvp in commandOptions)
+            {
+                values += $"**{kvp.Key}**: {kvp.Value}";
+            }
+
+            builder.AddField("Options", values);
+        }
+
+        builder.AddField("OS", os);
+        builder.AddField("Arch", arch);
+        builder.WithAuthor(botName, BugReportUrl);
+        builder.WithFooter($"Version: {botVersion}");
+
+        return builder;
     }
 }

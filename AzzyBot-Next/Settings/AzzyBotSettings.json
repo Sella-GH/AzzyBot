@@ -7,5 +7,13 @@
         "Doing": "Music",
         "Status": 1,
         "StreamUrl": ""
+    },
+    "CoreSettings": {
+        "CoreUpdater": {
+            "CheckInterval": 1,
+            "DisplayChangelog": true,
+            "DisplayInstructions": true,
+            "MessageChannelId": 0
+        }
     }
 }

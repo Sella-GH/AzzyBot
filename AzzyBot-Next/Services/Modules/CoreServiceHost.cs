@@ -18,7 +18,7 @@ internal sealed class CoreServiceHost : BaseService, IHostedService
     {
         _settings = settings;
         _logger = logger;
-        CheckSettings(_settings.DiscordStatus, _logger);
+        CheckSettings(_settings.CoreSettings, _logger, [nameof(CoreSettings.CoreUpdater.MessageChannelId)]);
 
         _isActivated = true;
     }

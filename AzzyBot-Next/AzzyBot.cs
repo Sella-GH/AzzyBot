@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using AzzyBot.Enums;
 using AzzyBot.Services;
 using AzzyBot.Services.Modules;
 using AzzyBot.Settings;
@@ -17,7 +18,9 @@ internal static class AzzyBot
 {
     private static async Task Main(string[] args)
     {
-        string environment = AzzyStatsGeneral.GetBotEnvironment;
+        EnvironmentEnum environment = AzzyStatsGeneral.GetBotEnvironment;
+        bool isDev = environment is EnvironmentEnum.Development;
+        bool forceDebug = args.Length > 0 && args[0] is "-forceDebug";
         IHostBuilder builder = Host.CreateDefaultBuilder();
 
         // Add logging
@@ -34,7 +37,7 @@ internal static class AzzyBot
                 config.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
                 config.UseUtcTimestamp = true;
             });
-            logging.SetMinimumLevel((environment is "Development" || args[0] is "-forceDebug") ? LogLevel.Debug: LogLevel.Information);
+            logging.SetMinimumLevel((isDev || forceDebug) ? LogLevel.Debug : LogLevel.Information);
         });
 
         // Need to register as Singleton first
@@ -45,11 +48,9 @@ internal static class AzzyBot
             services.AddSingleton(_ =>
             {
                 ConfigurationBuilder builder = new();
-                builder.Sources.Clear();
-                string settingsFile = "AzzyBotSettings.json";
-                if (environment is "Development")
-                    settingsFile = "AzzyBotSettings-Dev.json";
+                string settingsFile = (isDev) ? "AzzyBotSettings-Dev.json" : "AzzyBotSettings.json";
 
+                builder.Sources.Clear();
                 builder.AddJsonFile(Path.Combine("Settings", settingsFile), false, false);
 
                 IConfiguration config = builder.Build();
@@ -71,13 +72,17 @@ internal static class AzzyBot
             services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
 
             services.AddSingleton<DiscordBotService>();
-
             services.AddSingleton<DiscordBotServiceHost>();
             services.AddHostedService(s => s.GetRequiredService<DiscordBotServiceHost>());
+
+            services.AddSingleton<WebRequestService>();
+            services.AddSingleton<UpdaterService>();
+            services.AddSingleton<TimerServiceHost>();
+            services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());
         });
 
         builder.UseConsoleLifetime();
-        builder.UseEnvironment(environment);
+        builder.UseEnvironment(environment.ToString());
 
         await builder.RunConsoleAsync();
     }
