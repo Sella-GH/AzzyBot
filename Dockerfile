@@ -40,5 +40,6 @@ USER azzy
 # Start the app
 WORKDIR /app
 ARG RUNTIME
+ENV DLL="$RUNTIME"
 
-ENTRYPOINT ["dotnet", "${RUNTIME}"]
+ENTRYPOINT ["dotnet", "${DLL}"]
