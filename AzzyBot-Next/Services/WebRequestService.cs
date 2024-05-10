@@ -25,10 +25,11 @@ internal sealed class WebRequestService(ILogger<WebRequestService> logger) : IDi
                 Socket socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 await socket.ConnectAsync(context.DnsEndPoint, cancellationToken);
                 return new NetworkStream(socket, true);
-            }
+            },
+            PooledConnectionLifetime = TimeSpan.FromMinutes(15)
         })
     {
-        DefaultRequestVersion = new(1, 1),
+        DefaultRequestVersion = HttpVersion.Version11,
         DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher,
         Timeout = TimeSpan.FromSeconds(30)
     };
@@ -36,9 +37,12 @@ internal sealed class WebRequestService(ILogger<WebRequestService> logger) : IDi
     /// <summary>
     /// Default HttpClient which prefers IPv6.
     /// </summary>
-    private readonly HttpClient _httpClient = new()
+    private readonly HttpClient _httpClient = new(new SocketsHttpHandler()
+        {
+            PooledConnectionLifetime = TimeSpan.FromMinutes(15)
+        })
     {
-        DefaultRequestVersion = new(1, 1),
+        DefaultRequestVersion = HttpVersion.Version11,
         DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher,
         Timeout = TimeSpan.FromSeconds(30)
     };
