@@ -58,7 +58,7 @@ internal sealed class DiscordBotService
         string exInfo = (string.IsNullOrWhiteSpace(stackTrace)) ? exMessage : $"{exMessage}\n{stackTrace}";
         string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
 
-        _logger.LogCritical("{Ex}", ex.ToString());
+        _logger.ExceptionOccured(ex);
 
         try
         {
@@ -98,7 +98,7 @@ internal sealed class DiscordBotService
         Dictionary<string, string> commandOptions = [];
         ProcessOptions(ctx.Arguments, commandOptions);
 
-        _logger.LogCritical("{Ex}", ex.ToString());
+        _logger.ExceptionOccured(ex);
 
         try
         {

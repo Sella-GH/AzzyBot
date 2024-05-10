@@ -69,4 +69,7 @@ internal static partial class LoggerActions
 
     [LoggerMessage(401, LogLevel.Critical, "The given BotToken is either missing or invalid")]
     public static partial void BotTokenInvalid(this ILogger<DiscordBotServiceHost> logger);
+
+    [LoggerMessage(402, LogLevel.Critical, "An exception occured: ")]
+    public static partial void ExceptionOccured(this ILogger<DiscordBotService> logger, Exception ex);
 }
