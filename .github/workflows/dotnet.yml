@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-debug:
+  build-amd:
     name: Build and Publish DEBUG for ${{ matrix.os }} - ${{ matrix.arch }}
     runs-on: ubuntu-latest
     strategy:
@@ -27,99 +27,98 @@ jobs:
             arch: x64
           - os: win
             arch: arm64
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+     - name: Checkout
+       uses: actions/checkout@v4
+       with:
+         fetch-depth: 0
       
-      - name: Setup .NET 8.0.x
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x'
+     - name: Setup .NET 8.0.x
+       uses: actions/setup-dotnet@v4
+       with:
+         dotnet-version: '8.0.x'
 
-      - name: Install GitHub CLI
-        run: sudo apt update && sudo apt install -y gh
+     - name: Install GitHub CLI
+       run: sudo apt update && sudo apt install -y gh
       
-      - name: Publish Debug
-        run: |
-          dotnet publish /home/runner/work/AzzyBot/AzzyBot/AzzyBot-Next/AzzyBot-Next.csproj -c Debug -r ${{ matrix.os }}-${{ matrix.arch }}
+     - name: Publish Debug
+       run: |
+         dotnet publish /home/runner/work/AzzyBot/AzzyBot/AzzyBot-Next/AzzyBot-Next.csproj -c Debug -r ${{ matrix.os }}-${{ matrix.arch }}
 
-      #- name: Download and extract Lavalink
-      #  run: |
-      #    mkdir -p ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files/plugins
-      #    gh release download 4.0.4 --dir './artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files' --pattern 'Lavalink.jar' --repo lavalink-devs/Lavalink
-      #    wget -qO ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
-      #  env:
-      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+     #- name: Download and extract Lavalink
+     #  run: |
+     #    mkdir -p ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files/plugins
+     #    gh release download 4.0.4 --dir './artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files' --pattern 'Lavalink.jar' --repo lavalink-devs/Lavalink
+     #    wget -qO ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
+     #  env:
+     #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      #- name: Calculate Lines of Source Code
-      #  id: loc_cs
-      #  uses: PavanMudigonda/lines-of-code-reporter@v1.6
-      #  with:
-      #    include_lang: "C#,MSBuild script"
+     - name: Calculate Lines of Source Code
+       id: loc_cs
+       uses: PavanMudigonda/lines-of-code-reporter@v1.6
+       with:
+         include_lang: "C#,MSBuild script"
 
-      #- name: Calculate Lines of JSON Code
-      #  id: loc_json
-      #  uses: PavanMudigonda/lines-of-code-reporter@v1.6
-      #  with:
-      #    directory: "/home/runner/work/AzzyBot/AzzyBot/AzzyBot/Customization"
-      #    include_lang: "JSON"
+     # - name: Calculate Lines of JSON Code
+     #  id: loc_json
+     #  uses: PavanMudigonda/lines-of-code-reporter@v1.6
+     #  with:
+     #    directory: "/home/runner/work/AzzyBot/AzzyBot/AzzyBot/Customization"
+     #    include_lang: "JSON"
           
-      #- name: Get Date and Time
-      #  id: dateTime
-      #  uses: Kaven-Universe/github-action-current-date-time@v1
-      #  with:
-      #    format: "YYYY-MM-DDTHH:mm:ss"
+     - name: Get Date and Time
+       id: dateTime
+       uses: Kaven-Universe/github-action-current-date-time@v1
+       with:
+         format: "YYYY-MM-DDTHH:mm:ss"
 
-      #- name: Add some basic information
-      #  run: |
-      #    sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
-      #    sed -i 's\Compile date not found\${{ steps.dateTime.outputs.time }}\g' ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
-      #    sed -i 's\Lines of source code not found\${{ steps.loc_cs.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
-      #    sed -i 's\Lines of JSON code not found\${{ steps.loc_json.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
-      #  env:
-      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+     - name: Add some basic information
+       run: |
+         sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot-Next/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
+         sed -i 's\Compile date not found\${{ steps.dateTime.outputs.time }}\g' ./artifacts/publish/AzzyBot-Next/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
+         sed -i 's\Lines of source code not found\${{ steps.loc_cs.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot-Next/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
+         sed -i 's\Lines of JSON code not found\0\g' ./artifacts/publish/AzzyBot-Next/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
+       env:
+         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
-      - name: Archive Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: debug-${{ matrix.os }}-${{ matrix.arch }}
-          path: ./artifacts/publish/AzzyBot-Next/debug_${{ matrix.os }}-${{ matrix.arch }}
+     - name: Archive Build Artifact
+       uses: actions/upload-artifact@v4
+       with:
+         name: debug-${{ matrix.os }}-${{ matrix.arch }}
+         path: ./artifacts/publish/AzzyBot-Next/debug_${{ matrix.os }}-${{ matrix.arch }}
 
-  #build-docker:
-    #name: Build and publish docker .zip file
-    #runs-on: ubuntu-latest
-    #steps:
-      #- name: Checkout
-      #  uses: actions/checkout@v4
-      #  with:
-      #    fetch-depth: 0
+  build-docker:
+    name: Build and publish docker .zip file
+    runs-on: ubuntu-latest
+    steps:
+     - name: Checkout
+       uses: actions/checkout@v4
+       with:
+         fetch-depth: 0
 
-      #- name: Getting all files together
-      #  run: |
-      #    mkdir docker-zip
-      #    mv ./CHANGELOG.md ./docker-zip/CHANGELOG.md
-      #    mv ./CHANGELOG_HISTORY.md ./docker-zip/CHANGELOG_HISTORY.md
-      #    mv ./docker-compose.dev.yml ./docker-zip/docker-compose.dev.yml
-      #    mv ./docker-compose.yml ./docker-zip/docker-compose.yml
-      #    mv ./LICENSE ./docker-zip/LICENSE
-      #    mv ./README.md ./docker-zip/README.md
-      #    mv ./SECURITY.md ./docker-zip/SECURITY.md
-      #    mkdir -p ./docker-zip/AzzyBot/Customization
-      #    mv ./AzzyBot/Customization/* ./docker-zip/AzzyBot/Customization
-      #    mkdir -p ./docker-zip/AzzyBot/Modules/AzuraCast/Files
-      #    mv ./AzzyBot/Modules/AzuraCast/Files/* ./docker-zip/AzzyBot/Modules/AzuraCast/Files
-      #    mkdir -p ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins
-      #    mv ./AzzyBot/Modules/MusicStreaming/Files/application.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/application.yml
-      #    mv ./AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
-      #    wget -qO ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
-      #    mkdir -p ./docker-zip/AzzyBot/Settings
-      #    mv ./AzzyBot/Settings/appsettings.json ./docker-zip/AzzyBot/Settings/appsettings.json
+     - name: Getting all files together
+       run: |
+         mkdir docker-zip
+         #mv ./CHANGELOG.md ./docker-zip/CHANGELOG.md
+         #mv ./CHANGELOG_HISTORY.md ./docker-zip/CHANGELOG_HISTORY.md
+         mv ./docker-compose.dev.yml ./docker-zip/docker-compose.yml
+         mv ./LICENSE ./docker-zip/LICENSE
+         #mv ./README.md ./docker-zip/README.md
+         mv ./SECURITY.md ./docker-zip/SECURITY.md
+         #mkdir -p ./docker-zip/AzzyBot/Customization
+         #mv ./AzzyBot/Customization/* ./docker-zip/AzzyBot/Customization
+         #mkdir -p ./docker-zip/AzzyBot/Modules/AzuraCast/Files
+         #mv ./AzzyBot/Modules/AzuraCast/Files/* ./docker-zip/AzzyBot/Modules/AzuraCast/Files
+         #mkdir -p ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins
+         #mv ./AzzyBot/Modules/MusicStreaming/Files/application.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/application.yml
+         #mv ./AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
+         #wget -qO ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
+         mkdir -p ./docker-zip/AzzyBot-Next/Settings
+         mv ./AzzyBot-Next/Settings/AzzyBotSettings.json ./docker-zip/AzzyBot-Next/Settings/AzzyBotSettings.json
 
-      #- name: Archive docker-zip artifact
-      #  uses: actions/upload-artifact@v4
-      #  with:
-      #    name: debug-docker
-      #    path: ./docker-zip
-          
+     - name: Archive docker-zip artifact
+       uses: actions/upload-artifact@v4
+       with:
+         name: debug-docker
+         path: ./docker-zip

@@ -2,7 +2,7 @@
 
 namespace AzzyBot.Settings;
 
-public sealed record AzzyBotSettings
+public sealed record AzzyBotSettingsRecord
 {
     public required string BotToken { get; init; }
     public required ulong ServerId { get; init; }

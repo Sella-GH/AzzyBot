@@ -19,6 +19,7 @@
     <RepositoryUrl>https://github.com/Sella-GH/AzzyBot</RepositoryUrl>
     <PathMap>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)=.</PathMap>
     <AnalysisLevel>latest-all</AnalysisLevel>
+    <NoWarn>$(NoWarn);CA1812;CA2007</NoWarn>
     <Configurations>Debug;Release;Docker;Docker-debug</Configurations>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
@@ -124,6 +125,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Modules\Core\Files\AzzyBotStats.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Settings\AzzyBotSettings-Dev.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

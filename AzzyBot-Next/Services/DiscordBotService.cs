@@ -19,13 +19,13 @@ namespace AzzyBot.Services;
 internal sealed class DiscordBotService
 {
     private readonly ILogger<DiscordBotService> _logger;
-    private readonly AzzyBotSettings _settings;
+    private readonly AzzyBotSettingsRecord _settings;
     private readonly DiscordShardedClient _shardedClient;
     private const string BugReportUrl = "https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D";
     private const string BugReportMessage = $"Send a [bug report]({BugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
 
     [SuppressMessage("Style", "IDE0290:Use primary constructor", Justification = "Otherwise it throws CS9124")]
-    public DiscordBotService(AzzyBotSettings settings, ILogger<DiscordBotService> logger, DiscordBotServiceHost botServiceHost)
+    public DiscordBotService(AzzyBotSettingsRecord settings, ILogger<DiscordBotService> logger, DiscordBotServiceHost botServiceHost)
     {
         _settings = settings;
         _logger = logger;
@@ -58,7 +58,7 @@ internal sealed class DiscordBotService
         string exInfo = (string.IsNullOrWhiteSpace(stackTrace)) ? exMessage : $"{exMessage}\n{stackTrace}";
         string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
 
-        _logger.LogCritical("{Ex}", ex.ToString());
+        _logger.ExceptionOccured(ex);
 
         try
         {
@@ -98,7 +98,7 @@ internal sealed class DiscordBotService
         Dictionary<string, string> commandOptions = [];
         ProcessOptions(ctx.Arguments, commandOptions);
 
-        _logger.LogCritical("{Ex}", ex.ToString());
+        _logger.ExceptionOccured(ex);
 
         try
         {

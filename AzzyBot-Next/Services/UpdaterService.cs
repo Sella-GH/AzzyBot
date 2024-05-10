@@ -11,10 +11,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-internal sealed class UpdaterService(AzzyBotSettings settings, DiscordBotService botService, WebRequestService webService, ILogger<UpdaterService> logger)
+internal sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotService botService, WebRequestService webService, ILogger<UpdaterService> logger)
 {
     private readonly ILogger<UpdaterService> _logger = logger;
-    private readonly AzzyBotSettings _settings = settings;
+    private readonly AzzyBotSettingsRecord _settings = settings;
     private readonly DiscordBotService _botService = botService;
     private readonly WebRequestService _webService = webService;
     private DateTime _lastAzzyUpdateNotificationTime = DateTime.MinValue;

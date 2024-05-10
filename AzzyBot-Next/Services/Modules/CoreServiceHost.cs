@@ -12,9 +12,9 @@ internal sealed class CoreServiceHost : BaseService, IHostedService
 {
     internal readonly bool _isActivated;
     private readonly ILogger<CoreServiceHost> _logger;
-    private readonly AzzyBotSettings _settings;
+    private readonly AzzyBotSettingsRecord _settings;
 
-    public CoreServiceHost(AzzyBotSettings settings, ILogger<CoreServiceHost> logger)
+    public CoreServiceHost(AzzyBotSettingsRecord settings, ILogger<CoreServiceHost> logger)
     {
         _settings = settings;
         _logger = logger;

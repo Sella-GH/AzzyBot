@@ -1,17 +1,17 @@
-include:
-  - ./AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
+#include:
+  #- ./AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
 services:
   AzzyBot:
-    container_name: AzzyBot
-    image: sellagh/azzybot:dev
+    container_name: AzzyBot-Next
+    image: sellagh/azzybot:dev-Docker
     pull_policy: always
     restart: unless-stopped
     user: ${CURRENT_UID}
-    depends_on:
-      - lavalink
-    networks:
-      - lavalink
+    #depends_on:
+    #  - lavalink
+    #networks:
+    #  - lavalink
     volumes:
-      - ./AzzyBot/Customization:/app/Customization
-      - ./AzzyBot/Modules/AzuraCast/Files:/app/Modules/AzuraCast/Files
-      - ./AzzyBot/Settings:/app/Settings
+      #- ./AzzyBot/Customization:/app/Customization
+      #- ./AzzyBot/Modules/AzuraCast/Files:/app/Modules/AzuraCast/Files
+      - ./AzzyBot-Next/Settings:/app/Settings
