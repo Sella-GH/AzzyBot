@@ -28,7 +28,7 @@ jobs:
           - os: win
             arch: arm64
             
-    steps:    
+    steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -88,39 +88,38 @@ jobs:
           name: debug-${{ matrix.os }}-${{ matrix.arch }}
           path: ./artifacts/publish/AzzyBot-Next/debug_${{ matrix.os }}-${{ matrix.arch }}
 
-  #build-docker:
-    #name: Build and publish docker .zip file
-    #runs-on: ubuntu-latest
-    #steps:
-      #- name: Checkout
-      #  uses: actions/checkout@v4
-      #  with:
-      #    fetch-depth: 0
+  build-docker:
+    name: Build and publish docker .zip file
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      #- name: Getting all files together
-      #  run: |
-      #    mkdir docker-zip
-      #    mv ./CHANGELOG.md ./docker-zip/CHANGELOG.md
-      #    mv ./CHANGELOG_HISTORY.md ./docker-zip/CHANGELOG_HISTORY.md
-      #    mv ./docker-compose.dev.yml ./docker-zip/docker-compose.dev.yml
-      #    mv ./docker-compose.yml ./docker-zip/docker-compose.yml
-      #    mv ./LICENSE ./docker-zip/LICENSE
-      #    mv ./README.md ./docker-zip/README.md
-      #    mv ./SECURITY.md ./docker-zip/SECURITY.md
-      #    mkdir -p ./docker-zip/AzzyBot/Customization
-      #    mv ./AzzyBot/Customization/* ./docker-zip/AzzyBot/Customization
-      #    mkdir -p ./docker-zip/AzzyBot/Modules/AzuraCast/Files
-      #    mv ./AzzyBot/Modules/AzuraCast/Files/* ./docker-zip/AzzyBot/Modules/AzuraCast/Files
-      #    mkdir -p ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins
-      #    mv ./AzzyBot/Modules/MusicStreaming/Files/application.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/application.yml
-      #    mv ./AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
-      #    wget -qO ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
-      #    mkdir -p ./docker-zip/AzzyBot/Settings
-      #    mv ./AzzyBot/Settings/appsettings.json ./docker-zip/AzzyBot/Settings/appsettings.json
+      - name: Getting all files together
+        run: |
+          mkdir docker-zip
+          #mv ./CHANGELOG.md ./docker-zip/CHANGELOG.md
+          #mv ./CHANGELOG_HISTORY.md ./docker-zip/CHANGELOG_HISTORY.md
+          mv ./docker-compose.dev.yml ./docker-zip/docker-compose.yml
+          mv ./LICENSE ./docker-zip/LICENSE
+          #mv ./README.md ./docker-zip/README.md
+          mv ./SECURITY.md ./docker-zip/SECURITY.md
+          #mkdir -p ./docker-zip/AzzyBot/Customization
+          #mv ./AzzyBot/Customization/* ./docker-zip/AzzyBot/Customization
+          #mkdir -p ./docker-zip/AzzyBot/Modules/AzuraCast/Files
+          #mv ./AzzyBot/Modules/AzuraCast/Files/* ./docker-zip/AzzyBot/Modules/AzuraCast/Files
+          #mkdir -p ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins
+          #mv ./AzzyBot/Modules/MusicStreaming/Files/application.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/application.yml
+          #mv ./AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
+          #wget -qO ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
+          mkdir -p ./docker-zip/AzzyBot-Next/Settings
+          mv ./AzzyBot-Next/Settings/AzzyBotSettings.json ./docker-zip/AzzyBot-Next/Settings/AzzyBotSettings.json
 
-      #- name: Archive docker-zip artifact
-      #  uses: actions/upload-artifact@v4
-      #  with:
-      #    name: debug-docker
-      #    path: ./docker-zip
+      - name: Archive docker-zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-docker
+          path: ./docker-zip
           
