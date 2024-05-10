@@ -41,6 +41,6 @@ USER azzy
 WORKDIR /config
 ARG CONFIG
 ARG DLL=AzzyBot-Next-Docker.dll
-RUN if [ "$CONFIG" = "Docker-debug" ]; then DLL="AzzyBot-Next-Docker-Dev.dll"; fi
+RUN if [ "$CONFIG" = "Docker-debug" ]; then DLL=AzzyBot-Next-Docker-Dev.dll ; fi
 
 ENTRYPOINT ["dotnet", $DLL]
