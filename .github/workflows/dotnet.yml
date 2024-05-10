@@ -54,7 +54,7 @@ jobs:
       #  env:
       #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Calculate Lines of Source Code
+     - name: Calculate Lines of Source Code
        id: loc_cs
        uses: PavanMudigonda/lines-of-code-reporter@v1.6
        with:
@@ -67,13 +67,13 @@ jobs:
       #    directory: "/home/runner/work/AzzyBot/AzzyBot/AzzyBot/Customization"
       #    include_lang: "JSON"
           
-      - name: Get Date and Time
+     - name: Get Date and Time
        id: dateTime
        uses: Kaven-Universe/github-action-current-date-time@v1
        with:
          format: "YYYY-MM-DDTHH:mm:ss"
 
-      - name: Add some basic information
+     - name: Add some basic information
        run: |
          sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot-Next/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
          sed -i 's\Compile date not found\${{ steps.dateTime.outputs.time }}\g' ./artifacts/publish/AzzyBot-Next/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
