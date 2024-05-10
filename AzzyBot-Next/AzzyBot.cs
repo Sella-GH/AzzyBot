@@ -54,17 +54,16 @@ internal static class AzzyBot
 
         appBuilder.Services.AddSingleton(_ =>
         {
-            ConfigurationBuilder configBuilder = new();
-
             string settingsFile = (isDev) ? "AzzyBotSettings-Dev.json" : "AzzyBotSettings.json";
+            string path = Path.Combine("Settings", settingsFile);
 
-            configBuilder.Sources.Clear();
-            configBuilder.AddJsonFile(Path.Combine("Settings", settingsFile), false, false);
-
-            AzzyBotSettings? settings = configBuilder.Build().Get<AzzyBotSettings>();
+            AzzyBotSettingsRecord? settings = GetConfiguration(path).Get<AzzyBotSettingsRecord>();
             if (settings is null)
             {
                 Console.Error.Write("No bot configuration found! Please set your settings.");
+                if (!AzzyStatsGeneral.CheckIfLinuxOs)
+                    Console.ReadKey();
+
                 Environment.Exit(1);
             }
 
@@ -93,5 +92,15 @@ internal static class AzzyBot
 
         IHost app = appBuilder.Build();
         await app.RunAsync();
+    }
+
+    private static IConfiguration GetConfiguration(string path)
+    {
+        ConfigurationBuilder configBuilder = new();
+
+        configBuilder.Sources.Clear();
+        configBuilder.AddJsonFile(path, false, false);
+
+        return configBuilder.Build();
     }
 }

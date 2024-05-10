@@ -27,11 +27,11 @@ internal sealed class DiscordBotServiceHost : IHostedService
     private readonly ILogger<DiscordBotServiceHost> _logger;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IServiceProvider _serviceProvider;
-    private readonly AzzyBotSettings _settings;
+    private readonly AzzyBotSettingsRecord _settings;
     internal readonly DiscordShardedClient _shardedClient;
     private DiscordBotService? _botService;
 
-    public DiscordBotServiceHost(AzzyBotSettings settings, ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
+    public DiscordBotServiceHost(AzzyBotSettingsRecord settings, ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
     {
         _settings = settings;
         _logger = logger;
