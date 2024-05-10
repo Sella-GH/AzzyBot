@@ -107,7 +107,7 @@ internal static class AzzyBot
 
         #endregion Add services
 
-        IHost app = appBuilder.Build();
+        using IHost app = appBuilder.Build();
         await app.StartAsync();
         await app.WaitForShutdownAsync();
     }
