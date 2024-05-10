@@ -3,7 +3,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim AS build
 USER root
 RUN apt update && apt upgrade -y && apt autoremove -y
 WORKDIR /src
-COPY ./AzzyBot ./
+COPY ./AzzyBot-Next ./
 RUN dotnet restore ./AzzyBot-Next.csproj
 ARG CONFIG
 RUN dotnet publish ./AzzyBot-Next.csproj -c $CONFIG -o out
