@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dotnet $DLL
+dotnet $DLL &
 
 handle_sigint() {
   echo "Caught SIGINT, shutting down..."
