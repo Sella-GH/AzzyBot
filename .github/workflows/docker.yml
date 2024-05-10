@@ -55,9 +55,9 @@ jobs:
         id: runtime
         run: |
           if ${{ steps.config.outputs.config }} == "Docker"; then
-            echo "runtime=AzzyBot-Next-Docker.dll" >> "$GITHUB_OUTPUT"
+            echo "runtime=AzzyBot-Docker.dll" >> "$GITHUB_OUTPUT"
           else
-            echo "runtime=AzzyBot-Next-Docker-Dev.dll" >> "$GITHUB_OUTPUT"
+            echo "runtime=AzzyBot-Docker-Dev.dll" >> "$GITHUB_OUTPUT"
           fi
           
       - name: Get Date and Time
@@ -166,9 +166,9 @@ jobs:
         id: runtime
         run: |
           if ${{ steps.config.outputs.config }} == "Docker" ; then
-            echo "runtime=AzzyBot-Next-Docker.dll" >> "$GITHUB_OUTPUT"
+            echo "runtime=AzzyBot-Docker.dll" >> "$GITHUB_OUTPUT"
           else
-            echo "runtime=AzzyBot-Next-Docker-Dev.dll" >> "$GITHUB_OUTPUT"
+            echo "runtime=AzzyBot-Docker-Dev.dll" >> "$GITHUB_OUTPUT"
           fi
           
       - name: Get Date and Time
