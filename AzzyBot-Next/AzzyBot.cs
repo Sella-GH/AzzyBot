@@ -109,6 +109,7 @@ internal static class AzzyBot
 
         IHost app = appBuilder.Build();
         await app.StartAsync();
+        await app.WaitForShutdownAsync();
     }
 
     private static IConfiguration GetConfiguration(string path)
