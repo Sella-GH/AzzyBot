@@ -38,7 +38,7 @@ RUN chmod 0755 -R /app
 USER azzy
 
 # Start the app
-WORKDIR /config
+WORKDIR /app
 ARG CONFIG
 ENV DLL=AzzyBot-Next-Docker.dll
 RUN if [ "$CONFIG" = "Docker-debug" ]; then export DLL=AzzyBot-Next-Docker-Dev.dll ; fi
