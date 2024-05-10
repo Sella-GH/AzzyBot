@@ -42,4 +42,4 @@ WORKDIR /app
 ARG RUNTIME
 ENV DLL="$RUNTIME"
 
-ENTRYPOINT /app/docker-startup.sh
+ENTRYPOINT ["dotnet", $DLL]
