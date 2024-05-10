@@ -39,8 +39,7 @@ USER azzy
 
 # Start the app
 WORKDIR /app
-ARG CONFIG
-ENV DLL=AzzyBot-Next-Docker.dll
-RUN if [ "$CONFIG" = "Docker-debug" ]; then export DLL=AzzyBot-Next-Docker-Dev.dll ; fi
+ARG RUNTIME
+ENV DLL=RUNTIME
 
 ENTRYPOINT ["/bin/sh", "-c", "dotnet $DLL"]

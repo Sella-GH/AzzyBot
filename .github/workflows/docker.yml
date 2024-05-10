@@ -42,13 +42,22 @@ jobs:
             echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Get config environment
+        id: config
+        run: |
+          if ${{ contains(github.event.head_commit.message, '[release]') }}; then
+            echo "config=Docker" >> "$GITHUB_OUTPUT"
+          else
+            echo "config=Docker-debug" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Get runtime environment
         id: runtime
         run: |
-          if ${{ contains(github.event.head_commit.message, '[release]') }}; then
-            echo "runtime=Docker" >> "$GITHUB_OUTPUT"
+          if ${{ steps.config.outputs.config == "Docker" }}; then
+            echo "runtime=AzzyBot-Next-Docker.dll" >> "$GITHUB_OUTPUT"
           else
-            echo "runtime=Docker-debug" >> "$GITHUB_OUTPUT"
+            echo "runtime=AzzyBot-Next-Docker-Dev.dll" >> "$GITHUB_OUTPUT"
           fi
           
       - name: Get Date and Time
@@ -95,8 +104,9 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           build-args: |
-            CONFIG=${{ steps.runtime.outputs.runtime }}
+            CONFIG=${{ steps.config.outputs.config }}
             COMMIT=${{ github.sha }}
+            RUNTIME=${{ steps.runtime.outputs.runtime }}
             TIMESTAMP=${{ steps.dateTime.outputs.time }}
             LOC_CS=${{ steps.loc_cs.outputs.total_lines }}
             LOC_JSON=0
@@ -143,13 +153,22 @@ jobs:
             echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Get config environment
+        id: config
+        run: |
+          if ${{ contains(github.event.head_commit.message, '[release]') }}; then
+            echo "config=Docker" >> "$GITHUB_OUTPUT"
+          else
+            echo "config=Docker-debug" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Get runtime environment
         id: runtime
         run: |
-          if ${{ contains(github.event.head_commit.message, '[release]') }}; then
-            echo "runtime=Docker" >> "$GITHUB_OUTPUT"
+          if ${{ steps.config.outputs.config == "Docker" }}; then
+            echo "runtime=AzzyBot-Next-Docker.dll" >> "$GITHUB_OUTPUT"
           else
-            echo "runtime=Docker-debug" >> "$GITHUB_OUTPUT"
+            echo "runtime=AzzyBot-Next-Docker-Dev.dll" >> "$GITHUB_OUTPUT"
           fi
           
       - name: Get Date and Time
@@ -196,8 +215,9 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           build-args: |
-            CONFIG=${{ steps.runtime.outputs.runtime }}
+            CONFIG=${{ steps.config.outputs.config }}
             COMMIT=${{ github.sha }}
+            RUNTIME=${{ steps.runtime.outputs.runtime }}
             TIMESTAMP=${{ steps.dateTime.outputs.time }}
             LOC_CS=${{ steps.loc_cs.outputs.total_lines }}
             LOC_JSON=0
@@ -244,7 +264,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Get build environment
+      - name: Get docker environment
         id: environment
         run: |
           if ${{ contains(github.event.head_commit.message, '[release]') }}; then
