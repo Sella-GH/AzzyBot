@@ -2,6 +2,11 @@
 
 dotnet $DLL
 
-trap "exit" SIGINT
+handle_sigint() {
+  echo "Caught SIGINT, shutting down..."
+  kill -INT -$!
+}
 
-wait $!
+trap handle_sigint() SIGINT
+
+done
