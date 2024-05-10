@@ -48,7 +48,7 @@ jobs:
           if ${{ contains(github.event.head_commit.message, '[release]') }}; then
             echo "runtime=Docker" >> "$GITHUB_OUTPUT"
           else
-            echo "runtime=Docker-debug >> "$GITHUB_OUTPUT"
+            echo "runtime=Docker-debug" >> "$GITHUB_OUTPUT"
           fi
           
       - name: Get Date and Time
