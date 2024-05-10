@@ -12,10 +12,10 @@ on:
       - "**.json"
       - "**.md"
       - "**.props"
+      - "**.sh"
       - "**.sln"
       - "**.yml"
       - "Dockerfile"
-      - "docker-startup.sh"
   workflow_dispatch:
 
 jobs:
