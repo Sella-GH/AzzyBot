@@ -21,69 +21,77 @@ internal static class AzzyBot
         EnvironmentEnum environment = AzzyStatsGeneral.GetBotEnvironment;
         bool isDev = environment is EnvironmentEnum.Development;
         bool forceDebug = args.Length > 0 && args[0] is "-forceDebug";
-        IHostBuilder builder = Host.CreateDefaultBuilder();
 
-        // Add logging
-        builder.ConfigureLogging(logging =>
+        HostApplicationBuilderSettings appSettings = new()
         {
-            logging.AddConsole();
-            logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.Warning);
-            logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Warning);
-            logging.AddSimpleConsole(config =>
-            {
-                config.ColorBehavior = LoggerColorBehavior.Enabled;
-                config.IncludeScopes = true;
-                config.SingleLine = true;
-                config.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
-                config.UseUtcTimestamp = true;
-            });
-            logging.SetMinimumLevel((isDev || forceDebug) ? LogLevel.Debug : LogLevel.Information);
+            DisableDefaults = true
+        };
+        HostApplicationBuilder appBuilder = Host.CreateApplicationBuilder(appSettings);
+
+        appBuilder.Environment.ContentRootPath = Directory.GetCurrentDirectory();
+        appBuilder.Environment.EnvironmentName = nameof(EnvironmentEnum.Production);
+        if (isDev)
+            appBuilder.Environment.EnvironmentName = nameof(EnvironmentEnum.Development);
+
+        #region Add logging
+
+        appBuilder.Logging.AddConsole();
+        appBuilder.Logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.Warning);
+        appBuilder.Logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Warning);
+        appBuilder.Logging.AddSimpleConsole(config =>
+        {
+            config.ColorBehavior = LoggerColorBehavior.Enabled;
+            config.IncludeScopes = true;
+            config.SingleLine = true;
+            config.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
+            config.UseUtcTimestamp = true;
         });
+        appBuilder.Logging.SetMinimumLevel((isDev || forceDebug) ? LogLevel.Debug : LogLevel.Information);
+
+        #endregion Add logging
+
+        #region Add services
+
+        appBuilder.Services.AddSingleton(_ =>
+        {
+            ConfigurationBuilder configBuilder = new();
+
+            string settingsFile = (isDev) ? "AzzyBotSettings-Dev.json" : "AzzyBotSettings.json";
+
+            configBuilder.Sources.Clear();
+            configBuilder.AddJsonFile(Path.Combine("Settings", settingsFile), false, false);
+
+            AzzyBotSettings? settings = configBuilder.Build().Get<AzzyBotSettings>();
+            if (settings is null)
+            {
+                Console.Error.Write("No bot configuration found! Please set your settings.");
+                Environment.Exit(1);
+            }
+
+            return settings;
+        });
+
+        // Enable or disable modules based on the settings
+        //IServiceProvider serviceProvider = services.BuildServiceProvider();
+        //AzzyBotSettings settings = serviceProvider.GetRequiredService<AzzyBotSettings>();
 
         // Need to register as Singleton first
         // Otherwise DI doesn't work properly
-        builder.ConfigureServices(services =>
-        {
-            // Configure the settings
-            services.AddSingleton(_ =>
-            {
-                ConfigurationBuilder builder = new();
-                string settingsFile = (isDev) ? "AzzyBotSettings-Dev.json" : "AzzyBotSettings.json";
+        appBuilder.Services.AddSingleton<CoreServiceHost>();
+        appBuilder.Services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
 
-                builder.Sources.Clear();
-                builder.AddJsonFile(Path.Combine("Settings", settingsFile), false, false);
+        appBuilder.Services.AddSingleton<DiscordBotService>();
+        appBuilder.Services.AddSingleton<DiscordBotServiceHost>();
+        appBuilder.Services.AddHostedService(s => s.GetRequiredService<DiscordBotServiceHost>());
 
-                IConfiguration config = builder.Build();
-                AzzyBotSettings? settings = config.Get<AzzyBotSettings>();
-                if (settings is null)
-                {
-                    Console.WriteLine("No bot configuration found! Please set your settings.");
-                    Environment.Exit(1);
-                }
+        appBuilder.Services.AddSingleton<WebRequestService>();
+        appBuilder.Services.AddSingleton<UpdaterService>();
+        appBuilder.Services.AddSingleton<TimerServiceHost>();
+        appBuilder.Services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());
 
-                return settings;
-            });
+        #endregion Add services
 
-            // Enable or disable modules based on the settings
-            //IServiceProvider serviceProvider = services.BuildServiceProvider();
-            //AzzyBotSettings settings = serviceProvider.GetRequiredService<AzzyBotSettings>();
-
-            services.AddSingleton<CoreServiceHost>();
-            services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
-
-            services.AddSingleton<DiscordBotService>();
-            services.AddSingleton<DiscordBotServiceHost>();
-            services.AddHostedService(s => s.GetRequiredService<DiscordBotServiceHost>());
-
-            services.AddSingleton<WebRequestService>();
-            services.AddSingleton<UpdaterService>();
-            services.AddSingleton<TimerServiceHost>();
-            services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());
-        });
-
-        builder.UseConsoleLifetime();
-        builder.UseEnvironment(environment.ToString());
-
-        await builder.RunConsoleAsync();
+        IHost app = appBuilder.Build();
+        await app.RunAsync();
     }
 }
