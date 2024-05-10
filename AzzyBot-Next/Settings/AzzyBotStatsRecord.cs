@@ -2,7 +2,7 @@
 
 namespace AzzyBot.Settings;
 
-internal record AzzyBotStatsRecord
+internal sealed record AzzyBotStatsRecord
 {
     public required string Commit { get; init; }
     public required DateTime CompilationDate { get; init; }
