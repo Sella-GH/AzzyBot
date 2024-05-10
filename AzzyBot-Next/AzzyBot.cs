@@ -70,6 +70,23 @@ internal static class AzzyBot
             return settings;
         });
 
+        appBuilder.Services.AddSingleton(_ =>
+        {
+            string path = Path.Combine("Core", "Modules", "Files", "AzzyBotStats.json");
+
+            AzzyBotStatsRecord? stats = GetConfiguration(path).Get<AzzyBotStatsRecord>();
+            if (stats is null)
+            {
+                Console.Error.Write("There is something wrong with your configuration. Have you followed the installation instructions?");
+                if (!AzzyStatsGeneral.CheckIfLinuxOs)
+                    Console.ReadKey();
+
+                Environment.Exit(1);
+            }
+
+            return stats;
+        });
+
         // Enable or disable modules based on the settings
         //IServiceProvider serviceProvider = services.BuildServiceProvider();
         //AzzyBotSettings settings = serviceProvider.GetRequiredService<AzzyBotSettings>();
