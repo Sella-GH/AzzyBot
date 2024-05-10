@@ -29,60 +29,60 @@ jobs:
             arch: arm64
 
     steps:
-      - name: Checkout
+     - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
       
-      - name: Setup .NET 8.0.x
+     - name: Setup .NET 8.0.x
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      - name: Install GitHub CLI
+     - name: Install GitHub CLI
         run: sudo apt update && sudo apt install -y gh
       
-      - name: Publish Debug
+     - name: Publish Debug
         run: |
           dotnet publish /home/runner/work/AzzyBot/AzzyBot/AzzyBot-Next/AzzyBot-Next.csproj -c Debug -r ${{ matrix.os }}-${{ matrix.arch }}
 
-      #- name: Download and extract Lavalink
-      #  run: |
-      #    mkdir -p ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files/plugins
-      #    gh release download 4.0.4 --dir './artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files' --pattern 'Lavalink.jar' --repo lavalink-devs/Lavalink
-      #    wget -qO ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
-      #  env:
-      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+     #- name: Download and extract Lavalink
+     #  run: |
+     #    mkdir -p ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files/plugins
+     #    gh release download 4.0.4 --dir './artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files' --pattern 'Lavalink.jar' --repo lavalink-devs/Lavalink
+     #    wget -qO ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
+     #  env:
+     #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
      - name: Calculate Lines of Source Code
-       id: loc_cs
-       uses: PavanMudigonda/lines-of-code-reporter@v1.6
-       with:
-         include_lang: "C#,MSBuild script"
+        id: loc_cs
+        uses: PavanMudigonda/lines-of-code-reporter@v1.6
+        with:
+          include_lang: "C#,MSBuild script"
 
-      # - name: Calculate Lines of JSON Code
-      #  id: loc_json
-      #  uses: PavanMudigonda/lines-of-code-reporter@v1.6
-      #  with:
-      #    directory: "/home/runner/work/AzzyBot/AzzyBot/AzzyBot/Customization"
-      #    include_lang: "JSON"
+     # - name: Calculate Lines of JSON Code
+     #  id: loc_json
+     #  uses: PavanMudigonda/lines-of-code-reporter@v1.6
+     #  with:
+     #    directory: "/home/runner/work/AzzyBot/AzzyBot/AzzyBot/Customization"
+     #    include_lang: "JSON"
           
      - name: Get Date and Time
-       id: dateTime
-       uses: Kaven-Universe/github-action-current-date-time@v1
-       with:
-         format: "YYYY-MM-DDTHH:mm:ss"
+        id: dateTime
+        uses: Kaven-Universe/github-action-current-date-time@v1
+        with:
+          format: "YYYY-MM-DDTHH:mm:ss"
 
      - name: Add some basic information
-       run: |
-         sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot-Next/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
-         sed -i 's\Compile date not found\${{ steps.dateTime.outputs.time }}\g' ./artifacts/publish/AzzyBot-Next/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
-         sed -i 's\Lines of source code not found\${{ steps.loc_cs.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot-Next/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
-         sed -i 's\Lines of JSON code not found\0\g' ./artifacts/publish/AzzyBot-Next/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
+        run: |
+          sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot-Next/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
+          sed -i 's\Compile date not found\${{ steps.dateTime.outputs.time }}\g' ./artifacts/publish/AzzyBot-Next/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
+          sed -i 's\Lines of source code not found\${{ steps.loc_cs.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot-Next/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
+          sed -i 's\Lines of JSON code not found\0\g' ./artifacts/publish/AzzyBot-Next/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
        env:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
-      - name: Archive Build Artifact
+     - name: Archive Build Artifact
         uses: actions/upload-artifact@v4
         with:
           name: debug-${{ matrix.os }}-${{ matrix.arch }}
@@ -92,12 +92,12 @@ jobs:
     name: Build and publish docker .zip file
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+     - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Getting all files together
+     - name: Getting all files together
         run: |
           mkdir docker-zip
           #mv ./CHANGELOG.md ./docker-zip/CHANGELOG.md
@@ -117,7 +117,7 @@ jobs:
           mkdir -p ./docker-zip/AzzyBot-Next/Settings
           mv ./AzzyBot-Next/Settings/AzzyBotSettings.json ./docker-zip/AzzyBot-Next/Settings/AzzyBotSettings.json
 
-      - name: Archive docker-zip artifact
+     - name: Archive docker-zip artifact
         uses: actions/upload-artifact@v4
         with:
           name: debug-docker
