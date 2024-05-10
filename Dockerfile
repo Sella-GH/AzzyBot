@@ -42,4 +42,4 @@ WORKDIR /app
 ARG RUNTIME
 ENV DLL="$RUNTIME"
 
-ENTRYPOINT docker-startup.sh
+ENTRYPOINT /app/docker-startup.sh
