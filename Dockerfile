@@ -40,6 +40,6 @@ USER azzy
 # Start the app
 WORKDIR /app
 ARG RUNTIME
-ENV DLL=RUNTIME
+ENV DLL="$RUNTIME"
 
 ENTRYPOINT ["/bin/sh", "-c", "dotnet $DLL"]
