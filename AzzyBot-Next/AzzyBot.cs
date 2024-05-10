@@ -44,7 +44,6 @@ internal static class AzzyBot
             config.IncludeScopes = true;
             config.SingleLine = true;
             config.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
-            config.UseUtcTimestamp = true;
         });
         appBuilder.Logging.SetMinimumLevel((isDev || forceDebug) ? LogLevel.Debug : LogLevel.Information);
 
