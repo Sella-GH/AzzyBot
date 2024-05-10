@@ -54,7 +54,7 @@ jobs:
       - name: Get runtime environment
         id: runtime
         run: |
-          if ${{ steps.config.outputs.config == "Docker" }}; then
+          if ${{ steps.config.outputs.config }} == "Docker"; then
             echo "runtime=AzzyBot-Next-Docker.dll" >> "$GITHUB_OUTPUT"
           else
             echo "runtime=AzzyBot-Next-Docker-Dev.dll" >> "$GITHUB_OUTPUT"
@@ -165,7 +165,7 @@ jobs:
       - name: Get runtime environment
         id: runtime
         run: |
-          if ${{ steps.config.outputs.config == "Docker" }}; then
+          if ${{ steps.config.outputs.config }} == "Docker" ; then
             echo "runtime=AzzyBot-Next-Docker.dll" >> "$GITHUB_OUTPUT"
           else
             echo "runtime=AzzyBot-Next-Docker-Dev.dll" >> "$GITHUB_OUTPUT"
