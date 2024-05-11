@@ -6,7 +6,7 @@ namespace AzzyBot.Database;
 
 internal static class PrepareDb
 {
-    internal static void ApplyMigrations(this IHost app)
+    internal static void ApplyDbMigrations(this IHost app)
     {
         using IServiceScope scope = app.Services.CreateScope();
         using DatabaseContext db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();

@@ -38,6 +38,9 @@ internal static class AzzyBot
         #region Add logging
 
         appBuilder.Logging.AddConsole();
+        appBuilder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Infrastructure", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
+        appBuilder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
+        appBuilder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Migrations", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Information);
         appBuilder.Logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.Warning);
         appBuilder.Logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Warning);
         appBuilder.Logging.AddSimpleConsole(config =>
@@ -112,7 +115,7 @@ internal static class AzzyBot
         #endregion Add services
 
         using IHost app = appBuilder.Build();
-        app.ApplyMigrations();
+        app.ApplyDbMigrations();
         await app.StartAsync();
         await app.WaitForShutdownAsync();
     }
