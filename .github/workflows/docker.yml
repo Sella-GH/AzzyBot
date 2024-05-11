@@ -16,6 +16,7 @@ on:
       - "**.sln"
       - "**.yml"
       - "Dockerfile"
+      - "Dockerfile-Dev"
   workflow_dispatch:
 
 jobs:
@@ -52,13 +53,13 @@ jobs:
             echo "config=Docker-debug" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Get runtime environment
+      - name: Get correct dockerfile
         id: runtime
         run: |
           if ${{ steps.config.outputs.config }} == "Docker"; then
-            echo "runtime=AzzyBot-Docker.dll" >> "$GITHUB_OUTPUT"
+            echo "runtime=Dockerfile" >> "$GITHUB_OUTPUT"
           else
-            echo "runtime=AzzyBot-Docker-Dev.dll" >> "$GITHUB_OUTPUT"
+            echo "runtime=dev.Dockerfile" >> "$GITHUB_OUTPUT"
           fi
           
       - name: Get Date and Time
@@ -107,11 +108,11 @@ jobs:
           build-args: |
             CONFIG=${{ steps.config.outputs.config }}
             COMMIT=${{ github.sha }}
-            RUNTIME=${{ steps.runtime.outputs.runtime }}
             TIMESTAMP=${{ steps.dateTime.outputs.time }}
             LOC_CS=${{ steps.loc_cs.outputs.total_lines }}
             LOC_JSON=0
           context: .
+          file: ${{ steps.runtime.outputs.runtime }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ matrix.os }}/${{ matrix.arch }}
           outputs: type=image,name=sellagh/azzybot,push-by-digest=true,name-canonical=true,push=true
@@ -163,13 +164,13 @@ jobs:
             echo "config=Docker-debug" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Get runtime environment
+      - name: Get correct dockerfile
         id: runtime
         run: |
-          if ${{ steps.config.outputs.config }} == "Docker" ; then
-            echo "runtime=AzzyBot-Docker.dll" >> "$GITHUB_OUTPUT"
+          if ${{ steps.config.outputs.config }} == "Docker"; then
+            echo "runtime=Dockerfile" >> "$GITHUB_OUTPUT"
           else
-            echo "runtime=AzzyBot-Docker-Dev.dll" >> "$GITHUB_OUTPUT"
+            echo "runtime=dev.Dockerfile" >> "$GITHUB_OUTPUT"
           fi
           
       - name: Get Date and Time
@@ -218,11 +219,11 @@ jobs:
           build-args: |
             CONFIG=${{ steps.config.outputs.config }}
             COMMIT=${{ github.sha }}
-            RUNTIME=${{ steps.runtime.outputs.runtime }}
             TIMESTAMP=${{ steps.dateTime.outputs.time }}
             LOC_CS=${{ steps.loc_cs.outputs.total_lines }}
             LOC_JSON=0
           context: .
+          file: ${{ steps.runtime.outputs.runtime }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ matrix.os }}/${{ matrix.arch }}
           outputs: type=image,name=sellagh/azzybot,push-by-digest=true,name-canonical=true,push=true
