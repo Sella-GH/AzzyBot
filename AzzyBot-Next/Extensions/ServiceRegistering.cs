@@ -33,7 +33,7 @@ internal static class ServiceRegistering
         logging.SetMinimumLevel((isDev || forceDebug) ? LogLevel.Debug : LogLevel.Information);
     }
 
-    internal static IServiceCollection AzzyBotServices(this IServiceCollection services)
+    internal static void AzzyBotServices(this IServiceCollection services)
     {
         // Enable or disable modules based on the settings
         IServiceProvider serviceProvider = services.BuildServiceProvider();
@@ -55,11 +55,9 @@ internal static class ServiceRegistering
         services.AddSingleton<UpdaterService>();
         services.AddSingleton<TimerServiceHost>();
         services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());
-
-        return services;
     }
 
-    internal static IServiceCollection AzzyBotSettings(this IServiceCollection services, bool isDev = false)
+    internal static void AzzyBotSettings(this IServiceCollection services, bool isDev = false)
     {
         string settingsFile = (isDev) ? "AzzyBotSettings-Dev.json" : "AzzyBotSettings.json";
         string path = Path.Combine("Settings", settingsFile);
@@ -74,24 +72,24 @@ internal static class ServiceRegistering
             Environment.Exit(1);
         }
 
-        return services.AddSingleton(settings);
+        services.AddSingleton(settings);
     }
 
-    internal static IServiceCollection AzzyBotStats(this IServiceCollection services)
+    internal static void AzzyBotStats(this IServiceCollection services)
     {
         string path = Path.Combine("Modules", "Core", "Files", "AzzyBotStats.json");
 
         AzzyBotStatsRecord? stats = GetConfiguration(path).Get<AzzyBotStatsRecord>();
         if (stats is null)
         {
-            Console.Error.Write("There is something wrong with your configuration. Have you followed the installation instructions?");
+            Console.Error.Write("There is something wrong with your configuration. Did you followed the installation instructions?");
             if (!AzzyStatsGeneral.CheckIfLinuxOs)
                 Console.ReadKey();
 
             Environment.Exit(1);
         }
 
-        return services.AddSingleton(stats);
+        services.AddSingleton(stats);
     }
 
     private static IConfiguration GetConfiguration(string path)
