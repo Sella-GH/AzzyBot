@@ -14,12 +14,12 @@ public sealed record AzzyBotSettingsRecord
 
 public sealed record Database
 {
-    public required string Host { get; init; }
-    public required int Port { get; init; }
-    public required string User { get; init; }
-    public string Password { get; init; } = string.Empty;
-    public required string DatabaseName { get; init; }
-    public string ConnectionString => $"Server={Host};Port={Port};User Id={User};Password={Password};Database={DatabaseName};";
+    public string Host { get; init; } = "AzzyBot-Db";
+    public int Port { get; init; } = 3306;
+    public string User { get; init; } = "azzybot";
+    public string Password { get; init; } = "thisIsAzzyB0!P@ssw0rd";
+    public string DatabaseName { get; init; } = "azzybot";
+    public string ConnectionString => $"Server={Host};Port={Port};User={User};Password={Password};Database={DatabaseName};";
 }
 
 public sealed record DiscordStatus
