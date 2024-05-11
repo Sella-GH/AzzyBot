@@ -19,6 +19,7 @@ public sealed record Database
     public required string User { get; init; }
     public string Password { get; init; } = string.Empty;
     public required string DatabaseName { get; init; }
+    public string ConnectionString => $"Server={Host};Port={Port};User Id={User};Password={Password};Database={DatabaseName};";
 }
 
 public sealed record DiscordStatus

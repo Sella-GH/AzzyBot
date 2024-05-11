@@ -97,15 +97,8 @@ internal static class AzzyBot
         appBuilder.Services.AddSingleton<CoreServiceHost>();
         appBuilder.Services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
 
-        string host = settings.Database?.Host ?? string.Empty;
-        int port = settings.Database?.Port ?? 0;
-        string user = settings.Database?.User ?? string.Empty;
-        string pwd = settings.Database?.Password ?? string.Empty;
-        string database = settings.Database?.DatabaseName ?? string.Empty;
-
-        string connectionString = $"{nameof(host)}={host};{nameof(port)}={port};{nameof(user)}={user};{nameof(pwd)}={pwd};{nameof(database)}={database}";
-        MariaDbServerVersion serverVersion = new(new Version(10, 4, 32, 0));
-        appBuilder.Services.AddDbContext<DatabaseContext>(options => options.UseMySql(connectionString, serverVersion));
+        string connectionString = settings.Database?.ConnectionString ?? string.Empty;
+        appBuilder.Services.AddDbContext<DatabaseContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
         appBuilder.Services.AddSingleton<DiscordBotService>();
         appBuilder.Services.AddSingleton<DiscordBotServiceHost>();

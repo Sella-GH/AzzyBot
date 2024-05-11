@@ -7,7 +7,7 @@
         "Port": 3306,
         "User": "root",
         "Password": "",
-        "DatabaseName": "test"
+        "DatabaseName": "azzybot"
     },
     "DiscordStatus": {
         "Activity": 2,
