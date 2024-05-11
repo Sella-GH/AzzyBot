@@ -9,5 +9,5 @@ internal class AzuraCastChecksEntity
     public bool UpdatesShowChangelog { get; set; }
 
     public int AzuraCastId { get; set; }
-    public virtual AzuraCastEntity AzuraCast { get; set; } = new();
+    public AzuraCastEntity AzuraCast { get; set; } = null!;
 }

@@ -10,9 +10,8 @@ internal class AzuraCastEntity
     public ulong OutagesChannelId { get; set; }
     public bool ShowPlaylistInNowPlaying { get; set; }
 
-    public int AzuraCastChecksId { get; set; }
-    public virtual AzuraCastChecksEntity AutomaticChecks { get; set; } = new();
+    public AzuraCastChecksEntity? AutomaticChecks { get; set; }
 
     public int GuildId { get; set; }
-    public virtual GuildsEntity Guild { get; set; } = new();
+    public GuildsEntity Guild { get; set; } = null!;
 }
