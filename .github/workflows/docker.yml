@@ -10,11 +10,10 @@ on:
       - "**.cs"
       - "**.csproj"
       - "**.json"
-      - "**.md"
       - "**.props"
-      - "**.sh"
       - "**.sln"
-      - "**.yml"
+      - "**/docker.yml"
+      - "CHANGELOG.md"
       - "Dockerfile"
       - "Dockerfile-Dev"
   workflow_dispatch:
