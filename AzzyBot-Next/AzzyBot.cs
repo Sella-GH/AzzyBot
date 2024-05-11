@@ -1,18 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
-using AzzyBot.Database;
 using AzzyBot.Enums;
-using AzzyBot.Services;
-using AzzyBot.Services.Modules;
-using AzzyBot.Settings;
+using AzzyBot.Extensions;
 using AzzyBot.Utilities;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
 
 namespace AzzyBot;
 
@@ -31,86 +22,19 @@ internal static class AzzyBot
         HostApplicationBuilder appBuilder = Host.CreateApplicationBuilder(appSettings);
 
         appBuilder.Environment.ContentRootPath = Directory.GetCurrentDirectory();
-        appBuilder.Environment.EnvironmentName = nameof(EnvironmentEnum.Production);
-        if (isDev)
-            appBuilder.Environment.EnvironmentName = nameof(EnvironmentEnum.Development);
+        appBuilder.Environment.EnvironmentName = (isDev) ? nameof(EnvironmentEnum.Development) : nameof(EnvironmentEnum.Production);
 
         #region Add logging
 
-        appBuilder.Logging.AddConsole();
-        appBuilder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Infrastructure", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
-        appBuilder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Database", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
-        appBuilder.Logging.AddFilter("Microsoft.EntityFrameworkCore.Migrations", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Information);
-        appBuilder.Logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.Warning);
-        appBuilder.Logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Warning);
-        appBuilder.Logging.AddSimpleConsole(config =>
-        {
-            config.ColorBehavior = LoggerColorBehavior.Enabled;
-            config.IncludeScopes = true;
-            config.SingleLine = true;
-            config.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
-        });
-        appBuilder.Logging.SetMinimumLevel((isDev || forceDebug) ? LogLevel.Debug : LogLevel.Information);
+        appBuilder.Logging.AzzyBotLogging(isDev, forceDebug);
 
         #endregion Add logging
 
         #region Add services
 
-        appBuilder.Services.AddSingleton(_ =>
-        {
-            string settingsFile = (isDev) ? "AzzyBotSettings-Dev.json" : "AzzyBotSettings.json";
-            string path = Path.Combine("Settings", settingsFile);
-
-            AzzyBotSettingsRecord? settings = GetConfiguration(path).Get<AzzyBotSettingsRecord>();
-            if (settings is null)
-            {
-                Console.Error.Write("No bot configuration found! Please set your settings.");
-                if (!AzzyStatsGeneral.CheckIfLinuxOs)
-                    Console.ReadKey();
-
-                Environment.Exit(1);
-            }
-
-            return settings;
-        });
-
-        appBuilder.Services.AddSingleton(_ =>
-        {
-            string path = Path.Combine("Core", "Modules", "Files", "AzzyBotStats.json");
-
-            AzzyBotStatsRecord? stats = GetConfiguration(path).Get<AzzyBotStatsRecord>();
-            if (stats is null)
-            {
-                Console.Error.Write("There is something wrong with your configuration. Have you followed the installation instructions?");
-                if (!AzzyStatsGeneral.CheckIfLinuxOs)
-                    Console.ReadKey();
-
-                Environment.Exit(1);
-            }
-
-            return stats;
-        });
-
-        // Enable or disable modules based on the settings
-        IServiceProvider serviceProvider = appBuilder.Services.BuildServiceProvider();
-        AzzyBotSettingsRecord settings = serviceProvider.GetRequiredService<AzzyBotSettingsRecord>();
-
-        // Need to register as Singleton first
-        // Otherwise DI doesn't work properly
-        appBuilder.Services.AddSingleton<CoreServiceHost>();
-        appBuilder.Services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
-
-        string connectionString = settings.Database?.ConnectionString ?? string.Empty;
-        appBuilder.Services.AddDbContext<DatabaseContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
-
-        appBuilder.Services.AddSingleton<DiscordBotService>();
-        appBuilder.Services.AddSingleton<DiscordBotServiceHost>();
-        appBuilder.Services.AddHostedService(s => s.GetRequiredService<DiscordBotServiceHost>());
-
-        appBuilder.Services.AddSingleton<WebRequestService>();
-        appBuilder.Services.AddSingleton<UpdaterService>();
-        appBuilder.Services.AddSingleton<TimerServiceHost>();
-        appBuilder.Services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());
+        appBuilder.Services.AzzyBotSettings(isDev);
+        appBuilder.Services.AzzyBotStats();
+        appBuilder.Services.AzzyBotServices();
 
         #endregion Add services
 
@@ -118,15 +42,5 @@ internal static class AzzyBot
         app.ApplyDbMigrations();
         await app.StartAsync();
         await app.WaitForShutdownAsync();
-    }
-
-    private static IConfiguration GetConfiguration(string path)
-    {
-        ConfigurationBuilder configBuilder = new();
-
-        configBuilder.Sources.Clear();
-        configBuilder.AddJsonFile(path, false, false);
-
-        return configBuilder.Build();
     }
 }
