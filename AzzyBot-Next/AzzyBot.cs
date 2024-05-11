@@ -27,12 +27,11 @@ internal static class AzzyBot
 
         HostApplicationBuilderSettings appSettings = new()
         {
-            DisableDefaults = true
+            ContentRootPath = Directory.GetCurrentDirectory(),
+            DisableDefaults = true,
+            EnvironmentName = (isDev) ? Environments.Development : Environments.Production
         };
         HostApplicationBuilder appBuilder = Host.CreateApplicationBuilder(appSettings);
-
-        appBuilder.Environment.ContentRootPath = Directory.GetCurrentDirectory();
-        appBuilder.Environment.EnvironmentName = (isDev) ? Environments.Development : Environments.Production;
 
         #region Add logging
 
@@ -49,7 +48,7 @@ internal static class AzzyBot
         #endregion Add services
 
         // Give the database time to start up
-        await Task.Delay(TimeSpan.FromSeconds(5));
+        await Task.Delay(TimeSpan.FromSeconds(3));
 
         using IHost app = appBuilder.Build();
         app.ApplyDbMigrations();
