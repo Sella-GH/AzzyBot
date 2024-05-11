@@ -103,6 +103,7 @@ internal static class ServiceRegistering
         if (string.IsNullOrWhiteSpace(user))
             user = "azzybot";
 
+        // No password because it can be null when using non-docker
         if (string.IsNullOrWhiteSpace(password) && AzzyStatsGeneral.CheckIfDocker)
             password = "thisIsAzzyB0!P@ssw0rd";
 
