@@ -44,7 +44,7 @@ internal static class ServiceRegistering
         services.AddSingleton<CoreServiceHost>();
         services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
 
-        string connectionString = settings.Database?.ConnectionString ?? string.Empty;
+        string connectionString = GetConnectionString(settings.Database?.Host, settings.Database?.Port, settings.Database?.User, settings.Database?.Password, settings.Database?.DatabaseName);
         services.AddDbContext<DatabaseContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
         services.AddSingleton<DiscordBotService>();
@@ -90,6 +90,26 @@ internal static class ServiceRegistering
         }
 
         services.AddSingleton(stats);
+    }
+
+    private static string GetConnectionString(string? host, int? port, string? user, string? password, string? database)
+    {
+        if (string.IsNullOrWhiteSpace(host))
+            host = "AzzyBot-Db";
+
+        if (port is 0)
+            port = 3306;
+
+        if (string.IsNullOrWhiteSpace(user))
+            user = "azzybot";
+
+        if (string.IsNullOrWhiteSpace(password) && AzzyStatsGeneral.CheckIfDocker)
+            password = "thisIsAzzyB0!P@ssw0rd";
+
+        if (string.IsNullOrWhiteSpace(database))
+            database = "azzybot";
+
+        return $"Server={host};Port={port};User={user};Password={password};Database={database};";
     }
 
     private static IConfiguration GetConfiguration(string path)
