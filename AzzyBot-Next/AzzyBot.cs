@@ -22,7 +22,7 @@ internal static class AzzyBot
         HostApplicationBuilder appBuilder = Host.CreateApplicationBuilder(appSettings);
 
         appBuilder.Environment.ContentRootPath = Directory.GetCurrentDirectory();
-        appBuilder.Environment.EnvironmentName = (isDev) ? nameof(EnvironmentEnum.Development) : nameof(EnvironmentEnum.Production);
+        appBuilder.Environment.EnvironmentName = (isDev) ? Environments.Development : Environments.Production;
 
         #region Add logging
 
