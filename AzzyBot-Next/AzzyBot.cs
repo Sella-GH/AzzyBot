@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using AzzyBot.Database;
 using AzzyBot.Enums;
 using AzzyBot.Services;
 using AzzyBot.Services.Modules;
 using AzzyBot.Settings;
 using AzzyBot.Utilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -87,13 +89,23 @@ internal static class AzzyBot
         });
 
         // Enable or disable modules based on the settings
-        //IServiceProvider serviceProvider = services.BuildServiceProvider();
-        //AzzyBotSettings settings = serviceProvider.GetRequiredService<AzzyBotSettings>();
+        IServiceProvider serviceProvider = appBuilder.Services.BuildServiceProvider();
+        AzzyBotSettingsRecord settings = serviceProvider.GetRequiredService<AzzyBotSettingsRecord>();
 
         // Need to register as Singleton first
         // Otherwise DI doesn't work properly
         appBuilder.Services.AddSingleton<CoreServiceHost>();
         appBuilder.Services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
+
+        string host = settings.Database?.Host ?? string.Empty;
+        int port = settings.Database?.Port ?? 0;
+        string user = settings.Database?.User ?? string.Empty;
+        string pwd = settings.Database?.Password ?? string.Empty;
+        string database = settings.Database?.DatabaseName ?? string.Empty;
+
+        string connectionString = $"{nameof(host)}={host};{nameof(port)}={port};{nameof(user)}={user};{nameof(pwd)}={pwd};{nameof(database)}={database}";
+        MariaDbServerVersion serverVersion = new(new Version(10, 4, 32, 0));
+        appBuilder.Services.AddDbContext<DatabaseContext>(options => options.UseMySql(connectionString, serverVersion));
 
         appBuilder.Services.AddSingleton<DiscordBotService>();
         appBuilder.Services.AddSingleton<DiscordBotServiceHost>();
