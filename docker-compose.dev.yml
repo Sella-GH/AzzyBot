@@ -25,7 +25,6 @@ services:
     image: mariadb:lts
     pull_policy: always
     restart: unless-stopped
-    user: ${CURRENT_UID}
     environment:
       - MYSQL_ROOT_PASSWORD=thisIsR00!P@ssw0rd
       - MYSQL_DATABASE=azzybot
