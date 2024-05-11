@@ -80,7 +80,7 @@ internal sealed class WebRequestService(ILogger<WebRequestService> logger) : IDi
         }
         catch (HttpRequestException ex)
         {
-            _logger.WebRequestFailed("GET", ex.Message);
+            _logger.WebRequestFailed(HttpMethod.Get, ex.Message);
             throw;
         }
     }

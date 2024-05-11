@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 using AzzyBot.Services;
 using AzzyBot.Services.Modules;
 using Microsoft.Extensions.Logging;
@@ -56,7 +57,7 @@ internal static partial class LoggerActions
     public static partial void WebInvalidUri(this ILogger logger, Uri uri);
 
     [LoggerMessage(304, LogLevel.Error, "The {type} request failed with error: {ex}")]
-    public static partial void WebRequestFailed(this ILogger logger, string type, string ex);
+    public static partial void WebRequestFailed(this ILogger logger, HttpMethod type, string ex);
 
     [LoggerMessage(390, LogLevel.Warning, "Latest online version of the bot is empty")]
     public static partial void OnlineVersionEmpty(this ILogger<UpdaterService> logger);
