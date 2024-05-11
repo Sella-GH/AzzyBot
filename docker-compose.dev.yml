@@ -7,6 +7,8 @@ services:
     pull_policy: always
     restart: unless-stopped
     user: ${CURRENT_UID}
+    environment:
+      - FORCE_DEBUG=false
     #depends_on:
     #  - lavalink
     #networks:

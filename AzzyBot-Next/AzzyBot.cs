@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using AzzyBot.Enums;
 using AzzyBot.Extensions;
@@ -13,7 +14,16 @@ internal static class AzzyBot
     {
         EnvironmentEnum environment = AzzyStatsGeneral.GetBotEnvironment;
         bool isDev = environment is EnvironmentEnum.Development;
-        bool forceDebug = args.Length > 0 && args[0] is "-forceDebug";
+        bool forceDebug;
+
+        if (AzzyStatsGeneral.CheckIfDocker)
+        {
+            forceDebug = Environment.GetEnvironmentVariable("FORCE_DEBUG") == "true";
+        }
+        else
+        {
+            forceDebug = args.Length > 0 && args[0] is "-forceDebug";
+        }
 
         HostApplicationBuilderSettings appSettings = new()
         {
