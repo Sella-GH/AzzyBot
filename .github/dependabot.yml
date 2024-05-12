@@ -30,7 +30,6 @@ updates:
         - "minor"
         - "patch"
     open-pull-requests-limit: 25
-    milestone: 4
 
   - package-ecosystem: "nuget" # See documentation for possible values
     directory: "/AzzyBot" # Location of package manifests
@@ -89,8 +88,6 @@ updates:
         - "minor"
         - "patch"
     open-pull-requests-limit: 25
-    milestone: 4
-
 
   - package-ecosystem: "nuget" # See documentation for possible values
     directory: "/AzzyBot-Next" # Location of package manifests
@@ -101,6 +98,8 @@ updates:
     commit-message:
       prefix: "[NuGet]"
       include: "scope"
+    labels:
+      - "2.0 Rewrite"
     groups:
       Microsoft:
         applies-to: version-updates
@@ -126,4 +125,4 @@ updates:
         - "minor"
         - "patch"
     open-pull-requests-limit: 25
-    milestone: 4
+    milestone: 6
