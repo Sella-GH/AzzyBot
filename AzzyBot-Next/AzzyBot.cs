@@ -48,7 +48,7 @@ internal static class AzzyBot
         #endregion Add services
 
         // Give the database time to start up
-        await Task.Delay(TimeSpan.FromSeconds(3));
+        //await Task.Delay(TimeSpan.FromSeconds(3));
 
         using IHost app = appBuilder.Build();
         app.ApplyDbMigrations();
