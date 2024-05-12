@@ -6,7 +6,7 @@ namespace AzzyBot.Database.Models;
 internal sealed class GuildsEntity
 {
     public int Id { get; set; }
-    public ulong GuildId { get; set; }
+    public ulong UniqueId { get; set; }
 
     public AzuraCastEntity? AzuraCast { get; set; }
 }
