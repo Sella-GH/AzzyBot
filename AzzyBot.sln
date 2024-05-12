@@ -6,6 +6,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot", "AzzyBot\AzzyBot.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot-Next", "AzzyBot-Next\AzzyBot-Next.csproj", "{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzzyBot-Next.Migrations", "AzzyBot-Next.Migrations\AzzyBot-Next.Migrations.csproj", "{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,6 +24,30 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Debug|x64.Build.0 = Debug|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Docker|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Docker|Any CPU.Build.0 = Debug|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Docker|ARM64.ActiveCfg = Debug|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Docker|ARM64.Build.0 = Debug|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Docker|x64.ActiveCfg = Debug|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Docker|x64.Build.0 = Debug|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Docker-debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Docker-debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Docker-debug|ARM64.ActiveCfg = Debug|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Docker-debug|ARM64.Build.0 = Debug|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Docker-debug|x64.ActiveCfg = Debug|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Docker-debug|x64.Build.0 = Debug|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Release|ARM64.Build.0 = Release|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Release|x64.ActiveCfg = Release|Any CPU
+		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}.Release|x64.Build.0 = Release|Any CPU
 		{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}.Debug|ARM64.ActiveCfg = Debug|Any CPU
