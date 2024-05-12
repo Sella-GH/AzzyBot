@@ -47,6 +47,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git branch actions/DspUpdate
           git add AzzyBot-Next/AzzyBot-Next.csproj
           git commit -m "Update DSharpPlus Nightly to ${{ steps.nuget_version.outputs.NUGET_VERSION }}"
-          git push --force
+          git push
+          gh pr create -a "Sella-GH" -B "dev-next" -f -l "dev-next,dependencies,.NET" -m "2.0 Rewrite"
