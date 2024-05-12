@@ -33,11 +33,11 @@ internal sealed class DiscordBotServiceHost : IHostedService
     private readonly ILoggerFactory _loggerFactory;
     private readonly IServiceProvider _serviceProvider;
     private readonly AzzyBotSettingsRecord _settings;
-    private readonly IDbContextFactory<DatabaseContext> _dbContextFactory;
+    private readonly IDbContextFactory<AzzyDbContext> _dbContextFactory;
     internal readonly DiscordShardedClient _shardedClient;
     private DiscordBotService? _botService;
 
-    public DiscordBotServiceHost(AzzyBotSettingsRecord settings, IDbContextFactory<DatabaseContext> dbContextFactory, ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
+    public DiscordBotServiceHost(AzzyBotSettingsRecord settings, IDbContextFactory<AzzyDbContext> dbContextFactory, ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
     {
         _settings = settings;
         _dbContextFactory = dbContextFactory;
@@ -188,7 +188,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
     {
         _logger.GuildCreated(e.Guild.Name);
 
-        await using DatabaseContext context = await _dbContextFactory.CreateDbContextAsync();
+        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
 
         try
@@ -211,7 +211,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
     {
         _logger.GuildDeleted(e.Guild.Name);
 
-        await using DatabaseContext context = await _dbContextFactory.CreateDbContextAsync();
+        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
 
         try
@@ -244,7 +244,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
 
     private async Task ShardedClientGuildDownloadCompletedAsync(DiscordClient c, GuildDownloadCompletedEventArgs e)
     {
-        await using DatabaseContext context = await _dbContextFactory.CreateDbContextAsync();
+        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
 
         try

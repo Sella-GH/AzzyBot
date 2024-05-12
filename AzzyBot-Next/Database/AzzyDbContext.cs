@@ -3,12 +3,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AzzyBot.Database;
 
-internal sealed class DatabaseContext : DbContext
+internal sealed class AzzyDbContext : DbContext
 {
-    public DatabaseContext()
+    public AzzyDbContext()
     { }
 
-    public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
+    public AzzyDbContext(DbContextOptions<AzzyDbContext> options) : base(options)
     { }
 
     public DbSet<GuildsEntity> Guilds { get; set; }
