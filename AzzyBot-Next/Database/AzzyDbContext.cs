@@ -1,4 +1,4 @@
-﻿using AzzyBot.Database.Models;
+﻿using AzzyBot.Database.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace AzzyBot.Database;

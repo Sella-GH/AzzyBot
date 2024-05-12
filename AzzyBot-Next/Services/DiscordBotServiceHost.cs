@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using AzzyBot.Commands;
 using AzzyBot.Commands.Converters;
 using AzzyBot.Database;
-using AzzyBot.Database.Models;
+using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
 using AzzyBot.Services.Modules;
 using AzzyBot.Settings;
