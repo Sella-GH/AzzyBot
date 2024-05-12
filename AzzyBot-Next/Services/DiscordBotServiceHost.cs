@@ -284,6 +284,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
         catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
         {
             _logger.DatabaseTransactionFailed(ex);
+            await transaction.RollbackAsync();
         }
     }
 
