@@ -254,7 +254,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
             List<ulong> existingGuildIds = await context.Guilds.Select(g => g.UniqueId).ToListAsync();
             List<GuildsEntity> newGuilds = e.Guilds.Values
                 .Where(guild => !existingGuildIds.Contains(guild.Id))
-                .Select(guild => new GuildsEntity { UniqueId = guild.Id })
+                .Select(guild => new GuildsEntity() { UniqueId = guild.Id })
                 .ToList();
 
             if (newGuilds.Count > 0)

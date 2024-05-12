@@ -10,17 +10,7 @@ internal static class FileOperations
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(content, nameof(content));
 
-        string tempFilePath;
-
-        if (!string.IsNullOrWhiteSpace(fileName))
-        {
-            tempFilePath = Path.Combine(Path.GetTempPath(), fileName);
-        }
-        else
-        {
-            tempFilePath = Path.GetTempFileName();
-        }
-
+        string tempFilePath = (!string.IsNullOrWhiteSpace(fileName)) ? Path.Combine(Path.GetTempPath(), fileName) : Path.GetTempFileName();
         await File.WriteAllTextAsync(tempFilePath, content);
 
         return tempFilePath;

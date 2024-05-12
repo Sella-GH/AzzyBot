@@ -119,7 +119,7 @@ internal sealed class WebRequestService(ILogger<WebRequestService> logger) : IDi
 
         // If we have multiple addresses, we need to determine which one to use
         // Prefer IPv6 over IPv4
-        foreach (IPAddress address in iPAddresses.Where(ip => ip.AddressFamily == AddressFamily.InterNetworkV6))
+        foreach (IPAddress _ in iPAddresses.Where(ip => ip.AddressFamily == AddressFamily.InterNetworkV6))
         {
             if (await TestIfPreferredMethodIsReachableAsync(url, AddressFamily.InterNetworkV6))
                 return AddressFamily.InterNetworkV6;

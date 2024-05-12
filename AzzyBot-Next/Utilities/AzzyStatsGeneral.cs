@@ -33,16 +33,13 @@ internal static class AzzyStatsGeneral
 
     internal static DiskUsageRecord GetDiskUsage()
     {
-        foreach (DriveInfo drive in DriveInfo.GetDrives().Where(d => d.IsReady))
+        foreach (DriveInfo drive in DriveInfo.GetDrives().Where(d => d.IsReady && d.Name == "/"))
         {
-            if (drive.Name == "/")
-            {
-                double totalSize = drive.TotalSize / (1024.0 * 1024.0 * 1024.0);
-                double totalFreeSpace = drive.TotalFreeSpace / (1024.0 * 1024.0 * 1024.0);
-                double totalUsedSpace = totalSize - totalFreeSpace;
+            double totalSize = drive.TotalSize / (1024.0 * 1024.0 * 1024.0);
+            double totalFreeSpace = drive.TotalFreeSpace / (1024.0 * 1024.0 * 1024.0);
+            double totalUsedSpace = totalSize - totalFreeSpace;
 
-                return new(totalSize, totalFreeSpace, totalUsedSpace);
-            }
+            return new(totalSize, totalFreeSpace, totalUsedSpace);
         }
 
         return new(0, 0, 0);

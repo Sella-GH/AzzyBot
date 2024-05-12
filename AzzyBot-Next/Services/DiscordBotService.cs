@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Security;
+using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Logging;
 using AzzyBot.Settings;
@@ -39,10 +41,9 @@ internal sealed class DiscordBotService
 
         DiscordGuild? guild = null;
 
-        foreach (KeyValuePair<int, DiscordClient> kvp in _shardedClient.ShardClients)
+        foreach (DiscordClient client in _shardedClient.ShardClients.Select(c => c.Value))
         {
-            DiscordClient discordClient = kvp.Value;
-            guild = await discordClient.GetGuildAsync(guildId);
+            guild = await client.GetGuildAsync(guildId);
 
             if (guild is not null)
                 break;
@@ -264,13 +265,13 @@ internal sealed class DiscordBotService
 
         if (commandOptions?.Count > 0)
         {
-            string values = string.Empty;
+            StringBuilder stringBuilder = new();
             foreach (KeyValuePair<string, string> kvp in commandOptions)
             {
-                values += $"**{kvp.Key}**: {kvp.Value}";
+                stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"**{kvp.Key}**: {kvp.Value}");
             }
 
-            builder.AddField("Options", values);
+            builder.AddField("Options", stringBuilder.ToString());
         }
 
         builder.AddField("OS", os);
