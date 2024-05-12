@@ -63,7 +63,7 @@ dotnet_naming_symbols.constant_fields.applicable_kinds   = field
 dotnet_naming_symbols.constant_fields.required_modifiers = const
 dotnet_naming_style.pascal_case_style.capitalization = pascal_case
 
-# static fields using PascalCase
+# static fields should be PascalCase
 dotnet_naming_rule.static_fields_should_have_prefix.severity = suggestion
 dotnet_naming_rule.static_fields_should_have_prefix.symbols  = static_fields
 dotnet_naming_rule.static_fields_should_have_prefix.style    = static_prefix_style
@@ -72,12 +72,14 @@ dotnet_naming_symbols.static_fields.required_modifiers = static
 dotnet_naming_symbols.static_fields.applicable_accessibilities = private, internal, private_protected
 dotnet_naming_style.static_prefix_style.capitalization = pascal_case
 
-# internal and private fields using PascalCase
+# internal and private fields should be _camelCase
 dotnet_naming_rule.camel_case_for_private_internal_fields.severity = suggestion
 dotnet_naming_rule.camel_case_for_private_internal_fields.symbols  = private_internal_fields
-dotnet_naming_rule.camel_case_for_private_internal_fields.style    = pascal_case_style
+dotnet_naming_rule.camel_case_for_private_internal_fields.style    = camel_case_underscore_style
 dotnet_naming_symbols.private_internal_fields.applicable_kinds = field
 dotnet_naming_symbols.private_internal_fields.applicable_accessibilities = private, internal
+dotnet_naming_style.camel_case_underscore_style.required_prefix = _
+dotnet_naming_style.camel_case_underscore_style.capitalization = camel_case
 
 # Code style defaults
 csharp_using_directive_placement = outside_namespace:suggestion
@@ -539,7 +541,8 @@ dotnet_diagnostic.rcs1102.severity = warning
 dotnet_diagnostic.rcs1103.severity = suggestion
 
 # Simplify conditional expression
-dotnet_diagnostic.rcs1104.severity = suggestion
+# This one is doubled
+dotnet_diagnostic.rcs1104.severity = none
 
 # Unnecessary interpolation
 dotnet_diagnostic.rcs1105.severity = suggestion
@@ -656,7 +659,8 @@ dotnet_diagnostic.rcs1161.severity = none
 dotnet_diagnostic.rcs1162.severity = suggestion
 
 # Unused parameter
-dotnet_diagnostic.rcs1163.severity = suggestion
+# This one is doubled
+dotnet_diagnostic.rcs1163.severity = none
 
 # Unused type parameter
 dotnet_diagnostic.rcs1164.severity = suggestion
@@ -749,7 +753,7 @@ dotnet_diagnostic.rcs1199.severity = suggestion
 dotnet_diagnostic.rcs1200.severity = suggestion
 
 # Use method chaining
-dotnet_diagnostic.rcs1201.severity = suggestion
+dotnet_diagnostic.rcs1201.severity = none
 
 # Avoid NullReferenceException
 dotnet_diagnostic.rcs1202.severity = suggestion
@@ -785,7 +789,8 @@ dotnet_diagnostic.rcs1211.severity = suggestion
 dotnet_diagnostic.rcs1212.severity = suggestion
 
 # Remove unused member declaration
-dotnet_diagnostic.rcs1213.severity = suggestion
+# This one is doubled
+dotnet_diagnostic.rcs1213.severity = none
 
 # Unnecessary interpolated string
 dotnet_diagnostic.rcs1214.severity = suggestion
@@ -812,7 +817,7 @@ dotnet_diagnostic.rcs1221.severity = suggestion
 dotnet_diagnostic.rcs1222.severity = suggestion
 
 # Mark publicly visible type with DebuggerDisplay attribute
-dotnet_diagnostic.rcs1223.severity = suggestion
+dotnet_diagnostic.rcs1223.severity = none
 
 # Make method an extension method
 dotnet_diagnostic.rcs1224.severity = suggestion

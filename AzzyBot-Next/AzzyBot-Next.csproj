@@ -12,70 +12,70 @@
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <Authors>Sella-GH, AzzyBot Contributors</Authors>
-    <Version>1.10.0</Version>
+    <Version>2.0.0</Version>
     <Copyright>© 2024 - $(Authors)</Copyright>
-    <Product>AzzyBot</Product>
+    <Product>AzzyBot-Next</Product>
     <Description>General purpose discord bot, written in C# and with DSharpPlus, dedicated for the use with AzuraCast.</Description>
     <RepositoryUrl>https://github.com/Sella-GH/AzzyBot</RepositoryUrl>
     <PathMap>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)=.</PathMap>
     <AnalysisLevel>latest-all</AnalysisLevel>
-    <Configurations>Debug;Release;Docker;Docker-debug</Configurations>
     <NoWarn>$(NoWarn);CA1812;CA2007</NoWarn>
+    <Configurations>Debug;Release;Docker;Docker-debug</Configurations>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Dev</AssemblyName>
-    <Product>AzzyBot-Dev</Product>
+    <Product>AzzyBot-Next-Dev</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Dev</AssemblyName>
-    <Product>AzzyBot-Dev</Product>
+    <Product>AzzyBot-Next-Dev</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Dev</AssemblyName>
-    <Product>AzzyBot-Dev</Product>
+    <Product>AzzyBot-Next-Dev</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|AnyCPU'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Docker</AssemblyName>
-    <Product>AzzyBot-Docker</Product>
+    <Product>AzzyBot-Next-Docker</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|ARM64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Docker</AssemblyName>
-    <Product>AzzyBot-Docker</Product>
+    <Product>AzzyBot-Next-Docker</Product>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|x64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Docker</AssemblyName>
-    <Product>AzzyBot-Docker</Product>
+    <Product>AzzyBot-Next-Docker</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker-debug|AnyCPU'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <AssemblyName>AzzyBot-Dev</AssemblyName>
-    <Product>AzzyBot-Dev</Product>
+    <AssemblyName>AzzyBot-Docker-Dev</AssemblyName>
+    <Product>AzzyBot-Next-Docker-Dev</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker-debug|ARM64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <AssemblyName>AzzyBot-Dev</AssemblyName>
-    <Product>AzzyBot-Dev</Product>
+    <AssemblyName>AzzyBot-Docker-Dev</AssemblyName>
+    <Product>AzzyBot-Next-Docker-Dev</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker-debug|x64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <AssemblyName>AzzyBot-Dev</AssemblyName>
-    <Product>AzzyBot-Dev</Product>
+    <AssemblyName>AzzyBot-Docker-Dev</AssemblyName>
+    <Product>AzzyBot-Next-Docker-Dev</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -92,20 +92,16 @@
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot</AssemblyName>
   </PropertyGroup>
-  
+
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="32.0.2" />
-    <PackageReference Include="DSharpPlus" Version="4.4.6" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="4.4.6" />
-    <PackageReference Include="DSharpPlus.SlashCommands" Version="4.4.6" />
-    <PackageReference Include="Lavalink4NET.DSharpPlus" Version="4.0.18" />
-    <PackageReference Include="Lavalink4NET.InactivityTracking" Version="4.0.18" />
-    <PackageReference Include="Lavalink4NET.Integrations.LyricsJava" Version="4.0.18" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02248" />
+    <PackageReference Include="DSharpPlus.Commands" Version="5.0.0-nightly-02248" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
     <PackageReference Include="Roslynator.Analyzers" Version="4.12.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -126,49 +122,18 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Net.Security" Version="4.3.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Modules\Core\Files\AzzyBot.json">
+    <None Update="Modules\Core\Files\AzzyBotStats.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Settings\appsettings.development.json">
+    <None Update="Settings\AzzyBotSettings-Dev.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Settings\appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Customization\ClubManagement\ClubBotStatus.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Customization\AzuraCast\FavoriteSongs.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Customization\AzuraCast\PlaylistSlogans.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Customization\AzuraCast\StringsAzuraCast.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Customization\ClubManagement\StringsClubManagement.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Customization\Core\StringsCore.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Customization\MusicStreaming\StringsMusicStreaming.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Modules\AzuraCast\Files\FileCache.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Modules\MusicStreaming\Files\application.yml">
+    <None Update="Settings\AzzyBotSettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Customization\MusicStreaming\" />
-  </ItemGroup>
 </Project>

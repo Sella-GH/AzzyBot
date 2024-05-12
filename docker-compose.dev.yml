@@ -1,17 +1,45 @@
-include:
-  - ./AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
+#include:
+  #- ./AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
 services:
   AzzyBot:
     container_name: AzzyBot
-    image: sellagh/azzybot:dev
+    image: sellagh/azzybot:dev-Database
     pull_policy: always
     restart: unless-stopped
     user: ${CURRENT_UID}
+    environment:
+      - FORCE_DEBUG=false
     depends_on:
-      - lavalink
+      - AzzyBot-Db
+    #  - lavalink
     networks:
-      - lavalink
+      - AzzyBot-Db-Nw
+    #  - lavalink
     volumes:
-      - ./AzzyBot/Customization:/app/Customization
-      - ./AzzyBot/Modules/AzuraCast/Files:/app/Modules/AzuraCast/Files
-      - ./AzzyBot/Settings:/app/Settings
+      #- ./AzzyBot/Customization:/app/Customization
+      #- ./AzzyBot/Modules/AzuraCast/Files:/app/Modules/AzuraCast/Files
+      - ./AzzyBot-Next/Settings:/app/Settings
+
+  AzzyBot-Db:
+    container_name: AzzyBot-Db
+    image: mariadb:lts
+    pull_policy: always
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=thisIsR00!P@ssw0rd
+      - MYSQL_DATABASE=azzybot
+      - MYSQL_USER=azzybot
+      - MYSQL_PASSWORD=thisIsAzzyB0!P@ssw0rd
+    networks:
+      - AzzyBot-Db-Nw
+    hostname: AzzyBot-Db
+    volumes:
+      - azzybot_data:/var/lib/mysql
+
+networks:
+  AzzyBot-Db-Nw:
+    name: AzzyBot-Db-Nw
+
+volumes:
+  azzybot_data:
+    driver: local

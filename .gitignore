@@ -399,7 +399,4 @@ FodyWeavers.xsd
 
 # Config files
 appsettings.development.json
-*.env
-
-# BuildFiles
-BuildDate.txt
+AzzyBotSettings-Dev.json

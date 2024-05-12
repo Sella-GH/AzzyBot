@@ -1,0 +1,26 @@
+{
+    "BotToken": "",
+    "ServerId": 0,
+    "ErrorChannelId": 0,
+    "Database": {
+        "Host": "localhost",
+        "Port": 3306,
+        "User": "root",
+        "Password": "",
+        "DatabaseName": "azzybot"
+    },
+    "DiscordStatus": {
+        "Activity": 2,
+        "Doing": "Music",
+        "Status": 1,
+        "StreamUrl": ""
+    },
+    "CoreSettings": {
+        "CoreUpdater": {
+            "CheckInterval": 1,
+            "DisplayChangelog": true,
+            "DisplayInstructions": true,
+            "MessageChannelId": 0
+        }
+    }
+}
