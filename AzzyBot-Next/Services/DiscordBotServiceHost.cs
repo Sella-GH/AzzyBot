@@ -240,8 +240,6 @@ internal sealed class DiscordBotServiceHost : IHostedService
             _logger.DatabaseTransactionFailed(ex);
             await transaction.RollbackAsync();
         }
-
-        await e.Guild.Owner.SendMessageAsync("I am sorry for being not used anymore on this server. I removed every piece of data of your server from my database and hope you will find use of me again!");
     }
 
     private async Task ShardedClientGuildDownloadCompletedAsync(DiscordClient c, GuildDownloadCompletedEventArgs e)
