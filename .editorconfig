@@ -499,7 +499,8 @@ dotnet_diagnostic.rcs1078.severity = suggestion
 dotnet_diagnostic.rcs1079.severity = suggestion
 
 # Use 'Count/Length' property instead of 'Any' method
-dotnet_diagnostic.rcs1080.severity = suggestion
+# This one is doubled
+dotnet_diagnostic.rcs1080.severity = none
 
 # Split variable declaration
 dotnet_diagnostic.rcs1081.severity = suggestion

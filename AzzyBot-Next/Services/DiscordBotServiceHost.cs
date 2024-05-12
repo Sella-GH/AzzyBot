@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Commands;
@@ -215,31 +216,24 @@ internal sealed class DiscordBotServiceHost : IHostedService
 
         try
         {
-            GuildsEntity? guild = null;
-            AzuraCastEntity? azura = null;
-            AzuraCastChecksEntity? checks = null;
-
-            try
-            {
-                guild = await context.Guilds.SingleAsync(g => g.UniqueId == e.Guild.Id);
-                azura = await context.AzuraCast.SingleAsync(a => a.GuildId == guild.Id);
-                checks = await context.AzuraCastChecks.SingleAsync(c => c.AzuraCastId == azura.Id);
-            }
-            catch (InvalidOperationException)
-            { }
-
-            if (checks is not null)
-                context.AzuraCastChecks.Remove(checks);
-
-            if (azura is not null)
-                context.AzuraCast.Remove(azura);
-
+            GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == e.Guild.Id);
             if (guild is not null)
+            {
+                AzuraCastEntity? azura = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
+                if (azura is not null)
+                {
+                    AzuraCastChecksEntity? checks = await context.AzuraCastChecks.SingleOrDefaultAsync(c => c.AzuraCastId == azura.Id);
+                    if (checks is not null)
+                        context.AzuraCastChecks.Remove(checks);
+
+                    context.AzuraCast.Remove(azura);
+                }
+
                 context.Guilds.Remove(guild);
+                await context.SaveChangesAsync();
 
-            await context.SaveChangesAsync();
-
-            await transaction.CommitAsync();
+                await transaction.CommitAsync();
+            }
         }
         catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
         {
@@ -257,29 +251,19 @@ internal sealed class DiscordBotServiceHost : IHostedService
 
         try
         {
-            List<GuildsEntity> guilds = await context.Guilds.ToListAsync();
+            List<ulong> existingGuildIds = await context.Guilds.Select(g => g.UniqueId).ToListAsync();
+            List<GuildsEntity> newGuilds = e.Guilds.Values
+                .Where(guild => !existingGuildIds.Contains(guild.Id))
+                .Select(guild => new GuildsEntity { UniqueId = guild.Id })
+                .ToList();
 
-            foreach (DiscordGuild guild in e.Guilds.Values)
+            if (newGuilds.Count > 0)
             {
-                if (guilds.Count > 0)
-                {
-                    foreach (GuildsEntity entity in guilds)
-                    {
-                        if (guild.Id == entity.UniqueId)
-                            continue;
+                await context.Guilds.AddRangeAsync(newGuilds);
+                await context.SaveChangesAsync();
 
-                        await context.Guilds.AddAsync(new() { UniqueId = guild.Id });
-                    }
-                }
-                else
-                {
-                    await context.Guilds.AddAsync(new() { UniqueId = guild.Id });
-                }
+                await transaction.CommitAsync();
             }
-
-            await context.SaveChangesAsync();
-
-            await transaction.CommitAsync();
         }
         catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
         {
