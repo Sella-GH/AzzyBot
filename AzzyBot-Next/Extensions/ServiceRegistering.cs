@@ -46,6 +46,7 @@ internal static class ServiceRegistering
 
         string connectionString = GetConnectionString(settings.Database?.Host, settings.Database?.Port, settings.Database?.User, settings.Database?.Password, settings.Database?.DatabaseName);
         services.AddDbContextFactory<AzzyDbContext>(options => options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+        services.AddSingleton<DbActions>();
 
         services.AddSingleton<DiscordBotService>();
         services.AddSingleton<DiscordBotServiceHost>();
