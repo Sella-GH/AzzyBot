@@ -5,7 +5,7 @@ on:
     branches:
       - "main"
       - "rel/**"
-      - "dev**"
+      - "dev/**"
     paths:
       - "**.cs"
       - "**.csproj"
@@ -15,7 +15,7 @@ on:
       - "**/docker.yml"
       - "CHANGELOG.md"
       - "Dockerfile"
-      - "Dockerfile-Dev"
+      - "dev.Dockerfile"
   workflow_dispatch:
 
 jobs:
