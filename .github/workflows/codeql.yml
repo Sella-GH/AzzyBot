@@ -16,9 +16,10 @@ on:
     paths:
       - "**.cs"
       - "**.csproj"
+      - "**.json"
       - "**.props"
       - "**.sln"
-      - "**.yml"
+      - "**/codeql.yml"
 
 jobs:
   analyze:
