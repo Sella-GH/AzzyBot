@@ -32,6 +32,12 @@ internal static partial class LoggerActions
     [LoggerMessage(103, LogLevel.Information, "Command {command} requested by {user} to execute")]
     public static partial void CommandRequested(this ILogger logger, string command, string user);
 
+    [LoggerMessage(110, LogLevel.Information, "AzzyBot joined the following Guild: {guild}")]
+    public static partial void GuildCreated(this ILogger<DiscordBotServiceHost> logger, string guild);
+
+    [LoggerMessage(111, LogLevel.Information, "AzzyBot was removed from the following Guild: {guild}")]
+    public static partial void GuildDeleted(this ILogger<DiscordBotServiceHost> logger, string guild);
+
     [LoggerMessage(197, LogLevel.Information, "An update for Azzy is available! Please update now to version: {version} to get the latest fixes and improvements.")]
     public static partial void UpdateAvailable(this ILogger<UpdaterService> logger, Version version);
 
@@ -43,6 +49,12 @@ internal static partial class LoggerActions
 
     [LoggerMessage(200, LogLevel.Warning, "Commands error occured!")]
     public static partial void CommandsError(this ILogger<DiscordBotServiceHost> logger);
+
+    [LoggerMessage(290, LogLevel.Warning, "Latest online version of the bot is empty")]
+    public static partial void OnlineVersionEmpty(this ILogger<UpdaterService> logger);
+
+    [LoggerMessage(291, LogLevel.Warning, "Body of online version could not be deserialized")]
+    public static partial void OnlineVersionUnserializable(this ILogger<UpdaterService> logger);
 
     [LoggerMessage(300, LogLevel.Error, "{setting} has to be filled out!")]
     public static partial void SettingNotFilled(this ILogger logger, string setting);
@@ -59,11 +71,8 @@ internal static partial class LoggerActions
     [LoggerMessage(304, LogLevel.Error, "The {type} request failed with error: {ex}")]
     public static partial void WebRequestFailed(this ILogger logger, HttpMethod type, string ex);
 
-    [LoggerMessage(390, LogLevel.Warning, "Latest online version of the bot is empty")]
-    public static partial void OnlineVersionEmpty(this ILogger<UpdaterService> logger);
-
-    [LoggerMessage(391, LogLevel.Warning, "Body of online version could not be deserialized")]
-    public static partial void OnlineVersionUnserializable(this ILogger<UpdaterService> logger);
+    [LoggerMessage(320, LogLevel.Error, "Database transaction failed with error: ")]
+    public static partial void DatabaseTransactionFailed(this ILogger logger, Exception ex);
 
     [LoggerMessage(400, LogLevel.Critical, "The given settings can't be parsed, are they filled out?")]
     public static partial void UnableToParseSettings(this ILogger<DiscordBotServiceHost> logger);

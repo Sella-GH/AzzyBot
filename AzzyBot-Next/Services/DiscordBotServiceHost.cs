@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Transactions;
 using AzzyBot.Commands;
 using AzzyBot.Commands.Converters;
+using AzzyBot.Database;
+using AzzyBot.Database.Models;
 using AzzyBot.Logging;
 using AzzyBot.Services.Modules;
 using AzzyBot.Settings;
@@ -16,6 +20,8 @@ using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Exceptions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -136,8 +142,18 @@ internal sealed class DiscordBotServiceHost : IHostedService
         }
     }
 
-    private void RegisterEventHandlers() => _shardedClient.ClientErrored += ShardedClientErroredAsync;
-    private void UnregisterEventHandlers() => _shardedClient.ClientErrored -= ShardedClientErroredAsync;
+    private void RegisterEventHandlers()
+    {
+        _shardedClient.ClientErrored += ShardedClientErroredAsync;
+        _shardedClient.GuildCreated += ShardedClientGuildCreatedAsync;
+        _shardedClient.GuildDeleted += ShardedClientGuildDeletedAsync;
+    }
+    private void UnregisterEventHandlers()
+    {
+        _shardedClient.ClientErrored -= ShardedClientErroredAsync;
+        _shardedClient.GuildCreated -= ShardedClientGuildCreatedAsync;
+        _shardedClient.GuildDeleted -= ShardedClientGuildDeletedAsync;
+    }
 
     private async Task CommandErroredAsync(CommandsExtension c, CommandErroredEventArgs e)
     {
@@ -162,6 +178,59 @@ internal sealed class DiscordBotServiceHost : IHostedService
         {
             await _botService.LogExceptionAsync(ex, now, ctx, ((DiscordException)e.Exception).JsonMessage);
         }
+    }
+
+    private async Task ShardedClientGuildCreatedAsync(DiscordClient c, GuildCreateEventArgs e)
+    {
+        _logger.GuildCreated(e.Guild.Name);
+
+        await using DatabaseContext context = new();
+        await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
+
+        try
+        {
+            await context.Guilds.AddAsync(new() { UniqueId = e.Guild.Id });
+            await context.SaveChangesAsync();
+
+            await transaction.CommitAsync();
+        }
+        catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
+        {
+            _logger.DatabaseTransactionFailed(ex);
+        }
+
+        await e.Guild.Owner.SendMessageAsync("Thank you for adding me to your guild! Before you can make use of me, you have to set my settings first.\n\nPlease use the command `settings set` for this.\nOnly you are able to execute this command right now.");
+    }
+
+    private async Task ShardedClientGuildDeletedAsync(DiscordClient c, GuildDeleteEventArgs e)
+    {
+        _logger.GuildDeleted(e.Guild.Name);
+
+        await using DatabaseContext context = new();
+        await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
+
+        try
+        {
+            GuildsEntity guild = await context.Guilds.SingleAsync(g => g.UniqueId == e.Guild.Id);
+            AzuraCastEntity azura = await context.AzuraCast.SingleAsync(a => a.GuildId  == guild.Id);
+            AzuraCastChecksEntity checks = await context.AzuraCastChecks.SingleAsync(c => c.AzuraCastId == azura.Id);
+
+            int guildId = guild.Id;
+            int azuraId = azura.Id;
+            int checksId = checks.Id;
+
+            context.AzuraCastChecks.Remove(checks);
+            context.AzuraCast.Remove(azura);
+            context.Guilds.Remove(guild);
+
+            await transaction.CommitAsync();
+        }
+        catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
+        {
+            _logger.DatabaseTransactionFailed(ex);
+        }
+
+        await e.Guild.Owner.SendMessageAsync("I am sorry for being not used anymore on this server. I removed every piece of data of your server from my database.");
     }
 
     private async Task ShardedClientErroredAsync(DiscordClient c, ClientErrorEventArgs e)
