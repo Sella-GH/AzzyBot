@@ -5,9 +5,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot", "AzzyBot\AzzyBot.csproj", "{91AAAF0E-4931-4247-BE86-74C595C7D5FC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot-Next", "AzzyBot-Next\AzzyBot-Next.csproj", "{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2} = {0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzzyBot-Next.Migrations", "AzzyBot-Next.Migrations\AzzyBot-Next.Migrations.csproj", "{0DEF20B9-FBE6-4C81-B75E-AB2F742452D2}"
 EndProject
