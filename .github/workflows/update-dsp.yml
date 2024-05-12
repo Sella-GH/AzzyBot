@@ -39,14 +39,26 @@ jobs:
             echo "No versions found in the NuGet package data."
           fi
 
-      - name: Update .csproj file if versions differ
+      - name: Check if PR was already created
         if: ${{ steps.current_version.outputs.CURRENT_VERSION != steps.nuget_version.outputs.NUGET_VERSION }}
+        id: check_pr
+        run: |
+          PRS="$(gh pr list --search "Update DSharpPlus Nightly to ${{ steps.nuget_version.outputs.NUGET_VERSION }}")"
+          echo "Found PRs: $PRS"
+          if [ "$PRS" != '' ]; then
+            echo "PR_CREATED=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "PR_CREATED=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update .csproj file if versions differ
+        if: ${{ steps.check_pr.outputs.PR_CREATED != 'true' }}
         run: |
           sed -i 's/<PackageReference Include="DSharpPlus" Version="'${{ steps.current_version.outputs.CURRENT_VERSION }}'"/<PackageReference Include="DSharpPlus" Version="'${{ steps.nuget_version.outputs.NUGET_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
           sed -i 's/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.current_version.outputs.CURRENT_VERSION }}'"/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.nuget_version.outputs.NUGET_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
 
       - name: Commit and push if there was a change
-        if: ${{ steps.current_version.outputs.CURRENT_VERSION != steps.nuget_version.outputs.NUGET_VERSION }}
+        if: ${{ steps.check_pr.outputs.PR_CREATED != 'true' }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
