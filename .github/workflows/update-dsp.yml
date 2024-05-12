@@ -56,3 +56,5 @@ jobs:
           git commit -m "Update DSharpPlus Nightly to ${{ steps.nuget_version.outputs.NUGET_VERSION }}"
           git push
           gh pr create -a "Sella-GH" -B "dev-next" -f -l "dev-next,dependencies,.NET" -m "2.0 Rewrite"
+        env:
+          GH_TOKEN: ${{ github.token }}
