@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
@@ -118,9 +119,9 @@ internal sealed class WebRequestService(ILogger<WebRequestService> logger) : IDi
 
         // If we have multiple addresses, we need to determine which one to use
         // Prefer IPv6 over IPv4
-        foreach (IPAddress address in iPAddresses)
+        foreach (IPAddress address in iPAddresses.Where(ip => ip.AddressFamily == AddressFamily.InterNetworkV6))
         {
-            if (address.AddressFamily == AddressFamily.InterNetworkV6 && await TestIfPreferredMethodIsReachableAsync(url, AddressFamily.InterNetworkV6))
+            if (await TestIfPreferredMethodIsReachableAsync(url, AddressFamily.InterNetworkV6))
                 return AddressFamily.InterNetworkV6;
         }
 

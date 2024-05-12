@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using AzzyBot.Enums;
@@ -32,9 +33,9 @@ internal static class AzzyStatsGeneral
 
     internal static DiskUsageRecord GetDiskUsage()
     {
-        foreach (DriveInfo drive in DriveInfo.GetDrives())
+        foreach (DriveInfo drive in DriveInfo.GetDrives().Where(d => d.IsReady))
         {
-            if (drive.IsReady && drive.Name == "/")
+            if (drive.Name == "/")
             {
                 double totalSize = drive.TotalSize / (1024.0 * 1024.0 * 1024.0);
                 double totalFreeSpace = drive.TotalFreeSpace / (1024.0 * 1024.0 * 1024.0);
