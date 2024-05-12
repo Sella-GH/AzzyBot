@@ -7,8 +7,18 @@ public sealed record AzzyBotSettingsRecord
     public required string BotToken { get; init; }
     public required ulong ServerId { get; init; }
     public required ulong ErrorChannelId { get; init; }
+    public Database? Database { get; init; }
     public DiscordStatus? DiscordStatus { get; init; }
     public required CoreSettings CoreSettings { get; init; }
+}
+
+public sealed record Database
+{
+    public string Host { get; init; } = string.Empty;
+    public int Port { get; init; } = 3306;
+    public string User { get; init; } = string.Empty;
+    public string Password { get; init; } = string.Empty;
+    public string DatabaseName { get; init; } = string.Empty;
 }
 
 public sealed record DiscordStatus

@@ -541,7 +541,8 @@ dotnet_diagnostic.rcs1102.severity = warning
 dotnet_diagnostic.rcs1103.severity = suggestion
 
 # Simplify conditional expression
-dotnet_diagnostic.rcs1104.severity = suggestion
+# This one is doubled
+dotnet_diagnostic.rcs1104.severity = none
 
 # Unnecessary interpolation
 dotnet_diagnostic.rcs1105.severity = suggestion

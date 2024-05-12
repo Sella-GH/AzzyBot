@@ -6,10 +6,10 @@ on:
       - "**.cs"
       - "**.csproj"
       - "**.json"
-      - "**.md"
       - "**.props"
       - "**.sln"
-      - "**dotnet.yml"
+      - "CHANGELOG.md"
+      - "**/dotnet.yml"
   workflow_dispatch:
 
 jobs:
