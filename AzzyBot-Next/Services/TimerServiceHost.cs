@@ -2,7 +2,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using AzzyBot.Enums;
 using AzzyBot.Logging;
 using AzzyBot.Settings;
 using AzzyBot.Utilities;
@@ -17,7 +16,7 @@ internal sealed class TimerServiceHost(AzzyBotSettingsRecord settings, DiscordBo
     private readonly AzzyBotSettingsRecord _settings = settings;
     private readonly DiscordBotService _discordBotService = discordBotService;
     private readonly UpdaterService _updaterService = updaterService;
-    private readonly bool _isDev = AzzyStatsGeneral.GetBotEnvironment is EnvironmentEnum.Development;
+    private readonly bool _isDev = AzzyStatsGeneral.GetBotEnvironment == Environments.Development;
     private Timer? _timer;
     private DateTime _lastBotUpdateCheck = DateTime.MinValue;
 

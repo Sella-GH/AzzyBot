@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using AzzyBot.Enums;
 using AzzyBot.Utilities.Records;
+using Microsoft.Extensions.Hosting;
 
 namespace AzzyBot.Utilities;
 
@@ -13,7 +13,7 @@ internal static class AzzyStatsGeneral
 {
     internal static string GetBotAuthors => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).CompanyName ?? "Bot authors not found";
     internal static string GetBotDotNetVersion => Environment.Version.ToString() ?? ".NET version not found";
-    internal static EnvironmentEnum GetBotEnvironment => (GetBotName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase)) ? EnvironmentEnum.Development : EnvironmentEnum.Production;
+    internal static string GetBotEnvironment => (GetBotName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase)) ? Environments.Development : Environments.Production;
     internal static string GetBotName => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductName ?? "Bot name not found";
     internal static string GetBotVersion => Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "Bot version not found";
 
