@@ -90,6 +90,7 @@ jobs:
 
   build-docker:
     name: Build and publish docker .zip file
+    if: contains(github.event.head_commit.message, '[release]')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
