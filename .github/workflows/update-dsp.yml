@@ -1,6 +1,9 @@
 name: Update DSharpPlus Nightly version
 
 on:
+  push:
+    paths:
+      - "**update-dsp.yml"
   schedule:
     - cron: '0 */6 * * *'
 
