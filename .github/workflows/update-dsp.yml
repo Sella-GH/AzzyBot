@@ -52,13 +52,13 @@ jobs:
           fi
 
       - name: Update .csproj file if versions differ
-        if: ${{ steps.check_pr.outputs.PR_CREATED != 'true' }}
+        if: ${{ steps.check_pr.outputs.PR_CREATED != 'true' && steps.current_version.outputs.CURRENT_VERSION != steps.nuget_version.outputs.NUGET_VERSION }}
         run: |
           sed -i 's/<PackageReference Include="DSharpPlus" Version="'${{ steps.current_version.outputs.CURRENT_VERSION }}'"/<PackageReference Include="DSharpPlus" Version="'${{ steps.nuget_version.outputs.NUGET_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
           sed -i 's/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.current_version.outputs.CURRENT_VERSION }}'"/<PackageReference Include="DSharpPlus.Commands" Version="'${{ steps.nuget_version.outputs.NUGET_VERSION }}'"/' AzzyBot-Next/AzzyBot-Next.csproj
 
       - name: Commit and push if there was a change
-        if: ${{ steps.check_pr.outputs.PR_CREATED != 'true' }}
+        if: ${{ steps.check_pr.outputs.PR_CREATED != 'true' && steps.current_version.outputs.CURRENT_VERSION != steps.nuget_version.outputs.NUGET_VERSION }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
