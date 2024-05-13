@@ -80,7 +80,7 @@ internal static class ServiceRegistering
 
         if (settings.EncryptionKey.Length != 32)
         {
-            Console.Error.WriteLine($"The {nameof(settings.EncryptionKey)} and  must contain exactly 32 characters");
+            Console.Error.WriteLine($"The {nameof(settings.EncryptionKey)} must contain exactly 32 characters!");
             if (!AzzyStatsGeneral.CheckIfLinuxOs)
                 Console.ReadKey();
 
