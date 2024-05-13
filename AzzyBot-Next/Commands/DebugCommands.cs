@@ -24,8 +24,8 @@ internal sealed class DebugCommands
 
             await context.DeferResponseAsync();
 
-            string encrypted = EncryptionHelper.Encrypt(text);
-            string decrypted = EncryptionHelper.Decrypt(encrypted);
+            string encrypted = Crypto.Encrypt(text);
+            string decrypted = Crypto.Decrypt(encrypted);
 
             await context.EditResponseAsync($"Original: {text}\nEncrypted: {encrypted}\nDecrypted: {decrypted}");
         }

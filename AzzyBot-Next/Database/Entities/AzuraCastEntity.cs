@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using AzzyBot.Utilities.Encryption;
 
 namespace AzzyBot.Database.Entities;
 
@@ -7,11 +6,7 @@ namespace AzzyBot.Database.Entities;
 internal sealed class AzuraCastEntity
 {
     public int Id { get; set; }
-
-    [Encryption]
     public string ApiKey { get; set; } = string.Empty;
-
-    [Encryption]
     public string ApiUrl { get; set; } = string.Empty;
 
     public int StationId { get; set; }

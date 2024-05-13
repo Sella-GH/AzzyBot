@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using AzzyBot.Database;
 using AzzyBot.Services;
 using AzzyBot.Services.Modules;
@@ -41,8 +42,7 @@ internal static class ServiceRegistering
         AzzyBotSettingsRecord settings = serviceProvider.GetRequiredService<AzzyBotSettingsRecord>();
 
         // Set the encryption key
-        EncryptionHelper.Iv = settings.EncryptionIv;
-        EncryptionHelper.Key = settings.EncryptionKey;
+        Crypto.EncryptionKey = Encoding.UTF8.GetBytes(settings.EncryptionKey);
 
         // Need to register as Singleton first
         // Otherwise DI doesn't work properly
@@ -80,16 +80,7 @@ internal static class ServiceRegistering
 
         if (settings.EncryptionKey.Length != 32)
         {
-            Console.Error.WriteLine($"The {nameof(settings.EncryptionKey)} and  must contain exactly 32 characters");
-            if (!AzzyStatsGeneral.CheckIfLinuxOs)
-                Console.ReadKey();
-
-            Environment.Exit(1);
-        }
-
-        if (settings.EncryptionIv.Length != 16)
-        {
-            Console.Error.WriteLine($"The {nameof(settings.EncryptionIv)} must contain exactly 16 characters.");
+            Console.Error.WriteLine($"The {nameof(settings.EncryptionKey)} must contain exactly 32 characters!");
             if (!AzzyStatsGeneral.CheckIfLinuxOs)
                 Console.ReadKey();
 
