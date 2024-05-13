@@ -41,6 +41,7 @@ internal static class ServiceRegistering
         AzzyBotSettingsRecord settings = serviceProvider.GetRequiredService<AzzyBotSettingsRecord>();
 
         // Set the encryption key
+        EncryptionHelper.Iv = settings.EncryptionIv;
         EncryptionHelper.Key = settings.EncryptionKey;
 
         // Need to register as Singleton first
@@ -71,6 +72,24 @@ internal static class ServiceRegistering
         if (settings is null)
         {
             Console.Error.Write("No bot configuration found! Please set your settings.");
+            if (!AzzyStatsGeneral.CheckIfLinuxOs)
+                Console.ReadKey();
+
+            Environment.Exit(1);
+        }
+
+        if (settings.EncryptionKey.Length != 32)
+        {
+            Console.Error.WriteLine($"The {nameof(settings.EncryptionKey)} and  must contain exactly 32 characters");
+            if (!AzzyStatsGeneral.CheckIfLinuxOs)
+                Console.ReadKey();
+
+            Environment.Exit(1);
+        }
+
+        if (settings.EncryptionIv.Length != 16)
+        {
+            Console.Error.WriteLine($"The {nameof(settings.EncryptionIv)} must contain exactly 16 characters.");
             if (!AzzyStatsGeneral.CheckIfLinuxOs)
                 Console.ReadKey();
 
