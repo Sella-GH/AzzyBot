@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using AzzyBot.Database;
 using AzzyBot.Services;
 using AzzyBot.Services.Modules;
 using AzzyBot.Settings;
 using AzzyBot.Utilities;
+using AzzyBot.Utilities.Encryption;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +41,9 @@ internal static class ServiceRegistering
         IServiceProvider serviceProvider = services.BuildServiceProvider();
         AzzyBotSettingsRecord settings = serviceProvider.GetRequiredService<AzzyBotSettingsRecord>();
 
+        // Set the encryption key
+        Crypto.EncryptionKey = Encoding.UTF8.GetBytes(settings.EncryptionKey);
+
         // Need to register as Singleton first
         // Otherwise DI doesn't work properly
         services.AddSingleton<CoreServiceHost>();
@@ -67,6 +72,15 @@ internal static class ServiceRegistering
         if (settings is null)
         {
             Console.Error.Write("No bot configuration found! Please set your settings.");
+            if (!AzzyStatsGeneral.CheckIfLinuxOs)
+                Console.ReadKey();
+
+            Environment.Exit(1);
+        }
+
+        if (settings.EncryptionKey.Length != 32)
+        {
+            Console.Error.WriteLine($"The {nameof(settings.EncryptionKey)} must contain exactly 32 characters!");
             if (!AzzyStatsGeneral.CheckIfLinuxOs)
                 Console.ReadKey();
 

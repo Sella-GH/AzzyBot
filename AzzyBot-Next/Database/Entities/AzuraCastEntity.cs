@@ -8,6 +8,7 @@ internal sealed class AzuraCastEntity
     public int Id { get; set; }
     public string ApiKey { get; set; } = string.Empty;
     public string ApiUrl { get; set; } = string.Empty;
+
     public int StationId { get; set; }
     public ulong MusicRequestsChannelId { get; set; }
     public ulong OutagesChannelId { get; set; }

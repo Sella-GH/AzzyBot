@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using AzzyBot.Logging;
 using AzzyBot.Services;
+using AzzyBot.Utilities.Encryption;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using Microsoft.Extensions.Logging;
@@ -15,6 +16,19 @@ internal sealed class DebugCommands
     {
         private readonly ILogger<Debug> _logger = logger;
         private readonly WebRequestService _webRequestService = webRequestService;
+
+        [Command("encrypt-decrypt")]
+        public async ValueTask DebugEncryptDecryptAsync(SlashCommandContext context, string text)
+        {
+            _logger.CommandRequested(nameof(DebugEncryptDecryptAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            string encrypted = Crypto.Encrypt(text);
+            string decrypted = Crypto.Decrypt(encrypted);
+
+            await context.EditResponseAsync($"Original: {text}\nEncrypted: {encrypted}\nDecrypted: {decrypted}");
+        }
 
         [Command("trigger-exception")]
         public async ValueTask DebugTriggerExceptionAsync(SlashCommandContext context)

@@ -2,6 +2,8 @@
     "BotToken": "",
     "ServerId": 0,
     "ErrorChannelId": 0,
+    "EncryptionKey": "",
+    "EncryptionIv": "",
     "Database": {
         "Host": "localhost",
         "Port": 3306,
