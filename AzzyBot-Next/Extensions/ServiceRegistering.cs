@@ -5,6 +5,7 @@ using AzzyBot.Services;
 using AzzyBot.Services.Modules;
 using AzzyBot.Settings;
 using AzzyBot.Utilities;
+using AzzyBot.Utilities.Encryption;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,6 +39,9 @@ internal static class ServiceRegistering
         // Enable or disable modules based on the settings
         IServiceProvider serviceProvider = services.BuildServiceProvider();
         AzzyBotSettingsRecord settings = serviceProvider.GetRequiredService<AzzyBotSettingsRecord>();
+
+        // Set the encryption key
+        EncryptionHelper.Key = settings.EncryptionKey;
 
         // Need to register as Singleton first
         // Otherwise DI doesn't work properly

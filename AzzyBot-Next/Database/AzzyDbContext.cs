@@ -1,4 +1,5 @@
 ﻿using AzzyBot.Database.Entities;
+using AzzyBot.Utilities.Encryption;
 using Microsoft.EntityFrameworkCore;
 
 namespace AzzyBot.Database;
@@ -14,4 +15,7 @@ internal sealed class AzzyDbContext : DbContext
     public DbSet<GuildsEntity> Guilds { get; set; }
     public DbSet<AzuraCastEntity> AzuraCast { get; set; }
     public DbSet<AzuraCastChecksEntity> AzuraCastChecks { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+        => modelBuilder.UseEncryption();
 }

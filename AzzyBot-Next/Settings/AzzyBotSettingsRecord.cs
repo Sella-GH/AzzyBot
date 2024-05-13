@@ -7,6 +7,7 @@ public sealed record AzzyBotSettingsRecord
     public required string BotToken { get; init; }
     public required ulong ServerId { get; init; }
     public required ulong ErrorChannelId { get; init; }
+    public required string EncryptionKey { get; init; }
     public Database? Database { get; init; }
     public DiscordStatus? DiscordStatus { get; init; }
     public required CoreSettings CoreSettings { get; init; }
