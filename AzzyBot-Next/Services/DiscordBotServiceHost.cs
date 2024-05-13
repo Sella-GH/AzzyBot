@@ -18,6 +18,9 @@ using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Exceptions;
+using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.Enums;
+using DSharpPlus.Interactivity.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -53,6 +56,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
         _botService = _serviceProvider.GetRequiredService<DiscordBotService>();
         RegisterEventHandlers();
         await RegisterCommandsAsync();
+        await RegisterInteractivity();
         await _shardedClient.StartAsync();
 
         _logger.BotReady();
@@ -139,6 +143,20 @@ internal sealed class DiscordBotServiceHost : IHostedService
 
             await commandsExtension.AddProcessorAsync(slashCommandProcessor);
         }
+    }
+
+    private async Task RegisterInteractivity()
+    {
+        ArgumentNullException.ThrowIfNull(_shardedClient, nameof(_shardedClient));
+
+        InteractivityConfiguration config = new()
+        {
+            ResponseBehavior = InteractionResponseBehavior.Ignore,
+            ResponseMessage = "This is not a valid option!",
+            Timeout = TimeSpan.FromMinutes(15)
+        };
+
+        await _shardedClient.UseInteractivityAsync(config);
     }
 
     private void RegisterEventHandlers()
