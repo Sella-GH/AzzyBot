@@ -20,15 +20,15 @@ internal sealed class WebRequestService(ILogger<WebRequestService> logger) : IDi
     /// Forcing this client to use IPv4, only TCP ports because HTTP and HTTPS are usually TCP.
     /// </summary>
     private readonly HttpClient _httpClientV4 = new(new SocketsHttpHandler()
+    {
+        ConnectCallback = async (context, cancellationToken) =>
         {
-            ConnectCallback = async (context, cancellationToken) =>
-            {
-                Socket socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                await socket.ConnectAsync(context.DnsEndPoint, cancellationToken);
-                return new NetworkStream(socket, true);
-            },
-            PooledConnectionLifetime = TimeSpan.FromMinutes(15)
-        })
+            Socket socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            await socket.ConnectAsync(context.DnsEndPoint, cancellationToken);
+            return new NetworkStream(socket, true);
+        },
+        PooledConnectionLifetime = TimeSpan.FromMinutes(15)
+    })
     {
         DefaultRequestVersion = HttpVersion.Version11,
         DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher,
@@ -39,9 +39,9 @@ internal sealed class WebRequestService(ILogger<WebRequestService> logger) : IDi
     /// Default HttpClient which prefers IPv6.
     /// </summary>
     private readonly HttpClient _httpClient = new(new SocketsHttpHandler()
-        {
-            PooledConnectionLifetime = TimeSpan.FromMinutes(15)
-        })
+    {
+        PooledConnectionLifetime = TimeSpan.FromMinutes(15)
+    })
     {
         DefaultRequestVersion = HttpVersion.Version11,
         DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher,
@@ -130,7 +130,7 @@ internal sealed class WebRequestService(ILogger<WebRequestService> logger) : IDi
 
     private static async Task<bool> TestIfPreferredMethodIsReachableAsync(Uri url, AddressFamily addressFamily)
     {
-        ArgumentNullException.ThrowIfNull(url, nameof (url));
+        ArgumentNullException.ThrowIfNull(url, nameof(url));
 
         try
         {

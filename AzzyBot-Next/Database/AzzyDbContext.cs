@@ -5,11 +5,13 @@ namespace AzzyBot.Database;
 
 internal sealed class AzzyDbContext : DbContext
 {
+#pragma warning disable CS8618
     public AzzyDbContext()
     { }
 
     public AzzyDbContext(DbContextOptions<AzzyDbContext> options) : base(options)
     { }
+#pragma warning restore CS8618
 
     public DbSet<GuildsEntity> Guilds { get; set; }
     public DbSet<AzuraCastEntity> AzuraCast { get; set; }

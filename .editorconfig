@@ -328,7 +328,7 @@ dotnet_diagnostic.rcs0051.severity = suggestion
 dotnet_diagnostic.rcs0052.severity = suggestion
 
 # Fix formatting of a list
-dotnet_diagnostic.rcs0053.severity = suggestion
+dotnet_diagnostic.rcs0053.severity = none
 
 # Fix formatting of a call chain
 dotnet_diagnostic.rcs0054.severity = suggestion
