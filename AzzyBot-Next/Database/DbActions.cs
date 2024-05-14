@@ -63,6 +63,58 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
         }
     }
 
+    internal async Task<AzuraCastEntity> GetAzuraCastEntityAsync(ulong guildId)
+    {
+        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+
+        GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
+        if (guild is not null)
+        {
+            AzuraCastEntity? azura = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
+            if (azura is not null)
+            {
+                azura.ApiKey = Crypto.Decrypt(azura.ApiKey);
+                azura.ApiUrl = Crypto.Decrypt(azura.ApiUrl);
+
+                return azura;
+            }
+
+            throw new InvalidOperationException("AzuraCast settings not found in database.");
+        }
+
+        throw new InvalidOperationException("Guild settings not found in database.");
+    }
+
+    internal async Task<AzuraCastChecksEntity> GetAzuraCastChecksEntityAsync(ulong guildId)
+    {
+        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+
+        GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
+        if (guild is not null)
+        {
+            AzuraCastEntity? azura = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
+            if (azura is not null)
+            {
+                AzuraCastChecksEntity? checks = await context.AzuraCastChecks.SingleOrDefaultAsync(c => c.AzuraCastId == azura.Id);
+
+                return checks ?? throw new InvalidOperationException("AzuraCast checks settings not found in database.");
+            }
+
+            throw new InvalidOperationException("AzuraCast settings not found in database.");
+        }
+
+        throw new InvalidOperationException("Guild settings not found in database.");
+    }
+
+    internal async Task<GuildsEntity> GetGuildEntityAsync(ulong guildId)
+    {
+        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+
+        GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
+
+        return guild ?? throw new InvalidOperationException("Guild settings not found in database.");
+    }
+
     internal async Task RemoveGuildEntityAsync(ulong guildId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
@@ -166,6 +218,30 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
                         await transaction.CommitAsync();
                     }
                 }
+            }
+        }
+        catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
+        {
+            _logger.DatabaseTransactionFailed(ex);
+            await transaction.RollbackAsync();
+        }
+    }
+
+    internal async Task SetGuildEntityAsync(ulong guildId)
+    {
+        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
+
+        try
+        {
+            GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
+            if (guild?.ConfigSet is false)
+            {
+                guild.ConfigSet = true;
+
+                await context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
             }
         }
         catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)

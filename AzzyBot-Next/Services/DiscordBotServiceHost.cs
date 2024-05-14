@@ -190,13 +190,13 @@ internal sealed class DiscordBotServiceHost : IHostedService
         {
             await _botService.LogExceptionAsync(ex, now, ctx);
         }
-        else if (ex is not DiscordException)
+        else if (ex is DiscordException)
         {
-            await _botService.LogExceptionAsync(ex, now, ctx);
+            await _botService.LogExceptionAsync(ex, now, ctx, ((DiscordException)e.Exception).JsonMessage);
         }
         else
         {
-            await _botService.LogExceptionAsync(ex, now, ctx, ((DiscordException)e.Exception).JsonMessage);
+            await _botService.LogExceptionAsync(ex, now, ctx);
         }
     }
 
