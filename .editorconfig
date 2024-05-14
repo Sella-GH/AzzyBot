@@ -893,7 +893,8 @@ dotnet_diagnostic.rcs1248.severity = suggestion
 dotnet_diagnostic.rcs1249.severity = suggestion
 
 # Use implicit/explicit object creation
-dotnet_diagnostic.rcs1250.severity = suggestion
+# This is doubled
+dotnet_diagnostic.rcs1250.severity = none
 
 # Remove unnecessary braces from record declaration
 dotnet_diagnostic.rcs1251.severity = suggestion

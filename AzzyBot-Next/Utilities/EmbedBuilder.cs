@@ -51,7 +51,7 @@ internal static class EmbedBuilder
         const string title = "Settings overview";
         string description = $"Here are all settings which are currently set for {serverName}";
 
-        Dictionary<string, DiscordEmbedRecord> fields = new();
+        Dictionary<string, DiscordEmbedRecord> fields = [];
 
         if (azuraCast is not null)
         {

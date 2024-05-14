@@ -76,7 +76,6 @@ internal sealed class ConfigCommands
             string guildName = context.Guild.Name;
             DiscordMember member = context.Member ?? throw new InvalidOperationException("Member is null");
 
-            GuildsEntity guilds = await _db.GetGuildEntityAsync(guildId);
             AzuraCastEntity azuraCast = await _db.GetAzuraCastEntityAsync(guildId);
             AzuraCastChecksEntity checks = await _db.GetAzuraCastChecksEntityAsync(guildId);
             DiscordEmbed embed = EmbedBuilder.BuildGetSettingsEmbed(guildName, azuraCast, checks);
