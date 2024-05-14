@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
+using AzzyBot.Utilities.Encryption;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
@@ -86,6 +87,86 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
                 await context.SaveChangesAsync();
 
                 await transaction.CommitAsync();
+            }
+        }
+        catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
+        {
+            _logger.DatabaseTransactionFailed(ex);
+            await transaction.RollbackAsync();
+        }
+    }
+
+    internal async Task SetAzuraCastEntityAsync(ulong guildId, string apiUrl = "", string apiKey = "", int stationid = 0, ulong requestsChannel = 0, ulong outagesChanel = 0, bool showPlaylistInNowPlaying = false)
+    {
+        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
+
+        try
+        {
+            GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
+            if (guild is not null)
+            {
+                AzuraCastEntity? azuraCast = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
+                if (azuraCast is not null)
+                {
+                    if (!string.IsNullOrWhiteSpace(apiKey))
+                        azuraCast.ApiKey = Crypto.Encrypt(apiKey);
+
+                    if (!string.IsNullOrWhiteSpace(apiUrl))
+                        azuraCast.ApiUrl = Crypto.Encrypt(apiUrl);
+
+                    if (stationid != 0)
+                        azuraCast.StationId = stationid;
+
+                    if (requestsChannel != 0)
+                        azuraCast.MusicRequestsChannelId = requestsChannel;
+
+                    if (outagesChanel != 0)
+                        azuraCast.OutagesChannelId = outagesChanel;
+
+                    if (showPlaylistInNowPlaying)
+                        azuraCast.ShowPlaylistInNowPlaying = showPlaylistInNowPlaying;
+
+                    await context.SaveChangesAsync();
+
+                    await transaction.CommitAsync();
+                }
+            }
+        }
+        catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
+        {
+            _logger.DatabaseTransactionFailed(ex);
+            await transaction.RollbackAsync();
+            throw;
+        }
+    }
+
+    internal async Task SetAzuraCastChecksEntityAsync(ulong guildId, bool fileChanges = false, bool serverStatus = false, bool updates = false, bool updatesChangelog = false)
+    {
+        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
+
+        try
+        {
+            GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
+            if (guild is not null)
+            {
+                AzuraCastEntity? azuraCast = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
+                if (azuraCast is not null)
+                {
+                    AzuraCastChecksEntity? checks = await context.AzuraCastChecks.SingleOrDefaultAsync(c => c.AzuraCastId == azuraCast.Id);
+                    if (checks is not null)
+                    {
+                        checks.FileChanges = fileChanges;
+                        checks.ServerStatus = serverStatus;
+                        checks.Updates = updates;
+                        checks.UpdatesShowChangelog = updatesChangelog;
+
+                        await context.SaveChangesAsync();
+
+                        await transaction.CommitAsync();
+                    }
+                }
             }
         }
         catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
