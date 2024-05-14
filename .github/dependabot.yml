@@ -99,7 +99,7 @@ updates:
       prefix: "[NuGet]"
       include: "scope"
     labels:
-      - "2.0 Rewrite"
+      - "dev-next"
     groups:
       DSharpPlus:
         applies-to: version-updates
