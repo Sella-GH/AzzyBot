@@ -3,7 +3,6 @@ using AzzyBot.Commands.Choices;
 using AzzyBot.Logging;
 using AzzyBot.Services;
 using DSharpPlus.Commands;
-using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using Microsoft.Extensions.Logging;
 
@@ -18,7 +17,7 @@ internal sealed class CoreCommands
         private readonly DiscordBotServiceHost _discordBotServiceHost = discordBotServiceHost;
 
         [Command("change-bot-status")]
-        public async ValueTask CoreChangeStatusAsync(SlashCommandContext context, [SlashChoiceProvider<BotActivityProvider>] int activity, [SlashChoiceProvider<BotStatusProvider>] int status, string doing, string? url = null)
+        public async ValueTask CoreChangeStatusAsync(CommandContext context, [SlashChoiceProvider<BotActivityProvider>] int activity, [SlashChoiceProvider<BotStatusProvider>] int status, string doing, string? url = null)
         {
             _logger.CommandRequested(nameof(CoreChangeStatusAsync), context.User.GlobalName);
 
@@ -28,12 +27,12 @@ internal sealed class CoreCommands
         }
 
         //[Command("info")]
-        //public static async ValueTask CoreInfoAsync(SlashCommandContext context)
+        //public static async ValueTask CoreInfoAsync(CommandContext context)
         //{
         //    await context.DeferResponseAsync();
         //}
 
         [Command("ping")]
-        public static ValueTask CorePingAsync(SlashCommandContext context) => context.RespondAsync($"Pong! {context.Client.Ping}ms");
+        public static ValueTask CorePingAsync(CommandContext context) => context.RespondAsync($"Pong! {context.Client.Ping}ms");
     }
 }

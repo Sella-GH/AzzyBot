@@ -96,7 +96,7 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
         }
     }
 
-    internal async Task SetAzuraCastEntityAsync(ulong guildId, string apiUrl = "", string apiKey = "", int stationid = 0, ulong requestsChannel = 0, ulong outagesChanel = 0, bool showPlaylistInNowPlaying = false)
+    internal async Task SetAzuraCastEntityAsync(ulong guildId, string apiKey = "", Uri? apiUrl = null, int stationId = 0, ulong requestsChannel = 0, ulong outagesChannel = 0, bool showPlaylistInNowPlaying = false)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
@@ -112,17 +112,17 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
                     if (!string.IsNullOrWhiteSpace(apiKey))
                         azuraCast.ApiKey = Crypto.Encrypt(apiKey);
 
-                    if (!string.IsNullOrWhiteSpace(apiUrl))
-                        azuraCast.ApiUrl = Crypto.Encrypt(apiUrl);
+                    if (apiUrl is not null)
+                        azuraCast.ApiUrl = Crypto.Encrypt(apiUrl.ToString());
 
-                    if (stationid != 0)
-                        azuraCast.StationId = stationid;
+                    if (stationId is not 0)
+                        azuraCast.StationId = stationId;
 
-                    if (requestsChannel != 0)
+                    if (requestsChannel is not 0)
                         azuraCast.MusicRequestsChannelId = requestsChannel;
 
-                    if (outagesChanel != 0)
-                        azuraCast.OutagesChannelId = outagesChanel;
+                    if (outagesChannel is not 0)
+                        azuraCast.OutagesChannelId = outagesChannel;
 
                     if (showPlaylistInNowPlaying)
                         azuraCast.ShowPlaylistInNowPlaying = showPlaylistInNowPlaying;
@@ -137,7 +137,6 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
         {
             _logger.DatabaseTransactionFailed(ex);
             await transaction.RollbackAsync();
-            throw;
         }
     }
 
