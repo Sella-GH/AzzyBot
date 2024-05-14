@@ -126,7 +126,9 @@ updates:
       Others:
         applies-to: version-updates
         exclude-patterns:
+        - "DSharpPlus*"
         - "Microsoft.*"
+        - "Pomelo.*"
         - "Roslynator.*"
         update-types:
         - "minor"
