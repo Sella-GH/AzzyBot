@@ -49,6 +49,8 @@ jobs:
           else
             echo "PR_CREATED=false" >> "$GITHUB_OUTPUT"
           fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update .csproj file if versions differ
         if: ${{ steps.check_pr.outputs.PR_CREATED != 'true' && steps.current_version.outputs.CURRENT_VERSION != steps.nuget_version.outputs.NUGET_VERSION }}
