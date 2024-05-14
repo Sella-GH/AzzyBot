@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using AzzyBot.Commands;
 using AzzyBot.Commands.Converters;
 using AzzyBot.Database;
-using AzzyBot.Database.Models;
 using AzzyBot.Logging;
 using AzzyBot.Services.Modules;
 using AzzyBot.Settings;
@@ -19,8 +18,9 @@ using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Exceptions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
+using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.Enums;
+using DSharpPlus.Interactivity.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -33,17 +33,17 @@ internal sealed class DiscordBotServiceHost : IHostedService
     private readonly ILoggerFactory _loggerFactory;
     private readonly IServiceProvider _serviceProvider;
     private readonly AzzyBotSettingsRecord _settings;
-    private readonly IDbContextFactory<DatabaseContext> _dbContextFactory;
+    private readonly DbActions _dbActions;
     internal readonly DiscordShardedClient _shardedClient;
     private DiscordBotService? _botService;
 
-    public DiscordBotServiceHost(AzzyBotSettingsRecord settings, IDbContextFactory<DatabaseContext> dbContextFactory, ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
+    public DiscordBotServiceHost(AzzyBotSettingsRecord settings, DbActions dbActions, ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
     {
-        _settings = settings;
-        _dbContextFactory = dbContextFactory;
         _logger = logger;
         _loggerFactory = loggerFactory;
         _serviceProvider = serviceProvider;
+        _dbActions = dbActions;
+        _settings = settings;
 
         _shardedClient = new(GetDiscordConfig());
     }
@@ -56,6 +56,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
         _botService = _serviceProvider.GetRequiredService<DiscordBotService>();
         RegisterEventHandlers();
         await RegisterCommandsAsync();
+        await RegisterInteractivityAsync();
         await _shardedClient.StartAsync();
 
         _logger.BotReady();
@@ -118,29 +119,44 @@ internal sealed class DiscordBotServiceHost : IHostedService
         ArgumentNullException.ThrowIfNull(_settings, nameof(_settings));
 
         IReadOnlyDictionary<int, CommandsExtension> commandsExtensions = await _shardedClient.UseCommandsAsync(new()
-            {
-                RegisterDefaultCommandProcessors = false,
-                ServiceProvider = _serviceProvider,
-                UseDefaultCommandErrorHandler = false
-            });
+        {
+            RegisterDefaultCommandProcessors = false,
+            ServiceProvider = _serviceProvider,
+            UseDefaultCommandErrorHandler = false
+        });
 
         foreach (CommandsExtension commandsExtension in commandsExtensions.Values)
         {
             commandsExtension.CommandErrored += CommandErroredAsync;
 
-            // Activate commands based on the modules
+            commandsExtension.AddCommands(typeof(ConfigCommands.Config));
+
             if (_serviceProvider.GetRequiredService<CoreServiceHost>()._isActivated)
                 commandsExtension.AddCommands(typeof(CoreCommands.Core));
 
             // Only add debug commands if it's a dev build
             if (AzzyStatsGeneral.GetBotName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase))
-                commandsExtension.AddCommands(typeof(CoreCommands.Debug));
+                commandsExtension.AddCommands(typeof(DebugCommands.Debug));
 
             SlashCommandProcessor slashCommandProcessor = new();
             slashCommandProcessor.AddConverter<Uri>(new UriArgumentConverter());
 
             await commandsExtension.AddProcessorAsync(slashCommandProcessor);
         }
+    }
+
+    private async Task RegisterInteractivityAsync()
+    {
+        ArgumentNullException.ThrowIfNull(_shardedClient, nameof(_shardedClient));
+
+        InteractivityConfiguration config = new()
+        {
+            ResponseBehavior = InteractionResponseBehavior.Ignore,
+            ResponseMessage = "This is not a valid option!",
+            Timeout = TimeSpan.FromMinutes(15)
+        };
+
+        await _shardedClient.UseInteractivityAsync(config);
     }
 
     private void RegisterEventHandlers()
@@ -188,22 +204,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
     {
         _logger.GuildCreated(e.Guild.Name);
 
-        await using DatabaseContext context = await _dbContextFactory.CreateDbContextAsync();
-        await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
-
-        try
-        {
-            await context.Guilds.AddAsync(new() { UniqueId = e.Guild.Id });
-            await context.SaveChangesAsync();
-
-            await transaction.CommitAsync();
-        }
-        catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
-        {
-            _logger.DatabaseTransactionFailed(ex);
-            await transaction.RollbackAsync();
-        }
-
+        await _dbActions.AddGuildEntityAsync(e.Guild.Id);
         await e.Guild.Owner.SendMessageAsync("Thank you for adding me to your server! Before you can make use of me, you have to set my settings first.\n\nPlease use the command `settings set` for this.\nOnly you are able to execute this command right now.");
     }
 
@@ -211,66 +212,11 @@ internal sealed class DiscordBotServiceHost : IHostedService
     {
         _logger.GuildDeleted(e.Guild.Name);
 
-        await using DatabaseContext context = await _dbContextFactory.CreateDbContextAsync();
-        await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
-
-        try
-        {
-            GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == e.Guild.Id);
-            if (guild is not null)
-            {
-                AzuraCastEntity? azura = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
-                if (azura is not null)
-                {
-                    AzuraCastChecksEntity? checks = await context.AzuraCastChecks.SingleOrDefaultAsync(c => c.AzuraCastId == azura.Id);
-                    if (checks is not null)
-                        context.AzuraCastChecks.Remove(checks);
-
-                    context.AzuraCast.Remove(azura);
-                }
-
-                context.Guilds.Remove(guild);
-                await context.SaveChangesAsync();
-
-                await transaction.CommitAsync();
-            }
-        }
-        catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
-        {
-            _logger.DatabaseTransactionFailed(ex);
-            await transaction.RollbackAsync();
-        }
-
-        await e.Guild.Owner.SendMessageAsync("I am sorry for being not used anymore on this server. I removed every piece of data of your server from my database and hope you will find use of me again!");
+        await _dbActions.RemoveGuildEntityAsync(e.Guild.Id);
     }
 
     private async Task ShardedClientGuildDownloadCompletedAsync(DiscordClient c, GuildDownloadCompletedEventArgs e)
-    {
-        await using DatabaseContext context = await _dbContextFactory.CreateDbContextAsync();
-        await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
-
-        try
-        {
-            List<ulong> existingGuildIds = await context.Guilds.Select(g => g.UniqueId).ToListAsync();
-            List<GuildsEntity> newGuilds = e.Guilds.Values
-                .Where(guild => !existingGuildIds.Contains(guild.Id))
-                .Select(guild => new GuildsEntity() { UniqueId = guild.Id })
-                .ToList();
-
-            if (newGuilds.Count > 0)
-            {
-                await context.Guilds.AddRangeAsync(newGuilds);
-                await context.SaveChangesAsync();
-
-                await transaction.CommitAsync();
-            }
-        }
-        catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
-        {
-            _logger.DatabaseTransactionFailed(ex);
-            await transaction.RollbackAsync();
-        }
-    }
+        => await _dbActions.AddBulkGuildEntitiesAsync(e.Guilds.Select(g => g.Value.Id).ToList());
 
     private async Task ShardedClientErroredAsync(DiscordClient c, ClientErrorEventArgs e)
     {

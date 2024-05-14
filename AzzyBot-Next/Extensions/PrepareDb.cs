@@ -10,7 +10,7 @@ internal static class PrepareDb
     internal static void ApplyDbMigrations(this IHost app)
     {
         using IServiceScope scope = app.Services.CreateScope();
-        using DatabaseContext db = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+        using AzzyDbContext db = scope.ServiceProvider.GetRequiredService<Database.AzzyDbContext>();
         db.Database.Migrate();
     }
 }

@@ -112,6 +112,7 @@ updates:
         applies-to: version-updates
         patterns:
         - "Microsoft.*"
+        - "MySqlConnector"
         - "Pomelo.*"
         update-types:
         - "minor"

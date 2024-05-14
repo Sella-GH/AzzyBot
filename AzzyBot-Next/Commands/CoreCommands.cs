@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AzzyBot.Commands.Choices;
 using AzzyBot.Logging;
 using AzzyBot.Services;
@@ -36,32 +35,5 @@ internal sealed class CoreCommands
 
         [Command("ping")]
         public static ValueTask CorePingAsync(SlashCommandContext context) => context.RespondAsync($"Pong! {context.Client.Ping}ms");
-    }
-
-    [Command("debug")]
-    internal sealed class Debug(WebRequestService webRequestService, ILogger<Debug> logger)
-    {
-        private readonly ILogger<Debug> _logger = logger;
-        private readonly WebRequestService _webRequestService = webRequestService;
-
-        [Command("trigger-exception")]
-        public async ValueTask DebugTriggerExceptionAsync(SlashCommandContext context)
-        {
-            _logger.CommandRequested(nameof(DebugTriggerExceptionAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
-
-            throw new InvalidOperationException("This is a debug exception");
-        }
-
-        [Command("webservice-tests")]
-        public async ValueTask DebugWebServiceTestsAsync(SlashCommandContext context, Uri url)
-        {
-            _logger.CommandRequested(nameof(DebugWebServiceTestsAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
-            await _webRequestService.GetWebAsync(url);
-            await context.EditResponseAsync($"Web service test for *{url}* was successful!");
-        }
     }
 }

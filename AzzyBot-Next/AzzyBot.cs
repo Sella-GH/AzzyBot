@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using AzzyBot.Enums;
 using AzzyBot.Extensions;
 using AzzyBot.Utilities;
 using Microsoft.Extensions.Hosting;
@@ -12,11 +11,12 @@ internal static class AzzyBot
 {
     private static async Task Main(string[] args)
     {
-        EnvironmentEnum environment = AzzyStatsGeneral.GetBotEnvironment;
-        bool isDev = environment is EnvironmentEnum.Development;
+        string environment = AzzyStatsGeneral.GetBotEnvironment;
+        bool isDev = environment == Environments.Development;
+        bool isDocker = AzzyStatsGeneral.CheckIfDocker;
         bool forceDebug;
 
-        if (AzzyStatsGeneral.CheckIfDocker)
+        if (isDocker)
         {
             forceDebug = Environment.GetEnvironmentVariable("FORCE_DEBUG") == "true";
         }
@@ -47,8 +47,11 @@ internal static class AzzyBot
 
         #endregion Add services
 
-        // Give the database time to start up
-        //await Task.Delay(TimeSpan.FromSeconds(3));
+        if (isDocker)
+        {
+            // Give the database time to start up
+            await Task.Delay(TimeSpan.FromSeconds(3));
+        }
 
         using IHost app = appBuilder.Build();
         app.ApplyDbMigrations();

@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AzzyBot.Settings;
 
+[SuppressMessage("Roslynator", "RCS1181:Convert comment to documentation comment", Justification = "Informational comment")]
 public sealed record AzzyBotSettingsRecord
 {
     public required string BotToken { get; init; }
     public required ulong ServerId { get; init; }
     public required ulong ErrorChannelId { get; init; }
+    public required string EncryptionKey { get; init; } // 32 Characters
+    public required string EncryptionIv { get; init; } // 16 Characters
     public Database? Database { get; init; }
     public DiscordStatus? DiscordStatus { get; init; }
     public required CoreSettings CoreSettings { get; init; }

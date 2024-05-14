@@ -13,8 +13,9 @@ services:
       - AzzyBot-Db
     #  - lavalink
     networks:
-      - AzzyBot-Db-Nw
     #  - lavalink
+      - AzzyBot-Db-Nw
+      - AzzyBot-Nw
     volumes:
       #- ./AzzyBot/Customization:/app/Customization
       #- ./AzzyBot/Modules/AzuraCast/Files:/app/Modules/AzuraCast/Files
@@ -39,6 +40,12 @@ services:
 networks:
   AzzyBot-Db-Nw:
     name: AzzyBot-Db-Nw
+    driver: bridge
+    internal: true
+
+  AzzyBot-Nw:
+    name: AzzyBot-Nw
+    driver: bridge
 
 volumes:
   azzybot_data:

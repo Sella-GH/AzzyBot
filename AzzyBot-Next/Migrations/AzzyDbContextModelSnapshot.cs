@@ -3,7 +3,6 @@ using AzzyBot.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,12 +10,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AzzyBot.Migrations
 {
-    [DbContext(typeof(DatabaseContext))]
-    [Migration("20240512003314_InitialCreation")]
-    partial class InitialCreation
+    [DbContext(typeof(AzzyDbContext))]
+    partial class AzzyDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -25,7 +22,7 @@ namespace AzzyBot.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("AzzyBot.Database.Models.AzuraCastChecksEntity", b =>
+            modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastChecksEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -56,7 +53,7 @@ namespace AzzyBot.Migrations
                     b.ToTable("AzuraCastChecks");
                 });
 
-            modelBuilder.Entity("AzzyBot.Database.Models.AzuraCastEntity", b =>
+            modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -95,13 +92,16 @@ namespace AzzyBot.Migrations
                     b.ToTable("AzuraCast");
                 });
 
-            modelBuilder.Entity("AzzyBot.Database.Models.GuildsEntity", b =>
+            modelBuilder.Entity("AzzyBot.Database.Entities.GuildsEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("ConfigSet")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<ulong>("UniqueId")
                         .HasColumnType("bigint unsigned");
@@ -111,34 +111,34 @@ namespace AzzyBot.Migrations
                     b.ToTable("Guilds");
                 });
 
-            modelBuilder.Entity("AzzyBot.Database.Models.AzuraCastChecksEntity", b =>
+            modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastChecksEntity", b =>
                 {
-                    b.HasOne("AzzyBot.Database.Models.AzuraCastEntity", "AzuraCast")
+                    b.HasOne("AzzyBot.Database.Entities.AzuraCastEntity", "AzuraCast")
                         .WithOne("AutomaticChecks")
-                        .HasForeignKey("AzzyBot.Database.Models.AzuraCastChecksEntity", "AzuraCastId")
+                        .HasForeignKey("AzzyBot.Database.Entities.AzuraCastChecksEntity", "AzuraCastId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("AzuraCast");
                 });
 
-            modelBuilder.Entity("AzzyBot.Database.Models.AzuraCastEntity", b =>
+            modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastEntity", b =>
                 {
-                    b.HasOne("AzzyBot.Database.Models.GuildsEntity", "Guild")
+                    b.HasOne("AzzyBot.Database.Entities.GuildsEntity", "Guild")
                         .WithOne("AzuraCast")
-                        .HasForeignKey("AzzyBot.Database.Models.AzuraCastEntity", "GuildId")
+                        .HasForeignKey("AzzyBot.Database.Entities.AzuraCastEntity", "GuildId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Guild");
                 });
 
-            modelBuilder.Entity("AzzyBot.Database.Models.AzuraCastEntity", b =>
+            modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastEntity", b =>
                 {
                     b.Navigation("AutomaticChecks");
                 });
 
-            modelBuilder.Entity("AzzyBot.Database.Models.GuildsEntity", b =>
+            modelBuilder.Entity("AzzyBot.Database.Entities.GuildsEntity", b =>
                 {
                     b.Navigation("AzuraCast");
                 });
