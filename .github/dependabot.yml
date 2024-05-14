@@ -101,6 +101,13 @@ updates:
     labels:
       - "2.0 Rewrite"
     groups:
+      DSharpPlus:
+        applies-to: version-updates
+        patterns:
+        - "DSharpPlus*"
+        update-types:
+        - "minor"
+        - "patch"
       Microsoft:
         applies-to: version-updates
         patterns:
@@ -119,7 +126,9 @@ updates:
       Others:
         applies-to: version-updates
         exclude-patterns:
+        - "DSharpPlus*"
         - "Microsoft.*"
+        - "Pomelo.*"
         - "Roslynator.*"
         update-types:
         - "minor"
