@@ -99,11 +99,14 @@ updates:
       prefix: "[NuGet]"
       include: "scope"
     labels:
-      - "dev-next,dependencies,.NET"
+      - "dev-next"
+      - "dependencies"
+      - ".NET"
     groups:
       DSharpPlus:
         applies-to: version-updates
         patterns:
+        - "DSharpPlus.*"
         - "DSharpPlus*"
         update-types:
         - "minor"
@@ -127,6 +130,7 @@ updates:
       Others:
         applies-to: version-updates
         exclude-patterns:
+        - "DSharpPlus.*"
         - "DSharpPlus*"
         - "Microsoft.*"
         - "Pomelo.*"
