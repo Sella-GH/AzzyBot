@@ -1,17 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AzzyBot.Commands.Choices;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
 using DSharpPlus.Commands;
+using DSharpPlus.Commands.ArgumentModifiers;
+using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
-using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands;
@@ -19,39 +17,51 @@ namespace AzzyBot.Commands;
 internal sealed class ConfigCommands
 {
     [Command("config")]
-    internal sealed class Config(IDbContextFactory<AzzyDbContext> dbContextFactory, ILogger<Config> logger)
+    [RequireGuild]
+    [RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
+    internal sealed class Config
     {
-        private readonly IDbContextFactory<AzzyDbContext> _dbContextFactory = dbContextFactory;
-        private readonly ILogger<Config> _logger = logger;
-
         [Command("set")]
-        public async ValueTask ConfigSetAsync(SlashCommandContext context)
+        internal sealed class Set(DbActions db, ILogger<Set> logger)
         {
-            _logger.CommandRequested(nameof(ConfigSetAsync), context.User.GlobalName);
+            private readonly DbActions _db = db;
+            private readonly ILogger<Set> _logger = logger;
 
-            await context.DeferResponseAsync();
+            [Command("azuracast")]
+            public async ValueTask ConfigSetAzuraCastAsync(SlashCommandContext context, string apiUrl = "", string apiKey = "", int stationid = 0, [ChannelTypes(DiscordChannelType.Text)] DiscordChannel? requestsChannel = null, [ChannelTypes(DiscordChannelType.Text)] DiscordChannel? outagesChannel = null, bool ShowPlaylistsInNowPlaying = false)
+            {
+                _logger.CommandRequested(nameof(ConfigSetAzuraCastAsync), context.User.GlobalName);
 
-            await using AzzyDbContext dbContext = await _dbContextFactory.CreateDbContextAsync();
+                await context.DeferResponseAsync();
 
-            GuildsEntity guild = dbContext.Guilds.Where(g => g.UniqueId == context.Guild!.Id).First();
-            AzuraCastEntity azuraCast = dbContext.AzuraCast.Where(a => a.GuildId == guild!.Id).First();
-            AzuraCastChecksEntity azuraCastChecks = dbContext.AzuraCastChecks.Where(c => c.AzuraCastId == azuraCast!.Id).First();
+                DiscordGuild guild = context.Guild ?? throw new InvalidOperationException("Guild is null");
 
-            bool azuraCastApiKey = !string.IsNullOrWhiteSpace(azuraCast.ApiKey);
-            bool azuraCastApiUrl = !string.IsNullOrWhiteSpace(azuraCast.ApiUrl);
-            bool azuraStationId = azuraCast.StationId is not 0;
-            DiscordButtonComponent apiKeyButton = new((azuraCastApiKey) ? DiscordButtonStyle.Success : DiscordButtonStyle.Danger, "btn_azuracast_api_key", "Add or change the AzuraCast api key");
-            DiscordButtonComponent apiUrlButton = new((azuraCastApiUrl) ? DiscordButtonStyle.Success : DiscordButtonStyle.Danger, "btn_azuracast_api_url", "Add or change the AzuraCast api url");
-            DiscordButtonComponent stationIdButton = new((azuraStationId) ? DiscordButtonStyle.Success : DiscordButtonStyle.Danger, "btn_azuracast_station_id", "Add or change the AzuraCast station id");
-            DiscordChannelSelectComponent requestsChannel = new("azura_requests_channel", "Select the Music Requests Channel", [DiscordChannelType.Text]);
-            DiscordChannelSelectComponent outagesChannel = new("azura_outages_channel", "Select the Outages channel", [DiscordChannelType.Text]);
+                await _db.SetAzuraCastEntityAsync(guild.Id, apiUrl, apiKey, stationid, requestsChannel?.Id ?? 0, outagesChannel?.Id ?? 0, ShowPlaylistsInNowPlaying);
 
-            await using DiscordMessageBuilder builder = new();
-            builder.WithContent("Please fill out all the following options.");
-            builder.AddComponents(requestsChannel);
-            builder.AddComponents(outagesChannel);
+                if (!string.IsNullOrWhiteSpace(apiKey) || !string.IsNullOrWhiteSpace(apiUrl))
+                {
+                    await context.DeleteResponseAsync();
+                    await context.FollowupAsync("Your settings were saved and sensitive data has been encrypted. Your message was also deleted for security reasons.");
+                }
+                else
+                {
+                    await context.EditResponseAsync("Your settings were saved successfully.");
+                }
+            }
 
-            await context.EditResponseAsync(builder);
+            [Command("azuracast-checks")]
+            public async ValueTask ConfigSetAzuraCastChecksAsync(SlashCommandContext context, bool fileChanges = false, bool serverStatus = false, bool updates = false, bool updatesChangelog = false)
+            {
+                _logger.CommandRequested(nameof(ConfigSetAzuraCastChecksAsync), context.User.GlobalName);
+
+                await context.DeferResponseAsync();
+
+                DiscordGuild guild = context.Guild ?? throw new InvalidOperationException("Guild is null");
+
+                await _db.SetAzuraCastChecksEntityAsync(guild.Id, fileChanges, serverStatus, updates, updatesChangelog);
+
+                await context.EditResponseAsync("Your settings were saved successfully.");
+            }
         }
     }
 }
