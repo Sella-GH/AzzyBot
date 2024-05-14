@@ -99,7 +99,7 @@ updates:
       prefix: "[NuGet]"
       include: "scope"
     labels:
-      - "dev-next"
+      - "dev-next,dependencies,.NET"
     groups:
       DSharpPlus:
         applies-to: version-updates
