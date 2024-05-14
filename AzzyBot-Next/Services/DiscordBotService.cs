@@ -54,12 +54,12 @@ internal sealed class DiscordBotService
 
     internal async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, string? info = null)
     {
+        _logger.ExceptionOccured(ex);
+
         string exMessage = ex.Message;
         string stackTrace = ex.StackTrace ?? string.Empty;
         string exInfo = (string.IsNullOrWhiteSpace(stackTrace)) ? exMessage : $"{exMessage}\n{stackTrace}";
         string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
-
-        _logger.ExceptionOccured(ex);
 
         try
         {
@@ -89,6 +89,8 @@ internal sealed class DiscordBotService
 
     internal async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, CommandContext ctx, string? info = null)
     {
+        _logger.ExceptionOccured(ex);
+
         DiscordMessage discordMessage = await AcknowledgeExceptionAsync(ctx);
         DiscordUser discordUser = ctx.User;
         string exMessage = ex.Message;
@@ -98,8 +100,6 @@ internal sealed class DiscordBotService
         string commandName = ctx.Command.FullName;
         Dictionary<string, string> commandOptions = [];
         ProcessOptions(ctx.Arguments, commandOptions);
-
-        _logger.ExceptionOccured(ex);
 
         try
         {
@@ -124,7 +124,7 @@ internal sealed class DiscordBotService
             _logger.UnableToLogException(e.ToString());
         }
 
-        return true;
+        return false;
     }
 
     internal async Task<bool> SendMessageAsync(ulong channelId, string? content = null, List<DiscordEmbed>? embeds = null, List<string>? filePaths = null, IMention[]? mentions = null)
