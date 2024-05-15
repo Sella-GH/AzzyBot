@@ -11,16 +11,16 @@ namespace AzzyBot.Commands;
 
 internal sealed class AdminCommands
 {
-    [Command("admin")]
-    [RequireApplicationOwner]
-    internal sealed class Admin(ILogger<Admin> logger)
-    {
-        private readonly ILogger<Admin> _logger = logger;
+    //[Command("admin")]
+    //[RequireApplicationOwner]
+    //internal sealed class Admin(ILogger<Admin> logger)
+    //{
+    //    private readonly ILogger<Admin> _logger = logger;
 
-        [Command("debug")]
-        public async ValueTask AdminDebugAsync(CommandContext context, [SlashChoiceProvider<ViewAddRemove>] int command = 0, [SlashAutoCompleteProvider<GuildsAutocomplete>] ulong guildId = 0)
-        {
-            _logger.CommandRequested(nameof(AdminDebugAsync), context.User.GlobalName);
-        }
-    }
+    //    [Command("debug")]
+    //    public async ValueTask AdminDebugAsync(CommandContext context, [SlashChoiceProvider<ViewAddRemove>] int command = 0, [SlashAutoCompleteProvider<GuildsAutocomplete>] ulong guildId = 0)
+    //    {
+    //        _logger.CommandRequested(nameof(AdminDebugAsync), context.User.GlobalName);
+    //    }
+    //}
 }
