@@ -136,7 +136,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
 
             // Only add debug commands if it's a dev build
             if (AzzyStatsGeneral.GetBotName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase))
-                commandsExtension.AddCommands(typeof(DebugCommands.Debug));
+                commandsExtension.AddCommands(typeof(DebugCommands.Debug), _settings.ServerId);
 
             SlashCommandProcessor slashCommandProcessor = new();
             slashCommandProcessor.AddConverter<Uri>(new UriArgumentConverter());

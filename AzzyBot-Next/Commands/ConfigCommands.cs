@@ -82,7 +82,7 @@ internal sealed class ConfigCommands
 
             await member.SendMessageAsync(embed);
 
-            await context.EditResponseAsync("I sent an overview with all the settings to you in private. Be aware of sensitive data.");
+            await context.EditResponseAsync("I sent you an overview with all the settings in private. Be aware of sensitive data.");
         }
     }
 }
