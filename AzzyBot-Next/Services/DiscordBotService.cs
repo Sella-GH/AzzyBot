@@ -12,6 +12,7 @@ using AzzyBot.Settings;
 using AzzyBot.Utilities;
 using DSharpPlus;
 using DSharpPlus.Commands;
+using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
@@ -87,11 +88,11 @@ internal sealed class DiscordBotService
         return false;
     }
 
-    internal async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, CommandContext ctx, string? info = null)
+    internal async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, SlashCommandContext ctx, string? info = null)
     {
         _logger.ExceptionOccured(ex);
 
-        DiscordMessage discordMessage = await AcknowledgeExceptionAsync(ctx);
+        DiscordMessage? discordMessage = await AcknowledgeExceptionAsync(ctx);
         DiscordUser discordUser = ctx.User;
         string exMessage = ex.Message;
         string stackTrace = ex.StackTrace ?? string.Empty;
@@ -198,7 +199,7 @@ internal sealed class DiscordBotService
         return message is not null;
     }
 
-    private static async Task<DiscordMessage> AcknowledgeExceptionAsync(CommandContext ctx)
+    private static async Task<DiscordMessage?> AcknowledgeExceptionAsync(SlashCommandContext ctx)
     {
         DiscordMember? member = ctx.Guild?.Owner;
         string errorMessage = "Ooops something went wrong!\n\nPlease inform the owner of this server.";
@@ -211,7 +212,20 @@ internal sealed class DiscordBotService
         };
         builder.WithAllowedMention(UserMention.All);
 
-        return await ctx.EditResponseAsync(builder);
+        switch (ctx.Interaction.ResponseState)
+        {
+            case DiscordInteractionResponseState.Unacknowledged:
+                await ctx.RespondAsync(builder);
+                return null;
+
+            case DiscordInteractionResponseState.Deferred:
+                return await ctx.EditResponseAsync(builder);
+
+            case DiscordInteractionResponseState.Replied:
+                return await ctx.FollowupAsync(builder);
+        }
+
+        return null;
     }
 
     private static void ProcessOptions(IReadOnlyDictionary<CommandParameter, object?> paramaters, Dictionary<string, string> commandParameters)

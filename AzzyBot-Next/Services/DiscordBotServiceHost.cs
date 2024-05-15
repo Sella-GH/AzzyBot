@@ -183,20 +183,25 @@ internal sealed class DiscordBotServiceHost : IHostedService
             return;
 
         Exception ex = e.Exception;
-        CommandContext ctx = e.Context;
         DateTime now = DateTime.Now;
+
+        if (e.Context is not SlashCommandContext slashContext)
+        {
+            await _botService.LogExceptionAsync(ex, now);
+            return;
+        }
 
         if (ex is ChecksFailedException checksFailed)
         {
-            await _botService.LogExceptionAsync(ex, now, ctx);
+            await _botService.LogExceptionAsync(ex, now, slashContext);
         }
         else if (ex is DiscordException)
         {
-            await _botService.LogExceptionAsync(ex, now, ctx, ((DiscordException)e.Exception).JsonMessage);
+            await _botService.LogExceptionAsync(ex, now, slashContext, ((DiscordException)e.Exception).JsonMessage);
         }
         else
         {
-            await _botService.LogExceptionAsync(ex, now, ctx);
+            await _botService.LogExceptionAsync(ex, now, slashContext);
         }
     }
 

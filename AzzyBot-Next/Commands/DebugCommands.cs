@@ -30,11 +30,18 @@ internal sealed class DebugCommands
         }
 
         [Command("trigger-exception")]
-        public async ValueTask DebugTriggerExceptionAsync(CommandContext context)
+        public async ValueTask DebugTriggerExceptionAsync(CommandContext context, bool beforeOrAfterDefer = true, bool afterReply = false)
         {
             _logger.CommandRequested(nameof(DebugTriggerExceptionAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
+            if (beforeOrAfterDefer)
+                await context.DeferResponseAsync();
+
+            if (afterReply && !beforeOrAfterDefer)
+                await context.RespondAsync("This is a debug reply");
+
+            if (afterReply && beforeOrAfterDefer)
+                await context.EditResponseAsync("This is a debug reply");
 
             throw new InvalidOperationException("This is a debug exception");
         }
