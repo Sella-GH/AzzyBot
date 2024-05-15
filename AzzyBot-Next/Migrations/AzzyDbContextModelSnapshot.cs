@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
-#pragma warning disable
 
 namespace AzzyBot.Migrations
 {
@@ -105,6 +104,9 @@ namespace AzzyBot.Migrations
 
                     b.Property<ulong>("ErrorChannelId")
                         .HasColumnType("bigint unsigned");
+
+                    b.Property<bool>("IsDebugAllowed")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<ulong>("UniqueId")
                         .HasColumnType("bigint unsigned");

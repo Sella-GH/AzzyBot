@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
-#pragma warning disable
 
 namespace AzzyBot.Migrations
 {
@@ -23,6 +22,7 @@ namespace AzzyBot.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     UniqueId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     ErrorChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
+                    IsDebugAllowed = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     ConfigSet = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>

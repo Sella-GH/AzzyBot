@@ -7,12 +7,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
-#pragma warning disable
 
 namespace AzzyBot.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20240515091602_InitialCreation")]
+    [Migration("20240515171707_InitialCreation")]
     partial class InitialCreation
     {
         /// <inheritdoc />
@@ -108,6 +107,9 @@ namespace AzzyBot.Migrations
 
                     b.Property<ulong>("ErrorChannelId")
                         .HasColumnType("bigint unsigned");
+
+                    b.Property<bool>("IsDebugAllowed")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<ulong>("UniqueId")
                         .HasColumnType("bigint unsigned");
