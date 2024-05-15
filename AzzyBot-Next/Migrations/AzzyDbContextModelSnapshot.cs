@@ -17,7 +17,7 @@ namespace AzzyBot.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -102,6 +102,9 @@ namespace AzzyBot.Migrations
 
                     b.Property<bool>("ConfigSet")
                         .HasColumnType("tinyint(1)");
+
+                    b.Property<ulong>("ErrorChannelId")
+                        .HasColumnType("bigint unsigned");
 
                     b.Property<ulong>("UniqueId")
                         .HasColumnType("bigint unsigned");

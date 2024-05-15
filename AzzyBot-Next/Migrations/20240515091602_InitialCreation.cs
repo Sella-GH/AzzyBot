@@ -22,6 +22,7 @@ namespace AzzyBot.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     UniqueId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
+                    ErrorChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     ConfigSet = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>

@@ -7,20 +7,23 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using AzzyBot.Database;
+using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
 using AzzyBot.Settings;
 using AzzyBot.Utilities;
 using DSharpPlus;
-using DSharpPlus.Commands;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
 internal sealed class DiscordBotService
 {
+    private readonly IDbContextFactory<AzzyDbContext> _dbContextFactory;
     private readonly ILogger<DiscordBotService> _logger;
     private readonly AzzyBotSettingsRecord _settings;
     private readonly DiscordShardedClient _shardedClient;
@@ -28,9 +31,10 @@ internal sealed class DiscordBotService
     private const string BugReportMessage = $"Send a [bug report]({BugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
 
     [SuppressMessage("Style", "IDE0290:Use primary constructor", Justification = "Otherwise it throws CS9124")]
-    public DiscordBotService(AzzyBotSettingsRecord settings, ILogger<DiscordBotService> logger, DiscordBotServiceHost botServiceHost)
+    public DiscordBotService(AzzyBotSettingsRecord settings, IDbContextFactory<AzzyDbContext> dbContextFactory, ILogger<DiscordBotService> logger, DiscordBotServiceHost botServiceHost)
     {
         _settings = settings;
+        _dbContextFactory = dbContextFactory;
         _logger = logger;
         _shardedClient = botServiceHost._shardedClient;
     }
@@ -53,7 +57,7 @@ internal sealed class DiscordBotService
         return guild;
     }
 
-    internal async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, string? info = null)
+    internal async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, ulong guildId = 0, string? info = null)
     {
         _logger.ExceptionOccured(ex);
 
@@ -61,13 +65,27 @@ internal sealed class DiscordBotService
         string stackTrace = ex.StackTrace ?? string.Empty;
         string exInfo = (string.IsNullOrWhiteSpace(stackTrace)) ? exMessage : $"{exMessage}\n{stackTrace}";
         string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
+        ulong errorChannelId = _settings.ErrorChannelId;
+
+        // This is a questionable approach as it sends messages
+        // to the main debug server even if it the error occurs
+        // in a different server
+        // TODO Find a better way to handle this
+        if (guildId is not 0 && guildId != _settings.ServerId)
+        {
+            await using AzzyDbContext dbContext = await _dbContextFactory.CreateDbContextAsync();
+            GuildsEntity? guild = await dbContext.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
+
+            if (guild is not null && guild.ErrorChannelId is not 0)
+                errorChannelId = guild.ErrorChannelId;
+        }
 
         try
         {
             string tempFilePath = await FileOperations.CreateTempFileAsync(exInfo, $"StackTrace_{timestampString}.log");
 
             DiscordEmbed embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), info);
-            bool messageSent = await SendMessageAsync(_settings?.ErrorChannelId ?? 0, BugReportMessage, [embed], [tempFilePath]);
+            bool messageSent = await SendMessageAsync(errorChannelId, BugReportMessage, [embed], [tempFilePath]);
 
             if (!messageSent)
                 _logger.UnableToSendMessage("Error message was not sent");
@@ -88,7 +106,7 @@ internal sealed class DiscordBotService
         return false;
     }
 
-    internal async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, SlashCommandContext ctx, string? info = null)
+    internal async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, SlashCommandContext ctx, ulong guildId = 0, string? info = null)
     {
         _logger.ExceptionOccured(ex);
 
@@ -99,15 +117,29 @@ internal sealed class DiscordBotService
         string exInfo = (string.IsNullOrWhiteSpace(stackTrace)) ? exMessage : $"{exMessage}\n{stackTrace}";
         string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
         string commandName = ctx.Command.FullName;
+        ulong errorChannelId = _settings.ErrorChannelId;
         Dictionary<string, string> commandOptions = [];
         ProcessOptions(ctx.Arguments, commandOptions);
+
+        // This is a questionable approach as it sends messages
+        // to the main debug server even if it the error occurs
+        // in a different server
+        // TODO Find a better way to handle this
+        if (guildId is not 0 && guildId != _settings.ServerId)
+        {
+            await using AzzyDbContext dbContext = await _dbContextFactory.CreateDbContextAsync();
+            GuildsEntity? guild = await dbContext.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
+
+            if (guild is not null && guild.ErrorChannelId is not 0)
+                errorChannelId = guild.ErrorChannelId;
+        }
 
         try
         {
             string tempFilePath = await FileOperations.CreateTempFileAsync(exInfo, $"StackTrace_{timestampString}.log");
 
             DiscordEmbed embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), info, discordMessage, discordUser, commandName, commandOptions);
-            bool messageSent = await SendMessageAsync(_settings.ErrorChannelId, BugReportMessage, [embed], [tempFilePath]);
+            bool messageSent = await SendMessageAsync(errorChannelId, BugReportMessage, [embed], [tempFilePath]);
 
             if (!messageSent)
                 _logger.UnableToSendMessage("Error message was not sent");

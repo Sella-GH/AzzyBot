@@ -184,6 +184,9 @@ internal sealed class DiscordBotServiceHost : IHostedService
 
         Exception ex = e.Exception;
         DateTime now = DateTime.Now;
+        ulong guildId = 0;
+        if (e.Context.Guild is not null)
+            guildId = e.Context.Guild.Id;
 
         if (e.Context is not SlashCommandContext slashContext)
         {
@@ -193,15 +196,15 @@ internal sealed class DiscordBotServiceHost : IHostedService
 
         if (ex is ChecksFailedException checksFailed)
         {
-            await _botService.LogExceptionAsync(ex, now, slashContext);
+            await _botService.LogExceptionAsync(ex, now, slashContext, guildId);
         }
         else if (ex is DiscordException)
         {
-            await _botService.LogExceptionAsync(ex, now, slashContext, ((DiscordException)e.Exception).JsonMessage);
+            await _botService.LogExceptionAsync(ex, now, slashContext, guildId, ((DiscordException)e.Exception).JsonMessage);
         }
         else
         {
-            await _botService.LogExceptionAsync(ex, now, slashContext);
+            await _botService.LogExceptionAsync(ex, now, slashContext, guildId);
         }
     }
 
@@ -252,7 +255,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
                     break;
                 }
 
-                await _botService.LogExceptionAsync(ex, now, ((DiscordException)e.Exception).JsonMessage);
+                await _botService.LogExceptionAsync(ex, now, 0, ((DiscordException)e.Exception).JsonMessage);
                 break;
         }
     }

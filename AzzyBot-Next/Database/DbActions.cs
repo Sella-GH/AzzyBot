@@ -227,7 +227,7 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
         }
     }
 
-    internal async Task SetGuildEntityAsync(ulong guildId)
+    internal async Task SetGuildEntityAsync(ulong guildId, ulong errorChannelId = 0)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
@@ -235,9 +235,14 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
         try
         {
             GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
-            if (guild?.ConfigSet is false)
+
+            if (guild is not null)
             {
-                guild.ConfigSet = true;
+                if (!guild.ConfigSet)
+                    guild.ConfigSet = true;
+
+                if (errorChannelId is not 0)
+                    guild.ErrorChannelId = errorChannelId;
 
                 await context.SaveChangesAsync();
 
