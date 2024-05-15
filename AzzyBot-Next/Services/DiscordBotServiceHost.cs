@@ -134,6 +134,9 @@ internal sealed class DiscordBotServiceHost : IHostedService
             if (_serviceProvider.GetRequiredService<CoreServiceHost>()._isActivated)
                 commandsExtension.AddCommands(typeof(CoreCommands.Core));
 
+            // Only add admin commands to the main server
+            commandsExtension.AddCommand(typeof(AdminCommands), _settings.ServerId);
+
             // Only add debug commands if it's a dev build
             if (AzzyStatsGeneral.GetBotName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase))
                 commandsExtension.AddCommands(typeof(DebugCommands.Debug), _settings.ServerId);

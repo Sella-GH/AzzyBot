@@ -8,6 +8,7 @@ internal sealed class GuildsEntity
     public int Id { get; set; }
     public ulong UniqueId { get; set; }
     public ulong ErrorChannelId { get; set; }
+    public bool IsDebugAllowed { get; set; }
     public bool ConfigSet { get; set; }
 
     public AzuraCastEntity? AzuraCast { get; set; }
