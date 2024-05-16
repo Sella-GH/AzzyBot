@@ -57,6 +57,20 @@ internal sealed class DiscordBotService
         return guild;
     }
 
+    internal Dictionary<ulong, DiscordGuild> GetDiscordGuilds()
+    {
+        Dictionary<ulong, DiscordGuild> guilds = [];
+        foreach (KeyValuePair<int, DiscordClient> client in _shardedClient.ShardClients)
+        {
+            foreach (KeyValuePair<ulong, DiscordGuild> guild in client.Value.Guilds)
+            {
+                guilds.Add(guild.Key, guild.Value);
+            }
+        }
+
+        return guilds;
+    }
+
     internal async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, ulong guildId = 0, string? info = null)
     {
         _logger.ExceptionOccured(ex);

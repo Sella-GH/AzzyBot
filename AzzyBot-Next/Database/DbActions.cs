@@ -115,6 +115,20 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
         return guild ?? throw new InvalidOperationException("Guild settings not found in database.");
     }
 
+    internal async Task<List<GuildsEntity>> GetGuildEntitiesWithDebugAsync(bool isDebug = true)
+    {
+        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+
+        if (isDebug)
+        {
+            return await context.Guilds.Where(g => g.IsDebugAllowed).ToListAsync();
+        }
+        else
+        {
+            return await context.Guilds.Where(g => !g.IsDebugAllowed).ToListAsync();
+        }
+    }
+
     internal async Task RemoveGuildEntityAsync(ulong guildId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
@@ -227,7 +241,7 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
         }
     }
 
-    internal async Task SetGuildEntityAsync(ulong guildId, ulong errorChannelId = 0)
+    internal async Task SetGuildEntityAsync(ulong guildId, ulong errorChannelId = 0, bool isDebug = false)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
@@ -243,6 +257,8 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
 
                 if (errorChannelId is not 0)
                     guild.ErrorChannelId = errorChannelId;
+
+                guild.IsDebugAllowed = isDebug;
 
                 await context.SaveChangesAsync();
 
