@@ -222,10 +222,17 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
                     AzuraCastChecksEntity? checks = await context.AzuraCastChecks.SingleOrDefaultAsync(c => c.AzuraCastId == azuraCast.Id);
                     if (checks is not null)
                     {
-                        checks.FileChanges = fileChanges;
-                        checks.ServerStatus = serverStatus;
-                        checks.Updates = updates;
-                        checks.UpdatesShowChangelog = updatesChangelog;
+                        if (checks.FileChanges != fileChanges)
+                            checks.FileChanges = fileChanges;
+
+                        if (checks.ServerStatus != serverStatus)
+                            checks.ServerStatus = serverStatus;
+
+                        if (checks.Updates != updates)
+                            checks.Updates = updates;
+
+                        if (checks.UpdatesShowChangelog != updatesChangelog)
+                            checks.UpdatesShowChangelog = updatesChangelog;
 
                         await context.SaveChangesAsync();
 
@@ -258,7 +265,10 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
                 if (errorChannelId is not 0)
                     guild.ErrorChannelId = errorChannelId;
 
-                guild.IsDebugAllowed = isDebug;
+                if (guild.IsDebugAllowed != isDebug)
+                {
+                    guild.IsDebugAllowed = isDebug;
+                }
 
                 await context.SaveChangesAsync();
 

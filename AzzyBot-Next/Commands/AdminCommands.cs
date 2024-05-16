@@ -20,10 +20,10 @@ internal sealed class AdminCommands
 {
     [Command("admin")]
     [RequireApplicationOwner]
-    internal sealed class Admin(DiscordBotService botService, DbActions dbActions, ILogger<Admin> logger)
+    internal sealed class Admin(DbActions dbActions, DiscordBotService botService, ILogger<Admin> logger)
     {
-        private readonly DiscordBotService _botService = botService;
         private readonly DbActions _dbActions = dbActions;
+        private readonly DiscordBotService _botService = botService;
         private readonly ILogger<Admin> _logger = logger;
 
         [Command("get-debug-guilds")]
