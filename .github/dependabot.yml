@@ -106,8 +106,9 @@ updates:
       DSharpPlus:
         applies-to: version-updates
         patterns:
-        - "DSharpPlus.*"
-        - "DSharpPlus*"
+        - "DSharpPlus"
+        - "DSharpPlus.Commands"
+        - "DSharpPlus.Interactivity"
         update-types:
         - "minor"
         - "patch"
@@ -130,8 +131,9 @@ updates:
       Others:
         applies-to: version-updates
         exclude-patterns:
-        - "DSharpPlus.*"
-        - "DSharpPlus*"
+        - "DSharpPlus"
+        - "DSharpPlus.Commands"
+        - "DSharpPlus.Interactivity"
         - "Microsoft.*"
         - "Pomelo.*"
         - "Roslynator.*"
