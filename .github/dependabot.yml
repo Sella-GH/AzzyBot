@@ -106,8 +106,7 @@ updates:
       DSharpPlus:
         applies-to: version-updates
         patterns:
-        - "DSharpPlus.*"
-        - "DSharpPlus*"
+        - "*DSharpPlus*"
         update-types:
         - "minor"
         - "patch"
