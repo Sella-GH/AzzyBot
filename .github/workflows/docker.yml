@@ -185,7 +185,7 @@ jobs:
         id: loc_cs
         uses: PavanMudigonda/lines-of-code-reporter@v1.6
         with:
-          exclude_dir: ".zzyBot"
+          exclude_dir: "AzzyBot"
           include_lang: "C#,MSBuild script"
 
       # - name: Calculate Lines of JSON Code
