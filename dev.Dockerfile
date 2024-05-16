@@ -5,8 +5,10 @@ RUN apt update && apt upgrade -y && apt autoremove -y
 WORKDIR /src
 COPY ./AzzyBot-Next ./
 RUN dotnet restore ./AzzyBot-Next.csproj
+ARG ARCH
 ARG CONFIG
-RUN dotnet publish ./AzzyBot-Next.csproj -c $CONFIG -o out
+ARG OS
+RUN dotnet publish ./AzzyBot-Next.csproj -a $ARCH -c $CONFIG --os $OS -o out
 
 # RUNNER IMAGE
 FROM mcr.microsoft.com/dotnet/runtime:8.0-bookworm-slim

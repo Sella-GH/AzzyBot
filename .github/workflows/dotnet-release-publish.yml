@@ -15,7 +15,7 @@ jobs:
     uses: ./.github/workflows/tag-creation.yml
 
   build:
-    name: Build and Publish RELEASE for ${{ matrix.os }} - ${{ matrix.arch }}
+    name: Build RELEASE for ${{ matrix.os }} - ${{ matrix.arch }}
     needs: check_for_tag
     if: ${{ needs.check_for_tag.outputs.tag_created }} == "true"
     runs-on: ubuntu-latest
@@ -58,6 +58,7 @@ jobs:
         id: loc_cs
         uses: PavanMudigonda/lines-of-code-reporter@v1.6
         with:
+          exclude_dir: "./AzzyBot"
           include_lang: "C#,MSBuild script"
 
       - name: Calculate Lines of JSON Code
@@ -89,7 +90,7 @@ jobs:
           path: ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}
 
   build-docker:
-    name: Build and publish docker .zip file
+    name: Build docker .zip file
     if: contains(github.event.head_commit.message, '[release]')
     runs-on: ubuntu-latest
     steps:

@@ -14,7 +14,7 @@ on:
 
 jobs:
   build-amd:
-    name: Build and Publish DEBUG for ${{ matrix.os }} - ${{ matrix.arch }}
+    name: Build DEBUG for ${{ matrix.os }} - ${{ matrix.arch }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -58,6 +58,7 @@ jobs:
        id: loc_cs
        uses: PavanMudigonda/lines-of-code-reporter@v1.6
        with:
+         exclude_dir: "./AzzyBot"
          include_lang: "C#,MSBuild script"
 
      # - name: Calculate Lines of JSON Code
@@ -89,7 +90,7 @@ jobs:
          path: ./artifacts/publish/AzzyBot-Next/debug_${{ matrix.os }}-${{ matrix.arch }}
 
   build-docker:
-    name: Build and publish docker .zip file
+    name: Build docker .zip file
     runs-on: ubuntu-latest
     steps:
      - name: Checkout
