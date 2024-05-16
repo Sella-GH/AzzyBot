@@ -119,14 +119,9 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        if (isDebug)
-        {
-            return await context.Guilds.Where(g => g.IsDebugAllowed).ToListAsync();
-        }
-        else
-        {
-            return await context.Guilds.Where(g => !g.IsDebugAllowed).ToListAsync();
-        }
+        return (isDebug)
+            ? await context.Guilds.Where(g => g.IsDebugAllowed).ToListAsync()
+            : await context.Guilds.Where(g => !g.IsDebugAllowed).ToListAsync();
     }
 
     internal async Task RemoveGuildEntityAsync(ulong guildId)

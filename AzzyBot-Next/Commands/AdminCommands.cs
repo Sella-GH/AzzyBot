@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Commands.Autocompletes;
@@ -43,10 +44,9 @@ internal sealed class AdminCommands
             Dictionary<ulong, DiscordGuild> clientGuilds = _botService.GetDiscordGuilds();
             StringBuilder stringBuilder = new();
             stringBuilder.AppendLine("I found the following Debug guilds:");
-            foreach (GuildsEntity guild in dbGuilds)
+            foreach (GuildsEntity guild in dbGuilds.Where(g => clientGuilds.ContainsKey(g.UniqueId)))
             {
-                if (clientGuilds.TryGetValue(guild.UniqueId, out DiscordGuild? discordGuild))
-                    stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"- {discordGuild.Name}");
+                stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"- {clientGuilds[guild.UniqueId].Name}");
             }
 
             await context.EditResponseAsync(stringBuilder.ToString());

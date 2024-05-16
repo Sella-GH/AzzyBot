@@ -35,10 +35,9 @@ internal sealed class GuildsAutocomplete(DiscordBotService botService, IDbContex
         }
 
         Dictionary<string, object> results = [];
-        foreach (GuildsEntity guildDb in guildsInDb)
+        foreach (GuildsEntity guildDb in guildsInDb.Where(g => guilds.ContainsKey(g.UniqueId)))
         {
-            if (guilds.TryGetValue(guildDb.UniqueId, out DiscordGuild? guild))
-                results.Add(guild.Name, guildDb.UniqueId.ToString(CultureInfo.InvariantCulture));
+            results.Add(guilds[guildDb.UniqueId].Name, guildDb.UniqueId.ToString(CultureInfo.InvariantCulture));
         }
 
         return results;
