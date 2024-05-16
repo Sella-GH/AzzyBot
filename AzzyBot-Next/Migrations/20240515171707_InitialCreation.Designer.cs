@@ -7,12 +7,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
-#pragma warning disable
 
 namespace AzzyBot.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20240512152410_InitialCreation")]
+    [Migration("20240515171707_InitialCreation")]
     partial class InitialCreation
     {
         /// <inheritdoc />
@@ -20,7 +19,7 @@ namespace AzzyBot.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -104,6 +103,12 @@ namespace AzzyBot.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("ConfigSet")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<ulong>("ErrorChannelId")
+                        .HasColumnType("bigint unsigned");
+
+                    b.Property<bool>("IsDebugAllowed")
                         .HasColumnType("tinyint(1)");
 
                     b.Property<ulong>("UniqueId")

@@ -17,6 +17,9 @@ end_of_line = crlf
 [*{_AssemblyInfo.cs,.notsupported.cs,AsmOffsets.cs}]
 generated_code = true
 
+[/AzzyBot-Next/Migrations/**]
+generated_code = true
+
 # C# files
 [*.cs]
 # C# 10 features
@@ -936,7 +939,8 @@ dotnet_diagnostic.rcs1262.severity = suggestion
 dotnet_diagnostic.rcs1263.severity = warning
 
 # Use 'var' or explicit type
-dotnet_diagnostic.rcs1264.severity = suggestion
+# This one is doubled
+dotnet_diagnostic.rcs1264.severity = none
 
 # Remove redundant catch block
 dotnet_diagnostic.rcs1265.severity = suggestion

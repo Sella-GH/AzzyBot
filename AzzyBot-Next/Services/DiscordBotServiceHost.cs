@@ -134,9 +134,12 @@ internal sealed class DiscordBotServiceHost : IHostedService
             if (_serviceProvider.GetRequiredService<CoreServiceHost>()._isActivated)
                 commandsExtension.AddCommands(typeof(CoreCommands.Core));
 
+            // Only add admin commands to the main server
+            commandsExtension.AddCommand(typeof(AdminCommands.Admin), _settings.ServerId);
+
             // Only add debug commands if it's a dev build
             if (AzzyStatsGeneral.GetBotName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase))
-                commandsExtension.AddCommands(typeof(DebugCommands.Debug));
+                commandsExtension.AddCommands(typeof(DebugCommands.Debug), _settings.ServerId);
 
             SlashCommandProcessor slashCommandProcessor = new();
             slashCommandProcessor.AddConverter<Uri>(new UriArgumentConverter());
@@ -184,6 +187,9 @@ internal sealed class DiscordBotServiceHost : IHostedService
 
         Exception ex = e.Exception;
         DateTime now = DateTime.Now;
+        ulong guildId = 0;
+        if (e.Context.Guild is not null)
+            guildId = e.Context.Guild.Id;
 
         if (e.Context is not SlashCommandContext slashContext)
         {
@@ -193,15 +199,15 @@ internal sealed class DiscordBotServiceHost : IHostedService
 
         if (ex is ChecksFailedException checksFailed)
         {
-            await _botService.LogExceptionAsync(ex, now, slashContext);
+            await _botService.LogExceptionAsync(ex, now, slashContext, guildId);
         }
         else if (ex is DiscordException)
         {
-            await _botService.LogExceptionAsync(ex, now, slashContext, ((DiscordException)e.Exception).JsonMessage);
+            await _botService.LogExceptionAsync(ex, now, slashContext, guildId, ((DiscordException)e.Exception).JsonMessage);
         }
         else
         {
-            await _botService.LogExceptionAsync(ex, now, slashContext);
+            await _botService.LogExceptionAsync(ex, now, slashContext, guildId);
         }
     }
 
@@ -252,7 +258,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
                     break;
                 }
 
-                await _botService.LogExceptionAsync(ex, now, ((DiscordException)e.Exception).JsonMessage);
+                await _botService.LogExceptionAsync(ex, now, 0, ((DiscordException)e.Exception).JsonMessage);
                 break;
         }
     }

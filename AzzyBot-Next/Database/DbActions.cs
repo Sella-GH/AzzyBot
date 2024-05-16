@@ -115,6 +115,15 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
         return guild ?? throw new InvalidOperationException("Guild settings not found in database.");
     }
 
+    internal async Task<List<GuildsEntity>> GetGuildEntitiesWithDebugAsync(bool isDebug = true)
+    {
+        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+
+        return (isDebug)
+            ? await context.Guilds.Where(g => g.IsDebugAllowed).ToListAsync()
+            : await context.Guilds.Where(g => !g.IsDebugAllowed).ToListAsync();
+    }
+
     internal async Task RemoveGuildEntityAsync(ulong guildId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
@@ -208,10 +217,17 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
                     AzuraCastChecksEntity? checks = await context.AzuraCastChecks.SingleOrDefaultAsync(c => c.AzuraCastId == azuraCast.Id);
                     if (checks is not null)
                     {
-                        checks.FileChanges = fileChanges;
-                        checks.ServerStatus = serverStatus;
-                        checks.Updates = updates;
-                        checks.UpdatesShowChangelog = updatesChangelog;
+                        if (checks.FileChanges != fileChanges)
+                            checks.FileChanges = fileChanges;
+
+                        if (checks.ServerStatus != serverStatus)
+                            checks.ServerStatus = serverStatus;
+
+                        if (checks.Updates != updates)
+                            checks.Updates = updates;
+
+                        if (checks.UpdatesShowChangelog != updatesChangelog)
+                            checks.UpdatesShowChangelog = updatesChangelog;
 
                         await context.SaveChangesAsync();
 
@@ -227,7 +243,7 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
         }
     }
 
-    internal async Task SetGuildEntityAsync(ulong guildId)
+    internal async Task SetGuildEntityAsync(ulong guildId, ulong errorChannelId = 0, bool isDebug = false)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
@@ -235,9 +251,19 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
         try
         {
             GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
-            if (guild?.ConfigSet is false)
+
+            if (guild is not null)
             {
-                guild.ConfigSet = true;
+                if (!guild.ConfigSet)
+                    guild.ConfigSet = true;
+
+                if (errorChannelId is not 0)
+                    guild.ErrorChannelId = errorChannelId;
+
+                if (guild.IsDebugAllowed != isDebug)
+                {
+                    guild.IsDebugAllowed = isDebug;
+                }
 
                 await context.SaveChangesAsync();
 

@@ -41,7 +41,7 @@ internal sealed class DebugCommands
                 await context.RespondAsync("This is a debug reply");
 
             if (afterReply && beforeOrAfterDefer)
-                await context.EditResponseAsync("This is a debug reply");
+                await context.EditResponseAsync("This is a debug reply edit");
 
             throw new InvalidOperationException("This is a debug exception");
         }

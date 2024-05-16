@@ -46,7 +46,7 @@ internal sealed class ConfigCommands
         }
 
         [Command("azuracast-checks")]
-        public async ValueTask ConfigSetAzuraCastChecksAsync(CommandContext context, bool fileChanges, bool serverStatus, bool updates, bool updatesChangelog)
+        public async ValueTask ConfigSetAzuraCastChecksAsync(CommandContext context, bool fileChanges = false, bool serverStatus = false, bool updates = false, bool updatesChangelog = false)
         {
             _logger.CommandRequested(nameof(ConfigSetAzuraCastChecksAsync), context.User.GlobalName);
 
@@ -55,6 +55,20 @@ internal sealed class ConfigCommands
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
 
             await _db.SetAzuraCastChecksEntityAsync(guildId, fileChanges, serverStatus, updates, updatesChangelog);
+
+            await context.EditResponseAsync("Your settings were saved successfully.");
+        }
+
+        [Command("core")]
+        public async ValueTask ConfigSetCoreAsync(CommandContext context, [ChannelTypes(DiscordChannelType.Text)] DiscordChannel? errorChannel = null)
+        {
+            _logger.CommandRequested(nameof(ConfigSetCoreAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
+
+            await _db.SetGuildEntityAsync(guildId, errorChannel?.Id ?? 0);
 
             await context.EditResponseAsync("Your settings were saved successfully.");
         }
@@ -82,7 +96,7 @@ internal sealed class ConfigCommands
 
             await member.SendMessageAsync(embed);
 
-            await context.EditResponseAsync("I sent an overview with all the settings to you in private. Be aware of sensitive data.");
+            await context.EditResponseAsync("I sent you an overview with all the settings in private. Be aware of sensitive data.");
         }
     }
 }
