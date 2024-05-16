@@ -1,4 +1,4 @@
-name: Build Docker image and publish to Hub
+name: Build Docker Image
 
 on:
   push:
@@ -71,6 +71,7 @@ jobs:
         id: loc_cs
         uses: PavanMudigonda/lines-of-code-reporter@v1.6
         with:
+          exclude_dir: "AzzyBot"
           include_lang: "C#,MSBuild script"
 
       # - name: Calculate Lines of JSON Code
@@ -105,6 +106,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           build-args: |
+            ARCH=${{ matrix.arch }}
+            OS=${{ matrix.os }}
             CONFIG=${{ steps.config.outputs.config }}
             COMMIT=${{ github.sha }}
             TIMESTAMP=${{ steps.dateTime.outputs.time }}
@@ -182,6 +185,7 @@ jobs:
         id: loc_cs
         uses: PavanMudigonda/lines-of-code-reporter@v1.6
         with:
+          exclude_dir: "AzzyBot"
           include_lang: "C#,MSBuild script"
 
       # - name: Calculate Lines of JSON Code
@@ -216,6 +220,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           build-args: |
+            ARCH=${{ matrix.arch }}
+            OS=${{ matrix.os }}
             CONFIG=${{ steps.config.outputs.config }}
             COMMIT=${{ github.sha }}
             TIMESTAMP=${{ steps.dateTime.outputs.time }}
