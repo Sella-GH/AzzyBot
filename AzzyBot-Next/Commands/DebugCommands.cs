@@ -1,9 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using AzzyBot.Logging;
 using AzzyBot.Services;
 using AzzyBot.Utilities.Encryption;
 using DSharpPlus.Commands;
+using DSharpPlus.Commands.ArgumentModifiers;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
@@ -20,8 +22,8 @@ internal sealed class DebugCommands
         private readonly ILogger<Debug> _logger = logger;
         private readonly WebRequestService _webRequestService = webRequestService;
 
-        [Command("encrypt-decrypt")]
-        public async ValueTask DebugEncryptDecryptAsync(CommandContext context, string text)
+        [Command("encrypt-decrypt"), Description("Test the encryption and decryption features of the bot.")]
+        public async ValueTask DebugEncryptDecryptAsync(CommandContext context, [Description("Enter the text which should be encrypted and decrypted again."), MinMaxLength(0, 1000)] string text)
         {
             _logger.CommandRequested(nameof(DebugEncryptDecryptAsync), context.User.GlobalName);
 
@@ -33,25 +35,30 @@ internal sealed class DebugCommands
             await context.EditResponseAsync($"Original: {text}\nEncrypted: {encrypted}\nDecrypted: {decrypted}");
         }
 
-        [Command("trigger-exception")]
-        public async ValueTask DebugTriggerExceptionAsync(CommandContext context, bool beforeOrAfterDefer = true, bool afterReply = false)
+        [Command("trigger-exception"), Description("Triggers an InvalidOperationException to test if the error reporting system works.")]
+        public async ValueTask DebugTriggerExceptionAsync
+            (
+            CommandContext context,
+            [Description("Enable to defer the message before throwing the exception.")] bool throwAfterDefering = true,
+            [Description("Enable to throw the exception after a reply was already made.")] bool afterReply = false
+            )
         {
             _logger.CommandRequested(nameof(DebugTriggerExceptionAsync), context.User.GlobalName);
 
-            if (beforeOrAfterDefer)
+            if (throwAfterDefering)
                 await context.DeferResponseAsync();
 
-            if (afterReply && !beforeOrAfterDefer)
+            if (afterReply && !throwAfterDefering)
                 await context.RespondAsync("This is a debug reply");
 
-            if (afterReply && beforeOrAfterDefer)
+            if (afterReply && throwAfterDefering)
                 await context.EditResponseAsync("This is a debug reply edit");
 
             throw new InvalidOperationException("This is a debug exception");
         }
 
-        [Command("webservice-tests")]
-        public async ValueTask DebugWebServiceTestsAsync(CommandContext context, Uri url)
+        [Command("webservice-tests"), Description("Test if the bot is able to resolve connections to external websites.")]
+        public async ValueTask DebugWebServiceTestsAsync(CommandContext context, [Description("Enter a valid url like the following: https://google.com")] Uri url)
         {
             _logger.CommandRequested(nameof(DebugWebServiceTestsAsync), context.User.GlobalName);
 
