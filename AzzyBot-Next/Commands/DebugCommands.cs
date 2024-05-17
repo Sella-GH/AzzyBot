@@ -4,6 +4,8 @@ using AzzyBot.Logging;
 using AzzyBot.Services;
 using AzzyBot.Utilities.Encryption;
 using DSharpPlus.Commands;
+using DSharpPlus.Commands.ContextChecks;
+using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands;
@@ -11,6 +13,7 @@ namespace AzzyBot.Commands;
 internal sealed class DebugCommands
 {
     [Command("debug")]
+    [RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
     internal sealed class Debug(WebRequestService webRequestService, ILogger<Debug> logger)
     {
         private readonly ILogger<Debug> _logger = logger;

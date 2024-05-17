@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Commands.Autocompletes;
+using AzzyBot.Commands.Choices;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
 using AzzyBot.Services;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
-using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
@@ -20,15 +20,27 @@ namespace AzzyBot.Commands;
 internal sealed class AdminCommands
 {
     [Command("admin")]
+    [RequireGuild]
     [RequireApplicationOwner]
-    internal sealed class Admin(DbActions dbActions, DiscordBotService botService, ILogger<Admin> logger)
+    internal sealed class Admin(DbActions dbActions, DiscordBotService botService, DiscordBotServiceHost botServiceHost, ILogger<Admin> logger)
     {
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
+        private readonly DiscordBotServiceHost _botServiceHost = botServiceHost;
         private readonly ILogger<Admin> _logger = logger;
 
+        [Command("change-bot-status")]
+        public async ValueTask CoreChangeStatusAsync(CommandContext context, [SlashChoiceProvider<BotActivityProvider>] int activity, [SlashChoiceProvider<BotStatusProvider>] int status, string doing, string? url = null)
+        {
+            _logger.CommandRequested(nameof(CoreChangeStatusAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+            await _botServiceHost.SetBotStatusAsync(status, activity, doing, url);
+            await context.EditResponseAsync("Bot status has been updated!");
+        }
+
         [Command("get-debug-guilds")]
-        public async ValueTask AdminGetDebugGuildsAsync(SlashCommandContext context)
+        public async ValueTask AdminGetDebugGuildsAsync(CommandContext context)
         {
             _logger.CommandRequested(nameof(AdminGetDebugGuildsAsync), context.User.GlobalName);
 
@@ -53,13 +65,13 @@ internal sealed class AdminCommands
         }
 
         [Command("remove-debug-guild")]
-        public async ValueTask AdminRemoveDebugGuildsAsync(SlashCommandContext context, [SlashAutoCompleteProvider<GuildsAutocomplete>] string guildId = "")
+        public async ValueTask AdminRemoveDebugGuildsAsync(CommandContext context, [SlashAutoCompleteProvider<GuildsAutocomplete>] string guildId = "")
         {
             _logger.CommandRequested(nameof(AdminRemoveDebugGuildsAsync), context.User.GlobalName);
 
             if (!ulong.TryParse(guildId, out ulong guildIdValue))
             {
-                await context.RespondAsync("Invalid guild ID.", true);
+                await context.RespondAsync("Invalid guild ID.");
                 return;
             }
 
@@ -84,13 +96,13 @@ internal sealed class AdminCommands
         }
 
         [Command("set-debug-guild")]
-        public async ValueTask AdminSetDebugGuildsAsync(SlashCommandContext context, [SlashAutoCompleteProvider<GuildsAutocomplete>] string guildId = "")
+        public async ValueTask AdminSetDebugGuildsAsync(CommandContext context, [SlashAutoCompleteProvider<GuildsAutocomplete>] string guildId = "")
         {
             _logger.CommandRequested(nameof(AdminSetDebugGuildsAsync), context.User.GlobalName);
 
             if (!ulong.TryParse(guildId, out ulong guildIdValue))
             {
-                await context.RespondAsync("Invalid guild ID.", true);
+                await context.RespondAsync("Invalid guild ID.");
                 return;
             }
 

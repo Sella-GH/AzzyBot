@@ -98,5 +98,20 @@ internal sealed class ConfigCommands
 
             await context.EditResponseAsync("I sent you an overview with all the settings in private. Be aware of sensitive data.");
         }
+
+        [Command("reset-settings")]
+        public async ValueTask ConfigResetSettingsAsync(CommandContext context)
+        {
+            _logger.CommandRequested(nameof(ConfigResetSettingsAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
+
+            await _db.RemoveGuildEntityAsync(guildId);
+            await _db.AddGuildEntityAsync(guildId);
+
+            await context.EditResponseAsync("Your settings were reset successfully.");
+        }
     }
 }
