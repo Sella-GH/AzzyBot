@@ -103,15 +103,15 @@ updates:
       - "dependencies"
       - ".NET"
     groups:
-      DSharpPlus:
-        applies-to: version-updates
-        patterns:
-        - "DSharpPlus"
-        - "DSharpPlus.Commands"
-        - "DSharpPlus.Interactivity"
-        update-types:
-        - "minor"
-        - "patch"
+      #DSharpPlus:
+      #  applies-to: version-updates
+      #  patterns:
+      #  - "DSharpPlus"
+      #  - "DSharpPlus.Commands"
+      #  - "DSharpPlus.Interactivity"
+      #  update-types:
+      #  - "minor"
+      #  - "patch"
       Microsoft:
         applies-to: version-updates
         patterns:
