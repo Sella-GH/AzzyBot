@@ -79,8 +79,14 @@ internal sealed class DiscordBotServiceHost : IHostedService
         UnregisterEventHandlers();
     }
 
-    internal async Task SetBotStatusAsync(int status = 1, int type = 2, string doing = "Music", string? url = null)
+    internal async Task SetBotStatusAsync(int status = 1, int type = 2, string doing = "Music", string? url = null, bool reset = false)
     {
+        if (reset)
+        {
+            await _shardedClient.UpdateStatusAsync(new DiscordActivity("Music", DiscordActivityType.ListeningTo), DiscordUserStatus.Online);
+            return;
+        }
+
         DiscordActivityType activityType = (DiscordActivityType)Enum.ToObject(typeof(DiscordActivityType), type);
         if (activityType.Equals(DiscordActivityType.Streaming) && string.IsNullOrWhiteSpace(url))
             activityType = DiscordActivityType.Playing;
