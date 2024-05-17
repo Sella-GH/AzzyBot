@@ -44,6 +44,23 @@ internal static class EmbedBuilder
         return builder;
     }
 
+    internal static DiscordEmbed BuildAzzyHelpEmbed(List<AzzyHelpRecord> commands)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(commands.Count, nameof(commands));
+
+        const string preTitle = "Command List For";
+        string title = $"{preTitle} {commands[0].SubCommand} Module";
+
+        Dictionary<string, DiscordEmbedRecord> fields = [];
+
+        foreach (AzzyHelpRecord command in commands)
+        {
+            fields.Add(command.Name, new(command.Description));
+        }
+
+        return CreateBasicEmbed(title, null, DiscordColor.Blurple, null, null, null, fields);
+    }
+
     internal static DiscordEmbed BuildGetSettingsGuildEmbed(string serverName, GuildsEntity? guild = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(serverName, nameof(serverName));

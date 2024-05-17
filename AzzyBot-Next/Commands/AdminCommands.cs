@@ -49,7 +49,7 @@ internal sealed class AdminCommands
             await context.EditResponseAsync("Bot status has been updated!");
         }
 
-        [Command("get-debug-servers"), Description("Displays all servers which can execute debug commands")]
+        [Command("get-debug-servers"), Description("Displays all servers which can execute debug commands.")]
         public async ValueTask AdminGetDebugGuildsAsync(CommandContext context)
         {
             _logger.CommandRequested(nameof(AdminGetDebugGuildsAsync), context.User.GlobalName);
