@@ -10,7 +10,6 @@ public sealed record AzzyBotSettingsRecord
     public required ulong ServerId { get; init; }
     public required ulong ErrorChannelId { get; init; }
     public required string EncryptionKey { get; init; } // 32 Characters
-    public required string EncryptionIv { get; init; } // 16 Characters
     public Database? Database { get; init; }
     public DiscordStatus? DiscordStatus { get; init; }
     public required CoreSettings CoreSettings { get; init; }
