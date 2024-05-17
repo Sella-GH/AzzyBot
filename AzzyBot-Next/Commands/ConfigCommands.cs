@@ -15,9 +15,7 @@ namespace AzzyBot.Commands;
 
 internal sealed class ConfigCommands
 {
-    [Command("config")]
-    [RequireGuild]
-    [RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
+    [Command("config"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
     internal sealed class Config(DbActions db, ILogger<Config> logger)
     {
         private readonly DbActions _db = db;

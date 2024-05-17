@@ -14,9 +14,7 @@ namespace AzzyBot.Commands;
 
 internal sealed class DebugCommands
 {
-    [Command("debug")]
-    [RequireGuild]
-    [RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
+    [Command("debug"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
     internal sealed class Debug(WebRequestService webRequestService, ILogger<Debug> logger)
     {
         private readonly ILogger<Debug> _logger = logger;

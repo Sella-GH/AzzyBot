@@ -20,8 +20,7 @@ namespace AzzyBot.Commands;
 
 internal sealed class CoreCommands
 {
-    [Command("core")]
-    [RequireGuild]
+    [Command("core"), RequireGuild]
     internal sealed class Core(AzzyBotSettingsRecord settings, DbActions dbActions, ILogger<Core> logger)
     {
         private readonly AzzyBotSettingsRecord _settings = settings;
