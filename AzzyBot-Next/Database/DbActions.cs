@@ -73,8 +73,11 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
             AzuraCastEntity? azura = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
             if (azura is not null)
             {
-                azura.ApiKey = Crypto.Decrypt(azura.ApiKey);
-                azura.ApiUrl = Crypto.Decrypt(azura.ApiUrl);
+                if (azura.ApiKey.Length > 0)
+                    azura.ApiKey = Crypto.Decrypt(azura.ApiKey);
+
+                if (azura.ApiUrl.Length > 0)
+                    azura.ApiUrl = Crypto.Decrypt(azura.ApiUrl);
 
                 return azura;
             }

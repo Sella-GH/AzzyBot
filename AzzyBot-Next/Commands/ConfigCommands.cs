@@ -92,9 +92,16 @@ internal sealed class ConfigCommands
 
             AzuraCastEntity azuraCast = await _db.GetAzuraCastEntityAsync(guildId);
             AzuraCastChecksEntity checks = await _db.GetAzuraCastChecksEntityAsync(guildId);
-            DiscordEmbed embed = EmbedBuilder.BuildGetSettingsEmbed(guildName, azuraCast, checks);
+            GuildsEntity guild = await _db.GetGuildEntityAsync(guildId);
 
-            await member.SendMessageAsync(embed);
+            DiscordEmbed guildEmbed = EmbedBuilder.BuildGetSettingsGuildEmbed(guildName, guild);
+            DiscordEmbed azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(azuraCast);
+            DiscordEmbed azuraChecksEmbed = EmbedBuilder.BuildGetSettingsAzuraChecksEmbed(checks);
+
+            await using DiscordMessageBuilder messageBuilder = new();
+            messageBuilder.AddEmbeds([guildEmbed, azuraEmbed, azuraChecksEmbed]);
+
+            await member.SendMessageAsync(messageBuilder);
 
             await context.EditResponseAsync("I sent you an overview with all the settings in private. Be aware of sensitive data.");
         }

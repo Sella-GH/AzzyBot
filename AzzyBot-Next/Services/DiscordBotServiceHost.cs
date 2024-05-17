@@ -197,11 +197,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
             return;
         }
 
-        if (ex is ChecksFailedException checksFailed)
-        {
-            await _botService.LogExceptionAsync(ex, now, slashContext, guildId);
-        }
-        else if (ex is DiscordException)
+        if (ex is DiscordException)
         {
             await _botService.LogExceptionAsync(ex, now, slashContext, guildId, ((DiscordException)e.Exception).JsonMessage);
         }
