@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
@@ -22,8 +23,17 @@ internal sealed class ConfigCommands
         private readonly DbActions _db = db;
         private readonly ILogger<Config> _logger = logger;
 
-        [Command("azuracast")]
-        public async ValueTask ConfigSetAzuraCastAsync(CommandContext context, string apiKey = "", Uri? apiUrl = null, int stationId = 0, [ChannelTypes(DiscordChannelType.Text)] DiscordChannel? requestsChannel = null, [ChannelTypes(DiscordChannelType.Text)] DiscordChannel? outagesChannel = null, bool showPlaylistInNowPlaying = false)
+        [Command("azuracast"), Description("Configure the settings of the AzuraCast module.")]
+        public async ValueTask ConfigSetAzuraCastAsync
+            (
+            CommandContext context,
+            [Description("Enter the api key of your azuracast installation.")] string apiKey = "",
+            [Description("Enter the url of your api endpoint, like: https://demo.azuracast.com/api")] Uri? apiUrl = null,
+            [Description("Enter the station id of your azuracast station.")] int stationId = 0,
+            [Description("Select a channel to get music requests when a request is not found on the server."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? requestsChannel = null,
+            [Description("Select a channel to get notifications when your azuracast installation is down."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? outagesChannel = null,
+            [Description("Enable or disable the showing of the playlist in the nowplaying embed.")] bool showPlaylistInNowPlaying = false
+            )
         {
             _logger.CommandRequested(nameof(ConfigSetAzuraCastAsync), context.User.GlobalName);
 
@@ -45,8 +55,15 @@ internal sealed class ConfigCommands
             }
         }
 
-        [Command("azuracast-checks")]
-        public async ValueTask ConfigSetAzuraCastChecksAsync(CommandContext context, bool fileChanges = false, bool serverStatus = false, bool updates = false, bool updatesChangelog = false)
+        [Command("azuracast-checks"), Description("Configure the settings of the automatic checks inside the AzuraCast module.")]
+        public async ValueTask ConfigSetAzuraCastChecksAsync
+            (
+            CommandContext context,
+            [Description("Enable or disable the automatic check if files have been changed.")] bool fileChanges = false,
+            [Description("Enable or disable the automatic check if the AzuraCast instance of your server is down.")] bool serverStatus = false,
+            [Description("Enable or disable the automatic check for AzuraCast updates.")] bool updates = false,
+            [Description("Enable or disable the addition of the changelog to the posted AzuraCast updates.")] bool updatesChangelog = false
+            )
         {
             _logger.CommandRequested(nameof(ConfigSetAzuraCastChecksAsync), context.User.GlobalName);
 
@@ -59,8 +76,8 @@ internal sealed class ConfigCommands
             await context.EditResponseAsync("Your settings were saved successfully.");
         }
 
-        [Command("core")]
-        public async ValueTask ConfigSetCoreAsync(CommandContext context, [ChannelTypes(DiscordChannelType.Text)] DiscordChannel? errorChannel = null)
+        [Command("core"), Description("Configure the settings of the core bot.")]
+        public async ValueTask ConfigSetCoreAsync(CommandContext context, [Description("Select a channel to get notifications when the bot runs into an issue."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? errorChannel = null)
         {
             _logger.CommandRequested(nameof(ConfigSetCoreAsync), context.User.GlobalName);
 
@@ -73,7 +90,7 @@ internal sealed class ConfigCommands
             await context.EditResponseAsync("Your settings were saved successfully.");
         }
 
-        [Command("get-settings")]
+        [Command("get-settings"), Description("Get all configured settings per direct message.")]
         public async ValueTask ConfigGetSettingsAsync(CommandContext context)
         {
             _logger.CommandRequested(nameof(ConfigGetSettingsAsync), context.User.GlobalName);
@@ -100,7 +117,7 @@ internal sealed class ConfigCommands
             await context.EditResponseAsync("I sent you an overview with all the settings in private. Be aware of sensitive data.");
         }
 
-        [Command("reset-settings")]
+        [Command("reset-settings"), Description("Reset all of your settings to the default values.")]
         public async ValueTask ConfigResetSettingsAsync(CommandContext context)
         {
             _logger.CommandRequested(nameof(ConfigResetSettingsAsync), context.User.GlobalName);
