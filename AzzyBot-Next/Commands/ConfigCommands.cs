@@ -80,13 +80,7 @@ internal sealed class ConfigCommands
 
             await context.DeferResponseAsync();
 
-            if (context.Guild is null)
-            {
-                await context.EditResponseAsync("This command can only be used in a server.");
-                return;
-            }
-
-            ulong guildId = context.Guild.Id;
+            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             string guildName = context.Guild.Name;
             DiscordMember member = context.Member ?? throw new InvalidOperationException("Member is null");
 
