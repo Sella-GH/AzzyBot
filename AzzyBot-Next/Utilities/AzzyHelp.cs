@@ -74,11 +74,8 @@ internal static class AzzyHelp
     internal static Dictionary<int, List<AzzyHelpRecord>> GetCommands(bool adminServer, bool approvedDebug, DiscordMember member)
     {
         Dictionary<int, List<AzzyHelpRecord>> records = [];
-        foreach (Type type in Assembly.GetExecutingAssembly().GetTypes().Where(t => t.Namespace == "AzzyBot.Commands"))
+        foreach (Type type in Assembly.GetExecutingAssembly().GetTypes().Where(t => t.Namespace == "AzzyBot.Commands" && CheckIfMemberHasPermission(adminServer, approvedDebug, member, t)))
         {
-            if (!CheckIfMemberHasPermission(adminServer, approvedDebug, member, type))
-                continue;
-
             records.Add(records.Count, GetAllCommandsOfType(type));
         }
 
@@ -89,11 +86,7 @@ internal static class AzzyHelp
     {
         foreach (KeyValuePair<int, List<AzzyHelpRecord>> kvp in GetCommands(adminServer, approvedDebug, member))
         {
-            foreach (AzzyHelpRecord command in kvp.Value)
-            {
-                if (command.Name == commandName)
-                    return command;
-            }
+            return kvp.Value.First(c => c.Name == commandName);
         }
 
         throw new InvalidOperationException("No command found!");

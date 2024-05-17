@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Commands.Autocompletes;
 using AzzyBot.Database;
@@ -44,13 +45,10 @@ internal sealed class CoreCommands
             GuildsEntity guild = await _dbActions.GetGuildEntityAsync(guildId);
 
             bool adminServer = false;
-            foreach (DiscordUser user in botOwners)
+            foreach (DiscordUser user in botOwners.Where(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId))
             {
-                if (user.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId)
-                {
-                    adminServer = true;
-                    break;
-                }
+                adminServer = true;
+                break;
             }
 
             bool approvedDebug = guild.IsDebugAllowed || guildId == _settings.ServerId;
