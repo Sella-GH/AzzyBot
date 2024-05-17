@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using AzzyBot.Commands;
 using AzzyBot.Utilities.Records;
 using DSharpPlus.Commands;
 using DSharpPlus.Entities;
@@ -56,12 +57,29 @@ internal static class AzzyHelp
         return commands;
     }
 
-    internal static List<DiscordEmbed> GetCommands()
+    private static bool CheckIfMemberHasPermission(bool adminServer, bool approvedDebug, DiscordMember member, Type type)
+    {
+        DiscordPermissions permissions = member.Permissions;
+
+        return type.Name switch
+        {
+            nameof(AdminCommands) => adminServer,
+            nameof(ConfigCommands) => permissions.HasPermission(DiscordPermissions.Administrator),
+            nameof(CoreCommands) => true,
+            nameof(DebugCommands) => approvedDebug && permissions.HasPermission(DiscordPermissions.Administrator),
+            _ => false,
+        };
+    }
+
+    internal static List<DiscordEmbed> GetCommands(bool adminServer, bool approvedDebug, DiscordMember member)
     {
         List<DiscordEmbed> embeds = [];
 
         foreach (Type type in Assembly.GetExecutingAssembly().GetTypes().Where(t => t.Namespace == "AzzyBot.Commands"))
         {
+            if (!CheckIfMemberHasPermission(adminServer, approvedDebug, member, type))
+                continue;
+
             List<AzzyHelpRecord> commands = GetAllCommandsOfType(type);
 
             if (commands.Count == 0)

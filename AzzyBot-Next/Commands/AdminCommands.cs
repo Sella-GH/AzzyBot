@@ -21,9 +21,7 @@ namespace AzzyBot.Commands;
 
 internal sealed class AdminCommands
 {
-    [Command("admin")]
-    [RequireGuild]
-    [RequireApplicationOwner]
+    [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
     internal sealed class Admin(DbActions dbActions, DiscordBotService botService, DiscordBotServiceHost botServiceHost, ILogger<Admin> logger)
     {
         private readonly DbActions _dbActions = dbActions;
