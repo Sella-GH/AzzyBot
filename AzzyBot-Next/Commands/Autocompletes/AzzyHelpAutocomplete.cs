@@ -28,7 +28,7 @@ internal sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings, DbAct
         GuildsEntity guild = await _dbActions.GetGuildEntityAsync(guildId);
 
         bool adminServer = false;
-        foreach (DiscordUser user in botOwners.Where(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId))
+        foreach (DiscordUser _ in botOwners.Where(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId))
         {
             adminServer = true;
             break;
