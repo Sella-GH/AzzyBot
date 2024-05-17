@@ -71,24 +71,31 @@ internal static class AzzyHelp
         };
     }
 
-    internal static List<DiscordEmbed> GetCommands(bool adminServer, bool approvedDebug, DiscordMember member)
+    internal static Dictionary<int, List<AzzyHelpRecord>> GetCommands(bool adminServer, bool approvedDebug, DiscordMember member)
     {
-        List<DiscordEmbed> embeds = [];
-
+        Dictionary<int, List<AzzyHelpRecord>> records = [];
         foreach (Type type in Assembly.GetExecutingAssembly().GetTypes().Where(t => t.Namespace == "AzzyBot.Commands"))
         {
             if (!CheckIfMemberHasPermission(adminServer, approvedDebug, member, type))
                 continue;
 
-            List<AzzyHelpRecord> commands = GetAllCommandsOfType(type);
-
-            if (commands.Count == 0)
-                continue;
-
-            DiscordEmbed embed = EmbedBuilder.BuildAzzyHelpEmbed(commands);
-            embeds.Add(embed);
+            records.Add(records.Count, GetAllCommandsOfType(type));
         }
 
-        return embeds;
+        return records;
+    }
+
+    internal static AzzyHelpRecord GetSingleCommand(bool adminServer, bool approvedDebug, DiscordMember member, string commandName)
+    {
+        foreach (KeyValuePair<int, List<AzzyHelpRecord>> kvp in GetCommands(adminServer, approvedDebug, member))
+        {
+            foreach (AzzyHelpRecord command in kvp.Value)
+            {
+                if (command.Name == commandName)
+                    return command;
+            }
+        }
+
+        throw new InvalidOperationException("No command found!");
     }
 }

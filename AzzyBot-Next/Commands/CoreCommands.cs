@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using AzzyBot.Commands.Autocompletes;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
 using AzzyBot.Settings;
 using AzzyBot.Utilities;
+using AzzyBot.Utilities.Records;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
+using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 
@@ -25,7 +28,11 @@ internal sealed class CoreCommands
         private readonly ILogger<Core> _logger = logger;
 
         [Command("help"), Description("Gives an overview about all the available commands.")]
-        public async ValueTask CoreHelpAsync(CommandContext context)
+        public async ValueTask CoreHelpAsync
+            (
+            CommandContext context,
+            [Description("The command you want to get more information about."), SlashAutoCompleteProvider<AzzyHelpAutocomplete>] string? command = null
+            )
         {
             _logger.CommandRequested(nameof(CoreHelpAsync), context.User.GlobalName);
 
@@ -48,8 +55,23 @@ internal sealed class CoreCommands
 
             bool approvedDebug = guild.IsDebugAllowed || guildId == _settings.ServerId;
 
+            List<DiscordEmbed> embeds = [];
+
+            if (string.IsNullOrWhiteSpace(command))
+            {
+                foreach (KeyValuePair<int, List<AzzyHelpRecord>> kvp in AzzyHelp.GetCommands(adminServer, approvedDebug, member))
+                {
+                    embeds.Add(EmbedBuilder.BuildAzzyHelpEmbed(kvp.Value));
+                }
+            }
+            else
+            {
+                AzzyHelpRecord helpCommand = AzzyHelp.GetSingleCommand(adminServer, approvedDebug, member, command);
+                DiscordEmbed embed = EmbedBuilder.BuildAzzyHelpEmbed(helpCommand);
+                embeds.Add(embed);
+            }
+
             await using DiscordMessageBuilder messageBuilder = new();
-            List<DiscordEmbed> embeds = AzzyHelp.GetCommands(adminServer, approvedDebug, member);
             messageBuilder.AddEmbeds(embeds);
 
             await context.EditResponseAsync(messageBuilder);
