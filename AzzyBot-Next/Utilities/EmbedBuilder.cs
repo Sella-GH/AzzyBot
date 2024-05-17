@@ -44,6 +44,37 @@ internal static class EmbedBuilder
         return builder;
     }
 
+    internal static DiscordEmbed BuildAzzyHelpEmbed(AzzyHelpRecord command)
+    {
+        string title = command.Name;
+        string description = command.Description;
+
+        Dictionary<string, DiscordEmbedRecord> fields = [];
+        foreach (KeyValuePair<string, string> kvp in command.Parameters)
+        {
+            fields.Add(kvp.Key, new(kvp.Value, false));
+        }
+
+        return CreateBasicEmbed(title, description, DiscordColor.Blurple, null, null, null, fields);
+    }
+
+    internal static DiscordEmbed BuildAzzyHelpEmbed(List<AzzyHelpRecord> commands)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(commands.Count, nameof(commands));
+
+        const string preTitle = "Command List For";
+        string title = $"{preTitle} {commands[0].SubCommand} Module";
+
+        Dictionary<string, DiscordEmbedRecord> fields = [];
+
+        foreach (AzzyHelpRecord command in commands)
+        {
+            fields.Add(command.Name, new(command.Description));
+        }
+
+        return CreateBasicEmbed(title, null, DiscordColor.Blurple, null, null, null, fields);
+    }
+
     internal static DiscordEmbed BuildGetSettingsGuildEmbed(string serverName, GuildsEntity? guild = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(serverName, nameof(serverName));

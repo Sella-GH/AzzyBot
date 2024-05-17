@@ -451,7 +451,7 @@ dotnet_diagnostic.rcs1050.severity = suggestion
 dotnet_diagnostic.rcs1051.severity = suggestion
 
 # Declare each attribute separately
-dotnet_diagnostic.rcs1052.severity = suggestion
+dotnet_diagnostic.rcs1052.severity = none
 
 # Unnecessary semicolon at the end of declaration
 dotnet_diagnostic.rcs1055.severity = suggestion
