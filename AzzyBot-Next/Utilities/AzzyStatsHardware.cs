@@ -46,7 +46,7 @@ internal static class AzzyStatsHardware
             string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             long[] values = new long[parts.Length - 1];
 
-            for (int i = 0; i < values.Length; i++)
+            for (int i = 1; i < values.Length; i++)
             {
                 if (!long.TryParse(parts[i], out values[i - 1]))
                     throw new InvalidOperationException("Could not convert string to long");
