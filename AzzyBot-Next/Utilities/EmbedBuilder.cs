@@ -78,13 +78,13 @@ internal static class EmbedBuilder
         fields.Add("CPU Usage", new(cpuUsageBuilder.ToString(), false));
 
         string cpuLoad = $"1-Min-Load: **{cpuLoads.OneMin}**\n5-Min-Load: **{cpuLoads.FiveMin}**\n15-Min-Load: **{cpuLoads.FifteenMin}**";
-        fields.Add("CPU Load", new(cpuLoad, false));
+        fields.Add("CPU Load", new(cpuLoad, true));
 
         string memoryUsage = $"Total: **{memory.Total}** GB\nUsed: **{memory.Used}** GB\nFree: **{Math.Round(memory.Total - memory.Used, 2)}** GB";
-        fields.Add("Memory Usage", new(memoryUsage, false));
+        fields.Add("Memory Usage", new(memoryUsage, true));
 
         string diskUsage = $"Total: **{disk.TotalSize}** GB\nUsed: **{disk.TotalUsedSpace}** GB\nFree: **{disk.TotalFreeSpace}** GB";
-        fields.Add("Disk Usage", new(diskUsage, false));
+        fields.Add("Disk Usage", new(diskUsage, true));
 
         StringBuilder networkUsageBuilder = new();
         foreach (KeyValuePair<string, NetworkSpeedRecord> kvp in networkUsage)
