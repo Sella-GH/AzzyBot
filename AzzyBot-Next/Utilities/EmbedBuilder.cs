@@ -66,65 +66,12 @@ internal static class EmbedBuilder
         string title = $"{preTitle} {commands[0].SubCommand} Module";
 
         Dictionary<string, DiscordEmbedRecord> fields = [];
-
         foreach (AzzyHelpRecord command in commands)
         {
             fields.Add(command.Name, new(command.Description));
         }
 
         return CreateBasicEmbed(title, null, DiscordColor.Blurple, null, null, null, fields);
-    }
-
-    internal static DiscordEmbed BuildGetSettingsGuildEmbed(string serverName, GuildsEntity? guild = null)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(serverName, nameof(serverName));
-
-        const string title = "Settings overview";
-        string description = $"Here are all settings which are currently set for {serverName}";
-
-        Dictionary<string, DiscordEmbedRecord> fields = [];
-
-        if (guild is not null)
-        {
-            fields.Add("Server ID", new(guild.UniqueId.ToString(CultureInfo.InvariantCulture)));
-            fields.Add("Error channel", new((guild.ErrorChannelId > 0) ? $"<#{guild.ErrorChannelId}>" : "Not set"));
-            fields.Add("Configuration complete", new(guild.ConfigSet.ToString()));
-        }
-
-        return CreateBasicEmbed(title, description, DiscordColor.White, null, null, null, fields);
-    }
-
-    internal static DiscordEmbed BuildGetSettingsAzuraEmbed(AzuraCastEntity? azuraCast = null)
-    {
-        const string title = "AzuraCast settings";
-
-        Dictionary<string, DiscordEmbedRecord> fields = [];
-
-        if (azuraCast is not null)
-        {
-            fields.Add("API Key", new($"||{((!string.IsNullOrWhiteSpace(azuraCast.ApiKey)) ? azuraCast.ApiKey : "Not set")}||"));
-            fields.Add("API URL", new($"||{((!string.IsNullOrWhiteSpace(azuraCast.ApiUrl)) ? azuraCast.ApiUrl : "Not set")}||"));
-            fields.Add("Station ID", new($"{((azuraCast.StationId > 0) ? azuraCast.StationId : "Not set")}"));
-            fields.Add("Music Requests Channel", new((azuraCast.MusicRequestsChannelId > 0) ? $"<#{azuraCast.MusicRequestsChannelId}>" : "Not set"));
-            fields.Add("Outages Channel", new((azuraCast.OutagesChannelId > 0) ? $"<#{azuraCast.OutagesChannelId}>" : "Not set"));
-            fields.Add("Show Playlist In Now Playing", new(azuraCast.ShowPlaylistInNowPlaying.ToString()));
-        }
-
-        return CreateBasicEmbed(title, string.Empty, DiscordColor.White, null, null, null, fields);
-    }
-
-    internal static DiscordEmbed BuildGetSettingsAzuraChecksEmbed(AzuraCastChecksEntity checks)
-    {
-        const string title = "AzuraCast Checks settings";
-
-        Dictionary<string, DiscordEmbedRecord> fields = [];
-
-        fields.Add("File Changes", new(checks.FileChanges.ToString()));
-        fields.Add("Server Status", new(checks.ServerStatus.ToString()));
-        fields.Add("Updates", new(checks.Updates.ToString()));
-        fields.Add("Updates Changelog", new(checks.UpdatesShowChangelog.ToString()));
-
-        return CreateBasicEmbed(title, string.Empty, DiscordColor.White, null, null, null, fields);
     }
 
     internal static DiscordEmbed BuildAzzyUpdatesAvailableEmbed(Version version, in DateTime updateDate, Uri url)
@@ -173,5 +120,54 @@ internal static class EmbedBuilder
         }
 
         return CreateBasicEmbed(title, description, DiscordColor.White);
+    }
+
+    internal static DiscordEmbed BuildGetSettingsGuildEmbed(string serverName, GuildsEntity guild)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(serverName, nameof(serverName));
+
+        const string title = "Settings overview";
+        string description = $"Here are all settings which are currently set for {serverName}";
+
+        Dictionary<string, DiscordEmbedRecord> fields = new()
+        {
+            ["Server ID"] = new(guild.UniqueId.ToString(CultureInfo.InvariantCulture)),
+            ["Error channel"] = new((guild.ErrorChannelId > 0) ? $"<#{guild.ErrorChannelId}>" : "Not set"),
+            ["Configuration complete"] = new(guild.ConfigSet.ToString())
+        };
+
+        return CreateBasicEmbed(title, description, DiscordColor.White, null, null, null, fields);
+    }
+
+    internal static DiscordEmbed BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast)
+    {
+        const string title = "AzuraCast settings";
+
+        Dictionary<string, DiscordEmbedRecord> fields = new()
+        {
+            ["API Key"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.ApiKey)) ? azuraCast.ApiKey : "Not set")}||"),
+            ["API URL"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.ApiUrl)) ? azuraCast.ApiUrl : "Not set")}||"),
+            ["Station ID"] = new($"{((azuraCast.StationId > 0) ? azuraCast.StationId : "Not set")}"),
+            ["Music Requests Channel"] = new((azuraCast.MusicRequestsChannelId > 0) ? $"<#{azuraCast.MusicRequestsChannelId}>" : "Not set"),
+            ["Outages Channel"] = new((azuraCast.OutagesChannelId > 0) ? $"<#{azuraCast.OutagesChannelId}>" : "Not set"),
+            ["Show Playlist In Now Playing"] = new(azuraCast.ShowPlaylistInNowPlaying.ToString())
+        };
+
+        return CreateBasicEmbed(title, string.Empty, DiscordColor.White, null, null, null, fields);
+    }
+
+    internal static DiscordEmbed BuildGetSettingsAzuraChecksEmbed(AzuraCastChecksEntity checks)
+    {
+        const string title = "AzuraCast Checks settings";
+
+        Dictionary<string, DiscordEmbedRecord> fields = new()
+        {
+            ["File Changes"] = new(checks.FileChanges.ToString()),
+            ["Server Status"] = new(checks.ServerStatus.ToString()),
+            ["Updates"] = new(checks.Updates.ToString()),
+            ["Updates Changelog"] = new(checks.UpdatesShowChangelog.ToString())
+        };
+
+        return CreateBasicEmbed(title, string.Empty, DiscordColor.White, null, null, null, fields);
     }
 }
