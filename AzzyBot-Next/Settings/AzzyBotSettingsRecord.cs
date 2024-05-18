@@ -9,10 +9,11 @@ public sealed record AzzyBotSettingsRecord
     public required string BotToken { get; init; }
     public required ulong ServerId { get; init; }
     public required ulong ErrorChannelId { get; init; }
+    public required ulong NotificationChannelId { get; init; }
     public required string EncryptionKey { get; init; } // 32 Characters
     public Database? Database { get; init; }
     public DiscordStatus? DiscordStatus { get; init; }
-    public required CoreSettings CoreSettings { get; init; }
+    public required CoreUpdater Updater { get; init; }
 }
 
 public sealed record Database
@@ -32,15 +33,9 @@ public sealed record DiscordStatus
     public Uri? StreamUrl { get; init; }
 }
 
-public sealed record CoreSettings
-{
-    public required CoreUpdater CoreUpdater { get; init; }
-}
-
 public sealed record CoreUpdater
 {
     public required int CheckInterval { get; init; }
     public required bool DisplayChangelog { get; init; }
     public required bool DisplayInstructions { get; init; }
-    public required ulong MessageChannelId { get; init; }
 }

@@ -2,6 +2,7 @@
     "BotToken": "",
     "ServerId": 0,
     "ErrorChannelId": 0,
+    "NotificationChannelId": 0,
     "EncryptionKey": "",
     "Database": {
         "Host": "localhost",
@@ -16,12 +17,9 @@
         "Status": 1,
         "StreamUrl": ""
     },
-    "CoreSettings": {
-        "CoreUpdater": {
-            "CheckInterval": 1,
-            "DisplayChangelog": true,
-            "DisplayInstructions": true,
-            "MessageChannelId": 0
-        }
+    "Updater": {
+        "CheckInterval": 1,
+        "DisplayChangelog": true,
+        "DisplayInstructions": true
     }
 }
