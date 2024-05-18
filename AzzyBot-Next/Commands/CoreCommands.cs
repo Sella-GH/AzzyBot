@@ -52,7 +52,6 @@ internal sealed class CoreCommands
             }
 
             bool approvedDebug = guild.IsDebugAllowed || guildId == _settings.ServerId;
-
             List<DiscordEmbed> embeds = [];
 
             if (string.IsNullOrWhiteSpace(command))
@@ -97,7 +96,6 @@ internal sealed class CoreCommands
 
             Uri avaUrl = new(context.Client.CurrentUser.AvatarUrl);
             string dspVersion = context.Client.VersionString.Split('+')[0];
-
             DiscordEmbed embed = EmbedBuilder.BuildAzzyInfoStatsEmbed(avaUrl, dspVersion, _stats.Commit, _stats.CompilationDate, _stats.LocCs);
 
             await context.EditResponseAsync(embed);

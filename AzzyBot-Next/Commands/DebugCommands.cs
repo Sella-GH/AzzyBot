@@ -61,7 +61,9 @@ internal sealed class DebugCommands
             _logger.CommandRequested(nameof(DebugWebServiceTestsAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
+
             await _webRequestService.GetWebAsync(url);
+
             await context.EditResponseAsync($"Web service test for *{url}* was successful!");
         }
     }
