@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using AzzyBot.Database;
@@ -77,6 +78,22 @@ internal static class ServiceRegistering
 
             Environment.Exit(1);
         }
+
+        // Check settings if something is missing
+        List<string> exclusions = [nameof(settings.DiscordStatus.StreamUrl)];
+        if (AzzyStatsHardware.CheckIfDocker)
+        {
+            exclusions.Add(nameof(settings.Database.Host));
+            exclusions.Add(nameof(settings.Database.Password));
+            exclusions.Add(nameof(settings.Database.Port));
+            exclusions.Add(nameof(settings.Database.User));
+        }
+        else
+        {
+            exclusions.Add(nameof(settings.Database.Password));
+        }
+
+        AzzyBotSettingsCheck.CheckSettings(settings, exclusions);
 
         if (settings.EncryptionKey.Length != 32)
         {
