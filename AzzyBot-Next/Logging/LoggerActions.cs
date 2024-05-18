@@ -38,11 +38,8 @@ internal static partial class LoggerActions
     [LoggerMessage(111, LogLevel.Information, "AzzyBot was removed from the following Guild: {guild}")]
     public static partial void GuildDeleted(this ILogger<DiscordBotServiceHost> logger, string guild);
 
-    [LoggerMessage(197, LogLevel.Information, "An update for Azzy is available! Please update now to version: {version} to get the latest fixes and improvements.")]
+    [LoggerMessage(198, LogLevel.Information, "An update for Azzy is available! Please update now to version: {version} to get the latest fixes and improvements.")]
     public static partial void UpdateAvailable(this ILogger<UpdaterService> logger, Version version);
-
-    [LoggerMessage(198, LogLevel.Information, "Press any key to stop the bot...")]
-    public static partial void PressAnyKeyToStop(this ILogger logger);
 
     [LoggerMessage(199, LogLevel.Information, "Stopping AzzyBot")]
     public static partial void BotStopping(this ILogger<CoreServiceHost> logger);
@@ -56,19 +53,16 @@ internal static partial class LoggerActions
     [LoggerMessage(291, LogLevel.Warning, "Body of online version could not be deserialized")]
     public static partial void OnlineVersionUnserializable(this ILogger<UpdaterService> logger);
 
-    [LoggerMessage(300, LogLevel.Error, "{setting} has to be filled out!")]
-    public static partial void SettingNotFilled(this ILogger logger, string setting);
-
-    [LoggerMessage(301, LogLevel.Error, "An error happend while logging the exception to discord: {ex}")]
+    [LoggerMessage(300, LogLevel.Error, "An error happend while logging the exception to discord: {ex}")]
     public static partial void UnableToLogException(this ILogger logger, string ex);
 
-    [LoggerMessage(302, LogLevel.Error, "An error happend while sending a message to discord: {ex}")]
+    [LoggerMessage(301, LogLevel.Error, "An error happend while sending a message to discord: {ex}")]
     public static partial void UnableToSendMessage(this ILogger logger, string ex);
 
-    [LoggerMessage(303, LogLevel.Error, "The provided uri is invalid: {uri}")]
+    [LoggerMessage(302, LogLevel.Error, "The provided uri is invalid: {uri}")]
     public static partial void WebInvalidUri(this ILogger logger, Uri uri);
 
-    [LoggerMessage(304, LogLevel.Error, "The {type} request failed with error: {ex}")]
+    [LoggerMessage(303, LogLevel.Error, "The {type} request failed with error: {ex}")]
     public static partial void WebRequestFailed(this ILogger logger, HttpMethod type, string ex);
 
     [LoggerMessage(320, LogLevel.Error, "Database transaction failed with error: ")]

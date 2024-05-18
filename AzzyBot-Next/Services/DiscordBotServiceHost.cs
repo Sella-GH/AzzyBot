@@ -135,9 +135,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
             commandsExtension.CommandErrored += CommandErroredAsync;
 
             commandsExtension.AddCommands(typeof(ConfigCommands.Config));
-
-            if (_serviceProvider.GetRequiredService<CoreServiceHost>()._isActivated)
-                commandsExtension.AddCommands(typeof(CoreCommands.Core));
+            commandsExtension.AddCommands(typeof(CoreCommands.Core));
 
             // Only add admin commands to the main server
             commandsExtension.AddCommand(typeof(AdminCommands.Admin), _settings.ServerId);

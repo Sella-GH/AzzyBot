@@ -2,15 +2,13 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
-using AzzyBot.Logging;
 using AzzyBot.Utilities;
-using Microsoft.Extensions.Logging;
 
-namespace AzzyBot.Services;
+namespace AzzyBot.Settings;
 
-internal abstract class BaseService
+internal static class AzzyBotSettingsCheck
 {
-    protected static int CheckSettings<T>(T? settings, ILogger logger, List<string>? excluded = null, bool isClass = false)
+    internal static int CheckSettings<T>(T? settings, List<string>? excluded = null, bool isClass = false)
     {
         ArgumentNullException.ThrowIfNull(settings, nameof(settings));
 
@@ -19,7 +17,7 @@ internal abstract class BaseService
 
         void LogAndIncrement(string settingName)
         {
-            logger.SettingNotFilled(settingName);
+            Console.Error.WriteLine("{0} has to be filled out!", settingName);
             missingSettings++;
         }
 
@@ -28,14 +26,11 @@ internal abstract class BaseService
             if (excluded?.Contains(property.Name) == true)
                 continue;
 
+            if (property.GetIndexParameters().Length != 0)
+                continue;
+
             object? value = property.GetValue(settings);
             Type propertyType = property.PropertyType;
-
-            if (propertyType.IsClass)
-            {
-                missingSettings = CheckSettings(value, logger, excluded, true);
-                continue;
-            }
 
             switch (property.PropertyType)
             {
@@ -56,6 +51,11 @@ internal abstract class BaseService
                         LogAndIncrement(property.Name);
 
                     break;
+
+                case Type t when t.IsClass:
+                    missingSettings = CheckSettings(value, excluded, true);
+
+                    continue;
             }
         }
 
@@ -64,7 +64,7 @@ internal abstract class BaseService
 
         if (!AzzyStatsSoftware.GetBotName.Contains("Docker", StringComparison.OrdinalIgnoreCase))
         {
-            logger.PressAnyKeyToStop();
+            Console.Error.WriteLine("Press any key to continue");
             Console.ReadKey();
         }
 
