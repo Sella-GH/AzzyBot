@@ -95,7 +95,7 @@ internal static class AzzyStatsHardware
 
             double coreUsage = CalculateCpuUsage(prevCoreTimes[idleTime], currCoreTimes[idleTime], CalculateTimes(prevCoreTimes), CalculateTimes(currCoreTimes));
 
-            coreUsages.Add(coreIndex, coreUsage);
+            coreUsages.Add(coreIndex, Math.Round(coreUsage, 2));
         }
 
         return coreUsages;
@@ -120,7 +120,7 @@ internal static class AzzyStatsHardware
             double totalFreeSpace = drive.TotalFreeSpace / (1024.0 * 1024.0 * 1024.0);
             double totalUsedSpace = totalSize - totalFreeSpace;
 
-            return new(totalSize, totalFreeSpace, totalUsedSpace);
+            return new(Math.Round(totalSize, 2), Math.Round(totalFreeSpace, 2), Math.Round(totalUsedSpace, 2));
         }
 
         return new(0, 0, 0);
@@ -203,7 +203,7 @@ internal static class AzzyStatsHardware
             double rxSpeedKbits = (currNetworkStats[networkName].Received - kvp.Value.Received) * 8.0 / bytesPerKbit / (delayInMs / 1000.0);
             double txSpeedKbits = (currNetworkStats[networkName].Transmitted - kvp.Value.Transmitted) * 8.0 / bytesPerKbit / (delayInMs / 1000.0);
 
-            networkSpeeds[networkName] = new(rxSpeedKbits, txSpeedKbits);
+            networkSpeeds[networkName] = new(Math.Round(rxSpeedKbits, 2), Math.Round(txSpeedKbits, 2));
         }
 
         return networkSpeeds;
