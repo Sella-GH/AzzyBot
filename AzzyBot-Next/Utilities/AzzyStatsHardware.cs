@@ -126,6 +126,20 @@ internal static class AzzyStatsHardware
         }
     }
 
+    internal static DiskUsageRecord GetSystemDiskUsage()
+    {
+        foreach (DriveInfo drive in DriveInfo.GetDrives().Where(d => d.IsReady && d.Name == "/"))
+        {
+            double totalSize = drive.TotalSize / (1024.0 * 1024.0 * 1024.0);
+            double totalFreeSpace = drive.TotalFreeSpace / (1024.0 * 1024.0 * 1024.0);
+            double totalUsedSpace = totalSize - totalFreeSpace;
+
+            return new(totalSize, totalFreeSpace, totalUsedSpace);
+        }
+
+        return new(0, 0, 0);
+    }
+
     internal static async Task<MemoryUsageRecord> GetSystemMemoryUsageAsync()
     {
         try
@@ -221,20 +235,6 @@ internal static class AzzyStatsHardware
         }
 
         return networkSpeeds;
-    }
-
-    internal static DiskUsageRecord GetSystemDiskUsage()
-    {
-        foreach (DriveInfo drive in DriveInfo.GetDrives().Where(d => d.IsReady && d.Name == "/"))
-        {
-            double totalSize = drive.TotalSize / (1024.0 * 1024.0 * 1024.0);
-            double totalFreeSpace = drive.TotalFreeSpace / (1024.0 * 1024.0 * 1024.0);
-            double totalUsedSpace = totalSize - totalFreeSpace;
-
-            return new(totalSize, totalFreeSpace, totalUsedSpace);
-        }
-
-        return new(0, 0, 0);
     }
 
     internal static string GetSystemOs => RuntimeInformation.OSDescription;
