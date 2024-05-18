@@ -21,9 +21,10 @@ namespace AzzyBot.Commands;
 internal sealed class CoreCommands
 {
     [Command("core"), RequireGuild]
-    internal sealed class Core(AzzyBotSettingsRecord settings, DbActions dbActions, ILogger<Core> logger)
+    internal sealed class Core(AzzyBotSettingsRecord settings, AzzyBotStatsRecord stats, DbActions dbActions, ILogger<Core> logger)
     {
         private readonly AzzyBotSettingsRecord _settings = settings;
+        private readonly AzzyBotStatsRecord _stats = stats;
         private readonly DbActions _dbActions = dbActions;
         private readonly ILogger<Core> _logger = logger;
 
@@ -107,7 +108,9 @@ internal sealed class CoreCommands
             Uri avaUrl = new(context.Client.CurrentUser.AvatarUrl);
             string dspVersion = context.Client.VersionString.Split('+')[0];
 
-            await context.EditResponseAsync(EmbedBuilder.BuildAzzyInfoStatsEmbed(avaUrl, dspVersion));
+            DiscordEmbed embed = EmbedBuilder.BuildAzzyInfoStatsEmbed(avaUrl, dspVersion, _stats.Commit, _stats.CompilationDate, _stats.LocCs);
+
+            await context.EditResponseAsync(embed);
         }
 
         [Command("ping"), Description("Ping the bot and get the latency to discord.")]

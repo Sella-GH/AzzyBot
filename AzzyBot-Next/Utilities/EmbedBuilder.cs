@@ -127,7 +127,7 @@ internal static class EmbedBuilder
         return CreateBasicEmbed(title, null, DiscordColor.Blurple, null, null, null, fields);
     }
 
-    internal static DiscordEmbed BuildAzzyInfoStatsEmbed(Uri avaUrl, string dspVersion)
+    internal static DiscordEmbed BuildAzzyInfoStatsEmbed(Uri avaUrl, string dspVersion, string commit, in DateTime compileDate, int loc)
     {
         const string title = "AzzyBot Informational Stats";
         const string githubUrl = "https://github.com/Sella-GH";
@@ -135,8 +135,7 @@ internal static class EmbedBuilder
         const string commitUrl = $"{botUrl}/commit";
         const string contribUrl = $"{botUrl}/graphs/contributors";
         string[] authors = AzzyStatsSoftware.GetBotAuthors.Split(',');
-        string commit = "Testcommit";
-        string sourceCode = $"{string.Empty} lines";
+        string sourceCode = $"{loc} lines";
         string formattedAuthors = $"- [{authors[0].Trim()}]({githubUrl})\n- [{authors[1].Trim()}]({contribUrl})";
         string formattedCommit = $"[{commit}]({commitUrl}/{commit})";
 
@@ -164,7 +163,7 @@ internal static class EmbedBuilder
             ["Memory Usage"] = new($"{AzzyStatsSoftware.GetBotMemoryUsage()} GB", true),
 
             // Row 6
-            ["Compilation Date"] = new($"<t:{Converter.ConvertToUnixTime(DateTime.Now)}>", false),
+            ["Compilation Date"] = new($"<t:{Converter.ConvertToUnixTime(compileDate)}>", false),
 
             // Row 7
             ["AzzyBot GitHub Commit"] = new(formattedCommit, false)
