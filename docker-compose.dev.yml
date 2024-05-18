@@ -3,7 +3,7 @@
 services:
   AzzyBot:
     container_name: AzzyBot
-    image: sellagh/azzybot:dev-Database
+    image: sellagh/azzybot:dev-AddHardwareEmbed
     pull_policy: always
     restart: unless-stopped
     user: ${CURRENT_UID}

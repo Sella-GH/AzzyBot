@@ -57,34 +57,27 @@ internal static class AzzyStatsHardware
 
         static async Task<Dictionary<int, long[]>> ReadCpuTimesAsync()
         {
-            try
+            string[] statLines = await File.ReadAllLinesAsync(Path.Combine("/proc", "stat"));
+            Dictionary<int, long[]> cpuTimes = new()
             {
-                string[] statLines = await File.ReadAllLinesAsync(Path.Combine("/proc", "stat"));
-                Dictionary<int, long[]> cpuTimes = new()
-                {
-                    // Index 0 is the aggregate of all cores
-                    [0] = ConvertToLongArray(statLines[0])
-                };
+                // Index 0 is the aggregate of all cores
+                [0] = ConvertToLongArray(statLines[0])
+            };
 
-                for (int i = 1; i < statLines.Length; i++)
+            for (int i = 1; i < statLines.Length; i++)
+            {
+                // Starting from index 1, each line represents a core
+                if (statLines[i].StartsWith("cpu", StringComparison.OrdinalIgnoreCase))
                 {
-                    // Starting from index 1, each line represents a core
-                    if (statLines[i].StartsWith("cpu", StringComparison.OrdinalIgnoreCase))
-                    {
-                        cpuTimes.Add(i, ConvertToLongArray(statLines[i]));
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    cpuTimes.Add(i, ConvertToLongArray(statLines[i]));
                 }
+                else
+                {
+                    break;
+                }
+            }
 
-                return cpuTimes;
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException("Could not read cpu times", ex);
-            }
+            return cpuTimes;
         }
 
         #endregion Declare local methods
@@ -110,20 +103,13 @@ internal static class AzzyStatsHardware
 
     internal static async Task<CpuLoadRecord> GetSystemCpuLoadAsync()
     {
-        try
-        {
-            string loadInfoLines = await File.ReadAllTextAsync(Path.Combine("/proc", "loadavg"));
-            string[] loadInfoParts = loadInfoLines.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            double oneMin = double.Parse(loadInfoParts[0], CultureInfo.InvariantCulture);
-            double fiveMin = double.Parse(loadInfoParts[1], CultureInfo.InvariantCulture);
-            double fifteenMin = double.Parse(loadInfoParts[2], CultureInfo.InvariantCulture);
+        string loadInfoLines = await File.ReadAllTextAsync(Path.Combine("/proc", "loadavg"));
+        string[] loadInfoParts = loadInfoLines.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        double oneMin = double.Parse(loadInfoParts[0], CultureInfo.InvariantCulture);
+        double fiveMin = double.Parse(loadInfoParts[1], CultureInfo.InvariantCulture);
+        double fifteenMin = double.Parse(loadInfoParts[2], CultureInfo.InvariantCulture);
 
-            return new(oneMin, fiveMin, fifteenMin);
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException("Could not get cpu load", ex);
-        }
+        return new(oneMin, fiveMin, fifteenMin);
     }
 
     internal static DiskUsageRecord GetSystemDiskUsage()
@@ -142,48 +128,41 @@ internal static class AzzyStatsHardware
 
     internal static async Task<MemoryUsageRecord> GetSystemMemoryUsageAsync()
     {
-        try
+        string[] memoryInfoLines = await File.ReadAllLinesAsync(Path.Combine("/proc", "meminfo"));
+        long memTotalKb = 0;
+        long memFreeKb = 0;
+
+        static long ParseValue(string line)
         {
-            string[] memoryInfoLines = await File.ReadAllLinesAsync(Path.Combine("/proc", "meminfo"));
-            long memTotalKb = 0;
-            long memFreeKb = 0;
+            ArgumentException.ThrowIfNullOrWhiteSpace(line, nameof(line));
 
-            static long ParseValue(string line)
-            {
-                ArgumentException.ThrowIfNullOrWhiteSpace(line, nameof(line));
+            string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (!long.TryParse(parts[1], out long value))
+                throw new InvalidOperationException("Could not parse value");
 
-                string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                if (!long.TryParse(parts[1], out long value))
-                    throw new InvalidOperationException("Could not parse value");
-
-                return value;
-            }
-
-            foreach (string line in memoryInfoLines)
-            {
-                if (line.StartsWith("MemTotal:", StringComparison.OrdinalIgnoreCase))
-                {
-                    memTotalKb = ParseValue(line);
-                }
-                else if (line.StartsWith("MemFree:", StringComparison.OrdinalIgnoreCase))
-                {
-                    memFreeKb = ParseValue(line);
-                }
-                else if (memTotalKb > 0 && memFreeKb > 0)
-                {
-                    break;
-                }
-            }
-
-            double memTotalGb = Math.Round(memTotalKb / (1024.0 * 1024.0), 2);
-            double memFreeGb = Math.Round(memFreeKb / (1024.0 * 1024.0), 2);
-
-            return new(memTotalGb, memFreeGb);
+            return value;
         }
-        catch (Exception ex)
+
+        foreach (string line in memoryInfoLines)
         {
-            throw new InvalidOperationException("Could not get memory usage", ex);
+            if (line.StartsWith("MemTotal:", StringComparison.OrdinalIgnoreCase))
+            {
+                memTotalKb = ParseValue(line);
+            }
+            else if (line.StartsWith("MemFree:", StringComparison.OrdinalIgnoreCase))
+            {
+                memFreeKb = ParseValue(line);
+            }
+            else if (memTotalKb > 0 && memFreeKb > 0)
+            {
+                break;
+            }
         }
+
+        double memTotalGb = Math.Round(memTotalKb / (1024.0 * 1024.0), 2);
+        double memFreeGb = Math.Round(memFreeKb / (1024.0 * 1024.0), 2);
+
+        return new(memTotalGb, memFreeGb);
     }
 
     internal static async Task<Dictionary<string, NetworkSpeedRecord>> GetSystemNetworkUsageAsync()
@@ -193,31 +172,24 @@ internal static class AzzyStatsHardware
 
         static async Task<Dictionary<string, NetworkStatsRecord>> ReadNetworkStatsAsync()
         {
-            try
-            {
-                string[] lines = await File.ReadAllLinesAsync(Path.Combine("/proc", "net", "dev"));
-                Dictionary<string, NetworkStatsRecord> networkStats = [];
+            string[] lines = await File.ReadAllLinesAsync(Path.Combine("/proc", "net", "dev"));
+            Dictionary<string, NetworkStatsRecord> networkStats = [];
 
-                for (int i = 2; i < lines.Length; i++)
+            for (int i = 2; i < lines.Length; i++)
+            {
+                string line = lines[i];
+                string[] parts = line.Split(':', StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length >= 10)
                 {
-                    string line = lines[i];
-                    string[] parts = line.Split(':', StringSplitOptions.RemoveEmptyEntries);
-                    if (parts.Length >= 10)
-                    {
-                        string networkName = parts[0];
-                        long rxBytes = long.Parse(parts[1], CultureInfo.InvariantCulture);
-                        long txBytes = long.Parse(parts[9], CultureInfo.InvariantCulture);
+                    string networkName = parts[0];
+                    long rxBytes = long.Parse(parts[1], CultureInfo.InvariantCulture);
+                    long txBytes = long.Parse(parts[9], CultureInfo.InvariantCulture);
 
-                        networkStats[networkName] = new(rxBytes, txBytes);
-                    }
+                    networkStats[networkName] = new(rxBytes, txBytes);
                 }
+            }
 
-                return networkStats;
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException("Could not read network stats", ex);
-            }
+            return networkStats;
         }
 
         Dictionary<string, NetworkStatsRecord> prevNetworkStats = await ReadNetworkStatsAsync();
