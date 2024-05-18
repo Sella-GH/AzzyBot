@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using AzzyBot.Database.Entities;
 using AzzyBot.Utilities.Records;
 using DSharpPlus.Entities;
@@ -42,6 +43,58 @@ internal static class EmbedBuilder
         }
 
         return builder;
+    }
+
+    internal static DiscordEmbed BuildAzzyHardwareStatsEmbed(Uri avaUrl, string os, string osArch, string isDocker, long sysUptime, Dictionary<int, double> cpuUsages, CpuLoadRecord cpuLoads, MemoryUsageRecord memory, DiskUsageRecord disk, Dictionary<string, NetworkSpeedRecord> networkUsage)
+    {
+        const string title = "AzzyBot Hardware Stats";
+        const string notLinux = "To display more information you need to have a linux os.";
+
+        Dictionary<string, DiscordEmbedRecord> fields = new()
+        {
+            ["Operating System"] = new(os, true),
+            ["Architecture"] = new(osArch, true),
+            ["Is Dockerized"] = new(isDocker, true),
+            ["System Uptime"] = new($"<t:{sysUptime}>", false)
+        };
+
+        if (!AzzyStatsHardware.CheckIfLinuxOs)
+            return CreateBasicEmbed(title, null, DiscordColor.Orange, null, notLinux, null, fields);
+
+        StringBuilder cpuUsage = new();
+        foreach (KeyValuePair<int, double> kvp in cpuUsages)
+        {
+            int counter = kvp.Key;
+
+            if (counter == 0)
+            {
+                cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Total usage: **{kvp.Value}**%");
+                continue;
+            }
+
+            cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Core {counter}: **{kvp.Value}**%");
+        }
+
+        fields.Add("CPU Usage", new(cpuUsage.ToString(), false));
+
+        string cpuLoad = $"1-Min-Load: **{cpuLoads.OneMin}**\n5-Min-Load: **{cpuLoads.FiveMin}**\n15-Min-Load: **{cpuLoads.FifteenMin}**";
+        fields.Add("CPU Load", new(cpuLoad, false));
+
+        string memoryUsage = $"Total: **{memory.Total}** GB\nUsed: **{memory.Used}** GB\nFree: **{memory.Total - memory.Used}** GB";
+        fields.Add("Memory Usage", new(memoryUsage, false));
+
+        string diskUsage = $"Total: **{disk.TotalSize}** GB\nUsed: **{disk.TotalUsedSpace}** GB\nFree: **{disk.TotalFreeSpace}** GB";
+        fields.Add("Disk Usage", new(diskUsage, false));
+
+        StringBuilder networkUsageBuilder = new();
+        foreach (KeyValuePair<string, NetworkSpeedRecord> kvp in networkUsage)
+        {
+            networkUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Interface: **{kvp.Key}** KB/s\nReceived: **{kvp.Value.Received}** KB/s\nTransmitted: **{kvp.Value.Transmitted}** KB/s");
+        }
+
+        fields.Add("Network Usage", new(networkUsageBuilder.ToString(), false));
+
+        return CreateBasicEmbed(title, null, DiscordColor.Orange, avaUrl, null, null, fields);
     }
 
     internal static DiscordEmbed BuildAzzyHelpEmbed(AzzyHelpRecord command)
