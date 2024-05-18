@@ -91,7 +91,7 @@ jobs:
         category: "/language:${{matrix.language}}"
 
     - name: Check CodeQL Results
-      if: ${{ github.event.name == 'pull_request' }}
+      if: ${{ github.event_name == 'pull_request' }}
       id: check_codeql
       run: |
         if [ -f /home/runner/work/AzzyBot/results/csharp.sarif ]; then
@@ -102,7 +102,7 @@ jobs:
         fi
 
     - name: Try approving PR
-      if: ${{ steps.check_codeql.outputs.results == '0' && github.event.name == 'pull_request' }}
+      if: ${{ steps.check_codeql.outputs.results == '0' && github.event_name == 'pull_request' }}
       run: |
         gh pr review ${{ github.event.pull_request.number }} --approve
       env:
