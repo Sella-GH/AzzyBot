@@ -11,9 +11,9 @@ internal static class AzzyBot
 {
     private static async Task Main(string[] args)
     {
-        string environment = AzzyStatsGeneral.GetBotEnvironment;
+        string environment = AzzyStatsSoftware.GetBotEnvironment;
         bool isDev = environment == Environments.Development;
-        bool isDocker = AzzyStatsGeneral.CheckIfDocker;
+        bool isDocker = AzzyStatsHardware.CheckIfDocker;
         bool forceDebug;
 
         if (isDocker)

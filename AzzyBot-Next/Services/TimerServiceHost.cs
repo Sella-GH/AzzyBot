@@ -16,7 +16,7 @@ internal sealed class TimerServiceHost(AzzyBotSettingsRecord settings, DiscordBo
     private readonly AzzyBotSettingsRecord _settings = settings;
     private readonly DiscordBotService _discordBotService = discordBotService;
     private readonly UpdaterService _updaterService = updaterService;
-    private readonly bool _isDev = AzzyStatsGeneral.GetBotEnvironment == Environments.Development;
+    private readonly bool _isDev = AzzyStatsSoftware.GetBotEnvironment == Environments.Development;
     private Timer? _timer;
     private DateTime _lastBotUpdateCheck = DateTime.MinValue;
 

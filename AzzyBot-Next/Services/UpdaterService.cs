@@ -24,11 +24,11 @@ internal sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotS
 
     internal async Task CheckForAzzyUpdatesAsync()
     {
-        Version localVersion = new(AzzyStatsGeneral.GetBotVersion);
+        Version localVersion = new(AzzyStatsSoftware.GetBotVersion);
 
         Dictionary<string, string> headers = new()
         {
-            ["User-Agent"] = AzzyStatsGeneral.GetBotName
+            ["User-Agent"] = AzzyStatsSoftware.GetBotName
         };
 
         string body = await _webService.GetWebAsync(_gitHubUrl, headers);

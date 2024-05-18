@@ -62,7 +62,7 @@ internal abstract class BaseService
         if (missingSettings == 0 || isClass)
             return missingSettings;
 
-        if (!AzzyStatsGeneral.GetBotName.Contains("Docker", StringComparison.OrdinalIgnoreCase))
+        if (!AzzyStatsSoftware.GetBotName.Contains("Docker", StringComparison.OrdinalIgnoreCase))
         {
             logger.PressAnyKeyToStop();
             Console.ReadKey();

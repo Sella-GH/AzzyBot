@@ -74,6 +74,29 @@ internal sealed class CoreCommands
             await context.EditResponseAsync(messageBuilder);
         }
 
+        [Command("hardware-stats")]
+        public async ValueTask CoreHardwareStatsAsync(CommandContext context)
+        {
+            _logger.CommandRequested(nameof(CoreHardwareStatsAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            Uri avaUrl = new(context.Client.CurrentUser.AvatarUrl);
+            string os = AzzyStatsHardware.GetSystemOs;
+            string osArch = AzzyStatsHardware.GetSystemOsArch;
+            string isDocker = AzzyStatsHardware.CheckIfDocker.ToString();
+            long uptime = Converter.ConvertToUnixTime(AzzyStatsHardware.GetSystemUptime());
+            Dictionary<int, double> cpuUsage = await AzzyStatsHardware.GetSystemCpusAsync();
+            CpuLoadRecord cpuLoads = await AzzyStatsHardware.GetSystemCpuLoadAsync();
+            MemoryUsageRecord memory = await AzzyStatsHardware.GetSystemMemoryUsageAsync();
+            DiskUsageRecord disk = AzzyStatsHardware.GetSystemDiskUsage();
+            Dictionary<string, NetworkSpeedRecord> networkUsage = await AzzyStatsHardware.GetSystemNetworkUsageAsync();
+
+            DiscordEmbed embed = EmbedBuilder.BuildAzzyHardwareStatsEmbed(avaUrl, os, osArch, isDocker, uptime, cpuUsage, cpuLoads, memory, disk, networkUsage);
+
+            await context.EditResponseAsync(embed);
+        }
+
         //[Command("info")]
         //public static async ValueTask CoreInfoAsync(CommandContext context)
         //{
