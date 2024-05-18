@@ -13,7 +13,6 @@ name: "CodeQL"
 
 on:
   pull_request:
-    types: [edited, opened, reopened]
   push:
     paths:
       - "**.cs"
