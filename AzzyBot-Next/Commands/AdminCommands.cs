@@ -43,7 +43,9 @@ internal sealed class AdminCommands
             _logger.CommandRequested(nameof(CoreChangeStatusAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
+
             await _botServiceHost.SetBotStatusAsync(status, activity, doing, url, reset);
+
             await context.EditResponseAsync("Bot status has been updated!");
         }
 

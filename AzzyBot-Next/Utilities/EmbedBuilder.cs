@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using System.Threading.Tasks;
 using AzzyBot.Database.Entities;
 using AzzyBot.Utilities.Records;
 using DSharpPlus.Entities;
@@ -45,17 +46,26 @@ internal static class EmbedBuilder
         return builder;
     }
 
-    internal static DiscordEmbed BuildAzzyHardwareStatsEmbed(Uri avaUrl, string os, string osArch, string isDocker, long sysUptime, Dictionary<int, double> cpuUsage, CpuLoadRecord cpuLoads, MemoryUsageRecord memory, DiskUsageRecord disk, Dictionary<string, NetworkSpeedRecord> networkUsage)
+    internal static async Task<DiscordEmbed> BuildAzzyHardwareStatsEmbedAsync(Uri avaUrl)
     {
         const string title = "AzzyBot Hardware Stats";
         const string notLinux = "To display more information you need to have a linux os.";
+        string os = AzzyStatsHardware.GetSystemOs;
+        string osArch = AzzyStatsHardware.GetSystemOsArch;
+        string isDocker = AzzyStatsHardware.CheckIfDocker.ToString();
+        long uptime = Converter.ConvertToUnixTime(AzzyStatsHardware.GetSystemUptime());
+        Dictionary<int, double> cpuUsage = await AzzyStatsHardware.GetSystemCpusAsync();
+        CpuLoadRecord cpuLoads = await AzzyStatsHardware.GetSystemCpuLoadAsync();
+        MemoryUsageRecord memory = await AzzyStatsHardware.GetSystemMemoryUsageAsync();
+        DiskUsageRecord disk = AzzyStatsHardware.GetSystemDiskUsage();
+        Dictionary<string, NetworkSpeedRecord> networkUsage = await AzzyStatsHardware.GetSystemNetworkUsageAsync();
 
         Dictionary<string, DiscordEmbedRecord> fields = new()
         {
             ["Operating System"] = new(os, true),
             ["Architecture"] = new(osArch, true),
             ["Is Dockerized"] = new(isDocker, true),
-            ["System Uptime"] = new($"<t:{sysUptime}>", false)
+            ["System Uptime"] = new($"<t:{uptime}>", false)
         };
 
         if (!AzzyStatsHardware.CheckIfLinuxOs)
@@ -125,6 +135,51 @@ internal static class EmbedBuilder
         }
 
         return CreateBasicEmbed(title, null, DiscordColor.Blurple, null, null, null, fields);
+    }
+
+    internal static DiscordEmbed BuildAzzyInfoStatsEmbed(Uri avaUrl, string dspVersion, string commit, in DateTime compileDate, int loc)
+    {
+        const string title = "AzzyBot Informational Stats";
+        const string githubUrl = "https://github.com/Sella-GH";
+        const string botUrl = $"{githubUrl}/AzzyBot";
+        const string commitUrl = $"{botUrl}/commit";
+        const string contribUrl = $"{botUrl}/graphs/contributors";
+        string[] authors = AzzyStatsSoftware.GetBotAuthors.Split(',');
+        string sourceCode = $"{loc} lines";
+        string formattedAuthors = $"- [{authors[0].Trim()}]({githubUrl})\n- [{authors[1].Trim()}]({contribUrl})";
+        string formattedCommit = $"[{commit}]({commitUrl}/{commit})";
+
+        Dictionary<string, DiscordEmbedRecord> fields = new()
+        {
+            // Row 1
+            ["Name"] = new(AzzyStatsSoftware.GetBotName, true),
+
+            // Row 2
+            ["Uptime"] = new($"<t:{Converter.ConvertToUnixTime(AzzyStatsSoftware.GetBotUptime())}>", false),
+
+            // Row 3
+            ["Bot Version"] = new(AzzyStatsSoftware.GetBotVersion, true),
+            [".NET Version"] = new(AzzyStatsSoftware.GetBotDotNetVersion, true),
+            ["D#+ Version"] = new(dspVersion, true),
+
+            // Row 4
+            ["Authors"] = new(formattedAuthors, true),
+            ["Repository"] = new($"[GitHub]({botUrl})", true),
+            ["Environment"] = new(AzzyStatsSoftware.GetBotEnvironment, true),
+
+            // Row 5
+            ["Language"] = new("C# 12.0", true),
+            ["Source Code"] = new(sourceCode, true),
+            ["Memory Usage"] = new($"{AzzyStatsSoftware.GetBotMemoryUsage()} GB", true),
+
+            // Row 6
+            ["Compilation Date"] = new($"<t:{Converter.ConvertToUnixTime(compileDate)}>", false),
+
+            // Row 7
+            ["AzzyBot GitHub Commit"] = new(formattedCommit, false)
+        };
+
+        return CreateBasicEmbed(title, null, DiscordColor.Orange, avaUrl, null, null, fields);
     }
 
     internal static DiscordEmbed BuildAzzyUpdatesAvailableEmbed(Version version, in DateTime updateDate, Uri url)

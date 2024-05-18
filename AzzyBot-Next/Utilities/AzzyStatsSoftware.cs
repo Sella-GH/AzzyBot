@@ -17,7 +17,7 @@ internal static class AzzyStatsSoftware
     {
         using Process? process = Process.GetCurrentProcess();
 
-        return process.WorkingSet64 / (1024.0 * 1024.0 * 1024.0);
+        return Math.Round(process.WorkingSet64 / (1024.0 * 1024.0 * 1024.0), 2);
     }
 
     internal static DateTime GetBotUptime()

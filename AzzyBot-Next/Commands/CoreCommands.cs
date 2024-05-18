@@ -21,9 +21,10 @@ namespace AzzyBot.Commands;
 internal sealed class CoreCommands
 {
     [Command("core"), RequireGuild]
-    internal sealed class Core(AzzyBotSettingsRecord settings, DbActions dbActions, ILogger<Core> logger)
+    internal sealed class Core(AzzyBotSettingsRecord settings, AzzyBotStatsRecord stats, DbActions dbActions, ILogger<Core> logger)
     {
         private readonly AzzyBotSettingsRecord _settings = settings;
+        private readonly AzzyBotStatsRecord _stats = stats;
         private readonly DbActions _dbActions = dbActions;
         private readonly ILogger<Core> _logger = logger;
 
@@ -51,7 +52,6 @@ internal sealed class CoreCommands
             }
 
             bool approvedDebug = guild.IsDebugAllowed || guildId == _settings.ServerId;
-
             List<DiscordEmbed> embeds = [];
 
             if (string.IsNullOrWhiteSpace(command))
@@ -74,7 +74,7 @@ internal sealed class CoreCommands
             await context.EditResponseAsync(messageBuilder);
         }
 
-        [Command("hardware-stats")]
+        [Command("hardware-stats"), Description("Shows information about the hardware side of the bot.")]
         public async ValueTask CoreHardwareStatsAsync(CommandContext context)
         {
             _logger.CommandRequested(nameof(CoreHardwareStatsAsync), context.User.GlobalName);
@@ -82,26 +82,24 @@ internal sealed class CoreCommands
             await context.DeferResponseAsync();
 
             Uri avaUrl = new(context.Client.CurrentUser.AvatarUrl);
-            string os = AzzyStatsHardware.GetSystemOs;
-            string osArch = AzzyStatsHardware.GetSystemOsArch;
-            string isDocker = AzzyStatsHardware.CheckIfDocker.ToString();
-            long uptime = Converter.ConvertToUnixTime(AzzyStatsHardware.GetSystemUptime());
-            Dictionary<int, double> cpuUsage = await AzzyStatsHardware.GetSystemCpusAsync();
-            CpuLoadRecord cpuLoads = await AzzyStatsHardware.GetSystemCpuLoadAsync();
-            MemoryUsageRecord memory = await AzzyStatsHardware.GetSystemMemoryUsageAsync();
-            DiskUsageRecord disk = AzzyStatsHardware.GetSystemDiskUsage();
-            Dictionary<string, NetworkSpeedRecord> networkUsage = await AzzyStatsHardware.GetSystemNetworkUsageAsync();
-
-            DiscordEmbed embed = EmbedBuilder.BuildAzzyHardwareStatsEmbed(avaUrl, os, osArch, isDocker, uptime, cpuUsage, cpuLoads, memory, disk, networkUsage);
+            DiscordEmbed embed = await EmbedBuilder.BuildAzzyHardwareStatsEmbedAsync(avaUrl);
 
             await context.EditResponseAsync(embed);
         }
 
-        //[Command("info")]
-        //public static async ValueTask CoreInfoAsync(CommandContext context)
-        //{
-        //    await context.DeferResponseAsync();
-        //}
+        [Command("info-stats"), Description("Shows information about the bot and it's components.")]
+        public async ValueTask CoreInfoStatsAsync(CommandContext context)
+        {
+            _logger.CommandRequested(nameof(CoreInfoStatsAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            Uri avaUrl = new(context.Client.CurrentUser.AvatarUrl);
+            string dspVersion = context.Client.VersionString.Split('+')[0];
+            DiscordEmbed embed = EmbedBuilder.BuildAzzyInfoStatsEmbed(avaUrl, dspVersion, _stats.Commit, _stats.CompilationDate, _stats.LocCs);
+
+            await context.EditResponseAsync(embed);
+        }
 
         [Command("ping"), Description("Ping the bot and get the latency to discord.")]
         public async ValueTask CorePingAsync(CommandContext context)

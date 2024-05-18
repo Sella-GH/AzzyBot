@@ -74,13 +74,6 @@ jobs:
           exclude_dir: "AzzyBot"
           include_lang: "C#,MSBuild script"
 
-      # - name: Calculate Lines of JSON Code
-      #   id: loc_json
-      #   uses: PavanMudigonda/lines-of-code-reporter@v1.6
-      #   with:
-      #     directory: "/home/runner/work/AzzyBot/AzzyBot/AzzyBot/Customization"
-      #     include_lang: "JSON"
-
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -112,7 +105,6 @@ jobs:
             COMMIT=${{ github.sha }}
             TIMESTAMP=${{ steps.dateTime.outputs.time }}
             LOC_CS=${{ steps.loc_cs.outputs.total_lines }}
-            LOC_JSON=0
           context: .
           file: ${{ steps.runtime.outputs.runtime }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -188,13 +180,6 @@ jobs:
           exclude_dir: "AzzyBot"
           include_lang: "C#,MSBuild script"
 
-      # - name: Calculate Lines of JSON Code
-      #   id: loc_json
-      #   uses: PavanMudigonda/lines-of-code-reporter@v1.6
-      #   with:
-      #     directory: "/home/runner/actions-runner/_work/AzzyBot/AzzyBot/AzzyBot/Customization"
-      #     include_lang: "JSON"
-
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -226,7 +211,6 @@ jobs:
             COMMIT=${{ github.sha }}
             TIMESTAMP=${{ steps.dateTime.outputs.time }}
             LOC_CS=${{ steps.loc_cs.outputs.total_lines }}
-            LOC_JSON=0
           context: .
           file: ${{ steps.runtime.outputs.runtime }}
           labels: ${{ steps.meta.outputs.labels }}

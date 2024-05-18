@@ -1,6 +1,5 @@
 {
     "Commit": "Commit not found",
-    "CompileDate": "Compile date not found",
-    "LoC_CS": "Lines of source code not found",
-    "LoC_JSON": "Lines of JSON code not found"
+    "CompilationDate": "Compilation date not found",
+    "LocCS": "Lines of source code not found"
 }

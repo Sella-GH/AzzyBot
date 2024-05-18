@@ -38,7 +38,6 @@ internal sealed class ConfigCommands
             await context.DeferResponseAsync();
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-
             await _db.SetAzuraCastEntityAsync(guildId, apiKey, apiUrl, stationId, requestsChannel?.Id ?? 0, outagesChannel?.Id ?? 0, showPlaylistInNowPlaying);
             await _db.SetGuildEntityAsync(guildId);
 
@@ -68,7 +67,6 @@ internal sealed class ConfigCommands
             await context.DeferResponseAsync();
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-
             await _db.SetAzuraCastChecksEntityAsync(guildId, fileChanges, serverStatus, updates, updatesChangelog);
 
             await context.EditResponseAsync("Your settings were saved successfully.");
@@ -82,7 +80,6 @@ internal sealed class ConfigCommands
             await context.DeferResponseAsync();
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-
             await _db.SetGuildEntityAsync(guildId, errorChannel?.Id ?? 0);
 
             await context.EditResponseAsync("Your settings were saved successfully.");
@@ -123,7 +120,6 @@ internal sealed class ConfigCommands
             await context.DeferResponseAsync();
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-
             await _db.RemoveGuildEntityAsync(guildId);
             await _db.AddGuildEntityAsync(guildId);
 

@@ -26,11 +26,9 @@ COPY --from=build /src/out .
 ARG COMMIT
 ARG TIMESTAMP
 ARG LOC_CS
-ARG LOC_JSON
 RUN sed -i "s\Commit not found\\$COMMIT\g" /app/Modules/Core/Files/AzzyBotStats.json
-RUN sed -i "s\Compile date not found\\$TIMESTAMP\g" /app/Modules/Core/Files/AzzyBotStats.json
+RUN sed -i "s\Compilation date not found\\$TIMESTAMP\g" /app/Modules/Core/Files/AzzyBotStats.json
 RUN sed -i "s\Lines of source code not found\\$LOC_CS\g" /app/Modules/Core/Files/AzzyBotStats.json
-RUN sed -i "s\Lines of JSON code not found\\$LOC_JSON\g" /app/Modules/Core/Files/AzzyBotStats.json
 
 # Add new user
 RUN groupadd azzy
