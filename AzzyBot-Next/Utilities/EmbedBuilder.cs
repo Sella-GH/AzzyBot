@@ -58,6 +58,11 @@ internal static class EmbedBuilder
             ["System Uptime"] = new($"<t:{sysUptime}>", false)
         };
 
+        Console.WriteLine($"OS: {os}");
+        Console.WriteLine($"Arch: {osArch}");
+        Console.WriteLine($"isDocker: {isDocker}");
+        Console.WriteLine($"Uptime: {sysUptime}");
+
         if (!AzzyStatsHardware.CheckIfLinuxOs)
             return CreateBasicEmbed(title, null, DiscordColor.Orange, null, notLinux, null, fields);
 
@@ -76,15 +81,19 @@ internal static class EmbedBuilder
         }
 
         fields.Add("CPU Usage", new(cpuUsage.ToString(), false));
+        Console.WriteLine($"CPU Usage: {cpuUsage}");
 
         string cpuLoad = $"1-Min-Load: **{cpuLoads.OneMin}**\n5-Min-Load: **{cpuLoads.FiveMin}**\n15-Min-Load: **{cpuLoads.FifteenMin}**";
         fields.Add("CPU Load", new(cpuLoad, false));
+        Console.WriteLine($"CPU Load: {cpuLoad}");
 
         string memoryUsage = $"Total: **{memory.Total}** GB\nUsed: **{memory.Used}** GB\nFree: **{memory.Total - memory.Used}** GB";
         fields.Add("Memory Usage", new(memoryUsage, false));
+        Console.WriteLine($"Memory Usage: {memoryUsage}");
 
         string diskUsage = $"Total: **{disk.TotalSize}** GB\nUsed: **{disk.TotalUsedSpace}** GB\nFree: **{disk.TotalFreeSpace}** GB";
         fields.Add("Disk Usage", new(diskUsage, false));
+        Console.WriteLine($"Disk Usage: {diskUsage}");
 
         StringBuilder networkUsageBuilder = new();
         foreach (KeyValuePair<string, NetworkSpeedRecord> kvp in networkUsage)
@@ -93,6 +102,7 @@ internal static class EmbedBuilder
         }
 
         fields.Add("Network Usage", new(networkUsageBuilder.ToString(), false));
+        Console.WriteLine($"Network Usage: {networkUsageBuilder}");
 
         return CreateBasicEmbed(title, null, DiscordColor.Orange, avaUrl, null, null, fields);
     }
