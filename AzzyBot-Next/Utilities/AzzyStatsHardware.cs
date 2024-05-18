@@ -181,7 +181,7 @@ internal static class AzzyStatsHardware
                 string line = lines[i];
                 Console.WriteLine($"line: {line}");
 
-                string[] parts = line.Split(':', StringSplitOptions.RemoveEmptyEntries);
+                string[] parts = line.Split([' ', ':'], StringSplitOptions.RemoveEmptyEntries);
                 Console.WriteLine($"parts: {parts.Length}");
 
                 if (parts.Length >= 10)
