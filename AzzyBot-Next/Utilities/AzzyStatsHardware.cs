@@ -173,24 +173,18 @@ internal static class AzzyStatsHardware
         static async Task<Dictionary<string, NetworkStatsRecord>> ReadNetworkStatsAsync()
         {
             string[] lines = await File.ReadAllLinesAsync(Path.Combine("/proc", "net", "dev"));
-            Console.WriteLine($"/proc/net/dev size: {lines.Length}");
             Dictionary<string, NetworkStatsRecord> networkStats = [];
 
             for (int i = 2; i < lines.Length; i++)
             {
                 string line = lines[i];
-                Console.WriteLine($"line: {line}");
-
                 string[] parts = line.Split([' ', ':'], StringSplitOptions.RemoveEmptyEntries);
-                Console.WriteLine($"parts: {parts.Length}");
 
                 if (parts.Length >= 10)
                 {
                     string networkName = parts[0];
                     long rxBytes = long.Parse(parts[1], CultureInfo.InvariantCulture);
                     long txBytes = long.Parse(parts[9], CultureInfo.InvariantCulture);
-
-                    Console.WriteLine($"Name: {networkName} Rx: {rxBytes} Tx: {txBytes}");
 
                     networkStats.Add(networkName, new(rxBytes, txBytes));
                 }
@@ -209,8 +203,6 @@ internal static class AzzyStatsHardware
             string networkName = kvp.Key;
             double rxSpeedKbits = (currNetworkStats[networkName].Received - kvp.Value.Received) * 8.0 / bytesPerKbit / (delayInMs / 1000.0);
             double txSpeedKbits = (currNetworkStats[networkName].Transmitted - kvp.Value.Transmitted) * 8.0 / bytesPerKbit / (delayInMs / 1000.0);
-
-            Console.WriteLine($"Name: {networkName} Rx: {rxSpeedKbits} Tx: {txSpeedKbits}");
 
             networkSpeeds.Add(networkName, new(Math.Round(rxSpeedKbits, 2), Math.Round(txSpeedKbits, 2)));
         }
