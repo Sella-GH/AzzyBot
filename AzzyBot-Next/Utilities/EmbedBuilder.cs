@@ -45,7 +45,7 @@ internal static class EmbedBuilder
         return builder;
     }
 
-    internal static DiscordEmbed BuildAzzyHardwareStatsEmbed(Uri avaUrl, string os, string osArch, string isDocker, long sysUptime, Dictionary<int, double> cpuUsages, CpuLoadRecord cpuLoads, MemoryUsageRecord memory, DiskUsageRecord disk, Dictionary<string, NetworkSpeedRecord> networkUsage)
+    internal static DiscordEmbed BuildAzzyHardwareStatsEmbed(Uri avaUrl, string os, string osArch, string isDocker, long sysUptime, Dictionary<int, double> cpuUsage, CpuLoadRecord cpuLoads, MemoryUsageRecord memory, DiskUsageRecord disk, Dictionary<string, NetworkSpeedRecord> networkUsage)
     {
         const string title = "AzzyBot Hardware Stats";
         const string notLinux = "To display more information you need to have a linux os.";
@@ -66,22 +66,22 @@ internal static class EmbedBuilder
         if (!AzzyStatsHardware.CheckIfLinuxOs)
             return CreateBasicEmbed(title, null, DiscordColor.Orange, null, notLinux, null, fields);
 
-        StringBuilder cpuUsage = new();
-        foreach (KeyValuePair<int, double> kvp in cpuUsages)
+        StringBuilder cpuUsageBuilder = new();
+        foreach (KeyValuePair<int, double> kvp in cpuUsage)
         {
             int counter = kvp.Key;
 
             if (counter == 0)
             {
-                cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Total usage: **{kvp.Value}**%");
+                cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Total usage: **{kvp.Value}**%");
                 continue;
             }
 
-            cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Core {counter}: **{kvp.Value}**%");
+            cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Core {counter}: **{kvp.Value}**%");
         }
 
-        fields.Add("CPU Usage", new(cpuUsage.ToString(), false));
-        Console.WriteLine($"CPU Usage: {cpuUsage}");
+        fields.Add("CPU Usage", new(cpuUsageBuilder.ToString(), false));
+        Console.WriteLine($"CPU Usage: {cpuUsageBuilder}");
 
         string cpuLoad = $"1-Min-Load: **{cpuLoads.OneMin}**\n5-Min-Load: **{cpuLoads.FiveMin}**\n15-Min-Load: **{cpuLoads.FifteenMin}**";
         fields.Add("CPU Load", new(cpuLoad, false));
@@ -98,7 +98,7 @@ internal static class EmbedBuilder
         StringBuilder networkUsageBuilder = new();
         foreach (KeyValuePair<string, NetworkSpeedRecord> kvp in networkUsage)
         {
-            networkUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Interface: **{kvp.Key}** KB/s\nReceived: **{kvp.Value.Received}** KB/s\nTransmitted: **{kvp.Value.Transmitted}** KB/s");
+            networkUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Interface: **{kvp.Key}**\nReceived: **{kvp.Value.Received}** KB/s\nTransmitted: **{kvp.Value.Transmitted}** KB/s\n");
         }
 
         fields.Add("Network Usage", new(networkUsageBuilder.ToString(), false));
