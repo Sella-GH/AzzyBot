@@ -130,6 +130,9 @@
     <None Update="Modules\Core\Files\AzzyBotStats.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Settings\AzzyBotSettings-Docker.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Settings\AzzyBotSettings-Dev.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

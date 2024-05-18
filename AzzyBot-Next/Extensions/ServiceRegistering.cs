@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using AzzyBot.Database;
@@ -63,9 +64,18 @@ internal static class ServiceRegistering
         services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());
     }
 
-    internal static void AzzyBotSettings(this IServiceCollection services, bool isDev = false)
+    internal static void AzzyBotSettings(this IServiceCollection services, bool isDev = false, bool isDocker = false)
     {
-        string settingsFile = (isDev) ? "AzzyBotSettings-Dev.json" : "AzzyBotSettings.json";
+        string settingsFile = "AzzyBotSettings.json";
+        if (isDev)
+        {
+            settingsFile = "AzzyBotSettings-Dev.json";
+        }
+        else if (isDocker)
+        {
+            settingsFile = "AzzyBotSettings-Docker.json";
+        }
+
         string path = Path.Combine("Settings", settingsFile);
 
         AzzyBotSettingsRecord? settings = GetConfiguration(path).Get<AzzyBotSettingsRecord>();
@@ -77,6 +87,22 @@ internal static class ServiceRegistering
 
             Environment.Exit(1);
         }
+
+        // Check settings if something is missing
+        List<string> exclusions = [nameof(settings.DiscordStatus.StreamUrl)];
+        if (isDocker)
+        {
+            exclusions.Add(nameof(settings.Database.Host));
+            exclusions.Add(nameof(settings.Database.Password));
+            exclusions.Add(nameof(settings.Database.Port));
+            exclusions.Add(nameof(settings.Database.User));
+        }
+        else
+        {
+            exclusions.Add(nameof(settings.Database.Password));
+        }
+
+        AzzyBotSettingsCheck.CheckSettings(settings, exclusions);
 
         if (settings.EncryptionKey.Length != 32)
         {
