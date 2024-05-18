@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using AzzyBot.Utilities;
 
@@ -21,17 +22,9 @@ internal static class AzzyBotSettingsCheck
             missingSettings++;
         }
 
-        foreach (PropertyInfo property in properties)
+        foreach (PropertyInfo property in properties.Where(p => excluded?.Contains(p.Name) == false))
         {
-            if (excluded?.Contains(property.Name) == true)
-                continue;
-
-            if (property.GetIndexParameters().Length != 0)
-                continue;
-
             object? value = property.GetValue(settings);
-            Type propertyType = property.PropertyType;
-
             switch (property.PropertyType)
             {
                 case Type t when t.Equals(typeof(string)):
