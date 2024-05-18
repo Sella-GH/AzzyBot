@@ -74,7 +74,7 @@ internal sealed class CoreCommands
             await context.EditResponseAsync(messageBuilder);
         }
 
-        [Command("hardware-stats")]
+        [Command("hardware-stats"), Description("Shows information about the hardware side of the bot.")]
         public async ValueTask CoreHardwareStatsAsync(CommandContext context)
         {
             _logger.CommandRequested(nameof(CoreHardwareStatsAsync), context.User.GlobalName);
@@ -97,11 +97,18 @@ internal sealed class CoreCommands
             await context.EditResponseAsync(embed);
         }
 
-        //[Command("info")]
-        //public static async ValueTask CoreInfoAsync(CommandContext context)
-        //{
-        //    await context.DeferResponseAsync();
-        //}
+        [Command("info-stats"), Description("Shows information about the bot and it's components.")]
+        public async ValueTask CoreInfoStatsAsync(CommandContext context)
+        {
+            _logger.CommandRequested(nameof(CoreInfoStatsAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            Uri avaUrl = new(context.Client.CurrentUser.AvatarUrl);
+            string dspVersion = context.Client.VersionString.Split('+')[0];
+
+            await context.EditResponseAsync(EmbedBuilder.BuildAzzyInfoStatsEmbed(avaUrl, dspVersion));
+        }
 
         [Command("ping"), Description("Ping the bot and get the latency to discord.")]
         public async ValueTask CorePingAsync(CommandContext context)

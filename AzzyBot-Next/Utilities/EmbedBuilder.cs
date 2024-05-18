@@ -127,6 +127,52 @@ internal static class EmbedBuilder
         return CreateBasicEmbed(title, null, DiscordColor.Blurple, null, null, null, fields);
     }
 
+    internal static DiscordEmbed BuildAzzyInfoStatsEmbed(Uri avaUrl, string dspVersion)
+    {
+        const string title = "AzzyBot Informational Stats";
+        const string githubUrl = "https://github.com/Sella-GH";
+        const string botUrl = $"{githubUrl}/AzzyBot";
+        const string commitUrl = $"{botUrl}/commit";
+        const string contribUrl = $"{botUrl}/graphs/contributors";
+        string[] authors = AzzyStatsSoftware.GetBotAuthors.Split(',');
+        string commit = "Testcommit";
+        string sourceCode = $"{string.Empty} lines";
+        string formattedAuthors = $"- [{authors[0].Trim()}]({githubUrl})\n- [{authors[1].Trim()}]({contribUrl})";
+        string formattedCommit = $"[{commit}]({commitUrl}/{commit})";
+
+        Dictionary<string, DiscordEmbedRecord> fields = new()
+        {
+            // Row 1
+            ["Name"] = new(AzzyStatsSoftware.GetBotName, true),
+
+            // Row 2
+            ["Uptime"] = new($"<t:{Converter.ConvertToUnixTime(AzzyStatsSoftware.GetBotUptime())}>", false),
+
+            // Row 3
+            ["Bot Version"] = new(AzzyStatsSoftware.GetBotVersion, true),
+            [".NET Version"] = new(AzzyStatsSoftware.GetBotDotNetVersion, true),
+            ["D#+ Version"] = new(dspVersion, true),
+
+            // Row 4
+            ["Authors"] = new(formattedAuthors, true),
+            ["Repository"] = new($"[GitHub]({botUrl})", true),
+            ["Environment"] = new(AzzyStatsSoftware.GetBotEnvironment, true),
+
+            // Row 5
+            ["Language"] = new("C# 12.0", true),
+            ["Source Code"] = new(sourceCode, true),
+            ["Memory Usage"] = new($"{AzzyStatsSoftware.GetBotMemoryUsage()} GB", true),
+
+            // Row 6
+            ["Compilation Date"] = new($"<t:{Converter.ConvertToUnixTime(DateTime.Now)}>", false),
+
+            // Row 7
+            ["AzzyBot GitHub Commit"] = new(formattedCommit, false)
+        };
+
+        return CreateBasicEmbed(title, null, DiscordColor.Orange, avaUrl, null, null, fields);
+    }
+
     internal static DiscordEmbed BuildAzzyUpdatesAvailableEmbed(Version version, in DateTime updateDate, Uri url)
     {
         const string title = "Azzy Updates Available";
