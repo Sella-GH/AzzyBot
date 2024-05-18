@@ -25,10 +25,10 @@ internal sealed class CoreServiceHost : BaseService, IHostedService
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        string name = AzzyStatsGeneral.GetBotName;
-        string version = AzzyStatsGeneral.GetBotVersion;
-        string os = AzzyStatsGeneral.GetOperatingSystem;
-        string arch = AzzyStatsGeneral.GetOsArchitecture;
+        string name = AzzyStatsSoftware.GetBotName;
+        string version = AzzyStatsSoftware.GetBotVersion;
+        string os = AzzyStatsHardware.GetSystemOs;
+        string arch = AzzyStatsHardware.GetSystemOsArch;
 
         _logger.BotStarting(name, version, os, arch);
 

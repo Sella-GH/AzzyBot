@@ -296,10 +296,10 @@ internal sealed class DiscordBotService
         ArgumentNullException.ThrowIfNull(ex, nameof(ex));
         ArgumentNullException.ThrowIfNull(timestamp, nameof(timestamp));
 
-        string os = AzzyStatsGeneral.GetOperatingSystem;
-        string arch = AzzyStatsGeneral.GetOsArchitecture;
-        string botName = AzzyStatsGeneral.GetBotName;
-        string botVersion = AzzyStatsGeneral.GetBotVersion;
+        string os = AzzyStatsHardware.GetSystemOs;
+        string arch = AzzyStatsHardware.GetSystemOsArch;
+        string botName = AzzyStatsSoftware.GetBotName;
+        string botVersion = AzzyStatsSoftware.GetBotVersion;
 
         DiscordEmbedBuilder builder = new()
         {

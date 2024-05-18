@@ -90,8 +90,8 @@ internal sealed class WebRequestService(ILogger<WebRequestService> logger) : IDi
     {
         ArgumentNullException.ThrowIfNull(headers, nameof(headers));
 
-        string botName = AzzyStatsGeneral.GetBotName;
-        string botVersion = AzzyStatsGeneral.GetBotVersion;
+        string botName = AzzyStatsSoftware.GetBotName;
+        string botVersion = AzzyStatsSoftware.GetBotVersion;
         HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
         client.DefaultRequestHeaders.Clear();
         client.DefaultRequestHeaders.UserAgent.Add(new(botName, botVersion));

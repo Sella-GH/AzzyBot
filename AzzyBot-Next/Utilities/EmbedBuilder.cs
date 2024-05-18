@@ -131,7 +131,7 @@ internal static class EmbedBuilder
     {
         const string title = "Azzy Updates Available";
         const string description = "Update now to get the latest bug fixes, features and improvements!";
-        string yourVersion = AzzyStatsGeneral.GetBotVersion;
+        string yourVersion = AzzyStatsSoftware.GetBotVersion;
 
         Dictionary<string, DiscordEmbedRecord> fields = new()
         {
@@ -158,8 +158,8 @@ internal static class EmbedBuilder
 
     internal static DiscordEmbed BuildAzzyUpdatesInstructionsEmbed()
     {
-        bool isLinux = AzzyStatsGeneral.CheckIfLinuxOs;
-        bool isWindows = AzzyStatsGeneral.CheckIfWindowsOs;
+        bool isLinux = AzzyStatsHardware.CheckIfLinuxOs;
+        bool isWindows = AzzyStatsHardware.CheckIfWindowsOs;
         const string title = "Update instructions";
         string description = "Please follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wiki/Docker-Update-Instructions).";
 
