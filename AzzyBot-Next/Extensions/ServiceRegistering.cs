@@ -64,9 +64,18 @@ internal static class ServiceRegistering
         services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());
     }
 
-    internal static void AzzyBotSettings(this IServiceCollection services, bool isDev = false)
+    internal static void AzzyBotSettings(this IServiceCollection services, bool isDev = false, bool isDocker = false)
     {
-        string settingsFile = (isDev) ? "AzzyBotSettings-Dev.json" : "AzzyBotSettings.json";
+        string settingsFile = "AzzyBotSettings.json";
+        if (isDev)
+        {
+            settingsFile = "AzzyBotSettings-Dev.json";
+        }
+        else if (isDocker)
+        {
+            settingsFile = "AzzyBotSettings-Docker.json";
+        }
+
         string path = Path.Combine("Settings", settingsFile);
 
         AzzyBotSettingsRecord? settings = GetConfiguration(path).Get<AzzyBotSettingsRecord>();
@@ -81,7 +90,7 @@ internal static class ServiceRegistering
 
         // Check settings if something is missing
         List<string> exclusions = [nameof(settings.DiscordStatus.StreamUrl)];
-        if (AzzyStatsHardware.CheckIfDocker)
+        if (isDocker)
         {
             exclusions.Add(nameof(settings.Database.Host));
             exclusions.Add(nameof(settings.Database.Password));

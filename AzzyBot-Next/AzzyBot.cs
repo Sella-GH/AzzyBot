@@ -41,7 +41,7 @@ internal static class AzzyBot
 
         #region Add services
 
-        appBuilder.Services.AzzyBotSettings(isDev);
+        appBuilder.Services.AzzyBotSettings(isDev, isDocker);
         appBuilder.Services.AzzyBotStats();
         appBuilder.Services.AzzyBotServices();
 
