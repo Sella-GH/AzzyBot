@@ -53,7 +53,7 @@ internal sealed class TimerServiceHost(AzzyBotSettingsRecord settings, DiscordBo
             {
                 DateTime now = DateTime.Now;
 
-                if (now - _lastBotUpdateCheck >= TimeSpan.FromDays(_settings.CoreSettings.CoreUpdater.CheckInterval))
+                if (now - _lastBotUpdateCheck >= TimeSpan.FromDays(_settings.Updater.CheckInterval))
                 {
                     _logger.GlobalTimerCheckForUpdates();
                     _lastBotUpdateCheck = now;

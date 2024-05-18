@@ -75,17 +75,17 @@ internal sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotS
 
         List<DiscordEmbed> embeds = [EmbedBuilder.BuildAzzyUpdatesAvailableEmbed(updateVersion, releaseDate, _gitHubUrl)];
 
-        if (_settings.CoreSettings.CoreUpdater.DisplayChangelog)
+        if (_settings.Updater.DisplayChangelog)
             embeds.Add(EmbedBuilder.BuildAzzyUpdatesChangelogEmbed(changelog, _gitHubUrl));
 
-        if (_settings.CoreSettings.CoreUpdater.DisplayInstructions)
+        if (_settings.Updater.DisplayInstructions)
             embeds.Add(EmbedBuilder.BuildAzzyUpdatesInstructionsEmbed());
 
         DiscordGuild? discordGuild = await _botService.GetDiscordGuildAsync();
         if (discordGuild is null)
             return;
 
-        ulong channelId = _settings.CoreSettings.CoreUpdater.MessageChannelId;
+        ulong channelId = _settings.NotificationChannelId;
         if (channelId is 0)
         {
             DiscordChannel? discordChannel = await discordGuild.GetSystemChannelAsync();
