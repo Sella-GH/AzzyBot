@@ -160,9 +160,9 @@ internal static class AzzyStatsHardware
         }
 
         double memTotalGb = Math.Round(memTotalKb / (1024.0 * 1024.0), 2);
-        double memFreeGb = Math.Round(memFreeKb / (1024.0 * 1024.0), 2);
+        double memUsedGb = Math.Round((memTotalKb - memFreeKb) / (1024.0 * 1024.0), 2);
 
-        return new(memTotalGb, memFreeGb);
+        return new(memTotalGb, memUsedGb);
     }
 
     internal static async Task<Dictionary<string, NetworkSpeedRecord>> GetSystemNetworkUsageAsync()
