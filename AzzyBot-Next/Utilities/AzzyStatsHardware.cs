@@ -177,8 +177,7 @@ internal static class AzzyStatsHardware
 
             for (int i = 2; i < lines.Length; i++)
             {
-                string line = lines[i];
-                string[] parts = line.Split([' ', ':'], StringSplitOptions.RemoveEmptyEntries);
+                string[] parts = lines[i].Split([' ', ':'], StringSplitOptions.RemoveEmptyEntries);
 
                 if (parts.Length >= 10)
                 {
