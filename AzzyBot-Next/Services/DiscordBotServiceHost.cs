@@ -7,7 +7,6 @@ using AzzyBot.Commands;
 using AzzyBot.Commands.Converters;
 using AzzyBot.Database;
 using AzzyBot.Logging;
-using AzzyBot.Services.Modules;
 using AzzyBot.Settings;
 using AzzyBot.Utilities;
 using DSharpPlus;
@@ -134,11 +133,14 @@ internal sealed class DiscordBotServiceHost : IHostedService
         {
             commandsExtension.CommandErrored += CommandErroredAsync;
 
+            // These commands are for every server
             commandsExtension.AddCommands(typeof(ConfigCommands.Config));
             commandsExtension.AddCommands(typeof(CoreCommands.Core));
+            commandsExtension.AddCommands(typeof(CoreCommands.Core.CoreStats));
 
             // Only add admin commands to the main server
             commandsExtension.AddCommand(typeof(AdminCommands.Admin), _settings.ServerId);
+            commandsExtension.AddCommand(typeof(AdminCommands.Admin.AdminDebugServers), _settings.ServerId);
 
             // Only add debug commands if it's a dev build
             if (AzzyStatsSoftware.GetBotName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase))
