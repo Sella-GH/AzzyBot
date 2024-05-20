@@ -65,7 +65,7 @@ public static partial class LoggerActions
     [LoggerMessage(303, LogLevel.Error, "The {type} request failed with error: {ex}")]
     public static partial void WebRequestFailed(this ILogger logger, HttpMethod type, string ex);
 
-    [LoggerMessage(320, LogLevel.Error, "DatabaseSettings transaction failed with error: ")]
+    [LoggerMessage(320, LogLevel.Error, "Database transaction failed with error: ")]
     public static partial void DatabaseTransactionFailed(this ILogger logger, Exception ex);
 
     [LoggerMessage(400, LogLevel.Critical, "The given settings can't be parsed, are they filled out?")]
