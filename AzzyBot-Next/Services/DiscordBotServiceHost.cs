@@ -32,12 +32,10 @@ public sealed class DiscordBotServiceHost : IHostedService
     private readonly IServiceProvider _serviceProvider;
     private readonly AzzyBotSettingsRecord _settings;
     private readonly DbActions _dbActions;
-    private readonly DiscordShardedClient _shardedClient;
     private DiscordBotService? _botService;
 
-    public DiscordShardedClient shardedClient { get; }
+    public DiscordShardedClient ShardedClient { get; init; }
 
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public DiscordBotServiceHost(AzzyBotSettingsRecord settings, DbActions dbActions, ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
     {
         _logger = logger;
@@ -46,9 +44,8 @@ public sealed class DiscordBotServiceHost : IHostedService
         _dbActions = dbActions;
         _settings = settings;
 
-        _shardedClient = new(GetDiscordConfig());
+        ShardedClient = new(GetDiscordConfig());
     }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -59,10 +56,10 @@ public sealed class DiscordBotServiceHost : IHostedService
         RegisterEventHandlers();
         await RegisterCommandsAsync();
         await RegisterInteractivityAsync();
-        await _shardedClient.StartAsync();
+        await ShardedClient.StartAsync();
 
         _logger.BotReady();
-        _logger.InviteUrl(_shardedClient.CurrentApplication.Id);
+        _logger.InviteUrl(ShardedClient.CurrentApplication.Id);
 
         // Wait 3 Seconds to let the client boot up
         await Task.Delay(3000, cancellationToken);
@@ -78,7 +75,7 @@ public sealed class DiscordBotServiceHost : IHostedService
     public async Task StopAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        await _shardedClient.StopAsync();
+        await ShardedClient.StopAsync();
         UnregisterEventHandlers();
     }
 
@@ -86,7 +83,7 @@ public sealed class DiscordBotServiceHost : IHostedService
     {
         if (reset)
         {
-            await _shardedClient.UpdateStatusAsync(new DiscordActivity("Music", DiscordActivityType.ListeningTo), DiscordUserStatus.Online);
+            await ShardedClient.UpdateStatusAsync(new DiscordActivity("Music", DiscordActivityType.ListeningTo), DiscordUserStatus.Online);
             return;
         }
 
@@ -100,7 +97,7 @@ public sealed class DiscordBotServiceHost : IHostedService
 
         DiscordUserStatus userStatus = (DiscordUserStatus)Enum.ToObject(typeof(DiscordUserStatus), status);
 
-        await _shardedClient.UpdateStatusAsync(activity, userStatus);
+        await ShardedClient.UpdateStatusAsync(activity, userStatus);
     }
 
     private DiscordConfiguration GetDiscordConfig()
@@ -126,7 +123,7 @@ public sealed class DiscordBotServiceHost : IHostedService
     {
         ArgumentNullException.ThrowIfNull(_settings, nameof(_settings));
 
-        IReadOnlyDictionary<int, CommandsExtension> commandsExtensions = await _shardedClient.UseCommandsAsync(new()
+        IReadOnlyDictionary<int, CommandsExtension> commandsExtensions = await ShardedClient.UseCommandsAsync(new()
         {
             RegisterDefaultCommandProcessors = false,
             ServiceProvider = _serviceProvider,
@@ -159,7 +156,7 @@ public sealed class DiscordBotServiceHost : IHostedService
 
     private async Task RegisterInteractivityAsync()
     {
-        ArgumentNullException.ThrowIfNull(_shardedClient, nameof(_shardedClient));
+        ArgumentNullException.ThrowIfNull(ShardedClient, nameof(ShardedClient));
 
         InteractivityConfiguration config = new()
         {
@@ -168,23 +165,23 @@ public sealed class DiscordBotServiceHost : IHostedService
             Timeout = TimeSpan.FromMinutes(15)
         };
 
-        await _shardedClient.UseInteractivityAsync(config);
+        await ShardedClient.UseInteractivityAsync(config);
     }
 
     private void RegisterEventHandlers()
     {
-        _shardedClient.ClientErrored += ShardedClientErroredAsync;
-        _shardedClient.GuildCreated += ShardedClientGuildCreatedAsync;
-        _shardedClient.GuildDeleted += ShardedClientGuildDeletedAsync;
-        _shardedClient.GuildDownloadCompleted += ShardedClientGuildDownloadCompletedAsync;
+        ShardedClient.ClientErrored += ShardedClientErroredAsync;
+        ShardedClient.GuildCreated += ShardedClientGuildCreatedAsync;
+        ShardedClient.GuildDeleted += ShardedClientGuildDeletedAsync;
+        ShardedClient.GuildDownloadCompleted += ShardedClientGuildDownloadCompletedAsync;
     }
 
     private void UnregisterEventHandlers()
     {
-        _shardedClient.ClientErrored -= ShardedClientErroredAsync;
-        _shardedClient.GuildCreated -= ShardedClientGuildCreatedAsync;
-        _shardedClient.GuildDeleted -= ShardedClientGuildDeletedAsync;
-        _shardedClient.GuildDownloadCompleted -= ShardedClientGuildDownloadCompletedAsync;
+        ShardedClient.ClientErrored -= ShardedClientErroredAsync;
+        ShardedClient.GuildCreated -= ShardedClientGuildCreatedAsync;
+        ShardedClient.GuildDeleted -= ShardedClientGuildDeletedAsync;
+        ShardedClient.GuildDownloadCompleted -= ShardedClientGuildDownloadCompletedAsync;
     }
 
     private async Task CommandErroredAsync(CommandsExtension c, CommandErroredEventArgs e)

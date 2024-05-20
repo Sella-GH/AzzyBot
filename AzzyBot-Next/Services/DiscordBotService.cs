@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -28,6 +29,7 @@ public sealed class DiscordBotService
     private readonly DiscordShardedClient _shardedClient;
     private const string BugReportUrl = "https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D";
     private const string BugReportMessage = $"Send a [bug report]({BugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
+    private const string ErrorChannelNotConfigured = $"**If you're seeing this message then I am not configured correctly!**\nTell your server admin to run */config config-core*\n\n{BugReportMessage}";
 
     public DiscordBotService(AzzyBotSettingsRecord settings, IDbContextFactory<AzzyDbContext> dbContextFactory, ILogger<DiscordBotService> logger, DiscordBotServiceHost botServiceHost)
     {
@@ -36,7 +38,7 @@ public sealed class DiscordBotService
         _settings = settings;
         _dbContextFactory = dbContextFactory;
         _logger = logger;
-        _shardedClient = botServiceHost.shardedClient;
+        _shardedClient = botServiceHost.ShardedClient;
     }
 
     public async Task<DiscordGuild?> GetDiscordGuildAsync(ulong guildId = 0)
@@ -71,6 +73,17 @@ public sealed class DiscordBotService
         return guilds;
     }
 
+    public async Task<DiscordMember?> GetDiscordMemberAsync(ulong guildId, ulong userId)
+    {
+        DiscordGuild? guild = await GetDiscordGuildAsync(guildId);
+        DiscordMember? member = null;
+
+        if (guild is not null)
+            member = await guild.GetMemberAsync(userId);
+
+        return member;
+    }
+
     public async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, ulong guildId = 0, string? info = null)
     {
         ArgumentNullException.ThrowIfNull(ex, nameof(ex));
@@ -82,18 +95,32 @@ public sealed class DiscordBotService
         string exInfo = (string.IsNullOrWhiteSpace(stackTrace)) ? exMessage : $"{exMessage}\n{stackTrace}";
         string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
         ulong errorChannelId = _settings.ErrorChannelId;
+        bool errorChannelConfigured = true;
 
-        // This is a questionable approach as it sends messages
-        // to the main debug server even if it the error occurs
-        // in a different server
-        // TODO Find a better way to handle this
-        if (guildId is not 0 && guildId != _settings.ServerId)
+        // Looks if the guild has an error channel set
+        // Otherwise it will use the first channel it can see
+        // However if nothing is present, send to debug server
+        if (guildId is not 0)
         {
             await using AzzyDbContext dbContext = await _dbContextFactory.CreateDbContextAsync();
             GuildsEntity? guild = await dbContext.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
 
             if (guild is not null && guild.ErrorChannelId is not 0)
                 errorChannelId = guild.ErrorChannelId;
+
+            if (errorChannelId is not 0 && errorChannelId != _settings.ErrorChannelId)
+            {
+                DiscordGuild? dGuild = await GetDiscordGuildAsync(guildId);
+                DiscordMember? dMember = await GetDiscordMemberAsync(guildId, _shardedClient.CurrentUser.Id);
+                if (dMember is null)
+                    return false;
+
+                errorChannelId = dGuild?.Channels.First(c => c.Value.PermissionsFor(dMember).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages)).Value.Id ?? _settings.ErrorChannelId;
+                if (errorChannelId is 0)
+                    return false;
+
+                errorChannelConfigured = false;
+            }
         }
 
         try
@@ -101,7 +128,7 @@ public sealed class DiscordBotService
             string tempFilePath = await FileOperations.CreateTempFileAsync(exInfo, $"StackTrace_{timestampString}.log");
 
             DiscordEmbed embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), info);
-            bool messageSent = await SendMessageAsync(errorChannelId, BugReportMessage, [embed], [tempFilePath]);
+            bool messageSent = await SendMessageAsync(errorChannelId, (errorChannelConfigured) ? BugReportMessage : ErrorChannelNotConfigured, [embed], [tempFilePath]);
 
             if (!messageSent)
                 _logger.UnableToSendMessage("Error message was not sent");
@@ -136,21 +163,39 @@ public sealed class DiscordBotService
         string exInfo = (string.IsNullOrWhiteSpace(stackTrace)) ? exMessage : $"{exMessage}\n{stackTrace}";
         string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
         string commandName = ctx.Command.FullName;
-        ulong errorChannelId = _settings.ErrorChannelId;
+        ulong errorChannelId = ctx.Channel.Id;
+        bool errorChannelConfigured = true;
         Dictionary<string, string> commandOptions = [];
         ProcessOptions(ctx.Arguments, commandOptions);
 
-        // This is a questionable approach as it sends messages
-        // to the main debug server even if it the error occurs
-        // in a different server
-        // TODO Find a better way to handle this
-        if (guildId is not 0 && guildId != _settings.ServerId)
+        // Looks if the guild has an error channel set
+        // Otherwise it will use the first channel it can see
+        // However if nothing is present, send to debug server
+        if (guildId is not 0)
         {
             await using AzzyDbContext dbContext = await _dbContextFactory.CreateDbContextAsync();
             GuildsEntity? guild = await dbContext.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
 
             if (guild is not null && guild.ErrorChannelId is not 0)
                 errorChannelId = guild.ErrorChannelId;
+
+            if (errorChannelId is not 0 && errorChannelId != _settings.ErrorChannelId)
+            {
+                DiscordGuild? dGuild = await GetDiscordGuildAsync(guildId);
+                DiscordMember? dMember = await GetDiscordMemberAsync(guildId, _shardedClient.CurrentUser.Id);
+                if (dMember is null)
+                    return false;
+
+                errorChannelId = dGuild?.Channels.First(c => c.Value.PermissionsFor(dMember).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages)).Value.Id ?? _settings.ErrorChannelId;
+                if (errorChannelId is 0)
+                    return false;
+
+                errorChannelConfigured = false;
+            }
+        }
+        else if (errorChannelId == ctx.Channel.Id)
+        {
+            errorChannelConfigured = false;
         }
 
         try
@@ -158,7 +203,7 @@ public sealed class DiscordBotService
             string tempFilePath = await FileOperations.CreateTempFileAsync(exInfo, $"StackTrace_{timestampString}.log");
 
             DiscordEmbed embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), info, discordMessage, discordUser, commandName, commandOptions);
-            bool messageSent = await SendMessageAsync(errorChannelId, BugReportMessage, [embed], [tempFilePath]);
+            bool messageSent = await SendMessageAsync(errorChannelId, (errorChannelConfigured) ? BugReportMessage : ErrorChannelNotConfigured, [embed], [tempFilePath]);
 
             if (!messageSent)
                 _logger.UnableToSendMessage("Error message was not sent");
