@@ -118,7 +118,7 @@ public static class ServiceRegistering
 
     public static void AzzyBotStats(this IServiceCollection services)
     {
-        string path = Path.Combine("Modules", "CoreGroup", "Files", "AzzyBotStats.json");
+        string path = Path.Combine("Modules", "Core", "Files", "AzzyBotStats.json");
 
         AzzyBotStatsRecord? stats = GetConfiguration(path).Get<AzzyBotStatsRecord>();
         if (stats is null)
