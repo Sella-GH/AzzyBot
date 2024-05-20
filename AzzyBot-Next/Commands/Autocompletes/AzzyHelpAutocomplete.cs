@@ -13,13 +13,15 @@ using DSharpPlus.Entities;
 
 namespace AzzyBot.Commands.Autocompletes;
 
-internal sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings, DbActions dbActions) : IAutoCompleteProvider
+public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings, DbActions dbActions) : IAutoCompleteProvider
 {
     private readonly AzzyBotSettingsRecord _settings = settings;
     private readonly DbActions _dbActions = dbActions;
 
     public async ValueTask<IReadOnlyDictionary<string, object>> AutoCompleteAsync(AutoCompleteContext context)
     {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+
         Dictionary<string, object> results = [];
 
         IEnumerable<DiscordUser> botOwners = context.Client.CurrentApplication.Owners ?? throw new InvalidOperationException("Invalid bot owners");

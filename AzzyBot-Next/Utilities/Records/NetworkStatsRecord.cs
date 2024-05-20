@@ -1,6 +1,6 @@
 ﻿namespace AzzyBot.Utilities.Records;
 
-internal sealed record NetworkStatsRecord
+public sealed record NetworkStatsRecord
 {
     public long Received { get; init; }
     public long Transmitted { get; init; }

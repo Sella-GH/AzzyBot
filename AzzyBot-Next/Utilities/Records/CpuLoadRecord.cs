@@ -1,6 +1,6 @@
 ﻿namespace AzzyBot.Utilities.Records;
 
-internal sealed record CpuLoadRecord
+public sealed record CpuLoadRecord
 {
     public double OneMin { get; init; }
     public double FiveMin { get; init; }

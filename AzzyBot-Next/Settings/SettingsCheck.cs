@@ -7,9 +7,9 @@ using AzzyBot.Utilities;
 
 namespace AzzyBot.Settings;
 
-internal static class AzzyBotSettingsCheck
+public static class SettingsCheck
 {
-    internal static int CheckSettings<T>(T? settings, List<string>? excluded = null, bool isClass = false)
+    public static int CheckSettings<T>(T? settings, IReadOnlyList<string>? excluded = null, bool isClass = false)
     {
         ArgumentNullException.ThrowIfNull(settings, nameof(settings));
 

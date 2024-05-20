@@ -9,13 +9,13 @@ using AzzyBot.Utilities.Records;
 
 namespace AzzyBot.Utilities;
 
-internal static class AzzyStatsHardware
+public static class AzzyStatsHardware
 {
-    internal static bool CheckIfDocker => Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER", EnvironmentVariableTarget.Process) == "true";
-    internal static bool CheckIfLinuxOs => RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-    internal static bool CheckIfWindowsOs => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+    public static bool CheckIfDocker => Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER", EnvironmentVariableTarget.Process) == "true";
+    public static bool CheckIfLinuxOs => RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+    public static bool CheckIfWindowsOs => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
-    internal static async Task<Dictionary<int, double>> GetSystemCpusAsync()
+    public static async Task<Dictionary<int, double>> GetSystemCpusAsync()
     {
         // Declare some variable stuff
         const int idleTime = 3;
@@ -101,7 +101,7 @@ internal static class AzzyStatsHardware
         return coreUsages;
     }
 
-    internal static async Task<CpuLoadRecord> GetSystemCpuLoadAsync()
+    public static async Task<CpuLoadRecord> GetSystemCpuLoadAsync()
     {
         string loadInfoLines = await File.ReadAllTextAsync(Path.Combine("/proc", "loadavg"));
         string[] loadInfoParts = loadInfoLines.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -112,7 +112,7 @@ internal static class AzzyStatsHardware
         return new(oneMin, fiveMin, fifteenMin);
     }
 
-    internal static DiskUsageRecord GetSystemDiskUsage()
+    public static DiskUsageRecord GetSystemDiskUsage()
     {
         foreach (DriveInfo drive in DriveInfo.GetDrives().Where(d => d.IsReady && d.Name == "/"))
         {
@@ -126,7 +126,7 @@ internal static class AzzyStatsHardware
         return new(0, 0, 0);
     }
 
-    internal static async Task<MemoryUsageRecord> GetSystemMemoryUsageAsync()
+    public static async Task<MemoryUsageRecord> GetSystemMemoryUsageAsync()
     {
         string[] memoryInfoLines = await File.ReadAllLinesAsync(Path.Combine("/proc", "meminfo"));
         long memTotalKb = 0;
@@ -165,7 +165,7 @@ internal static class AzzyStatsHardware
         return new(memTotalGb, memUsedGb);
     }
 
-    internal static async Task<Dictionary<string, NetworkSpeedRecord>> GetSystemNetworkUsageAsync()
+    public static async Task<Dictionary<string, NetworkSpeedRecord>> GetSystemNetworkUsageAsync()
     {
         const int delayInMs = 1000;
         const int bytesPerKbit = 125;
@@ -209,13 +209,7 @@ internal static class AzzyStatsHardware
         return networkSpeeds;
     }
 
-    internal static string GetSystemOs => RuntimeInformation.OSDescription;
-    internal static string GetSystemOsArch => RuntimeInformation.OSArchitecture.ToString();
-
-    internal static DateTime GetSystemUptime()
-    {
-        TimeSpan uptime = new(Environment.TickCount64);
-
-        return DateTime.Now - uptime;
-    }
+    public static string GetSystemOs => RuntimeInformation.OSDescription;
+    public static string GetSystemOsArch => RuntimeInformation.OSArchitecture.ToString();
+    public static DateTime GetSystemUptime => DateTime.Now - new TimeSpan(Environment.TickCount64);
 }

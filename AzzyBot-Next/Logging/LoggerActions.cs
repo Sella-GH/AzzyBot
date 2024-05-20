@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Logging;
 
-internal static partial class LoggerActions
+public static partial class LoggerActions
 {
     [LoggerMessage(0, LogLevel.Debug, "Starting global timer")]
     public static partial void GlobalTimerStart(this ILogger<TimerServiceHost> logger);

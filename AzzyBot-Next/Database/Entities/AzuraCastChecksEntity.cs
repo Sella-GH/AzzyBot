@@ -3,7 +3,7 @@
 namespace AzzyBot.Database.Entities;
 
 [SuppressMessage("Roslynator", "RCS0036:Remove blank line between single-line declarations of same kind", Justification = "Better clarification on ForeignKeys")]
-internal sealed class AzuraCastChecksEntity
+public sealed class AzuraCastChecksEntity
 {
     public int Id { get; set; }
     public bool FileChanges { get; set; }

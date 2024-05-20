@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -21,7 +20,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-internal sealed class DiscordBotService
+public sealed class DiscordBotService
 {
     private readonly IDbContextFactory<AzzyDbContext> _dbContextFactory;
     private readonly ILogger<DiscordBotService> _logger;
@@ -30,16 +29,17 @@ internal sealed class DiscordBotService
     private const string BugReportUrl = "https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D";
     private const string BugReportMessage = $"Send a [bug report]({BugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
 
-    [SuppressMessage("Style", "IDE0290:Use primary constructor", Justification = "Otherwise it throws CS9124")]
     public DiscordBotService(AzzyBotSettingsRecord settings, IDbContextFactory<AzzyDbContext> dbContextFactory, ILogger<DiscordBotService> logger, DiscordBotServiceHost botServiceHost)
     {
+        ArgumentNullException.ThrowIfNull(botServiceHost, nameof(botServiceHost));
+
         _settings = settings;
         _dbContextFactory = dbContextFactory;
         _logger = logger;
-        _shardedClient = botServiceHost._shardedClient;
+        _shardedClient = botServiceHost.shardedClient;
     }
 
-    internal async Task<DiscordGuild?> GetDiscordGuildAsync(ulong guildId = 0)
+    public async Task<DiscordGuild?> GetDiscordGuildAsync(ulong guildId = 0)
     {
         if (guildId is 0)
             guildId = _settings.ServerId;
@@ -57,7 +57,7 @@ internal sealed class DiscordBotService
         return guild;
     }
 
-    internal Dictionary<ulong, DiscordGuild> GetDiscordGuilds()
+    public Dictionary<ulong, DiscordGuild> GetDiscordGuilds()
     {
         Dictionary<ulong, DiscordGuild> guilds = [];
         foreach (KeyValuePair<int, DiscordClient> client in _shardedClient.ShardClients)
@@ -71,8 +71,10 @@ internal sealed class DiscordBotService
         return guilds;
     }
 
-    internal async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, ulong guildId = 0, string? info = null)
+    public async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, ulong guildId = 0, string? info = null)
     {
+        ArgumentNullException.ThrowIfNull(ex, nameof(ex));
+
         _logger.ExceptionOccured(ex);
 
         string exMessage = ex.Message;
@@ -120,8 +122,11 @@ internal sealed class DiscordBotService
         return false;
     }
 
-    internal async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, SlashCommandContext ctx, ulong guildId = 0, string? info = null)
+    public async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, SlashCommandContext ctx, ulong guildId = 0, string? info = null)
     {
+        ArgumentNullException.ThrowIfNull(ex, nameof(ex));
+        ArgumentNullException.ThrowIfNull(ctx, nameof(ctx));
+
         _logger.ExceptionOccured(ex);
 
         DiscordMessage? discordMessage = await AcknowledgeExceptionAsync(ctx);
@@ -174,7 +179,7 @@ internal sealed class DiscordBotService
         return false;
     }
 
-    internal async Task<bool> SendMessageAsync(ulong channelId, string? content = null, List<DiscordEmbed>? embeds = null, List<string>? filePaths = null, IMention[]? mentions = null)
+    public async Task<bool> SendMessageAsync(ulong channelId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, IMention[]? mentions = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
 

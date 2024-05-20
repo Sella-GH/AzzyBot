@@ -11,12 +11,12 @@ public sealed record AzzyBotSettingsRecord
     public required ulong ErrorChannelId { get; init; }
     public required ulong NotificationChannelId { get; init; }
     public required string EncryptionKey { get; init; } // 32 Characters
-    public Database? Database { get; init; }
+    public DatabaseSettings? Database { get; init; }
     public DiscordStatus? DiscordStatus { get; init; }
     public required CoreUpdater Updater { get; init; }
 }
 
-public sealed record Database
+public sealed record DatabaseSettings
 {
     public string Host { get; init; } = string.Empty;
     public int Port { get; init; } = 3306;

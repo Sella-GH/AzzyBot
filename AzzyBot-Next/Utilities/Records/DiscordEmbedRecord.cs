@@ -1,6 +1,6 @@
 ﻿namespace AzzyBot.Utilities.Records;
 
-internal sealed record DiscordEmbedRecord
+public sealed record DiscordEmbedRecord
 {
     public string Description { get; init; }
     public bool IsInline { get; init; }

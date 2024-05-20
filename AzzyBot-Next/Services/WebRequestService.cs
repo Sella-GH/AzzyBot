@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-internal sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisposable
+public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisposable
 {
     private readonly ILogger _logger = logger;
 
@@ -54,7 +54,7 @@ internal sealed class WebRequestService(ILogger<WebRequestService> logger) : IDi
         _httpClient?.Dispose();
     }
 
-    internal async Task<string> GetWebAsync(Uri url, Dictionary<string, string>? headers = null)
+    public async Task<string> GetWebAsync(Uri url, Dictionary<string, string>? headers = null)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
 

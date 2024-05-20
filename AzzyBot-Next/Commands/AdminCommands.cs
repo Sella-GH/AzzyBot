@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -19,121 +21,143 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands;
 
-internal sealed class AdminCommands
+[SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
+public sealed class AdminCommands
 {
     [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
-    internal sealed class Admin(DbActions dbActions, DiscordBotService botService, DiscordBotServiceHost botServiceHost, ILogger<Admin> logger)
+    public sealed class AdminGroup(DiscordBotServiceHost botServiceHost, ILogger<AdminGroup> logger)
     {
-        private readonly DbActions _dbActions = dbActions;
-        private readonly DiscordBotService _botService = botService;
         private readonly DiscordBotServiceHost _botServiceHost = botServiceHost;
-        private readonly ILogger<Admin> _logger = logger;
+        private readonly ILogger<AdminGroup> _logger = logger;
 
         [Command("change-bot-status"), Description("Change the global bot status according to your likes.")]
-        public async ValueTask CoreChangeStatusAsync
+        public async ValueTask ChangeStatusAsync
             (
             CommandContext context,
-            [Description("Choose the activity type which the bot should have."), SlashChoiceProvider<BotActivityProvider>] int activity,
-            [Description("Choose the status type which the bot should have."), SlashChoiceProvider<BotStatusProvider>] int status,
-            [Description("Enter a custom doing which is added after the activity type."), MinMaxLength(0, 128)] string doing,
-            [Description("Enter a custom url. Only usable when having activity type streaming or watching!")] string? url = null,
+            [Description("Choose the activity type which the bot should have."), SlashChoiceProvider<BotActivityProvider>] int activity = 1,
+            [Description("Choose the status type which the bot should have."), SlashChoiceProvider<BotStatusProvider>] int status = 2,
+            [Description("Enter a custom doing which is added after the activity type."), MinMaxLength(0, 128)] string doing = "Music",
+            [Description("Enter a custom url. Only usable when having activity type streaming or watching!")] Uri? url = null,
             [Description("Reset the status to default.")] bool reset = false
             )
         {
-            _logger.CommandRequested(nameof(CoreChangeStatusAsync), context.User.GlobalName);
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+            _logger.CommandRequested(nameof(ChangeStatusAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
 
             await _botServiceHost.SetBotStatusAsync(status, activity, doing, url, reset);
 
-            await context.EditResponseAsync("Bot status has been updated!");
+            if (reset)
+            {
+                await context.EditResponseAsync("Bot status has been reset!");
+            }
+            else
+            {
+                await context.EditResponseAsync("Bot status has been updated!");
+            }
         }
 
-        [Command("get-debug-servers"), Description("Displays all servers which can execute debug commands.")]
-        public async ValueTask AdminGetDebugGuildsAsync(CommandContext context)
+        [Command("debug-servers")]
+        public sealed class AdminDebugServers(DbActions dbActions, DiscordBotService botService, ILogger<AdminDebugServers> logger)
         {
-            _logger.CommandRequested(nameof(AdminGetDebugGuildsAsync), context.User.GlobalName);
+            private readonly DbActions _dbActions = dbActions;
+            private readonly DiscordBotService _botService = botService;
+            private readonly ILogger<AdminDebugServers> _logger = logger;
 
-            await context.DeferResponseAsync();
-
-            List<GuildsEntity> dbGuilds = await _dbActions.GetGuildEntitiesWithDebugAsync();
-            if (dbGuilds.Count == 0)
+            [Command("add-server"), Description("Adds the permission to execute debug commands to a server.")]
+            public async ValueTask AddDebugGuildsAsync(CommandContext context, [Description("Select the server you want to add."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId = "")
             {
-                await context.EditResponseAsync("No debug servers found.");
-                return;
+                ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+                _logger.CommandRequested(nameof(AddDebugGuildsAsync), context.User.GlobalName);
+
+                if (!ulong.TryParse(serverId, out ulong guildIdValue))
+                {
+                    await context.RespondAsync("Invalid server id.");
+                    return;
+                }
+
+                await context.DeferResponseAsync();
+
+                GuildsEntity? guildEntity = await _dbActions.GetGuildEntityAsync(guildIdValue);
+                if (guildEntity is null)
+                {
+                    await context.EditResponseAsync("Server not found in the database.");
+                    return;
+                }
+
+                if (guildEntity.IsDebugAllowed)
+                {
+                    await context.EditResponseAsync("Server is already specified as debug.");
+                    return;
+                }
+
+                await _dbActions.SetGuildEntityAsync(guildIdValue, 0, true);
+
+                await context.EditResponseAsync($"{await _botService.GetDiscordGuildAsync(guildIdValue)} added to debug servers.");
             }
 
-            Dictionary<ulong, DiscordGuild> clientGuilds = _botService.GetDiscordGuilds();
-            StringBuilder stringBuilder = new();
-            stringBuilder.AppendLine("I found the following Debug servers:");
-            foreach (GuildsEntity guild in dbGuilds.Where(g => clientGuilds.ContainsKey(g.UniqueId)))
+            [Command("get-servers"), Description("Displays all servers which can execute debug commands.")]
+            public async ValueTask GetDebugGuildsAsync(CommandContext context)
             {
-                stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"- {clientGuilds[guild.UniqueId].Name}");
+                ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+                _logger.CommandRequested(nameof(GetDebugGuildsAsync), context.User.GlobalName);
+
+                await context.DeferResponseAsync();
+
+                List<GuildsEntity> dbGuilds = await _dbActions.GetGuildEntitiesWithDebugAsync();
+                if (dbGuilds.Count == 0)
+                {
+                    await context.EditResponseAsync("No debug servers found.");
+                    return;
+                }
+
+                Dictionary<ulong, DiscordGuild> clientGuilds = _botService.GetDiscordGuilds();
+                StringBuilder stringBuilder = new();
+                stringBuilder.AppendLine("I found the following Debug servers:");
+                foreach (GuildsEntity guild in dbGuilds.Where(g => clientGuilds.ContainsKey(g.UniqueId)))
+                {
+                    stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"- {clientGuilds[guild.UniqueId].Name}");
+                }
+
+                await context.EditResponseAsync(stringBuilder.ToString());
             }
 
-            await context.EditResponseAsync(stringBuilder.ToString());
-        }
-
-        [Command("remove-debug-server"), Description("Removes the permission to execute debug commands from a server.")]
-        public async ValueTask AdminRemoveDebugGuildsAsync(CommandContext context, [Description("Select the server you want to remove."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId = "")
-        {
-            _logger.CommandRequested(nameof(AdminRemoveDebugGuildsAsync), context.User.GlobalName);
-
-            if (!ulong.TryParse(serverId, out ulong guildIdValue))
+            [Command("remove-server"), Description("Removes the permission to execute debug commands from a server.")]
+            public async ValueTask RemoveDebugGuildsAsync(CommandContext context, [Description("Select the server you want to remove."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId = "")
             {
-                await context.RespondAsync("Invalid server id.");
-                return;
+                ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+                _logger.CommandRequested(nameof(RemoveDebugGuildsAsync), context.User.GlobalName);
+
+                if (!ulong.TryParse(serverId, out ulong guildIdValue))
+                {
+                    await context.RespondAsync("Invalid server id.");
+                    return;
+                }
+
+                await context.DeferResponseAsync();
+
+                GuildsEntity? guildEntity = await _dbActions.GetGuildEntityAsync(guildIdValue);
+                if (guildEntity is null)
+                {
+                    await context.EditResponseAsync("Server not found in the database.");
+                    return;
+                }
+
+                if (!guildEntity.IsDebugAllowed)
+                {
+                    await context.EditResponseAsync("Server is not specified as debug.");
+                    return;
+                }
+
+                await _dbActions.SetGuildEntityAsync(guildIdValue, 0, false);
+
+                await context.EditResponseAsync($"{await _botService.GetDiscordGuildAsync(guildIdValue)} removed from debug servers.");
             }
-
-            await context.DeferResponseAsync();
-
-            GuildsEntity? guildEntity = await _dbActions.GetGuildEntityAsync(guildIdValue);
-            if (guildEntity is null)
-            {
-                await context.EditResponseAsync("Server not found in the database.");
-                return;
-            }
-
-            if (!guildEntity.IsDebugAllowed)
-            {
-                await context.EditResponseAsync("Server is not specified as debug.");
-                return;
-            }
-
-            await _dbActions.SetGuildEntityAsync(guildIdValue, 0, false);
-
-            await context.EditResponseAsync($"{await _botService.GetDiscordGuildAsync(guildIdValue)} removed from debug servers.");
-        }
-
-        [Command("set-debug-server"), Description("Adds the permission to execute debug commands to a server.")]
-        public async ValueTask AdminSetDebugGuildsAsync(CommandContext context, [Description("Select the server you want to add."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId = "")
-        {
-            _logger.CommandRequested(nameof(AdminSetDebugGuildsAsync), context.User.GlobalName);
-
-            if (!ulong.TryParse(serverId, out ulong guildIdValue))
-            {
-                await context.RespondAsync("Invalid server id.");
-                return;
-            }
-
-            await context.DeferResponseAsync();
-
-            GuildsEntity? guildEntity = await _dbActions.GetGuildEntityAsync(guildIdValue);
-            if (guildEntity is null)
-            {
-                await context.EditResponseAsync("Server not found in the database.");
-                return;
-            }
-
-            if (guildEntity.IsDebugAllowed)
-            {
-                await context.EditResponseAsync("Server is already specified as debug.");
-                return;
-            }
-
-            await _dbActions.SetGuildEntityAsync(guildIdValue, 0, true);
-
-            await context.EditResponseAsync($"{await _botService.GetDiscordGuildAsync(guildIdValue)} added to debug servers.");
         }
     }
 }

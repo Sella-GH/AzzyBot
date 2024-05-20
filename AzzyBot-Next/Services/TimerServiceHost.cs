@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-internal sealed class TimerServiceHost(AzzyBotSettingsRecord settings, DiscordBotService discordBotService, UpdaterService updaterService, ILogger<TimerServiceHost> logger) : IDisposable, IHostedService
+public sealed class TimerServiceHost(AzzyBotSettingsRecord settings, DiscordBotService discordBotService, UpdaterService updaterService, ILogger<TimerServiceHost> logger) : IDisposable, IHostedService
 {
     private readonly ILogger<TimerServiceHost> _logger = logger;
     private readonly AzzyBotSettingsRecord _settings = settings;

@@ -22,6 +22,7 @@
     <NoWarn>$(NoWarn);CA1812;CA2007</NoWarn>
     <Configurations>Debug;Release;Docker;Docker-debug</Configurations>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <StartupObject>AzzyBot.Startup</StartupObject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

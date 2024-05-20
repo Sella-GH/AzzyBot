@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-internal sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotService botService, WebRequestService webService, ILogger<UpdaterService> logger)
+public sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotService botService, WebRequestService webService, ILogger<UpdaterService> logger)
 {
     private readonly ILogger<UpdaterService> _logger = logger;
     private readonly AzzyBotSettingsRecord _settings = settings;
@@ -22,7 +22,7 @@ internal sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotS
     private int _azzyNotifyCounter;
     private readonly Uri _gitHubUrl = new("https://api.github.com/repos/Sella-GH/AzzyBot/releases/latest");
 
-    internal async Task CheckForAzzyUpdatesAsync()
+    public async Task CheckForAzzyUpdatesAsync()
     {
         Version localVersion = new(AzzyStatsSoftware.GetBotVersion);
 

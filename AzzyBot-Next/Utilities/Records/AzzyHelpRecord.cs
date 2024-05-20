@@ -2,7 +2,7 @@
 
 namespace AzzyBot.Utilities.Records;
 
-internal sealed record AzzyHelpRecord
+public sealed record AzzyHelpRecord
 {
     public string SubCommand { get; init; }
     public string Name { get; init; }

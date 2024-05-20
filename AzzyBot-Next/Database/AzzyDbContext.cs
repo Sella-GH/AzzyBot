@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AzzyBot.Database;
 
-internal sealed class AzzyDbContext : DbContext
+public sealed class AzzyDbContext : DbContext
 {
 #pragma warning disable CS8618
     public AzzyDbContext()

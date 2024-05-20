@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace AzzyBot.Settings;
 
-internal sealed record AzzyBotStatsRecord
+public sealed record AzzyBotStatsRecord
 {
     [JsonPropertyName(nameof(Commit))]
     public required string Commit { get; init; }

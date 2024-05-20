@@ -9,7 +9,7 @@ using DSharpPlus.Entities;
 
 namespace AzzyBot.Utilities;
 
-internal static class EmbedBuilder
+public static class EmbedBuilder
 {
     private static DiscordEmbedBuilder CreateBasicEmbed(string title, string? description = null, DiscordColor? color = null, Uri? thumbnailUrl = null, string? footerText = null, Uri? url = null, Dictionary<string, DiscordEmbedRecord>? fields = null)
     {
@@ -46,14 +46,14 @@ internal static class EmbedBuilder
         return builder;
     }
 
-    internal static async Task<DiscordEmbed> BuildAzzyHardwareStatsEmbedAsync(Uri avaUrl)
+    public static async Task<DiscordEmbed> BuildAzzyHardwareStatsEmbedAsync(Uri avaUrl)
     {
         const string title = "AzzyBot Hardware Stats";
         const string notLinux = "To display more information you need to have a linux os.";
         string os = AzzyStatsHardware.GetSystemOs;
         string osArch = AzzyStatsHardware.GetSystemOsArch;
         string isDocker = AzzyStatsHardware.CheckIfDocker.ToString();
-        long uptime = Converter.ConvertToUnixTime(AzzyStatsHardware.GetSystemUptime());
+        long uptime = Converter.ConvertToUnixTime(AzzyStatsHardware.GetSystemUptime);
         Dictionary<int, double> cpuUsage = await AzzyStatsHardware.GetSystemCpusAsync();
         CpuLoadRecord cpuLoads = await AzzyStatsHardware.GetSystemCpuLoadAsync();
         MemoryUsageRecord memory = await AzzyStatsHardware.GetSystemMemoryUsageAsync();
@@ -107,8 +107,10 @@ internal static class EmbedBuilder
         return CreateBasicEmbed(title, null, DiscordColor.Orange, avaUrl, null, null, fields);
     }
 
-    internal static DiscordEmbed BuildAzzyHelpEmbed(AzzyHelpRecord command)
+    public static DiscordEmbed BuildAzzyHelpEmbed(AzzyHelpRecord command)
     {
+        ArgumentNullException.ThrowIfNull(command, nameof(command));
+
         string title = command.Name;
         string description = command.Description;
 
@@ -121,8 +123,9 @@ internal static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.Blurple, null, null, null, fields);
     }
 
-    internal static DiscordEmbed BuildAzzyHelpEmbed(List<AzzyHelpRecord> commands)
+    public static DiscordEmbed BuildAzzyHelpEmbed(IReadOnlyList<AzzyHelpRecord> commands)
     {
+        ArgumentNullException.ThrowIfNull(commands, nameof(commands));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(commands.Count, nameof(commands));
 
         const string preTitle = "Command List For";
@@ -137,7 +140,7 @@ internal static class EmbedBuilder
         return CreateBasicEmbed(title, null, DiscordColor.Blurple, null, null, null, fields);
     }
 
-    internal static DiscordEmbed BuildAzzyInfoStatsEmbed(Uri avaUrl, string dspVersion, string commit, in DateTime compileDate, int loc)
+    public static DiscordEmbed BuildAzzyInfoStatsEmbed(Uri avaUrl, string dspVersion, string commit, in DateTime compileDate, int loc)
     {
         const string title = "AzzyBot Informational Stats";
         const string githubUrl = "https://github.com/Sella-GH";
@@ -182,8 +185,10 @@ internal static class EmbedBuilder
         return CreateBasicEmbed(title, null, DiscordColor.Orange, avaUrl, null, null, fields);
     }
 
-    internal static DiscordEmbed BuildAzzyUpdatesAvailableEmbed(Version version, in DateTime updateDate, Uri url)
+    public static DiscordEmbed BuildAzzyUpdatesAvailableEmbed(Version version, in DateTime updateDate, Uri url)
     {
+        ArgumentNullException.ThrowIfNull(version, nameof(version));
+
         const string title = "Azzy Updates Available";
         const string description = "Update now to get the latest bug fixes, features and improvements!";
         string yourVersion = AzzyStatsSoftware.GetBotVersion;
@@ -198,7 +203,7 @@ internal static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.White, null, null, url, fields);
     }
 
-    internal static DiscordEmbed BuildAzzyUpdatesChangelogEmbed(string changelog, Uri url)
+    public static DiscordEmbed BuildAzzyUpdatesChangelogEmbed(string changelog, Uri url)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(changelog);
 
@@ -211,7 +216,7 @@ internal static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.White);
     }
 
-    internal static DiscordEmbed BuildAzzyUpdatesInstructionsEmbed()
+    public static DiscordEmbed BuildAzzyUpdatesInstructionsEmbed()
     {
         bool isLinux = AzzyStatsHardware.CheckIfLinuxOs;
         bool isWindows = AzzyStatsHardware.CheckIfWindowsOs;
@@ -230,8 +235,9 @@ internal static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.White);
     }
 
-    internal static DiscordEmbed BuildGetSettingsGuildEmbed(string serverName, GuildsEntity guild)
+    public static DiscordEmbed BuildGetSettingsGuildEmbed(string serverName, GuildsEntity guild)
     {
+        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
         ArgumentException.ThrowIfNullOrWhiteSpace(serverName, nameof(serverName));
 
         const string title = "Settings overview";
@@ -247,8 +253,10 @@ internal static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.White, null, null, null, fields);
     }
 
-    internal static DiscordEmbed BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast)
+    public static DiscordEmbed BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast)
     {
+        ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
+
         const string title = "AzuraCast settings";
 
         Dictionary<string, DiscordEmbedRecord> fields = new()
@@ -264,8 +272,10 @@ internal static class EmbedBuilder
         return CreateBasicEmbed(title, string.Empty, DiscordColor.White, null, null, null, fields);
     }
 
-    internal static DiscordEmbed BuildGetSettingsAzuraChecksEmbed(AzuraCastChecksEntity checks)
+    public static DiscordEmbed BuildGetSettingsAzuraChecksEmbed(AzuraCastChecksEntity checks)
     {
+        ArgumentNullException.ThrowIfNull(checks, nameof(checks));
+
         const string title = "AzuraCast Checks settings";
 
         Dictionary<string, DiscordEmbedRecord> fields = new()

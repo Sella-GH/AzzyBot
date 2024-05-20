@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services.Modules;
 
-internal sealed class CoreServiceHost(ILogger<CoreServiceHost> logger) : IHostedService
+public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger) : IHostedService
 {
     private readonly ILogger<CoreServiceHost> _logger = logger;
 

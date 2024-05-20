@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AzzyBot.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20240515171707_InitialCreation")]
+    [Migration("20240520205121_InitialCreation")]
     partial class InitialCreation
     {
         /// <inheritdoc />

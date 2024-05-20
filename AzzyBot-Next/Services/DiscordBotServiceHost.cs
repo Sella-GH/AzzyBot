@@ -7,7 +7,6 @@ using AzzyBot.Commands;
 using AzzyBot.Commands.Converters;
 using AzzyBot.Database;
 using AzzyBot.Logging;
-using AzzyBot.Services.Modules;
 using AzzyBot.Settings;
 using AzzyBot.Utilities;
 using DSharpPlus;
@@ -26,16 +25,19 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-internal sealed class DiscordBotServiceHost : IHostedService
+public sealed class DiscordBotServiceHost : IHostedService
 {
     private readonly ILogger<DiscordBotServiceHost> _logger;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IServiceProvider _serviceProvider;
     private readonly AzzyBotSettingsRecord _settings;
     private readonly DbActions _dbActions;
-    internal readonly DiscordShardedClient _shardedClient;
+    private readonly DiscordShardedClient _shardedClient;
     private DiscordBotService? _botService;
 
+    public DiscordShardedClient shardedClient { get; }
+
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public DiscordBotServiceHost(AzzyBotSettingsRecord settings, DbActions dbActions, ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
     {
         _logger = logger;
@@ -46,6 +48,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
 
         _shardedClient = new(GetDiscordConfig());
     }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -67,7 +70,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
         int activity = _settings.DiscordStatus?.Activity ?? 2;
         string doing = _settings.DiscordStatus?.Doing ?? "Music";
         int status = _settings.DiscordStatus?.Status ?? 1;
-        string? url = _settings.DiscordStatus?.StreamUrl?.ToString();
+        Uri? url = _settings.DiscordStatus?.StreamUrl;
 
         await SetBotStatusAsync(status, activity, doing, url);
     }
@@ -79,7 +82,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
         UnregisterEventHandlers();
     }
 
-    internal async Task SetBotStatusAsync(int status = 1, int type = 2, string doing = "Music", string? url = null, bool reset = false)
+    public async Task SetBotStatusAsync(int status = 1, int type = 2, string doing = "Music", Uri? url = null, bool reset = false)
     {
         if (reset)
         {
@@ -88,12 +91,12 @@ internal sealed class DiscordBotServiceHost : IHostedService
         }
 
         DiscordActivityType activityType = (DiscordActivityType)Enum.ToObject(typeof(DiscordActivityType), type);
-        if (activityType.Equals(DiscordActivityType.Streaming) && string.IsNullOrWhiteSpace(url))
+        if (activityType.Equals(DiscordActivityType.Streaming) && url is null)
             activityType = DiscordActivityType.Playing;
 
         DiscordActivity activity = new(doing, activityType);
-        if (activityType.Equals(DiscordActivityType.Streaming) && !string.IsNullOrWhiteSpace(url) && (url.Contains("twitch", StringComparison.OrdinalIgnoreCase) || url.Contains("youtube", StringComparison.OrdinalIgnoreCase)))
-            activity.StreamUrl = url;
+        if (activityType.Equals(DiscordActivityType.Streaming) && url is not null && (url.Host.Contains("twitch", StringComparison.OrdinalIgnoreCase) || url.Host.Contains("youtube", StringComparison.OrdinalIgnoreCase)))
+            activity.StreamUrl = url.OriginalString;
 
         DiscordUserStatus userStatus = (DiscordUserStatus)Enum.ToObject(typeof(DiscordUserStatus), status);
 
@@ -134,15 +137,18 @@ internal sealed class DiscordBotServiceHost : IHostedService
         {
             commandsExtension.CommandErrored += CommandErroredAsync;
 
-            commandsExtension.AddCommands(typeof(ConfigCommands.Config));
-            commandsExtension.AddCommands(typeof(CoreCommands.Core));
+            // These commands are for every server
+            commandsExtension.AddCommands(typeof(ConfigCommands.ConfigGroup));
+            commandsExtension.AddCommands(typeof(CoreCommands.CoreGroup));
+            commandsExtension.AddCommands(typeof(CoreCommands.CoreGroup.CoreStats));
 
             // Only add admin commands to the main server
-            commandsExtension.AddCommand(typeof(AdminCommands.Admin), _settings.ServerId);
+            commandsExtension.AddCommand(typeof(AdminCommands.AdminGroup), _settings.ServerId);
+            commandsExtension.AddCommand(typeof(AdminCommands.AdminGroup.AdminDebugServers), _settings.ServerId);
 
             // Only add debug commands if it's a dev build
             if (AzzyStatsSoftware.GetBotName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase))
-                commandsExtension.AddCommands(typeof(DebugCommands.Debug), _settings.ServerId);
+                commandsExtension.AddCommands(typeof(DebugCommands.DebugGroup), _settings.ServerId);
 
             SlashCommandProcessor slashCommandProcessor = new();
             slashCommandProcessor.AddConverter<Uri>(new UriArgumentConverter());
