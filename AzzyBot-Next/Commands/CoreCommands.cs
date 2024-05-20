@@ -23,11 +23,11 @@ namespace AzzyBot.Commands;
 public sealed class CoreCommands
 {
     [Command("core"), RequireGuild]
-    public sealed class Core(AzzyBotSettingsRecord settings, DbActions dbActions, ILogger<Core> logger)
+    public sealed class CoreGroup(AzzyBotSettingsRecord settings, DbActions dbActions, ILogger<CoreGroup> logger)
     {
         private readonly AzzyBotSettingsRecord _settings = settings;
         private readonly DbActions _dbActions = dbActions;
-        private readonly ILogger<Core> _logger = logger;
+        private readonly ILogger<CoreGroup> _logger = logger;
 
         [Command("help"), Description("Gives an overview about all the available commands.")]
         public async ValueTask HelpAsync

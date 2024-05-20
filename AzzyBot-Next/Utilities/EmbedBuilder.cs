@@ -82,7 +82,7 @@ public static class EmbedBuilder
                 continue;
             }
 
-            cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Core {counter}: **{kvp.Value}**%");
+            cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"CoreGroup {counter}: **{kvp.Value}**%");
         }
 
         fields.Add("CPU Usage", new(cpuUsageBuilder.ToString(), false));

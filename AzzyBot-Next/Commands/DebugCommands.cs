@@ -17,9 +17,9 @@ namespace AzzyBot.Commands;
 public sealed class DebugCommands
 {
     [Command("debug"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
-    public sealed class Debug(WebRequestService webRequestService, ILogger<Debug> logger)
+    public sealed class DebugGroup(WebRequestService webRequestService, ILogger<DebugGroup> logger)
     {
-        private readonly ILogger<Debug> _logger = logger;
+        private readonly ILogger<DebugGroup> _logger = logger;
         private readonly WebRequestService _webRequestService = webRequestService;
 
         [Command("encrypt-decrypt"), Description("Test the encryption and decryption features of the bot.")]

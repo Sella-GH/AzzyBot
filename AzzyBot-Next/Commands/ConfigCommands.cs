@@ -18,10 +18,10 @@ namespace AzzyBot.Commands;
 public sealed class ConfigCommands
 {
     [Command("config"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
-    public sealed class Config(DbActions db, ILogger<Config> logger)
+    public sealed class ConfigGroup(DbActions db, ILogger<ConfigGroup> logger)
     {
         private readonly DbActions _db = db;
-        private readonly ILogger<Config> _logger = logger;
+        private readonly ILogger<ConfigGroup> _logger = logger;
 
         [Command("config-azuracast"), Description("Configure the settings of the AzuraCast module.")]
         public async ValueTask SetAzuraCastAsync

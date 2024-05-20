@@ -25,10 +25,10 @@ namespace AzzyBot.Commands;
 public sealed class AdminCommands
 {
     [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
-    public sealed class Admin(DiscordBotServiceHost botServiceHost, ILogger<Admin> logger)
+    public sealed class AdminGroup(DiscordBotServiceHost botServiceHost, ILogger<AdminGroup> logger)
     {
         private readonly DiscordBotServiceHost _botServiceHost = botServiceHost;
-        private readonly ILogger<Admin> _logger = logger;
+        private readonly ILogger<AdminGroup> _logger = logger;
 
         [Command("change-bot-status"), Description("Change the global bot status according to your likes.")]
         public async ValueTask ChangeStatusAsync
