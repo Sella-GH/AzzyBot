@@ -311,9 +311,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                     guild.ErrorChannelId = errorChannelId;
 
                 if (guild.IsDebugAllowed != isDebug)
-                {
                     guild.IsDebugAllowed = isDebug;
-                }
 
                 await context.SaveChangesAsync();
 

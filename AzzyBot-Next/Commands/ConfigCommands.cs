@@ -65,7 +65,6 @@ public sealed class ConfigCommands
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             await _db.SetAzuraCastEntityAsync(guildId, apiKey, apiUrl, stationId, requestsChannel?.Id ?? 0, outagesChannel?.Id ?? 0, hlsStreaming, showPlaylistInNowPlaying);
-            await _db.SetGuildEntityAsync(guildId);
 
             if (!string.IsNullOrWhiteSpace(apiKey) || apiUrl is not null)
             {
