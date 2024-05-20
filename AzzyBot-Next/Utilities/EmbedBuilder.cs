@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Text;
 using System.Threading.Tasks;
@@ -287,5 +288,21 @@ public static class EmbedBuilder
         };
 
         return CreateBasicEmbed(title, string.Empty, DiscordColor.White, null, null, null, fields);
+    }
+
+    public static DiscordEmbed BuildGetSettingsAzuraMountsEmbed(IReadOnlyList<AzuraCastMountsEntity> mounts)
+    {
+        ArgumentNullException.ThrowIfNull(mounts, nameof(mounts));
+
+        const string title = "AzuraCast Mount Points";
+        const string desc = "You have no mount points registered.";
+
+        Dictionary<string, DiscordEmbedRecord> fields = [];
+        foreach (AzuraCastMountsEntity mount in mounts)
+        {
+            fields.Add(mount.Name, new(mount.Mount));
+        }
+
+        return CreateBasicEmbed(title, (mounts.Count == 0) ? desc : string.Empty, DiscordColor.White, null, null, null, fields);
     }
 }

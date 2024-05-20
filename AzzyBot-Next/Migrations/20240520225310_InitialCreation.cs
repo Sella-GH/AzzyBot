@@ -44,6 +44,7 @@ namespace AzzyBot.Migrations
                     StationId = table.Column<int>(type: "int", nullable: false),
                     MusicRequestsChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     OutagesChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
+                    PreferHlsStreaming = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     ShowPlaylistInNowPlaying = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     GuildId = table.Column<int>(type: "int", nullable: false)
                 },
@@ -83,6 +84,30 @@ namespace AzzyBot.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "AzuraCastMounts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Mount = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    AzuraCastId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AzuraCastMounts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AzuraCastMounts_AzuraCast_AzuraCastId",
+                        column: x => x.AzuraCastId,
+                        principalTable: "AzuraCast",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
             migrationBuilder.CreateIndex(
                 name: "IX_AzuraCast_GuildId",
                 table: "AzuraCast",
@@ -94,6 +119,11 @@ namespace AzzyBot.Migrations
                 table: "AzuraCastChecks",
                 column: "AzuraCastId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AzuraCastMounts_AzuraCastId",
+                table: "AzuraCastMounts",
+                column: "AzuraCastId");
         }
 
         /// <inheritdoc />
@@ -101,6 +131,9 @@ namespace AzzyBot.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AzuraCastChecks");
+
+            migrationBuilder.DropTable(
+                name: "AzuraCastMounts");
 
             migrationBuilder.DropTable(
                 name: "AzuraCast");

@@ -77,6 +77,9 @@ namespace AzzyBot.Migrations
                     b.Property<ulong>("OutagesChannelId")
                         .HasColumnType("bigint unsigned");
 
+                    b.Property<bool>("PreferHlsStreaming")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<bool>("ShowPlaylistInNowPlaying")
                         .HasColumnType("tinyint(1)");
 
@@ -89,6 +92,32 @@ namespace AzzyBot.Migrations
                         .IsUnique();
 
                     b.ToTable("AzuraCast");
+                });
+
+            modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastMountsEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AzuraCastId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Mount")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AzuraCastId");
+
+                    b.ToTable("AzuraCastMounts");
                 });
 
             modelBuilder.Entity("AzzyBot.Database.Entities.GuildsEntity", b =>
@@ -138,9 +167,22 @@ namespace AzzyBot.Migrations
                     b.Navigation("Guild");
                 });
 
+            modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastMountsEntity", b =>
+                {
+                    b.HasOne("AzzyBot.Database.Entities.AzuraCastEntity", "AzuraCast")
+                        .WithMany("MountPoints")
+                        .HasForeignKey("AzuraCastId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AzuraCast");
+                });
+
             modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastEntity", b =>
                 {
                     b.Navigation("AutomaticChecks");
+
+                    b.Navigation("MountPoints");
                 });
 
             modelBuilder.Entity("AzzyBot.Database.Entities.GuildsEntity", b =>

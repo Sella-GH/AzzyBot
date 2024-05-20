@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace AzzyBot.Database.Entities;
 
@@ -13,7 +14,9 @@ public sealed class AzuraCastEntity
     public int StationId { get; set; }
     public ulong MusicRequestsChannelId { get; set; }
     public ulong OutagesChannelId { get; set; }
+    public bool PreferHlsStreaming { get; set; }
     public bool ShowPlaylistInNowPlaying { get; set; }
+    public ICollection<AzuraCastMountsEntity> MountPoints { get; } = new List<AzuraCastMountsEntity>();
 
     public AzuraCastChecksEntity? AutomaticChecks { get; set; }
 

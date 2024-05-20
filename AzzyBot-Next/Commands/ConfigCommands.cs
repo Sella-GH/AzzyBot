@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
@@ -23,6 +24,26 @@ public sealed class ConfigCommands
         private readonly DbActions _db = db;
         private readonly ILogger<ConfigGroup> _logger = logger;
 
+        [Command("add-azuracast-mount"), Description("Let's you add an AzuraCast mount point for streaming.")]
+        public async ValueTask AddAzuraCastMountAsync
+            (
+            CommandContext context,
+            [Description("Enter the mount point name.")] string mountName,
+            [Description("Enter the mount point stub.")] string mount
+            )
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+            _logger.CommandRequested(nameof(AddAzuraCastMountAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
+            await _db.AddAzuraCastMountPointAsync(guildId, mountName, mount);
+
+            await context.EditResponseAsync("Your mount point was added successfully.");
+        }
+
         [Command("config-azuracast"), Description("Configure the settings of the AzuraCast module.")]
         public async ValueTask SetAzuraCastAsync
             (
@@ -32,6 +53,7 @@ public sealed class ConfigCommands
             [Description("Enter the station id of your azuracast station.")] int stationId = 0,
             [Description("Select a channel to get music requests when a request is not found on the server."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? requestsChannel = null,
             [Description("Select a channel to get notifications when your azuracast installation is down."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? outagesChannel = null,
+            [Description("Enable or disable the preference of HLS streams if you add an able mount point.")] bool hlsStreaming = false,
             [Description("Enable or disable the showing of the playlist in the nowplaying embed.")] bool showPlaylistInNowPlaying = false
             )
         {
@@ -42,7 +64,7 @@ public sealed class ConfigCommands
             await context.DeferResponseAsync();
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.SetAzuraCastEntityAsync(guildId, apiKey, apiUrl, stationId, requestsChannel?.Id ?? 0, outagesChannel?.Id ?? 0, showPlaylistInNowPlaying);
+            await _db.SetAzuraCastEntityAsync(guildId, apiKey, apiUrl, stationId, requestsChannel?.Id ?? 0, outagesChannel?.Id ?? 0, hlsStreaming, showPlaylistInNowPlaying);
             await _db.SetGuildEntityAsync(guildId);
 
             if (!string.IsNullOrWhiteSpace(apiKey) || apiUrl is not null)
@@ -108,14 +130,16 @@ public sealed class ConfigCommands
 
             AzuraCastEntity azuraCast = await _db.GetAzuraCastEntityAsync(guildId);
             AzuraCastChecksEntity checks = await _db.GetAzuraCastChecksEntityAsync(guildId);
+            List<AzuraCastMountsEntity> mounts = await _db.GetAzuraCastMountsEntitiesAsync(guildId);
             GuildsEntity guild = await _db.GetGuildEntityAsync(guildId);
 
             DiscordEmbed guildEmbed = EmbedBuilder.BuildGetSettingsGuildEmbed(guildName, guild);
             DiscordEmbed azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(azuraCast);
-            DiscordEmbed azuraChecksEmbed = EmbedBuilder.BuildGetSettingsAzuraChecksEmbed(checks);
+            DiscordEmbed azuraChecks = EmbedBuilder.BuildGetSettingsAzuraChecksEmbed(checks);
+            DiscordEmbed azuraMounts = EmbedBuilder.BuildGetSettingsAzuraMountsEmbed(mounts);
 
             await using DiscordMessageBuilder messageBuilder = new();
-            messageBuilder.AddEmbeds([guildEmbed, azuraEmbed, azuraChecksEmbed]);
+            messageBuilder.AddEmbeds([guildEmbed, azuraEmbed, azuraChecks, azuraMounts]);
 
             await member.SendMessageAsync(messageBuilder);
 
