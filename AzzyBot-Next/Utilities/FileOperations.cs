@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 
 namespace AzzyBot.Utilities;
 
-internal static class FileOperations
+public static class FileOperations
 {
-    internal static async Task<string> CreateTempFileAsync(string content, string? fileName = null)
+    public static async Task<string> CreateTempFileAsync(string content, string? fileName = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(content, nameof(content));
 
@@ -16,7 +16,7 @@ internal static class FileOperations
         return tempFilePath;
     }
 
-    internal static void DeleteTempFilePath(string path)
+    public static void DeleteTempFilePath(string path)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path, nameof(path));
 

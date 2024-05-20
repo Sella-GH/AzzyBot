@@ -6,7 +6,7 @@ using DSharpPlus.EventArgs;
 
 namespace AzzyBot.Commands.Converters;
 
-internal sealed class UriArgumentConverter : ISlashArgumentConverter<Uri>
+public sealed class UriArgumentConverter : ISlashArgumentConverter<Uri>
 {
     public DiscordApplicationCommandOptionType ParameterType => DiscordApplicationCommandOptionType.String;
     public string ReadableName => "Url";

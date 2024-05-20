@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands;
 
-internal sealed class DebugCommands
+public sealed class DebugCommands
 {
     [Command("debug"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
     public sealed class Debug(WebRequestService webRequestService, ILogger<Debug> logger)

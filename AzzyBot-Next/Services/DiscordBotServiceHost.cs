@@ -25,14 +25,14 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-internal sealed class DiscordBotServiceHost : IHostedService
+public sealed class DiscordBotServiceHost : IHostedService
 {
     private readonly ILogger<DiscordBotServiceHost> _logger;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IServiceProvider _serviceProvider;
     private readonly AzzyBotSettingsRecord _settings;
     private readonly DbActions _dbActions;
-    internal readonly DiscordShardedClient _shardedClient;
+    public readonly DiscordShardedClient _shardedClient;
     private DiscordBotService? _botService;
 
     public DiscordBotServiceHost(AzzyBotSettingsRecord settings, DbActions dbActions, ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
@@ -78,7 +78,7 @@ internal sealed class DiscordBotServiceHost : IHostedService
         UnregisterEventHandlers();
     }
 
-    internal async Task SetBotStatusAsync(int status = 1, int type = 2, string doing = "Music", string? url = null, bool reset = false)
+    public async Task SetBotStatusAsync(int status = 1, int type = 2, string doing = "Music", string? url = null, bool reset = false)
     {
         if (reset)
         {

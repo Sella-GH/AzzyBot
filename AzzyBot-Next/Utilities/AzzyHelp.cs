@@ -11,7 +11,7 @@ using DSharpPlus.Entities;
 
 namespace AzzyBot.Utilities;
 
-internal static class AzzyHelp
+public static class AzzyHelp
 {
     [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "It's just to get the name fully normalized")]
     private static List<AzzyHelpRecord> GetAllCommandsOfType(Type type)
@@ -71,7 +71,7 @@ internal static class AzzyHelp
         };
     }
 
-    internal static Dictionary<int, List<AzzyHelpRecord>> GetCommands(bool adminServer, bool approvedDebug, DiscordMember member)
+    public static Dictionary<int, List<AzzyHelpRecord>> GetCommands(bool adminServer, bool approvedDebug, DiscordMember member)
     {
         Dictionary<int, List<AzzyHelpRecord>> records = [];
         foreach (Type type in Assembly.GetExecutingAssembly().GetTypes().Where(t => t.Namespace == "AzzyBot.Commands" && CheckIfMemberHasPermission(adminServer, approvedDebug, member, t)))
@@ -82,7 +82,7 @@ internal static class AzzyHelp
         return records;
     }
 
-    internal static AzzyHelpRecord GetSingleCommand(bool adminServer, bool approvedDebug, DiscordMember member, string commandName)
+    public static AzzyHelpRecord GetSingleCommand(bool adminServer, bool approvedDebug, DiscordMember member, string commandName)
     {
         foreach (KeyValuePair<int, List<AzzyHelpRecord>> kvp in GetCommands(adminServer, approvedDebug, member))
         {

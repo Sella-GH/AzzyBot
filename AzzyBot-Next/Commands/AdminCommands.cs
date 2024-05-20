@@ -19,7 +19,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands;
 
-internal sealed class AdminCommands
+public sealed class AdminCommands
 {
     [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
     public sealed class Admin(DiscordBotServiceHost botServiceHost, ILogger<Admin> logger)

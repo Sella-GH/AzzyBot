@@ -16,9 +16,9 @@ using Microsoft.Extensions.Logging.Console;
 
 namespace AzzyBot.Extensions;
 
-internal static class ServiceRegistering
+public static class ServiceRegistering
 {
-    internal static void AzzyBotLogging(this ILoggingBuilder logging, bool isDev = false, bool forceDebug = false)
+    public static void AzzyBotLogging(this ILoggingBuilder logging, bool isDev = false, bool forceDebug = false)
     {
         logging.AddConsole();
         logging.AddFilter("Microsoft.EntityFrameworkCore.Infrastructure", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
@@ -36,7 +36,7 @@ internal static class ServiceRegistering
         logging.SetMinimumLevel((isDev || forceDebug) ? LogLevel.Debug : LogLevel.Information);
     }
 
-    internal static void AzzyBotServices(this IServiceCollection services)
+    public static void AzzyBotServices(this IServiceCollection services)
     {
         // Enable or disable modules based on the settings
         IServiceProvider serviceProvider = services.BuildServiceProvider();
@@ -64,7 +64,7 @@ internal static class ServiceRegistering
         services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());
     }
 
-    internal static void AzzyBotSettings(this IServiceCollection services, bool isDev = false, bool isDocker = false)
+    public static void AzzyBotSettings(this IServiceCollection services, bool isDev = false, bool isDocker = false)
     {
         string settingsFile = "AzzyBotSettings.json";
         if (isDev)
@@ -116,7 +116,7 @@ internal static class ServiceRegistering
         services.AddSingleton(settings);
     }
 
-    internal static void AzzyBotStats(this IServiceCollection services)
+    public static void AzzyBotStats(this IServiceCollection services)
     {
         string path = Path.Combine("Modules", "Core", "Files", "AzzyBotStats.json");
 

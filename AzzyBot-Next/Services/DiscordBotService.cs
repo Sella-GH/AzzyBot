@@ -21,7 +21,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-internal sealed class DiscordBotService
+public sealed class DiscordBotService
 {
     private readonly IDbContextFactory<AzzyDbContext> _dbContextFactory;
     private readonly ILogger<DiscordBotService> _logger;
@@ -39,7 +39,7 @@ internal sealed class DiscordBotService
         _shardedClient = botServiceHost._shardedClient;
     }
 
-    internal async Task<DiscordGuild?> GetDiscordGuildAsync(ulong guildId = 0)
+    public async Task<DiscordGuild?> GetDiscordGuildAsync(ulong guildId = 0)
     {
         if (guildId is 0)
             guildId = _settings.ServerId;
@@ -57,7 +57,7 @@ internal sealed class DiscordBotService
         return guild;
     }
 
-    internal Dictionary<ulong, DiscordGuild> GetDiscordGuilds()
+    public Dictionary<ulong, DiscordGuild> GetDiscordGuilds()
     {
         Dictionary<ulong, DiscordGuild> guilds = [];
         foreach (KeyValuePair<int, DiscordClient> client in _shardedClient.ShardClients)
@@ -71,7 +71,7 @@ internal sealed class DiscordBotService
         return guilds;
     }
 
-    internal async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, ulong guildId = 0, string? info = null)
+    public async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, ulong guildId = 0, string? info = null)
     {
         _logger.ExceptionOccured(ex);
 
@@ -120,7 +120,7 @@ internal sealed class DiscordBotService
         return false;
     }
 
-    internal async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, SlashCommandContext ctx, ulong guildId = 0, string? info = null)
+    public async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, SlashCommandContext ctx, ulong guildId = 0, string? info = null)
     {
         _logger.ExceptionOccured(ex);
 
@@ -174,7 +174,7 @@ internal sealed class DiscordBotService
         return false;
     }
 
-    internal async Task<bool> SendMessageAsync(ulong channelId, string? content = null, List<DiscordEmbed>? embeds = null, List<string>? filePaths = null, IMention[]? mentions = null)
+    public async Task<bool> SendMessageAsync(ulong channelId, string? content = null, List<DiscordEmbed>? embeds = null, List<string>? filePaths = null, IMention[]? mentions = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
 

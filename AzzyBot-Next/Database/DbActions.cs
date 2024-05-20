@@ -11,12 +11,12 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Database;
 
-internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory, ILogger<DbActions> logger)
+public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory, ILogger<DbActions> logger)
 {
     private readonly IDbContextFactory<AzzyDbContext> _dbContextFactory = dbContextFactory;
     private readonly ILogger<DbActions> _logger = logger;
 
-    internal async Task AddGuildEntityAsync(ulong guildId)
+    public async Task AddGuildEntityAsync(ulong guildId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
@@ -35,7 +35,7 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
         }
     }
 
-    internal async Task AddBulkGuildEntitiesAsync(List<ulong> guildIds)
+    public async Task AddBulkGuildEntitiesAsync(List<ulong> guildIds)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
@@ -63,7 +63,7 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
         }
     }
 
-    internal async Task<AzuraCastEntity> GetAzuraCastEntityAsync(ulong guildId)
+    public async Task<AzuraCastEntity> GetAzuraCastEntityAsync(ulong guildId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
@@ -88,7 +88,7 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
         throw new InvalidOperationException("Guild settings not found in database.");
     }
 
-    internal async Task<AzuraCastChecksEntity> GetAzuraCastChecksEntityAsync(ulong guildId)
+    public async Task<AzuraCastChecksEntity> GetAzuraCastChecksEntityAsync(ulong guildId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
@@ -109,7 +109,7 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
         throw new InvalidOperationException("Guild settings not found in database.");
     }
 
-    internal async Task<GuildsEntity> GetGuildEntityAsync(ulong guildId)
+    public async Task<GuildsEntity> GetGuildEntityAsync(ulong guildId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
@@ -118,7 +118,7 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
         return guild ?? throw new InvalidOperationException("Guild settings not found in database.");
     }
 
-    internal async Task<List<GuildsEntity>> GetGuildEntitiesWithDebugAsync(bool isDebug = true)
+    public async Task<List<GuildsEntity>> GetGuildEntitiesWithDebugAsync(bool isDebug = true)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
@@ -127,7 +127,7 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
             : await context.Guilds.Where(g => !g.IsDebugAllowed).ToListAsync();
     }
 
-    internal async Task RemoveGuildEntityAsync(ulong guildId)
+    public async Task RemoveGuildEntityAsync(ulong guildId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
@@ -160,7 +160,7 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
         }
     }
 
-    internal async Task SetAzuraCastEntityAsync(ulong guildId, string apiKey = "", Uri? apiUrl = null, int stationId = 0, ulong requestsChannel = 0, ulong outagesChannel = 0, bool showPlaylistInNowPlaying = false)
+    public async Task SetAzuraCastEntityAsync(ulong guildId, string apiKey = "", Uri? apiUrl = null, int stationId = 0, ulong requestsChannel = 0, ulong outagesChannel = 0, bool showPlaylistInNowPlaying = false)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
@@ -204,7 +204,7 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
         }
     }
 
-    internal async Task SetAzuraCastChecksEntityAsync(ulong guildId, bool fileChanges = false, bool serverStatus = false, bool updates = false, bool updatesChangelog = false)
+    public async Task SetAzuraCastChecksEntityAsync(ulong guildId, bool fileChanges = false, bool serverStatus = false, bool updates = false, bool updatesChangelog = false)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
@@ -246,7 +246,7 @@ internal sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactor
         }
     }
 
-    internal async Task SetGuildEntityAsync(ulong guildId, ulong errorChannelId = 0, bool isDebug = false)
+    public async Task SetGuildEntityAsync(ulong guildId, ulong errorChannelId = 0, bool isDebug = false)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();

@@ -5,7 +5,7 @@ using DSharpPlus.Commands.Trees;
 
 namespace AzzyBot.Commands.Choices;
 
-internal sealed class BotActivityProvider : IChoiceProvider
+public sealed class BotActivityProvider : IChoiceProvider
 {
     private readonly IReadOnlyDictionary<string, object> _botActivity = new Dictionary<string, object>()
     {

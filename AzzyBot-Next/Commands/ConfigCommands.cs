@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands;
 
-internal sealed class ConfigCommands
+public sealed class ConfigCommands
 {
     [Command("config"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
     public sealed class Config(DbActions db, ILogger<Config> logger)

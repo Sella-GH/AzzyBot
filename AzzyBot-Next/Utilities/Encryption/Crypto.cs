@@ -3,11 +3,11 @@ using System.Text;
 
 namespace AzzyBot.Utilities.Encryption;
 
-internal static class Crypto
+public static class Crypto
 {
-    internal static byte[] EncryptionKey = [];
+    public static byte[] EncryptionKey = [];
 
-    internal static string Encrypt(string plain)
+    public static string Encrypt(string plain)
     {
         using AesCcm aes = new(EncryptionKey);
 
@@ -21,7 +21,7 @@ internal static class Crypto
         return new AesGcmCipher(nonce, tag, cipherBytes).ToString();
     }
 
-    internal static string Decrypt(string cipher)
+    public static string Decrypt(string cipher)
     {
         AesGcmCipher gcmCipher = AesGcmCipher.FromBase64String(cipher);
 

@@ -18,7 +18,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands;
 
-internal sealed class CoreCommands
+public sealed class CoreCommands
 {
     [Command("core"), RequireGuild]
     public sealed class Core(AzzyBotSettingsRecord settings, DbActions dbActions, ILogger<Core> logger)

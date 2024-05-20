@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AzzyBot.Commands.Autocompletes;
 
-internal sealed class GuildsAutocomplete(DiscordBotService botService, IDbContextFactory<AzzyDbContext> dbContextFactory) : IAutoCompleteProvider
+public sealed class GuildsAutocomplete(DiscordBotService botService, IDbContextFactory<AzzyDbContext> dbContextFactory) : IAutoCompleteProvider
 {
     private readonly DiscordBotService _botService = botService;
     private readonly IDbContextFactory<AzzyDbContext> _dbContextFactory = dbContextFactory;

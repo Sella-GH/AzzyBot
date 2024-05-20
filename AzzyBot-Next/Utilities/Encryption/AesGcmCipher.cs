@@ -4,13 +4,13 @@ using System.Security.Cryptography;
 
 namespace AzzyBot.Utilities.Encryption;
 
-internal sealed class AesGcmCipher
+public sealed class AesGcmCipher
 {
-    internal byte[] Nonce { get; }
-    internal byte[] Tag { get; }
-    internal byte[] Cipher { get; }
+    public byte[] Nonce { get; }
+    public byte[] Tag { get; }
+    public byte[] Cipher { get; }
 
-    internal static AesGcmCipher FromBase64String(string data)
+    public static AesGcmCipher FromBase64String(string data)
     {
         byte[] dataBytes = Convert.FromBase64String(data);
         return new(
@@ -20,7 +20,7 @@ internal sealed class AesGcmCipher
         );
     }
 
-    internal AesGcmCipher(byte[] nonce, byte[] tag, byte[] cipher)
+    public AesGcmCipher(byte[] nonce, byte[] tag, byte[] cipher)
     {
         Nonce = nonce;
         Tag = tag;
