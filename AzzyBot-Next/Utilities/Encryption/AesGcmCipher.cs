@@ -1,16 +1,18 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Cryptography;
 
 namespace AzzyBot.Utilities.Encryption;
 
-internal sealed class AesGcmCipher(byte[] nonce, byte[] tag, byte[] cipher)
+[SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "Needed for security")]
+public sealed class AesGcmCipher(byte[] nonce, byte[] tag, byte[] cipher)
 {
-    internal byte[] Nonce { get; } = nonce;
-    internal byte[] Tag { get; } = tag;
-    internal byte[] Cipher { get; } = cipher;
+    public byte[] Nonce { get; } = nonce;
+    public byte[] Tag { get; } = tag;
+    public byte[] Cipher { get; } = cipher;
 
-    internal static AesGcmCipher FromBase64String(string data)
+    public static AesGcmCipher FromBase64String(string data)
     {
         byte[] dataBytes = Convert.FromBase64String(data);
         return new(
