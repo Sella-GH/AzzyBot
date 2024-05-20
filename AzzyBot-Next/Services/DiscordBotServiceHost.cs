@@ -66,7 +66,7 @@ public sealed class DiscordBotServiceHost : IHostedService
         int activity = _settings.DiscordStatus?.Activity ?? 2;
         string doing = _settings.DiscordStatus?.Doing ?? "Music";
         int status = _settings.DiscordStatus?.Status ?? 1;
-        string? url = _settings.DiscordStatus?.StreamUrl?.ToString();
+        Uri? url = _settings.DiscordStatus?.StreamUrl;
 
         await SetBotStatusAsync(status, activity, doing, url);
     }
@@ -78,7 +78,7 @@ public sealed class DiscordBotServiceHost : IHostedService
         UnregisterEventHandlers();
     }
 
-    public async Task SetBotStatusAsync(int status = 1, int type = 2, string doing = "Music", string? url = null, bool reset = false)
+    public async Task SetBotStatusAsync(int status = 1, int type = 2, string doing = "Music", Uri? url = null, bool reset = false)
     {
         if (reset)
         {
@@ -87,12 +87,12 @@ public sealed class DiscordBotServiceHost : IHostedService
         }
 
         DiscordActivityType activityType = (DiscordActivityType)Enum.ToObject(typeof(DiscordActivityType), type);
-        if (activityType.Equals(DiscordActivityType.Streaming) && string.IsNullOrWhiteSpace(url))
+        if (activityType.Equals(DiscordActivityType.Streaming) && url is null)
             activityType = DiscordActivityType.Playing;
 
         DiscordActivity activity = new(doing, activityType);
-        if (activityType.Equals(DiscordActivityType.Streaming) && !string.IsNullOrWhiteSpace(url) && (url.Contains("twitch", StringComparison.OrdinalIgnoreCase) || url.Contains("youtube", StringComparison.OrdinalIgnoreCase)))
-            activity.StreamUrl = url;
+        if (activityType.Equals(DiscordActivityType.Streaming) && url is not null && (url.Host.Contains("twitch", StringComparison.OrdinalIgnoreCase) || url.Host.Contains("youtube", StringComparison.OrdinalIgnoreCase)))
+            activity.StreamUrl = url.OriginalString;
 
         DiscordUserStatus userStatus = (DiscordUserStatus)Enum.ToObject(typeof(DiscordUserStatus), status);
 
