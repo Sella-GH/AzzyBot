@@ -35,7 +35,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         }
     }
 
-    public async Task AddBulkGuildEntitiesAsync(List<ulong> guildIds)
+    public async Task AddBulkGuildEntitiesAsync(IReadOnlyList<ulong> guildIds)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();

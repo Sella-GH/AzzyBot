@@ -211,11 +211,5 @@ public static class AzzyStatsHardware
 
     public static string GetSystemOs => RuntimeInformation.OSDescription;
     public static string GetSystemOsArch => RuntimeInformation.OSArchitecture.ToString();
-
-    public static DateTime GetSystemUptime()
-    {
-        TimeSpan uptime = new(Environment.TickCount64);
-
-        return DateTime.Now - uptime;
-    }
+    public static DateTime GetSystemUptime => DateTime.Now - new TimeSpan(Environment.TickCount64);
 }

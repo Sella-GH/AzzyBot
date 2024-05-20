@@ -102,7 +102,7 @@ public static class ServiceRegistering
             exclusions.Add(nameof(settings.Database.Password));
         }
 
-        AzzyBotSettingsCheck.CheckSettings(settings, exclusions);
+        SettingsCheck.CheckSettings(settings, exclusions);
 
         if (settings.EncryptionKey.Length != 32)
         {

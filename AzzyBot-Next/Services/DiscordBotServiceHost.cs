@@ -32,9 +32,12 @@ public sealed class DiscordBotServiceHost : IHostedService
     private readonly IServiceProvider _serviceProvider;
     private readonly AzzyBotSettingsRecord _settings;
     private readonly DbActions _dbActions;
-    public readonly DiscordShardedClient _shardedClient;
+    private readonly DiscordShardedClient _shardedClient;
     private DiscordBotService? _botService;
 
+    public DiscordShardedClient shardedClient { get; }
+
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public DiscordBotServiceHost(AzzyBotSettingsRecord settings, DbActions dbActions, ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
     {
         _logger = logger;
@@ -45,6 +48,7 @@ public sealed class DiscordBotServiceHost : IHostedService
 
         _shardedClient = new(GetDiscordConfig());
     }
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {

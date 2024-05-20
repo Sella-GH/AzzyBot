@@ -20,6 +20,8 @@ public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings, DbActio
 
     public async ValueTask<IReadOnlyDictionary<string, object>> AutoCompleteAsync(AutoCompleteContext context)
     {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+
         Dictionary<string, object> results = [];
 
         IEnumerable<DiscordUser> botOwners = context.Client.CurrentApplication.Owners ?? throw new InvalidOperationException("Invalid bot owners");

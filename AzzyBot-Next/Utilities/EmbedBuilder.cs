@@ -53,7 +53,7 @@ public static class EmbedBuilder
         string os = AzzyStatsHardware.GetSystemOs;
         string osArch = AzzyStatsHardware.GetSystemOsArch;
         string isDocker = AzzyStatsHardware.CheckIfDocker.ToString();
-        long uptime = Converter.ConvertToUnixTime(AzzyStatsHardware.GetSystemUptime());
+        long uptime = Converter.ConvertToUnixTime(AzzyStatsHardware.GetSystemUptime);
         Dictionary<int, double> cpuUsage = await AzzyStatsHardware.GetSystemCpusAsync();
         CpuLoadRecord cpuLoads = await AzzyStatsHardware.GetSystemCpuLoadAsync();
         MemoryUsageRecord memory = await AzzyStatsHardware.GetSystemMemoryUsageAsync();
