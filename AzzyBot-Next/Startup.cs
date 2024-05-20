@@ -9,7 +9,7 @@ namespace AzzyBot;
 
 public static class Startup
 {
-    private static async Task Main(string[] args)
+    public static async Task Main(string[] args)
     {
         string environment = AzzyStatsSoftware.GetBotEnvironment;
         bool isDev = environment == Environments.Development;
@@ -22,7 +22,7 @@ public static class Startup
         }
         else
         {
-            forceDebug = args.Length > 0 && args[0] is "-forceDebug";
+            forceDebug = args?.Length > 0 && args[0] is "-forceDebug";
         }
 
         HostApplicationBuilderSettings appSettings = new()
