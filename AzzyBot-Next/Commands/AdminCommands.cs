@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands;
 
+[SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class AdminCommands
 {
     [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
@@ -39,6 +41,8 @@ public sealed class AdminCommands
             [Description("Reset the status to default.")] bool reset = false
             )
         {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
             _logger.CommandRequested(nameof(ChangeStatusAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
@@ -65,6 +69,8 @@ public sealed class AdminCommands
             [Command("add-server"), Description("Adds the permission to execute debug commands to a server.")]
             public async ValueTask AddDebugGuildsAsync(CommandContext context, [Description("Select the server you want to add."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId = "")
             {
+                ArgumentNullException.ThrowIfNull(context, nameof(context));
+
                 _logger.CommandRequested(nameof(AddDebugGuildsAsync), context.User.GlobalName);
 
                 if (!ulong.TryParse(serverId, out ulong guildIdValue))
@@ -96,6 +102,8 @@ public sealed class AdminCommands
             [Command("get-servers"), Description("Displays all servers which can execute debug commands.")]
             public async ValueTask GetDebugGuildsAsync(CommandContext context)
             {
+                ArgumentNullException.ThrowIfNull(context, nameof(context));
+
                 _logger.CommandRequested(nameof(GetDebugGuildsAsync), context.User.GlobalName);
 
                 await context.DeferResponseAsync();
@@ -121,6 +129,8 @@ public sealed class AdminCommands
             [Command("remove-server"), Description("Removes the permission to execute debug commands from a server.")]
             public async ValueTask RemoveDebugGuildsAsync(CommandContext context, [Description("Select the server you want to remove."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId = "")
             {
+                ArgumentNullException.ThrowIfNull(context, nameof(context));
+
                 _logger.CommandRequested(nameof(RemoveDebugGuildsAsync), context.User.GlobalName);
 
                 if (!ulong.TryParse(serverId, out ulong guildIdValue))

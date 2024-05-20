@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace AzzyBot;
 
-public static class AzzyBot
+public static class Startup
 {
     private static async Task Main(string[] args)
     {

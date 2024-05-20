@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Commands.Autocompletes;
@@ -18,6 +19,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands;
 
+[SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class CoreCommands
 {
     [Command("core"), RequireGuild]
@@ -34,6 +36,8 @@ public sealed class CoreCommands
             [Description("The command you want to get more information about."), SlashAutoCompleteProvider<AzzyHelpAutocomplete>] string? command = null
             )
         {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
             _logger.CommandRequested(nameof(HelpAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
@@ -82,6 +86,8 @@ public sealed class CoreCommands
             [Command("hardware"), Description("Shows information about the hardware side of the bot.")]
             public async ValueTask HardwareStatsAsync(CommandContext context)
             {
+                ArgumentNullException.ThrowIfNull(context, nameof(context));
+
                 _logger.CommandRequested(nameof(HardwareStatsAsync), context.User.GlobalName);
 
                 await context.DeferResponseAsync();
@@ -95,6 +101,8 @@ public sealed class CoreCommands
             [Command("info"), Description("Shows information about the bot and it's components.")]
             public async ValueTask InfoStatsAsync(CommandContext context)
             {
+                ArgumentNullException.ThrowIfNull(context, nameof(context));
+
                 _logger.CommandRequested(nameof(InfoStatsAsync), context.User.GlobalName);
 
                 await context.DeferResponseAsync();
@@ -109,6 +117,8 @@ public sealed class CoreCommands
             [Command("ping"), Description("Ping the bot and get the latency to discord.")]
             public async ValueTask PingAsync(CommandContext context)
             {
+                ArgumentNullException.ThrowIfNull(context, nameof(context));
+
                 _logger.CommandRequested(nameof(PingAsync), context.User.GlobalName);
 
                 await context.RespondAsync($"Pong! {context.Client.Ping}ms");

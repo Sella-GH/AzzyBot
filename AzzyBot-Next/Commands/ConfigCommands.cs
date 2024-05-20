@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands;
 
+[SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class ConfigCommands
 {
     [Command("config"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
@@ -33,6 +35,8 @@ public sealed class ConfigCommands
             [Description("Enable or disable the showing of the playlist in the nowplaying embed.")] bool showPlaylistInNowPlaying = false
             )
         {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
             _logger.CommandRequested(nameof(SetAzuraCastAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
@@ -62,6 +66,8 @@ public sealed class ConfigCommands
             [Description("Enable or disable the addition of the changelog to the posted AzuraCast updates.")] bool updatesChangelog = false
             )
         {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
             _logger.CommandRequested(nameof(SetAzuraCastChecksAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
@@ -75,6 +81,8 @@ public sealed class ConfigCommands
         [Command("config-core")]
         public async ValueTask SetCoreAsync(CommandContext context, [Description("Select a channel to get notifications when the bot runs into an issue."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? errorChannel = null)
         {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
             _logger.CommandRequested(nameof(SetCoreAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
@@ -88,6 +96,8 @@ public sealed class ConfigCommands
         [Command("get-settings"), Description("Get all configured settings per direct message.")]
         public async ValueTask GetSettingsAsync(CommandContext context)
         {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
             _logger.CommandRequested(nameof(GetSettingsAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
@@ -115,6 +125,8 @@ public sealed class ConfigCommands
         [Command("reset-settings"), Description("Reset all of your settings to the default values.")]
         public async ValueTask ResetSettingsAsync(CommandContext context)
         {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
             _logger.CommandRequested(nameof(ResetSettingsAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
