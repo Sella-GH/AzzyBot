@@ -109,6 +109,8 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildAzzyHelpEmbed(AzzyHelpRecord command)
     {
+        ArgumentNullException.ThrowIfNull(command, nameof(command));
+
         string title = command.Name;
         string description = command.Description;
 
@@ -121,8 +123,9 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.Blurple, null, null, null, fields);
     }
 
-    public static DiscordEmbed BuildAzzyHelpEmbed(List<AzzyHelpRecord> commands)
+    public static DiscordEmbed BuildAzzyHelpEmbed(IReadOnlyList<AzzyHelpRecord> commands)
     {
+        ArgumentNullException.ThrowIfNull(commands, nameof(commands));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(commands.Count, nameof(commands));
 
         const string preTitle = "Command List For";
@@ -184,6 +187,8 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildAzzyUpdatesAvailableEmbed(Version version, in DateTime updateDate, Uri url)
     {
+        ArgumentNullException.ThrowIfNull(version, nameof(version));
+
         const string title = "Azzy Updates Available";
         const string description = "Update now to get the latest bug fixes, features and improvements!";
         string yourVersion = AzzyStatsSoftware.GetBotVersion;
@@ -232,6 +237,7 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildGetSettingsGuildEmbed(string serverName, GuildsEntity guild)
     {
+        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
         ArgumentException.ThrowIfNullOrWhiteSpace(serverName, nameof(serverName));
 
         const string title = "Settings overview";
@@ -249,6 +255,8 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast)
     {
+        ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
+
         const string title = "AzuraCast settings";
 
         Dictionary<string, DiscordEmbedRecord> fields = new()
@@ -266,6 +274,8 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildGetSettingsAzuraChecksEmbed(AzuraCastChecksEntity checks)
     {
+        ArgumentNullException.ThrowIfNull(checks, nameof(checks));
+
         const string title = "AzuraCast Checks settings";
 
         Dictionary<string, DiscordEmbedRecord> fields = new()

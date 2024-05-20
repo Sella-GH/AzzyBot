@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,6 +20,8 @@ public sealed class GuildsAutocomplete(DiscordBotService botService, IDbContextF
 
     public async ValueTask<IReadOnlyDictionary<string, object>> AutoCompleteAsync(AutoCompleteContext context)
     {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+
         await using AzzyDbContext dbContext = await _dbContextFactory.CreateDbContextAsync();
         List<GuildsEntity> guildsInDb = [];
         Dictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds();

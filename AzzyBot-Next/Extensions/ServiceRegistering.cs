@@ -22,7 +22,7 @@ public static class ServiceRegistering
     {
         logging.AddConsole();
         logging.AddFilter("Microsoft.EntityFrameworkCore.Infrastructure", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
-        logging.AddFilter("Microsoft.EntityFrameworkCore.Database", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
+        logging.AddFilter("Microsoft.EntityFrameworkCore.DatabaseSettings", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
         logging.AddFilter("Microsoft.EntityFrameworkCore.Migrations", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Information);
         logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.Warning);
         logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Warning);
@@ -151,7 +151,7 @@ public static class ServiceRegistering
         if (string.IsNullOrWhiteSpace(database))
             database = "azzybot";
 
-        return $"Server={host};Port={port};User={user};Password={password};Database={database};";
+        return $"Server={host};Port={port};User={user};Password={password};DatabaseSettings={database};";
     }
 
     private static IConfiguration GetConfiguration(string path)
