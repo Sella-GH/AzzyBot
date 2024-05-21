@@ -254,24 +254,30 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.White, null, null, null, fields);
     }
 
-    public static DiscordEmbed BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast)
+    public static IReadOnlyList<DiscordEmbed> BuildGetSettingsAzuraEmbed(IReadOnlyList<AzuraCastEntity> azuraCast)
     {
         ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
 
         const string title = "AzuraCast settings";
+        List<DiscordEmbed> embeds = [];
 
-        Dictionary<string, DiscordEmbedRecord> fields = new()
+        foreach (AzuraCastEntity azura in azuraCast)
         {
-            ["API Key"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.ApiKey)) ? azuraCast.ApiKey : "Not set")}||"),
-            ["API URL"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.ApiUrl)) ? azuraCast.ApiUrl : "Not set")}||"),
-            ["Station ID"] = new($"{((azuraCast.StationId > 0) ? azuraCast.StationId : "Not set")}"),
-            ["Music Requests Channel"] = new((azuraCast.MusicRequestsChannelId > 0) ? $"<#{azuraCast.MusicRequestsChannelId}>" : "Not set"),
-            ["Outages Channel"] = new((azuraCast.OutagesChannelId > 0) ? $"<#{azuraCast.OutagesChannelId}>" : "Not set"),
-            ["Prefer HLS Streaming"] = new(azuraCast.PreferHlsStreaming.ToString()),
-            ["Show Playlist In Now Playing"] = new(azuraCast.ShowPlaylistInNowPlaying.ToString())
-        };
+            Dictionary<string, DiscordEmbedRecord> fields = new()
+            {
+                ["API Key"] = new($"||{((!string.IsNullOrWhiteSpace(azura.ApiKey)) ? azura.ApiKey : "Not set")}||"),
+                ["API URL"] = new($"||{((!string.IsNullOrWhiteSpace(azura.ApiUrl)) ? azura.ApiUrl : "Not set")}||"),
+                ["Station ID"] = new($"{((azura.StationId > 0) ? azura.StationId : "Not set")}"),
+                ["Music Requests Channel"] = new((azura.MusicRequestsChannelId > 0) ? $"<#{azura.MusicRequestsChannelId}>" : "Not set"),
+                ["Outages Channel"] = new((azura.OutagesChannelId > 0) ? $"<#{azura.OutagesChannelId}>" : "Not set"),
+                ["Prefer HLS Streaming"] = new(azura.PreferHlsStreaming.ToString()),
+                ["Show Playlist In Now Playing"] = new(azura.ShowPlaylistInNowPlaying.ToString())
+            };
 
-        return CreateBasicEmbed(title, string.Empty, DiscordColor.White, null, null, null, fields);
+            embeds.Add(CreateBasicEmbed(title, string.Empty, DiscordColor.White, null, null, null, fields));
+        }
+
+        return embeds;
     }
 
     public static DiscordEmbed BuildGetSettingsAzuraChecksEmbed(AzuraCastChecksEntity checks)

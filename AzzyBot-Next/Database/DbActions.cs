@@ -16,6 +16,39 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     private readonly IDbContextFactory<AzzyDbContext> _dbContextFactory = dbContextFactory;
     private readonly ILogger<DbActions> _logger = logger;
 
+    public async Task AddAzuraCastEntityAsync(ulong guildId, string apiKey = "", Uri? apiUrl = null, int stationId = 0, ulong requestsChannel = 0, ulong outagesChannel = 0, bool hlsStreaming = false, bool showPlaylistInNowPlaying = false)
+    {
+        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
+
+        try
+        {
+            GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
+            if (guild is not null)
+            {
+                await context.AzuraCast.AddAsync(new()
+                {
+                    ApiKey = Crypto.Encrypt(apiKey),
+                    ApiUrl = Crypto.Encrypt(apiUrl?.OriginalString ?? throw new InvalidOperationException("You have to provide an api key!")),
+                    StationId = stationId,
+                    MusicRequestsChannelId = requestsChannel,
+                    OutagesChannelId = outagesChannel,
+                    PreferHlsStreaming = hlsStreaming,
+                    ShowPlaylistInNowPlaying = showPlaylistInNowPlaying,
+                    GuildId = guild.Id
+                });
+                await context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+            }
+        }
+        catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
+        {
+            _logger.DatabaseTransactionFailed(ex);
+            await transaction.RollbackAsync();
+        }
+    }
+
     public async Task AddAzuraCastMountPointAsync(ulong guildId, string mountName, string mount)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
@@ -90,26 +123,21 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         }
     }
 
-    public async Task<AzuraCastEntity> GetAzuraCastEntityAsync(ulong guildId)
+    public async Task<List<AzuraCastEntity>> GetAzuraCastEntityAsync(ulong guildId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
         GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
         if (guild is not null)
         {
-            AzuraCastEntity? azura = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
-            if (azura is not null)
+            List<AzuraCastEntity> azura = await context.AzuraCast.Where(a => a.GuildId == guild.Id).ToListAsync();
+            foreach (AzuraCastEntity entity in azura)
             {
-                if (azura.ApiKey.Length > 0)
-                    azura.ApiKey = Crypto.Decrypt(azura.ApiKey);
-
-                if (azura.ApiUrl.Length > 0)
-                    azura.ApiUrl = Crypto.Decrypt(azura.ApiUrl);
-
-                return azura;
+                entity.ApiKey = Crypto.Decrypt(entity.ApiKey);
+                entity.ApiUrl = Crypto.Decrypt(entity.ApiUrl);
             }
 
-            throw new InvalidOperationException("AzuraCast settings not found in database.");
+            return azura;
         }
 
         throw new InvalidOperationException("Guild settings not found in database.");
