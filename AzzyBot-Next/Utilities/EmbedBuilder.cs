@@ -263,6 +263,25 @@ public static class EmbedBuilder
 
         foreach (AzuraCastEntity azura in azuraCast)
         {
+            StringBuilder checks = new();
+            checks.AppendLine(CultureInfo.InvariantCulture, $"- File Changes: {azura.AutomaticChecks.FileChanges}");
+            checks.AppendLine(CultureInfo.InvariantCulture, $"- Server Status: {azura.AutomaticChecks.ServerStatus}");
+            checks.AppendLine(CultureInfo.InvariantCulture, $"- Updates: {azura.AutomaticChecks.Updates}");
+            checks.AppendLine(CultureInfo.InvariantCulture, $"- Updates Changelog: {azura.AutomaticChecks.UpdatesShowChangelog}");
+
+            StringBuilder mounts = new();
+            if (azura.MountPoints.Count > 0)
+            {
+                foreach (AzuraCastMountsEntity mount in azura.MountPoints)
+                {
+                    mounts.AppendLine(CultureInfo.InvariantCulture, $"- {mount.Name}: {mount.Mount}");
+                }
+            }
+            else
+            {
+                mounts.AppendLine("No AzuraCast Mount Points added.");
+            }
+
             Dictionary<string, DiscordEmbedRecord> fields = new()
             {
                 ["API Key"] = new($"||{((!string.IsNullOrWhiteSpace(azura.ApiKey)) ? azura.ApiKey : "Not set")}||"),
@@ -271,45 +290,14 @@ public static class EmbedBuilder
                 ["Music Requests Channel"] = new((azura.MusicRequestsChannelId > 0) ? $"<#{azura.MusicRequestsChannelId}>" : "Not set"),
                 ["Outages Channel"] = new((azura.OutagesChannelId > 0) ? $"<#{azura.OutagesChannelId}>" : "Not set"),
                 ["Prefer HLS Streaming"] = new(azura.PreferHlsStreaming.ToString()),
-                ["Show Playlist In Now Playing"] = new(azura.ShowPlaylistInNowPlaying.ToString())
+                ["Show Playlist In Now Playing"] = new(azura.ShowPlaylistInNowPlaying.ToString()),
+                ["Automatic Checks"] = new(checks.ToString()),
+                ["Mount Points"] = new(mounts.ToString())
             };
 
             embeds.Add(CreateBasicEmbed(title, string.Empty, DiscordColor.White, null, null, null, fields));
         }
 
         return embeds;
-    }
-
-    public static DiscordEmbed BuildGetSettingsAzuraChecksEmbed(AzuraCastChecksEntity checks)
-    {
-        ArgumentNullException.ThrowIfNull(checks, nameof(checks));
-
-        const string title = "AzuraCast Checks settings";
-
-        Dictionary<string, DiscordEmbedRecord> fields = new()
-        {
-            ["File Changes"] = new(checks.FileChanges.ToString()),
-            ["Server Status"] = new(checks.ServerStatus.ToString()),
-            ["Updates"] = new(checks.Updates.ToString()),
-            ["Updates Changelog"] = new(checks.UpdatesShowChangelog.ToString())
-        };
-
-        return CreateBasicEmbed(title, string.Empty, DiscordColor.White, null, null, null, fields);
-    }
-
-    public static DiscordEmbed BuildGetSettingsAzuraMountsEmbed(IReadOnlyList<AzuraCastMountsEntity> mounts)
-    {
-        ArgumentNullException.ThrowIfNull(mounts, nameof(mounts));
-
-        const string title = "AzuraCast Mount Points";
-        const string desc = "You have no mount points registered.";
-
-        Dictionary<string, DiscordEmbedRecord> fields = [];
-        foreach (AzuraCastMountsEntity mount in mounts)
-        {
-            fields.Add(mount.Name, new(mount.Mount));
-        }
-
-        return CreateBasicEmbed(title, (mounts.Count == 0) ? desc : string.Empty, DiscordColor.White, null, null, null, fields);
     }
 }

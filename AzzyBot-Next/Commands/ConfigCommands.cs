@@ -122,16 +122,12 @@ public sealed class ConfigCommands
 
             GuildsEntity guild = await _db.GetGuildEntityAsync(guildId);
             List<AzuraCastEntity> azuraCast = await _db.GetAzuraCastEntitiesAsync(guildId);
-            AzuraCastChecksEntity checks = await _db.GetAzuraCastChecksEntityAsync(guildId);
-            List<AzuraCastMountsEntity> mounts = await _db.GetAzuraCastMountsEntitiesAsync(guildId);
 
             DiscordEmbed guildEmbed = EmbedBuilder.BuildGetSettingsGuildEmbed(guildName, guild);
             IReadOnlyList<DiscordEmbed> azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(azuraCast);
-            DiscordEmbed azuraChecks = EmbedBuilder.BuildGetSettingsAzuraChecksEmbed(checks);
-            DiscordEmbed azuraMounts = EmbedBuilder.BuildGetSettingsAzuraMountsEmbed(mounts);
 
             await using DiscordMessageBuilder messageBuilder = new();
-            messageBuilder.AddEmbeds([guildEmbed, .. azuraEmbed, azuraChecks, azuraMounts]);
+            messageBuilder.AddEmbeds([guildEmbed, .. azuraEmbed]);
 
             await member.SendMessageAsync(messageBuilder);
 

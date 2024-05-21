@@ -37,8 +37,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                     OutagesChannelId = outagesChannel,
                     PreferHlsStreaming = hlsStreaming,
                     ShowPlaylistInNowPlaying = showPlaylistInNowPlaying,
-                    GuildId = guild.Id,
-                    AutomaticChecks = new()
+                    GuildId = guild.Id
                 });
                 await context.SaveChangesAsync();
 
@@ -137,10 +136,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             foreach (AzuraCastEntity entity in azura)
             {
                 if (!string.IsNullOrWhiteSpace(entity.ApiKey))
-                entity.ApiKey = Crypto.Decrypt(entity.ApiKey);
+                    entity.ApiKey = Crypto.Decrypt(entity.ApiKey);
 
                 if (!string.IsNullOrWhiteSpace(entity.ApiUrl))
-                entity.ApiUrl = Crypto.Decrypt(entity.ApiUrl);
+                    entity.ApiUrl = Crypto.Decrypt(entity.ApiUrl);
             }
 
             return azura;
@@ -149,42 +148,30 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         throw new InvalidOperationException("Guild settings not found in database.");
     }
 
-    public async Task<AzuraCastChecksEntity> GetAzuraCastChecksEntityAsync(ulong guildId)
+    public async Task<AzuraCastChecksEntity> GetAzuraCastChecksEntityAsync(int azuraId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
-        if (guild is not null)
+        AzuraCastEntity? azura = await context.AzuraCast.SingleOrDefaultAsync(a => a.Id == azuraId);
+        if (azura is not null)
         {
-            AzuraCastEntity? azura = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
-            if (azura is not null)
-            {
-                AzuraCastChecksEntity? checks = await context.AzuraCastChecks.SingleOrDefaultAsync(c => c.AzuraCastId == azura.Id);
+            AzuraCastChecksEntity? checks = await context.AzuraCastChecks.SingleOrDefaultAsync(c => c.AzuraCastId == azura.Id);
 
-                return checks ?? throw new InvalidOperationException("AzuraCast checks settings not found in database.");
-            }
-
-            throw new InvalidOperationException("AzuraCast settings not found in database.");
+            return checks ?? throw new InvalidOperationException("AzuraCast checks settings not found in database.");
         }
 
-        throw new InvalidOperationException("Guild settings not found in database.");
+        throw new InvalidOperationException("AzuraCast settings not found in database.");
     }
 
-    public async Task<List<AzuraCastMountsEntity>> GetAzuraCastMountsEntitiesAsync(ulong guildId)
+    public async Task<List<AzuraCastMountsEntity>> GetAzuraCastMountsEntitiesAsync(int azuraId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
-        if (guild is not null)
-        {
-            AzuraCastEntity? azura = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
-            if (azura is not null)
-                return await context.AzuraCastMounts.Where(m => m.AzuraCastId == azura.Id).ToListAsync();
+        AzuraCastEntity? azura = await context.AzuraCast.SingleOrDefaultAsync(a => a.Id == azuraId);
+        if (azura is not null)
+            return await context.AzuraCastMounts.Where(m => m.AzuraCastId == azura.Id).ToListAsync();
 
-            throw new InvalidOperationException("AzuraCast settings not found in database.");
-        }
-
-        throw new InvalidOperationException("Guild settings not found in database.");
+        throw new InvalidOperationException("AzuraCast settings not found in database.");
     }
 
     public async Task<GuildsEntity> GetGuildEntityAsync(ulong guildId)
@@ -215,16 +202,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
             if (guild is not null)
             {
-                AzuraCastEntity? azura = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
-                if (azura is not null)
-                {
-                    AzuraCastChecksEntity? checks = await context.AzuraCastChecks.SingleOrDefaultAsync(c => c.AzuraCastId == azura.Id);
-                    if (checks is not null)
-                        context.AzuraCastChecks.Remove(checks);
-
-                    context.AzuraCast.Remove(azura);
-                }
-
                 context.Guilds.Remove(guild);
                 await context.SaveChangesAsync();
 

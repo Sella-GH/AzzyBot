@@ -17,8 +17,7 @@ public sealed class AzuraCastEntity
     public bool PreferHlsStreaming { get; set; }
     public bool ShowPlaylistInNowPlaying { get; set; }
     public ICollection<AzuraCastMountsEntity> MountPoints { get; } = new List<AzuraCastMountsEntity>();
-
-    public AzuraCastChecksEntity? AutomaticChecks { get; set; }
+    public AzuraCastChecksEntity AutomaticChecks { get; set; } = new();
 
     public int GuildId { get; set; }
     public GuildsEntity Guild { get; set; } = null!;
