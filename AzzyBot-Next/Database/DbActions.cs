@@ -16,8 +16,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     private readonly IDbContextFactory<AzzyDbContext> _dbContextFactory = dbContextFactory;
     private readonly ILogger<DbActions> _logger = logger;
 
-    public async Task AddAzuraCastEntityAsync(ulong guildId, string apiKey = "", Uri? apiUrl = null, int stationId = 0, ulong requestsChannel = 0, ulong outagesChannel = 0, bool hlsStreaming = false, bool showPlaylistInNowPlaying = false)
+    public async Task AddAzuraCastEntityAsync(ulong guildId, string apiKey, Uri apiUrl, int stationId, ulong requestsChannel, ulong outagesChannel, bool hlsStreaming, bool showPlaylistInNowPlaying)
     {
+        ArgumentNullException.ThrowIfNull(apiUrl, nameof(apiUrl));
+
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
 
@@ -29,13 +31,14 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 await context.AzuraCast.AddAsync(new()
                 {
                     ApiKey = Crypto.Encrypt(apiKey),
-                    ApiUrl = Crypto.Encrypt(apiUrl?.OriginalString ?? throw new InvalidOperationException("You have to provide an api key!")),
+                    ApiUrl = Crypto.Encrypt(apiUrl.OriginalString),
                     StationId = stationId,
                     MusicRequestsChannelId = requestsChannel,
                     OutagesChannelId = outagesChannel,
                     PreferHlsStreaming = hlsStreaming,
                     ShowPlaylistInNowPlaying = showPlaylistInNowPlaying,
-                    GuildId = guild.Id
+                    GuildId = guild.Id,
+                    AutomaticChecks = new()
                 });
                 await context.SaveChangesAsync();
 

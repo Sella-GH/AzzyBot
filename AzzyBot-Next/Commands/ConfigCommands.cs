@@ -44,38 +44,31 @@ public sealed class ConfigCommands
             await context.EditResponseAsync("Your mount point was added successfully.");
         }
 
-        [Command("config-azuracast"), Description("Configure the settings of the AzuraCast module.")]
-        public async ValueTask SetAzuraCastAsync
+        [Command("add-azuracast-station"), Description("Let's you dd an AzuraCast station to manage.")]
+        public async ValueTask AddAzuraCastStationAsync
             (
             CommandContext context,
-            [Description("Enter the api key of your azuracast installation.")] string apiKey = "",
-            [Description("Enter the url of your api endpoint, like: https://demo.azuracast.com/api")] Uri? apiUrl = null,
-            [Description("Enter the station id of your azuracast station.")] int stationId = 0,
-            [Description("Select a channel to get music requests when a request is not found on the server."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? requestsChannel = null,
-            [Description("Select a channel to get notifications when your azuracast installation is down."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? outagesChannel = null,
-            [Description("Enable or disable the preference of HLS streams if you add an able mount point.")] bool hlsStreaming = false,
-            [Description("Enable or disable the showing of the playlist in the nowplaying embed.")] bool showPlaylistInNowPlaying = false
+            [Description("Enter the api key of your azuracast installation.")] string apiKey,
+            [Description("Enter the url of your api endpoint, like: https://demo.azuracast.com/api")] Uri apiUrl,
+            [Description("Enter the station id of your azuracast station.")] int stationId,
+            [Description("Select a channel to get music requests when a request is not found on the server."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel requestsChannel,
+            [Description("Select a channel to get notifications when your azuracast installation is down."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel outagesChannel,
+            [Description("Enable or disable the preference of HLS streams if you add an able mount point.")] bool hlsStreaming,
+            [Description("Enable or disable the showing of the playlist in the nowplaying embed.")] bool showPlaylistInNowPlaying
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
-            _logger.CommandRequested(nameof(SetAzuraCastAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(AddAzuraCastStationAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.SetAzuraCastEntityAsync(guildId, apiKey, apiUrl, stationId, requestsChannel?.Id ?? 0, outagesChannel?.Id ?? 0, hlsStreaming, showPlaylistInNowPlaying);
+            await _db.AddAzuraCastEntityAsync(guildId, apiKey, apiUrl, stationId, requestsChannel?.Id ?? 0, outagesChannel?.Id ?? 0, hlsStreaming, showPlaylistInNowPlaying);
 
-            if (!string.IsNullOrWhiteSpace(apiKey) || apiUrl is not null)
-            {
                 await context.DeleteResponseAsync();
                 await context.FollowupAsync("Your settings were saved and sensitive data has been encrypted. Your message was also deleted for security reasons.");
             }
-            else
-            {
-                await context.EditResponseAsync("Your settings were saved successfully.");
-            }
-        }
 
         [Command("config-azuracast-checks"), Description("Configure the settings of the automatic checks inside the AzuraCast module.")]
         public async ValueTask SetAzuraCastChecksAsync
