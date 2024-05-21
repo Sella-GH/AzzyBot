@@ -126,7 +126,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         }
     }
 
-    public async Task<List<AzuraCastEntity>> GetAzuraCastEntityAsync(ulong guildId)
+    public async Task<List<AzuraCastEntity>> GetAzuraCastEntitiesAsync(ulong guildId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
@@ -136,7 +136,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             List<AzuraCastEntity> azura = await context.AzuraCast.Where(a => a.GuildId == guild.Id).ToListAsync();
             foreach (AzuraCastEntity entity in azura)
             {
+                if (!string.IsNullOrWhiteSpace(entity.ApiKey))
                 entity.ApiKey = Crypto.Decrypt(entity.ApiKey);
+
+                if (!string.IsNullOrWhiteSpace(entity.ApiUrl))
                 entity.ApiUrl = Crypto.Decrypt(entity.ApiUrl);
             }
 

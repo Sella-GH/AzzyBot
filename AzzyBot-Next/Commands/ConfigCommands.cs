@@ -66,9 +66,9 @@ public sealed class ConfigCommands
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             await _db.AddAzuraCastEntityAsync(guildId, apiKey, apiUrl, stationId, requestsChannel?.Id ?? 0, outagesChannel?.Id ?? 0, hlsStreaming, showPlaylistInNowPlaying);
 
-                await context.DeleteResponseAsync();
-                await context.FollowupAsync("Your settings were saved and sensitive data has been encrypted. Your message was also deleted for security reasons.");
-            }
+            await context.DeleteResponseAsync();
+            await context.FollowupAsync("Your settings were saved and sensitive data has been encrypted. Your message was also deleted for security reasons.");
+        }
 
         [Command("config-azuracast-checks"), Description("Configure the settings of the automatic checks inside the AzuraCast module.")]
         public async ValueTask SetAzuraCastChecksAsync
@@ -120,10 +120,10 @@ public sealed class ConfigCommands
             string guildName = context.Guild.Name;
             DiscordMember member = context.Member ?? throw new InvalidOperationException("Member is null");
 
-            List<AzuraCastEntity> azuraCast = await _db.GetAzuraCastEntityAsync(guildId);
+            GuildsEntity guild = await _db.GetGuildEntityAsync(guildId);
+            List<AzuraCastEntity> azuraCast = await _db.GetAzuraCastEntitiesAsync(guildId);
             AzuraCastChecksEntity checks = await _db.GetAzuraCastChecksEntityAsync(guildId);
             List<AzuraCastMountsEntity> mounts = await _db.GetAzuraCastMountsEntitiesAsync(guildId);
-            GuildsEntity guild = await _db.GetGuildEntityAsync(guildId);
 
             DiscordEmbed guildEmbed = EmbedBuilder.BuildGetSettingsGuildEmbed(guildName, guild);
             IReadOnlyList<DiscordEmbed> azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(azuraCast);
@@ -131,7 +131,7 @@ public sealed class ConfigCommands
             DiscordEmbed azuraMounts = EmbedBuilder.BuildGetSettingsAzuraMountsEmbed(mounts);
 
             await using DiscordMessageBuilder messageBuilder = new();
-            messageBuilder.AddEmbeds([guildEmbed, ..azuraEmbed, azuraChecks, azuraMounts]);
+            messageBuilder.AddEmbeds([guildEmbed, .. azuraEmbed, azuraChecks, azuraMounts]);
 
             await member.SendMessageAsync(messageBuilder);
 
