@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AzzyBot.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20240520225310_InitialCreation")]
+    [Migration("20240521031014_InitialCreation")]
     partial class InitialCreation
     {
         /// <inheritdoc />
@@ -91,8 +91,7 @@ namespace AzzyBot.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GuildId")
-                        .IsUnique();
+                    b.HasIndex("GuildId");
 
                     b.ToTable("AzuraCast");
                 });
@@ -162,8 +161,8 @@ namespace AzzyBot.Migrations
             modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastEntity", b =>
                 {
                     b.HasOne("AzzyBot.Database.Entities.GuildsEntity", "Guild")
-                        .WithOne("AzuraCast")
-                        .HasForeignKey("AzzyBot.Database.Entities.AzuraCastEntity", "GuildId")
+                        .WithMany("AzuraCastStations")
+                        .HasForeignKey("GuildId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -190,7 +189,7 @@ namespace AzzyBot.Migrations
 
             modelBuilder.Entity("AzzyBot.Database.Entities.GuildsEntity", b =>
                 {
-                    b.Navigation("AzuraCast");
+                    b.Navigation("AzuraCastStations");
                 });
 #pragma warning restore 612, 618
         }

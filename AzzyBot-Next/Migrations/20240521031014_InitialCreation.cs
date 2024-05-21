@@ -111,8 +111,7 @@ namespace AzzyBot.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_AzuraCast_GuildId",
                 table: "AzuraCast",
-                column: "GuildId",
-                unique: true);
+                column: "GuildId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AzuraCastChecks_AzuraCastId",

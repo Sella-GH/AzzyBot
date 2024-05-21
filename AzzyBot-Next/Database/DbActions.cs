@@ -50,7 +50,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
         try
         {
-            await context.Guilds.AddAsync(new() { UniqueId = guildId, AzuraCast = new() { AutomaticChecks = new() } });
+            await context.Guilds.AddAsync(new() { UniqueId = guildId });
             await context.SaveChangesAsync();
 
             await transaction.CommitAsync();
@@ -72,7 +72,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             List<ulong> existingGuilds = await context.Guilds.Select(g => g.UniqueId).ToListAsync();
             List<GuildsEntity> newGuilds = guildIds
                 .Where(guild => !existingGuilds.Contains(guild))
-                .Select(guild => new GuildsEntity() { UniqueId = guild, AzuraCast = new() { AutomaticChecks = new() } })
+                .Select(guild => new GuildsEntity() { UniqueId = guild })
                 .ToList();
 
             if (newGuilds.Count > 0)
