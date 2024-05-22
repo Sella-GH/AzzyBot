@@ -93,10 +93,6 @@ public static class ServiceRegistering
         if (isDocker)
         {
             exclusions.Add(nameof(settings.Database));
-            exclusions.Add(nameof(settings.Database.Host));
-            exclusions.Add(nameof(settings.Database.Password));
-            exclusions.Add(nameof(settings.Database.Port));
-            exclusions.Add(nameof(settings.Database.User));
         }
         else
         {
