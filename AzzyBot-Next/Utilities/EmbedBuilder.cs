@@ -64,7 +64,7 @@ public static class EmbedBuilder
         {
             ["Operating System"] = new(os, true),
             ["Architecture"] = new(osArch, true),
-            ["Is Dockerized"] = new(isDocker, true),
+            ["Is Docker?"] = new(isDocker, true),
             ["System Uptime"] = new($"<t:{uptime}>", false)
         };
 
@@ -196,8 +196,8 @@ public static class EmbedBuilder
         Dictionary<string, DiscordEmbedRecord> fields = new()
         {
             ["Release Date"] = new($"<t:{Converter.ConvertToUnixTime(updateDate)}>"),
-            ["Your version"] = new(yourVersion),
-            ["New version"] = new(version.ToString())
+            ["Your Version"] = new(yourVersion),
+            ["New Version"] = new(version.ToString())
         };
 
         return CreateBasicEmbed(title, description, DiscordColor.White, null, null, url, fields);
@@ -220,7 +220,7 @@ public static class EmbedBuilder
     {
         bool isLinux = AzzyStatsHardware.CheckIfLinuxOs;
         bool isWindows = AzzyStatsHardware.CheckIfWindowsOs;
-        const string title = "Update instructions";
+        const string title = "Update Instructions";
         string description = "Please follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wiki/Docker-Update-Instructions).";
 
         if (isLinux)
@@ -240,14 +240,14 @@ public static class EmbedBuilder
         ArgumentNullException.ThrowIfNull(guild, nameof(guild));
         ArgumentException.ThrowIfNullOrWhiteSpace(serverName, nameof(serverName));
 
-        const string title = "Settings overview";
-        string description = $"Here are all settings which are currently set for {serverName}";
+        const string title = "Settings Overview";
+        string description = $"Here are all settings which are currently set for **{serverName}**";
 
         Dictionary<string, DiscordEmbedRecord> fields = new()
         {
             ["Server ID"] = new(guild.UniqueId.ToString(CultureInfo.InvariantCulture)),
-            ["Error channel"] = new((guild.ErrorChannelId > 0) ? $"<#{guild.ErrorChannelId}>" : "Not set"),
-            ["Configuration complete"] = new(guild.ConfigSet.ToString())
+            ["Error Channel"] = new((guild.ErrorChannelId > 0) ? $"<#{guild.ErrorChannelId}>" : "Not set"),
+            ["Configuration Complete"] = new(guild.ConfigSet.ToString())
         };
 
         return CreateBasicEmbed(title, description, DiscordColor.White, null, null, null, fields);
@@ -257,7 +257,7 @@ public static class EmbedBuilder
     {
         ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
 
-        const string title = "AzuraCast settings";
+        const string title = "AzuraCast Settings";
         List<DiscordEmbed> embeds = [];
 
         foreach (AzuraCastEntity azura in azuraCast)
