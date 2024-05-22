@@ -92,6 +92,7 @@ public static class ServiceRegistering
         List<string> exclusions = [nameof(settings.DiscordStatus.StreamUrl)];
         if (isDocker)
         {
+            exclusions.Add(nameof(settings.Database));
             exclusions.Add(nameof(settings.Database.Host));
             exclusions.Add(nameof(settings.Database.Password));
             exclusions.Add(nameof(settings.Database.Port));
