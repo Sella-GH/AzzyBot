@@ -67,7 +67,7 @@ public sealed class ConfigCommands
             await _db.AddAzuraCastEntityAsync(guildId, apiKey, apiUrl, stationId, requestsChannel?.Id ?? 0, outagesChannel?.Id ?? 0, hlsStreaming, showPlaylistInNowPlaying);
 
             await context.DeleteResponseAsync();
-            await context.FollowupAsync("Your settings were saved and sensitive data has been encrypted. Your message was also deleted for security reasons.");
+            await context.FollowupAsync("Your station was added successfully. Your API Key and URL have been encrypted and your message was deleted for security reasons.");
         }
 
         [Command("config-azuracast-checks"), Description("Configure the settings of the automatic checks inside the AzuraCast module.")]
