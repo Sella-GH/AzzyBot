@@ -25,6 +25,10 @@ public static class Startup
             forceDebug = args?.Length > 0 && args[0] is "-forceDebug";
         }
 
+        await Console.Out.WriteLineAsync($"Dev?: {isDev}");
+        await Console.Out.WriteLineAsync($"Docker?: {isDocker}");
+        await Console.Out.WriteLineAsync($"Debug?: {forceDebug}");
+
         HostApplicationBuilderSettings appSettings = new()
         {
             ContentRootPath = Directory.GetCurrentDirectory(),
