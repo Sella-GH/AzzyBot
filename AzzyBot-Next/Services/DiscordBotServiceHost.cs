@@ -137,11 +137,9 @@ public sealed class DiscordBotServiceHost : IHostedService
             // These commands are for every server
             commandsExtension.AddCommands(typeof(ConfigCommands.ConfigGroup));
             commandsExtension.AddCommands(typeof(CoreCommands.CoreGroup));
-            commandsExtension.AddCommands(typeof(CoreCommands.CoreGroup.CoreStats));
 
             // Only add admin commands to the main server
             commandsExtension.AddCommand(typeof(AdminCommands.AdminGroup), _settings.ServerId);
-            commandsExtension.AddCommand(typeof(AdminCommands.AdminGroup.AdminDebugServers), _settings.ServerId);
 
             // Only add debug commands if it's a dev build
             if (AzzyStatsSoftware.GetBotName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase))
