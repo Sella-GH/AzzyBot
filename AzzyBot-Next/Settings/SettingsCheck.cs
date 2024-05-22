@@ -24,10 +24,6 @@ public static class SettingsCheck
 
         foreach (PropertyInfo property in properties.Where(p => excluded?.Contains(p.Name) == false))
         {
-            Console.Out.WriteLine(property.Name);
-            Console.Out.WriteLine(property.PropertyType.Name);
-            Console.Out.WriteLine(property.GetValue(settings));
-
             object? value = property.GetValue(settings);
             switch (property.PropertyType)
             {
