@@ -72,46 +72,64 @@ public static class EmbedBuilder
         if (!AzzyStatsHardware.CheckIfLinuxOs)
             return CreateBasicEmbed(title, null, DiscordColor.Orange, null, notLinux, null, fields);
 
-        StringBuilder cpuUsageBuilder = new();
-        foreach (KeyValuePair<int, double> kvp in cpuUsage)
+        if (cpuUsage.Count > 0)
         {
-            int counter = kvp.Key;
-
-            if (counter == 0)
+            StringBuilder cpuUsageBuilder = new();
+            foreach (KeyValuePair<int, double> kvp in cpuUsage)
             {
-                cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Total usage: **{kvp.Value}**%");
-                continue;
+                int counter = kvp.Key;
+
+                if (counter == 0)
+                {
+                    cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Total usage: **{kvp.Value}**%");
+                    continue;
+                }
+
+                cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Core {counter}: **{kvp.Value}**%");
             }
 
-            cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Core {counter}: **{kvp.Value}**%");
+            fields.Add("CPU Usage", new(cpuUsageBuilder.ToString(), false));
         }
 
-        fields.Add("CPU Usage", new(cpuUsageBuilder.ToString(), false));
-
-        StringBuilder cpuTempBuilder = new();
-        foreach (KeyValuePair<string, double> kvp in cpuTemp)
+        if (cpuTemp.Count > 0)
         {
-            cpuTempBuilder.AppendLine(CultureInfo.InvariantCulture, $"{kvp.Key}: **{kvp.Value}** °C");
+            StringBuilder cpuTempBuilder = new();
+            foreach (KeyValuePair<string, double> kvp in cpuTemp)
+            {
+                cpuTempBuilder.AppendLine(CultureInfo.InvariantCulture, $"{kvp.Key}: **{kvp.Value}** °C");
+            }
+
+            fields.Add("Temperatures", new(cpuTempBuilder.ToString(), false));
         }
 
-        fields.Add("Temperatures", new(cpuTempBuilder.ToString(), false));
-
-        string cpuLoad = $"1-Min-Load: **{cpuLoads.OneMin}**\n5-Min-Load: **{cpuLoads.FiveMin}**\n15-Min-Load: **{cpuLoads.FifteenMin}**";
-        fields.Add("CPU Load", new(cpuLoad, true));
-
-        string memoryUsage = $"Total: **{memory.Total}** GB\nUsed: **{memory.Used}** GB\nFree: **{Math.Round(memory.Total - memory.Used, 2)}** GB";
-        fields.Add("Memory Usage", new(memoryUsage, true));
-
-        string diskUsage = $"Total: **{disk.TotalSize}** GB\nUsed: **{disk.TotalUsedSpace}** GB\nFree: **{disk.TotalFreeSpace}** GB";
-        fields.Add("Disk Usage", new(diskUsage, true));
-
-        StringBuilder networkUsageBuilder = new();
-        foreach (KeyValuePair<string, NetworkSpeedRecord> kvp in networkUsage)
+        if (cpuLoads is not null)
         {
-            networkUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Interface: **{kvp.Key}**\nReceived: **{kvp.Value.Received}** KB/s\nTransmitted: **{kvp.Value.Transmitted}** KB/s\n");
+            string cpuLoad = $"1-Min-Load: **{cpuLoads.OneMin}**\n5-Min-Load: **{cpuLoads.FiveMin}**\n15-Min-Load: **{cpuLoads.FifteenMin}**";
+            fields.Add("CPU Load", new(cpuLoad, true));
         }
 
-        fields.Add("Network Usage", new(networkUsageBuilder.ToString(), false));
+        if (memory is not null)
+        {
+            string memoryUsage = $"Total: **{memory.Total}** GB\nUsed: **{memory.Used}** GB\nFree: **{Math.Round(memory.Total - memory.Used, 2)}** GB";
+            fields.Add("Memory Usage", new(memoryUsage, true));
+        }
+
+        if (disk is not null)
+        {
+            string diskUsage = $"Total: **{disk.TotalSize}** GB\nUsed: **{disk.TotalUsedSpace}** GB\nFree: **{disk.TotalFreeSpace}** GB";
+            fields.Add("Disk Usage", new(diskUsage, true));
+        }
+
+        if (networkUsage.Count > 0)
+        {
+            StringBuilder networkUsageBuilder = new();
+            foreach (KeyValuePair<string, NetworkSpeedRecord> kvp in networkUsage)
+            {
+                networkUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Interface: **{kvp.Key}**\nReceived: **{kvp.Value.Received}** KB/s\nTransmitted: **{kvp.Value.Transmitted}** KB/s\n");
+            }
+
+            fields.Add("Network Usage", new(networkUsageBuilder.ToString(), false));
+        }
 
         return CreateBasicEmbed(title, null, DiscordColor.Orange, avaUrl, null, null, fields);
     }
