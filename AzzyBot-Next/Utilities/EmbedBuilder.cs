@@ -91,7 +91,7 @@ public static class EmbedBuilder
         StringBuilder cpuTempBuilder = new();
         foreach (KeyValuePair<string, double> kvp in cpuTemp)
         {
-            cpuTempBuilder.AppendLine(CultureInfo.InvariantCulture, $"{kvp.Key}: **{kvp.Value}**°C");
+            cpuTempBuilder.AppendLine(CultureInfo.InvariantCulture, $"{kvp.Key}: **{kvp.Value}** °C");
         }
 
         fields.Add("Temperatures", new(cpuTempBuilder.ToString(), false));

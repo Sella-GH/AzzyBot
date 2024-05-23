@@ -111,19 +111,11 @@ public static class AzzyStatsHardware
         {
             foreach (string folder in Directory.GetDirectories(typeFolderPath))
             {
-                await Console.Out.WriteLineAsync(folder);
-
                 string typeFilePath = Path.Combine(folder, "type");
-
-                await Console.Out.WriteLineAsync(typeFilePath);
-
                 if (File.Exists(typeFilePath))
                 {
                     bool chipset = false;
                     string content = await File.ReadAllTextAsync(typeFilePath);
-
-                    await Console.Out.WriteLineAsync(content);
-
                     switch (content)
                     {
                         case string c when c.StartsWith("pch_", StringComparison.OrdinalIgnoreCase):
@@ -132,16 +124,10 @@ public static class AzzyStatsHardware
                     }
 
                     string tempFilePath = Path.Combine(folder, "temp");
-
-                    await Console.Out.WriteLineAsync(tempFilePath);
-
                     if (File.Exists(tempFilePath))
                     {
                         tempInfo = await File.ReadAllTextAsync(tempFilePath);
-
-                        await Console.Out.WriteLineAsync(tempInfo);
-
-                        string type = "Cpu";
+                        string type = "CPU";
                         if (chipset)
                             type = "Chipset";
 
