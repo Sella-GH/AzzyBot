@@ -15,7 +15,7 @@ public static class AzzyStatsHardware
     public static bool CheckIfLinuxOs => RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
     public static bool CheckIfWindowsOs => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
-    public static async Task<Dictionary<int, double>> GetSystemCpusAsync()
+    public static async Task<Dictionary<int, double>> GetSystemCpuAsync()
     {
         // Declare some variable stuff
         const int idleTime = 3;
@@ -99,6 +99,45 @@ public static class AzzyStatsHardware
         }
 
         return coreUsages;
+    }
+
+    public static async Task<Dictionary<string, double>> GetSystemCpuTempAsync()
+    {
+        string typeFolderPath = Path.Combine("/sys", "class", "thermal");
+        string tempInfo;
+        Dictionary<string, double> result = [];
+
+        if (Directory.Exists(typeFolderPath))
+        {
+            foreach (string folder in Directory.GetDirectories(typeFolderPath, "thermal_zone", SearchOption.TopDirectoryOnly))
+            {
+                string typeFilePath = Path.Combine(folder, "type");
+                if (File.Exists(typeFilePath))
+                {
+                    bool chipset = false;
+                    string content = await File.ReadAllTextAsync(typeFilePath);
+                    switch (content)
+                    {
+                        case string c when c.StartsWith("pch_", StringComparison.OrdinalIgnoreCase):
+                            chipset = true;
+                            break;
+                    }
+
+                    string tempFilePath = Path.Combine(folder, "temp");
+                    if (File.Exists(tempFilePath))
+                    {
+                        tempInfo = await File.ReadAllTextAsync(tempFilePath);
+                        string type = "cpu";
+                        if (chipset)
+                            type = "chipset";
+
+                        result.Add(type, Math.Round(double.Parse(tempInfo, CultureInfo.InvariantCulture) / 1000.0));
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     public static async Task<CpuLoadRecord> GetSystemCpuLoadAsync()

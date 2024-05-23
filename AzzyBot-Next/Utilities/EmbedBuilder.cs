@@ -54,7 +54,8 @@ public static class EmbedBuilder
         string osArch = AzzyStatsHardware.GetSystemOsArch;
         string isDocker = AzzyStatsHardware.CheckIfDocker.ToString();
         long uptime = Converter.ConvertToUnixTime(AzzyStatsHardware.GetSystemUptime);
-        Dictionary<int, double> cpuUsage = await AzzyStatsHardware.GetSystemCpusAsync();
+        Dictionary<int, double> cpuUsage = await AzzyStatsHardware.GetSystemCpuAsync();
+        Dictionary<string, double> cpuTemp = await AzzyStatsHardware.GetSystemCpuTempAsync();
         CpuLoadRecord cpuLoads = await AzzyStatsHardware.GetSystemCpuLoadAsync();
         MemoryUsageRecord memory = await AzzyStatsHardware.GetSystemMemoryUsageAsync();
         DiskUsageRecord disk = AzzyStatsHardware.GetSystemDiskUsage();
@@ -86,6 +87,14 @@ public static class EmbedBuilder
         }
 
         fields.Add("CPU Usage", new(cpuUsageBuilder.ToString(), false));
+
+        StringBuilder cpuTempBuilder = new();
+        foreach (KeyValuePair<string, double> kvp in cpuTemp)
+        {
+            cpuTempBuilder.AppendLine(CultureInfo.InvariantCulture, $"{kvp.Key}: **{kvp.Value}**°C");
+        }
+
+        fields.Add("Temperatures", new(cpuTempBuilder.ToString(), false));
 
         string cpuLoad = $"1-Min-Load: **{cpuLoads.OneMin}**\n5-Min-Load: **{cpuLoads.FiveMin}**\n15-Min-Load: **{cpuLoads.FifteenMin}**";
         fields.Add("CPU Load", new(cpuLoad, true));
