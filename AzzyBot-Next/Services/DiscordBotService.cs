@@ -96,10 +96,19 @@ public sealed class DiscordBotService
         ulong errorChannelId = _settings.ErrorChannelId;
         bool errorChannelConfigured = true;
 
-        // Looks if the guild has an error channel set
+        //
+        // Checks if the guild is the main guild
+        // If not look if the guild has an error channel set
         // Otherwise it will use the first channel it can see
         // However if nothing is present, send to debug server
-        if (guildId is not 0)
+        // If there's no guild, take the current channel
+        //
+
+        if (guildId == _settings.ServerId)
+        {
+            errorChannelId = _settings.ErrorChannelId;
+        }
+        else if (guildId is not 0)
         {
             await using AzzyDbContext dbContext = await _dbContextFactory.CreateDbContextAsync();
             GuildsEntity? guild = await dbContext.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
@@ -107,7 +116,7 @@ public sealed class DiscordBotService
             if (guild is not null && guild.ErrorChannelId is not 0)
                 errorChannelId = guild.ErrorChannelId;
 
-            if (errorChannelId is not 0 && errorChannelId != _settings.ErrorChannelId)
+            if (errorChannelId == _settings.ErrorChannelId)
             {
                 DiscordGuild? dGuild = await GetDiscordGuildAsync(guildId);
                 DiscordMember? dMember = await GetDiscordMemberAsync(guildId, _shardedClient.CurrentUser.Id);
@@ -167,10 +176,19 @@ public sealed class DiscordBotService
         Dictionary<string, string> commandOptions = [];
         ProcessOptions(ctx.Arguments, commandOptions);
 
-        // Looks if the guild has an error channel set
+        //
+        // Checks if the guild is the main guild
+        // If not look if the guild has an error channel set
         // Otherwise it will use the first channel it can see
         // However if nothing is present, send to debug server
-        if (guildId is not 0)
+        // If there's no guild, take the current channel
+        //
+
+        if (guildId == _settings.ServerId)
+        {
+            errorChannelId = _settings.ErrorChannelId;
+        }
+        else if (guildId is not 0)
         {
             await using AzzyDbContext dbContext = await _dbContextFactory.CreateDbContextAsync();
             GuildsEntity? guild = await dbContext.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
@@ -178,7 +196,7 @@ public sealed class DiscordBotService
             if (guild is not null && guild.ErrorChannelId is not 0)
                 errorChannelId = guild.ErrorChannelId;
 
-            if (errorChannelId is not 0 && errorChannelId != _settings.ErrorChannelId)
+            if (errorChannelId is 0)
             {
                 DiscordGuild? dGuild = await GetDiscordGuildAsync(guildId);
                 DiscordMember? dMember = await GetDiscordMemberAsync(guildId, _shardedClient.CurrentUser.Id);
