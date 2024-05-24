@@ -293,6 +293,19 @@ public sealed class DiscordBotService
         }
         else
         {
+            DiscordMember? dMember = await GetDiscordMemberAsync(channel.Guild.Id, _shardedClient.CurrentUser.Id);
+            if (dMember is null)
+            {
+                _logger.UnableToSendMessage($"Bot is not a member of server: {channel.Guild.Name} ({channel.Guild.Id})");
+                return false;
+            }
+
+            if (!channel.PermissionsFor(dMember).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages))
+            {
+                _logger.UnableToSendMessage($"Bot has no permission to send messages in channel: {channel.Name} ({channel.Id})");
+                return false;
+            }
+
             message = await channel.SendMessageAsync(builder);
         }
 
