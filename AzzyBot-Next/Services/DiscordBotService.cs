@@ -114,7 +114,7 @@ public sealed class DiscordBotService
                 if (dMember is null)
                     return false;
 
-                errorChannelId = dGuild?.Channels.First(c => c.Value.PermissionsFor(dMember).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages)).Value.Id ?? _settings.ErrorChannelId;
+                errorChannelId = dGuild?.Channels.First(c => c.Value.Type.Equals(DiscordChannelType.Text) && c.Value.PermissionsFor(dMember).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages)).Value.Id ?? _settings.ErrorChannelId;
                 if (errorChannelId is 0)
                     return false;
 
@@ -185,7 +185,7 @@ public sealed class DiscordBotService
                 if (dMember is null)
                     return false;
 
-                errorChannelId = dGuild?.Channels.First(c => c.Value.PermissionsFor(dMember).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages)).Value.Id ?? _settings.ErrorChannelId;
+                errorChannelId = dGuild?.Channels.First(c => c.Value.Type.Equals(DiscordChannelType.Text) && c.Value.PermissionsFor(dMember).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages)).Value.Id ?? _settings.ErrorChannelId;
                 if (errorChannelId is 0)
                     return false;
 
