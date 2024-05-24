@@ -95,7 +95,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02262" />
+    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02265" />
     <PackageReference Include="DSharpPlus.Commands" Version="5.0.0-nightly-02262" />
     <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02262" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.5">
