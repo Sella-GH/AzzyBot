@@ -18,7 +18,7 @@ public static class AzzyHelp
     {
         List<AzzyHelpRecord> commands = [];
 
-        foreach (Type nestedType in type.GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Instance))
+        foreach (Type nestedType in type.GetNestedTypes(BindingFlags.Public | BindingFlags.Instance))
         {
             string parentCommand = nestedType.Name;
 
