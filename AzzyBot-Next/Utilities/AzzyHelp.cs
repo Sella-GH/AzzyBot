@@ -29,7 +29,7 @@ public static class AzzyHelp
                 if (command is null)
                     continue;
 
-                string commandName = $"/{parentCommand.ToLowerInvariant()} {command.Name}";
+                string commandName = $"/{parentCommand.ToLowerInvariant().Replace("group", string.Empty, StringComparison.OrdinalIgnoreCase)} {command.Name}";
                 string description = method.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "No description provided";
 
                 Dictionary<string, string> parameters = [];

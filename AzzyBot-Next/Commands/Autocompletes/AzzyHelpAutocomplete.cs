@@ -45,7 +45,7 @@ public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings, DbActio
                 if (results.Count == 25)
                     return results;
 
-                results.Add(command.Name, command.Name);
+                results.Add(command.Name.Replace("group", string.Empty, StringComparison.OrdinalIgnoreCase), command.Name);
             }
         }
 
