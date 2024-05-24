@@ -132,6 +132,8 @@ updates:
         applies-to: version-updates
         exclude-patterns:
         - "DSharpPlus"
+        - "DSharpPlus*"
+        - "DSharpPlus.*"
         - "DSharpPlus.Commands"
         - "DSharpPlus.Interactivity"
         - "Microsoft.*"
