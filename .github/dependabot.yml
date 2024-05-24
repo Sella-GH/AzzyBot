@@ -6,7 +6,7 @@
 version: 2
 updates:
   - package-ecosystem: "github-actions" # See documentation for possible values
-    directory: "/" # Location of package manifests
+    directory: "/.github" # Location of package manifests
     schedule:
       interval: "daily"
     assignees:
@@ -30,10 +30,9 @@ updates:
         - "minor"
         - "patch"
     open-pull-requests-limit: 25
-    milestone: 4
 
   - package-ecosystem: "nuget" # See documentation for possible values
-    directory: "/" # Location of package manifests
+    directory: "/AzzyBot" # Location of package manifests
     schedule:
       interval: "daily"
     assignees:
@@ -89,4 +88,59 @@ updates:
         - "minor"
         - "patch"
     open-pull-requests-limit: 25
-    milestone: 4
+
+  - package-ecosystem: "nuget" # See documentation for possible values
+    directory: "/AzzyBot-Next" # Location of package manifests
+    schedule:
+      interval: "daily"
+    assignees:
+      - "Sella-GH"
+    commit-message:
+      prefix: "[NuGet]"
+      include: "scope"
+    labels:
+      - "dev-next"
+      - "dependencies"
+      - ".NET"
+    groups:
+      #DSharpPlus:
+      #  applies-to: version-updates
+      #  patterns:
+      #  - "DSharpPlus"
+      #  - "DSharpPlus.Commands"
+      #  - "DSharpPlus.Interactivity"
+      #  update-types:
+      #  - "minor"
+      #  - "patch"
+      Microsoft:
+        applies-to: version-updates
+        patterns:
+        - "Microsoft.*"
+        - "MySqlConnector"
+        - "Pomelo.*"
+        update-types:
+        - "minor"
+        - "patch"
+      Roslynator:
+        applies-to: version-updates
+        patterns:
+        - "Roslynator.*"
+        update-types:
+        - "minor"
+        - "patch"
+      Others:
+        applies-to: version-updates
+        exclude-patterns:
+        - "DSharpPlus"
+        - "DSharpPlus*"
+        - "DSharpPlus.*"
+        - "DSharpPlus.Commands"
+        - "DSharpPlus.Interactivity"
+        - "Microsoft.*"
+        - "Pomelo.*"
+        - "Roslynator.*"
+        update-types:
+        - "minor"
+        - "patch"
+    open-pull-requests-limit: 25
+    milestone: 6
