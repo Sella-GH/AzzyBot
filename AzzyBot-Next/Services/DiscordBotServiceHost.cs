@@ -112,10 +112,8 @@ public sealed class DiscordBotServiceHost : IHostedService
 
         return new()
         {
-            Intents = DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers,
             LoggerFactory = _loggerFactory,
-            Token = _settings.BotToken,
-            TokenType = TokenType.Bot
+            Token = _settings.BotToken
         };
     }
 
