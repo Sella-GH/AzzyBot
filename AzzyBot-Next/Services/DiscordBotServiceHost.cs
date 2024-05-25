@@ -259,5 +259,4 @@ public sealed class DiscordBotServiceHost : IHostedService
 
     private async Task ShardedClientGuildDownloadCompletedAsync(DiscordClient c, GuildDownloadCompletedEventArgs e)
         => await _dbActions.AddBulkGuildEntitiesAsync(e.Guilds.Select(g => g.Value.Id).ToList());
-    }
 }

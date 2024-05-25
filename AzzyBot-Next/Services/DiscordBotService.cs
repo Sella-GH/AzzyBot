@@ -40,6 +40,12 @@ public sealed class DiscordBotService
         _shardedClient = botServiceHost.ShardedClient;
     }
 
+    public bool CheckIfClientsAreConnected()
+    {
+        List<DiscordClient> connected = _shardedClient.ShardClients.Values.Where(c => !c.IsConnected).ToList();
+        return connected.Count == 0;
+    }
+
     public async Task<DiscordGuild?> GetDiscordGuildAsync(ulong guildId = 0)
     {
         if (guildId is 0)
@@ -244,6 +250,9 @@ public sealed class DiscordBotService
     public async Task<bool> SendMessageAsync(ulong channelId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, IMention[]? mentions = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
+
+        if (!CheckIfClientsAreConnected())
+            return false;
 
         await using DiscordMessageBuilder builder = new();
 
