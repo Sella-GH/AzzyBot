@@ -113,6 +113,9 @@ public sealed class DiscordBotServiceHost : IHostedService
         return new()
         {
             LoggerFactory = _loggerFactory,
+            // Otherwise it stops reconnecting after 4 attempts
+            // TODO Remove this when the new IoC Client is released #1908
+            ReconnectIndefinitely = true,
             Token = _settings.BotToken
         };
     }
