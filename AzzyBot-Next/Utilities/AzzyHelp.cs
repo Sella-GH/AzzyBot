@@ -13,7 +13,6 @@ namespace AzzyBot.Utilities;
 
 public static class AzzyHelp
 {
-    [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "It's just to get the name fully normalized")]
     private static List<AzzyHelpRecord> GetAllCommandsOfType(Type type)
     {
         List<AzzyHelpRecord> commands = [];

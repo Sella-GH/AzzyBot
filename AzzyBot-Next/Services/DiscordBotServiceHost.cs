@@ -209,6 +209,39 @@ public sealed class DiscordBotServiceHost : IHostedService
         }
     }
 
+    private async Task ShardedClientErroredAsync(DiscordClient c, ClientErrorEventArgs e)
+    {
+        if (_botService is null)
+            return;
+
+        Exception ex = e.Exception;
+        DateTime now = DateTime.Now;
+
+        switch (ex)
+        {
+            case RateLimitException:
+                break;
+
+            case BadRequestException:
+            case NotFoundException:
+            case RequestSizeException:
+            case ServerErrorException:
+            case UnauthorizedException:
+                await _botService.LogExceptionAsync(ex, now);
+                break;
+
+            default:
+                if (ex is not DiscordException)
+                {
+                    await _botService.LogExceptionAsync(ex, now);
+                    break;
+                }
+
+                await _botService.LogExceptionAsync(ex, now, 0, ((DiscordException)e.Exception).JsonMessage);
+                break;
+        }
+    }
+
     private async Task ShardedClientGuildCreatedAsync(DiscordClient c, GuildCreateEventArgs e)
     {
         _logger.GuildCreated(e.Guild.Name);
@@ -226,38 +259,5 @@ public sealed class DiscordBotServiceHost : IHostedService
 
     private async Task ShardedClientGuildDownloadCompletedAsync(DiscordClient c, GuildDownloadCompletedEventArgs e)
         => await _dbActions.AddBulkGuildEntitiesAsync(e.Guilds.Select(g => g.Value.Id).ToList());
-
-    private async Task ShardedClientErroredAsync(DiscordClient c, ClientErrorEventArgs e)
-    {
-        if (_botService is null)
-            return;
-
-        Exception ex = e.Exception;
-
-        switch (ex)
-        {
-            case RateLimitException:
-                break;
-
-            case BadRequestException:
-            case NotFoundException:
-            case RequestSizeException:
-            case ServerErrorException:
-            case UnauthorizedException:
-                await _botService.LogExceptionAsync(ex, DateTime.Now);
-                break;
-
-            default:
-                DateTime now = DateTime.Now;
-
-                if (ex is not DiscordException)
-                {
-                    await _botService.LogExceptionAsync(ex, now);
-                    break;
-                }
-
-                await _botService.LogExceptionAsync(ex, now, 0, ((DiscordException)e.Exception).JsonMessage);
-                break;
-        }
     }
 }
