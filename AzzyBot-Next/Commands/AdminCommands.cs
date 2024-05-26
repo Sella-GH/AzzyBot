@@ -81,20 +81,14 @@ public sealed class AdminCommands
 
                 await context.DeferResponseAsync();
 
-                GuildsEntity? guildEntity = await _dbActions.GetGuildEntityAsync(guildIdValue);
-                if (guildEntity is null)
-                {
-                    await context.EditResponseAsync("Server not found in the database.");
-                    return;
-                }
-
+                GuildsEntity guildEntity = await _dbActions.GetGuildAsync(guildIdValue);
                 if (guildEntity.IsDebugAllowed)
                 {
                     await context.EditResponseAsync("Server is already specified as debug.");
                     return;
                 }
 
-                await _dbActions.SetGuildEntityAsync(guildIdValue, 0, true);
+                await _dbActions.UpdateGuildAsync(guildIdValue, null, true);
 
                 await context.EditResponseAsync($"{await _botService.GetDiscordGuildAsync(guildIdValue)} added to debug servers.");
             }
@@ -108,7 +102,7 @@ public sealed class AdminCommands
 
                 await context.DeferResponseAsync();
 
-                List<GuildsEntity> dbGuilds = await _dbActions.GetGuildEntitiesWithDebugAsync();
+                List<GuildsEntity> dbGuilds = await _dbActions.GetGuildsWithDebugAsync();
                 if (dbGuilds.Count == 0)
                 {
                     await context.EditResponseAsync("No debug servers found.");
@@ -141,20 +135,14 @@ public sealed class AdminCommands
 
                 await context.DeferResponseAsync();
 
-                GuildsEntity? guildEntity = await _dbActions.GetGuildEntityAsync(guildIdValue);
-                if (guildEntity is null)
-                {
-                    await context.EditResponseAsync("Server not found in the database.");
-                    return;
-                }
-
+                GuildsEntity guildEntity = await _dbActions.GetGuildAsync(guildIdValue);
                 if (!guildEntity.IsDebugAllowed)
                 {
                     await context.EditResponseAsync("Server is not specified as debug.");
                     return;
                 }
 
-                await _dbActions.SetGuildEntityAsync(guildIdValue, 0, false);
+                await _dbActions.UpdateGuildAsync(guildIdValue, null, false);
 
                 await context.EditResponseAsync($"{await _botService.GetDiscordGuildAsync(guildIdValue)} removed from debug servers.");
             }
