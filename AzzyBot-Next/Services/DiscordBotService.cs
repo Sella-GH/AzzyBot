@@ -15,28 +15,27 @@ using DSharpPlus;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
 public sealed class DiscordBotService
 {
-    private readonly IDbContextFactory<AzzyDbContext> _dbContextFactory;
     private readonly ILogger<DiscordBotService> _logger;
     private readonly AzzyBotSettingsRecord _settings;
+    private readonly DbActions _db;
     private readonly DiscordShardedClient _shardedClient;
     private const string BugReportUrl = "https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D";
     private const string BugReportMessage = $"Send a [bug report]({BugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
     private const string ErrorChannelNotConfigured = $"**If you're seeing this message then I am not configured correctly!**\nTell your server admin to run */config config-core*\n\n{BugReportMessage}";
 
-    public DiscordBotService(AzzyBotSettingsRecord settings, IDbContextFactory<AzzyDbContext> dbContextFactory, ILogger<DiscordBotService> logger, DiscordBotServiceHost botServiceHost)
+    public DiscordBotService(AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotServiceHost botServiceHost, ILogger<DiscordBotService> logger)
     {
         ArgumentNullException.ThrowIfNull(botServiceHost, nameof(botServiceHost));
 
-        _settings = settings;
-        _dbContextFactory = dbContextFactory;
         _logger = logger;
+        _settings = settings;
+        _db = dbActions;
         _shardedClient = botServiceHost.ShardedClient;
     }
 
@@ -116,10 +115,9 @@ public sealed class DiscordBotService
         }
         else if (guildId is not 0)
         {
-            await using AzzyDbContext dbContext = await _dbContextFactory.CreateDbContextAsync();
-            GuildsEntity? guild = await dbContext.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
+            GuildsEntity guild = await _db.GetGuildAsync(guildId);
 
-            if (guild is not null && guild.ErrorChannelId is not 0)
+            if (guild.ErrorChannelId is not 0)
                 errorChannelId = guild.ErrorChannelId;
 
             if (errorChannelId == _settings.ErrorChannelId)
@@ -196,10 +194,9 @@ public sealed class DiscordBotService
         }
         else if (guildId is not 0)
         {
-            await using AzzyDbContext dbContext = await _dbContextFactory.CreateDbContextAsync();
-            GuildsEntity? guild = await dbContext.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
+            GuildsEntity guild = await _db.GetGuildAsync(guildId);
 
-            if (guild is not null && guild.ErrorChannelId is not 0)
+            if (guild.ErrorChannelId is not 0)
                 errorChannelId = guild.ErrorChannelId;
 
             if (errorChannelId is 0)
