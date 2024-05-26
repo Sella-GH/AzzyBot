@@ -393,13 +393,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
         try
         {
-            GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
-            if (guild is null)
-                return false;
-
-            AzuraCastEntity? azuraCast = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
-            if (azuraCast is null)
-                return false;
+            AzuraCastEntity azuraCast = await GetAzuraCastAsync(guildId);
 
             if (baseUrl is not null)
                 azuraCast.BaseUrl = Crypto.Encrypt(baseUrl.OriginalString);
@@ -428,21 +422,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
         try
         {
-            GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
-            if (guild is null)
-                return false;
-
-            AzuraCastEntity? azuraCast = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
-            if (azuraCast is null)
-                return false;
-
-            AzuraCastStationEntity? station = await context.AzuraCastStations.SingleOrDefaultAsync(s => s.AzuraCastId == azuraCast.Id && s.Id == stationId);
-            if (station is null)
-                return false;
-
-            AzuraCastChecksEntity? checks = await context.AzuraCastChecks.SingleOrDefaultAsync(c => c.StationId == station.Id);
-            if (checks is null)
-                return false;
+            AzuraCastChecksEntity checks = await GetAzuraCastChecksAsync(guildId, stationId);
 
             if (fileChanges.HasValue)
                 checks.FileChanges = fileChanges.Value;
@@ -477,17 +457,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
         try
         {
-            GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
-            if (guild is null)
-                return false;
-
-            AzuraCastEntity? azuraCast = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
-            if (azuraCast is null)
-                return false;
-
-            AzuraCastStationEntity? azuraStation = await context.AzuraCastStations.SingleOrDefaultAsync(s => s.AzuraCastId == azuraCast.Id && s.Id == station);
-            if (azuraStation is null)
-                return false;
+            AzuraCastStationEntity azuraStation = await GetAzuraCastStationAsync(guildId, station);
 
             if (stationId.HasValue)
                 azuraStation.StationId = stationId.Value;
@@ -528,10 +498,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
         try
         {
-            GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
-
-            if (guild is null)
-                return false;
+            GuildsEntity guild = await GetGuildAsync(guildId);
 
             if (!guild.ConfigSet)
                 guild.ConfigSet = true;
