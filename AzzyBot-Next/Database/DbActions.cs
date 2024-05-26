@@ -201,13 +201,8 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
         try
         {
-            GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
-            if (guild is null)
-                return false;
-
-            AzuraCastEntity? azuraCast = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
-            if (azuraCast is null)
-                return false;
+            GuildsEntity guild = await GetGuildAsync(guildId);
+            AzuraCastEntity azuraCast = guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast settings not found in database");
 
             guild.AzuraCastSet = false;
 
@@ -233,21 +228,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
         try
         {
-            GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
-            if (guild is null)
-                return false;
-
-            AzuraCastEntity? azuraCast = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
-            if (azuraCast is null)
-                return false;
-
-            AzuraCastStationEntity? station = await context.AzuraCastStations.SingleOrDefaultAsync(s => s.AzuraCastId == azuraCast.Id && s.StationId == stationId);
-            if (station is null)
-                return false;
-
-            AzuraCastMountEntity? mount = await context.AzuraCastMounts.SingleOrDefaultAsync(m => m.StationId == station.Id && m.Id == mountId);
-            if (mount is null)
-                return false;
+            AzuraCastMountEntity mount = await GetAzuraCastMountAsync(guildId, stationId, mountId);
 
             context.AzuraCastMounts.Remove(mount);
             await context.SaveChangesAsync();
@@ -271,17 +252,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
         try
         {
-            GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
-            if (guild is null)
-                return false;
-
-            AzuraCastEntity? azuraCast = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
-            if (azuraCast is null)
-                return false;
-
-            AzuraCastStationEntity? station = await context.AzuraCastStations.SingleOrDefaultAsync(s => s.AzuraCastId == azuraCast.Id && s.StationId == stationId);
-            if (station is null)
-                return false;
+            AzuraCastStationEntity station = await GetAzuraCastStationAsync(guildId, stationId);
 
             context.AzuraCastStations.Remove(station);
             await context.SaveChangesAsync();
@@ -305,10 +276,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
         try
         {
-            GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
-            if (guild is null)
-                return false;
-
+            GuildsEntity guild = await GetGuildAsync(guildId);
             AzuraCastEntity? azuraCast = guild.AzuraCast;
             if (azuraCast is not null)
                 context.AzuraCast.Remove(azuraCast);
@@ -340,6 +308,13 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         AzuraCastStationEntity station = await GetAzuraCastStationAsync(guildId, stationId);
 
         return station.Checks;
+    }
+
+    public async Task<AzuraCastMountEntity> GetAzuraCastMountAsync(ulong guildId, int stationId, int mountId)
+    {
+        AzuraCastStationEntity station = await GetAzuraCastStationAsync(guildId, stationId);
+
+        return station.Mounts.SingleOrDefault(m => m.Id == mountId) ?? throw new InvalidOperationException("Mount not found in database");
     }
 
     public async Task<List<AzuraCastMountEntity>> GetAzuraCastMountsAsync(ulong guildId, int stationId)
