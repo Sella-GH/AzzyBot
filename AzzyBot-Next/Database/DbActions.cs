@@ -295,7 +295,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     {
         AzuraCastStationEntity station = await GetAzuraCastStationAsync(guildId, stationId);
 
-        return station.Mounts.SingleOrDefault(m => m.Id == mountId) ?? throw new InvalidOperationException("Mount not found in database");
+        return station.Mounts.FirstOrDefault(m => m.Id == mountId) ?? throw new InvalidOperationException("Mount not found in database");
     }
 
     public async Task<List<AzuraCastMountEntity>> GetAzuraCastMountsAsync(ulong guildId, int stationId)
@@ -309,7 +309,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     {
         AzuraCastEntity azuraCast = await GetAzuraCastAsync(guildId);
 
-        return azuraCast.Stations.SingleOrDefault(s => s.StationId == stationId) ?? throw new InvalidOperationException("Station not found in database");
+        return azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId) ?? throw new InvalidOperationException("Station not found in database");
     }
 
     public async Task<List<AzuraCastStationEntity>> GetAzuraCastStationsAsync(ulong guildId)
@@ -323,7 +323,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     {
         List<GuildsEntity> guild = await GetGuildsAsync();
 
-        return guild.SingleOrDefault(g => g.UniqueId == guildId) ?? throw new InvalidOperationException("Guild not found in database");
+        return guild.Find(g => g.UniqueId == guildId) ?? throw new InvalidOperationException("Guild not found in database");
     }
 
     public async Task<List<GuildsEntity>> GetGuildsAsync()
