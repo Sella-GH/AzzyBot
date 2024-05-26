@@ -281,7 +281,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         }
     }
 
-    public async Task SetAzuraCastEntityAsync(ulong guildId, string apiKey = "", Uri? apiUrl = null, int stationId = 0, ulong requestsChannel = 0, ulong outagesChannel = 0, bool hlsStreaming = false, bool showPlaylistInNowPlaying = false)
+    public async Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl = null)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
@@ -289,46 +289,80 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         try
         {
             GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
-            if (guild is not null)
-            {
+            if (guild is null)
+                return false;
+
                 AzuraCastEntity? azuraCast = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
-                if (azuraCast is not null)
-                {
-                    if (!string.IsNullOrWhiteSpace(apiKey))
-                        azuraCast.ApiKey = Crypto.Encrypt(apiKey);
+            if (azuraCast is null)
+                return false;
 
-                    if (apiUrl is not null)
-                        azuraCast.ApiUrl = Crypto.Encrypt(apiUrl.ToString());
+            if (baseUrl is not null)
+                azuraCast.BaseUrl = Crypto.Encrypt(baseUrl.OriginalString);
 
-                    if (stationId is not 0)
-                        azuraCast.StationId = stationId;
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
 
-                    if (requestsChannel is not 0)
-                        azuraCast.MusicRequestsChannelId = requestsChannel;
-
-                    if (outagesChannel is not 0)
-                        azuraCast.OutagesChannelId = outagesChannel;
-
-                    if (hlsStreaming)
-                        azuraCast.PreferHlsStreaming = hlsStreaming;
-
-                    if (showPlaylistInNowPlaying)
-                        azuraCast.ShowPlaylistInNowPlaying = showPlaylistInNowPlaying;
-
-                    await context.SaveChangesAsync();
-
-                    await transaction.CommitAsync();
-                }
-            }
+            return true;
         }
+        catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
+                {
+            _logger.DatabaseTransactionFailed(ex);
+            await transaction.RollbackAsync();
+        }
+
+        return false;
+    }
+
+    public async Task<bool> UpdateAzuraCastChecksAsync(ulong guildId, int stationId, bool? fileChanges, bool? serverStatus, bool? updates, bool? updatesChangelog)
+    {
+        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
+
+        try
+        {
+            GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
+            if (guild is null)
+                return false;
+
+            AzuraCastEntity? azuraCast = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
+            if (azuraCast is null)
+                return false;
+
+            AzuraCastStationEntity? station = await context.AzuraCastStations.SingleOrDefaultAsync(s => s.AzuraCastId == azuraCast.Id && s.Id == stationId);
+            if (station is null)
+                return false;
+
+            AzuraCastChecksEntity? checks = await context.AzuraCastChecks.SingleOrDefaultAsync(c => c.StationId == station.Id);
+            if (checks is null)
+                return false;
+
+            if (fileChanges.HasValue)
+                checks.FileChanges = fileChanges.Value;
+
+            if (serverStatus.HasValue)
+                checks.ServerStatus = serverStatus.Value;
+
+            if (updates.HasValue)
+                checks.Updates = updates.Value;
+
+            if (updatesChangelog.HasValue)
+                checks.UpdatesShowChangelog = updatesChangelog.Value;
+
+            await context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+            return true;
+                }
         catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
         {
             _logger.DatabaseTransactionFailed(ex);
             await transaction.RollbackAsync();
         }
+
+        return false;
     }
 
-    public async Task SetAzuraCastChecksEntityAsync(ulong guildId, bool fileChanges = false, bool serverStatus = false, bool updates = false, bool updatesChangelog = false)
+    public async Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int stationId, string? apiKey, ulong? requestId, ulong? outagesId, bool? hls, bool? playlist)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
@@ -336,41 +370,47 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         try
         {
             GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
-            if (guild is not null)
-            {
+            if (guild is null)
+                return false;
+
                 AzuraCastEntity? azuraCast = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
-                if (azuraCast is not null)
-                {
-                    AzuraCastChecksEntity? checks = await context.AzuraCastChecks.SingleOrDefaultAsync(c => c.AzuraCastId == azuraCast.Id);
-                    if (checks is not null)
-                    {
-                        if (checks.FileChanges != fileChanges)
-                            checks.FileChanges = fileChanges;
+            if (azuraCast is null)
+                return false;
 
-                        if (checks.ServerStatus != serverStatus)
-                            checks.ServerStatus = serverStatus;
+            AzuraCastStationEntity? station = await context.AzuraCastStations.SingleOrDefaultAsync(s => s.AzuraCastId == azuraCast.Id && s.Id == stationId);
+            if (station is null)
+                return false;
 
-                        if (checks.Updates != updates)
-                            checks.Updates = updates;
+            if (!string.IsNullOrWhiteSpace(apiKey))
+                station.ApiKey = Crypto.Encrypt(apiKey);
 
-                        if (checks.UpdatesShowChangelog != updatesChangelog)
-                            checks.UpdatesShowChangelog = updatesChangelog;
+            if (requestId.HasValue)
+                station.RequestsChannelId = requestId.Value;
+
+            if (outagesId.HasValue)
+                station.OutagesChannelId = outagesId.Value;
+
+            if (hls.HasValue)
+                station.PreferHls = hls.Value;
+
+            if (playlist.HasValue)
+                station.ShowPlaylistInNowPlaying = playlist.Value;
 
                         await context.SaveChangesAsync();
-
                         await transaction.CommitAsync();
+
+            return true;
                     }
-                }
-            }
-        }
         catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
         {
             _logger.DatabaseTransactionFailed(ex);
             await transaction.RollbackAsync();
         }
+
+        return false;
     }
 
-    public async Task SetGuildEntityAsync(ulong guildId, ulong errorChannelId = 0, bool isDebug = false)
+    public async Task<bool> UpdateGuildAsync(ulong guildId, ulong? errorChannelId, bool? isDebug)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
@@ -379,26 +419,29 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         {
             GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
 
-            if (guild is not null)
-            {
+            if (guild is null)
+                return false;
+
                 if (!guild.ConfigSet)
                     guild.ConfigSet = true;
 
-                if (errorChannelId is not 0)
-                    guild.ErrorChannelId = errorChannelId;
+            if (errorChannelId.HasValue)
+                guild.ErrorChannelId = errorChannelId.Value;
 
-                if (guild.IsDebugAllowed != isDebug)
-                    guild.IsDebugAllowed = isDebug;
+            if (isDebug.HasValue)
+                guild.IsDebugAllowed = isDebug.Value;
 
                 await context.SaveChangesAsync();
+            await transaction.CommitAsync();
 
-                await transaction.CommitAsync();
-            }
+            return true;
         }
         catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
         {
             _logger.DatabaseTransactionFailed(ex);
             await transaction.RollbackAsync();
         }
+
+        return false;
     }
 }
