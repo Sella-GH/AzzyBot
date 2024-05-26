@@ -25,9 +25,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
         try
         {
-            GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
-            if (guild is null)
-                return false;
+            GuildsEntity guild = await GetGuildAsync(guildId);
 
             AzuraCastEntity azuraCast = new()
             {
@@ -60,14 +58,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
         try
         {
-            GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
-
-            if (guild is null)
-                return false;
-
-            AzuraCastEntity? azura = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
-            if (azura is null)
-                return false;
+            AzuraCastEntity azura = await GetAzuraCastAsync(guildId);
 
             AzuraCastStationEntity station = new()
             {
@@ -111,17 +102,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
         try
         {
-            GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
-            if (guild is null)
-                return false;
-
-            AzuraCastEntity? azura = await context.AzuraCast.SingleOrDefaultAsync(a => a.GuildId == guild.Id);
-            if (azura is null)
-                return false;
-
-            AzuraCastStationEntity? station = await context.AzuraCastStations.SingleOrDefaultAsync(s => s.AzuraCastId == azura.Id && s.StationId == stationId);
-            if (station is null)
-                return false;
+            AzuraCastStationEntity station = await GetAzuraCastStationAsync(guildId, stationId);
 
             AzuraCastMountEntity mountPoint = new()
             {
@@ -174,9 +155,9 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
         try
         {
-            List<ulong> existingGuilds = await context.Guilds.Select(g => g.UniqueId).ToListAsync();
+            List<GuildsEntity> guilds = await GetGuildsAsync();
             List<GuildsEntity> newGuilds = guildIds
-                .Where(guild => !existingGuilds.Contains(guild))
+                .Where(guild => !guilds.Select(g => g.UniqueId).Contains(guild))
                 .Select(guild => new GuildsEntity() { UniqueId = guild })
                 .ToList();
 
