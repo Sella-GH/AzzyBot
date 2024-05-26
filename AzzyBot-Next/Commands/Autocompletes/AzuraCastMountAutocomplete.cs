@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Database;
@@ -20,17 +21,11 @@ public sealed class AzuraCastMountAutocomplete(DbActions dbActions) : IAutoCompl
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
-        long stationId = 0;
-        foreach (DiscordInteractionDataOption option in context.Options.Where(o => o.Name == "station"))
-        {
-            if (option.Value is not null)
-                stationId = (long)option.Value;
-        }
-
+        int stationId = Convert.ToInt32(context.Options.Single(o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
         if (stationId == 0)
             return new Dictionary<string, object>();
 
-        List<AzuraCastMountEntity> mountsInDb = await _dbActions.GetAzuraCastMountsAsync(context.Guild.Id, Convert.ToInt32(stationId));
+        List<AzuraCastMountEntity> mountsInDb = await _dbActions.GetAzuraCastMountsAsync(context.Guild.Id, stationId);
 
         Dictionary<string, object> results = [];
         foreach (AzuraCastMountEntity mount in mountsInDb)
