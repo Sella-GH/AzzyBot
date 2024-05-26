@@ -14,7 +14,6 @@ public sealed class AzuraCastStationEntity
     public AzuraCastChecksEntity Checks { get; set; } = new();
     public ICollection<AzuraCastMountEntity> Mounts { get; } = new List<AzuraCastMountEntity>();
     public ulong RequestsChannelId { get; set; }
-    public ulong OutagesChannelId { get; set; }
     public bool PreferHls { get; set; }
     public bool ShowPlaylistInNowPlaying { get; set; }
 

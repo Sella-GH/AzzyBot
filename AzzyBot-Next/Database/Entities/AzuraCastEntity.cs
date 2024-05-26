@@ -10,6 +10,7 @@ public sealed class AzuraCastEntity
     public int Id { get; set; }
 
     public string BaseUrl { get; set; } = string.Empty;
+    public ulong OutagesChannelId { get; set; }
     public ICollection<AzuraCastStationEntity> Stations { get; } = new List<AzuraCastStationEntity>();
 
     public int? GuildId { get; set; }

@@ -16,7 +16,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     private readonly IDbContextFactory<AzzyDbContext> _dbContextFactory = dbContextFactory;
     private readonly ILogger<DbActions> _logger = logger;
 
-    public async Task<bool> AddAzuraCastAsync(ulong guildId, Uri baseUrl)
+    public async Task<bool> AddAzuraCastAsync(ulong guildId, Uri baseUrl, ulong outagesId)
     {
         ArgumentNullException.ThrowIfNull(baseUrl, nameof(baseUrl));
 
@@ -32,6 +32,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             AzuraCastEntity azuraCast = new()
             {
                 BaseUrl = Crypto.Encrypt(baseUrl.OriginalString),
+                OutagesChannelId = outagesId,
                 GuildId = guild.Id
             };
 
@@ -50,7 +51,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         return false;
     }
 
-    public async Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, string name, string apiKey, ulong requestsId, ulong outagesId, bool hls, bool showPlaylist, bool fileChanges, bool serverStatus, bool updates, bool updatesChangelog)
+    public async Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, string name, string apiKey, ulong requestsId, bool hls, bool showPlaylist, bool fileChanges, bool serverStatus, bool updates, bool updatesChangelog)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
@@ -72,7 +73,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 Name = Crypto.Encrypt(name),
                 ApiKey = Crypto.Encrypt(apiKey),
                 RequestsChannelId = requestsId,
-                OutagesChannelId = outagesId,
                 PreferHls = hls,
                 ShowPlaylistInNowPlaying = showPlaylist,
                 AzuraCastId = azura.Id
@@ -165,7 +165,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         return false;
     }
 
-    public async Task AddBulkGuildsAsync(IReadOnlyList<ulong> guildIds)
+    public async Task AddGuildsAsync(IReadOnlyList<ulong> guildIds)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
@@ -379,7 +379,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             : await context.Guilds.Where(g => !g.IsDebugAllowed).ToListAsync();
     }
 
-    public async Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl = null)
+    public async Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl, ulong? outagesId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
@@ -396,6 +396,9 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             if (baseUrl is not null)
                 azuraCast.BaseUrl = Crypto.Encrypt(baseUrl.OriginalString);
+
+            if (outagesId.HasValue)
+                azuraCast.OutagesChannelId = outagesId.Value;
 
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -460,7 +463,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         return false;
     }
 
-    public async Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int stationId, string? name, string? apiKey, ulong? requestId, ulong? outagesId, bool? hls, bool? playlist)
+    public async Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId, string? name, string? apiKey, ulong? requestId, bool? hls, bool? playlist)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
@@ -475,27 +478,27 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             if (azuraCast is null)
                 return false;
 
-            AzuraCastStationEntity? station = await context.AzuraCastStations.SingleOrDefaultAsync(s => s.AzuraCastId == azuraCast.Id && s.Id == stationId);
-            if (station is null)
+            AzuraCastStationEntity? azuraStation = await context.AzuraCastStations.SingleOrDefaultAsync(s => s.AzuraCastId == azuraCast.Id && s.Id == station);
+            if (azuraStation is null)
                 return false;
 
+            if (stationId.HasValue)
+                azuraStation.StationId = stationId.Value;
+
             if (!string.IsNullOrWhiteSpace(name))
-                station.Name = Crypto.Encrypt(name);
+                azuraStation.Name = Crypto.Encrypt(name);
 
             if (!string.IsNullOrWhiteSpace(apiKey))
-                station.ApiKey = Crypto.Encrypt(apiKey);
+                azuraStation.ApiKey = Crypto.Encrypt(apiKey);
 
             if (requestId.HasValue)
-                station.RequestsChannelId = requestId.Value;
-
-            if (outagesId.HasValue)
-                station.OutagesChannelId = outagesId.Value;
+                azuraStation.RequestsChannelId = requestId.Value;
 
             if (hls.HasValue)
-                station.PreferHls = hls.Value;
+                azuraStation.PreferHls = hls.Value;
 
             if (playlist.HasValue)
-                station.ShowPlaylistInNowPlaying = playlist.Value;
+                azuraStation.ShowPlaylistInNowPlaying = playlist.Value;
 
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
