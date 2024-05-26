@@ -50,7 +50,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         return false;
     }
 
-    public async Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, string apiKey, ulong requestsId, ulong outagesId, bool hls, bool showPlaylist, bool fileChanges, bool serverStatus, bool updates, bool updatesChangelog)
+    public async Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, string name, string apiKey, ulong requestsId, ulong outagesId, bool hls, bool showPlaylist, bool fileChanges, bool serverStatus, bool updates, bool updatesChangelog)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
@@ -69,6 +69,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             AzuraCastStationEntity station = new()
             {
                 StationId = stationId,
+                Name = Crypto.Encrypt(name),
                 ApiKey = Crypto.Encrypt(apiKey),
                 RequestsChannelId = requestsId,
                 OutagesChannelId = outagesId,
@@ -459,7 +460,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         return false;
     }
 
-    public async Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int stationId, string? apiKey, ulong? requestId, ulong? outagesId, bool? hls, bool? playlist)
+    public async Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int stationId, string? name, string? apiKey, ulong? requestId, ulong? outagesId, bool? hls, bool? playlist)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
         await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
@@ -477,6 +478,9 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             AzuraCastStationEntity? station = await context.AzuraCastStations.SingleOrDefaultAsync(s => s.AzuraCastId == azuraCast.Id && s.Id == stationId);
             if (station is null)
                 return false;
+
+            if (!string.IsNullOrWhiteSpace(name))
+                station.Name = Crypto.Encrypt(name);
 
             if (!string.IsNullOrWhiteSpace(apiKey))
                 station.ApiKey = Crypto.Encrypt(apiKey);
