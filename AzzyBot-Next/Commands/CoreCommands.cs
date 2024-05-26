@@ -45,7 +45,7 @@ public sealed class CoreCommands
             IEnumerable<DiscordUser> botOwners = context.Client.CurrentApplication.Owners ?? throw new InvalidOperationException("Invalid bot owners");
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Invalid guild id");
             DiscordMember member = context.Member ?? throw new InvalidOperationException("Invalid member");
-            GuildsEntity guild = await _dbActions.GetGuildEntityAsync(guildId);
+            GuildsEntity guild = await _dbActions.GetGuildAsync(guildId);
 
             bool adminServer = false;
             foreach (DiscordUser _ in botOwners.Where(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId))

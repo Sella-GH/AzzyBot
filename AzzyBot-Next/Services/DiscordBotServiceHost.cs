@@ -249,7 +249,7 @@ public sealed class DiscordBotServiceHost : IHostedService
     {
         _logger.GuildCreated(e.Guild.Name);
 
-        await _dbActions.AddGuildEntityAsync(e.Guild.Id);
+        await _dbActions.AddGuildAsync(e.Guild.Id);
         await e.Guild.Owner.SendMessageAsync("Thank you for adding me to your server! Before you can make use of me, you have to set my settings first.\n\nPlease use the command `settings set` for this.\nOnly you are able to execute this command right now.");
     }
 
@@ -257,9 +257,9 @@ public sealed class DiscordBotServiceHost : IHostedService
     {
         _logger.GuildDeleted(e.Guild.Name);
 
-        await _dbActions.RemoveGuildEntityAsync(e.Guild.Id);
+        await _dbActions.DeleteGuildAsync(e.Guild.Id);
     }
 
     private async Task ShardedClientGuildDownloadCompletedAsync(DiscordClient c, GuildDownloadCompletedEventArgs e)
-        => await _dbActions.AddBulkGuildEntitiesAsync(e.Guilds.Select(g => g.Value.Id).ToList());
+        => await _dbActions.AddGuildsAsync(e.Guilds.Select(g => g.Value.Id).ToList());
 }

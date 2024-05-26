@@ -36,6 +36,8 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 GuildId = guild.Id
             };
 
+            guild.AzuraCastSet = true;
+
             await context.AzuraCast.AddAsync(azuraCast);
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -207,6 +209,8 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             if (azuraCast is null)
                 return false;
 
+            guild.AzuraCastSet = false;
+
             context.AzuraCast.Remove(azuraCast);
             await context.SaveChangesAsync();
             await transaction.CommitAsync();
@@ -304,6 +308,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
             if (guild is null)
                 return false;
+
+            AzuraCastEntity? azuraCast = guild.AzuraCast;
+            if (azuraCast is not null)
+                context.AzuraCast.Remove(azuraCast);
 
             context.Guilds.Remove(guild);
             await context.SaveChangesAsync();
