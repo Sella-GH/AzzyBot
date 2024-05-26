@@ -588,7 +588,8 @@ dotnet_diagnostic.rcs1126.severity = suggestion
 dotnet_diagnostic.rcs1128.severity = suggestion
 
 # Remove redundant field initialization
-dotnet_diagnostic.rcs1129.severity = suggestion
+# This one is doubled
+dotnet_diagnostic.rcs1129.severity = none
 
 # Bitwise operation on enum without Flags attribute
 dotnet_diagnostic.rcs1130.severity = suggestion
@@ -679,7 +680,8 @@ dotnet_diagnostic.rcs1166.severity = suggestion
 dotnet_diagnostic.rcs1168.severity = suggestion
 
 # Make field read-only
-dotnet_diagnostic.rcs1169.severity = suggestion
+# This one is doubled
+dotnet_diagnostic.rcs1169.severity = none
 
 # Use read-only auto-implemented property
 dotnet_diagnostic.rcs1170.severity = suggestion

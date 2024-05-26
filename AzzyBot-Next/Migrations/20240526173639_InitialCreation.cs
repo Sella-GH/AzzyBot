@@ -23,7 +23,8 @@ namespace AzzyBot.Migrations
                     UniqueId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     ErrorChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     IsDebugAllowed = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    ConfigSet = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                    ConfigSet = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    AzuraCastSet = table.Column<bool>(type: "tinyint(1)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -37,16 +38,10 @@ namespace AzzyBot.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    ApiKey = table.Column<string>(type: "longtext", nullable: false)
+                    BaseUrl = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ApiUrl = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    StationId = table.Column<int>(type: "int", nullable: false),
-                    MusicRequestsChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     OutagesChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
-                    PreferHlsStreaming = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    ShowPlaylistInNowPlaying = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    GuildId = table.Column<int>(type: "int", nullable: false)
+                    GuildId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -55,6 +50,33 @@ namespace AzzyBot.Migrations
                         name: "FK_AzuraCast_Guilds_GuildId",
                         column: x => x.GuildId,
                         principalTable: "Guilds",
+                        principalColumn: "Id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "AzuraCastStations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    StationId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ApiKey = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RequestsChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
+                    PreferHls = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    ShowPlaylistInNowPlaying = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    AzuraCastId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AzuraCastStations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AzuraCastStations_AzuraCast_AzuraCastId",
+                        column: x => x.AzuraCastId,
+                        principalTable: "AzuraCast",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -70,15 +92,15 @@ namespace AzzyBot.Migrations
                     ServerStatus = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     Updates = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     UpdatesShowChangelog = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    AzuraCastId = table.Column<int>(type: "int", nullable: false)
+                    StationId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AzuraCastChecks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AzuraCastChecks_AzuraCast_AzuraCastId",
-                        column: x => x.AzuraCastId,
-                        principalTable: "AzuraCast",
+                        name: "FK_AzuraCastChecks_AzuraCastStations_StationId",
+                        column: x => x.StationId,
+                        principalTable: "AzuraCastStations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -94,15 +116,15 @@ namespace AzzyBot.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Mount = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    AzuraCastId = table.Column<int>(type: "int", nullable: false)
+                    StationId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AzuraCastMounts", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AzuraCastMounts_AzuraCast_AzuraCastId",
-                        column: x => x.AzuraCastId,
-                        principalTable: "AzuraCast",
+                        name: "FK_AzuraCastMounts_AzuraCastStations_StationId",
+                        column: x => x.StationId,
+                        principalTable: "AzuraCastStations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -115,14 +137,19 @@ namespace AzzyBot.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_AzuraCastChecks_AzuraCastId",
+                name: "IX_AzuraCastChecks_StationId",
                 table: "AzuraCastChecks",
-                column: "AzuraCastId",
+                column: "StationId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_AzuraCastMounts_AzuraCastId",
+                name: "IX_AzuraCastMounts_StationId",
                 table: "AzuraCastMounts",
+                column: "StationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AzuraCastStations_AzuraCastId",
+                table: "AzuraCastStations",
                 column: "AzuraCastId");
         }
 
@@ -134,6 +161,9 @@ namespace AzzyBot.Migrations
 
             migrationBuilder.DropTable(
                 name: "AzuraCastMounts");
+
+            migrationBuilder.DropTable(
+                name: "AzuraCastStations");
 
             migrationBuilder.DropTable(
                 name: "AzuraCast");

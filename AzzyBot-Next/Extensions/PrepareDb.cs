@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using AzzyBot.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +14,8 @@ public static class PrepareDb
         ArgumentNullException.ThrowIfNull(app, nameof(app));
 
         using IServiceScope scope = app.Services.CreateScope();
-        using AzzyDbContext db = scope.ServiceProvider.GetRequiredService<Database.AzzyDbContext>();
-        db.Database.Migrate();
+        using AzzyDbContext db = scope.ServiceProvider.GetRequiredService<AzzyDbContext>();
+        if (db.Database.GetPendingMigrations().Any())
+            db.Database.Migrate();
     }
 }

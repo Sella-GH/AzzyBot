@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Database.Entities;
+using AzzyBot.Utilities.Encryption;
 using AzzyBot.Utilities.Records;
 using DSharpPlus.Entities;
 
@@ -55,7 +56,8 @@ public static class EmbedBuilder
         string osArch = AzzyStatsHardware.GetSystemOsArch;
         string isDocker = AzzyStatsHardware.CheckIfDocker.ToString();
         long uptime = Converter.ConvertToUnixTime(AzzyStatsHardware.GetSystemUptime);
-        Dictionary<int, double> cpuUsage = await AzzyStatsHardware.GetSystemCpusAsync();
+        Dictionary<int, double> cpuUsage = await AzzyStatsHardware.GetSystemCpuAsync();
+        Dictionary<string, double> cpuTemp = await AzzyStatsHardware.GetSystemCpuTempAsync();
         CpuLoadRecord cpuLoads = await AzzyStatsHardware.GetSystemCpuLoadAsync();
         MemoryUsageRecord memory = await AzzyStatsHardware.GetSystemMemoryUsageAsync();
         DiskUsageRecord disk = AzzyStatsHardware.GetSystemDiskUsage();
@@ -65,45 +67,71 @@ public static class EmbedBuilder
         {
             ["Operating System"] = new(os, true),
             ["Architecture"] = new(osArch, true),
-            ["Is Dockerized"] = new(isDocker, true),
+            ["Is Docker?"] = new(isDocker, true),
             ["System Uptime"] = new($"<t:{uptime}>", false)
         };
 
         if (!AzzyStatsHardware.CheckIfLinuxOs)
             return CreateBasicEmbed(title, null, DiscordColor.Orange, null, notLinux, null, fields);
 
-        StringBuilder cpuUsageBuilder = new();
-        foreach (KeyValuePair<int, double> kvp in cpuUsage)
+        if (cpuUsage.Count > 0)
         {
-            int counter = kvp.Key;
-
-            if (counter == 0)
+            StringBuilder cpuUsageBuilder = new();
+            foreach (KeyValuePair<int, double> kvp in cpuUsage)
             {
-                cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Total usage: **{kvp.Value}**%");
-                continue;
+                int counter = kvp.Key;
+
+                if (counter == 0)
+                {
+                    cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Total usage: **{kvp.Value}**%");
+                    continue;
+                }
+
+                cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Core {counter}: **{kvp.Value}**%");
             }
 
-            cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Core {counter}: **{kvp.Value}**%");
+            fields.Add("CPU Usage", new(cpuUsageBuilder.ToString(), false));
         }
 
-        fields.Add("CPU Usage", new(cpuUsageBuilder.ToString(), false));
-
-        string cpuLoad = $"1-Min-Load: **{cpuLoads.OneMin}**\n5-Min-Load: **{cpuLoads.FiveMin}**\n15-Min-Load: **{cpuLoads.FifteenMin}**";
-        fields.Add("CPU Load", new(cpuLoad, true));
-
-        string memoryUsage = $"Total: **{memory.Total}** GB\nUsed: **{memory.Used}** GB\nFree: **{Math.Round(memory.Total - memory.Used, 2)}** GB";
-        fields.Add("Memory Usage", new(memoryUsage, true));
-
-        string diskUsage = $"Total: **{disk.TotalSize}** GB\nUsed: **{disk.TotalUsedSpace}** GB\nFree: **{disk.TotalFreeSpace}** GB";
-        fields.Add("Disk Usage", new(diskUsage, true));
-
-        StringBuilder networkUsageBuilder = new();
-        foreach (KeyValuePair<string, NetworkSpeedRecord> kvp in networkUsage)
+        if (cpuTemp.Count > 0)
         {
-            networkUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Interface: **{kvp.Key}**\nReceived: **{kvp.Value.Received}** KB/s\nTransmitted: **{kvp.Value.Transmitted}** KB/s\n");
+            StringBuilder cpuTempBuilder = new();
+            foreach (KeyValuePair<string, double> kvp in cpuTemp)
+            {
+                cpuTempBuilder.AppendLine(CultureInfo.InvariantCulture, $"{kvp.Key}: **{kvp.Value}** °C");
+            }
+
+            fields.Add("Temperatures", new(cpuTempBuilder.ToString(), false));
         }
 
-        fields.Add("Network Usage", new(networkUsageBuilder.ToString(), false));
+        if (cpuLoads is not null)
+        {
+            string cpuLoad = $"1-Min-Load: **{cpuLoads.OneMin}**\n5-Min-Load: **{cpuLoads.FiveMin}**\n15-Min-Load: **{cpuLoads.FifteenMin}**";
+            fields.Add("CPU Load", new(cpuLoad, true));
+        }
+
+        if (memory is not null)
+        {
+            string memoryUsage = $"Total: **{memory.Total}** GB\nUsed: **{memory.Used}** GB\nFree: **{Math.Round(memory.Total - memory.Used, 2)}** GB";
+            fields.Add("Memory Usage", new(memoryUsage, true));
+        }
+
+        if (disk is not null)
+        {
+            string diskUsage = $"Total: **{disk.TotalSize}** GB\nUsed: **{disk.TotalUsedSpace}** GB\nFree: **{disk.TotalFreeSpace}** GB";
+            fields.Add("Disk Usage", new(diskUsage, true));
+        }
+
+        if (networkUsage.Count > 0)
+        {
+            StringBuilder networkUsageBuilder = new();
+            foreach (KeyValuePair<string, NetworkSpeedRecord> kvp in networkUsage)
+            {
+                networkUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Interface: **{kvp.Key}**\nReceived: **{kvp.Value.Received}** KB/s\nTransmitted: **{kvp.Value.Transmitted}** KB/s\n");
+            }
+
+            fields.Add("Network Usage", new(networkUsageBuilder.ToString(), false));
+        }
 
         return CreateBasicEmbed(title, null, DiscordColor.Orange, avaUrl, null, null, fields);
     }
@@ -197,8 +225,8 @@ public static class EmbedBuilder
         Dictionary<string, DiscordEmbedRecord> fields = new()
         {
             ["Release Date"] = new($"<t:{Converter.ConvertToUnixTime(updateDate)}>"),
-            ["Your version"] = new(yourVersion),
-            ["New version"] = new(version.ToString())
+            ["Your Version"] = new(yourVersion),
+            ["New Version"] = new(version.ToString())
         };
 
         return CreateBasicEmbed(title, description, DiscordColor.White, null, null, url, fields);
@@ -221,7 +249,7 @@ public static class EmbedBuilder
     {
         bool isLinux = AzzyStatsHardware.CheckIfLinuxOs;
         bool isWindows = AzzyStatsHardware.CheckIfWindowsOs;
-        const string title = "Update instructions";
+        const string title = "Update Instructions";
         string description = "Please follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wiki/Docker-Update-Instructions).";
 
         if (isLinux)
@@ -241,69 +269,52 @@ public static class EmbedBuilder
         ArgumentNullException.ThrowIfNull(guild, nameof(guild));
         ArgumentException.ThrowIfNullOrWhiteSpace(serverName, nameof(serverName));
 
-        const string title = "Settings overview";
-        string description = $"Here are all settings which are currently set for {serverName}";
+        const string title = "Settings Overview";
+        string description = $"Here are all settings which are currently set for **{serverName}**";
 
         Dictionary<string, DiscordEmbedRecord> fields = new()
         {
             ["Server ID"] = new(guild.UniqueId.ToString(CultureInfo.InvariantCulture)),
-            ["Error channel"] = new((guild.ErrorChannelId > 0) ? $"<#{guild.ErrorChannelId}>" : "Not set"),
-            ["Configuration complete"] = new(guild.ConfigSet.ToString())
+            ["Error Channel"] = new((guild.ErrorChannelId > 0) ? $"<#{guild.ErrorChannelId}>" : "Not set"),
+            ["Configuration Complete"] = new(guild.ConfigSet.ToString()),
+            ["AzuraCast Activated"] = new(guild.AzuraCastSet.ToString())
         };
 
         return CreateBasicEmbed(title, description, DiscordColor.White, null, null, null, fields);
     }
 
-    public static DiscordEmbed BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast)
+    public static IReadOnlyList<DiscordEmbed> BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast)
     {
         ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
 
-        const string title = "AzuraCast settings";
-
+        const string title = "AzuraCast Settings";
+        List<DiscordEmbed> embeds = [];
         Dictionary<string, DiscordEmbedRecord> fields = new()
         {
-            ["API Key"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.ApiKey)) ? azuraCast.ApiKey : "Not set")}||"),
-            ["API URL"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.ApiUrl)) ? azuraCast.ApiUrl : "Not set")}||"),
-            ["Station ID"] = new($"{((azuraCast.StationId > 0) ? azuraCast.StationId : "Not set")}"),
-            ["Music Requests Channel"] = new((azuraCast.MusicRequestsChannelId > 0) ? $"<#{azuraCast.MusicRequestsChannelId}>" : "Not set"),
-            ["Outages Channel"] = new((azuraCast.OutagesChannelId > 0) ? $"<#{azuraCast.OutagesChannelId}>" : "Not set"),
-            ["Prefer HLS Streaming"] = new(azuraCast.PreferHlsStreaming.ToString()),
-            ["Show Playlist In Now Playing"] = new(azuraCast.ShowPlaylistInNowPlaying.ToString())
+            ["Base Url"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.BaseUrl)) ? Crypto.Decrypt(azuraCast.BaseUrl) : "Not set")}||"),
+            ["Outages Channel"] = new((azuraCast.OutagesChannelId > 0) ? $"<#{azuraCast.OutagesChannelId}>" : "Not set")
         };
 
-        return CreateBasicEmbed(title, string.Empty, DiscordColor.White, null, null, null, fields);
-    }
+        embeds.Add(CreateBasicEmbed(title, string.Empty, DiscordColor.White, null, null, null, fields));
 
-    public static DiscordEmbed BuildGetSettingsAzuraChecksEmbed(AzuraCastChecksEntity checks)
-    {
-        ArgumentNullException.ThrowIfNull(checks, nameof(checks));
-
-        const string title = "AzuraCast Checks settings";
-
-        Dictionary<string, DiscordEmbedRecord> fields = new()
+        const string stationTitle = "AzuraCast Stations";
+        foreach (AzuraCastStationEntity station in azuraCast.Stations)
         {
-            ["File Changes"] = new(checks.FileChanges.ToString()),
-            ["Server Status"] = new(checks.ServerStatus.ToString()),
-            ["Updates"] = new(checks.Updates.ToString()),
-            ["Updates Changelog"] = new(checks.UpdatesShowChangelog.ToString())
-        };
+            fields = new()
+            {
+                ["Station Name"] = new(Crypto.Decrypt(station.Name)),
+                ["Station ID"] = new(station.StationId.ToString(CultureInfo.InvariantCulture)),
+                ["Api key"] = new($"||{((!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : "Not set")}||"),
+                ["Music Requests Channel"] = new((station.RequestsChannelId > 0) ? $"<#{station.RequestsChannelId}>" : "Not set"),
+                ["Prefer HLS Streaming"] = new(station.PreferHls.ToString()),
+                ["Show Playlist In Now Playing"] = new(station.ShowPlaylistInNowPlaying.ToString()),
+                ["Automatic Checks"] = new($"- File Changes: {station.Checks.FileChanges}\n- Server Status: {station.Checks.ServerStatus}\n- Updates: {station.Checks.Updates}\n- Updates Changelog: {station.Checks.UpdatesShowChangelog}"),
+                ["Mount Points"] = new((station.Mounts.Count > 0) ? string.Join('\n', station.Mounts.Select(x => $"- {Crypto.Decrypt(x.Name)}: {Crypto.Decrypt(x.Mount)}")) : "No Mount Points added")
+            };
 
-        return CreateBasicEmbed(title, string.Empty, DiscordColor.White, null, null, null, fields);
-    }
-
-    public static DiscordEmbed BuildGetSettingsAzuraMountsEmbed(IReadOnlyList<AzuraCastMountsEntity> mounts)
-    {
-        ArgumentNullException.ThrowIfNull(mounts, nameof(mounts));
-
-        const string title = "AzuraCast Mount Points";
-        const string desc = "You have no mount points registered.";
-
-        Dictionary<string, DiscordEmbedRecord> fields = [];
-        foreach (AzuraCastMountsEntity mount in mounts)
-        {
-            fields.Add(mount.Name, new(mount.Mount));
+            embeds.Add(CreateBasicEmbed(stationTitle, string.Empty, DiscordColor.White, null, null, null, fields));
         }
 
-        return CreateBasicEmbed(title, (mounts.Count == 0) ? desc : string.Empty, DiscordColor.White, null, null, null, fields);
+        return embeds;
     }
 }

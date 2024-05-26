@@ -15,29 +15,34 @@ using DSharpPlus;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
 public sealed class DiscordBotService
 {
-    private readonly IDbContextFactory<AzzyDbContext> _dbContextFactory;
     private readonly ILogger<DiscordBotService> _logger;
     private readonly AzzyBotSettingsRecord _settings;
+    private readonly DbActions _db;
     private readonly DiscordShardedClient _shardedClient;
     private const string BugReportUrl = "https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D";
     private const string BugReportMessage = $"Send a [bug report]({BugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
     private const string ErrorChannelNotConfigured = $"**If you're seeing this message then I am not configured correctly!**\nTell your server admin to run */config config-core*\n\n{BugReportMessage}";
 
-    public DiscordBotService(AzzyBotSettingsRecord settings, IDbContextFactory<AzzyDbContext> dbContextFactory, ILogger<DiscordBotService> logger, DiscordBotServiceHost botServiceHost)
+    public DiscordBotService(AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotServiceHost botServiceHost, ILogger<DiscordBotService> logger)
     {
         ArgumentNullException.ThrowIfNull(botServiceHost, nameof(botServiceHost));
 
-        _settings = settings;
-        _dbContextFactory = dbContextFactory;
         _logger = logger;
+        _settings = settings;
+        _db = dbActions;
         _shardedClient = botServiceHost.ShardedClient;
+    }
+
+    public bool CheckIfClientsAreConnected()
+    {
+        List<DiscordClient> connected = _shardedClient.ShardClients.Values.Where(c => !c.IsConnected).ToList();
+        return connected.Count == 0;
     }
 
     public async Task<DiscordGuild?> GetDiscordGuildAsync(ulong guildId = 0)
@@ -96,25 +101,33 @@ public sealed class DiscordBotService
         ulong errorChannelId = _settings.ErrorChannelId;
         bool errorChannelConfigured = true;
 
-        // Looks if the guild has an error channel set
+        //
+        // Checks if the guild is the main guild
+        // If not look if the guild has an error channel set
         // Otherwise it will use the first channel it can see
         // However if nothing is present, send to debug server
-        if (guildId is not 0)
-        {
-            await using AzzyDbContext dbContext = await _dbContextFactory.CreateDbContextAsync();
-            GuildsEntity? guild = await dbContext.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
+        // If there's no guild, take the current channel
+        //
 
-            if (guild is not null && guild.ErrorChannelId is not 0)
+        if (guildId == _settings.ServerId)
+        {
+            errorChannelId = _settings.ErrorChannelId;
+        }
+        else if (guildId is not 0)
+        {
+            GuildsEntity guild = await _db.GetGuildAsync(guildId);
+
+            if (guild.ErrorChannelId is not 0)
                 errorChannelId = guild.ErrorChannelId;
 
-            if (errorChannelId is not 0 && errorChannelId != _settings.ErrorChannelId)
+            if (errorChannelId == _settings.ErrorChannelId)
             {
                 DiscordGuild? dGuild = await GetDiscordGuildAsync(guildId);
                 DiscordMember? dMember = await GetDiscordMemberAsync(guildId, _shardedClient.CurrentUser.Id);
                 if (dMember is null)
                     return false;
 
-                errorChannelId = dGuild?.Channels.First(c => c.Value.PermissionsFor(dMember).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages)).Value.Id ?? _settings.ErrorChannelId;
+                errorChannelId = dGuild?.Channels.First(c => c.Value.Type.Equals(DiscordChannelType.Text) && c.Value.PermissionsFor(dMember).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages)).Value.Id ?? _settings.ErrorChannelId;
                 if (errorChannelId is 0)
                     return false;
 
@@ -167,25 +180,33 @@ public sealed class DiscordBotService
         Dictionary<string, string> commandOptions = [];
         ProcessOptions(ctx.Arguments, commandOptions);
 
-        // Looks if the guild has an error channel set
+        //
+        // Checks if the guild is the main guild
+        // If not look if the guild has an error channel set
         // Otherwise it will use the first channel it can see
         // However if nothing is present, send to debug server
-        if (guildId is not 0)
-        {
-            await using AzzyDbContext dbContext = await _dbContextFactory.CreateDbContextAsync();
-            GuildsEntity? guild = await dbContext.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
+        // If there's no guild, take the current channel
+        //
 
-            if (guild is not null && guild.ErrorChannelId is not 0)
+        if (guildId == _settings.ServerId)
+        {
+            errorChannelId = _settings.ErrorChannelId;
+        }
+        else if (guildId is not 0)
+        {
+            GuildsEntity guild = await _db.GetGuildAsync(guildId);
+
+            if (guild.ErrorChannelId is not 0)
                 errorChannelId = guild.ErrorChannelId;
 
-            if (errorChannelId is not 0 && errorChannelId != _settings.ErrorChannelId)
+            if (errorChannelId is 0)
             {
                 DiscordGuild? dGuild = await GetDiscordGuildAsync(guildId);
                 DiscordMember? dMember = await GetDiscordMemberAsync(guildId, _shardedClient.CurrentUser.Id);
                 if (dMember is null)
                     return false;
 
-                errorChannelId = dGuild?.Channels.First(c => c.Value.PermissionsFor(dMember).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages)).Value.Id ?? _settings.ErrorChannelId;
+                errorChannelId = dGuild?.Channels.First(c => c.Value.Type.Equals(DiscordChannelType.Text) && c.Value.PermissionsFor(dMember).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages)).Value.Id ?? _settings.ErrorChannelId;
                 if (errorChannelId is 0)
                     return false;
 
@@ -226,6 +247,9 @@ public sealed class DiscordBotService
     public async Task<bool> SendMessageAsync(ulong channelId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, IMention[]? mentions = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
+
+        if (!CheckIfClientsAreConnected())
+            return false;
 
         await using DiscordMessageBuilder builder = new();
 
@@ -275,6 +299,19 @@ public sealed class DiscordBotService
         }
         else
         {
+            DiscordMember? dMember = await GetDiscordMemberAsync(channel.Guild.Id, _shardedClient.CurrentUser.Id);
+            if (dMember is null)
+            {
+                _logger.UnableToSendMessage($"Bot is not a member of server: {channel.Guild.Name} ({channel.Guild.Id})");
+                return false;
+            }
+
+            if (!channel.PermissionsFor(dMember).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages))
+            {
+                _logger.UnableToSendMessage($"Bot has no permission to send messages in channel: {channel.Name} ({channel.Id})");
+                return false;
+            }
+
             message = await channel.SendMessageAsync(builder);
         }
 

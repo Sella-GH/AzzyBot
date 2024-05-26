@@ -112,10 +112,11 @@ public sealed class DiscordBotServiceHost : IHostedService
 
         return new()
         {
-            Intents = DiscordIntents.AllUnprivileged | DiscordIntents.GuildMembers,
             LoggerFactory = _loggerFactory,
-            Token = _settings.BotToken,
-            TokenType = TokenType.Bot
+            // Otherwise it stops reconnecting after 4 attempts
+            // TODO Remove this when the new IoC Client is released #1908
+            ReconnectIndefinitely = true,
+            Token = _settings.BotToken
         };
     }
 
@@ -137,11 +138,9 @@ public sealed class DiscordBotServiceHost : IHostedService
             // These commands are for every server
             commandsExtension.AddCommands(typeof(ConfigCommands.ConfigGroup));
             commandsExtension.AddCommands(typeof(CoreCommands.CoreGroup));
-            commandsExtension.AddCommands(typeof(CoreCommands.CoreGroup.CoreStats));
 
             // Only add admin commands to the main server
             commandsExtension.AddCommand(typeof(AdminCommands.AdminGroup), _settings.ServerId);
-            commandsExtension.AddCommand(typeof(AdminCommands.AdminGroup.AdminDebugServers), _settings.ServerId);
 
             // Only add debug commands if it's a dev build
             if (AzzyStatsSoftware.GetBotName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase))
@@ -213,30 +212,13 @@ public sealed class DiscordBotServiceHost : IHostedService
         }
     }
 
-    private async Task ShardedClientGuildCreatedAsync(DiscordClient c, GuildCreateEventArgs e)
-    {
-        _logger.GuildCreated(e.Guild.Name);
-
-        await _dbActions.AddGuildEntityAsync(e.Guild.Id);
-        await e.Guild.Owner.SendMessageAsync("Thank you for adding me to your server! Before you can make use of me, you have to set my settings first.\n\nPlease use the command `settings set` for this.\nOnly you are able to execute this command right now.");
-    }
-
-    private async Task ShardedClientGuildDeletedAsync(DiscordClient c, GuildDeleteEventArgs e)
-    {
-        _logger.GuildDeleted(e.Guild.Name);
-
-        await _dbActions.RemoveGuildEntityAsync(e.Guild.Id);
-    }
-
-    private async Task ShardedClientGuildDownloadCompletedAsync(DiscordClient c, GuildDownloadCompletedEventArgs e)
-        => await _dbActions.AddBulkGuildEntitiesAsync(e.Guilds.Select(g => g.Value.Id).ToList());
-
     private async Task ShardedClientErroredAsync(DiscordClient c, ClientErrorEventArgs e)
     {
         if (_botService is null)
             return;
 
         Exception ex = e.Exception;
+        DateTime now = DateTime.Now;
 
         switch (ex)
         {
@@ -248,12 +230,10 @@ public sealed class DiscordBotServiceHost : IHostedService
             case RequestSizeException:
             case ServerErrorException:
             case UnauthorizedException:
-                await _botService.LogExceptionAsync(ex, DateTime.Now);
+                await _botService.LogExceptionAsync(ex, now);
                 break;
 
             default:
-                DateTime now = DateTime.Now;
-
                 if (ex is not DiscordException)
                 {
                     await _botService.LogExceptionAsync(ex, now);
@@ -264,4 +244,22 @@ public sealed class DiscordBotServiceHost : IHostedService
                 break;
         }
     }
+
+    private async Task ShardedClientGuildCreatedAsync(DiscordClient c, GuildCreateEventArgs e)
+    {
+        _logger.GuildCreated(e.Guild.Name);
+
+        await _dbActions.AddGuildAsync(e.Guild.Id);
+        await e.Guild.Owner.SendMessageAsync("Thank you for adding me to your server! Before you can make use of me, you have to set my settings first.\n\nPlease use the command `settings set` for this.\nOnly you are able to execute this command right now.");
+    }
+
+    private async Task ShardedClientGuildDeletedAsync(DiscordClient c, GuildDeleteEventArgs e)
+    {
+        _logger.GuildDeleted(e.Guild.Name);
+
+        await _dbActions.DeleteGuildAsync(e.Guild.Id);
+    }
+
+    private async Task ShardedClientGuildDownloadCompletedAsync(DiscordClient c, GuildDownloadCompletedEventArgs e)
+        => await _dbActions.AddGuildsAsync(e.Guilds.Select(g => g.Value.Id).ToList());
 }

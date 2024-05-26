@@ -13,45 +13,64 @@ namespace AzzyBot.Utilities;
 
 public static class AzzyHelp
 {
-    [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "It's just to get the name fully normalized")]
     private static List<AzzyHelpRecord> GetAllCommandsOfType(Type type)
     {
         List<AzzyHelpRecord> commands = [];
 
-        foreach (Type nestedType in type.GetNestedTypes(BindingFlags.NonPublic | BindingFlags.Instance))
+        foreach (Type nestedType in type.GetNestedTypes(BindingFlags.Public | BindingFlags.Instance))
         {
-            string parentCommand = nestedType.Name;
+            string parentCommand = nestedType.GetCustomAttribute<CommandAttribute>()?.Name ?? nestedType.Name;
 
-            foreach (MethodInfo method in nestedType.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))
+            foreach (Type subType in nestedType.GetNestedTypes(BindingFlags.Public | BindingFlags.Instance))
             {
-                CommandAttribute? command = method.GetCustomAttribute<CommandAttribute>();
+                string subCommand = subType.GetCustomAttribute<CommandAttribute>()?.Name ?? subType.Name;
+                List<MethodInfo> subMethods = subType.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(m => m.GetCustomAttribute<CommandAttribute>() is not null).ToList();
+                commands.AddRange(GetAllCommandsOfClass(subMethods, parentCommand, subCommand));
+            }
 
-                if (command is null)
-                    continue;
+            List<MethodInfo> methods = nestedType.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(m => m.GetCustomAttribute<CommandAttribute>() is not null).ToList();
+            commands.AddRange(GetAllCommandsOfClass(methods, parentCommand));
+        }
 
-                string commandName = $"/{parentCommand.ToLowerInvariant()} {command.Name}";
-                string description = method.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "No description provided";
+        return commands;
+    }
 
-                Dictionary<string, string> parameters = [];
-                foreach (ParameterInfo parameter in method.GetParameters().Where(p => p.ParameterType != typeof(CommandContext)))
+    [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "It's just to get the name fully normalized")]
+    private static List<AzzyHelpRecord> GetAllCommandsOfClass(List<MethodInfo> methods, string parent, string subParent = "")
+    {
+        List<AzzyHelpRecord> commands = [];
+        foreach (MethodInfo method in methods)
+        {
+            CommandAttribute? command = method.GetCustomAttribute<CommandAttribute>();
+
+            if (command is null)
+                continue;
+
+            string commandName = $"/{parent.ToLowerInvariant()} {command.Name}";
+            if (!string.IsNullOrWhiteSpace(subParent))
+                commandName = commandName.Replace(parent.ToLowerInvariant(), $"{parent.ToLowerInvariant()} {subParent.ToLowerInvariant()}", StringComparison.OrdinalIgnoreCase);
+
+            string description = method.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "No description provided";
+
+            Dictionary<string, string> parameters = [];
+            foreach (ParameterInfo parameter in method.GetParameters().Where(p => p.ParameterType != typeof(CommandContext)))
+            {
+                string paramName = parameter.Name ?? "No name provided";
+                string paramDescription = parameter.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "No description provided";
+                if (parameter.HasDefaultValue)
                 {
-                    string paramName = parameter.Name ?? "No name provided";
-                    string paramDescription = parameter.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "No description provided";
-                    if (parameter.HasDefaultValue)
-                    {
-                        paramName += " (optional)";
-                    }
-                    else
-                    {
-                        paramName += " (required)";
-                    }
-
-                    parameters.Add(paramName, paramDescription);
+                    paramName += " (optional)";
+                }
+                else
+                {
+                    paramName += " (required)";
                 }
 
-                AzzyHelpRecord commandInfo = new(parentCommand, commandName, description, parameters);
-                commands.Add(commandInfo);
+                parameters.Add(paramName, paramDescription);
             }
+
+            AzzyHelpRecord commandInfo = new(parent, commandName, description, parameters);
+            commands.Add(commandInfo);
         }
 
         return commands;
