@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Database.Entities;
+using AzzyBot.Utilities.Encryption;
 using AzzyBot.Utilities.Records;
 using DSharpPlus.Entities;
 
@@ -274,54 +276,43 @@ public static class EmbedBuilder
         {
             ["Server ID"] = new(guild.UniqueId.ToString(CultureInfo.InvariantCulture)),
             ["Error Channel"] = new((guild.ErrorChannelId > 0) ? $"<#{guild.ErrorChannelId}>" : "Not set"),
-            ["Configuration Complete"] = new(guild.ConfigSet.ToString())
+            ["Configuration Complete"] = new(guild.ConfigSet.ToString()),
+            ["AzuraCast Activated"] = new(guild.AzuraCastSet.ToString())
         };
 
         return CreateBasicEmbed(title, description, DiscordColor.White, null, null, null, fields);
     }
 
-    public static IReadOnlyList<DiscordEmbed> BuildGetSettingsAzuraEmbed(IReadOnlyList<AzuraCastEntity> azuraCast)
+    public static IReadOnlyList<DiscordEmbed> BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast)
     {
         ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
 
         const string title = "AzuraCast Settings";
         List<DiscordEmbed> embeds = [];
-
-        foreach (AzuraCastEntity azura in azuraCast)
+        Dictionary<string, DiscordEmbedRecord> fields = new()
         {
-            StringBuilder checks = new();
-            checks.AppendLine(CultureInfo.InvariantCulture, $"- File Changes: {azura.AutomaticChecks.FileChanges}");
-            checks.AppendLine(CultureInfo.InvariantCulture, $"- Server Status: {azura.AutomaticChecks.ServerStatus}");
-            checks.AppendLine(CultureInfo.InvariantCulture, $"- Updates: {azura.AutomaticChecks.Updates}");
-            checks.AppendLine(CultureInfo.InvariantCulture, $"- Updates Changelog: {azura.AutomaticChecks.UpdatesShowChangelog}");
+            ["Base Url"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.BaseUrl)) ? Crypto.Decrypt(azuraCast.BaseUrl) : "Not set")}||"),
+            ["Outages Channel"] = new((azuraCast.OutagesChannelId > 0) ? $"<#{azuraCast.OutagesChannelId}>" : "Not set")
+        };
 
-            StringBuilder mounts = new();
-            if (azura.MountPoints.Count > 0)
-            {
-                foreach (AzuraCastMountsEntity mount in azura.MountPoints)
-                {
-                    mounts.AppendLine(CultureInfo.InvariantCulture, $"- {mount.Name}: {mount.Mount}");
-                }
-            }
-            else
-            {
-                mounts.AppendLine("No AzuraCast Mount Points added.");
-            }
+        embeds.Add(CreateBasicEmbed(title, string.Empty, DiscordColor.White, null, null, null, fields));
 
-            Dictionary<string, DiscordEmbedRecord> fields = new()
+        const string stationTitle = "AzuraCast Stations";
+        foreach (AzuraCastStationEntity station in azuraCast.Stations)
+        {
+            fields = new()
             {
-                ["API Key"] = new($"||{((!string.IsNullOrWhiteSpace(azura.ApiKey)) ? azura.ApiKey : "Not set")}||"),
-                ["API URL"] = new($"||{((!string.IsNullOrWhiteSpace(azura.ApiUrl)) ? azura.ApiUrl : "Not set")}||"),
-                ["Station ID"] = new($"{((azura.StationId > 0) ? azura.StationId : "Not set")}"),
-                ["Music Requests Channel"] = new((azura.MusicRequestsChannelId > 0) ? $"<#{azura.MusicRequestsChannelId}>" : "Not set"),
-                ["Outages Channel"] = new((azura.OutagesChannelId > 0) ? $"<#{azura.OutagesChannelId}>" : "Not set"),
-                ["Prefer HLS Streaming"] = new(azura.PreferHlsStreaming.ToString()),
-                ["Show Playlist In Now Playing"] = new(azura.ShowPlaylistInNowPlaying.ToString()),
-                ["Automatic Checks"] = new(checks.ToString()),
-                ["Mount Points"] = new(mounts.ToString())
+                ["Station Name"] = new(Crypto.Decrypt(station.Name)),
+                ["Station ID"] = new(station.StationId.ToString(CultureInfo.InvariantCulture)),
+                ["Api key"] = new($"||{((!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : "Not set")}||"),
+                ["Music Requests Channel"] = new((station.RequestsChannelId > 0) ? $"<#{station.RequestsChannelId}>" : "Not set"),
+                ["Prefer HLS Streaming"] = new(station.PreferHls.ToString()),
+                ["Show Playlist In Now Playing"] = new(station.ShowPlaylistInNowPlaying.ToString()),
+                ["Automatic Checks"] = new($"- File Changes: {station.Checks.FileChanges}\n- Server Status: {station.Checks.ServerStatus}\n- Updates: {station.Checks.Updates}\n- Updates Changelog: {station.Checks.UpdatesShowChangelog}"),
+                ["Mount Points"] = new((station.Mounts.Count > 0) ? string.Join('\n', station.Mounts.Select(x => $"- {Crypto.Decrypt(x.Name)}: {Crypto.Decrypt(x.Mount)}")) : "No Mount Points added")
             };
 
-            embeds.Add(CreateBasicEmbed(title, string.Empty, DiscordColor.White, null, null, null, fields));
+            embeds.Add(CreateBasicEmbed(stationTitle, string.Empty, DiscordColor.White, null, null, null, fields));
         }
 
         return embeds;
