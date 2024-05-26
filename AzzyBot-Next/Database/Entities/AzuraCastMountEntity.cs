@@ -3,13 +3,13 @@
 namespace AzzyBot.Database.Entities;
 
 [SuppressMessage("Roslynator", "RCS0036:Remove blank line between single-line declarations of same kind", Justification = "Better clarification on keys")]
-public sealed class GuildsEntity
+public sealed class AzuraCastMountEntity
 {
     public int Id { get; set; }
 
-    public ulong UniqueId { get; set; }
-    public ulong ErrorChannelId { get; set; }
-    public bool IsDebugAllowed { get; set; }
-    public bool ConfigSet { get; set; }
-    public AzuraCastEntity AzuraCast { get; set; } = new ();
+    public string Name { get; set; } = string.Empty;
+    public string Mount { get; set; } = string.Empty;
+
+    public int StationId { get; set; }
+    public AzuraCastStationEntity Station { get; set; } = null!;
 }

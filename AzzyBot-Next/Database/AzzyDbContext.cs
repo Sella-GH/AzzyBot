@@ -15,6 +15,7 @@ public sealed class AzzyDbContext : DbContext
 
     public DbSet<GuildsEntity> Guilds { get; set; }
     public DbSet<AzuraCastEntity> AzuraCast { get; set; }
+    public DbSet<AzuraCastStationEntity> AzuraCastStations { get; set; }
     public DbSet<AzuraCastChecksEntity> AzuraCastChecks { get; set; }
-    public DbSet<AzuraCastMountsEntity> AzuraCastMounts { get; set; }
+    public DbSet<AzuraCastMountEntity> AzuraCastMounts { get; set; }
 }
