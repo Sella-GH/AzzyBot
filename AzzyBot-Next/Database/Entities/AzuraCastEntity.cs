@@ -12,6 +12,6 @@ public sealed class AzuraCastEntity
     public string BaseUrl { get; set; } = string.Empty;
     public ICollection<AzuraCastStationEntity> Stations { get; } = new List<AzuraCastStationEntity>();
 
-    public int GuildId { get; set; }
-    public GuildsEntity Guild { get; set; } = null!;
+    public int? GuildId { get; set; }
+    public GuildsEntity? Guild { get; set; }
 }
