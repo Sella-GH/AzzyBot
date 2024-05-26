@@ -330,61 +330,60 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
     public async Task<AzuraCastEntity> GetAzuraCastAsync(ulong guildId)
     {
-        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        GuildsEntity guild = await GetGuildAsync(guildId);
 
-        GuildsEntity guild = await context.Guilds.FirstOrDefaultAsync(g => g.UniqueId == guildId) ?? throw new InvalidOperationException("Guild not found in database");
-
-        return await context.AzuraCast.FirstOrDefaultAsync(a => a.GuildId == guild.Id) ?? throw new InvalidOperationException("AzuraCast settings not found in databse");
+        return guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast settings not found in databse");
     }
 
     public async Task<AzuraCastChecksEntity> GetAzuraCastChecksAsync(ulong guildId, int stationId)
     {
-        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        AzuraCastStationEntity station = await GetAzuraCastStationAsync(guildId, stationId);
 
-        GuildsEntity guild = await context.Guilds.FirstOrDefaultAsync(g => g.UniqueId == guildId) ?? throw new InvalidOperationException("Guild not found in database");
-        AzuraCastEntity azuraCast = await context.AzuraCast.FirstOrDefaultAsync(a => a.GuildId == guild.Id) ?? throw new InvalidOperationException("AzuraCast settings not found in databse");
-        AzuraCastStationEntity station = await context.AzuraCastStations.FirstOrDefaultAsync(s => s.AzuraCastId == azuraCast.Id && s.StationId == stationId) ?? throw new InvalidOperationException("Station not found in database");
-
-        return await context.AzuraCastChecks.FirstOrDefaultAsync(c => c.StationId == station.Id) ?? throw new InvalidOperationException("Checks not found in database");
+        return station.Checks;
     }
 
     public async Task<List<AzuraCastMountEntity>> GetAzuraCastMountsAsync(ulong guildId, int stationId)
     {
-        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        AzuraCastStationEntity station = await GetAzuraCastStationAsync(guildId, stationId);
 
-        GuildsEntity guild = await context.Guilds.FirstOrDefaultAsync(g => g.UniqueId == guildId) ?? throw new InvalidOperationException("Guild not found in database");
-        AzuraCastEntity azuraCast = await context.AzuraCast.FirstOrDefaultAsync(a => a.GuildId == guild.Id) ?? throw new InvalidOperationException("AzuraCast settings not found in databse");
-        AzuraCastStationEntity station = await context.AzuraCastStations.FirstOrDefaultAsync(s => s.AzuraCastId == azuraCast.Id && s.StationId == stationId) ?? throw new InvalidOperationException("Station not found in database");
+        return [.. station.Mounts];
+    }
 
-        return await context.AzuraCastMounts.Where(m => m.StationId == station.Id).ToListAsync();
+    public async Task<AzuraCastStationEntity> GetAzuraCastStationAsync(ulong guildId, int stationId)
+    {
+        AzuraCastEntity azuraCast = await GetAzuraCastAsync(guildId);
+
+        return azuraCast.Stations.SingleOrDefault(s => s.StationId == stationId) ?? throw new InvalidOperationException("Station not found in database");
     }
 
     public async Task<List<AzuraCastStationEntity>> GetAzuraCastStationsAsync(ulong guildId)
     {
-        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        AzuraCastEntity azuraCast = await GetAzuraCastAsync(guildId);
 
-        GuildsEntity guild = await context.Guilds.FirstOrDefaultAsync(g => g.UniqueId == guildId) ?? throw new InvalidOperationException("Guild not found in database");
-        AzuraCastEntity azuraCast = await context.AzuraCast.FirstOrDefaultAsync(a => a.GuildId == guild.Id) ?? throw new InvalidOperationException("AzuraCast settings not found in databse");
-
-        return await context.AzuraCastStations.Where(s => s.AzuraCastId == azuraCast.Id).ToListAsync();
+        return [.. azuraCast.Stations];
     }
 
     public async Task<GuildsEntity> GetGuildAsync(ulong guildId)
     {
+        List<GuildsEntity> guild = await GetGuildsAsync();
+
+        return guild.SingleOrDefault(g => g.UniqueId == guildId) ?? throw new InvalidOperationException("Guild not found in database");
+    }
+
+    public async Task<List<GuildsEntity>> GetGuildsAsync()
+    {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        GuildsEntity? guild = await context.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
-
-        return guild ?? throw new InvalidOperationException("Guild not found in database.");
+        return await context.Guilds.ToListAsync();
     }
 
     public async Task<List<GuildsEntity>> GetGuildsWithDebugAsync(bool isDebug = true)
     {
-        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        List<GuildsEntity> guilds = await GetGuildsAsync();
 
         return (isDebug)
-            ? await context.Guilds.Where(g => g.IsDebugAllowed).ToListAsync()
-            : await context.Guilds.Where(g => !g.IsDebugAllowed).ToListAsync();
+            ? guilds.Where(g => g.IsDebugAllowed).ToList()
+            : guilds.Where(g => !g.IsDebugAllowed).ToList();
     }
 
     public async Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl, ulong? outagesId)
