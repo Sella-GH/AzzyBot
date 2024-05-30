@@ -3,7 +3,9 @@
     "ServerId": 0,
     "ErrorChannelId": 0,
     "NotificationChannelId": 0,
-    "EncryptionKey": "",
+    "Database": {
+        "EncryptionKey": ""
+    },
     "DiscordStatus": {
         "Activity": 2,
         "Doing": "Music",

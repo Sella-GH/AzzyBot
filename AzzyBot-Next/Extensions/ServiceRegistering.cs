@@ -44,7 +44,7 @@ public static class ServiceRegistering
         AzzyBotSettingsRecord settings = serviceProvider.GetRequiredService<AzzyBotSettingsRecord>();
 
         // Set the encryption key
-        Crypto.EncryptionKey = Encoding.UTF8.GetBytes(settings.EncryptionKey);
+        Crypto.EncryptionKey = Encoding.UTF8.GetBytes(settings.Database!.EncryptionKey);
 
         // Need to register as Singleton first
         // Otherwise DI doesn't work properly
@@ -93,7 +93,11 @@ public static class ServiceRegistering
         List<string> exclusions = [nameof(settings.DiscordStatus.StreamUrl)];
         if (isDocker)
         {
-            exclusions.Add(nameof(settings.Database));
+            exclusions.Add(nameof(settings.Database.Host));
+            exclusions.Add(nameof(settings.Database.Port));
+            exclusions.Add(nameof(settings.Database.User));
+            exclusions.Add(nameof(settings.Database.Password));
+            exclusions.Add(nameof(settings.Database.DatabaseName));
         }
         else
         {
@@ -102,9 +106,9 @@ public static class ServiceRegistering
 
         SettingsCheck.CheckSettings(settings, exclusions);
 
-        if (settings.EncryptionKey.Length != 32)
+        if (settings.Database!.EncryptionKey.Length != 32)
         {
-            Console.Error.WriteLine($"The {nameof(settings.EncryptionKey)} must contain exactly 32 characters!");
+            Console.Error.WriteLine($"The {nameof(settings.Database.EncryptionKey)} must contain exactly 32 characters!");
             if (!AzzyStatsHardware.CheckIfLinuxOs)
                 Console.ReadKey();
 

@@ -3,8 +3,8 @@
     "ServerId": 0,
     "ErrorChannelId": 0,
     "NotificationChannelId": 0,
-    "EncryptionKey": "",
     "Database": {
+        "EncryptionKey": "",
         "Host": "localhost",
         "Port": 3306,
         "User": "root",
