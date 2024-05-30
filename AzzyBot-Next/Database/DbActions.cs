@@ -226,7 +226,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        return await context.Guilds.ToListAsync();
+        return await context.Guilds.AsSplitQuery().ToListAsync();
     }
 
     public async Task<List<GuildsEntity>> GetGuildsWithDebugAsync(bool isDebug = true)
