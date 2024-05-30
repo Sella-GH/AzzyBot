@@ -18,7 +18,6 @@
         "StreamUrl": ""
     },
     "Updater": {
-        "CheckInterval": 1,
         "DisplayChangelog": true,
         "DisplayInstructions": true
     }

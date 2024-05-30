@@ -35,7 +35,6 @@ public sealed record DiscordStatus
 
 public sealed record CoreUpdater
 {
-    public required int CheckInterval { get; init; }
     public required bool DisplayChangelog { get; init; }
     public required bool DisplayInstructions { get; init; }
 }
