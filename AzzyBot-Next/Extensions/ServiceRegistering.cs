@@ -52,7 +52,7 @@ public static class ServiceRegistering
         services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
 
         string connectionString = GetConnectionString(settings.Database?.Host, settings.Database?.Port, settings.Database?.User, settings.Database?.Password, settings.Database?.DatabaseName);
-        services.AddDbContextFactory<AzzyDbContext>(o => o.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+        services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
         services.AddSingleton<DbActions>();
 
         services.AddSingleton<DiscordBotService>();

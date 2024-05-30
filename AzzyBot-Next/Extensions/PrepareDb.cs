@@ -14,7 +14,8 @@ public static class PrepareDb
         ArgumentNullException.ThrowIfNull(app, nameof(app));
 
         using IServiceScope scope = app.Services.CreateScope();
-        using AzzyDbContext db = scope.ServiceProvider.GetRequiredService<AzzyDbContext>();
+        IDbContextFactory<AzzyDbContext> factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AzzyDbContext>>();
+        using AzzyDbContext db = factory.CreateDbContext();
         if (db.Database.GetPendingMigrations().Any())
             db.Database.Migrate();
     }
