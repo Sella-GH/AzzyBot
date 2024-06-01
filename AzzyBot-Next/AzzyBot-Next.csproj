@@ -15,7 +15,7 @@
     <Version>2.0.0-preview1</Version>
     <Copyright>© 2024 - $(Authors)</Copyright>
     <Product>AzzyBot-Next</Product>
-    <Description>General purpose discord bot, written in C# and with DSharpPlus, dedicated for the use with AzuraCast.</Description>
+    <Description>Kind of music bot for discord, written in C# and with DSharpPlus. This bot is dedicated for the use with AzuraCast and does not work at it's fully glory without it.</Description>
     <RepositoryUrl>https://github.com/Sella-GH/AzzyBot</RepositoryUrl>
     <PathMap>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)=.</PathMap>
     <AnalysisLevel>latest-all</AnalysisLevel>
