@@ -158,7 +158,7 @@ public sealed class ConfigCommands
             [Description("Choose the station you want to delete."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station
             )
         {
-            ArgumentNullException.ThrowIfNull (context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
 
             _logger.CommandRequested(nameof(DeleteAzuraCastStationAsync), context.User.GlobalName);
 
