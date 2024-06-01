@@ -66,7 +66,7 @@ jobs:
           if ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
             echo "environment=dev" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
-            echo "environment=rel/${{ needs.extract_version.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
+            echo "environment=rel-${{ needs.extract_version.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
           else
             echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
@@ -175,7 +175,7 @@ jobs:
           if ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
             echo "environment=dev" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
-            echo "environment=rel/${{ needs.extract_version.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
+            echo "environment=rel-${{ needs.extract_version.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
           else
             echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
