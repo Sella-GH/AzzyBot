@@ -63,7 +63,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') }}
+          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/') }}
           images: sellagh/azzybot
           tags: type=raw,value=${{ steps.environment.outputs.set-env }}
 
@@ -157,7 +157,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') }}
+          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/') }}
           images: sellagh/azzybot
           tags: type=raw,value=${{ steps.environment.outputs.set-env }}
 
@@ -231,7 +231,7 @@ jobs:
       - name: Get build environment
         id: environment
         run: |
-          if ${{ contains(github.event.head_commit.message, '[release]') }}; then
+          if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/') }}; then
             echo "set-env=latest" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.ref_name, 'main') }}; then
             echo "set-env=dev" >> "$GITHUB_OUTPUT"
@@ -243,7 +243,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') }}
+          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/') }}
           images: sellagh/azzybot
           tags: type=raw,value=${{ steps.environment.outputs.set-env }}
           
