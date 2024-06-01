@@ -19,8 +19,34 @@ on:
   workflow_dispatch:
 
 jobs:
+  extract_version:
+    name: Get Release Version
+    needs: check_for_tag
+    runs-on: ubuntu-latest
+    outputs:
+      clean_version: ${{ steps.set-version.outputs.clean_version }}
+      version: ${{ steps.set-version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version from csproj
+        uses: kzrnm/get-net-sdk-project-versions-action@v2
+        id: get-version
+        with:
+          proj-path: AzzyBot-Next/AzzyBot-Next.csproj
+
+      - name: Set version
+        id: set-version
+        run: |
+          echo "version=v${{ steps.get-version.outputs.version }}" >> "$GITHUB_OUTPUT"
+          echo "clean_version=${{ steps.get-version.outputs.version }}" >> "$GITHUB_OUTPUT"
+
   docker-build-amd:
     name: Build Docker image for ${{ matrix.os }} - ${{ matrix.arch }}
+    needs: [extract_version]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -39,6 +65,8 @@ jobs:
         run: |
           if ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
             echo "environment=dev" >> "$GITHUB_OUTPUT"
+          elif ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
+            echo "environment=rel/${{ needs.extract_version.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
           else
             echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
@@ -127,6 +155,7 @@ jobs:
 
   docker-build-arm:
     name: Build Docker image for ${{ matrix.os }} - ${{ matrix.arch }}
+    needs: [extract_version]
     runs-on: self-hosted
     strategy:
       matrix:
@@ -145,6 +174,8 @@ jobs:
         run: |
           if ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
             echo "environment=dev" >> "$GITHUB_OUTPUT"
+          elif ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
+            echo "environment=rel/${{ needs.extract_version.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
           else
             echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
