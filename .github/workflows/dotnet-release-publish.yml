@@ -18,7 +18,7 @@ jobs:
   build:
     name: Build RELEASE for ${{ matrix.os }} - ${{ matrix.arch }}
     needs: check_for_tag
-    if: ${{ needs.check_for_tag.outputs.tag_created == 'true' && (contains(github.event.head_commit.message, '[release]') }}
+    if: ${{ needs.check_for_tag.outputs.tag_created == 'true' && contains(github.event.head_commit.message, '[release]') }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
