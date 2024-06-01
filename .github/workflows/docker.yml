@@ -37,7 +37,7 @@ jobs:
       - name: Get build environment
         id: environment
         run: |
-          if ${{ contains(github.ref_name, 'main') }}; then
+          if ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
             echo "environment=dev" >> "$GITHUB_OUTPUT"
           else
             echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
@@ -46,7 +46,7 @@ jobs:
       - name: Get config environment
         id: config
         run: |
-          if ${{ contains(github.event.head_commit.message, '[release]') }}; then
+          if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
             echo "config=Docker" >> "$GITHUB_OUTPUT"
           else
             echo "config=Docker-debug" >> "$GITHUB_OUTPUT"
@@ -143,7 +143,7 @@ jobs:
       - name: Get build environment
         id: environment
         run: |
-          if ${{ contains(github.ref_name, 'main') }}; then
+          if ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
             echo "environment=dev" >> "$GITHUB_OUTPUT"
           else
             echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
@@ -152,7 +152,7 @@ jobs:
       - name: Get config environment
         id: config
         run: |
-          if ${{ contains(github.event.head_commit.message, '[release]') }}; then
+          if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
             echo "config=Docker" >> "$GITHUB_OUTPUT"
           else
             echo "config=Docker-debug" >> "$GITHUB_OUTPUT"
@@ -258,9 +258,9 @@ jobs:
       - name: Get docker environment
         id: environment
         run: |
-          if ${{ contains(github.event.head_commit.message, '[release]') }}; then
+          if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/') }}; then
             echo "environment=latest" >> "$GITHUB_OUTPUT"
-          elif ${{ contains(github.ref_name, 'main') }}; then
+          elif ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
             echo "environment=dev" >> "$GITHUB_OUTPUT"
           else
             echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
@@ -285,7 +285,3 @@ jobs:
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
             $(printf 'sellagh/azzybot@sha256:%s ' *)
-            
-      - name: Inspect image
-        run: |
-          docker buildx imagetools inspect sellagh/azzybot:${{ steps.meta.outputs.version }}
