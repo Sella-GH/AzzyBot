@@ -17,12 +17,19 @@
     <Product>AzzyBot-Next</Product>
     <Description>Kind of music bot for discord, written in C# and with DSharpPlus. This bot is dedicated for the use with AzuraCast and does not work at it's fully glory without it.</Description>
     <RepositoryUrl>https://github.com/Sella-GH/AzzyBot</RepositoryUrl>
-    <PathMap>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)=.</PathMap>
     <AnalysisLevel>latest-all</AnalysisLevel>
     <NoWarn>$(NoWarn);CA1812;CA2007</NoWarn>
     <Configurations>Debug;Release;Docker;Docker-debug</Configurations>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <StartupObject>AzzyBot.Startup</StartupObject>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
+    <PathMap>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)=.</PathMap>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(OS)' == 'UNIX' ">
+    <PathMap>$(MSBuildProjectDirectory)/$(IntermediateOutputPath)=.</PathMap>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
