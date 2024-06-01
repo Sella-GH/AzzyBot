@@ -273,7 +273,7 @@ jobs:
   merge:
     name: Creating Docker Release
     runs-on: ubuntu-latest
-    needs: [docker-build-amd,docker-build-arm]
+    needs: [extract_version, docker-build-amd, docker-build-arm]
     steps:
       - name: Download digests
         uses: actions/download-artifact@v4
