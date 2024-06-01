@@ -21,7 +21,6 @@ on:
 jobs:
   extract_version:
     name: Get Release Version
-    needs: check_for_tag
     runs-on: ubuntu-latest
     outputs:
       clean_version: ${{ steps.set-version.outputs.clean_version }}
