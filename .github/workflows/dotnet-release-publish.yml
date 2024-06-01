@@ -110,7 +110,7 @@ jobs:
           #mv ./AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
           #wget -qO ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
           mkdir -p ./docker-zip/AzzyBot/Settings
-          mv ./AzzyBot/Settings/AzzyBotSettings-Docker.json ./docker-zip/AzzyBot/Settings/AzzyBotSettings-Docker.json
+          mv ./AzzyBot-Next/Settings/AzzyBotSettings-Docker.json ./docker-zip/AzzyBot/Settings/AzzyBotSettings-Docker.json
 
       - name: Archive docker-zip artifact
         uses: actions/upload-artifact@v4

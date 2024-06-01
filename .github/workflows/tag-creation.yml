@@ -26,7 +26,7 @@ jobs:
         uses: kzrnm/get-net-sdk-project-versions-action@v2
         id: get-version
         with:
-          proj-path: AzzyBot/AzzyBot.csproj
+          proj-path: AzzyBot-Next/AzzyBot-Next.csproj
 
       - name: Compare tags
         id: compare
@@ -41,7 +41,7 @@ jobs:
   create_tag:
     name: Create the tag if needed
     needs: check_csproj
-    if: ${{ needs.check_csproj.outputs.create_tag_needed == 'true' &&  needs.check_csproj.outputs.tag_version != '' }} 
+    if: ${{ needs.check_csproj.outputs.create_tag_needed == 'true' &&  needs.check_csproj.outputs.tag_version != '' }}
     runs-on: ubuntu-latest
     outputs:
       tag_was_created: ${{ steps.create-tag.outputs.created-tag }}
