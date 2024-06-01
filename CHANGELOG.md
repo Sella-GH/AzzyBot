@@ -1,22 +1,9 @@
-## 1.10.0
-### Breaking Changes
-- `StringsMusicStreaming.json` was changed
-
-### Dependancies
-- Updated [CsvHelper](https://github.com/JoshClose/CsvHelper) to 32.0.1
-
+## 2.0.0-preview1
 ### General
-- `core info azzy` was renamed to `core info`
-- `core ping azzy` was renamed to `core ping`
-- Internal change from `Newtonsoft.Json` to `System.Text.Json` (probably resulting in performance improvements)
+- Complete rewrite of the bot using newest technologies
+- Included a database to store your settings and other important data
+- New commands to manage your bot and settings inside a database
+- Support for multiple servers, multiple stations and multiple users
 
-### Improvements
-- AzuraCast update notifications aligned to the timeframe of Core update notifications
-- AzuraCast checks now fire before the command is executed
-  - This means the users get a ephemeral (not visible for everyone) notification if something is not correct (e.g. server down, api key not working, etc)
-  - You continue to get the normal error messages if something goes wrong during the command execution
-
-### Fixes
-- 1-Min-Load not showing when it's 0 in `core ping`
-- Update notifications not firing properly
-- Lavalink not being able to load the current version of the Dependancy [Lyrics.Java](https://github.com/DuncteBot/java-timed-lyrics)
+Please note that this is a preview version and not all features are implemented yet. Some features may not work as expected or may not work at all.
+If you find any bugs or have any suggestions, please let me know by creating an [issue](https://github.com/Sella-GH/AzzyBot/issues/new/choose) on GitHub.

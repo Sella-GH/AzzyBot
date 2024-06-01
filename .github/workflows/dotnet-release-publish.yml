@@ -12,13 +12,13 @@ on:
 jobs:
   check_for_tag:
     name: Check if tag has to be created
-    if: contains(github.event.head_commit.message, '[release]')
+    if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
     uses: ./.github/workflows/tag-creation.yml
 
   build:
     name: Build RELEASE for ${{ matrix.os }} - ${{ matrix.arch }}
     needs: check_for_tag
-    if: ${{ needs.check_for_tag.outputs.tag_created }} == "true"
+    if: ${{ needs.check_for_tag.outputs.tag_created == "true" && contains(github.event.head_commit.message, '[release]') }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -47,13 +47,13 @@ jobs:
         run: |
           dotnet publish -c Release -r ${{ matrix.os }}-${{ matrix.arch }}
           
-      - name: Download and extract Lavalink
-        run: |
-          mkdir -p ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files/plugins
-          gh release download 4.0.4 --dir './artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files' --pattern 'Lavalink.jar' --repo lavalink-devs/Lavalink
-          wget -qO ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #- name: Download and extract Lavalink
+      #  run: |
+      #    mkdir -p ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files/plugins
+      #    gh release download 4.0.4 --dir './artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files' --pattern 'Lavalink.jar' --repo lavalink-devs/Lavalink
+      #    wget -qO ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
+      #  env:
+      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Calculate Lines of Source Code
         id: loc_cs
@@ -70,9 +70,9 @@ jobs:
 
       - name: Add some basic information
         run: |
-          sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
-          sed -i 's\Compilation date not found\${{ steps.dateTime.outputs.time }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
-          sed -i 's\Lines of source code not found\${{ steps.loc_cs.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
+          sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot-Next/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
+          sed -i 's\Compilation date not found\${{ steps.dateTime.outputs.time }}\g' ./artifacts/publish/AzzyBot-Next/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
+          sed -i 's\Lines of source code not found\${{ steps.loc_cs.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot-Next/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
@@ -80,11 +80,11 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-${{ matrix.os }}-${{ matrix.arch }}
-          path: ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}
+          path: ./artifacts/publish/AzzyBot-Next/release_${{ matrix.os }}-${{ matrix.arch }}
 
   build-docker:
     name: Build docker .zip file
-    if: contains(github.event.head_commit.message, '[release]')
+    if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -97,21 +97,20 @@ jobs:
           mkdir docker-zip
           mv ./CHANGELOG.md ./docker-zip/CHANGELOG.md
           mv ./CHANGELOG_HISTORY.md ./docker-zip/CHANGELOG_HISTORY.md
-          mv ./docker-compose.dev.yml ./docker-zip/docker-compose.dev.yml
-          mv ./docker-compose.yml ./docker-zip/docker-compose.yml
+          mv ./docker-compose.dev.yml ./docker-zip/docker-compose.yml
           mv ./LICENSE ./docker-zip/LICENSE
           mv ./README.md ./docker-zip/README.md
           mv ./SECURITY.md ./docker-zip/SECURITY.md
-          mkdir -p ./docker-zip/AzzyBot/Customization
-          mv ./AzzyBot/Customization/* ./docker-zip/AzzyBot/Customization
-          mkdir -p ./docker-zip/AzzyBot/Modules/AzuraCast/Files
-          mv ./AzzyBot/Modules/AzuraCast/Files/* ./docker-zip/AzzyBot/Modules/AzuraCast/Files
-          mkdir -p ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins
-          mv ./AzzyBot/Modules/MusicStreaming/Files/application.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/application.yml
-          mv ./AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
-          wget -qO ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
+          #mkdir -p ./docker-zip/AzzyBot/Customization
+          #mv ./AzzyBot/Customization/* ./docker-zip/AzzyBot/Customization
+          #mkdir -p ./docker-zip/AzzyBot/Modules/AzuraCast/Files
+          #mv ./AzzyBot/Modules/AzuraCast/Files/* ./docker-zip/AzzyBot/Modules/AzuraCast/Files
+          #mkdir -p ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins
+          #mv ./AzzyBot/Modules/MusicStreaming/Files/application.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/application.yml
+          #mv ./AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
+          #wget -qO ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
           mkdir -p ./docker-zip/AzzyBot/Settings
-          mv ./AzzyBot/Settings/appsettings.json ./docker-zip/AzzyBot/Settings/appsettings.json
+          mv ./AzzyBot/Settings/AzzyBotSettings-Docker.json ./docker-zip/AzzyBot/Settings/AzzyBotSettings-Docker.json
 
       - name: Archive docker-zip artifact
         uses: actions/upload-artifact@v4
@@ -136,7 +135,7 @@ jobs:
         uses: kzrnm/get-net-sdk-project-versions-action@v2
         id: get-version
         with:
-          proj-path: AzzyBot/AzzyBot.csproj
+          proj-path: AzzyBot-Next/AzzyBot-Next.csproj
 
       - name: Set version
         id: set-version
@@ -146,7 +145,7 @@ jobs:
 
   create_release:
     name: Create GitHub Release
-    needs: [build, extract_version]
+    needs: [build-docker, extract_version]
     runs-on: ubuntu-latest
     outputs:
       release_version: ${{ steps.set_output.outputs.release_version }}
@@ -164,7 +163,7 @@ jobs:
           name: ${{ needs.extract_version.outputs.clean_version }}
           body_path: CHANGELOG.md
           draft: false
-          prerelease: false
+          prerelease: ${{ contains(github.event.head_commit.message, '[pre-release]') }}
           
       - name: Set Release Version Output
         id: set_output
@@ -173,7 +172,7 @@ jobs:
           
   upload_assets:
     name: Upload GitHub Release Assets
-    needs: [create_release, build]
+    needs: [build-docker, create_release]
     runs-on: ubuntu-latest
     steps:
       - name: Install GitHub CLI

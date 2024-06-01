@@ -1,7 +1,7 @@
 name : Feature requests
 description : Create a feature request to help us improving the discord bot.
 title : "[FEATURE]"
-labels : enhancement
+labels : [enhancement]
 assignees : Sella-GH
 body :
   - type : markdown

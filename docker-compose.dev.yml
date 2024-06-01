@@ -1,9 +1,7 @@
-#include:
-  #- ./AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
 services:
   AzzyBot:
     container_name: AzzyBot
-    image: sellagh/azzybot:dev-AddHardwareEmbed
+    image: sellagh/azzybot:rel-2.0.0-preview1
     pull_policy: always
     restart: unless-stopped
     user: ${CURRENT_UID}
@@ -11,15 +9,11 @@ services:
       - FORCE_DEBUG=false
     depends_on:
       - AzzyBot-Db
-    #  - lavalink
     networks:
-    #  - lavalink
       - AzzyBot-Db-Nw
       - AzzyBot-Nw
     volumes:
-      #- ./AzzyBot/Customization:/app/Customization
-      #- ./AzzyBot/Modules/AzuraCast/Files:/app/Modules/AzuraCast/Files
-      - ./AzzyBot-Next/Settings:/app/Settings
+      - ./AzzyBot/Settings:/app/Settings
 
   AzzyBot-Db:
     container_name: AzzyBot-Db

@@ -1,7 +1,7 @@
 name : Bug report
 description : Create a bug report to help us fixing pesky bugs
 title : "[BUG]"
-labels : bug
+labels : [bug]
 assignees : Sella-GH
 body :
   - type : markdown
@@ -10,6 +10,52 @@ body :
         Thank you very much for reporting an issue regarding Azzy.
         Please note that this form is only intended to be used for bug reports.
         If you want to suggest a feature, please use the [following form](https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=enhancement&projects=&template=feature_request.yml&title=%5BFEATURE%5D).
+
+  - type : dropdown
+    id : version
+    attributes :
+      label : "Version"
+      description : "Which version of Azzy are you using?"
+      options :
+        - "1.9.x"
+        - "1.10.x"
+        - "2.0.0-preview1"
+    validations :
+      required : true
+
+  - type : dropdown
+    id : deploy-version
+    attributes :
+      label : "Deployement version"
+      description : "Which deployement version are you using?"
+      options :
+        - Docker
+        - Native
+    validations :
+      required : true
+
+  - type : dropdown
+    id : operating-system
+    attributes :
+      label : "Operating system"
+      description : "Which operating system are you using?"
+      options :
+        - Linux
+        - MacOS
+        - Windows
+    validations :
+      required : true
+
+  - type : dropdown
+    id : operating-system-arch
+    attributes :
+      label : "Architecture"
+      description : "Which architecture are you using?"
+      options :
+        - ARM64
+        - x64
+    validations :
+      required : true
 
   - type : input
     id : bug-description
@@ -52,40 +98,6 @@ body :
      label : "Relevant log output"
      description : "If applicable, add relevant log output to help explain your issue."
      render : shell
-
-  - type : dropdown
-    id : deploy-version
-    attributes :
-      label : "Deployement version"
-      description : "Which deployement version are you using?"
-      options :
-        - Docker
-        - Native
-    validations :
-      required : true
-
-  - type : dropdown
-    id : operating-system
-    attributes :
-      label : "Operating system"
-      description : "Which operating system are you using?"
-      options :
-        - Linux
-        - MacOS
-        - Windows
-    validations :
-      required : true
-
-  - type : dropdown
-    id : operating-system-arch
-    attributes :
-      label : "Architecture"
-      description : "Which architecture are you using?"
-      options :
-        - ARM64
-        - x64
-    validations :
-      required : true
       
   - type : textarea
     id : more-info
