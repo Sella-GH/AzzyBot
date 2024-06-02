@@ -56,12 +56,6 @@ public static class EmbedBuilder
         string osArch = AzzyStatsHardware.GetSystemOsArch;
         string isDocker = AzzyStatsHardware.CheckIfDocker.ToString();
         long uptime = Converter.ConvertToUnixTime(AzzyStatsHardware.GetSystemUptime);
-        Dictionary<int, double> cpuUsage = await AzzyStatsHardware.GetSystemCpuAsync();
-        Dictionary<string, double> cpuTemp = await AzzyStatsHardware.GetSystemCpuTempAsync();
-        CpuLoadRecord cpuLoads = await AzzyStatsHardware.GetSystemCpuLoadAsync();
-        MemoryUsageRecord memory = await AzzyStatsHardware.GetSystemMemoryUsageAsync();
-        DiskUsageRecord disk = AzzyStatsHardware.GetSystemDiskUsage();
-        Dictionary<string, NetworkSpeedRecord> networkUsage = await AzzyStatsHardware.GetSystemNetworkUsageAsync();
 
         Dictionary<string, DiscordEmbedRecord> fields = new()
         {
@@ -73,6 +67,13 @@ public static class EmbedBuilder
 
         if (!AzzyStatsHardware.CheckIfLinuxOs)
             return CreateBasicEmbed(title, null, DiscordColor.Orange, null, notLinux, null, fields);
+
+        Dictionary<int, double> cpuUsage = await AzzyStatsHardware.GetSystemCpuAsync();
+        Dictionary<string, double> cpuTemp = await AzzyStatsHardware.GetSystemCpuTempAsync();
+        CpuLoadRecord cpuLoads = await AzzyStatsHardware.GetSystemCpuLoadAsync();
+        MemoryUsageRecord memory = await AzzyStatsHardware.GetSystemMemoryUsageAsync();
+        DiskUsageRecord disk = AzzyStatsHardware.GetSystemDiskUsage();
+        Dictionary<string, NetworkSpeedRecord> networkUsage = await AzzyStatsHardware.GetSystemNetworkUsageAsync();
 
         if (cpuUsage.Count > 0)
         {

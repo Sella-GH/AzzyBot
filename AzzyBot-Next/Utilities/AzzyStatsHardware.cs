@@ -12,7 +12,7 @@ namespace AzzyBot.Utilities;
 public static class AzzyStatsHardware
 {
     public static bool CheckIfDocker => Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER", EnvironmentVariableTarget.Process) == "true";
-    public static bool CheckIfLinuxOs => RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD) || RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
+    public static bool CheckIfLinuxOs => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
     public static bool CheckIfWindowsOs => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
     public static async Task<Dictionary<int, double>> GetSystemCpuAsync()
@@ -248,7 +248,7 @@ public static class AzzyStatsHardware
         return networkSpeeds;
     }
 
-    public static string GetSystemOs => RuntimeInformation.OSDescription;
+    public static string GetSystemOs => Environment.OSVersion.VersionString;
     public static string GetSystemOsArch => RuntimeInformation.OSArchitecture.ToString();
     public static DateTime GetSystemUptime => DateTime.Now.AddMilliseconds(-Environment.TickCount64);
 }
