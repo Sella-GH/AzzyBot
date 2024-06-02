@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using AzzyBot.Database;
 using AzzyBot.Services;
 using AzzyBot.Services.Modules;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
+using MySqlConnector;
 
 namespace AzzyBot.Extensions;
 
@@ -52,6 +54,8 @@ public static class ServiceRegistering
         services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
 
         string connectionString = GetConnectionString(settings.Database?.Host, settings.Database?.Port, settings.Database?.User, settings.Database?.Password, settings.Database?.DatabaseName);
+        CheckIfDatabaseIsOnline(connectionString);
+
         services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
         services.AddSingleton<DbActions>();
 
@@ -133,6 +137,25 @@ public static class ServiceRegistering
         }
 
         services.AddSingleton(stats);
+    }
+
+    private static void CheckIfDatabaseIsOnline(string connectionString)
+    {
+        bool isOnline = false;
+
+        while (!isOnline)
+        {
+            try
+            {
+                using AzzyDbContext context = new(new DbContextOptionsBuilder<AzzyDbContext>().UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)).Options);
+                isOnline = true;
+            }
+            catch (MySqlException)
+            {
+                Console.Out.WriteLine("Database is not online yet. Retrying in 5 seconds...");
+                Task.Delay(TimeSpan.FromSeconds(5));
+            }
+        }
     }
 
     private static string GetConnectionString(string? host, int? port, string? user, string? password, string? database)
