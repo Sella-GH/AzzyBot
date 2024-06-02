@@ -1,3 +1,8 @@
+## 2.0.0-preview2
+### Improvements
+- Check if Database is online before trying to connect
+- Detection of operating systems in the hardware embed improved
+
 ## 2.0.0-preview1
 ### General
 - Complete rewrite of the bot using newest technologies
