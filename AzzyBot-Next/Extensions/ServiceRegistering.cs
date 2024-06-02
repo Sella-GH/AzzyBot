@@ -153,7 +153,7 @@ public static class ServiceRegistering
             catch (MySqlException)
             {
                 Console.Out.WriteLine("Database is not online yet. Retrying in 5 seconds...");
-                Task.Delay(TimeSpan.FromSeconds(5));
+                Task.Delay(TimeSpan.FromSeconds(5)).Wait();
             }
         }
     }
