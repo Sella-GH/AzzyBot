@@ -102,9 +102,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02267" />
-    <PackageReference Include="DSharpPlus.Commands" Version="5.0.0-nightly-02267" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02267" />
+    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02271" />
+    <PackageReference Include="DSharpPlus.Commands" Version="5.0.0-nightly-02271" />
+    <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02271" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
