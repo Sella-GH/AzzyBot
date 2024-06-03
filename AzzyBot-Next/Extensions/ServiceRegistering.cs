@@ -24,7 +24,7 @@ public static class ServiceRegistering
     public static void AzzyBotLogging(this ILoggingBuilder logging, bool isDev = false, bool forceDebug = false)
     {
         logging.AddConsole();
-        logging.AddFile(Path.Combine("Logs", $"AzzyBot_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.log"));
+        logging.AddFile(Path.Combine("Settings", $"AzzyBot_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.log"));
         logging.AddFilter("Microsoft.EntityFrameworkCore.Database", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
         logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
         logging.AddFilter("Microsoft.EntityFrameworkCore.Infrastructure", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
