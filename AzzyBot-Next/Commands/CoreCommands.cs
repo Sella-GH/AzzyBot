@@ -58,7 +58,15 @@ public sealed class CoreCommands
             List<DiscordEmbed> embeds = [];
             if (string.IsNullOrWhiteSpace(command))
             {
-                embeds.Add(EmbedBuilder.BuildAzzyHelpEmbed(AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member)));
+                string subCommand = string.Empty;
+                foreach (KeyValuePair<string, List<AzzyHelpRecord>> kvp in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member))
+                {
+                    if (embeds.Count == 10)
+                        break;
+
+                    DiscordEmbed embed = EmbedBuilder.BuildAzzyHelpEmbed(kvp.Value);
+                    embeds.Add(embed);
+                }
             }
             else
             {

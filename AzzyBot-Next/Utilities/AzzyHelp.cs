@@ -22,7 +22,7 @@ public static class AzzyHelp
         };
     }
 
-    public static IReadOnlyList<AzzyHelpRecord> GetAllCommands(IReadOnlyDictionary<string, Command> commands, bool adminServer, bool approvedDebug, DiscordMember member)
+    public static IReadOnlyDictionary<string, List<AzzyHelpRecord>> GetAllCommands(IReadOnlyDictionary<string, Command> commands, bool adminServer, bool approvedDebug, DiscordMember member)
     {
         ArgumentNullException.ThrowIfNull(commands, nameof(commands));
         ArgumentOutOfRangeException.ThrowIfZero(commands.Count, nameof(commands));
@@ -36,27 +36,37 @@ public static class AzzyHelp
         ArgumentOutOfRangeException.ThrowIfZero(commands.Count, nameof(commands));
         ArgumentException.ThrowIfNullOrWhiteSpace(commandName, nameof(commandName));
 
-        return GetCommandGroups(commands, adminServer, approvedDebug, member).Find(record => record.Name == commandName) ?? throw new InvalidOperationException("No command found!");
+        foreach (KeyValuePair<string, List<AzzyHelpRecord>> record in GetCommandGroups(commands, adminServer, approvedDebug, member))
+        {
+            foreach (AzzyHelpRecord subRecord in record.Value)
+            {
+                if (subRecord.Name == commandName)
+                    return subRecord;
+            }
+        }
+
+        throw new InvalidOperationException("Command not found");
     }
 
-    private static List<AzzyHelpRecord> GetCommandGroups(IReadOnlyDictionary<string, Command> commands, bool adminServer, bool approvedDebug, DiscordMember member)
+    private static Dictionary<string, List<AzzyHelpRecord>> GetCommandGroups(IReadOnlyDictionary<string, Command> commands, bool adminServer, bool approvedDebug, DiscordMember member)
     {
-        List<AzzyHelpRecord> records = [];
+        List<string> commandGroups = [];
         foreach (KeyValuePair<string, Command> kvp in commands)
         {
             Command command = kvp.Value;
-            string subCommand = command.Name;
             if (command.Subcommands.Count > 0)
             {
                 if (!CheckIfMemberHasPermission(adminServer, approvedDebug, member, command.Name))
                     continue;
 
-                records.AddRange(GetCommands(command.Subcommands, subCommand));
+                commandGroups.Add(command.Name);
             }
-            else
-            {
-                records.AddRange(GetCommands([command]));
-            }
+        }
+
+        Dictionary<string, List<AzzyHelpRecord>> records = [];
+        foreach (string group in commandGroups)
+        {
+            records.Add(group, GetCommands(commands[group].Subcommands, group));
         }
 
         return records;
@@ -85,7 +95,7 @@ public static class AzzyHelp
                 parameters.Add(paramName, paramDescription);
             }
 
-            records.Add(new AzzyHelpRecord(subCommand, command.Name, description, parameters));
+            records.Add(new AzzyHelpRecord(subCommand, command.FullName, description, parameters));
         }
 
         return records;

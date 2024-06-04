@@ -23,6 +23,7 @@ public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings, DbActio
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
         Dictionary<string, object> results = [];
+        string search = context.UserInput;
 
         IEnumerable<DiscordUser> botOwners = context.Client.CurrentApplication.Owners ?? throw new InvalidOperationException("Invalid bot owners");
         ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Invalid guild id");
@@ -37,12 +38,16 @@ public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings, DbActio
         }
 
         bool approvedDebug = guild.IsDebugAllowed || guildId == _settings.ServerId;
-        foreach (AzzyHelpRecord record in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member))
+        foreach (KeyValuePair<string, List<AzzyHelpRecord>> kvp in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member))
         {
             if (results.Count == 25)
                 return results;
 
-            results.Add(record.Name, record.Name);
+            if (!string.IsNullOrWhiteSpace(search) && kvp.Value.All(r => !r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)))
+                continue;
+
+            foreach (AzzyHelpRecord record in kvp.Value.Where(r => r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)))
+                results.Add(record.Name, record.Name);
         }
 
         return results;
