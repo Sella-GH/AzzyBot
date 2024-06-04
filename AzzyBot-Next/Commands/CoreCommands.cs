@@ -56,17 +56,16 @@ public sealed class CoreCommands
 
             bool approvedDebug = guild.IsDebugAllowed || guildId == _settings.ServerId;
             List<DiscordEmbed> embeds = [];
-
             if (string.IsNullOrWhiteSpace(command))
             {
-                foreach (KeyValuePair<int, List<AzzyHelpRecord>> kvp in AzzyHelp.GetCommands(adminServer, approvedDebug, member))
+                foreach (AzzyHelpRecord record in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member))
                 {
-                    embeds.Add(EmbedBuilder.BuildAzzyHelpEmbed(kvp.Value));
+                    embeds.Add(EmbedBuilder.BuildAzzyHelpEmbed(record));
                 }
             }
             else
             {
-                AzzyHelpRecord helpCommand = AzzyHelp.GetSingleCommand(adminServer, approvedDebug, member, command);
+                AzzyHelpRecord helpCommand = AzzyHelp.GetSingleCommand(context.Extension.Commands, command, adminServer, approvedDebug, member);
                 DiscordEmbed embed = EmbedBuilder.BuildAzzyHelpEmbed(helpCommand);
                 embeds.Add(embed);
             }
