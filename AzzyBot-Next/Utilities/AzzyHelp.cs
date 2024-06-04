@@ -37,16 +37,7 @@ public static class AzzyHelp
         ArgumentOutOfRangeException.ThrowIfZero(commands.Count, nameof(commands));
         ArgumentException.ThrowIfNullOrWhiteSpace(commandName, nameof(commandName));
 
-        foreach (KeyValuePair<string, List<AzzyHelpRecord>> record in GetCommandGroups(commands, adminServer, approvedDebug, member))
-        {
-            foreach (AzzyHelpRecord subRecord in record.Value)
-            {
-                if (subRecord.Name == commandName)
-                    return subRecord;
-            }
-        }
-
-        throw new InvalidOperationException("Command not found");
+        return GetCommandGroups(commands, adminServer, approvedDebug, member).FirstOrDefault(r => r.Value.Any(c => c.Name == commandName)).Value.FirstOrDefault() ?? throw new InvalidOperationException("Command not found");
     }
 
     private static Dictionary<string, List<AzzyHelpRecord>> GetCommandGroups(IReadOnlyDictionary<string, Command> commands, bool adminServer, bool approvedDebug, DiscordMember member)
