@@ -1,27 +1,33 @@
+using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Logging;
 
-public sealed class FileLoggerProvider(string directory) : ILoggerProvider
+public sealed class FileLoggerProvider : ILoggerProvider
 {
-    private readonly string _directory = directory;
-    private readonly ConcurrentDictionary<string, FileLogger> _loggers = new();
+    private readonly IDisposable? _onChangeToken;
+    private FileLoggerConfiguration _configuration;
+    private readonly ConcurrentDictionary<string, FileLogger> _loggers = new(StringComparer.OrdinalIgnoreCase);
 
-    public ILogger CreateLogger(string categoryName) => _loggers.GetOrAdd(categoryName, name => new FileLogger(_directory));
-    public void Dispose() => Dispose(true);
-
-    public void Dispose(bool disposing)
+    public FileLoggerProvider(IOptionsMonitor<FileLoggerConfiguration> config)
     {
-        if (!disposing)
-            return;
+        ArgumentNullException.ThrowIfNull(config, nameof(config));
 
-        foreach (KeyValuePair<string, FileLogger> logger in _loggers)
-        {
-            logger.Value.Dispose();
-        }
+        _configuration = config.CurrentValue;
+        _onChangeToken = config.OnChange(updatedConfig => _configuration = updatedConfig);
+    }
 
+    public ILogger CreateLogger(string categoryName)
+        => _loggers.GetOrAdd(categoryName, name => new FileLogger(name, GetCurrentConfig));
+
+    private FileLoggerConfiguration GetCurrentConfig()
+        => _configuration;
+
+    public void Dispose()
+    {
         _loggers.Clear();
+        _onChangeToken?.Dispose();
     }
 }

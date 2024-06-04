@@ -1,63 +1,69 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Reflection;
-using AzzyBot.Commands;
 using AzzyBot.Utilities.Records;
-using DSharpPlus.Commands;
+using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
 
 namespace AzzyBot.Utilities;
 
 public static class AzzyHelp
 {
-    private static List<AzzyHelpRecord> GetAllCommandsOfType(Type type)
+    private static bool CheckIfMemberHasPermission(bool adminServer, bool approvedDebug, DiscordMember member, string command)
     {
-        List<AzzyHelpRecord> commands = [];
+        DiscordPermissions permissions = member.Permissions;
 
-        foreach (Type nestedType in type.GetNestedTypes(BindingFlags.Public | BindingFlags.Instance))
+        return command switch
         {
-            string parentCommand = nestedType.GetCustomAttribute<CommandAttribute>()?.Name ?? nestedType.Name;
-
-            foreach (Type subType in nestedType.GetNestedTypes(BindingFlags.Public | BindingFlags.Instance))
-            {
-                string subCommand = subType.GetCustomAttribute<CommandAttribute>()?.Name ?? subType.Name;
-                List<MethodInfo> subMethods = subType.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(m => m.GetCustomAttribute<CommandAttribute>() is not null).ToList();
-                commands.AddRange(GetAllCommandsOfClass(subMethods, parentCommand, subCommand));
-            }
-
-            List<MethodInfo> methods = nestedType.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(m => m.GetCustomAttribute<CommandAttribute>() is not null).ToList();
-            commands.AddRange(GetAllCommandsOfClass(methods, parentCommand));
-        }
-
-        return commands;
+            "admin" => adminServer,
+            "config" => permissions.HasPermission(DiscordPermissions.Administrator),
+            "core" => true,
+            "debug" => approvedDebug && permissions.HasPermission(DiscordPermissions.Administrator),
+            _ => false,
+        };
     }
 
-    [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "It's just to get the name fully normalized")]
-    private static List<AzzyHelpRecord> GetAllCommandsOfClass(List<MethodInfo> methods, string parent, string subParent = "")
+    public static IReadOnlyDictionary<string, List<AzzyHelpRecord>> GetAllCommands(IReadOnlyDictionary<string, Command> commands, bool adminServer, bool approvedDebug, DiscordMember member)
     {
-        List<AzzyHelpRecord> commands = [];
-        foreach (MethodInfo method in methods)
+        ArgumentNullException.ThrowIfNull(commands, nameof(commands));
+        ArgumentOutOfRangeException.ThrowIfZero(commands.Count, nameof(commands));
+
+        return GetCommandGroups(commands, adminServer, approvedDebug, member);
+    }
+
+    public static AzzyHelpRecord GetSingleCommand(IReadOnlyDictionary<string, Command> commands, string commandName, bool adminServer, bool approvedDebug, DiscordMember member)
+    {
+        ArgumentNullException.ThrowIfNull(commands, nameof(commands));
+        ArgumentOutOfRangeException.ThrowIfZero(commands.Count, nameof(commands));
+        ArgumentException.ThrowIfNullOrWhiteSpace(commandName, nameof(commandName));
+
+        return GetCommandGroups(commands, adminServer, approvedDebug, member).FirstOrDefault(r => r.Value.Any(c => c.Name == commandName)).Value.FirstOrDefault() ?? throw new InvalidOperationException("Command not found");
+    }
+
+    private static Dictionary<string, List<AzzyHelpRecord>> GetCommandGroups(IReadOnlyDictionary<string, Command> commands, bool adminServer, bool approvedDebug, DiscordMember member)
+    {
+        List<string> commandGroups = commands.Where(c => c.Value.Subcommands.Count > 0 && CheckIfMemberHasPermission(adminServer, approvedDebug, member, c.Value.Name)).Select(c => c.Value.Name).ToList();
+        Dictionary<string, List<AzzyHelpRecord>> records = [];
+        foreach (string group in commandGroups)
         {
-            CommandAttribute? command = method.GetCustomAttribute<CommandAttribute>();
+            records.Add(group, GetCommands(commands[group].Subcommands, group));
+        }
 
-            if (command is null)
-                continue;
+        return records;
+    }
 
-            string commandName = $"/{parent.ToLowerInvariant()} {command.Name}";
-            if (!string.IsNullOrWhiteSpace(subParent))
-                commandName = commandName.Replace(parent.ToLowerInvariant(), $"{parent.ToLowerInvariant()} {subParent.ToLowerInvariant()}", StringComparison.OrdinalIgnoreCase);
-
-            string description = method.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "No description provided";
-
+    private static List<AzzyHelpRecord> GetCommands(IReadOnlyList<Command> commands, string subCommand = "")
+    {
+        List<AzzyHelpRecord> records = [];
+        foreach (Command command in commands)
+        {
+            string description = command.Description ?? "No description provided";
             Dictionary<string, string> parameters = [];
-            foreach (ParameterInfo parameter in method.GetParameters().Where(p => p.ParameterType != typeof(CommandContext)))
+            foreach (CommandParameter parameter in command.Parameters)
             {
                 string paramName = parameter.Name ?? "No name provided";
-                string paramDescription = parameter.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "No description provided";
-                if (parameter.HasDefaultValue)
+                string paramDescription = parameter.Description ?? "No description provided";
+                if (parameter.DefaultValue.HasValue)
                 {
                     paramName += " (optional)";
                 }
@@ -69,45 +75,9 @@ public static class AzzyHelp
                 parameters.Add(paramName, paramDescription);
             }
 
-            AzzyHelpRecord commandInfo = new(parent, commandName, description, parameters);
-            commands.Add(commandInfo);
-        }
-
-        return commands;
-    }
-
-    private static bool CheckIfMemberHasPermission(bool adminServer, bool approvedDebug, DiscordMember member, Type type)
-    {
-        DiscordPermissions permissions = member.Permissions;
-
-        return type.Name switch
-        {
-            nameof(AdminCommands) => adminServer,
-            nameof(ConfigCommands) => permissions.HasPermission(DiscordPermissions.Administrator),
-            nameof(CoreCommands) => true,
-            nameof(DebugCommands) => approvedDebug && permissions.HasPermission(DiscordPermissions.Administrator),
-            _ => false,
-        };
-    }
-
-    public static Dictionary<int, List<AzzyHelpRecord>> GetCommands(bool adminServer, bool approvedDebug, DiscordMember member)
-    {
-        Dictionary<int, List<AzzyHelpRecord>> records = [];
-        foreach (Type type in Assembly.GetExecutingAssembly().GetTypes().Where(t => t.Namespace == "AzzyBot.Commands" && CheckIfMemberHasPermission(adminServer, approvedDebug, member, t)))
-        {
-            records.Add(records.Count, GetAllCommandsOfType(type));
+            records.Add(new AzzyHelpRecord(subCommand, command.FullName, description, parameters));
         }
 
         return records;
-    }
-
-    public static AzzyHelpRecord GetSingleCommand(bool adminServer, bool approvedDebug, DiscordMember member, string commandName)
-    {
-        foreach (KeyValuePair<int, List<AzzyHelpRecord>> kvp in GetCommands(adminServer, approvedDebug, member))
-        {
-            return kvp.Value.First(c => c.Name == commandName);
-        }
-
-        throw new InvalidOperationException("No command found!");
     }
 }
