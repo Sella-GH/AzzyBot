@@ -16,8 +16,10 @@ public sealed class FileLogger(string path) : ILogger, IDisposable
 
     public void Dispose(bool disposing)
     {
-        if (disposing)
-            _semaphore.Dispose();
+        if (!disposing)
+            return;
+
+        _semaphore.Dispose();
     }
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
