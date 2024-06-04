@@ -51,15 +51,7 @@ public static class AzzyHelp
 
     private static Dictionary<string, List<AzzyHelpRecord>> GetCommandGroups(IReadOnlyDictionary<string, Command> commands, bool adminServer, bool approvedDebug, DiscordMember member)
     {
-        List<string> commandGroups = [];
-        foreach (Command command in commands.Where(c => c.Value.Subcommands.Count > 0).Select(c => c.Value))
-        {
-            if (!CheckIfMemberHasPermission(adminServer, approvedDebug, member, command.Name))
-                continue;
-
-            commandGroups.Add(command.Name);
-        }
-
+        List<string> commandGroups = commands.Where(c => c.Value.Subcommands.Count > 0 && CheckIfMemberHasPermission(adminServer, approvedDebug, member, c.Value.Name)).Select(c => c.Value.Name).ToList();
         Dictionary<string, List<AzzyHelpRecord>> records = [];
         foreach (string group in commandGroups)
         {
