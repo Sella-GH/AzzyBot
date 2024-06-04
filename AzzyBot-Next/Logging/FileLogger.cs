@@ -5,15 +5,12 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Logging;
 
-public sealed class FileLogger(string filePath) : ILogger, IDisposable
+public sealed class FileLogger(string path) : ILogger, IDisposable
 {
-    private readonly string _filePath = filePath;
+    private readonly string _path = path;
     private readonly SemaphoreSlim _semaphore = new(1, 1);
 
-#pragma warning disable CS8633 // Nullability in constraints for type parameter doesn't match the constraints for type parameter in implicitly implemented interface method'.
-    public IDisposable? BeginScope<TState>(TState? state) => null;
-#pragma warning restore CS8633 // Nullability in constraints for type parameter doesn't match the constraints for type parameter in implicitly implemented interface method'.
-
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => default!;
     public bool IsEnabled(LogLevel logLevel) => true;
     public void Dispose() => Dispose(true);
 
@@ -26,6 +23,9 @@ public sealed class FileLogger(string filePath) : ILogger, IDisposable
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
         ArgumentNullException.ThrowIfNull(formatter, nameof(formatter));
+
+        if (!IsEnabled(logLevel))
+            return;
 
         _semaphore.Wait();
 
@@ -40,7 +40,7 @@ public sealed class FileLogger(string filePath) : ILogger, IDisposable
 
         try
         {
-            File.AppendAllText(_filePath, logMessage);
+            File.AppendAllText(_path, logMessage);
         }
         finally
         {

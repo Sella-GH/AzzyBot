@@ -9,10 +9,7 @@ public sealed class FileLoggerProvider(string filePath) : ILoggerProvider
     private readonly string _filePath = filePath;
     private readonly ConcurrentDictionary<string, FileLogger> _loggers = new();
 
-    public ILogger CreateLogger(string categoryName)
-    {
-        return _loggers.GetOrAdd(categoryName, name => new FileLogger(_filePath));
-    }
+    public ILogger CreateLogger(string categoryName) => _loggers.GetOrAdd(categoryName, name => new FileLogger(_filePath));
 
     public void Dispose()
     {
