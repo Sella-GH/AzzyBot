@@ -11,7 +11,7 @@
             "preLaunchTask": "build-next",
             "program": "${workspaceFolder}/artifacts/bin/AzzyBot-Next/Debug/AzzyBot-Dev.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/AzzyBot-Next",
+            "cwd": "${workspaceFolder}/artifacts/bin/AzzyBot-Next/Debug",
             "console": "externalTerminal",
             "stopAtEntry": false,
         },
