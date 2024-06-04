@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AzzyBot.Utilities.Records;
 using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
@@ -51,16 +52,13 @@ public static class AzzyHelp
     private static Dictionary<string, List<AzzyHelpRecord>> GetCommandGroups(IReadOnlyDictionary<string, Command> commands, bool adminServer, bool approvedDebug, DiscordMember member)
     {
         List<string> commandGroups = [];
-        foreach (KeyValuePair<string, Command> kvp in commands)
+        foreach (KeyValuePair<string, Command> kvp in commands.Where(c => c.Value.Subcommands.Count > 0))
         {
             Command command = kvp.Value;
-            if (command.Subcommands.Count > 0)
-            {
-                if (!CheckIfMemberHasPermission(adminServer, approvedDebug, member, command.Name))
-                    continue;
+            if (!CheckIfMemberHasPermission(adminServer, approvedDebug, member, command.Name))
+                continue;
 
-                commandGroups.Add(command.Name);
-            }
+            commandGroups.Add(command.Name);
         }
 
         Dictionary<string, List<AzzyHelpRecord>> records = [];
