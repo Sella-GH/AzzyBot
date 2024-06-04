@@ -1,7 +1,13 @@
 ## 2.0.0-preview2
+### Additions
+- File Logging to folder `Logs`
+  - There is one log file per day
+
 ### Improvements
-- Check if Database is online before trying to connect
-- Detection of operating systems in the hardware embed improved
+- Check if database is online before trying to connect
+- Detection of operating systems in the hardware embed
+- Complete rework of the logic behind `core help` command
+- Code and reliability improvements
 
 ## 2.0.0-preview1
 ### General

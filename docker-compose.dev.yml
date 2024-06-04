@@ -13,6 +13,7 @@ services:
       - AzzyBot-Db-Nw
       - AzzyBot-Nw
     volumes:
+      - ./AzzyBot/Logs:/app/Logs
       - ./AzzyBot/Settings:/app/Settings
 
   AzzyBot-Db:
