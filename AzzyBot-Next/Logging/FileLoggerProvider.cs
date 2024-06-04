@@ -4,12 +4,12 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Logging;
 
-public sealed class FileLoggerProvider(string filePath) : ILoggerProvider
+public sealed class FileLoggerProvider(string directory) : ILoggerProvider
 {
-    private readonly string _filePath = filePath;
+    private readonly string _directory = directory;
     private readonly ConcurrentDictionary<string, FileLogger> _loggers = new();
 
-    public ILogger CreateLogger(string categoryName) => _loggers.GetOrAdd(categoryName, name => new FileLogger(_filePath));
+    public ILogger CreateLogger(string categoryName) => _loggers.GetOrAdd(categoryName, name => new FileLogger(_directory));
     public void Dispose() => Dispose(true);
 
     public void Dispose(bool disposing)
