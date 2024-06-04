@@ -37,16 +37,12 @@ public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings, DbActio
         }
 
         bool approvedDebug = guild.IsDebugAllowed || guildId == _settings.ServerId;
-
-        foreach (KeyValuePair<int, List<AzzyHelpRecord>> kvp in AzzyHelp.GetCommands(adminServer, approvedDebug, member))
+        foreach (AzzyHelpRecord record in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member))
         {
-            foreach (AzzyHelpRecord command in kvp.Value)
-            {
-                if (results.Count == 25)
-                    return results;
+            if (results.Count == 25)
+                return results;
 
-                results.Add(command.Name, command.Name);
-            }
+            results.Add(record.Name, record.Name);
         }
 
         return results;
