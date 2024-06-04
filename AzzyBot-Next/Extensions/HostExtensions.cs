@@ -7,7 +7,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace AzzyBot.Extensions;
 
-public static class PrepareDb
+public static class HostExtensions
 {
     public static void ApplyDbMigrations(this IHost app)
     {

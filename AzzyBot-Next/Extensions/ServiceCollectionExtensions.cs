@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Database;
-using AzzyBot.Logging;
 using AzzyBot.Services;
 using AzzyBot.Services.Modules;
 using AzzyBot.Settings;
@@ -13,38 +12,12 @@ using AzzyBot.Utilities.Encryption;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
 using MySqlConnector;
 
 namespace AzzyBot.Extensions;
 
-public static class ServiceRegistering
+public static class ServiceCollectionExtensions
 {
-    public static void AzzyBotLogging(this ILoggingBuilder logging, bool isDev = false, bool forceDebug = false)
-    {
-        logging.AddConsole();
-
-        if (!Directory.Exists("Logs"))
-            Directory.CreateDirectory("Logs");
-
-        logging.AddFile("Logs");
-        logging.AddFilter("Microsoft.EntityFrameworkCore.Database", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
-        logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
-        logging.AddFilter("Microsoft.EntityFrameworkCore.Infrastructure", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
-        logging.AddFilter("Microsoft.EntityFrameworkCore.Migrations", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Information);
-        logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.Warning);
-        logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Warning);
-        logging.AddSimpleConsole(config =>
-        {
-            config.ColorBehavior = LoggerColorBehavior.Enabled;
-            config.IncludeScopes = true;
-            config.SingleLine = true;
-            config.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
-        });
-        logging.SetMinimumLevel((isDev || forceDebug) ? LogLevel.Debug : LogLevel.Information);
-    }
-
     public static void AzzyBotServices(this IServiceCollection services)
     {
         // Enable or disable modules based on the settings
