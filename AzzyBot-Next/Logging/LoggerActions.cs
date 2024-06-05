@@ -47,6 +47,9 @@ public static partial class LoggerActions
     [LoggerMessage(200, LogLevel.Warning, "Commands error occured!")]
     public static partial void CommandsError(this ILogger<DiscordBotServiceHost> logger);
 
+    [LoggerMessage(201, LogLevel.Warning, "Could not fetch channel for id {id}")]
+    public static partial void ChannelNotFound(this ILogger<DiscordBotService> logger, ulong id);
+
     [LoggerMessage(290, LogLevel.Warning, "Latest online version of the bot is empty")]
     public static partial void OnlineVersionEmpty(this ILogger<UpdaterService> logger);
 

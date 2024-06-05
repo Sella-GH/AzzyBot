@@ -15,6 +15,7 @@ using DSharpPlus;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
+using DSharpPlus.Exceptions;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
@@ -24,7 +25,7 @@ public sealed class DiscordBotService
     private readonly ILogger<DiscordBotService> _logger;
     private readonly AzzyBotSettingsRecord _settings;
     private readonly DbActions _db;
-    private readonly DiscordShardedClient _shardedClient;
+    private readonly DiscordClient _client;
     private const string BugReportUrl = "https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D";
     private const string BugReportMessage = $"Send a [bug report]({BugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
     private const string ErrorChannelNotConfigured = $"**If you're seeing this message then I am not configured correctly!**\nTell your server admin to run */config config-core*\n\n{BugReportMessage}";
@@ -36,50 +37,39 @@ public sealed class DiscordBotService
         _logger = logger;
         _settings = settings;
         _db = dbActions;
-        _shardedClient = botServiceHost.ShardedClient;
+        _client = botServiceHost.Client;
     }
 
-    public bool CheckIfClientsAreConnected()
+    public bool CheckIfClientIsConnected
+        => _client.IsConnected;
+
+    public async Task<DiscordChannel?> GetDiscordChannelAsync(ulong channelId)
     {
-        List<DiscordClient> connected = _shardedClient.ShardClients.Values.Where(c => !c.IsConnected).ToList();
-        return connected.Count == 0;
+        try
+        {
+            return await _client.GetChannelAsync(channelId);
+        }
+        catch (NotFoundException)
+        {
+            _logger.ChannelNotFound(channelId);
+            return null;
+        }
     }
 
-    public async Task<DiscordGuild?> GetDiscordGuildAsync(ulong guildId = 0)
+    public DiscordGuild? GetDiscordGuild(ulong guildId = 0)
     {
         if (guildId is 0)
             guildId = _settings.ServerId;
 
-        DiscordGuild? guild = null;
-
-        foreach (DiscordClient client in _shardedClient.ShardClients.Select(c => c.Value))
-        {
-            guild = await client.GetGuildAsync(guildId);
-
-            if (guild is not null)
-                break;
-        }
-
-        return guild;
+        return GetDiscordGuilds.Select(g => g.Value).FirstOrDefault(g => g.Id.Equals(guildId));
     }
 
-    public Dictionary<ulong, DiscordGuild> GetDiscordGuilds()
-    {
-        Dictionary<ulong, DiscordGuild> guilds = [];
-        foreach (KeyValuePair<int, DiscordClient> client in _shardedClient.ShardClients)
-        {
-            foreach (KeyValuePair<ulong, DiscordGuild> guild in client.Value.Guilds)
-            {
-                guilds.Add(guild.Key, guild.Value);
-            }
-        }
-
-        return guilds;
-    }
+    public IReadOnlyDictionary<ulong, DiscordGuild> GetDiscordGuilds
+        => _client.Guilds;
 
     public async Task<DiscordMember?> GetDiscordMemberAsync(ulong guildId, ulong userId)
     {
-        DiscordGuild? guild = await GetDiscordGuildAsync(guildId);
+        DiscordGuild? guild = GetDiscordGuild(guildId);
         DiscordMember? member = null;
 
         if (guild is not null)
@@ -122,8 +112,8 @@ public sealed class DiscordBotService
 
             if (errorChannelId == _settings.ErrorChannelId)
             {
-                DiscordGuild? dGuild = await GetDiscordGuildAsync(guildId);
-                DiscordMember? dMember = await GetDiscordMemberAsync(guildId, _shardedClient.CurrentUser.Id);
+                DiscordGuild? dGuild = GetDiscordGuild(guildId);
+                DiscordMember? dMember = await GetDiscordMemberAsync(guildId, _client.CurrentUser.Id);
                 if (dMember is null)
                     return false;
 
@@ -201,8 +191,8 @@ public sealed class DiscordBotService
 
             if (errorChannelId is 0)
             {
-                DiscordGuild? dGuild = await GetDiscordGuildAsync(guildId);
-                DiscordMember? dMember = await GetDiscordMemberAsync(guildId, _shardedClient.CurrentUser.Id);
+                DiscordGuild? dGuild = GetDiscordGuild(guildId);
+                DiscordMember? dMember = await GetDiscordMemberAsync(guildId, _client.CurrentUser.Id);
                 if (dMember is null)
                     return false;
 
@@ -248,7 +238,7 @@ public sealed class DiscordBotService
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
 
-        if (!CheckIfClientsAreConnected())
+        if (!CheckIfClientIsConnected)
             return false;
 
         await using DiscordMessageBuilder builder = new();
@@ -282,16 +272,7 @@ public sealed class DiscordBotService
             }
         }
 
-        DiscordChannel? channel = null;
-        foreach (KeyValuePair<int, DiscordClient> kvp in _shardedClient.ShardClients)
-        {
-            await foreach (DiscordGuild guild in kvp.Value.GetGuildsAsync())
-            {
-                if (guild.Id == _settings.ServerId)
-                    channel = await kvp.Value.GetChannelAsync(channelId);
-            }
-        }
-
+        DiscordChannel? channel = await GetDiscordChannelAsync(channelId);
         DiscordMessage? message = null;
         if (channel is null)
         {
@@ -299,7 +280,7 @@ public sealed class DiscordBotService
         }
         else
         {
-            DiscordMember? dMember = await GetDiscordMemberAsync(channel.Guild.Id, _shardedClient.CurrentUser.Id);
+            DiscordMember? dMember = await GetDiscordMemberAsync(channel.Guild.Id, _client.CurrentUser.Id);
             if (dMember is null)
             {
                 _logger.UnableToSendMessage($"Bot is not a member of server: {channel.Guild.Name} ({channel.Guild.Id})");
