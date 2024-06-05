@@ -22,7 +22,7 @@ public sealed class GuildsAutocomplete(DbActions dbActions, DiscordBotService bo
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
         List<GuildsEntity> guildsInDb = [];
-        Dictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds();
+        IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
 
         switch (context.Command.FullName)
         {
