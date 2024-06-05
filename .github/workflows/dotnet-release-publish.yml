@@ -52,7 +52,7 @@ jobs:
       - name: Download and extract Lavalink
         run: |
           mkdir -p ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files/plugins
-          gh release download 4.0.4 --dir './artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files' --pattern 'Lavalink.jar' --repo lavalink-devs/Lavalink
+          gh release download 4.0.6 --dir './artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files' --pattern 'Lavalink.jar' --repo lavalink-devs/Lavalink
           wget -qO ./artifacts/publish/AzzyBot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
