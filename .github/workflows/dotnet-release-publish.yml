@@ -154,6 +154,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Extract Latest Changelog Entry
+        id: extract_changelog
+        run: |
+          # Extract the latest changelog entry from CHANGELOG.md
+          latest_entry=$(awk 'BEGIN {found=0} /^## / {if (found) exit; found=1} {if (found) print}' CHANGELOG.md)
+          echo "$latest_entry" > latest_changelog.md
+          echo "latest_entry=${latest_entry}" >> "$GITHUB_OUTPUT"
+
       - name: Create Release
         id: create_release_action
         uses: softprops/action-gh-release@v2
@@ -162,8 +170,7 @@ jobs:
         with:
           tag_name: ${{ needs.extract_version.outputs.version }}
           name: ${{ needs.extract_version.outputs.clean_version }}
-          body_path: CHANGELOG.md
-          draft: false
+          body_path: latest_changelog.md
           prerelease: ${{ contains(github.event.head_commit.message, '[pre-release]') }}
           
       - name: Set Release Version Output
