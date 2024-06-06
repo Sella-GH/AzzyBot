@@ -15,7 +15,7 @@ public sealed class AzuraCastService(WebRequestService webService)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
-        Uri url = new($"{baseUrl}/api/{endpoint}");
+        Uri url = new($"{baseUrl}api/{endpoint}");
         string body = await _webService.GetWebAsync(url, headers);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException($"API response is empty, url: {url}");
@@ -27,7 +27,7 @@ public sealed class AzuraCastService(WebRequestService webService)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
-        Uri uri = new($"{baseUrl}/api/{endpoint}");
+        Uri uri = new($"{baseUrl}api/{endpoint}");
         string body = await _webService.GetWebAsync(uri, headers);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException($"API response is empty, url: {uri}");
