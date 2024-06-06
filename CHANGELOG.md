@@ -1,3 +1,13 @@
+## 2.0.0-preview2
+### General
+- The integrated updater is now able to identify preview versions
+- The `AzuraCast` module is finally added!
+  - Now you can finally use the bot again and work with it
+
+### Additions
+- New commands:
+  - `music nowplaying` - Shows the currently played stuff from the choosen station
+
 ## 2.0.0-preview1.1
 ### General
 - Your Database needs a complete reset, please DROP it and start from scratch.
