@@ -8,7 +8,7 @@ using AzzyBot.Commands.Autocompletes;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
-using AzzyBot.Services;
+using AzzyBot.Services.Modules;
 using AzzyBot.Utilities;
 using AzzyBot.Utilities.Encryption;
 using AzzyBot.Utilities.Records.AzuraCast;
@@ -16,6 +16,7 @@ using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands;
@@ -47,14 +48,15 @@ public sealed class AzuraCastCommands
             GuildsEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id);
             AzuraCastEntity azuraCast = guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast is null");
             AzuraCastStationEntity station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId) ?? throw new InvalidOperationException("Station is null");
-            string baseUrl = azuraCast.BaseUrl;
+            string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
-            NowPlayingDataRecord nowPlaying = await _azuraCast.GetNowPlayingAsync(new(Crypto.Decrypt(baseUrl)), stationId);
+            NowPlayingDataRecord nowPlaying = await _azuraCast.GetNowPlayingAsync(new(baseUrl), stationId);
 
             string? playlistName = null;
             if (station.ShowPlaylistInNowPlaying)
             {
-                IReadOnlyList<PlaylistRecord> playlist = await _azuraCast.GetPlaylistsAsync(new(Crypto.Decrypt(baseUrl)), stationId);
+                string apiKey = Crypto.Decrypt(station.ApiKey);
+                IReadOnlyList<PlaylistRecord> playlist = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, stationId);
                 playlistName = playlist.Where(p => p.Name == nowPlaying.NowPlaying.Playlist).Select(p => p.Name).FirstOrDefault();
             }
 
