@@ -1,4 +1,4 @@
-## 2.0.0-preview2
+## 2.0.0-preview1.1
 ### Additions
 - File Logging to folder `Logs`
   - There is one log file per day
@@ -10,6 +10,7 @@
 - Code and reliability improvements
 
 ### Fixes
+- Database does not save objects when they are modified
 - Debug Servers not showing inside the AutoComplete, affected commands:
   - `admin debug-servers add-server`
   - `admin debug-servers remove-server`

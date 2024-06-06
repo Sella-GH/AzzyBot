@@ -248,6 +248,8 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             if (outagesId.HasValue)
                 azuraCast.OutagesChannelId = outagesId.Value;
+
+            context.AzuraCast.Update(azuraCast);
         });
     }
 
@@ -268,6 +270,8 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             if (updatesChangelog.HasValue)
                 checks.UpdatesShowChangelog = updatesChangelog.Value;
+
+            context.AzuraCastChecks.Update(checks);
         });
     }
 
@@ -294,6 +298,8 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             if (playlist.HasValue)
                 azuraStation.ShowPlaylistInNowPlaying = playlist.Value;
+
+            context.AzuraCastStations.Update(azuraStation);
         });
     }
 
@@ -311,6 +317,8 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             if (isDebug.HasValue)
                 guild.IsDebugAllowed = isDebug.Value;
+
+            context.Guilds.Update(guild);
         });
     }
 }
