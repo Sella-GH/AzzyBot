@@ -1,4 +1,7 @@
 ## 2.0.0-preview1.1
+### General
+- Your Database needs a complete reset, please DROP it and start from scratch.
+
 ### Additions
 - File Logging to folder `Logs`
   - There is one log file per day
