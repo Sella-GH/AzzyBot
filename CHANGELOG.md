@@ -9,6 +9,11 @@
 - Complete rework of the logic behind `core help` command
 - Code and reliability improvements
 
+### Fixes
+- Debug Servers not showing inside the AutoComplete, affected commands:
+  - `admin debug-servers add-server`
+  - `admin debug-servers remove-server`
+
 ## 2.0.0-preview1
 ### General
 - Complete rewrite of the bot using newest technologies
