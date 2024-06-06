@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AzzyBot.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20240526173639_InitialCreation")]
+    [Migration("20240606122854_InitialCreation")]
     partial class InitialCreation
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace AzzyBot.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.5")
+                .HasAnnotation("ProductVersion", "8.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
