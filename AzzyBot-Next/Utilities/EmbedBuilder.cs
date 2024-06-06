@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AzzyBot.Database.Entities;
 using AzzyBot.Utilities.Encryption;
 using AzzyBot.Utilities.Records;
+using AzzyBot.Utilities.Records.AzuraCast;
 using DSharpPlus.Entities;
 
 namespace AzzyBot.Utilities;
@@ -317,5 +318,45 @@ public static class EmbedBuilder
         }
 
         return embeds;
+    }
+
+    public static DiscordEmbed BuildMusicNowPlayingEmbed(NowPlayingDataRecord data, string? playlistName = null)
+    {
+        ArgumentNullException.ThrowIfNull(data, nameof(data));
+
+        const string title = "Now Playing";
+        string? message = null;
+        string thumbnailUrl = (!string.IsNullOrWhiteSpace(data.Live.Art)) ? data.Live.Art : data.NowPlaying.Song.Art;
+
+        Dictionary<string, DiscordEmbedRecord> fields = new()
+        {
+            ["Song"] = new(data.NowPlaying.Song.Title),
+            ["By"] = new(data.NowPlaying.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase))
+        };
+
+        if (!string.IsNullOrWhiteSpace(data.NowPlaying.Song.Album))
+            fields.Add("On", new(data.NowPlaying.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase)));
+
+        if (data.Live.IsLive)
+        {
+            message = $"Currently served *live* by the one and only **{data.Live.StreamerName}**";
+            fields.Add("Streaming live since", new($"<t:{Converter.ConvertFromUnixTime(Convert.ToInt64(data.Live.BroadcastStart, CultureInfo.InvariantCulture))}>"));
+        }
+        else
+        {
+            TimeSpan duration = TimeSpan.FromSeconds(data.NowPlaying.Duration);
+            TimeSpan elapsed = TimeSpan.FromSeconds(data.NowPlaying.Elapsed);
+
+            string songDuration = duration.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
+            string songElapsed = elapsed.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
+            string progressBar = AzuraCastMisc.GetProgressBar(14, elapsed.TotalSeconds, duration.TotalSeconds);
+
+            fields.Add("Duration", new($"{progressBar} `[{songElapsed} / {songDuration}]`"));
+
+            if (!string.IsNullOrWhiteSpace(playlistName))
+                fields.Add("Playlist", new(playlistName));
+        }
+
+        return CreateBasicEmbed(title, message, DiscordColor.Aquamarine, new(thumbnailUrl), null, null, fields);
     }
 }
