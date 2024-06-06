@@ -81,7 +81,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
         catch (HttpRequestException ex)
         {
-            _logger.WebRequestFailed(HttpMethod.Get, ex.Message);
+            _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
             throw;
         }
     }

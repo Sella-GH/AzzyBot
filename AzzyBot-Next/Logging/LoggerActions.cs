@@ -65,8 +65,8 @@ public static partial class LoggerActions
     [LoggerMessage(302, LogLevel.Error, "The provided uri is invalid: {uri}")]
     public static partial void WebInvalidUri(this ILogger logger, Uri uri);
 
-    [LoggerMessage(303, LogLevel.Error, "The {type} request failed with error: {ex}")]
-    public static partial void WebRequestFailed(this ILogger logger, HttpMethod type, string ex);
+    [LoggerMessage(303, LogLevel.Error, "The {type} request to {uri} failed with error: {ex}")]
+    public static partial void WebRequestFailed(this ILogger logger, HttpMethod type, string ex, Uri uri);
 
     [LoggerMessage(320, LogLevel.Error, "Database transaction failed with error: ")]
     public static partial void DatabaseTransactionFailed(this ILogger logger, Exception ex);
