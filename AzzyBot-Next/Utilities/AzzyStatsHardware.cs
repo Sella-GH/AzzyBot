@@ -13,6 +13,7 @@ public static class AzzyStatsHardware
 {
     public static bool CheckIfDocker => Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER", EnvironmentVariableTarget.Process) == "true";
     public static bool CheckIfLinuxOs => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+    public static bool CheckIfMacOs => RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
     public static bool CheckIfWindowsOs => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
     public static async Task<Dictionary<int, double>> GetSystemCpuAsync()

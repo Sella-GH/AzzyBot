@@ -11,6 +11,13 @@ public static class Startup
 {
     public static async Task Main(string[] args)
     {
+        if (AzzyStatsHardware.CheckIfMacOs)
+        {
+            await Console.Error.WriteLineAsync("This bot does not support macOS.");
+            await Console.Error.WriteLineAsync("Please use another platform for it, as this one can't handle the security requirements of the AES encryption standard.");
+            return;
+        }
+
         string environment = AzzyStatsSoftware.GetBotEnvironment;
         bool isDev = environment == Environments.Development;
         bool isDocker = AzzyStatsHardware.CheckIfDocker;
