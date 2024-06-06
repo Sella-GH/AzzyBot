@@ -14,8 +14,6 @@ public sealed class AzuraCastService(WebRequestService webService)
     private async Task<string> FetchFromApiAsync(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
-        ArgumentNullException.ThrowIfNull(headers, nameof(headers));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(headers.Count, nameof(headers.Count));
 
         Uri url = new($"{baseUrl}/api/{endpoint}");
         string body = await _webService.GetWebAsync(url, headers);
@@ -28,8 +26,6 @@ public sealed class AzuraCastService(WebRequestService webService)
     private async Task<T> FetchFromApiAsync<T>(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
-        ArgumentNullException.ThrowIfNull(headers, nameof(headers));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(headers.Count, nameof(headers.Count));
 
         Uri uri = new($"{baseUrl}/api/{endpoint}");
         string body = await _webService.GetWebAsync(uri, headers);
@@ -42,8 +38,6 @@ public sealed class AzuraCastService(WebRequestService webService)
     private async Task<IReadOnlyList<T>> FetchFromApiListAsync<T>(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
-        ArgumentNullException.ThrowIfNull(headers, nameof(headers));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(headers.Count, nameof(headers.Count));
 
         string body = await FetchFromApiAsync(baseUrl, endpoint, headers);
 
