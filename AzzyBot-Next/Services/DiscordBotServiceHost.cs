@@ -34,7 +34,7 @@ public sealed class DiscordBotServiceHost : IHostedService
     private readonly DbActions _dbActions;
     private DiscordBotService? _botService;
 
-    public DiscordShardedClient ShardedClient { get; init; }
+    public DiscordClient Client { get; init; }
 
     public DiscordBotServiceHost(AzzyBotSettingsRecord settings, DbActions dbActions, ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
     {
@@ -44,7 +44,7 @@ public sealed class DiscordBotServiceHost : IHostedService
         _dbActions = dbActions;
         _settings = settings;
 
-        ShardedClient = new(GetDiscordConfig());
+        Client = new(GetDiscordConfig());
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -55,11 +55,11 @@ public sealed class DiscordBotServiceHost : IHostedService
         _botService = _serviceProvider.GetRequiredService<DiscordBotService>();
         RegisterEventHandlers();
         await RegisterCommandsAsync();
-        await RegisterInteractivityAsync();
-        await ShardedClient.StartAsync();
+        RegisterInteractivity();
+        await Client.ConnectAsync();
 
         _logger.BotReady();
-        _logger.InviteUrl(ShardedClient.CurrentApplication.Id);
+        _logger.InviteUrl(Client.CurrentApplication.Id);
 
         // Wait 3 Seconds to let the client boot up
         await Task.Delay(3000, cancellationToken);
@@ -75,7 +75,8 @@ public sealed class DiscordBotServiceHost : IHostedService
     public async Task StopAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        await ShardedClient.StopAsync();
+
+        await Client.DisconnectAsync();
         UnregisterEventHandlers();
     }
 
@@ -83,7 +84,7 @@ public sealed class DiscordBotServiceHost : IHostedService
     {
         if (reset)
         {
-            await ShardedClient.UpdateStatusAsync(new DiscordActivity("Music", DiscordActivityType.ListeningTo), DiscordUserStatus.Online);
+            await Client.UpdateStatusAsync(new DiscordActivity("Music", DiscordActivityType.ListeningTo), DiscordUserStatus.Online);
             return;
         }
 
@@ -97,7 +98,7 @@ public sealed class DiscordBotServiceHost : IHostedService
 
         DiscordUserStatus userStatus = (DiscordUserStatus)Enum.ToObject(typeof(DiscordUserStatus), status);
 
-        await ShardedClient.UpdateStatusAsync(activity, userStatus);
+        await Client.UpdateStatusAsync(activity, userStatus);
     }
 
     private DiscordConfiguration GetDiscordConfig()
@@ -124,38 +125,35 @@ public sealed class DiscordBotServiceHost : IHostedService
     {
         ArgumentNullException.ThrowIfNull(_settings, nameof(_settings));
 
-        IReadOnlyDictionary<int, CommandsExtension> commandsExtensions = await ShardedClient.UseCommandsAsync(new()
+        CommandsExtension commandsExtension = Client.UseCommands(new()
         {
             RegisterDefaultCommandProcessors = false,
             ServiceProvider = _serviceProvider,
             UseDefaultCommandErrorHandler = false
         });
 
-        foreach (CommandsExtension commandsExtension in commandsExtensions.Values)
-        {
-            commandsExtension.CommandErrored += CommandErroredAsync;
+        commandsExtension.CommandErrored += CommandErroredAsync;
 
-            // These commands are for every server
-            commandsExtension.AddCommands(typeof(ConfigCommands.ConfigGroup));
-            commandsExtension.AddCommands(typeof(CoreCommands.CoreGroup));
+        // These commands are for every server
+        commandsExtension.AddCommands(typeof(ConfigCommands.ConfigGroup));
+        commandsExtension.AddCommands(typeof(CoreCommands.CoreGroup));
 
-            // Only add admin commands to the main server
-            commandsExtension.AddCommand(typeof(AdminCommands.AdminGroup), _settings.ServerId);
+        // Only add admin commands to the main server
+        commandsExtension.AddCommand(typeof(AdminCommands.AdminGroup), _settings.ServerId);
 
-            // Only add debug commands if it's a dev build
-            if (AzzyStatsSoftware.GetBotName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase))
-                commandsExtension.AddCommands(typeof(DebugCommands.DebugGroup), _settings.ServerId);
+        // Only add debug commands if it's a dev build
+        if (AzzyStatsSoftware.GetBotName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase))
+            commandsExtension.AddCommands(typeof(DebugCommands.DebugGroup), _settings.ServerId);
 
-            SlashCommandProcessor slashCommandProcessor = new();
-            slashCommandProcessor.AddConverter<Uri>(new UriArgumentConverter());
+        SlashCommandProcessor slashCommandProcessor = new();
+        slashCommandProcessor.AddConverter<Uri>(new UriArgumentConverter());
 
-            await commandsExtension.AddProcessorAsync(slashCommandProcessor);
-        }
+        await commandsExtension.AddProcessorAsync(slashCommandProcessor);
     }
 
-    private async Task RegisterInteractivityAsync()
+    private void RegisterInteractivity()
     {
-        ArgumentNullException.ThrowIfNull(ShardedClient, nameof(ShardedClient));
+        ArgumentNullException.ThrowIfNull(Client, nameof(Client));
 
         InteractivityConfiguration config = new()
         {
@@ -164,23 +162,23 @@ public sealed class DiscordBotServiceHost : IHostedService
             Timeout = TimeSpan.FromMinutes(15)
         };
 
-        await ShardedClient.UseInteractivityAsync(config);
+        Client.UseInteractivity(config);
     }
 
     private void RegisterEventHandlers()
     {
-        ShardedClient.ClientErrored += ShardedClientErroredAsync;
-        ShardedClient.GuildCreated += ShardedClientGuildCreatedAsync;
-        ShardedClient.GuildDeleted += ShardedClientGuildDeletedAsync;
-        ShardedClient.GuildDownloadCompleted += ShardedClientGuildDownloadCompletedAsync;
+        Client.ClientErrored += ClientErroredAsync;
+        Client.GuildCreated += ClientGuildCreatedAsync;
+        Client.GuildDeleted += ClientGuildDeletedAsync;
+        Client.GuildDownloadCompleted += ClientGuildDownloadCompletedAsync;
     }
 
     private void UnregisterEventHandlers()
     {
-        ShardedClient.ClientErrored -= ShardedClientErroredAsync;
-        ShardedClient.GuildCreated -= ShardedClientGuildCreatedAsync;
-        ShardedClient.GuildDeleted -= ShardedClientGuildDeletedAsync;
-        ShardedClient.GuildDownloadCompleted -= ShardedClientGuildDownloadCompletedAsync;
+        Client.ClientErrored -= ClientErroredAsync;
+        Client.GuildCreated -= ClientGuildCreatedAsync;
+        Client.GuildDeleted -= ClientGuildDeletedAsync;
+        Client.GuildDownloadCompleted -= ClientGuildDownloadCompletedAsync;
     }
 
     private async Task CommandErroredAsync(CommandsExtension c, CommandErroredEventArgs e)
@@ -212,7 +210,7 @@ public sealed class DiscordBotServiceHost : IHostedService
         }
     }
 
-    private async Task ShardedClientErroredAsync(DiscordClient c, ClientErrorEventArgs e)
+    private async Task ClientErroredAsync(DiscordClient c, ClientErrorEventArgs e)
     {
         if (_botService is null)
             return;
@@ -245,7 +243,7 @@ public sealed class DiscordBotServiceHost : IHostedService
         }
     }
 
-    private async Task ShardedClientGuildCreatedAsync(DiscordClient c, GuildCreateEventArgs e)
+    private async Task ClientGuildCreatedAsync(DiscordClient c, GuildCreateEventArgs e)
     {
         _logger.GuildCreated(e.Guild.Name);
 
@@ -253,13 +251,13 @@ public sealed class DiscordBotServiceHost : IHostedService
         await e.Guild.Owner.SendMessageAsync("Thank you for adding me to your server! Before you can make use of me, you have to set my settings first.\n\nPlease use the command `settings set` for this.\nOnly you are able to execute this command right now.");
     }
 
-    private async Task ShardedClientGuildDeletedAsync(DiscordClient c, GuildDeleteEventArgs e)
+    private async Task ClientGuildDeletedAsync(DiscordClient c, GuildDeleteEventArgs e)
     {
         _logger.GuildDeleted(e.Guild.Name);
 
         await _dbActions.DeleteGuildAsync(e.Guild.Id);
     }
 
-    private async Task ShardedClientGuildDownloadCompletedAsync(DiscordClient c, GuildDownloadCompletedEventArgs e)
+    private async Task ClientGuildDownloadCompletedAsync(DiscordClient c, GuildDownloadCompletedEventArgs e)
         => await _dbActions.AddGuildsAsync(e.Guilds.Select(g => g.Value.Id).ToList());
 }

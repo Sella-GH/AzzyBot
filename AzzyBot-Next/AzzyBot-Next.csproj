@@ -19,17 +19,10 @@
     <RepositoryUrl>https://github.com/Sella-GH/AzzyBot</RepositoryUrl>
     <AnalysisLevel>latest-all</AnalysisLevel>
     <NoWarn>$(NoWarn);CA1812;CA2007</NoWarn>
+    <PathMap>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)=.</PathMap>
     <Configurations>Debug;Release;Docker;Docker-debug</Configurations>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <StartupObject>AzzyBot.Startup</StartupObject>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
-    <PathMap>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)=.</PathMap>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(OS)' == 'UNIX' ">
-    <PathMap>$(MSBuildProjectDirectory)/$(IntermediateOutputPath)=.</PathMap>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

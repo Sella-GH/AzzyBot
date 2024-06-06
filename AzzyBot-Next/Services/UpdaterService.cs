@@ -81,7 +81,7 @@ public sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotSer
         if (_settings.Updater.DisplayInstructions)
             embeds.Add(EmbedBuilder.BuildAzzyUpdatesInstructionsEmbed());
 
-        DiscordGuild? discordGuild = await _botService.GetDiscordGuildAsync();
+        DiscordGuild? discordGuild = _botService.GetDiscordGuild();
         if (discordGuild is null)
             return;
 

@@ -22,16 +22,16 @@ public sealed class GuildsAutocomplete(DbActions dbActions, DiscordBotService bo
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
         List<GuildsEntity> guildsInDb = [];
-        Dictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds();
+        IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
 
         switch (context.Command.FullName)
         {
-            case "admin remove-debug-guild":
-                guildsInDb = await _dbActions.GetGuildsWithDebugAsync(true);
+            case "admin debug-servers add-server":
+                guildsInDb = await _dbActions.GetGuildsWithDebugAsync(false);
                 break;
 
-            case "admin set-debug-guild":
-                guildsInDb = await _dbActions.GetGuildsWithDebugAsync(false);
+            case "admin debug-server remove-server":
+                guildsInDb = await _dbActions.GetGuildsWithDebugAsync(true);
                 break;
         }
 

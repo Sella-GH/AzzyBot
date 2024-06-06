@@ -90,7 +90,7 @@ public sealed class AdminCommands
 
                 await _dbActions.UpdateGuildAsync(guildIdValue, null, true);
 
-                await context.EditResponseAsync($"{await _botService.GetDiscordGuildAsync(guildIdValue)} added to debug servers.");
+                await context.EditResponseAsync($"{_botService.GetDiscordGuild(guildIdValue)?.Name} added to debug servers.");
             }
 
             [Command("get-servers"), Description("Displays all servers which can execute debug commands.")]
@@ -109,7 +109,7 @@ public sealed class AdminCommands
                     return;
                 }
 
-                Dictionary<ulong, DiscordGuild> clientGuilds = _botService.GetDiscordGuilds();
+                IReadOnlyDictionary<ulong, DiscordGuild> clientGuilds = _botService.GetDiscordGuilds;
                 StringBuilder stringBuilder = new();
                 stringBuilder.AppendLine("I found the following Debug servers:");
                 foreach (GuildsEntity guild in dbGuilds.Where(g => clientGuilds.ContainsKey(g.UniqueId)))
@@ -144,7 +144,7 @@ public sealed class AdminCommands
 
                 await _dbActions.UpdateGuildAsync(guildIdValue, null, false);
 
-                await context.EditResponseAsync($"{await _botService.GetDiscordGuildAsync(guildIdValue)} removed from debug servers.");
+                await context.EditResponseAsync($"{_botService.GetDiscordGuild(guildIdValue)?.Name} removed from debug servers.");
             }
         }
     }

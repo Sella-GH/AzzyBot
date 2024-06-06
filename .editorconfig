@@ -167,6 +167,7 @@ dotnet_style_parentheses_in_other_operators = always_for_clarity
 # Analyzers
 dotnet_diagnostic.CA1812.severity = none
 dotnet_diagnostic.CA2007.severity = none
+dotnet_diagnostic.IDE0047.severity = none
 dotnet_remove_unnecessary_suppression_exclusions = IDE0060,IDE1006
 
 # Roslynator
@@ -1014,6 +1015,6 @@ indent_size = 2
 
 # Shell scripts
 [*.sh]
-end_of_line = lf
+end_of_line = crlf
 [*.{cmd,bat}]
 end_of_line = crlf
