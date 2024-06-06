@@ -32,6 +32,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<CoreServiceHost>();
         services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
 
+        services.AddSingleton<AzuraCastService>();
+
         string connectionString = GetConnectionString(settings.Database?.Host, settings.Database?.Port, settings.Database?.User, settings.Database?.Password, settings.Database?.DatabaseName);
         CheckIfDatabaseIsOnline(connectionString);
 
