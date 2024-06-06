@@ -112,19 +112,18 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     public Task<bool> AddGuildAsync(ulong guildId)
         => ExecuteDbActionAsync(async context => await context.Guilds.AddAsync(new() { UniqueId = guildId }));
 
-    public Task<bool> AddGuildsAsync(IReadOnlyList<ulong> guildIds)
+    public async Task<bool> AddGuildsAsync(IReadOnlyList<ulong> guildIds)
     {
-        return ExecuteDbActionAsync(async context =>
-        {
-            List<GuildsEntity> guilds = await GetGuildsAsync();
-            List<GuildsEntity> newGuilds = guildIds
-                .Where(guild => !guilds.Select(g => g.UniqueId).Contains(guild))
-                .Select(guild => new GuildsEntity() { UniqueId = guild })
-                .ToList();
+        List<GuildsEntity> guilds = await GetGuildsAsync();
+        List<GuildsEntity> newGuilds = guildIds
+            .Where(guild => !guilds.Select(g => g.UniqueId).Contains(guild))
+            .Select(guild => new GuildsEntity() { UniqueId = guild })
+            .ToList();
 
-            if (newGuilds.Count > 0)
-                await context.Guilds.AddRangeAsync(newGuilds);
-        });
+        if (newGuilds.Count == 0)
+            return true;
+
+        return await ExecuteDbActionAsync(async context => await context.Guilds.AddRangeAsync(newGuilds));
     }
 
     public Task<bool> DeleteAzuraCastAsync(ulong guildId)
