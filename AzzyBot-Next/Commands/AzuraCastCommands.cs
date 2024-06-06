@@ -30,6 +30,7 @@ public sealed class AzuraCastCommands
         private readonly AzuraCastService _azuraCast = azuraCast;
         private readonly DbActions _dbActions = dbActions;
 
+        [Command("now-playing"), Description("Get the currently playing song on the station.")]
         public async ValueTask GetNowPlayingAsync
             (
             CommandContext context,
@@ -37,10 +38,10 @@ public sealed class AzuraCastCommands
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
             _logger.CommandRequested(nameof(GetNowPlayingAsync), context.User.GlobalName);
 
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             GuildsEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id);
             AzuraCastEntity azuraCast = guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast is null");
             AzuraCastStationEntity station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId) ?? throw new InvalidOperationException("Station is null");
