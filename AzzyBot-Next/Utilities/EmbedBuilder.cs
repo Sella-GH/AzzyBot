@@ -215,7 +215,7 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, null, DiscordColor.Orange, avaUrl, null, null, fields);
     }
 
-    public static DiscordEmbed BuildAzzyUpdatesAvailableEmbed(Version version, in DateTime updateDate, Uri url)
+    public static DiscordEmbed BuildAzzyUpdatesAvailableEmbed(string version, in DateTime updateDate, Uri url)
     {
         ArgumentNullException.ThrowIfNull(version, nameof(version));
 
@@ -227,7 +227,7 @@ public static class EmbedBuilder
         {
             ["Release Date"] = new($"<t:{Converter.ConvertToUnixTime(updateDate)}>"),
             ["Your Version"] = new(yourVersion),
-            ["New Version"] = new(version.ToString())
+            ["New Version"] = new(version)
         };
 
         return CreateBasicEmbed(title, description, DiscordColor.White, null, null, url, fields);

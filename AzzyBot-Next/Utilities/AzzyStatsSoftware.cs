@@ -11,7 +11,7 @@ public static class AzzyStatsSoftware
     public static string GetBotDotNetVersion => Environment.Version.ToString() ?? ".NET version not found";
     public static string GetBotEnvironment => (GetBotName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase)) ? Environments.Development : Environments.Production;
     public static string GetBotName => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductName ?? "Bot name not found";
-    public static string GetBotVersion => Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "Bot version not found";
+    public static string GetBotVersion => Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "Bot version not found";
 
     public static double GetBotMemoryUsage()
     {

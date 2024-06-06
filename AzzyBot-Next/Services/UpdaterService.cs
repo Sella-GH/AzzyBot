@@ -18,13 +18,13 @@ public sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotSer
     private readonly DiscordBotService _botService = botService;
     private readonly WebRequestService _webService = webService;
     private DateTime _lastAzzyUpdateNotificationTime = DateTime.MinValue;
-    private Version _lastOnlineVersion = new(0, 0, 0);
+    private string _lastOnlineVersion = string.Empty;
     private int _azzyNotifyCounter;
     private readonly Uri _gitHubUrl = new("https://api.github.com/repos/Sella-GH/AzzyBot/releases/latest");
 
     public async Task CheckForAzzyUpdatesAsync()
     {
-        Version localVersion = new(AzzyStatsSoftware.GetBotVersion);
+        string localVersion = AzzyStatsSoftware.GetBotVersion;
 
         Dictionary<string, string> headers = new()
         {
@@ -46,8 +46,8 @@ public sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotSer
             return;
         }
 
-        Version onlineVersion = new(updaterRecord.Name);
-        if (localVersion >= onlineVersion)
+        string onlineVersion = updaterRecord.Name;
+        if (localVersion == onlineVersion)
             return;
 
         if (!DateTime.TryParse(updaterRecord.CreatedAt, out DateTime releaseDate))
@@ -56,7 +56,7 @@ public sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotSer
         await SendUpdateMessageAsync(onlineVersion, releaseDate, updaterRecord.Body);
     }
 
-    private async Task SendUpdateMessageAsync(Version updateVersion, DateTime releaseDate, string changelog)
+    private async Task SendUpdateMessageAsync(string updateVersion, DateTime releaseDate, string changelog)
     {
         if (_lastOnlineVersion != updateVersion)
         {

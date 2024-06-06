@@ -39,7 +39,7 @@ public static partial class LoggerActions
     public static partial void GuildDeleted(this ILogger<DiscordBotServiceHost> logger, string guild);
 
     [LoggerMessage(198, LogLevel.Information, "An update for Azzy is available! Please update now to version: {version} to get the latest fixes and improvements.")]
-    public static partial void UpdateAvailable(this ILogger<UpdaterService> logger, Version version);
+    public static partial void UpdateAvailable(this ILogger<UpdaterService> logger, string version);
 
     [LoggerMessage(199, LogLevel.Information, "Stopping AzzyBot")]
     public static partial void BotStopping(this ILogger<CoreServiceHost> logger);
