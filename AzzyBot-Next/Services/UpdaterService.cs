@@ -20,25 +20,35 @@ public sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotSer
     private DateTime _lastAzzyUpdateNotificationTime = DateTime.MinValue;
     private string _lastOnlineVersion = string.Empty;
     private int _azzyNotifyCounter;
-    private readonly Uri _gitHubUrl = new("https://api.github.com/repos/Sella-GH/AzzyBot/releases/latest");
+    private readonly Uri _latestUrl = new("https://api.github.com/repos/Sella-GH/AzzyBot/releases/latest");
+    private readonly Uri _previewUrl = new("https://api.github.com/repos/Sella-GH/AzzyBot/releases");
 
     public async Task CheckForAzzyUpdatesAsync()
     {
         string localVersion = AzzyStatsSoftware.GetBotVersion;
+        bool isPreview = localVersion.Contains("-preview", StringComparison.OrdinalIgnoreCase);
 
         Dictionary<string, string> headers = new()
         {
             ["User-Agent"] = AzzyStatsSoftware.GetBotName
         };
 
-        string body = await _webService.GetWebAsync(_gitHubUrl, headers);
+        string body = await _webService.GetWebAsync((isPreview) ? _previewUrl : _latestUrl, headers);
         if (string.IsNullOrWhiteSpace(body))
         {
             _logger.OnlineVersionEmpty();
             return;
         }
 
-        UpdateRecord? updaterRecord = JsonSerializer.Deserialize<UpdateRecord>(body);
+        UpdateRecord? updaterRecord;
+        if (isPreview)
+        {
+            updaterRecord = JsonSerializer.Deserialize<List<UpdateRecord>>(body)?[0];
+        }
+        else
+        {
+            updaterRecord = JsonSerializer.Deserialize<UpdateRecord>(body);
+        }
 
         if (updaterRecord is null)
         {
@@ -73,10 +83,10 @@ public sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotSer
 
         _logger.UpdateAvailable(updateVersion);
 
-        List<DiscordEmbed> embeds = [EmbedBuilder.BuildAzzyUpdatesAvailableEmbed(updateVersion, releaseDate, _gitHubUrl)];
+        List<DiscordEmbed> embeds = [EmbedBuilder.BuildAzzyUpdatesAvailableEmbed(updateVersion, releaseDate, _latestUrl)];
 
         if (_settings.Updater.DisplayChangelog)
-            embeds.Add(EmbedBuilder.BuildAzzyUpdatesChangelogEmbed(changelog, _gitHubUrl));
+            embeds.Add(EmbedBuilder.BuildAzzyUpdatesChangelogEmbed(changelog, _latestUrl));
 
         if (_settings.Updater.DisplayInstructions)
             embeds.Add(EmbedBuilder.BuildAzzyUpdatesInstructionsEmbed());
