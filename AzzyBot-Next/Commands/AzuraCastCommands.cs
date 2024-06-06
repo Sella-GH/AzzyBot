@@ -42,6 +42,8 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(GetNowPlayingAsync), context.User.GlobalName);
 
+            await context.DeferResponseAsync();
+
             GuildsEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id);
             AzuraCastEntity azuraCast = guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast is null");
             AzuraCastStationEntity station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId) ?? throw new InvalidOperationException("Station is null");
@@ -58,7 +60,7 @@ public sealed class AzuraCastCommands
 
             DiscordEmbed embed = EmbedBuilder.BuildMusicNowPlayingEmbed(nowPlaying, playlistName);
 
-            await context.RespondAsync(embed);
+            await context.EditResponseAsync(embed);
         }
     }
 }
