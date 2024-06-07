@@ -47,16 +47,16 @@ public sealed record CoreData : CpuTotalData;
 public sealed record MemoryData
 {
     [JsonPropertyName("readable")]
-    public required ReadableData Readable { get; init; }
+    public required ReadableMemoryData Readable { get; init; }
 }
 
 public sealed record DiskData
 {
     [JsonPropertyName("readable")]
-    public required ReadableData Readable { get; init; }
+    public required ReadableDiskData Readable { get; init; }
 }
 
-public sealed record ReadableData
+public record ReadableDiskData
 {
     [JsonPropertyName("total")]
     public required string Total { get; init; }
@@ -64,11 +64,14 @@ public sealed record ReadableData
     [JsonPropertyName("free")]
     public required string Free { get; init; }
 
-    [JsonPropertyName("cached")]
-    public required string Cached { get; init; }
-
     [JsonPropertyName("used")]
     public required string Used { get; init; }
+}
+
+public sealed record ReadableMemoryData : ReadableDiskData
+{
+    [JsonPropertyName("Cached")]
+    public required string Cached { get; init; }
 }
 
 public sealed record NetworkData
