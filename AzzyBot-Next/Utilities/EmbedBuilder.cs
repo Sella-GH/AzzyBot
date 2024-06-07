@@ -49,6 +49,54 @@ public static class EmbedBuilder
         return builder;
     }
 
+    public static DiscordEmbed BuildAzuraCastHardwareStatsEmbed(HardwareStatsRecord stats)
+    {
+        ArgumentNullException.ThrowIfNull(stats, nameof(stats));
+
+        const string title = "AzuraCast Hardware Stats";
+        StringBuilder cpuUsage = new();
+        StringBuilder cpuLoads = new();
+        StringBuilder memoryUsage = new();
+        StringBuilder diskUsage = new();
+
+        Dictionary<string, DiscordEmbedRecord> fields = [];
+
+        for (int i = 0; i < stats.Cpu.Cores.Count; i++)
+        {
+            cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Core {i + 1}: {stats.Cpu.Cores[i].Usage}");
+        }
+
+        cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Steal: {stats.Cpu.Total.Steal}");
+        cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: {stats.Cpu.Total.Usage}");
+        fields.Add("CPU Usage", new(cpuUsage.ToString(), false));
+
+        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"1-Min: {stats.Cpu.Load[0]}");
+        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"5-Min: {stats.Cpu.Load[1]}");
+        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"15-Min: {stats.Cpu.Load[2]}");
+        fields.Add("CPU Load", new(cpuLoads.ToString(), false));
+
+        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Used: {stats.Memory.Readable.Used}");
+        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Cached: {stats.Memory.Readable.Cached}");
+        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Free: {stats.Memory.Readable.Free}");
+        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: {stats.Memory.Readable.Total}");
+        fields.Add("Memory Usage", new(memoryUsage.ToString(), false));
+
+        diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Used: {stats.Disk.Readable.Used}");
+        diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Free: {stats.Disk.Readable.Free}");
+        diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: {stats.Disk.Readable.Total}");
+        fields.Add("Disk Usage", new(diskUsage.ToString(), false));
+
+        foreach (NetworkData network in stats.Network)
+        {
+            StringBuilder networkUsage = new();
+            networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Received: {network.Received}");
+            networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Transmitted: {network.Transmitted}");
+            fields.Add(network.InterfaceName, new(networkUsage.ToString(), false));
+        }
+
+        return CreateBasicEmbed(title, null, DiscordColor.Orange, null, null, null, fields);
+    }
+
     public static async Task<DiscordEmbed> BuildAzzyHardwareStatsEmbedAsync(Uri avaUrl)
     {
         const string title = "AzzyBot Hardware Stats";

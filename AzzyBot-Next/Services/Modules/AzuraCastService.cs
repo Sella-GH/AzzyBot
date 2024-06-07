@@ -52,6 +52,18 @@ public sealed class AzuraCastService(WebRequestService webService)
         return JsonSerializer.Deserialize<List<T>>(body) ?? throw new InvalidOperationException($"Could not deserialize body: {body}");
     }
 
+    public Task<HardwareStatsRecord> GetHardwareStatsAsync(Uri baseUrl)
+        => FetchFromApiAsync<HardwareStatsRecord>(baseUrl, "system/stats");
+
+    public Task<NowPlayingDataRecord> GetNowPlayingAsync(Uri baseUrl, int stationId)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+
+        string endpoint = $"nowplaying/{stationId}";
+
+        return FetchFromApiAsync<NowPlayingDataRecord>(baseUrl, endpoint);
+    }
+
     public Task<PlaylistRecord> GetPlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
@@ -70,14 +82,5 @@ public sealed class AzuraCastService(WebRequestService webService)
         string endpoint = $"station/{stationId}/playlists";
 
         return FetchFromApiListAsync<PlaylistRecord>(baseUrl, endpoint, CreateHeader(apiKey));
-    }
-
-    public Task<NowPlayingDataRecord> GetNowPlayingAsync(Uri baseUrl, int stationId)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
-
-        string endpoint = $"nowplaying/{stationId}";
-
-        return FetchFromApiAsync<NowPlayingDataRecord>(baseUrl, endpoint);
     }
 }
