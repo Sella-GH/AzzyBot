@@ -1,4 +1,7 @@
 ## 2.0.0-preview2
+### Breaking Changes
+- Your Database needs a complete reset, please DROP it and start from scratch.
+
 ### General
 - The integrated updater is now able to identify preview versions
 - The `AzuraCast` module is finally added!
@@ -7,6 +10,12 @@
 ### Additions
 - New commands:
   - `music nowplaying` - Shows the currently played stuff from the choosen station
+- AzuraCast Admin Api Key added
+  - This is a required field if you want to set up AzuraCast in the bot. Ensure it has the view admin info permission inside AzuraCast
+
+### Improvements
+- AzuraCast Station Api Key is now optional
+  - Because the Admin Api Key is required the station one is now optional. However if you do not add a station one the admin one will be used!
 
 ## 2.0.0-preview1.1
 ### General

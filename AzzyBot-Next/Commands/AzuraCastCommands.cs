@@ -84,7 +84,7 @@ public sealed class AzuraCastCommands
             string? playlistName = null;
             if (station.ShowPlaylistInNowPlaying)
             {
-                string apiKey = Crypto.Decrypt(station.ApiKey);
+                string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
                 IReadOnlyList<PlaylistRecord> playlist = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, stationId);
                 playlistName = playlist.Where(p => p.Name == nowPlaying.NowPlaying.Playlist).Select(p => p.Name).FirstOrDefault();
             }
