@@ -18,6 +18,9 @@
 - AzuraCast Station Api Key is now optional
   - Because the Admin Api Key is required the station one is now optional. However if you do not add a station one the admin one will be used!
 
+## Fixes
+- Guild Database Entity was not updated when AzuraCast was activated or disabled
+
 ## 2.0.0-preview1.1
 ### General
 - Your Database needs a complete reset, please DROP it and start from scratch.
