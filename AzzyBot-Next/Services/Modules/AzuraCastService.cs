@@ -53,7 +53,7 @@ public sealed class AzuraCastService(WebRequestService webService)
     }
 
     public Task<HardwareStatsRecord> GetHardwareStatsAsync(Uri baseUrl)
-        => FetchFromApiAsync<HardwareStatsRecord>(baseUrl, "system/stats");
+        => FetchFromApiAsync<HardwareStatsRecord>(baseUrl, "admin/server/stats");
 
     public Task<NowPlayingDataRecord> GetNowPlayingAsync(Uri baseUrl, int stationId)
     {
