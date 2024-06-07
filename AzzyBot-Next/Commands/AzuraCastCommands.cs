@@ -16,7 +16,6 @@ using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands;
@@ -24,6 +23,35 @@ namespace AzzyBot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class AzuraCastCommands
 {
+    [Command("azuracast"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
+    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastService azuraCast, DbActions dbActions)
+    {
+        private readonly ILogger<AzuraCastGroup> _logger = logger;
+        private readonly AzuraCastService _azuraCast = azuraCast;
+        private readonly DbActions _dbActions = dbActions;
+
+        [Command("hardware-stats"), Description("Get the hardware stats of the running server.")]
+        public async ValueTask GetHardwareStatsAsync(CommandContext context)
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+
+            _logger.CommandRequested(nameof(GetHardwareStatsAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            GuildsEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id);
+            AzuraCastEntity azuraCast = guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast is null");
+            string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
+
+            HardwareStatsRecord hardwareStats = await _azuraCast.GetHardwareStatsAsync(new(baseUrl));
+
+            DiscordEmbed embed = EmbedBuilder.BuildAzuraCastHardwareStatsEmbed(hardwareStats);
+
+            await context.EditResponseAsync(embed);
+        }
+    }
+
     [Command("music"), RequireGuild]
     public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastService azuraCast, DbActions dbActions)
     {
