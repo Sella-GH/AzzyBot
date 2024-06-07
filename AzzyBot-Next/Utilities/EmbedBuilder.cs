@@ -86,12 +86,13 @@ public static class EmbedBuilder
         diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: {stats.Disk.Readable.Total}");
         fields.Add("Disk Usage", new(diskUsage.ToString(), false));
 
+        StringBuilder networkUsage = new();
         foreach (NetworkData network in stats.Network)
         {
-            StringBuilder networkUsage = new();
             networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Received: {network.Received}");
             networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Transmitted: {network.Transmitted}");
             fields.Add(network.InterfaceName, new(networkUsage.ToString(), false));
+            networkUsage.Clear();
         }
 
         return CreateBasicEmbed(title, null, DiscordColor.Orange, null, null, null, fields);

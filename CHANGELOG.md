@@ -9,6 +9,7 @@
 
 ### Additions
 - New commands:
+  - `azuracast hardware-stats` - Shows the usage statistics of the hardware
   - `music nowplaying` - Shows the currently played stuff from the choosen station
 - AzuraCast Admin Api Key added
   - This is a required field if you want to set up AzuraCast in the bot. Ensure it has the view admin info permission inside AzuraCast

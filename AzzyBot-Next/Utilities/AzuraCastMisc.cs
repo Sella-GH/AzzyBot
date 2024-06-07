@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace AzzyBot.Utilities;
 
@@ -12,19 +13,19 @@ public static class AzuraCastMisc
 
         double pos = Math.Floor(number * (elapsed / duration));
 
-        string bar = string.Empty;
-        for (int i = 0; i <= number; i++)
+        StringBuilder bar = new();
+        for (double i = 0; i <= number; i++)
         {
             if (i == pos)
             {
-                bar += ":radio_button:";
+                bar.Append(":radio_button:");
             }
             else
             {
-                bar += "▬";
+                bar.Append('▬');
             }
         }
 
-        return bar;
+        return bar.ToString();
     }
 }
