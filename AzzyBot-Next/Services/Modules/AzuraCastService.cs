@@ -52,8 +52,14 @@ public sealed class AzuraCastService(WebRequestService webService)
         return JsonSerializer.Deserialize<List<T>>(body) ?? throw new InvalidOperationException($"Could not deserialize body: {body}");
     }
 
-    public Task<HardwareStatsRecord> GetHardwareStatsAsync(Uri baseUrl)
-        => FetchFromApiAsync<HardwareStatsRecord>(baseUrl, "admin/server/stats");
+    public Task<HardwareStatsRecord> GetHardwareStatsAsync(Uri baseUrl, string apiKey)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+
+        const string endpoint = "admin/server/stats";
+
+        return FetchFromApiAsync<HardwareStatsRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+    }
 
     public Task<NowPlayingDataRecord> GetNowPlayingAsync(Uri baseUrl, int stationId)
     {
