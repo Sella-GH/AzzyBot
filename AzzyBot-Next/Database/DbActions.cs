@@ -41,7 +41,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         }
     }
 
-    public Task<bool> AddAzuraCastAsync(ulong guildId, Uri baseUrl, ulong outagesId)
+    public Task<bool> AddAzuraCastAsync(ulong guildId, Uri baseUrl, string apiKey, ulong outagesId)
     {
         ArgumentNullException.ThrowIfNull(baseUrl, nameof(baseUrl));
 
@@ -52,6 +52,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             AzuraCastEntity azuraCast = new()
             {
                 BaseUrl = Crypto.Encrypt(baseUrl.OriginalString),
+                AdminApiKey = Crypto.Encrypt(apiKey),
                 OutagesChannelId = outagesId,
                 GuildId = guild.Id
             };
@@ -62,7 +63,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, string name, string apiKey, ulong requestsId, bool hls, bool showPlaylist, bool fileChanges, bool serverStatus, bool updates, bool updatesChangelog)
+    public Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, string name, ulong requestsId, bool hls, bool showPlaylist, bool fileChanges, bool serverStatus, bool updates, bool updatesChangelog, string? apiKey)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -72,7 +73,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             {
                 StationId = stationId,
                 Name = Crypto.Encrypt(name),
-                ApiKey = Crypto.Encrypt(apiKey),
+                ApiKey = (string.IsNullOrWhiteSpace(apiKey)) ? string.Empty : Crypto.Encrypt(apiKey),
                 RequestsChannelId = requestsId,
                 PreferHls = hls,
                 ShowPlaylistInNowPlaying = showPlaylist,
@@ -237,7 +238,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             : guilds.Where(g => !g.IsDebugAllowed).ToList();
     }
 
-    public Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl, ulong? outagesId)
+    public Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl, string? apiKey, ulong? outagesId)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -245,6 +246,9 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             if (baseUrl is not null)
                 azuraCast.BaseUrl = Crypto.Encrypt(baseUrl.OriginalString);
+
+            if (!string.IsNullOrWhiteSpace(apiKey))
+                azuraCast.AdminApiKey = Crypto.Encrypt(apiKey);
 
             if (outagesId.HasValue)
                 azuraCast.OutagesChannelId = outagesId.Value;

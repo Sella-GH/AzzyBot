@@ -40,6 +40,8 @@ namespace AzzyBot.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     BaseUrl = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    AdminApiKey = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     OutagesChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     GuildId = table.Column<int>(type: "int", nullable: true)
                 },

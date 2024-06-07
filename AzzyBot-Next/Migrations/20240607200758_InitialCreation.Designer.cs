@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AzzyBot.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20240606122854_InitialCreation")]
+    [Migration("20240607200758_InitialCreation")]
     partial class InitialCreation
     {
         /// <inheritdoc />
@@ -63,6 +63,10 @@ namespace AzzyBot.Migrations
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdminApiKey")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("BaseUrl")
                         .IsRequired()

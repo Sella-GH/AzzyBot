@@ -61,6 +61,10 @@ namespace AzzyBot.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AdminApiKey")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("BaseUrl")
                         .IsRequired()
                         .HasColumnType("longtext");
