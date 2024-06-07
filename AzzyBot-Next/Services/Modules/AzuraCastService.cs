@@ -56,7 +56,7 @@ public sealed class AzuraCastService(WebRequestService webService)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
 
-        const string endpoint = "admin/server/stats";
+        const string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Server}/{ApiEndpoints.Stats}";
 
         return FetchFromApiAsync<HardwareStatsRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
@@ -65,7 +65,7 @@ public sealed class AzuraCastService(WebRequestService webService)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        string endpoint = $"nowplaying/{stationId}";
+        string endpoint = $"{ApiEndpoints.NowPlaying}/{stationId}";
 
         return FetchFromApiAsync<NowPlayingDataRecord>(baseUrl, endpoint);
     }
@@ -75,7 +75,7 @@ public sealed class AzuraCastService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        string endpoint = $"station/{stationId}/playlist/{playlistId}";
+        string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Playlist}/{playlistId}";
 
         return FetchFromApiAsync<PlaylistRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
@@ -85,7 +85,7 @@ public sealed class AzuraCastService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        string endpoint = $"station/{stationId}/playlists";
+        string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Playlists}";
 
         return FetchFromApiListAsync<PlaylistRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
