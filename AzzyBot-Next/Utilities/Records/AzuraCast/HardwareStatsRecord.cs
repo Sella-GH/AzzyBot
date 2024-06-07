@@ -47,7 +47,7 @@ public sealed record CoreData : CpuTotalData;
 public sealed record MemoryData
 {
     [JsonPropertyName("readable")]
-    public required ReadableMemoryData Readable { get; init; }
+    public required ReadableDiskData Readable { get; init; }
 }
 
 public sealed record DiskData

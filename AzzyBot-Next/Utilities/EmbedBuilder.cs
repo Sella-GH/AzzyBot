@@ -76,7 +76,7 @@ public static class EmbedBuilder
         fields.Add("CPU Load", new(cpuLoads.ToString(), false));
 
         memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Used: {stats.Memory.Readable.Used}");
-        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Cached: {stats.Memory.Readable.Cached}");
+        //memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Cached: {stats.Memory.Readable.Cached}");
         memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Free: {stats.Memory.Readable.Free}");
         memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: {stats.Memory.Readable.Total}");
         fields.Add("Memory Usage", new(memoryUsage.ToString(), false));
