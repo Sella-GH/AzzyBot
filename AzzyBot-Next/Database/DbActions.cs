@@ -60,6 +60,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             guild.AzuraCastSet = true;
 
             await context.AzuraCast.AddAsync(azuraCast);
+            await context.Guilds.UpdateAsync(guild);
         });
     }
 
@@ -137,6 +138,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             guild.AzuraCastSet = false;
 
             context.AzuraCast.Remove(azuraCast);
+            context.Guilds.Update(guild);
         });
     }
 
