@@ -11,10 +11,10 @@ public static class AzuraCastMisc
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(elapsed, nameof(elapsed));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(duration, nameof(duration));
 
-        double pos = Math.Floor(number * (elapsed / duration));
+        int pos = Convert.ToInt32(Math.Floor(number * (elapsed / duration)));
 
         StringBuilder bar = new();
-        for (double i = 0; i <= number; i++)
+        for (int i = 0; i <= number; i++)
         {
             if (i == pos)
             {
