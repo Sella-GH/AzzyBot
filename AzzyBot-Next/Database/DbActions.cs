@@ -41,7 +41,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         }
     }
 
-    public Task<bool> AddAzuraCastAsync(ulong guildId, Uri baseUrl, string apiKey, ulong outagesId)
+    public Task<bool> AddAzuraCastAsync(ulong guildId, Uri baseUrl, string apiKey, ulong notificationId, ulong outagesId)
     {
         ArgumentNullException.ThrowIfNull(baseUrl, nameof(baseUrl));
 
@@ -53,6 +53,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             {
                 BaseUrl = Crypto.Encrypt(baseUrl.OriginalString),
                 AdminApiKey = Crypto.Encrypt(apiKey),
+                NotificationChannelId = notificationId,
                 OutagesChannelId = outagesId,
                 GuildId = guild.Id
             };
@@ -240,7 +241,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             : guilds.Where(g => !g.IsDebugAllowed).ToList();
     }
 
-    public Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl, string? apiKey, ulong? outagesId)
+    public Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl, string? apiKey, ulong? notificationId, ulong? outagesId)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -251,6 +252,9 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             if (!string.IsNullOrWhiteSpace(apiKey))
                 azuraCast.AdminApiKey = Crypto.Encrypt(apiKey);
+
+            if (notificationId.HasValue)
+                azuraCast.NotificationChannelId = notificationId.Value;
 
             if (outagesId.HasValue)
                 azuraCast.OutagesChannelId = outagesId.Value;

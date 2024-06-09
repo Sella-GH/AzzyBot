@@ -43,6 +43,9 @@ public sealed class AzuraCastFileService(IHostApplicationLifetime applicationLif
 
         cancellationToken.ThrowIfCancellationRequested();
 
+        if (!Directory.Exists(_azuraCast.FilePath))
+            Directory.CreateDirectory(_azuraCast.FilePath);
+
         try
         {
             foreach (GuildsEntity guild in await _dbActions.GetGuildsAsync())
@@ -51,12 +54,14 @@ public sealed class AzuraCastFileService(IHostApplicationLifetime applicationLif
                     continue;
 
                 AzuraCastEntity azuraCast = guild.AzuraCast;
-                foreach (AzuraCastStationEntity station in azuraCast.Stations)
+                foreach (AzuraCastStationEntity station in azuraCast.Stations.Where(s => s.Checks.FileChanges))
                 {
-                    IReadOnlyList<FilesRecord> onlineFiles = await _azuraCast.GetFilesOnlineAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), Crypto.Decrypt(station.ApiKey), station.StationId);
+                    string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? azuraCast.AdminApiKey : station.ApiKey;
+
+                    IReadOnlyList<FilesRecord> onlineFiles = await _azuraCast.GetFilesOnlineAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), Crypto.Decrypt(apiKey), station.StationId);
                     IReadOnlyList<FilesRecord> localFiles = await _azuraCast.GetFilesLocalAsync(station.Id, station.StationId);
 
-                    await CheckIfFilesWereModifiedAsync(onlineFiles, localFiles, station.Id, station.StationId, station.Name, azuraCast.NotificatioChannelId);
+                    await CheckIfFilesWereModifiedAsync(onlineFiles, localFiles, station.Id, station.StationId, Crypto.Decrypt(station.Name), azuraCast.NotificationChannelId);
                 }
             }
         }
@@ -84,20 +89,29 @@ public sealed class AzuraCastFileService(IHostApplicationLifetime applicationLif
 
         string addedFileName = Path.Combine(_azuraCast.FilePath, $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}-{stationDbId}-{stationId}-added.txt");
         string removedFileName = Path.Combine(_azuraCast.FilePath, $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}-{stationDbId}-{stationId}-removed.txt");
-
         StringBuilder added = new();
         StringBuilder removed = new();
+        List<string> paths = [];
 
-        foreach (FilesRecord record in addedFiles)
-            added.AppendLine(record.Path);
+        if (addedFiles.Count > 0)
+        {
+            foreach (FilesRecord record in addedFiles)
+                added.AppendLine(record.Path);
 
-        foreach (FilesRecord record in removedFiles)
-            removed.AppendLine(record.Path);
+            await FileOperations.WriteToFileAsync(addedFileName, added.ToString());
+            paths.Add(addedFileName);
+        }
 
-        await FileOperations.WriteToFileAsync(addedFileName, added.ToString());
-        await FileOperations.WriteToFileAsync(removedFileName, removed.ToString());
+        if (removedFiles.Count > 0)
+        {
+            foreach (FilesRecord record in removedFiles)
+                removed.AppendLine(record.Path);
+
+            await FileOperations.WriteToFileAsync(removedFileName, removed.ToString());
+            paths.Add(removedFileName);
+        }
 
         DiscordEmbed embed = EmbedBuilder.BuildAzuraCastFileChangesEmbed(stationName, addedFiles.Count, removedFiles.Count);
-        await _botService.SendMessageAsync(channelId, $"Changes in the files of station {stationName} detected. Check the details below.", [embed], [addedFileName, removedFileName]);
+        await _botService.SendMessageAsync(channelId, $"Changes in the files of station {stationName} detected. Check the details below.", [embed], paths);
     }
 }

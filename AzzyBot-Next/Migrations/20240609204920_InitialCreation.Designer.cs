@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AzzyBot.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20240609203919_InitialCreation")]
+    [Migration("20240609204920_InitialCreation")]
     partial class InitialCreation
     {
         /// <inheritdoc />
@@ -75,7 +75,7 @@ namespace AzzyBot.Migrations
                     b.Property<int?>("GuildId")
                         .HasColumnType("int");
 
-                    b.Property<ulong>("NotificatioChannelId")
+                    b.Property<ulong>("NotificationChannelId")
                         .HasColumnType("bigint unsigned");
 
                     b.Property<ulong>("OutagesChannelId")
