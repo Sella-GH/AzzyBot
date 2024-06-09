@@ -54,25 +54,25 @@ public static class EmbedBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(stationName, nameof(stationName));
 
         const string title = "File Changes";
-        string addedFiles;
-        string removedFiles;
+        string addedFiles = "No files were added";
+        string removedFiles = "No files were removed";
 
-        if (added == 0)
+        if (added == 1)
         {
-            addedFiles = "No files were added.";
+            addedFiles = "1 file was added.";
         }
-        else
+        else if (added > 1)
         {
-            addedFiles = (added == 1) ? "1 file was added." : $"{added} files were added.";
+            addedFiles = $"{added} files were added.";
         }
 
-        if (removed == 0)
+        if (removed == 1)
         {
-            removedFiles = "No files were removed.";
+            removedFiles = "1 file was removed.";
         }
-        else
+        else if (removed > 1)
         {
-            removedFiles = (removed == 1) ? "1 file was removed." : $"{removed} files were removed.";
+            removedFiles = $"{removed} files were removed.";
         }
 
         Dictionary<string, DiscordEmbedRecord> fields = new()

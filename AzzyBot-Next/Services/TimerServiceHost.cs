@@ -40,8 +40,8 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraCast
 
     public async ValueTask DisposeAsync()
     {
-        if (_timer is IAsyncDisposable timer)
-            await timer.DisposeAsync();
+        if (_timer is not null)
+            await _timer.DisposeAsync();
 
         _timer = null;
     }

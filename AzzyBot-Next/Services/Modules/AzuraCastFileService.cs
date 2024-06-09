@@ -50,12 +50,11 @@ public sealed class AzuraCastFileService(IHostApplicationLifetime applicationLif
 
         try
         {
-            foreach (GuildsEntity guild in await _dbActions.GetGuildsAsync())
-            {
-                if (guild.AzuraCast is null)
-                    continue;
+            List<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
 
-                AzuraCastEntity azuraCast = guild.AzuraCast;
+            foreach (GuildsEntity guild in guilds.Where(g => g.AzuraCast is not null))
+            {
+                AzuraCastEntity azuraCast = guild.AzuraCast!;
                 foreach (AzuraCastStationEntity station in azuraCast.Stations.Where(s => s.Checks.FileChanges))
                 {
                     string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? azuraCast.AdminApiKey : station.ApiKey;
