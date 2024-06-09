@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -21,5 +22,19 @@ public static class FileOperations
         ArgumentException.ThrowIfNullOrWhiteSpace(path, nameof(path));
 
         File.Delete(path);
+    }
+
+    public static Task<string> GetFileContentAsync(string path)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path, nameof(path));
+
+        return File.ReadAllTextAsync(path);
+    }
+
+    public static IReadOnlyList<string> GetFilesInDirectory(string path)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path, nameof(path));
+
+        return Directory.GetFiles(path);
     }
 }
