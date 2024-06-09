@@ -12,6 +12,7 @@ using AzzyBot.Logging;
 using AzzyBot.Services.Interfaces;
 using AzzyBot.Utilities;
 using AzzyBot.Utilities.Encryption;
+using AzzyBot.Utilities.Enums;
 using AzzyBot.Utilities.Records.AzuraCast;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Hosting;
@@ -29,17 +30,25 @@ public sealed class AzuraCastFileService(IHostApplicationLifetime applicationLif
     private readonly CancellationToken _cancellationToken = applicationLifetime.ApplicationStopping;
     private readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true };
 
-    public void StartAzuraCastFileService()
+    public void StartAzuraCastFileService(AzuraCastChecks check)
     {
         _logger.AzuraCastFileServiceStart();
 
         if (_cancellationToken.IsCancellationRequested)
             return;
 
-        Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(BuildWorkItemAsync));
+        switch (check)
+        {
+            case AzuraCastChecks.CheckForUpdates:
+                break;
+
+            case AzuraCastChecks.CheckForFileChanges:
+                Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(CheckForFileChangesAsync));
+                break;
+        }
     }
 
-    private async ValueTask BuildWorkItemAsync(CancellationToken cancellationToken)
+    private async ValueTask CheckForFileChangesAsync(CancellationToken cancellationToken)
     {
         _logger.AzuraCastFileServiceWorkItem();
 
@@ -66,7 +75,7 @@ public sealed class AzuraCastFileService(IHostApplicationLifetime applicationLif
         }
         catch (OperationCanceledException)
         {
-            _logger.OperationCanceled(nameof(BuildWorkItemAsync));
+            _logger.OperationCanceled(nameof(CheckForFileChangesAsync));
         }
 
         return;

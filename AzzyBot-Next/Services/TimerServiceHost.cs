@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AzzyBot.Logging;
 using AzzyBot.Services.Modules;
 using AzzyBot.Utilities;
+using AzzyBot.Utilities.Enums;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -68,7 +69,7 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraCast
                 _logger.GlobalTimerCheckForAzuraCastFiles();
                 _lastAzuraCastFileCheck = now;
 
-                _azuraCastFileService.StartAzuraCastFileService();
+                _azuraCastFileService.StartAzuraCastFileService(AzuraCastChecks.CheckForFileChanges);
             }
         }
         catch (Exception ex)
