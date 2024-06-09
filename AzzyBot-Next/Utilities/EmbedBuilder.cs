@@ -49,6 +49,42 @@ public static class EmbedBuilder
         return builder;
     }
 
+    public static DiscordEmbed BuildAzuraCastFileChangesEmbed(string stationName, int added, int removed)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(stationName, nameof(stationName));
+
+        const string title = "File Changes";
+        string addedFiles;
+        string removedFiles;
+
+        if (added == 0)
+        {
+            addedFiles = "No files were added.";
+        }
+        else
+        {
+            addedFiles = (added == 1) ? "1 file was added." : $"{added} files were added.";
+        }
+
+        if (removed == 0)
+        {
+            removedFiles = "No files were removed.";
+        }
+        else
+        {
+            removedFiles = (removed == 1) ? "1 file was removed." : $"{removed} files were removed.";
+        }
+
+        Dictionary<string, DiscordEmbedRecord> fields = new()
+        {
+            ["Station"] = new(stationName),
+            ["Added"] = new(addedFiles),
+            ["Removed"] = new(removedFiles)
+        };
+
+        return CreateBasicEmbed(title, null, DiscordColor.Orange, null, null, null, fields);
+    }
+
     public static DiscordEmbed BuildAzuraCastHardwareStatsEmbed(HardwareStatsRecord stats)
     {
         ArgumentNullException.ThrowIfNull(stats, nameof(stats));

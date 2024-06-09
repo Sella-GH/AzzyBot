@@ -37,4 +37,12 @@ public static class FileOperations
 
         return Directory.GetFiles(path);
     }
+
+    public static async Task WriteToFileAsync(string path, string content)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path, nameof(path));
+        ArgumentException.ThrowIfNullOrWhiteSpace(content, nameof(content));
+
+        await File.WriteAllTextAsync(path, content);
+    }
 }
