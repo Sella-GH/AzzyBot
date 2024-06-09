@@ -38,6 +38,9 @@ public static partial class LoggerActions
     [LoggerMessage(91, LogLevel.Debug, "AzuraCastFileServiceHost stopped")]
     public static partial void AzuraCastFileServiceHostStop(this ILogger<AzuraCastFileServiceHost> logger);
 
+    [LoggerMessage(99, LogLevel.Debug, "Operation {ops} canceled by CancellationToken")]
+    public static partial void OperationCanceled(this ILogger logger, string ops);
+
     [LoggerMessage(100, LogLevel.Information, "Starting {name} in version {version} on {os}-{arch}")]
     public static partial void BotStarting(this ILogger<CoreServiceHost> logger, string name, string version, string os, string arch);
 

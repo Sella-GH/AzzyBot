@@ -48,7 +48,9 @@ public sealed class AzuraCastFileServiceHost(IQueuedBackgroundTask taskQueue, IL
                 await workItem(cancellationToken);
             }
             catch (OperationCanceledException)
-            { }
+            {
+                _logger.OperationCanceled(nameof(ProcessQueueAsync));
+            }
             catch (Exception ex)
             {
                 await _botService.LogExceptionAsync(ex, DateTime.Now);

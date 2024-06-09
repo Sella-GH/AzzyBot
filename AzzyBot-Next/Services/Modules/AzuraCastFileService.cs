@@ -67,7 +67,9 @@ public sealed class AzuraCastFileService(IHostApplicationLifetime applicationLif
             }
         }
         catch (OperationCanceledException)
-        { }
+        {
+            _logger.OperationCanceled(nameof(BuildWorkItemAsync));
+        }
 
         return;
     }
