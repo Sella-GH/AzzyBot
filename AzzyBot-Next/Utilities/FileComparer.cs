@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using AzzyBot.Utilities.Records.AzuraCast;
 
 namespace AzzyBot.Utilities;
 
+[SuppressMessage("Roslynator", "RCS1241:Implement non-generic counterpart", Justification = "Not needed")]
 public sealed class FileComparer : IEqualityComparer<FilesRecord>
 {
     public bool Equals(FilesRecord? x, FilesRecord? y)
