@@ -17,7 +17,7 @@ public static class FileOperations
         return tempFilePath;
     }
 
-    public static void DeleteTempFilePath(string path)
+    public static void DeleteFile(string path)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path, nameof(path));
 

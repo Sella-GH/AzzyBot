@@ -135,7 +135,7 @@ public sealed class DiscordBotService
             if (!messageSent)
                 _logger.UnableToSendMessage("Error message was not sent");
 
-            FileOperations.DeleteTempFilePath(tempFilePath);
+            FileOperations.DeleteFile(tempFilePath);
 
             return true;
         }
@@ -218,7 +218,7 @@ public sealed class DiscordBotService
             if (!messageSent)
                 _logger.UnableToSendMessage("Error message was not sent");
 
-            FileOperations.DeleteTempFilePath(tempFilePath);
+            FileOperations.DeleteFile(tempFilePath);
 
             return true;
         }
@@ -305,7 +305,7 @@ public sealed class DiscordBotService
 
             foreach (string path in filePaths)
             {
-                FileOperations.DeleteTempFilePath(path);
+                FileOperations.DeleteFile(path);
             }
         }
 
