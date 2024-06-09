@@ -17,8 +17,20 @@ public static partial class LoggerActions
     [LoggerMessage(2, LogLevel.Debug, "Global timer checking for bot updates")]
     public static partial void GlobalTimerCheckForUpdates(this ILogger<TimerServiceHost> logger);
 
-    [LoggerMessage(9, LogLevel.Debug, "Stopping global timer")]
+    [LoggerMessage(10, LogLevel.Debug, "AzuraCastFileService started")]
+    public static partial void AzuraCastFileServiceStarted(this ILogger<AzuraCastFileService> logger);
+
+    [LoggerMessage(11, LogLevel.Debug, "AzuraCastFileServiceHost running")]
+    public static partial void AzuraCastFileServiceHostRun(this ILogger<AzuraCastFileServiceHost> logger);
+
+    [LoggerMessage(12, LogLevel.Debug, "Creating work item for AzuraCastFileService")]
+    public static partial void AzuraCastFileServiceWorkItem(this ILogger<AzuraCastFileService> logger);
+
+    [LoggerMessage(90, LogLevel.Debug, "Stopping global timer")]
     public static partial void GlobalTimerStop(this ILogger<TimerServiceHost> logger);
+
+    [LoggerMessage(91, LogLevel.Debug, "AzuraCastFileServiceHost stopped")]
+    public static partial void AzuraCastFileServiceHostStopped(this ILogger<AzuraCastFileServiceHost> logger);
 
     [LoggerMessage(100, LogLevel.Information, "Starting {name} in version {version} on {os}-{arch}")]
     public static partial void BotStarting(this ILogger<CoreServiceHost> logger, string name, string version, string os, string arch);
@@ -56,10 +68,10 @@ public static partial class LoggerActions
     [LoggerMessage(291, LogLevel.Warning, "Body of online version could not be deserialized")]
     public static partial void OnlineVersionUnserializable(this ILogger<UpdaterService> logger);
 
-    [LoggerMessage(300, LogLevel.Error, "An error happend while logging the exception to discord: {ex}")]
+    [LoggerMessage(300, LogLevel.Error, "An error occured while logging the exception to discord: {ex}")]
     public static partial void UnableToLogException(this ILogger logger, string ex);
 
-    [LoggerMessage(301, LogLevel.Error, "An error happend while sending a message to discord: {ex}")]
+    [LoggerMessage(301, LogLevel.Error, "An error occured while sending a message to discord: {ex}")]
     public static partial void UnableToSendMessage(this ILogger logger, string ex);
 
     [LoggerMessage(302, LogLevel.Error, "The provided uri is invalid: {uri}")]
@@ -67,6 +79,9 @@ public static partial class LoggerActions
 
     [LoggerMessage(303, LogLevel.Error, "The {type} request to {uri} failed with error: {ex}")]
     public static partial void WebRequestFailed(this ILogger logger, HttpMethod type, string ex, Uri uri);
+
+    [LoggerMessage(310, LogLevel.Error, "An error occured while executing the background task: {ex}")]
+    public static partial void BackgroundTaskError(this ILogger logger, string ex);
 
     [LoggerMessage(320, LogLevel.Error, "Database transaction failed with error: ")]
     public static partial void DatabaseTransactionFailed(this ILogger logger, Exception ex);
