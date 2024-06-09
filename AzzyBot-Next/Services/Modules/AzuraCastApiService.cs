@@ -1,14 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using AzzyBot.Utilities;
+using AzzyBot.Utilities.Helpers;
 using AzzyBot.Utilities.Records.AzuraCast;
 
 namespace AzzyBot.Services.Modules;
 
-public sealed class AzuraCastService(WebRequestService webService)
+public sealed class AzuraCastApiService(WebRequestService webService)
 {
     private readonly WebRequestService _webService = webService;
+    private readonly string _filePath = Path.Combine(Environment.CurrentDirectory, "Modules", "AzuraCast", "Files");
     //private readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
 
     private async Task<string> FetchFromApiAsync(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
@@ -50,6 +55,34 @@ public sealed class AzuraCastService(WebRequestService webService)
         string body = await FetchFromApiAsync(baseUrl, endpoint, headers);
 
         return JsonSerializer.Deserialize<List<T>>(body) ?? throw new InvalidOperationException($"Could not deserialize body: {body}");
+    }
+
+    public async Task<IReadOnlyList<FilesRecord>> GetFilesLocalAsync(int databaseId, int stationId)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+
+        IReadOnlyList<string> files = FileOperations.GetFilesInDirectory(_filePath);
+        List<FilesRecord> records = [];
+
+        foreach (string file in files.Where(f => f.StartsWith($"{databaseId}-{stationId}", StringComparison.OrdinalIgnoreCase)))
+        {
+            string content = await FileOperations.GetFileContentAsync(file);
+            FilesRecord record = JsonSerializer.Deserialize<FilesRecord>(content) ?? throw new InvalidOperationException($"Could not deserialize content: {content}");
+
+            records.Add(record);
+        }
+
+        return records;
+    }
+
+    public Task<IReadOnlyList<FilesRecord>> GetFilesOnlineAsync(Uri baseUrl, string apiKey, int stationId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+
+        string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Files}";
+
+        return FetchFromApiListAsync<FilesRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
     public Task<HardwareStatsRecord> GetHardwareStatsAsync(Uri baseUrl, string apiKey)

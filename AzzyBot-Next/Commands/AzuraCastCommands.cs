@@ -24,10 +24,10 @@ namespace AzzyBot.Commands;
 public sealed class AzuraCastCommands
 {
     [Command("azuracast"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
-    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastService azuraCast, DbActions dbActions)
+    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCast, DbActions dbActions)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
-        private readonly AzuraCastService _azuraCast = azuraCast;
+        private readonly AzuraCastApiService _azuraCast = azuraCast;
         private readonly DbActions _dbActions = dbActions;
 
         [Command("hardware-stats"), Description("Get the hardware stats of the running server.")]
@@ -54,10 +54,10 @@ public sealed class AzuraCastCommands
     }
 
     [Command("music"), RequireGuild]
-    public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastService azuraCast, DbActions dbActions)
+    public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastApiService azuraCast, DbActions dbActions)
     {
         private readonly ILogger<MusicGroup> _logger = logger;
-        private readonly AzuraCastService _azuraCast = azuraCast;
+        private readonly AzuraCastApiService _azuraCast = azuraCast;
         private readonly DbActions _dbActions = dbActions;
 
         [Command("now-playing"), Description("Get the currently playing song on the station.")]
