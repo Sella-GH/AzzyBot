@@ -46,7 +46,6 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<WebRequestService>();
         services.AddSingleton<UpdaterService>();
-        services.AddSingleton<TimerServiceHost>();
         services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());
     }
 

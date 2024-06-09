@@ -3,19 +3,19 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Logging;
-using AzzyBot.Settings;
 using AzzyBot.Utilities;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-public sealed class TimerServiceHost(DiscordBotService discordBotService, UpdaterService updaterService, ILogger<TimerServiceHost> logger) : IDisposable, IHostedService
+public sealed class TimerServiceHost(DiscordBotService discordBotService, UpdaterService updaterService, ILogger<TimerServiceHost> logger) : IAsyncDisposable, IHostedService
 {
     private readonly ILogger<TimerServiceHost> _logger = logger;
     private readonly DiscordBotService _discordBotService = discordBotService;
     private readonly UpdaterService _updaterService = updaterService;
     private readonly bool _isDev = AzzyStatsSoftware.GetBotEnvironment == Environments.Development;
+    private readonly Task _completedTask = Task.CompletedTask;
     private Timer? _timer;
     private DateTime _lastBotUpdateCheck = DateTime.MinValue;
 
@@ -24,7 +24,7 @@ public sealed class TimerServiceHost(DiscordBotService discordBotService, Update
         _logger.GlobalTimerStart();
         _timer = new(new TimerCallback(TimerTimeoutAsync), null, TimeSpan.Zero, TimeSpan.FromMinutes(15));
 
-        return Task.CompletedTask;
+        return _completedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -32,13 +32,15 @@ public sealed class TimerServiceHost(DiscordBotService discordBotService, Update
         _timer?.Change(Timeout.Infinite, Timeout.Infinite);
         _logger.GlobalTimerStop();
 
-        return Task.CompletedTask;
+        return _completedTask;
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        _timer?.Change(Timeout.Infinite, Timeout.Infinite);
-        _timer?.Dispose();
+        if (_timer is IAsyncDisposable timer)
+            await timer.DisposeAsync();
+
+        _timer = null;
     }
 
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "General exception is there to log unkown exceptions")]
