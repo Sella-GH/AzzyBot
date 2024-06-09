@@ -10,9 +10,9 @@ public sealed class AzuraCastFileTask : IQueuedBackgroundTask
 {
     private readonly Channel<Func<CancellationToken, ValueTask>> _queue;
 
-    public AzuraCastFileTask(int capacity)
+    public AzuraCastFileTask()
     {
-        BoundedChannelOptions options = new(capacity)
+        BoundedChannelOptions options = new(100)
         {
             FullMode = BoundedChannelFullMode.Wait
         };

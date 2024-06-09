@@ -12,25 +12,28 @@ public static partial class LoggerActions
     public static partial void GlobalTimerStart(this ILogger<TimerServiceHost> logger);
 
     [LoggerMessage(1, LogLevel.Debug, "Global timer ticked")]
-    public static partial void GlobalTimerTicked(this ILogger<TimerServiceHost> logger);
+    public static partial void GlobalTimerTick(this ILogger<TimerServiceHost> logger);
 
     [LoggerMessage(2, LogLevel.Debug, "Global timer checking for bot updates")]
     public static partial void GlobalTimerCheckForUpdates(this ILogger<TimerServiceHost> logger);
 
-    [LoggerMessage(10, LogLevel.Debug, "AzuraCastFileService started")]
-    public static partial void AzuraCastFileServiceStarted(this ILogger<AzuraCastFileService> logger);
+    [LoggerMessage(10, LogLevel.Debug, "AzuraCastFileServiceHost started")]
+    public static partial void AzuraCastFileServiceHostStart(this ILogger<AzuraCastFileServiceHost> logger);
 
-    [LoggerMessage(11, LogLevel.Debug, "AzuraCastFileServiceHost running")]
+    [LoggerMessage(11, LogLevel.Debug, "AzuraCastFileService started")]
+    public static partial void AzuraCastFileServiceStart(this ILogger<AzuraCastFileService> logger);
+
+    [LoggerMessage(12, LogLevel.Debug, "AzuraCastFileServiceHost running")]
     public static partial void AzuraCastFileServiceHostRun(this ILogger<AzuraCastFileServiceHost> logger);
 
-    [LoggerMessage(12, LogLevel.Debug, "Creating work item for AzuraCastFileService")]
+    [LoggerMessage(13, LogLevel.Debug, "Creating work item for AzuraCastFileService")]
     public static partial void AzuraCastFileServiceWorkItem(this ILogger<AzuraCastFileService> logger);
 
     [LoggerMessage(90, LogLevel.Debug, "Stopping global timer")]
     public static partial void GlobalTimerStop(this ILogger<TimerServiceHost> logger);
 
     [LoggerMessage(91, LogLevel.Debug, "AzuraCastFileServiceHost stopped")]
-    public static partial void AzuraCastFileServiceHostStopped(this ILogger<AzuraCastFileServiceHost> logger);
+    public static partial void AzuraCastFileServiceHostStop(this ILogger<AzuraCastFileServiceHost> logger);
 
     [LoggerMessage(100, LogLevel.Information, "Starting {name} in version {version} on {os}-{arch}")]
     public static partial void BotStarting(this ILogger<CoreServiceHost> logger, string name, string version, string os, string arch);

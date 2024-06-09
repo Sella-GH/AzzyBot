@@ -46,7 +46,7 @@ public sealed class TimerServiceHost(DiscordBotService discordBotService, Update
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "General exception is there to log unkown exceptions")]
     private async void TimerTimeoutAsync(object? o)
     {
-        _logger.GlobalTimerTicked();
+        _logger.GlobalTimerTick();
 
         try
         {
