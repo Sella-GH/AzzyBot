@@ -72,6 +72,9 @@ namespace AzzyBot.Migrations
                     b.Property<int?>("GuildId")
                         .HasColumnType("int");
 
+                    b.Property<ulong>("NotificatioChannelId")
+                        .HasColumnType("bigint unsigned");
+
                     b.Property<ulong>("OutagesChannelId")
                         .HasColumnType("bigint unsigned");
 

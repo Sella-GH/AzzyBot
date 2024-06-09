@@ -42,6 +42,7 @@ namespace AzzyBot.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     AdminApiKey = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    NotificatioChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     OutagesChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     GuildId = table.Column<int>(type: "int", nullable: true)
                 },
