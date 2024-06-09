@@ -17,6 +17,9 @@ public static partial class LoggerActions
     [LoggerMessage(2, LogLevel.Debug, "Global timer checking for bot updates")]
     public static partial void GlobalTimerCheckForUpdates(this ILogger<TimerServiceHost> logger);
 
+    [LoggerMessage(3, LogLevel.Debug, "Global timer checking for AzuraCast files changes")]
+    public static partial void GlobalTimerCheckForAzuraCastFiles(this ILogger<TimerServiceHost> logger);
+
     [LoggerMessage(10, LogLevel.Debug, "AzuraCastFileServiceHost started")]
     public static partial void AzuraCastFileServiceHostStart(this ILogger<AzuraCastFileServiceHost> logger);
 

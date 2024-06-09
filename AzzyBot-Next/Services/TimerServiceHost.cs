@@ -3,20 +3,23 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Logging;
+using AzzyBot.Services.Modules;
 using AzzyBot.Utilities;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-public sealed class TimerServiceHost(DiscordBotService discordBotService, UpdaterService updaterService, ILogger<TimerServiceHost> logger) : IAsyncDisposable, IHostedService
+public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraCastFileService azuraCastFileService, DiscordBotService discordBotService, UpdaterService updaterService) : IAsyncDisposable, IHostedService
 {
     private readonly ILogger<TimerServiceHost> _logger = logger;
+    private readonly AzuraCastFileService _azuraCastFileService = azuraCastFileService;
     private readonly DiscordBotService _discordBotService = discordBotService;
     private readonly UpdaterService _updaterService = updaterService;
     private readonly bool _isDev = AzzyStatsSoftware.GetBotEnvironment == Environments.Development;
     private readonly Task _completedTask = Task.CompletedTask;
     private Timer? _timer;
+    private DateTime _lastAzuraCastFileCheck = DateTime.MinValue;
     private DateTime _lastBotUpdateCheck = DateTime.MinValue;
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -50,17 +53,22 @@ public sealed class TimerServiceHost(DiscordBotService discordBotService, Update
 
         try
         {
-            if (!_isDev)
+            DateTime now = DateTime.Now;
+
+            if (!_isDev && now - _lastBotUpdateCheck >= TimeSpan.FromHours(5.98))
             {
-                DateTime now = DateTime.Now;
+                _logger.GlobalTimerCheckForUpdates();
+                _lastBotUpdateCheck = now;
 
-                if (now - _lastBotUpdateCheck >= TimeSpan.FromHours(5.98))
-                {
-                    _logger.GlobalTimerCheckForUpdates();
-                    _lastBotUpdateCheck = now;
+                await _updaterService.CheckForAzzyUpdatesAsync();
+            }
 
-                    await _updaterService.CheckForAzzyUpdatesAsync();
-                }
+            if (now - _lastAzuraCastFileCheck >= TimeSpan.FromHours(1))
+            {
+                _logger.GlobalTimerCheckForAzuraCastFiles();
+                _lastAzuraCastFileCheck = now;
+
+                _azuraCastFileService.StartAzuraCastFileService();
             }
         }
         catch (Exception ex)

@@ -9,17 +9,15 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services.Modules;
 
-public sealed class AzuraCastFileServiceHost(IQueuedBackgroundTask taskQueue, ILogger<AzuraCastFileServiceHost> logger, AzuraCastFileService azuraCastFileService, DiscordBotService discordBotService) : BackgroundService
+public sealed class AzuraCastFileServiceHost(IQueuedBackgroundTask taskQueue, ILogger<AzuraCastFileServiceHost> logger, DiscordBotService discordBotService) : BackgroundService
 {
     private readonly ILogger<AzuraCastFileServiceHost> _logger = logger;
     private readonly IQueuedBackgroundTask _taskQueue = taskQueue;
-    private readonly AzuraCastFileService _azuraCastFileService = azuraCastFileService;
     private readonly DiscordBotService _botService = discordBotService;
 
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.AzuraCastFileServiceHostStart();
-        _azuraCastFileService.StartAzuraCastFileService();
 
         await base.StartAsync(cancellationToken);
     }

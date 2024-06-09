@@ -13,7 +13,8 @@ namespace AzzyBot.Services.Modules;
 public sealed class AzuraCastApiService(WebRequestService webService)
 {
     private readonly WebRequestService _webService = webService;
-    private readonly string _filePath = Path.Combine(Environment.CurrentDirectory, "Modules", "AzuraCast", "Files");
+
+    public string FilePath { get; } = Path.Combine(Environment.CurrentDirectory, "Modules", "AzuraCast", "Files");
     //private readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
 
     private async Task<string> FetchFromApiAsync(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
@@ -61,7 +62,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        IReadOnlyList<string> files = FileOperations.GetFilesInDirectory(_filePath);
+        IReadOnlyList<string> files = FileOperations.GetFilesInDirectory(FilePath);
         List<FilesRecord> records = [];
 
         foreach (string file in files.Where(f => f.StartsWith($"{databaseId}-{stationId}", StringComparison.OrdinalIgnoreCase)))
