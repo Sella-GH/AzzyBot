@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Database;
@@ -26,6 +27,7 @@ public sealed class AzuraCastFileService(IHostApplicationLifetime applicationLif
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = discordBotService;
     private readonly CancellationToken _cancellationToken = applicationLifetime.ApplicationStopping;
+    private readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true };
 
     public void StartAzuraCastFileService()
     {
@@ -113,5 +115,6 @@ public sealed class AzuraCastFileService(IHostApplicationLifetime applicationLif
 
         DiscordEmbed embed = EmbedBuilder.BuildAzuraCastFileChangesEmbed(stationName, addedFiles.Count, removedFiles.Count);
         await _botService.SendMessageAsync(channelId, $"Changes in the files of station {stationName} detected. Check the details below.", [embed], paths);
+        await FileOperations.WriteToFileAsync(Path.Combine(_azuraCast.FilePath, $"{stationDbId}-{stationId}-files.json"), JsonSerializer.Serialize(onlineFiles, _serializerOptions));
     }
 }

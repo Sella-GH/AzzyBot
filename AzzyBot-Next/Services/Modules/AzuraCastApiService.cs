@@ -65,15 +65,15 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         IReadOnlyList<string> files = FileOperations.GetFilesInDirectory(FilePath);
         List<FilesRecord> records = [];
 
-        foreach (string file in files.Where(f => f.StartsWith($"{databaseId}-{stationId}", StringComparison.OrdinalIgnoreCase)))
-        {
-            string content = await FileOperations.GetFileContentAsync(file);
-            FilesRecord record = JsonSerializer.Deserialize<FilesRecord>(content) ?? throw new InvalidOperationException($"Could not deserialize content: {content}");
+        string file = files.FirstOrDefault(f => f.Contains($"{databaseId}-{stationId}-files.json", StringComparison.OrdinalIgnoreCase)) ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(file))
+            return records;
 
-            records.Add(record);
-        }
+        string content = await FileOperations.GetFileContentAsync(file);
+        if (string.IsNullOrWhiteSpace(content))
+            return records;
 
-        return records;
+        return JsonSerializer.Deserialize<List<FilesRecord>>(content) ?? throw new InvalidOperationException($"Could not deserialize content: {content}");
     }
 
     public Task<IReadOnlyList<FilesRecord>> GetFilesOnlineAsync(Uri baseUrl, string apiKey, int stationId)
