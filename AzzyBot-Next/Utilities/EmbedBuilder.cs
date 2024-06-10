@@ -14,7 +14,7 @@ namespace AzzyBot.Utilities;
 
 public static class EmbedBuilder
 {
-    private static DiscordEmbedBuilder CreateBasicEmbed(string title, string? description = null, DiscordColor? color = null, Uri? thumbnailUrl = null, string? footerText = null, Uri? url = null, Dictionary<string, DiscordEmbedRecord>? fields = null)
+    private static DiscordEmbedBuilder CreateBasicEmbed(string title, string? description = null, DiscordColor? color = null, Uri? thumbnailUrl = null, string? footerText = null, Uri? url = null, Dictionary<string, AzzyDiscordEmbedRecord>? fields = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title, nameof(title));
 
@@ -40,7 +40,7 @@ public static class EmbedBuilder
 
         if (fields is not null)
         {
-            foreach (KeyValuePair<string, DiscordEmbedRecord> field in fields)
+            foreach (KeyValuePair<string, AzzyDiscordEmbedRecord> field in fields)
             {
                 builder.AddField(field.Key, field.Value.Description, field.Value.IsInline);
             }
@@ -75,7 +75,7 @@ public static class EmbedBuilder
             removedFiles = $"{removed} files were removed.";
         }
 
-        Dictionary<string, DiscordEmbedRecord> fields = new()
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
             ["Station"] = new(stationName),
             ["Added"] = new(addedFiles),
@@ -85,7 +85,7 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, null, DiscordColor.Orange, null, null, null, fields);
     }
 
-    public static DiscordEmbed BuildAzuraCastHardwareStatsEmbed(HardwareStatsRecord stats)
+    public static DiscordEmbed BuildAzuraCastHardwareStatsEmbed(AzuraHardwareStatsRecord stats)
     {
         ArgumentNullException.ThrowIfNull(stats, nameof(stats));
 
@@ -96,7 +96,7 @@ public static class EmbedBuilder
         StringBuilder memoryUsage = new();
         StringBuilder diskUsage = new();
 
-        Dictionary<string, DiscordEmbedRecord> fields = [];
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
 
         for (int i = 0; i < stats.Cpu.Cores.Count; i++)
         {
@@ -143,7 +143,7 @@ public static class EmbedBuilder
         string isDocker = AzzyStatsHardware.CheckIfDocker.ToString();
         long uptime = Converter.ConvertToUnixTime(AzzyStatsHardware.GetSystemUptime);
 
-        Dictionary<string, DiscordEmbedRecord> fields = new()
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
             ["Operating System"] = new(os, true),
             ["Architecture"] = new(osArch, true),
@@ -156,10 +156,10 @@ public static class EmbedBuilder
 
         Dictionary<int, double> cpuUsage = await AzzyStatsHardware.GetSystemCpuAsync();
         Dictionary<string, double> cpuTemp = await AzzyStatsHardware.GetSystemCpuTempAsync();
-        CpuLoadRecord cpuLoads = await AzzyStatsHardware.GetSystemCpuLoadAsync();
-        MemoryUsageRecord memory = await AzzyStatsHardware.GetSystemMemoryUsageAsync();
-        DiskUsageRecord disk = AzzyStatsHardware.GetSystemDiskUsage();
-        Dictionary<string, NetworkSpeedRecord> networkUsage = await AzzyStatsHardware.GetSystemNetworkUsageAsync();
+        AzzyCpuLoadRecord cpuLoads = await AzzyStatsHardware.GetSystemCpuLoadAsync();
+        AzzyMemoryUsageRecord memory = await AzzyStatsHardware.GetSystemMemoryUsageAsync();
+        AzzyDiskUsageRecord disk = AzzyStatsHardware.GetSystemDiskUsage();
+        Dictionary<string, AzzyNetworkSpeedRecord> networkUsage = await AzzyStatsHardware.GetSystemNetworkUsageAsync();
 
         if (cpuUsage.Count > 0)
         {
@@ -212,7 +212,7 @@ public static class EmbedBuilder
         if (networkUsage.Count > 0)
         {
             StringBuilder networkUsageBuilder = new();
-            foreach (KeyValuePair<string, NetworkSpeedRecord> kvp in networkUsage)
+            foreach (KeyValuePair<string, AzzyNetworkSpeedRecord> kvp in networkUsage)
             {
                 networkUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Interface: **{kvp.Key}**\nReceived: **{kvp.Value.Received}** KB/s\nTransmitted: **{kvp.Value.Transmitted}** KB/s\n");
             }
@@ -230,7 +230,7 @@ public static class EmbedBuilder
         string title = command.Name;
         string description = command.Description;
 
-        Dictionary<string, DiscordEmbedRecord> fields = [];
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
         foreach (KeyValuePair<string, string> kvp in command.Parameters)
         {
             fields.Add(kvp.Key, new(kvp.Value, false));
@@ -247,7 +247,7 @@ public static class EmbedBuilder
         const string preTitle = "Command List For";
         string title = $"{preTitle} {commands[0].SubCommand} Module";
 
-        Dictionary<string, DiscordEmbedRecord> fields = [];
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
         foreach (AzzyHelpRecord command in commands)
         {
             fields.Add(command.Name, new(command.Description));
@@ -268,7 +268,7 @@ public static class EmbedBuilder
         string formattedAuthors = $"- [{authors[0].Trim()}]({githubUrl})\n- [{authors[1].Trim()}]({contribUrl})";
         string formattedCommit = $"[{commit}]({commitUrl}/{commit})";
 
-        Dictionary<string, DiscordEmbedRecord> fields = new()
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
             // Row 1
             ["Name"] = new(AzzyStatsSoftware.GetBotName, true),
@@ -309,7 +309,7 @@ public static class EmbedBuilder
         const string description = "Update now to get the latest bug fixes, features and improvements!";
         string yourVersion = AzzyStatsSoftware.GetBotVersion;
 
-        Dictionary<string, DiscordEmbedRecord> fields = new()
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
             ["Release Date"] = new($"<t:{Converter.ConvertToUnixTime(updateDate)}>"),
             ["Your Version"] = new(yourVersion),
@@ -359,7 +359,7 @@ public static class EmbedBuilder
         const string title = "Settings Overview";
         string description = $"Here are all settings which are currently set for **{serverName}**";
 
-        Dictionary<string, DiscordEmbedRecord> fields = new()
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
             ["Server ID"] = new(guild.UniqueId.ToString(CultureInfo.InvariantCulture)),
             ["Error Channel"] = new((guild.ErrorChannelId > 0) ? $"<#{guild.ErrorChannelId}>" : "Not set"),
@@ -376,7 +376,7 @@ public static class EmbedBuilder
 
         const string title = "AzuraCast Settings";
         List<DiscordEmbed> embeds = [];
-        Dictionary<string, DiscordEmbedRecord> fields = new()
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
             ["Base Url"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.BaseUrl)) ? Crypto.Decrypt(azuraCast.BaseUrl) : "Not set")}||"),
             ["Admin Api Key"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.AdminApiKey)) ? Crypto.Decrypt(azuraCast.AdminApiKey) : "Not set")}||"),
@@ -407,7 +407,7 @@ public static class EmbedBuilder
         return embeds;
     }
 
-    public static DiscordEmbed BuildMusicNowPlayingEmbed(NowPlayingDataRecord data, string? playlistName = null)
+    public static DiscordEmbed BuildMusicNowPlayingEmbed(AzuraNowPlayingDataRecord data, string? playlistName = null)
     {
         ArgumentNullException.ThrowIfNull(data, nameof(data));
 
@@ -415,7 +415,7 @@ public static class EmbedBuilder
         string? message = null;
         string thumbnailUrl = (!string.IsNullOrWhiteSpace(data.Live.Art)) ? data.Live.Art : data.NowPlaying.Song.Art;
 
-        Dictionary<string, DiscordEmbedRecord> fields = new()
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
             ["Song"] = new(data.NowPlaying.Song.Title, true),
             ["By"] = new(data.NowPlaying.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true)

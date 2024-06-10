@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace AzzyBot.Utilities.Records.AzuraCast;
 
-public sealed record NowPlayingDataRecord
+public sealed record AzuraNowPlayingDataRecord
 {
     [JsonPropertyName("now_playing")]
     public NowPlayingRecord NowPlaying { get; init; } = new();
@@ -38,7 +38,7 @@ public sealed record NowPlayingLiveRecord
     public string Art { get; init; } = string.Empty;
 }
 
-public sealed record NowPlayingRecord : SongDataRecord
+public sealed record NowPlayingRecord : AzuraSongDataRecord
 {
     [JsonPropertyName("elapsed")]
     public int Elapsed { get; init; }

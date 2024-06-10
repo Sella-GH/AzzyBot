@@ -6,9 +6,9 @@ using AzzyBot.Utilities.Records.AzuraCast;
 namespace AzzyBot.Utilities;
 
 [SuppressMessage("Roslynator", "RCS1241:Implement non-generic counterpart", Justification = "Not needed")]
-public sealed class FileComparer : IEqualityComparer<FilesRecord>
+public sealed class FileComparer : IEqualityComparer<AzuraFilesRecord>
 {
-    public bool Equals(FilesRecord? x, FilesRecord? y)
+    public bool Equals(AzuraFilesRecord? x, AzuraFilesRecord? y)
     {
         if (ReferenceEquals(x, y))
             return true;
@@ -19,7 +19,7 @@ public sealed class FileComparer : IEqualityComparer<FilesRecord>
         return x.UniqueId == y.UniqueId && x.SongId == y.SongId;
     }
 
-    public int GetHashCode(FilesRecord? obj)
+    public int GetHashCode(AzuraFilesRecord? obj)
     {
         if (obj is null)
             return 0;

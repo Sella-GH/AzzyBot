@@ -58,12 +58,12 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return JsonSerializer.Deserialize<List<T>>(body) ?? throw new InvalidOperationException($"Could not deserialize body: {body}");
     }
 
-    public async Task<IReadOnlyList<FilesRecord>> GetFilesLocalAsync(int databaseId, int stationId)
+    public async Task<IReadOnlyList<AzuraFilesRecord>> GetFilesLocalAsync(int databaseId, int stationId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
         IReadOnlyList<string> files = FileOperations.GetFilesInDirectory(FilePath);
-        List<FilesRecord> records = [];
+        List<AzuraFilesRecord> records = [];
 
         string file = files.FirstOrDefault(f => f.Contains($"{databaseId}-{stationId}-files.json", StringComparison.OrdinalIgnoreCase)) ?? string.Empty;
         if (string.IsNullOrWhiteSpace(file))
@@ -73,63 +73,63 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         if (string.IsNullOrWhiteSpace(content))
             return records;
 
-        return JsonSerializer.Deserialize<List<FilesRecord>>(content) ?? throw new InvalidOperationException($"Could not deserialize content: {content}");
+        return JsonSerializer.Deserialize<List<AzuraFilesRecord>>(content) ?? throw new InvalidOperationException($"Could not deserialize content: {content}");
     }
 
-    public Task<IReadOnlyList<FilesRecord>> GetFilesOnlineAsync(Uri baseUrl, string apiKey, int stationId)
+    public Task<IReadOnlyList<AzuraFilesRecord>> GetFilesOnlineAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
         string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Files}";
 
-        return FetchFromApiListAsync<FilesRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+        return FetchFromApiListAsync<AzuraFilesRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
-    public Task<HardwareStatsRecord> GetHardwareStatsAsync(Uri baseUrl, string apiKey)
+    public Task<AzuraHardwareStatsRecord> GetHardwareStatsAsync(Uri baseUrl, string apiKey)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
 
         const string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Server}/{ApiEndpoints.Stats}";
 
-        return FetchFromApiAsync<HardwareStatsRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+        return FetchFromApiAsync<AzuraHardwareStatsRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
-    public Task<NowPlayingDataRecord> GetNowPlayingAsync(Uri baseUrl, int stationId)
+    public Task<AzuraNowPlayingDataRecord> GetNowPlayingAsync(Uri baseUrl, int stationId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
         string endpoint = $"{ApiEndpoints.NowPlaying}/{stationId}";
 
-        return FetchFromApiAsync<NowPlayingDataRecord>(baseUrl, endpoint);
+        return FetchFromApiAsync<AzuraNowPlayingDataRecord>(baseUrl, endpoint);
     }
 
-    public Task<PlaylistRecord> GetPlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId)
+    public Task<AzuraPlaylistRecord> GetPlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
         string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Playlist}/{playlistId}";
 
-        return FetchFromApiAsync<PlaylistRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+        return FetchFromApiAsync<AzuraPlaylistRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
-    public Task<IReadOnlyList<PlaylistRecord>> GetPlaylistsAsync(Uri baseUrl, string apiKey, int stationId)
+    public Task<IReadOnlyList<AzuraPlaylistRecord>> GetPlaylistsAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
         string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Playlists}";
 
-        return FetchFromApiListAsync<PlaylistRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+        return FetchFromApiListAsync<AzuraPlaylistRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
-    public Task<UpdateRecord> GetUpdatesAsync(Uri baseUrl, string apiKey)
+    public Task<AzuraUpdateRecord> GetUpdatesAsync(Uri baseUrl, string apiKey)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
 
         string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Updates}";
 
-        return FetchFromApiAsync<UpdateRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+        return FetchFromApiAsync<AzuraUpdateRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 }

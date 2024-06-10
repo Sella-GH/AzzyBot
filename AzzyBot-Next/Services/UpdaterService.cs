@@ -40,14 +40,14 @@ public sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotSer
             return;
         }
 
-        UpdateRecord? updaterRecord;
+        AzzyUpdateRecord? updaterRecord;
         if (isPreview)
         {
-            updaterRecord = JsonSerializer.Deserialize<List<UpdateRecord>>(body)?[0];
+            updaterRecord = JsonSerializer.Deserialize<List<AzzyUpdateRecord>>(body)?[0];
         }
         else
         {
-            updaterRecord = JsonSerializer.Deserialize<UpdateRecord>(body);
+            updaterRecord = JsonSerializer.Deserialize<AzzyUpdateRecord>(body);
         }
 
         if (updaterRecord is null)

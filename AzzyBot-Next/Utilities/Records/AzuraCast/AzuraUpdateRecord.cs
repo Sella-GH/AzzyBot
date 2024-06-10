@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace AzzyBot.Utilities.Records.AzuraCast;
 
-public sealed record UpdateRecord
+public sealed record AzuraUpdateRecord
 {
     [JsonPropertyName("current_release")]
     public required string CurrentRelease { get; init; }

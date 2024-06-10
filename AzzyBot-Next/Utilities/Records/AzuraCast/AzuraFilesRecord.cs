@@ -2,7 +2,7 @@
 
 namespace AzzyBot.Utilities.Records.AzuraCast;
 
-public sealed record FilesRecord
+public sealed record AzuraFilesRecord
 {
     [JsonPropertyName("unique_id")]
     public required string UniqueId { get; init; }
