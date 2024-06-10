@@ -1,11 +1,15 @@
 ## 2.0.0-preview2
 ### Breaking Changes
-- Your Database needs a complete reset, please DROP it and start from scratch.
+- Your Database needs a complete reset, please DROP it and start from scratch
+  - You'll likely experience this a few more times until the final release
+  - No, I won't provide migration scripts for preview versions unless I'm fully confident that the database structure is somewhat final
 
 ### General
+- Greatly reworked the way how background checks, features and other stuff is handled
 - The integrated updater is now able to identify preview versions
-- The `AzuraCast` module is finally added!
-  - Now you can finally use the bot again and work with it
+- Unified the config command names of the AzuraCast stuff
+  - Yes, this means that the command names have changed
+  - Also the whole background check configuration shifted from one database table to others
 
 ### Additions
 - New commands:
@@ -13,6 +17,9 @@
   - `music nowplaying` - Shows the currently played stuff from the choosen station
 - AzuraCast Admin Api Key added
   - This is a required field if you want to set up AzuraCast in the bot. Ensure it has the view admin info permission inside AzuraCast
+- The `AzuraCast` module is finally added!
+  - Now you can use the bot again and work with it like before (just in better)
+  - Implemented new commands, new background checks and a lot of API stuff
 
 ### Improvements
 - AzuraCast Station Api Key is now optional
