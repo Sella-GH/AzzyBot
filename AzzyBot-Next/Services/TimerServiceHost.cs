@@ -65,7 +65,7 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBackg
                 await _updaterService.CheckForAzzyUpdatesAsync();
             }
 
-            if (now - _lastAzuraCastFileCheck >= TimeSpan.FromHours(1))
+            if (now - _lastAzuraCastFileCheck >= TimeSpan.FromHours(0.98))
             {
                 _logger.GlobalTimerCheckForAzuraCastFiles();
                 _lastAzuraCastFileCheck = now;
@@ -73,7 +73,7 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBackg
                 await _azuraCastBackgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges);
             }
 
-            if (now - _lastAzuraCastUpdateCheck >= TimeSpan.FromHours(12))
+            if (now - _lastAzuraCastUpdateCheck >= TimeSpan.FromHours(11.98))
             {
                 _logger.GlobalTimerCheckForAzuraCastUpdates();
                 _lastAzuraCastUpdateCheck = now;
