@@ -3,5 +3,6 @@
 public enum AzuraCastChecks
 {
     CheckForFileChanges,
+    CheckForOnlineStatus,
     CheckForUpdates
 }

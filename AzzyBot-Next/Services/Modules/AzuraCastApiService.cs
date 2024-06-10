@@ -123,4 +123,13 @@ public sealed class AzuraCastApiService(WebRequestService webService)
 
         return FetchFromApiListAsync<PlaylistRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
+
+    public Task<UpdateRecord> GetUpdatesAsync(Uri baseUrl, string apiKey)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+
+        string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Updates}";
+
+        return FetchFromApiAsync<UpdateRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+    }
 }
