@@ -89,7 +89,7 @@ public sealed class AzuraCastCommands
                 playlistName = playlist.Where(p => p.Name == nowPlaying.NowPlaying.Playlist).Select(p => p.Name).FirstOrDefault();
             }
 
-            DiscordEmbed embed = EmbedBuilder.BuildMusicNowPlayingEmbed(nowPlaying, playlistName);
+            DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicNowPlayingEmbed(nowPlaying, playlistName);
 
             await context.EditResponseAsync(embed);
         }

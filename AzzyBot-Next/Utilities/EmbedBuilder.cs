@@ -14,6 +14,10 @@ namespace AzzyBot.Utilities;
 
 public static class EmbedBuilder
 {
+    private static readonly Uri AzuraCastPic = new("https://raw.githubusercontent.com/AzuraCast/AzuraCast/main/resources/icon.png");
+    private static readonly Uri AzuraCastRollingUrl = new("https://github.com/AzuraCast/AzuraCast/commits/main");
+    private static readonly Uri AzuraCastStableUrl = new("https://github.com/AzuraCast/AzuraCast/blob/main/CHANGELOG.md");
+
     private static DiscordEmbedBuilder CreateBasicEmbed(string title, string? description = null, DiscordColor? color = null, Uri? thumbnailUrl = null, string? footerText = null, Uri? url = null, Dictionary<string, AzzyDiscordEmbedRecord>? fields = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title, nameof(title));
@@ -90,7 +94,6 @@ public static class EmbedBuilder
         ArgumentNullException.ThrowIfNull(stats, nameof(stats));
 
         const string title = "AzuraCast Hardware Stats";
-        Uri azuraUrl = new("https://raw.githubusercontent.com/AzuraCast/AzuraCast/main/resources/icon.png");
         StringBuilder cpuUsage = new();
         StringBuilder cpuLoads = new();
         StringBuilder memoryUsage = new();
@@ -131,7 +134,90 @@ public static class EmbedBuilder
             networkUsage.Clear();
         }
 
-        return CreateBasicEmbed(title, null, DiscordColor.Orange, azuraUrl, null, null, fields);
+        return CreateBasicEmbed(title, null, DiscordColor.Orange, AzuraCastPic, null, null, fields);
+    }
+
+    public static DiscordEmbed BuildAzuraCastMusicNowPlayingEmbed(AzuraNowPlayingDataRecord data, string? playlistName = null)
+    {
+        ArgumentNullException.ThrowIfNull(data, nameof(data));
+
+        const string title = "Now Playing";
+        string? message = null;
+        string thumbnailUrl = (!string.IsNullOrWhiteSpace(data.Live.Art)) ? data.Live.Art : data.NowPlaying.Song.Art;
+
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
+        {
+            ["Song"] = new(data.NowPlaying.Song.Title, true),
+            ["By"] = new(data.NowPlaying.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true)
+        };
+
+        if (!string.IsNullOrWhiteSpace(data.NowPlaying.Song.Album))
+            fields.Add("On", new(data.NowPlaying.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true));
+
+        if (data.Live.IsLive)
+        {
+            message = $"Currently served *live* by the one and only **{data.Live.StreamerName}**";
+            fields.Add("Streaming live since", new($"<t:{Converter.ConvertFromUnixTime(Convert.ToInt64(data.Live.BroadcastStart, CultureInfo.InvariantCulture))}>"));
+        }
+        else
+        {
+            TimeSpan duration = TimeSpan.FromSeconds(data.NowPlaying.Duration);
+            TimeSpan elapsed = TimeSpan.FromSeconds(data.NowPlaying.Elapsed);
+
+            string songDuration = duration.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
+            string songElapsed = elapsed.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
+            string progressBar = AzuraCastMisc.GetProgressBar(14, elapsed.TotalSeconds, duration.TotalSeconds);
+
+            fields.Add("Duration", new($"{progressBar} `[{songElapsed} / {songDuration}]`"));
+
+            if (!string.IsNullOrWhiteSpace(playlistName))
+                fields.Add("Playlist", new(playlistName));
+        }
+
+        return CreateBasicEmbed(title, message, DiscordColor.Aquamarine, new(thumbnailUrl), null, null, fields);
+    }
+
+    public static DiscordEmbed BuildAzuraCastUpdatesAvailableEmbed(AzuraUpdateRecord update)
+    {
+        ArgumentNullException.ThrowIfNull(update, nameof(update));
+
+        const string title = "AzuraCast Updates Available";
+        string description = $"Your AzuraCast installation needs {update.RollingUpdatesList.Count} updates.";
+        if (update.RollingUpdatesList.Count == 1)
+            description = "Your AzuraCast installation needs 1 update.";
+
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
+        {
+            ["Current Version"] = new(update.CurrentRelease)
+        };
+
+        if ((update.CurrentRelease != update.LatestRelease) && update.NeedsReleaseUpdate)
+            fields.Add("Latest Release", new(update.LatestRelease));
+
+        if (update.CanSwitchToStable)
+            fields.Add("Stable Switch Available?", new("Yes"));
+
+        return CreateBasicEmbed(title, description, DiscordColor.White, AzuraCastPic, null, null, fields);
+    }
+
+    public static DiscordEmbed BuildAzuraCastUpdatesAvailableEmbed(IReadOnlyList<string> changelog, bool isRolling)
+    {
+        ArgumentNullException.ThrowIfNull(changelog, nameof(changelog));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(changelog.Count, nameof(changelog));
+
+        const string title = "AzuraCast Updates Changelog";
+
+        IEnumerable<string> revChangelog = changelog.Reverse();
+        StringBuilder body = new();
+        foreach (string line in revChangelog)
+        {
+            body.AppendLine(line);
+        }
+
+        if (title.Length + body.Length > 6000)
+            body = new($"The changelog is too big to display it in an Embed, you can view it [here]({((isRolling) ? AzuraCastRollingUrl : AzuraCastStableUrl)})");
+
+        return CreateBasicEmbed(title, body.ToString(), DiscordColor.White, AzuraCastPic);
     }
 
     public static async Task<DiscordEmbed> BuildAzzyHardwareStatsEmbedAsync(Uri avaUrl)
@@ -405,45 +491,5 @@ public static class EmbedBuilder
         }
 
         return embeds;
-    }
-
-    public static DiscordEmbed BuildMusicNowPlayingEmbed(AzuraNowPlayingDataRecord data, string? playlistName = null)
-    {
-        ArgumentNullException.ThrowIfNull(data, nameof(data));
-
-        const string title = "Now Playing";
-        string? message = null;
-        string thumbnailUrl = (!string.IsNullOrWhiteSpace(data.Live.Art)) ? data.Live.Art : data.NowPlaying.Song.Art;
-
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
-        {
-            ["Song"] = new(data.NowPlaying.Song.Title, true),
-            ["By"] = new(data.NowPlaying.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true)
-        };
-
-        if (!string.IsNullOrWhiteSpace(data.NowPlaying.Song.Album))
-            fields.Add("On", new(data.NowPlaying.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true));
-
-        if (data.Live.IsLive)
-        {
-            message = $"Currently served *live* by the one and only **{data.Live.StreamerName}**";
-            fields.Add("Streaming live since", new($"<t:{Converter.ConvertFromUnixTime(Convert.ToInt64(data.Live.BroadcastStart, CultureInfo.InvariantCulture))}>"));
-        }
-        else
-        {
-            TimeSpan duration = TimeSpan.FromSeconds(data.NowPlaying.Duration);
-            TimeSpan elapsed = TimeSpan.FromSeconds(data.NowPlaying.Elapsed);
-
-            string songDuration = duration.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
-            string songElapsed = elapsed.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
-            string progressBar = AzuraCastMisc.GetProgressBar(14, elapsed.TotalSeconds, duration.TotalSeconds);
-
-            fields.Add("Duration", new($"{progressBar} `[{songElapsed} / {songDuration}]`"));
-
-            if (!string.IsNullOrWhiteSpace(playlistName))
-                fields.Add("Playlist", new(playlistName));
-        }
-
-        return CreateBasicEmbed(title, message, DiscordColor.Aquamarine, new(thumbnailUrl), null, null, fields);
     }
 }
