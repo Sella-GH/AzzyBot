@@ -11,17 +11,18 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, Modules.AzzyBackgroundService azuraCastBackgroundService, DiscordBotService discordBotService, UpdaterService updaterService) : IAsyncDisposable, IHostedService
+public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBackgroundService azuraCastBackgroundService, DiscordBotService discordBotService, UpdaterService updaterService) : IAsyncDisposable, IHostedService
 {
     private readonly ILogger<TimerServiceHost> _logger = logger;
-    private readonly Modules.AzzyBackgroundService _azuraCastBackgroundService = azuraCastBackgroundService;
+    private readonly AzzyBackgroundService _azuraCastBackgroundService = azuraCastBackgroundService;
     private readonly DiscordBotService _discordBotService = discordBotService;
     private readonly UpdaterService _updaterService = updaterService;
     private readonly bool _isDev = AzzyStatsSoftware.GetBotEnvironment == Environments.Development;
     private readonly Task _completedTask = Task.CompletedTask;
     private Timer? _timer;
     private DateTime _lastAzuraCastFileCheck = DateTime.MinValue;
-    private DateTime _lastBotUpdateCheck = DateTime.MinValue;
+    private DateTime _lastAzuraCastUpdateCheck = DateTime.MinValue;
+    private DateTime _lastAzzyBotUpdateCheck = DateTime.MinValue;
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
@@ -56,10 +57,10 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, Modules.A
         {
             DateTime now = DateTime.Now;
 
-            if (!_isDev && now - _lastBotUpdateCheck >= TimeSpan.FromHours(5.98))
+            if (!_isDev && now - _lastAzzyBotUpdateCheck >= TimeSpan.FromHours(5.98))
             {
                 _logger.GlobalTimerCheckForUpdates();
-                _lastBotUpdateCheck = now;
+                _lastAzzyBotUpdateCheck = now;
 
                 await _updaterService.CheckForAzzyUpdatesAsync();
             }
@@ -70,6 +71,14 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, Modules.A
                 _lastAzuraCastFileCheck = now;
 
                 await _azuraCastBackgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges);
+            }
+
+            if (now - _lastAzuraCastUpdateCheck >= TimeSpan.FromHours(12))
+            {
+                _logger.GlobalTimerCheckForAzuraCastUpdates();
+                _lastAzuraCastUpdateCheck = now;
+
+                await _azuraCastBackgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates);
             }
         }
         catch (Exception ex)

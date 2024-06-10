@@ -8,19 +8,22 @@ using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
 using AzzyBot.Services.Interfaces;
+using AzzyBot.Services.Modules;
 using AzzyBot.Settings;
 using AzzyBot.Utilities;
 using AzzyBot.Utilities.Encryption;
 using AzzyBot.Utilities.Records;
+using AzzyBot.Utilities.Records.AzuraCast;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-public sealed class UpdaterService(ILogger<UpdaterService> logger, IQueuedBackgroundTask taskQueue, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotService botService, WebRequestService webService)
+public sealed class UpdaterService(ILogger<UpdaterService> logger, IQueuedBackgroundTask taskQueue, AzuraCastApiService azuraCastApiService, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotService botService, WebRequestService webService)
 {
     private readonly ILogger<UpdaterService> _logger = logger;
     private readonly IQueuedBackgroundTask _taskQueue = taskQueue;
+    private readonly AzuraCastApiService _azuraCastApiService = azuraCastApiService;
     private readonly AzzyBotSettingsRecord _settings = settings;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
@@ -50,7 +53,16 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IQueuedBackgr
         {
             string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
 
+            AzuraUpdateRecord update = await _azuraCastApiService.GetUpdatesAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), apiKey);
 
+            if (!update.NeedsReleaseUpdate && !update.NeedsRollingUpdate)
+                return;
+
+            List<DiscordEmbed> embeds = [EmbedBuilder.BuildAzuraCastUpdatesAvailableEmbed(update)];
+            if (_settings.Updater.DisplayChangelog)
+                embeds.Add(EmbedBuilder.BuildAzuraCastUpdatesChangelogEmbed(update.RollingUpdatesList, update.NeedsRollingUpdate));
+
+            await _botService.SendMessageAsync(azuraCast.NotificationChannelId, null, embeds);
         }
         catch (OperationCanceledException)
         {

@@ -20,6 +20,9 @@ public static partial class LoggerActions
     [LoggerMessage(3, LogLevel.Debug, "Global timer checking for AzuraCast files changes")]
     public static partial void GlobalTimerCheckForAzuraCastFiles(this ILogger<TimerServiceHost> logger);
 
+    [LoggerMessage(4, LogLevel.Debug, "Global timer checking for AzuraCast updates")]
+    public static partial void GlobalTimerCheckForAzuraCastUpdates(this ILogger<TimerServiceHost> logger);
+
     [LoggerMessage(10, LogLevel.Debug, "BackgroundServiceHost started")]
     public static partial void BackgroundServiceHostStart(this ILogger<AzzyBackgroundServiceHost> logger);
 

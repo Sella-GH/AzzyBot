@@ -7,10 +7,11 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services.Modules;
 
-public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLifetime, ILogger<AzzyBackgroundService> logger, AzuraCastFileService azuraCastFileService)
+public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLifetime, ILogger<AzzyBackgroundService> logger, AzuraCastFileService azuraCastFileService, UpdaterService updaterService)
 {
     private readonly ILogger<AzzyBackgroundService> _logger = logger;
     private readonly AzuraCastFileService _azuraCastFileService = azuraCastFileService;
+    private readonly UpdaterService _updaterService = updaterService;
     private readonly CancellationToken _cancellationToken = applicationLifetime.ApplicationStopping;
 
     public async Task StartAzuraCastBackgroundServiceAsync(AzuraCastChecks checks)
@@ -30,6 +31,7 @@ public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLi
                 break;
 
             case AzuraCastChecks.CheckForUpdates:
+                await _updaterService.QueueAzuraCastUpdatesAsync();
                 break;
         }
     }

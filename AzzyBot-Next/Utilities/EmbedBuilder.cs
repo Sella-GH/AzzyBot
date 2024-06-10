@@ -200,7 +200,7 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.White, AzuraCastPic, null, null, fields);
     }
 
-    public static DiscordEmbed BuildAzuraCastUpdatesAvailableEmbed(IReadOnlyList<string> changelog, bool isRolling)
+    public static DiscordEmbed BuildAzuraCastUpdatesChangelogEmbed(IReadOnlyList<string> changelog, bool isRolling)
     {
         ArgumentNullException.ThrowIfNull(changelog, nameof(changelog));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(changelog.Count, nameof(changelog));
