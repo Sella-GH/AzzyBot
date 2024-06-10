@@ -27,6 +27,7 @@
 
 ## Fixes
 - Guild Database Entity was not updated when AzuraCast was activated or disabled
+- Some autocomplete exceptions
 
 ## 2.0.0-preview1.1
 ### General

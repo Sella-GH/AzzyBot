@@ -25,9 +25,18 @@ public sealed class AzuraCastMountAutocomplete(DbActions dbActions) : IAutoCompl
         if (stationId == 0)
             return new Dictionary<string, object>();
 
-        List<AzuraCastStationMountEntity> mountsInDb = await _dbActions.GetAzuraCastStationMountsAsync(context.Guild.Id, stationId);
-
+        // TODO Solve this more clean and nicer when it's possible
         Dictionary<string, object> results = [];
+        List<AzuraCastStationMountEntity> mountsInDb;
+        try
+        {
+            mountsInDb = await _dbActions.GetAzuraCastStationMountsAsync(context.Guild.Id, stationId);
+        }
+        catch (InvalidOperationException)
+        {
+            return results;
+        }
+
         foreach (AzuraCastStationMountEntity mount in mountsInDb)
         {
             results.Add(Crypto.Decrypt(mount.Name), mount.Id);
