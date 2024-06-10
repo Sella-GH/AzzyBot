@@ -12,43 +12,34 @@ using AzzyBot.Logging;
 using AzzyBot.Services.Interfaces;
 using AzzyBot.Utilities;
 using AzzyBot.Utilities.Encryption;
-using AzzyBot.Utilities.Enums;
 using AzzyBot.Utilities.Records.AzuraCast;
 using DSharpPlus.Entities;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services.Modules;
 
-public sealed class AzuraCastFileService(IHostApplicationLifetime applicationLifetime, ILogger<AzuraCastFileService> logger, IQueuedBackgroundTask taskQueue, AzuraCastApiService azuraCast, DbActions dbActions, DiscordBotService discordBotService)
+public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, IQueuedBackgroundTask taskQueue, AzuraCastApiService azuraCast, DbActions dbActions, DiscordBotService discordBotService)
 {
     private readonly ILogger<AzuraCastFileService> _logger = logger;
     private readonly IQueuedBackgroundTask _taskQueue = taskQueue;
     private readonly AzuraCastApiService _azuraCast = azuraCast;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = discordBotService;
-    private readonly CancellationToken _cancellationToken = applicationLifetime.ApplicationStopping;
     private readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true };
 
-    public void StartAzuraCastFileService(AzuraCastChecks check)
+    public async ValueTask QueueFileChangesChecksAsync()
     {
-        _logger.AzuraCastFileServiceStart();
-
-        if (_cancellationToken.IsCancellationRequested)
-            return;
-
-        switch (check)
+        List<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
+        foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast is not null).Select(g => g.AzuraCast!))
         {
-            case AzuraCastChecks.CheckForUpdates:
-                break;
-
-            case AzuraCastChecks.CheckForFileChanges:
-                Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(CheckForFileChangesAsync));
-                break;
+            foreach (AzuraCastStationEntity station in azuraCast.Stations.Where(s => s.Checks.FileChanges))
+            {
+                _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForFileChangesAsync(station, ct)));
+            }
         }
     }
 
-    private async ValueTask CheckForFileChangesAsync(CancellationToken cancellationToken)
+    private async ValueTask CheckForFileChangesAsync(AzuraCastStationEntity station, CancellationToken cancellationToken)
     {
         _logger.AzuraCastFileServiceWorkItem();
 
@@ -59,19 +50,12 @@ public sealed class AzuraCastFileService(IHostApplicationLifetime applicationLif
 
         try
         {
-            List<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
-            foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast is not null).Select(g => g.AzuraCast!))
-            {
-                foreach (AzuraCastStationEntity station in azuraCast.Stations.Where(s => s.Checks.FileChanges))
-                {
-                    string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? azuraCast.AdminApiKey : station.ApiKey;
+            string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? station.AzuraCast.AdminApiKey : station.ApiKey;
 
-                    IReadOnlyList<FilesRecord> onlineFiles = await _azuraCast.GetFilesOnlineAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), Crypto.Decrypt(apiKey), station.StationId);
-                    IReadOnlyList<FilesRecord> localFiles = await _azuraCast.GetFilesLocalAsync(station.Id, station.StationId);
+            IReadOnlyList<FilesRecord> onlineFiles = await _azuraCast.GetFilesOnlineAsync(new(Crypto.Decrypt(station.AzuraCast.BaseUrl)), Crypto.Decrypt(apiKey), station.StationId);
+            IReadOnlyList<FilesRecord> localFiles = await _azuraCast.GetFilesLocalAsync(station.Id, station.StationId);
 
-                    await CheckIfFilesWereModifiedAsync(onlineFiles, localFiles, station.Id, station.StationId, Crypto.Decrypt(station.Name), azuraCast.NotificationChannelId);
-                }
-            }
+            await CheckIfFilesWereModifiedAsync(onlineFiles, localFiles, station.Id, station.StationId, Crypto.Decrypt(station.Name), station.AzuraCast.NotificationChannelId);
         }
         catch (OperationCanceledException)
         {

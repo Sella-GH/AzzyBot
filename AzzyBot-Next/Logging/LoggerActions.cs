@@ -23,13 +23,13 @@ public static partial class LoggerActions
     [LoggerMessage(10, LogLevel.Debug, "AzuraCastFileServiceHost started")]
     public static partial void AzuraCastFileServiceHostStart(this ILogger<AzuraCastFileServiceHost> logger);
 
-    [LoggerMessage(11, LogLevel.Debug, "AzuraCastFileService started")]
-    public static partial void AzuraCastFileServiceStart(this ILogger<AzuraCastFileService> logger);
+    [LoggerMessage(11, LogLevel.Debug, "AzuraCastBackgroundService started")]
+    public static partial void AzuraCastBackgroundServiceStart(this ILogger<AzuraCastBackgroundService> logger);
 
     [LoggerMessage(12, LogLevel.Debug, "AzuraCastFileServiceHost running")]
     public static partial void AzuraCastFileServiceHostRun(this ILogger<AzuraCastFileServiceHost> logger);
 
-    [LoggerMessage(13, LogLevel.Debug, "Creating work item for AzuraCastFileService")]
+    [LoggerMessage(13, LogLevel.Debug, "Creating work items...")]
     public static partial void AzuraCastFileServiceWorkItem(this ILogger<AzuraCastFileService> logger);
 
     [LoggerMessage(90, LogLevel.Debug, "Stopping global timer")]
