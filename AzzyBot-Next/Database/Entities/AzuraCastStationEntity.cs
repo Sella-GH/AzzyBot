@@ -11,8 +11,8 @@ public sealed class AzuraCastStationEntity
     public int StationId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string ApiKey { get; set; } = string.Empty;
-    public AzuraCastChecksEntity Checks { get; set; } = new();
-    public ICollection<AzuraCastMountEntity> Mounts { get; } = new List<AzuraCastMountEntity>();
+    public AzuraCastStationChecksEntity Checks { get; set; } = new();
+    public ICollection<AzuraCastStationMountEntity> Mounts { get; } = new List<AzuraCastStationMountEntity>();
     public ulong RequestsChannelId { get; set; }
     public bool PreferHls { get; set; }
     public bool ShowPlaylistInNowPlaying { get; set; }

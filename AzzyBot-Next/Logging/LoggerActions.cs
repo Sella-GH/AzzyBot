@@ -30,7 +30,7 @@ public static partial class LoggerActions
     public static partial void BackgroundServiceHostRun(this ILogger<AzzyBackgroundServiceHost> logger);
 
     [LoggerMessage(13, LogLevel.Debug, "Creating work items...")]
-    public static partial void AzuraCastFileServiceWorkItem(this ILogger<AzuraCastFileService> logger);
+    public static partial void BackgroundServiceWorkItem(this ILogger logger);
 
     [LoggerMessage(90, LogLevel.Debug, "Stopping global timer")]
     public static partial void GlobalTimerStop(this ILogger<TimerServiceHost> logger);

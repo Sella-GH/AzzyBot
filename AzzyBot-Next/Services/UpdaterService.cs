@@ -1,20 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
+using AzzyBot.Database;
+using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
+using AzzyBot.Services.Interfaces;
 using AzzyBot.Settings;
 using AzzyBot.Utilities;
+using AzzyBot.Utilities.Encryption;
 using AzzyBot.Utilities.Records;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-public sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotService botService, WebRequestService webService, ILogger<UpdaterService> logger)
+public sealed class UpdaterService(ILogger<UpdaterService> logger, IQueuedBackgroundTask taskQueue, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotService botService, WebRequestService webService)
 {
     private readonly ILogger<UpdaterService> _logger = logger;
+    private readonly IQueuedBackgroundTask _taskQueue = taskQueue;
     private readonly AzzyBotSettingsRecord _settings = settings;
+    private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
     private readonly WebRequestService _webService = webService;
     private DateTime _lastAzzyUpdateNotificationTime = DateTime.MinValue;
@@ -22,6 +30,33 @@ public sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotSer
     private int _azzyNotifyCounter;
     private readonly Uri _latestUrl = new("https://api.github.com/repos/Sella-GH/AzzyBot/releases/latest");
     private readonly Uri _previewUrl = new("https://api.github.com/repos/Sella-GH/AzzyBot/releases");
+
+    public async ValueTask QueueAzuraCastUpdatesAsync()
+    {
+        List<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
+        foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.Checks.Updates == true).Select(g => g.AzuraCast!))
+        {
+            _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForAzuraCastUpdatesAsync(azuraCast, ct)));
+        }
+    }
+
+    private async ValueTask CheckForAzuraCastUpdatesAsync(AzuraCastEntity azuraCast, CancellationToken cancellationToken)
+    {
+        _logger.BackgroundServiceWorkItem();
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        try
+        {
+            string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
+
+
+        }
+        catch (OperationCanceledException)
+        {
+            _logger.OperationCanceled(nameof(CheckForAzuraCastUpdatesAsync));
+        }
+    }
 
     public async Task CheckForAzzyUpdatesAsync()
     {
@@ -74,7 +109,7 @@ public sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotSer
             _azzyNotifyCounter = 0;
         }
 
-        if (!ChecKUpdateNotification(_azzyNotifyCounter, _lastAzzyUpdateNotificationTime))
+        if (!CheckUpdateNotification(_azzyNotifyCounter, _lastAzzyUpdateNotificationTime))
             return;
 
         _lastAzzyUpdateNotificationTime = DateTime.Now;
@@ -108,7 +143,7 @@ public sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotSer
         await _botService.SendMessageAsync(channelId, null, embeds);
     }
 
-    private static bool ChecKUpdateNotification(int notifyCounter, in DateTime lastNotificationTime)
+    private static bool CheckUpdateNotification(int notifyCounter, in DateTime lastNotificationTime)
     {
         DateTime now = DateTime.Now;
         bool dayNotification = false;

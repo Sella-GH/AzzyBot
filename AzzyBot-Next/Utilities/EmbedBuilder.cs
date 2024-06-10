@@ -467,6 +467,8 @@ public static class EmbedBuilder
             ["Base Url"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.BaseUrl)) ? Crypto.Decrypt(azuraCast.BaseUrl) : "Not set")}||"),
             ["Admin Api Key"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.AdminApiKey)) ? Crypto.Decrypt(azuraCast.AdminApiKey) : "Not set")}||"),
             ["Notification Channel"] = new((azuraCast.NotificationChannelId > 0) ? $"<#{azuraCast.NotificationChannelId}>" : "Not set"),
+            ["Updates"] = new(azuraCast.Checks.Updates.ToString()),
+            ["Updates Show Changelog"] = new(azuraCast.Checks.UpdatesShowChangelog.ToString()),
             ["Outages Channel"] = new((azuraCast.OutagesChannelId > 0) ? $"<#{azuraCast.OutagesChannelId}>" : "Not set")
         };
 
@@ -483,7 +485,7 @@ public static class EmbedBuilder
                 ["Music Requests Channel"] = new((station.RequestsChannelId > 0) ? $"<#{station.RequestsChannelId}>" : "Not set"),
                 ["Prefer HLS Streaming"] = new(station.PreferHls.ToString()),
                 ["Show Playlist In Now Playing"] = new(station.ShowPlaylistInNowPlaying.ToString()),
-                ["Automatic Checks"] = new($"- File Changes: {station.Checks.FileChanges}\n- Server Status: {station.Checks.ServerStatus}\n- Updates: {station.Checks.Updates}\n- Updates Changelog: {station.Checks.UpdatesShowChangelog}"),
+                ["Automatic Checks"] = new($"- File Changes: {station.Checks.FileChanges}\n- Server Status: {station.Checks.ServerStatus}"),
                 ["Mount Points"] = new((station.Mounts.Count > 0) ? string.Join('\n', station.Mounts.Select(x => $"- {Crypto.Decrypt(x.Name)}: {Crypto.Decrypt(x.Mount)}")) : "No Mount Points added")
             };
 

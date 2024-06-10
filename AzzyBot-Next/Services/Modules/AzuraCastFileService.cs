@@ -41,7 +41,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
 
     private async ValueTask CheckForFileChangesAsync(AzuraCastStationEntity station, CancellationToken cancellationToken)
     {
-        _logger.AzuraCastFileServiceWorkItem();
+        _logger.BackgroundServiceWorkItem();
 
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -61,8 +61,6 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
         {
             _logger.OperationCanceled(nameof(CheckForFileChangesAsync));
         }
-
-        return;
     }
 
     private async ValueTask CheckIfFilesWereModifiedAsync(IReadOnlyList<AzuraFilesRecord> onlineFiles, IReadOnlyList<AzuraFilesRecord> localFiles, int stationDbId, int stationId, string stationName, ulong channelId)

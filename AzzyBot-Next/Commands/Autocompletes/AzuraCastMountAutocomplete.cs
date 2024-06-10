@@ -25,10 +25,10 @@ public sealed class AzuraCastMountAutocomplete(DbActions dbActions) : IAutoCompl
         if (stationId == 0)
             return new Dictionary<string, object>();
 
-        List<AzuraCastMountEntity> mountsInDb = await _dbActions.GetAzuraCastMountsAsync(context.Guild.Id, stationId);
+        List<AzuraCastStationMountEntity> mountsInDb = await _dbActions.GetAzuraCastStationMountsAsync(context.Guild.Id, stationId);
 
         Dictionary<string, object> results = [];
-        foreach (AzuraCastMountEntity mount in mountsInDb)
+        foreach (AzuraCastStationMountEntity mount in mountsInDb)
         {
             results.Add(Crypto.Decrypt(mount.Name), mount.Id);
         }

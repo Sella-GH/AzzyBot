@@ -58,6 +58,29 @@ namespace AzzyBot.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "AzuraCastChecks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    ServerStatus = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    Updates = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    UpdatesShowChangelog = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    AzuraCastId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AzuraCastChecks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AzuraCastChecks_AzuraCast_AzuraCastId",
+                        column: x => x.AzuraCastId,
+                        principalTable: "AzuraCast",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "AzuraCastStations",
                 columns: table => new
                 {
@@ -80,30 +103,6 @@ namespace AzzyBot.Migrations
                         name: "FK_AzuraCastStations_AzuraCast_AzuraCastId",
                         column: x => x.AzuraCastId,
                         principalTable: "AzuraCast",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "AzuraCastChecks",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    FileChanges = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    ServerStatus = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    Updates = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    UpdatesShowChangelog = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    StationId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AzuraCastChecks", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AzuraCastChecks_AzuraCastStations_StationId",
-                        column: x => x.StationId,
-                        principalTable: "AzuraCastStations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -133,6 +132,28 @@ namespace AzzyBot.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "AzuraCastStationChecks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    FileChanges = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    ServerStatus = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    StationId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AzuraCastStationChecks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AzuraCastStationChecks_AzuraCastStations_StationId",
+                        column: x => x.StationId,
+                        principalTable: "AzuraCastStations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
             migrationBuilder.CreateIndex(
                 name: "IX_AzuraCast_GuildId",
                 table: "AzuraCast",
@@ -140,15 +161,21 @@ namespace AzzyBot.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_AzuraCastChecks_StationId",
+                name: "IX_AzuraCastChecks_AzuraCastId",
                 table: "AzuraCastChecks",
-                column: "StationId",
+                column: "AzuraCastId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AzuraCastMounts_StationId",
                 table: "AzuraCastMounts",
                 column: "StationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AzuraCastStationChecks_StationId",
+                table: "AzuraCastStationChecks",
+                column: "StationId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AzuraCastStations_AzuraCastId",
@@ -164,6 +191,9 @@ namespace AzzyBot.Migrations
 
             migrationBuilder.DropTable(
                 name: "AzuraCastMounts");
+
+            migrationBuilder.DropTable(
+                name: "AzuraCastStationChecks");
 
             migrationBuilder.DropTable(
                 name: "AzuraCastStations");
