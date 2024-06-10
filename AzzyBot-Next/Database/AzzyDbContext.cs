@@ -19,7 +19,7 @@ public sealed class AzzyDbContext : DbContext
     public DbSet<AzuraCastChecksEntity> AzuraCastChecks { get; set; }
     public DbSet<AzuraCastStationEntity> AzuraCastStations { get; set; }
     public DbSet<AzuraCastStationChecksEntity> AzuraCastStationChecks { get; set; }
-    public DbSet<AzuraCastStationMountEntity> AzuraCastMounts { get; set; }
+    public DbSet<AzuraCastStationMountEntity> AzuraCastStationMounts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

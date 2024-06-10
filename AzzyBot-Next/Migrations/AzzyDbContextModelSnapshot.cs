@@ -169,7 +169,7 @@ namespace AzzyBot.Migrations
 
                     b.HasIndex("StationId");
 
-                    b.ToTable("AzuraCastMounts");
+                    b.ToTable("AzuraCastStationMounts");
                 });
 
             modelBuilder.Entity("AzzyBot.Database.Entities.GuildsEntity", b =>

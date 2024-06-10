@@ -71,27 +71,6 @@ public sealed class ConfigCommands
             await context.FollowupAsync("Your AzuraCast installation was added successfully and your data has been encrypted.");
         }
 
-        [Command("add-azuracast-mount"), Description("Let's you add an AzuraCast mount point for streaming.")]
-        public async ValueTask AddAzuraCastMountAsync
-            (
-            CommandContext context,
-            [Description("Choose the station you want to add the mount."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
-            [Description("Enter the mount point name.")] string mountName,
-            [Description("Enter the mount point stub.")] string mount
-            )
-        {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-
-            _logger.CommandRequested(nameof(AddAzuraCastMountAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
-
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.AddAzuraCastStationMountPointAsync(guildId, station, mountName, mount);
-
-            await context.EditResponseAsync("Your mount point was added successfully.");
-        }
-
         [Command("add-azuracast-station"), Description("Let's you dd an AzuraCast station to manage.")]
         public async ValueTask AddAzuraCastStationAsync
             (
@@ -124,6 +103,27 @@ public sealed class ConfigCommands
             await context.FollowupAsync("Your station was added successfully. Your station name and api key have been encrypted. Your request was also deleted for security reasons.");
         }
 
+        [Command("add-azuracast-station-mount"), Description("Let's you add an AzuraCast mount point for streaming.")]
+        public async ValueTask AddAzuraCastStationMountAsync
+            (
+            CommandContext context,
+            [Description("Choose the station you want to add the mount."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("Enter the mount point name.")] string mountName,
+            [Description("Enter the mount point stub.")] string mount
+            )
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+            _logger.CommandRequested(nameof(AddAzuraCastStationMountAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
+            await _db.AddAzuraCastStationMountPointAsync(guildId, station, mountName, mount);
+
+            await context.EditResponseAsync("Your mount point was added successfully.");
+        }
+
         [Command("delete-azuracast"), Description("Delete the existing AzuraCast setup.")]
         public async ValueTask DeleteAzuraCastAsync(CommandContext context)
         {
@@ -137,26 +137,6 @@ public sealed class ConfigCommands
             await _db.DeleteAzuraCastAsync(guildId);
 
             await context.EditResponseAsync("Your AzuraCast setup was deleted successfully.");
-        }
-
-        [Command("delete-azuracast-mount"), Description("Delete an existing AzuraCast mount from a station.")]
-        public async ValueTask DeleteAzuraCastMountAsync
-            (
-            CommandContext context,
-            [Description("Select the station of the mount point."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
-            [Description("Select the mount point you want to delete."), SlashAutoCompleteProvider<AzuraCastMountAutocomplete>] int mountId
-            )
-        {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-
-            _logger.CommandRequested(nameof(DeleteAzuraCastMountAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
-
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.DeleteAzuraCastMountAsync(guildId, station, mountId);
-
-            await context.EditResponseAsync("Your mount point was deleted successfully.");
         }
 
         [Command("delete-azuracast-station"), Description("Delete an existing station.")]
@@ -176,6 +156,26 @@ public sealed class ConfigCommands
             await _db.DeleteAzuraCastStationAsync(guildId, station);
 
             await context.EditResponseAsync("Your station was deleted successfully.");
+        }
+
+        [Command("delete-azuracast-station-mount"), Description("Delete an existing AzuraCast mount from a station.")]
+        public async ValueTask DeleteAzuraCastStationMountAsync
+            (
+            CommandContext context,
+            [Description("Select the station of the mount point."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("Select the mount point you want to delete."), SlashAutoCompleteProvider<AzuraCastMountAutocomplete>] int mountId
+            )
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+            _logger.CommandRequested(nameof(DeleteAzuraCastStationMountAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
+            await _db.DeleteAzuraCastMountAsync(guildId, station, mountId);
+
+            await context.EditResponseAsync("Your mount point was deleted successfully.");
         }
 
         [Command("modify-azuracast"), Description("Modify the general AzuraCast settings.")]
@@ -249,7 +249,7 @@ public sealed class ConfigCommands
         }
 
         [Command("modify-azuracast-station-checks"), Description("Configure the automatic checks inside a station.")]
-        public async ValueTask UpdateAzuraCastChecksAsync
+        public async ValueTask UpdateAzuraCastStationChecksAsync
             (
             CommandContext context,
             [Description("Choose the station you want to modify the checks."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
@@ -258,7 +258,7 @@ public sealed class ConfigCommands
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
-            _logger.CommandRequested(nameof(UpdateAzuraCastChecksAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(UpdateAzuraCastStationChecksAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
 

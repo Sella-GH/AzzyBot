@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AzzyBot.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20240610192325_InitialCreation")]
+    [Migration("20240610192858_InitialCreation")]
     partial class InitialCreation
     {
         /// <inheritdoc />
@@ -172,7 +172,7 @@ namespace AzzyBot.Migrations
 
                     b.HasIndex("StationId");
 
-                    b.ToTable("AzuraCastMounts");
+                    b.ToTable("AzuraCastStationMounts");
                 });
 
             modelBuilder.Entity("AzzyBot.Database.Entities.GuildsEntity", b =>

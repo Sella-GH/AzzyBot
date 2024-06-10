@@ -113,7 +113,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 StationId = station.Id
             };
 
-            await context.AzuraCastMounts.AddAsync(mountPoint);
+            await context.AzuraCastStationMounts.AddAsync(mountPoint);
         });
     }
 
@@ -154,7 +154,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         {
             AzuraCastStationMountEntity mount = await GetAzuraCastStationMountAsync(guildId, stationId, mountId);
 
-            context.AzuraCastMounts.Remove(mount);
+            context.AzuraCastStationMounts.Remove(mount);
         });
     }
 
