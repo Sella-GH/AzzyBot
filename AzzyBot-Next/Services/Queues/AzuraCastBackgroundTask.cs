@@ -6,11 +6,11 @@ using AzzyBot.Services.Interfaces;
 
 namespace AzzyBot.Services.Queues;
 
-public sealed class AzuraCastFileTask : IQueuedBackgroundTask
+public sealed class AzuraCastBackgroundTask : IQueuedBackgroundTask
 {
     private readonly Channel<Func<CancellationToken, ValueTask>> _queue;
 
-    public AzuraCastFileTask()
+    public AzuraCastBackgroundTask()
     {
         BoundedChannelOptions options = new(100)
         {

@@ -51,7 +51,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<AzuraCastFileService>();
         services.AddHostedService<AzuraCastBackgroundServiceHost>();
-        services.AddSingleton<IQueuedBackgroundTask>(_ => new AzuraCastFileTask());
+        services.AddSingleton<IQueuedBackgroundTask>(_ => new AzuraCastBackgroundTask());
 
         services.AddSingleton<TimerServiceHost>();
         services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());
