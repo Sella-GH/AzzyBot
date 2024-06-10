@@ -7,15 +7,15 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services.Modules;
 
-public sealed class CoreBackgroundService(IHostApplicationLifetime applicationLifetime, ILogger<CoreBackgroundService> logger, AzuraCastFileService azuraCastFileService)
+public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLifetime, ILogger<AzzyBackgroundService> logger, AzuraCastFileService azuraCastFileService)
 {
-    private readonly ILogger<CoreBackgroundService> _logger = logger;
+    private readonly ILogger<AzzyBackgroundService> _logger = logger;
     private readonly AzuraCastFileService _azuraCastFileService = azuraCastFileService;
     private readonly CancellationToken _cancellationToken = applicationLifetime.ApplicationStopping;
 
     public async Task StartAzuraCastBackgroundServiceAsync(AzuraCastChecks checks)
     {
-        _logger.CoreBackgroundServiceStart();
+        _logger.BackgroundServiceStart();
 
         if (_cancellationToken.IsCancellationRequested)
             return;
