@@ -41,7 +41,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
 
     private async ValueTask CheckForFileChangesAsync(AzuraCastStationEntity station, CancellationToken cancellationToken)
     {
-        _logger.BackgroundServiceWorkItem();
+        _logger.BackgroundServiceWorkItem(nameof(CheckForFileChangesAsync));
 
         cancellationToken.ThrowIfCancellationRequested();
 

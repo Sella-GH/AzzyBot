@@ -32,8 +32,8 @@ public static partial class LoggerActions
     [LoggerMessage(12, LogLevel.Debug, "BackgroundServiceHost running")]
     public static partial void BackgroundServiceHostRun(this ILogger<AzzyBackgroundServiceHost> logger);
 
-    [LoggerMessage(13, LogLevel.Debug, "Creating work items...")]
-    public static partial void BackgroundServiceWorkItem(this ILogger logger);
+    [LoggerMessage(13, LogLevel.Debug, "Creating work items for: {item}")]
+    public static partial void BackgroundServiceWorkItem(this ILogger logger, string item);
 
     [LoggerMessage(90, LogLevel.Debug, "Stopping global timer")]
     public static partial void GlobalTimerStop(this ILogger<TimerServiceHost> logger);

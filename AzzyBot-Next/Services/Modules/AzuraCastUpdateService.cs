@@ -34,7 +34,7 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
 
     private async ValueTask CheckForAzuraCastUpdatesAsync(AzuraCastEntity azuraCast, CancellationToken cancellationToken)
     {
-        _logger.BackgroundServiceWorkItem();
+        _logger.BackgroundServiceWorkItem(nameof(CheckForAzuraCastUpdatesAsync));
 
         cancellationToken.ThrowIfCancellationRequested();
 
