@@ -9,29 +9,29 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services.Modules;
 
-public sealed class AzuraCastFileServiceHost(IQueuedBackgroundTask taskQueue, ILogger<AzuraCastFileServiceHost> logger, DiscordBotService discordBotService) : BackgroundService
+public sealed class AzuraCastBackgroundServiceHost(ILogger<AzuraCastBackgroundServiceHost> logger, IQueuedBackgroundTask taskQueue, DiscordBotService discordBotService) : BackgroundService
 {
-    private readonly ILogger<AzuraCastFileServiceHost> _logger = logger;
+    private readonly ILogger<AzuraCastBackgroundServiceHost> _logger = logger;
     private readonly IQueuedBackgroundTask _taskQueue = taskQueue;
     private readonly DiscordBotService _botService = discordBotService;
 
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.AzuraCastFileServiceHostStart();
+        _logger.AzuraCastBackgroundServiceHostStart();
 
         await base.StartAsync(cancellationToken);
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.AzuraCastFileServiceHostRun();
+        _logger.AzuraCastBackgroundServiceHostRun();
 
         return ProcessQueueAsync(stoppingToken);
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
-        _logger.AzuraCastFileServiceHostStop();
+        _logger.AzuraCastBackgroundServiceHostStop();
 
         await base.StopAsync(cancellationToken);
     }

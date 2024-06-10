@@ -20,14 +20,14 @@ public static partial class LoggerActions
     [LoggerMessage(3, LogLevel.Debug, "Global timer checking for AzuraCast files changes")]
     public static partial void GlobalTimerCheckForAzuraCastFiles(this ILogger<TimerServiceHost> logger);
 
-    [LoggerMessage(10, LogLevel.Debug, "AzuraCastFileServiceHost started")]
-    public static partial void AzuraCastFileServiceHostStart(this ILogger<AzuraCastFileServiceHost> logger);
+    [LoggerMessage(10, LogLevel.Debug, "AzuraCastBackgroundServiceHost started")]
+    public static partial void AzuraCastBackgroundServiceHostStart(this ILogger<AzuraCastBackgroundServiceHost> logger);
 
     [LoggerMessage(11, LogLevel.Debug, "AzuraCastBackgroundService started")]
     public static partial void AzuraCastBackgroundServiceStart(this ILogger<AzuraCastBackgroundService> logger);
 
-    [LoggerMessage(12, LogLevel.Debug, "AzuraCastFileServiceHost running")]
-    public static partial void AzuraCastFileServiceHostRun(this ILogger<AzuraCastFileServiceHost> logger);
+    [LoggerMessage(12, LogLevel.Debug, "AzuraCastBackgroundServiceHost running")]
+    public static partial void AzuraCastBackgroundServiceHostRun(this ILogger<AzuraCastBackgroundServiceHost> logger);
 
     [LoggerMessage(13, LogLevel.Debug, "Creating work items...")]
     public static partial void AzuraCastFileServiceWorkItem(this ILogger<AzuraCastFileService> logger);
@@ -35,8 +35,8 @@ public static partial class LoggerActions
     [LoggerMessage(90, LogLevel.Debug, "Stopping global timer")]
     public static partial void GlobalTimerStop(this ILogger<TimerServiceHost> logger);
 
-    [LoggerMessage(91, LogLevel.Debug, "AzuraCastFileServiceHost stopped")]
-    public static partial void AzuraCastFileServiceHostStop(this ILogger<AzuraCastFileServiceHost> logger);
+    [LoggerMessage(91, LogLevel.Debug, "AzuraCastBackgroundServiceHost stopped")]
+    public static partial void AzuraCastBackgroundServiceHostStop(this ILogger<AzuraCastBackgroundServiceHost> logger);
 
     [LoggerMessage(99, LogLevel.Debug, "Operation {ops} canceled by CancellationToken")]
     public static partial void OperationCanceled(this ILogger logger, string ops);
