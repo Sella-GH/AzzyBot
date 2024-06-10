@@ -34,8 +34,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<CoreServiceHost>();
         services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
 
-        services.AddSingleton<AzuraCastApiService>();
-
         string connectionString = GetConnectionString(settings.Database?.Host, settings.Database?.Port, settings.Database?.User, settings.Database?.Password, settings.Database?.DatabaseName);
         CheckIfDatabaseIsOnline(connectionString);
 
@@ -49,8 +47,10 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<WebRequestService>();
         services.AddSingleton<UpdaterService>();
 
+        services.AddSingleton<AzuraCastApiService>();
         services.AddSingleton<AzuraCastFileService>();
-        services.AddHostedService<AzuraCastBackgroundServiceHost>();
+        services.AddSingleton<CoreBackgroundService>();
+        services.AddHostedService<CoreBackgroundServiceHost>();
         services.AddSingleton<IQueuedBackgroundTask>(_ => new AzuraCastBackgroundTask());
 
         services.AddSingleton<TimerServiceHost>();

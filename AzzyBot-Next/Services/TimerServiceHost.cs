@@ -11,10 +11,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraCastBackgroundService azuraCastBackgroundService, DiscordBotService discordBotService, UpdaterService updaterService) : IAsyncDisposable, IHostedService
+public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, CoreBackgroundService azuraCastBackgroundService, DiscordBotService discordBotService, UpdaterService updaterService) : IAsyncDisposable, IHostedService
 {
     private readonly ILogger<TimerServiceHost> _logger = logger;
-    private readonly AzuraCastBackgroundService _azuraCastBackgroundService = azuraCastBackgroundService;
+    private readonly CoreBackgroundService _azuraCastBackgroundService = azuraCastBackgroundService;
     private readonly DiscordBotService _discordBotService = discordBotService;
     private readonly UpdaterService _updaterService = updaterService;
     private readonly bool _isDev = AzzyStatsSoftware.GetBotEnvironment == Environments.Development;

@@ -20,14 +20,14 @@ public static partial class LoggerActions
     [LoggerMessage(3, LogLevel.Debug, "Global timer checking for AzuraCast files changes")]
     public static partial void GlobalTimerCheckForAzuraCastFiles(this ILogger<TimerServiceHost> logger);
 
-    [LoggerMessage(10, LogLevel.Debug, "AzuraCastBackgroundServiceHost started")]
-    public static partial void AzuraCastBackgroundServiceHostStart(this ILogger<AzuraCastBackgroundServiceHost> logger);
+    [LoggerMessage(10, LogLevel.Debug, "CoreBackgroundServiceHost started")]
+    public static partial void CoreBackgroundServiceHostStart(this ILogger<CoreBackgroundServiceHost> logger);
 
-    [LoggerMessage(11, LogLevel.Debug, "AzuraCastBackgroundService started")]
-    public static partial void AzuraCastBackgroundServiceStart(this ILogger<AzuraCastBackgroundService> logger);
+    [LoggerMessage(11, LogLevel.Debug, "CoreBackgroundService started")]
+    public static partial void CoreBackgroundServiceStart(this ILogger<CoreBackgroundService> logger);
 
-    [LoggerMessage(12, LogLevel.Debug, "AzuraCastBackgroundServiceHost running")]
-    public static partial void AzuraCastBackgroundServiceHostRun(this ILogger<AzuraCastBackgroundServiceHost> logger);
+    [LoggerMessage(12, LogLevel.Debug, "CoreBackgroundServiceHost running")]
+    public static partial void CoreBackgroundServiceHostRun(this ILogger<CoreBackgroundServiceHost> logger);
 
     [LoggerMessage(13, LogLevel.Debug, "Creating work items...")]
     public static partial void AzuraCastFileServiceWorkItem(this ILogger<AzuraCastFileService> logger);
@@ -35,8 +35,8 @@ public static partial class LoggerActions
     [LoggerMessage(90, LogLevel.Debug, "Stopping global timer")]
     public static partial void GlobalTimerStop(this ILogger<TimerServiceHost> logger);
 
-    [LoggerMessage(91, LogLevel.Debug, "AzuraCastBackgroundServiceHost stopped")]
-    public static partial void AzuraCastBackgroundServiceHostStop(this ILogger<AzuraCastBackgroundServiceHost> logger);
+    [LoggerMessage(91, LogLevel.Debug, "CoreBackgroundServiceHost stopped")]
+    public static partial void CoreBackgroundServiceHostStop(this ILogger<CoreBackgroundServiceHost> logger);
 
     [LoggerMessage(99, LogLevel.Debug, "Operation {ops} canceled by CancellationToken")]
     public static partial void OperationCanceled(this ILogger logger, string ops);
