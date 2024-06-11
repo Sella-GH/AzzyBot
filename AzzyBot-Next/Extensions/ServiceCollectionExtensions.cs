@@ -32,7 +32,7 @@ public static class ServiceCollectionExtensions
         // Need to register as Singleton first
         // Otherwise DI doesn't work properly
         services.AddSingleton<CoreServiceHost>();
-        services.AddHostedService<CoreServiceHost>();
+        services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
 
         string connectionString = GetConnectionString(settings.Database?.Host, settings.Database?.Port, settings.Database?.User, settings.Database?.Password, settings.Database?.DatabaseName);
         CheckIfDatabaseIsOnline(connectionString);
@@ -42,7 +42,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<DiscordBotService>();
         services.AddSingleton<DiscordBotServiceHost>();
-        services.AddHostedService<DiscordBotServiceHost>();
+        services.AddHostedService(s => s.GetRequiredService<DiscordBotServiceHost>());
 
         services.AddSingleton<WebRequestService>();
         services.AddSingleton<UpdaterService>();
@@ -52,11 +52,12 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<AzuraCastPingService>();
         services.AddSingleton<AzuraCastUpdateService>();
         services.AddSingleton<AzzyBackgroundService>();
-        services.AddHostedService<AzzyBackgroundServiceHost>();
+        services.AddSingleton<AzzyBackgroundServiceHost>();
+        services.AddHostedService(s => s.GetRequiredService<AzzyBackgroundServiceHost>());
         services.AddSingleton<IQueuedBackgroundTask>(_ => new QueuedBackgroundTask());
 
         services.AddSingleton<TimerServiceHost>();
-        services.AddHostedService<TimerServiceHost>();
+        services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());
     }
 
     public static void AzzyBotSettings(this IServiceCollection services, bool isDev = false, bool isDocker = false)
