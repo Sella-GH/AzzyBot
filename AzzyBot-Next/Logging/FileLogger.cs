@@ -19,18 +19,16 @@ public sealed class FileLogger : ILogger
 
         _name = name;
         _getConfig = getConfig;
-
-        InitializeLogWriter();
     }
 
-    private void InitializeLogWriter()
+    private static void InitializeLogWriter(Func<FileLoggerConfiguration> getConfig)
     {
         if (LogStream is not null)
             return;
 
         lock (Lock)
         {
-            FileLoggerConfiguration config = _getConfig();
+            FileLoggerConfiguration config = getConfig();
             string logFilePath = GetLogFilePath(config.Directory);
             LogStream = new StreamWriter(logFilePath, true, Encoding.UTF8)
             {
@@ -55,6 +53,8 @@ public sealed class FileLogger : ILogger
 
         if (!IsEnabled(logLevel))
             return;
+
+        InitializeLogWriter(_getConfig);
 
         lock (Lock)
         {
