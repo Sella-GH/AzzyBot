@@ -40,7 +40,7 @@ public static class LoggingBuilderExtensions
         if (!Directory.Exists("Logs"))
             Directory.CreateDirectory("Logs");
 
-        //logging.AddFile(config => config.Directory = "Logs");
+        logging.AddFile(config => config.Directory = "Logs");
         logging.AddFilter("Microsoft.EntityFrameworkCore.Database", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
         logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
         logging.AddFilter("Microsoft.EntityFrameworkCore.Infrastructure", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
