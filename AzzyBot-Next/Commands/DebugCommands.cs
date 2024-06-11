@@ -41,7 +41,7 @@ public sealed class DebugCommands
         public async ValueTask DebugTriggerExceptionAsync
             (
             CommandContext context,
-            [Description("Enable to defer the message before throwing the exception.")] bool throwAfterDefering = true,
+            [Description("Enable to defer the message before throwing the exception.")] bool throwAfterDefering = false,
             [Description("Enable to throw the exception after a reply was already made.")] bool afterReply = false
             )
         {

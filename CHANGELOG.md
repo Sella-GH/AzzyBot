@@ -20,10 +20,13 @@
 - The `AzuraCast` module is finally added!
   - Now you can use the bot again and work with it like before (just in better)
   - Implemented new commands, new background checks and a lot of API stuff
+- Logfile cleaning after specified days (default 7)
 
 ### Improvements
 - AzuraCast Station Api Key is now optional
   - Because the Admin Api Key is required the station one is now optional. However if you do not add a station one the admin one will be used!
+- File logging now uses a shared static StreamWriter
+  - This should improve the performance and stability of logging
 
 ## Fixes
 - Guild Database Entity was not updated when AzuraCast was activated or disabled
