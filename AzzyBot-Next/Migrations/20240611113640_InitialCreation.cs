@@ -44,6 +44,7 @@ namespace AzzyBot.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     NotificationChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     OutagesChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
+                    IsOnline = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     GuildId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>

@@ -73,7 +73,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, string name, ulong requestsId, bool hls, bool showPlaylist, bool fileChanges, string? apiKey)
+    public Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, string name, ulong requestsId, bool hls, bool showPlaylist, bool fileChanges, string? apiKey = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -253,7 +253,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             : guilds.Where(g => !g.IsDebugAllowed).ToList();
     }
 
-    public Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl, string? apiKey, ulong? notificationId, ulong? outagesId)
+    public Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl = null, string? apiKey = null, ulong? notificationId = null, ulong? outagesId = null, bool? isOnline = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -271,11 +271,14 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             if (outagesId.HasValue)
                 azuraCast.OutagesChannelId = outagesId.Value;
 
+            if (isOnline.HasValue)
+                azuraCast.IsOnline = isOnline.Value;
+
             context.AzuraCast.Update(azuraCast);
         });
     }
 
-    public Task<bool> UpdateAzuraCastChecksAsync(ulong guildId, bool? serverStatus, bool? updates, bool? changelog)
+    public Task<bool> UpdateAzuraCastChecksAsync(ulong guildId, bool? serverStatus = null, bool? updates = null, bool? changelog = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -294,7 +297,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId, string? name, string? apiKey, ulong? requestId, bool? hls, bool? playlist)
+    public Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? name = null, string? apiKey = null, ulong? requestId = null, bool? hls = null, bool? playlist = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -322,7 +325,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> UpdateAzuraCastStationChecksAsync(ulong guildId, int stationId, bool? fileChanges)
+    public Task<bool> UpdateAzuraCastStationChecksAsync(ulong guildId, int stationId, bool? fileChanges = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -335,7 +338,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> UpdateGuildAsync(ulong guildId, ulong? errorChannelId, bool? isDebug)
+    public Task<bool> UpdateGuildAsync(ulong guildId, ulong? errorChannelId = null, bool? isDebug = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
