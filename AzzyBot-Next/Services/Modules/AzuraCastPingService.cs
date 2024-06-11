@@ -53,7 +53,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
 
                     channel = await _botService.GetDiscordChannelAsync(azuraCast.OutagesChannelId);
                     if (channel is not null)
-                        await channel.SendMessageAsync($"AzurCast instance, {Crypto.Decrypt(azuraCast.BaseUrl)}, is reachable again!");
+                        await channel.SendMessageAsync($"AzurCast instance, **{Crypto.Decrypt(azuraCast.BaseUrl)}**, is reachable again!");
                 }
 
                 return;
@@ -63,7 +63,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
 
             channel = await _botService.GetDiscordChannelAsync(azuraCast.OutagesChannelId);
             if (channel is not null)
-                await channel.SendMessageAsync($"AzurCast instance, {Crypto.Decrypt(azuraCast.BaseUrl)}, is not reachable!");
+                await channel.SendMessageAsync($"AzurCast instance, **{Crypto.Decrypt(azuraCast.BaseUrl)}**, is not reachable!");
         }
         catch (OperationCanceledException)
         {

@@ -104,7 +104,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
         }
 
         DiscordEmbed embed = EmbedBuilder.BuildAzuraCastFileChangesEmbed(stationName, addedFiles.Count, removedFiles.Count);
-        await _botService.SendMessageAsync(channelId, $"Changes in the files of station {stationName} detected. Check the details below.", [embed], paths);
+        await _botService.SendMessageAsync(channelId, $"Changes in the files of station **{stationName}** detected. Check the details below.", [embed], paths);
         await FileOperations.WriteToFileAsync(Path.Combine(_azuraCast.FilePath, $"{stationDbId}-{stationId}-files.json"), JsonSerializer.Serialize(onlineFiles, _serializerOptions));
     }
 }
