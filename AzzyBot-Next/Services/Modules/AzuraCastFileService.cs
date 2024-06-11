@@ -79,6 +79,8 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
         if (addedFiles.Count == 0 && removedFiles.Count == 0)
             return;
 
+        _logger.BackgroundServiceStationFilesChanged(stationDbId, stationId);
+
         string addedFileName = Path.Combine(_azuraCast.FilePath, $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}-{stationDbId}-{stationId}-added.txt");
         string removedFileName = Path.Combine(_azuraCast.FilePath, $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}-{stationDbId}-{stationId}-removed.txt");
         StringBuilder added = new();
@@ -103,8 +105,15 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
             paths.Add(removedFileName);
         }
 
-        DiscordEmbed embed = EmbedBuilder.BuildAzuraCastFileChangesEmbed(stationName, addedFiles.Count, removedFiles.Count);
-        await _botService.SendMessageAsync(channelId, $"Changes in the files of station **{stationName}** detected. Check the details below.", [embed], paths);
-        await FileOperations.WriteToFileAsync(Path.Combine(_azuraCast.FilePath, $"{stationDbId}-{stationId}-files.json"), JsonSerializer.Serialize(onlineFiles, _serializerOptions));
+        try
+        {
+            DiscordEmbed embed = EmbedBuilder.BuildAzuraCastFileChangesEmbed(stationName, addedFiles.Count, removedFiles.Count);
+            await _botService.SendMessageAsync(channelId, $"Changes in the files of station **{stationName}** detected. Check the details below.", [embed], paths);
+            await FileOperations.WriteToFileAsync(Path.Combine(_azuraCast.FilePath, $"{stationDbId}-{stationId}-files.json"), JsonSerializer.Serialize(onlineFiles, _serializerOptions));
+        }
+        catch (Exception ex)
+        {
+            await _botService.LogExceptionAsync(ex, DateTime.Now);
+        }
     }
 }

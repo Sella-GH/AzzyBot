@@ -23,6 +23,9 @@ public static partial class LoggerActions
     [LoggerMessage(4, LogLevel.Debug, "Global timer checking for AzuraCast updates")]
     public static partial void GlobalTimerCheckForAzuraCastUpdates(this ILogger<TimerServiceHost> logger);
 
+    [LoggerMessage(5, LogLevel.Debug, "Global timer checking for AzuraCast instance status")]
+    public static partial void GlobalTimerCheckForAzuraCastStatus(this ILogger<TimerServiceHost> logger);
+
     [LoggerMessage(10, LogLevel.Debug, "BackgroundServiceHost started")]
     public static partial void BackgroundServiceHostStart(this ILogger<AzzyBackgroundServiceHost> logger);
 
@@ -34,6 +37,12 @@ public static partial class LoggerActions
 
     [LoggerMessage(13, LogLevel.Debug, "Creating work items for: {item}")]
     public static partial void BackgroundServiceWorkItem(this ILogger logger, string item);
+
+    [LoggerMessage(14, LogLevel.Debug, "Station {dId}-{sId} has different files")]
+    public static partial void BackgroundServiceStationFilesChanged(this ILogger<AzuraCastFileService> logger, int dId, int sId);
+
+    [LoggerMessage(15, LogLevel.Debug, "Instance {id} is {status}")]
+    public static partial void BackgroundServiceInstanceStatus(this ILogger<AzuraCastPingService> logger, int id, string status);
 
     [LoggerMessage(90, LogLevel.Debug, "Stopping global timer")]
     public static partial void GlobalTimerStop(this ILogger<TimerServiceHost> logger);

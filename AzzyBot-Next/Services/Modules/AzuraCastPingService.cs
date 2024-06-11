@@ -47,6 +47,8 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
 
             if (!string.IsNullOrWhiteSpace(response))
             {
+                _logger.BackgroundServiceInstanceStatus(azuraCast.Id, "online");
+
                 if (!azuraCast.IsOnline)
                 {
                     await _dbActions.UpdateAzuraCastAsync(azuraCast.Guild.UniqueId, null, null, null, null, true);
@@ -58,6 +60,8 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
 
                 return;
             }
+
+            _logger.BackgroundServiceInstanceStatus(azuraCast.Id, "offline");
 
             await _dbActions.UpdateAzuraCastAsync(azuraCast.Guild.UniqueId, null, null, null, null, false);
 

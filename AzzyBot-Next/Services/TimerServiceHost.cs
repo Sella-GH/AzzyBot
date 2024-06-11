@@ -65,6 +65,9 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBackg
                 await _updaterService.CheckForAzzyUpdatesAsync();
             }
 
+            _logger.GlobalTimerCheckForAzuraCastStatus();
+            await _azuraCastBackgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus);
+
             if (now - _lastAzuraCastFileCheck >= TimeSpan.FromHours(0.98))
             {
                 _logger.GlobalTimerCheckForAzuraCastFiles();
