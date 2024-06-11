@@ -49,6 +49,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<AzuraCastApiService>();
         services.AddSingleton<AzuraCastFileService>();
+        services.AddSingleton<AzuraCastPingService>();
         services.AddSingleton<AzuraCastUpdateService>();
         services.AddSingleton<AzzyBackgroundService>();
         services.AddHostedService<AzzyBackgroundServiceHost>();
