@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Database;
+using AzzyBot.Logging;
 using AzzyBot.Services;
 using AzzyBot.Services.Interfaces;
 using AzzyBot.Services.Modules;
@@ -11,18 +14,22 @@ using AzzyBot.Services.Queues;
 using AzzyBot.Settings;
 using AzzyBot.Utilities;
 using AzzyBot.Utilities.Encryption;
+using DSharpPlus;
+using DSharpPlus.Commands.Processors.SlashCommands;
+using DSharpPlus.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using MySqlConnector;
 
 namespace AzzyBot.Extensions;
 
 public static class ServiceCollectionExtensions
 {
+    [SuppressMessage("Roslynator", "RCS0054:Fix formatting of a call chain", Justification = "Code Style")]
     public static void AzzyBotServices(this IServiceCollection services)
     {
-        // Enable or disable modules based on the settings
         IServiceProvider serviceProvider = services.BuildServiceProvider();
         AzzyBotSettingsRecord settings = serviceProvider.GetRequiredService<AzzyBotSettingsRecord>();
 
@@ -40,6 +47,29 @@ public static class ServiceCollectionExtensions
         services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
         services.AddSingleton<DbActions>();
 
+        serviceProvider = services.BuildServiceProvider();
+        DbActions dbActions = serviceProvider.GetRequiredService<DbActions>();
+        ILogger logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("AzzyBot");
+
+        services.AddDiscordClient(settings.BotToken, SlashCommandProcessor.RequiredIntents);
+        services.Configure<DiscordConfiguration>(s => s.ReconnectIndefinitely = true);
+        services.ConfigureEventHandlers
+        (
+            e =>
+            e.HandleGuildDownloadCompleted(async (s, e) => await dbActions.AddGuildsAsync(e.Guilds.Select(g => g.Value.Id).ToList()))
+             .HandleGuildCreated(async (s, e) =>
+             {
+                 logger.GuildCreated(e.Guild.Name);
+                 await dbActions.AddGuildAsync(e.Guild.Id);
+                 await e.Guild.Owner.SendMessageAsync("Thank you for adding me to your server! Please use the `/config` commands to configure me.");
+             })
+             .HandleGuildDeleted(async (s, e) =>
+             {
+                 logger.GuildDeleted(e.Guild.Name);
+                 await dbActions.DeleteGuildAsync(e.Guild.Id);
+             })
+        );
+
         services.AddSingleton<DiscordBotService>();
         services.AddSingleton<DiscordBotServiceHost>();
         services.AddHostedService<DiscordBotServiceHost>();
@@ -55,8 +85,8 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<AzzyBackgroundServiceHost>();
         services.AddSingleton<IQueuedBackgroundTask>(_ => new QueuedBackgroundTask());
 
-        services.AddSingleton<TimerServiceHost>();
-        services.AddHostedService<TimerServiceHost>();
+        //services.AddSingleton<TimerServiceHost>();
+        //services.AddHostedService<TimerServiceHost>();
     }
 
     public static void AzzyBotSettings(this IServiceCollection services, bool isDev = false, bool isDocker = false)

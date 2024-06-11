@@ -66,10 +66,10 @@ public static partial class LoggerActions
     public static partial void CommandRequested(this ILogger logger, string command, string user);
 
     [LoggerMessage(110, LogLevel.Information, "AzzyBot joined the following Guild: {guild}")]
-    public static partial void GuildCreated(this ILogger<DiscordBotServiceHost> logger, string guild);
+    public static partial void GuildCreated(this ILogger logger, string guild);
 
     [LoggerMessage(111, LogLevel.Information, "AzzyBot was removed from the following Guild: {guild}")]
-    public static partial void GuildDeleted(this ILogger<DiscordBotServiceHost> logger, string guild);
+    public static partial void GuildDeleted(this ILogger logger, string guild);
 
     [LoggerMessage(198, LogLevel.Information, "An update for Azzy is available! Please update now to version: {version} to get the latest fixes and improvements.")]
     public static partial void UpdateAvailable(this ILogger<UpdaterService> logger, string version);

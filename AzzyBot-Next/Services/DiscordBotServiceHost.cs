@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,27 +24,13 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-public sealed class DiscordBotServiceHost : IHostedService
+public sealed class DiscordBotServiceHost(ILogger<DiscordBotServiceHost> logger, IServiceProvider serviceProvider, AzzyBotSettingsRecord settings, DiscordClient client) : IHostedService, IClientErrorHandler
 {
-    private readonly ILogger<DiscordBotServiceHost> _logger;
-    private readonly ILoggerFactory _loggerFactory;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly AzzyBotSettingsRecord _settings;
-    private readonly DbActions _dbActions;
+    private readonly ILogger<DiscordBotServiceHost> _logger = logger;
+    private readonly IServiceProvider _serviceProvider = serviceProvider;
+    private readonly AzzyBotSettingsRecord _settings = settings;
+    private readonly DiscordClient _client = client;
     private DiscordBotService? _botService;
-
-    public DiscordClient Client { get; init; }
-
-    public DiscordBotServiceHost(AzzyBotSettingsRecord settings, DbActions dbActions, ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
-    {
-        _logger = logger;
-        _loggerFactory = loggerFactory;
-        _serviceProvider = serviceProvider;
-        _dbActions = dbActions;
-        _settings = settings;
-
-        Client = new(GetDiscordConfig());
-    }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -53,13 +38,12 @@ public sealed class DiscordBotServiceHost : IHostedService
 
         cancellationToken.ThrowIfCancellationRequested();
         _botService = _serviceProvider.GetRequiredService<DiscordBotService>();
-        RegisterEventHandlers();
         await RegisterCommandsAsync();
         RegisterInteractivity();
-        await Client.ConnectAsync();
+        await _client.ConnectAsync();
 
         _logger.BotReady();
-        _logger.InviteUrl(Client.CurrentApplication.Id);
+        _logger.InviteUrl(_client.CurrentApplication.Id);
 
         // Wait 3 Seconds to let the client boot up
         await Task.Delay(3000, cancellationToken);
@@ -76,15 +60,14 @@ public sealed class DiscordBotServiceHost : IHostedService
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        await Client.DisconnectAsync();
-        UnregisterEventHandlers();
+        await _client.DisconnectAsync();
     }
 
     public async Task SetBotStatusAsync(int status = 1, int type = 2, string doing = "Music", Uri? url = null, bool reset = false)
     {
         if (reset)
         {
-            await Client.UpdateStatusAsync(new DiscordActivity("Music", DiscordActivityType.ListeningTo), DiscordUserStatus.Online);
+            await _client.UpdateStatusAsync(new DiscordActivity("Music", DiscordActivityType.ListeningTo), DiscordUserStatus.Online);
             return;
         }
 
@@ -98,37 +81,16 @@ public sealed class DiscordBotServiceHost : IHostedService
 
         DiscordUserStatus userStatus = (DiscordUserStatus)Enum.ToObject(typeof(DiscordUserStatus), status);
 
-        await Client.UpdateStatusAsync(activity, userStatus);
-    }
-
-    private DiscordConfiguration GetDiscordConfig()
-    {
-        ArgumentNullException.ThrowIfNull(_settings, nameof(_settings));
-
-        if (string.IsNullOrWhiteSpace(_settings.BotToken))
-        {
-            _logger.BotTokenInvalid();
-            Environment.Exit(1);
-        }
-
-        return new()
-        {
-            LoggerFactory = _loggerFactory,
-            // Otherwise it stops reconnecting after 4 attempts
-            // TODO Remove this when the new IoC Client is released #1908
-            ReconnectIndefinitely = true,
-            Token = _settings.BotToken
-        };
+        await _client.UpdateStatusAsync(activity, userStatus);
     }
 
     private async Task RegisterCommandsAsync()
     {
         ArgumentNullException.ThrowIfNull(_settings, nameof(_settings));
 
-        CommandsExtension commandsExtension = Client.UseCommands(new()
+        CommandsExtension commandsExtension = _client.UseCommands(new()
         {
             RegisterDefaultCommandProcessors = false,
-            ServiceProvider = _serviceProvider,
             UseDefaultCommandErrorHandler = false
         });
 
@@ -155,7 +117,7 @@ public sealed class DiscordBotServiceHost : IHostedService
 
     private void RegisterInteractivity()
     {
-        ArgumentNullException.ThrowIfNull(Client, nameof(Client));
+        ArgumentNullException.ThrowIfNull(_client, nameof(_client));
 
         InteractivityConfiguration config = new()
         {
@@ -164,26 +126,10 @@ public sealed class DiscordBotServiceHost : IHostedService
             Timeout = TimeSpan.FromMinutes(15)
         };
 
-        Client.UseInteractivity(config);
+        _client.UseInteractivity(config);
     }
 
-    private void RegisterEventHandlers()
-    {
-        Client.ClientErrored += ClientErroredAsync;
-        Client.GuildCreated += ClientGuildCreatedAsync;
-        Client.GuildDeleted += ClientGuildDeletedAsync;
-        Client.GuildDownloadCompleted += ClientGuildDownloadCompletedAsync;
-    }
-
-    private void UnregisterEventHandlers()
-    {
-        Client.ClientErrored -= ClientErroredAsync;
-        Client.GuildCreated -= ClientGuildCreatedAsync;
-        Client.GuildDeleted -= ClientGuildDeletedAsync;
-        Client.GuildDownloadCompleted -= ClientGuildDownloadCompletedAsync;
-    }
-
-    private async Task CommandErroredAsync(CommandsExtension c, CommandErroredEventArgs e)
+    public async Task CommandErroredAsync(CommandsExtension c, CommandErroredEventArgs e)
     {
         _logger.CommandsError();
 
@@ -212,54 +158,43 @@ public sealed class DiscordBotServiceHost : IHostedService
         }
     }
 
-    private async Task ClientErroredAsync(DiscordClient c, ClientErrorEventArgs e)
+    public async ValueTask HandleEventHandlerError(string name, Exception exception, Delegate invokedDelegate, object sender, object args)
     {
         if (_botService is null)
             return;
 
-        Exception ex = e.Exception;
         DateTime now = DateTime.Now;
 
-        switch (ex)
-        {
-            case RateLimitException:
-                break;
+        //switch (ex)
+        //{
+        //    case RateLimitException:
+        //        break;
 
-            case BadRequestException:
-            case NotFoundException:
-            case RequestSizeException:
-            case ServerErrorException:
-            case UnauthorizedException:
-                await _botService.LogExceptionAsync(ex, now);
-                break;
+        //    case BadRequestException:
+        //    case NotFoundException:
+        //    case RequestSizeException:
+        //    case ServerErrorException:
+        //    case UnauthorizedException:
+        //        await _botService.LogExceptionAsync(ex, now);
+        //        break;
 
-            default:
-                if (ex is not DiscordException)
-                {
-                    await _botService.LogExceptionAsync(ex, now);
-                    break;
-                }
+        //    default:
+        //        if (ex is not DiscordException)
+        //        {
+        //            await _botService.LogExceptionAsync(ex, now);
+        //            break;
+        //        }
 
-                await _botService.LogExceptionAsync(ex, now, 0, ((DiscordException)e.Exception).JsonMessage);
-                break;
-        }
+        //        await _botService.LogExceptionAsync(ex, now, 0, ((DiscordException)e.Exception).JsonMessage);
+        //        break;
+        //}
     }
 
-    private async Task ClientGuildCreatedAsync(DiscordClient c, GuildCreateEventArgs e)
+    public async ValueTask HandleGatewayError(Exception exception)
     {
-        _logger.GuildCreated(e.Guild.Name);
+        if (_botService is null)
+            return;
 
-        await _dbActions.AddGuildAsync(e.Guild.Id);
-        await e.Guild.Owner.SendMessageAsync("Thank you for adding me to your server! Before you can make use of me, you have to set my settings first.\n\nPlease use the command `settings set` for this.\nOnly you are able to execute this command right now.");
+        DateTime now = DateTime.Now;
     }
-
-    private async Task ClientGuildDeletedAsync(DiscordClient c, GuildDeleteEventArgs e)
-    {
-        _logger.GuildDeleted(e.Guild.Name);
-
-        await _dbActions.DeleteGuildAsync(e.Guild.Id);
-    }
-
-    private async Task ClientGuildDownloadCompletedAsync(DiscordClient c, GuildDownloadCompletedEventArgs e)
-        => await _dbActions.AddGuildsAsync(e.Guilds.Select(g => g.Value.Id).ToList());
 }
