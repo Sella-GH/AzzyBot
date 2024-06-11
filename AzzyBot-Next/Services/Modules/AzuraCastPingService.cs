@@ -8,7 +8,6 @@ using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
 using AzzyBot.Services.Interfaces;
 using AzzyBot.Utilities.Encryption;
-using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services.Modules;
@@ -43,7 +42,6 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
         {
             Uri url = new($"{Crypto.Decrypt(azuraCast.BaseUrl)}/api");
             string response = await _webRequestService.GetWebAsync(url);
-            DiscordChannel? channel;
 
             if (!string.IsNullOrWhiteSpace(response))
             {
@@ -52,10 +50,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
                 if (!azuraCast.IsOnline)
                 {
                     await _dbActions.UpdateAzuraCastAsync(azuraCast.Guild.UniqueId, null, null, null, null, true);
-
-                    channel = await _botService.GetDiscordChannelAsync(azuraCast.OutagesChannelId);
-                    if (channel is not null)
-                        await channel.SendMessageAsync($"AzurCast instance, **{Crypto.Decrypt(azuraCast.BaseUrl)}**, is reachable again!");
+                    await _botService.SendMessageAsync(azuraCast.OutagesChannelId, $"AzurCast instance, **{Crypto.Decrypt(azuraCast.BaseUrl)}**, is reachable again!");
                 }
 
                 return;
@@ -64,10 +59,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
             _logger.BackgroundServiceInstanceStatus(azuraCast.Id, "offline");
 
             await _dbActions.UpdateAzuraCastAsync(azuraCast.Guild.UniqueId, null, null, null, null, false);
-
-            channel = await _botService.GetDiscordChannelAsync(azuraCast.OutagesChannelId);
-            if (channel is not null)
-                await channel.SendMessageAsync($"AzurCast instance, **{Crypto.Decrypt(azuraCast.BaseUrl)}**, is not reachable!");
+            await _botService.SendMessageAsync(azuraCast.OutagesChannelId, $"AzurCast instance, **{Crypto.Decrypt(azuraCast.BaseUrl)}**, is not reachable!");
         }
         catch (OperationCanceledException)
         {
