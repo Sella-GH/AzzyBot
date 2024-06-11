@@ -97,9 +97,6 @@ namespace AzzyBot.Migrations
                     b.Property<bool>("FileChanges")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<bool>("ServerStatus")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<int>("StationId")
                         .HasColumnType("int");
 

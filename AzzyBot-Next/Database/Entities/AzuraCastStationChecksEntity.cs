@@ -8,7 +8,6 @@ public sealed class AzuraCastStationChecksEntity
     public int Id { get; set; }
 
     public bool FileChanges { get; set; }
-    public bool ServerStatus { get; set; }
 
     public int StationId { get; set; }
     public AzuraCastStationEntity Station { get; set; } = null!;

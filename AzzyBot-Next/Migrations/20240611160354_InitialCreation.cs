@@ -116,7 +116,6 @@ namespace AzzyBot.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     FileChanges = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    ServerStatus = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     StationId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
