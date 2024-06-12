@@ -29,6 +29,8 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
 
     public async ValueTask QueueFileChangesChecksAsync()
     {
+        _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecksAsync));
+
         List<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
         foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast is not null).Select(g => g.AzuraCast!))
         {
@@ -42,6 +44,8 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
     public async ValueTask QueueFileChangesChecksAsync(ulong guildId, int stationId = 0)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId, nameof(guildId));
+
+        _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecksAsync));
 
         GuildsEntity guild = await _dbActions.GetGuildAsync(guildId);
         if (guild.AzuraCast is null)
@@ -67,8 +71,6 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
 
     private async ValueTask CheckForFileChangesAsync(AzuraCastStationEntity station, CancellationToken cancellationToken)
     {
-        _logger.BackgroundServiceWorkItem(nameof(CheckForFileChangesAsync));
-
         cancellationToken.ThrowIfCancellationRequested();
 
         if (!Directory.Exists(_azuraCast.FilePath))

@@ -33,6 +33,8 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId, nameof(guildId));
 
+        _logger.BackgroundServiceWorkItem(nameof(QueueInstancePingAsync));
+
         GuildsEntity guild = await _dbActions.GetGuildAsync(guildId);
         if (guild.AzuraCast is null)
             return;
@@ -45,8 +47,6 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
     {
         ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
         ArgumentNullException.ThrowIfNull(azuraCast.Guild, nameof(azuraCast.Guild));
-
-        _logger.BackgroundServiceWorkItem(nameof(PingInstanceAsync));
 
         cancellationToken.ThrowIfCancellationRequested();
 

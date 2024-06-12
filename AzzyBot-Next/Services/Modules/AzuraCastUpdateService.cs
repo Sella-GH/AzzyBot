@@ -25,6 +25,8 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
 
     public async ValueTask QueueAzuraCastUpdatesAsync()
     {
+        _logger.BackgroundServiceWorkItem(nameof(QueueAzuraCastUpdatesAsync));
+
         List<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
         foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.Checks.Updates == true).Select(g => g.AzuraCast!))
         {
@@ -36,6 +38,8 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId, nameof(guildId));
 
+        _logger.BackgroundServiceWorkItem(nameof(QueueAzuraCastUpdatesAsync));
+
         GuildsEntity guild = await _dbActions.GetGuildAsync(guildId);
         if (guild.AzuraCast is null)
             return;
@@ -46,8 +50,6 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
 
     private async ValueTask CheckForAzuraCastUpdatesAsync(AzuraCastEntity azuraCast, CancellationToken cancellationToken)
     {
-        _logger.BackgroundServiceWorkItem(nameof(CheckForAzuraCastUpdatesAsync));
-
         cancellationToken.ThrowIfCancellationRequested();
 
         try
