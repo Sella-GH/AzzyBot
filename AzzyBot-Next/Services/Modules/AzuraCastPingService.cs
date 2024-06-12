@@ -20,7 +20,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
     private readonly DiscordBotService _botService = discordBotService;
     private readonly WebRequestService _webRequestService = webRequestService;
 
-    public async ValueTask QueueStationPingAsync()
+    public async ValueTask QueueInstancePingAsync()
     {
         List<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
         foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.Checks.ServerStatus == true).Select(g => g.AzuraCast!))
@@ -29,7 +29,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
         }
     }
 
-    public async ValueTask QueueStationPingAsync(ulong guildId)
+    public async ValueTask QueueInstancePingAsync(ulong guildId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId, nameof(guildId));
 

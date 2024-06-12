@@ -11,6 +11,7 @@ using AzzyBot.Logging;
 using AzzyBot.Services.Modules;
 using AzzyBot.Utilities;
 using AzzyBot.Utilities.Encryption;
+using AzzyBot.Utilities.Enums;
 using AzzyBot.Utilities.Records.AzuraCast;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
@@ -24,10 +25,11 @@ namespace AzzyBot.Commands;
 public sealed class AzuraCastCommands
 {
     [Command("azuracast"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
-    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCast, DbActions dbActions)
+    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCast, AzzyBackgroundService backgroundService, DbActions dbActions)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCast = azuraCast;
+        private readonly AzzyBackgroundService _backgroundService = backgroundService;
         private readonly DbActions _dbActions = dbActions;
 
         [Command("hardware-stats"), Description("Get the hardware stats of the running server.")]
@@ -50,6 +52,25 @@ public sealed class AzuraCastCommands
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastHardwareStatsEmbed(hardwareStats);
 
             await context.EditResponseAsync(embed);
+        }
+
+        [Command("force-cache-refresh"), Description("Force the bot to refresh it's local song cache for a specific station.")]
+        public async ValueTask ForceCacheRefreshAsync
+        (
+            CommandContext context,
+            [Description("The station of which you want to refresh the cache."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+
+            _logger.CommandRequested(nameof(ForceCacheRefreshAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, context.Guild.Id, stationId);
+
+            await context.EditResponseAsync("Cache successfully refreshed");
         }
     }
 

@@ -39,17 +39,29 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
         }
     }
 
-    public async ValueTask QueueFileChangesChecksAsync(ulong guildId)
+    public async ValueTask QueueFileChangesChecksAsync(ulong guildId, int stationId = 0)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId, nameof(guildId));
 
-        GuildsEntity guilds = await _dbActions.GetGuildAsync(guildId);
-        if (guilds.AzuraCast is null)
+        GuildsEntity guild = await _dbActions.GetGuildAsync(guildId);
+        if (guild.AzuraCast is null)
             return;
 
-        foreach (AzuraCastStationEntity station in guilds.AzuraCast.Stations.Where(s => s.Checks.FileChanges))
+        IEnumerable<AzuraCastStationEntity> stations = guild.AzuraCast.Stations.Where(s => s.Checks.FileChanges);
+        if (stationId != 0)
         {
+            AzuraCastStationEntity? station = stations.FirstOrDefault(s => s.StationId == stationId);
+            if (station is null)
+                return;
+
             _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForFileChangesAsync(station, ct)));
+        }
+        else
+        {
+            foreach (AzuraCastStationEntity station in stations)
+            {
+                _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForFileChangesAsync(station, ct)));
+            }
         }
     }
 

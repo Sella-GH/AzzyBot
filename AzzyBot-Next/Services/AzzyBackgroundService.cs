@@ -15,7 +15,7 @@ public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLi
     private readonly AzuraCastUpdateService _updaterService = updaterService;
     private readonly CancellationToken _cancellationToken = applicationLifetime.ApplicationStopping;
 
-    public async Task StartAzuraCastBackgroundServiceAsync(AzuraCastChecks checks, ulong guildId = 0)
+    public async Task StartAzuraCastBackgroundServiceAsync(AzuraCastChecks checks, ulong guildId = 0, int stationId = 0)
     {
         _logger.BackgroundServiceStart();
 
@@ -31,7 +31,7 @@ public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLi
                 }
                 else
                 {
-                    await _fileService.QueueFileChangesChecksAsync(guildId);
+                    await _fileService.QueueFileChangesChecksAsync(guildId, stationId);
                 }
 
                 break;
@@ -39,11 +39,11 @@ public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLi
             case AzuraCastChecks.CheckForOnlineStatus:
                 if (guildId == 0)
                 {
-                    await _pingService.QueueStationPingAsync();
+                    await _pingService.QueueInstancePingAsync();
                 }
                 else
                 {
-                    await _pingService.QueueStationPingAsync(guildId);
+                    await _pingService.QueueInstancePingAsync(guildId);
                 }
 
                 break;
