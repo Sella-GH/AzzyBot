@@ -29,6 +29,18 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
         }
     }
 
+    public async ValueTask QueueStationPingAsync(ulong guildId)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId, nameof(guildId));
+
+        GuildsEntity guild = await _dbActions.GetGuildAsync(guildId);
+        if (guild.AzuraCast is null)
+            return;
+
+        if (guild.AzuraCast.Checks.ServerStatus)
+            _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await PingInstanceAsync(guild.AzuraCast, ct)));
+    }
+
     private async ValueTask PingInstanceAsync(AzuraCastEntity azuraCast, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
