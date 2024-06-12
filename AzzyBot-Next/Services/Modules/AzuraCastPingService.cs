@@ -65,7 +65,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
                 _logger.BackgroundServiceInstanceStatus(azuraCast.Id, "offline");
 
                 await _dbActions.UpdateAzuraCastAsync(azuraCast.Guild.UniqueId, null, null, null, null, false);
-                await _botService.SendMessageAsync(azuraCast.OutagesChannelId, $"AzurCast instance, **{Crypto.Decrypt(azuraCast.BaseUrl)}**, is not reachable!");
+                await _botService.SendMessageAsync(azuraCast.OutagesChannelId, $"AzuraCast instance **{Crypto.Decrypt(azuraCast.BaseUrl)}** is **down**!");
             }
 
             if (!string.IsNullOrWhiteSpace(response))
@@ -75,7 +75,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
                 if (!azuraCast.IsOnline)
                 {
                     await _dbActions.UpdateAzuraCastAsync(azuraCast.Guild.UniqueId, null, null, null, null, true);
-                    await _botService.SendMessageAsync(azuraCast.OutagesChannelId, $"AzurCast instance, **{Crypto.Decrypt(azuraCast.BaseUrl)}**, is reachable again!");
+                    await _botService.SendMessageAsync(azuraCast.OutagesChannelId, $"AzuraCast instance **{Crypto.Decrypt(azuraCast.BaseUrl)}** is **up** again!");
                 }
             }
             else
