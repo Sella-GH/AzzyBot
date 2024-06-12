@@ -66,11 +66,22 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceCacheRefreshAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
             await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, context.Guild.Id, stationId);
 
-            await context.EditResponseAsync("Cache successfully refreshed");
+            await context.RespondAsync("I initiated the cache refresh, please wait a little for it to occur.");
+        }
+
+        [Command("force-update-check"), Description("Forces the bot to search for AzuraCast Updates.")]
+        public async ValueTask ForceUpdateCheckAsync(CommandContext context)
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+
+            _logger.CommandRequested(nameof(ForceUpdateCheckAsync), context.User.GlobalName);
+
+            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, context.Guild.Id);
+
+            await context.RespondAsync("I initiated the check for AzuraCast Updates, please wait a little.\nThere won't be an answer if there are no updates available.");
         }
     }
 
