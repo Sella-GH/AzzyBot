@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Database;
@@ -53,7 +54,19 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
         try
         {
             Uri url = new($"{Crypto.Decrypt(azuraCast.BaseUrl)}/api");
-            string response = await _webRequestService.GetWebAsync(url);
+            string response = string.Empty;
+
+            try
+            {
+                response = await _webRequestService.GetWebAsync(url);
+            }
+            catch (HttpRequestException)
+            {
+                _logger.BackgroundServiceInstanceStatus(azuraCast.Id, "offline");
+
+                await _dbActions.UpdateAzuraCastAsync(azuraCast.Guild.UniqueId, null, null, null, null, false);
+                await _botService.SendMessageAsync(azuraCast.OutagesChannelId, $"AzurCast instance, **{Crypto.Decrypt(azuraCast.BaseUrl)}**, is not reachable!");
+            }
 
             if (!string.IsNullOrWhiteSpace(response))
             {
@@ -64,14 +77,11 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
                     await _dbActions.UpdateAzuraCastAsync(azuraCast.Guild.UniqueId, null, null, null, null, true);
                     await _botService.SendMessageAsync(azuraCast.OutagesChannelId, $"AzurCast instance, **{Crypto.Decrypt(azuraCast.BaseUrl)}**, is reachable again!");
                 }
-
-                return;
             }
-
-            _logger.BackgroundServiceInstanceStatus(azuraCast.Id, "offline");
-
-            await _dbActions.UpdateAzuraCastAsync(azuraCast.Guild.UniqueId, null, null, null, null, false);
-            await _botService.SendMessageAsync(azuraCast.OutagesChannelId, $"AzurCast instance, **{Crypto.Decrypt(azuraCast.BaseUrl)}**, is not reachable!");
+            else
+            {
+                _logger.BackgroundServiceInstanceStatus(azuraCast.Id, "unkown or offline");
+            }
         }
         catch (OperationCanceledException)
         {
