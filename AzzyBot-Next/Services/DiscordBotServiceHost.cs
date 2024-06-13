@@ -199,6 +199,7 @@ public sealed class DiscordBotServiceHost : IHostedService
     private async Task CommandErroredAsync(CommandsExtension c, CommandErroredEventArgs e)
     {
         _logger.CommandsError();
+        _logger.CommandsErrorType(e.Exception.GetType().Name);
 
         if (_botService is null)
             return;

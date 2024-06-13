@@ -71,6 +71,9 @@ public static partial class LoggerActions
     [LoggerMessage(103, LogLevel.Information, "Command {command} requested by {user} to execute")]
     public static partial void CommandRequested(this ILogger logger, string command, string user);
 
+    [LoggerMessage(104, LogLevel.Information, "Commands error is: {ex}")]
+    public static partial void CommandsErrorType(this ILogger<DiscordBotServiceHost> logger, string ex);
+
     [LoggerMessage(110, LogLevel.Information, "AzzyBot joined the following Guild: {guild}")]
     public static partial void GuildCreated(this ILogger<DiscordBotServiceHost> logger, string guild);
 
