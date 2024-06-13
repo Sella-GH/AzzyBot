@@ -6,10 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Database.Entities;
 using AzzyBot.Utilities.Encryption;
+using AzzyBot.Utilities.Enums;
 using AzzyBot.Utilities.Records;
 using AzzyBot.Utilities.Records.AzuraCast;
 using DSharpPlus.Entities;
-using AzzyBot.Utilities.Enums;
 
 namespace AzzyBot.Utilities;
 
@@ -59,8 +59,8 @@ public static class EmbedBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(stationName, nameof(stationName));
 
         const string title = "File Changes";
-        string addedFiles = "No files were added";
-        string removedFiles = "No files were removed";
+        string addedFiles = "No files were added.";
+        string removedFiles = "No files were removed.";
 
         if (added == 1)
         {
@@ -485,7 +485,7 @@ public static class EmbedBuilder
                 ["Music Requests Channel"] = new((station.RequestsChannelId > 0) ? $"<#{station.RequestsChannelId}>" : "Not set"),
                 ["Prefer HLS Streaming"] = new(AzuraCastMisc.ReadableBool(station.PreferHls, ReadbleBool.EnabledDisabled)),
                 ["Show Playlist In Now Playing"] = new(AzuraCastMisc.ReadableBool(station.ShowPlaylistInNowPlaying, ReadbleBool.EnabledDisabled)),
-                ["Automatic Checks"] = new($"- File Changes: {station.Checks.FileChanges}"),
+                ["Automatic Checks"] = new($"- File Changes: {AzuraCastMisc.ReadableBool(station.Checks.FileChanges, ReadbleBool.EnabledDisabled)}"),
                 ["Mount Points"] = new((station.Mounts.Count > 0) ? string.Join('\n', station.Mounts.Select(x => $"- {Crypto.Decrypt(x.Name)}: {Crypto.Decrypt(x.Mount)}")) : "No Mount Points added")
             };
 
