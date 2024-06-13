@@ -158,6 +158,7 @@ public sealed class DiscordBotServiceHost : IHostedService
         }
 
         commandsExtension.AddCheck<AzuraCastOnlineCheck>();
+        commandsExtension.AddCheck<ModuleActivatedCheck>();
 
         SlashCommandProcessor slashCommandProcessor = new();
         slashCommandProcessor.AddConverter<Uri>(new UriArgumentConverter());
