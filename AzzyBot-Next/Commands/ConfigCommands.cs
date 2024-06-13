@@ -26,7 +26,7 @@ public sealed class ConfigCommands
         private readonly DbActions _db = db;
         private readonly ILogger<ConfigGroup> _logger = logger;
 
-        [Command("add-azuracast"), Description("Configure AzuraCast for your server. This is a requirement to use the features.")]
+        [Command("add-azuracast"), Description("Add an AzuraCast instance to your server. This is a requirement to use the features.")]
         public async ValueTask AddAzuraCastAsync
             (
             CommandContext context,
@@ -71,7 +71,7 @@ public sealed class ConfigCommands
             await context.FollowupAsync("Your AzuraCast installation was added successfully and your data has been encrypted.");
         }
 
-        [Command("add-azuracast-station"), Description("Let's you dd an AzuraCast station to manage.")]
+        [Command("add-azuracast-station"), Description("Add an AzuraCast station to your instance.")]
         public async ValueTask AddAzuraCastStationAsync
             (
             CommandContext context,
@@ -103,7 +103,7 @@ public sealed class ConfigCommands
             await context.FollowupAsync("Your station was added successfully. Your station name and api key have been encrypted. Your request was also deleted for security reasons.");
         }
 
-        [Command("add-azuracast-station-mount"), Description("Let's you add an AzuraCast mount point for streaming.")]
+        [Command("add-azuracast-station-mount"), Description("Add an AzuraCast mount point to the selected station.")]
         public async ValueTask AddAzuraCastStationMountAsync
             (
             CommandContext context,
@@ -158,7 +158,7 @@ public sealed class ConfigCommands
             await context.EditResponseAsync("Your station was deleted successfully.");
         }
 
-        [Command("delete-azuracast-station-mount"), Description("Delete an existing AzuraCast mount from a station.")]
+        [Command("delete-azuracast-station-mount"), Description("Delete an existing mount point from a station.")]
         public async ValueTask DeleteAzuraCastStationMountAsync
             (
             CommandContext context,
@@ -184,8 +184,8 @@ public sealed class ConfigCommands
             CommandContext context,
             [Description("Update the base Url, an example: https://demo.azuracast.com/")] Uri? url = null,
             [Description("Update the administrator api key. It's enough when it has the permission to access system info.")] string? apiKey = null,
-            [Description("Update the channel to get general notifications about your azuracast installation."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? notificationsChannel = null,
-            [Description("Update the channel to get notifications when your azuracast installation is down."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? outagesChannel = null
+            [Description("Update the channel to get general notifications about your azuracast instance."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? notificationsChannel = null,
+            [Description("Update the channel to get notifications when your azuracast instance is down."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? outagesChannel = null
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -201,7 +201,7 @@ public sealed class ConfigCommands
             await context.FollowupAsync("Your AzuraCast settings were saved successfully and have been encrypted.");
         }
 
-        [Command("modify-azuracast-checks"), Description("Configure the automatic checks for your AzuraCast installation.")]
+        [Command("modify-azuracast-checks"), Description("Modify the automatic checks for your AzuraCast instance.")]
         public async ValueTask UpdateAzuraCastChecksAsync
             (
             CommandContext context,
@@ -248,7 +248,7 @@ public sealed class ConfigCommands
             await context.FollowupAsync("Your settings were saved successfully. Your station name and api key have been encrypted. Your request was also deleted for security reasons.");
         }
 
-        [Command("modify-azuracast-station-checks"), Description("Configure the automatic checks inside a station.")]
+        [Command("modify-azuracast-station-checks"), Description("Modify the automatic checks inside a station.")]
         public async ValueTask UpdateAzuraCastStationChecksAsync
             (
             CommandContext context,
@@ -268,7 +268,7 @@ public sealed class ConfigCommands
             await context.EditResponseAsync("Your settings were saved successfully.");
         }
 
-        [Command("modify-core")]
+        [Command("modify-core"), Description("Modify the core settings of the bot.")]
         public async ValueTask UpdateCoreAsync(CommandContext context, [Description("Select a channel to get notifications when the bot runs into an issue."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? errorChannel = null)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -283,7 +283,7 @@ public sealed class ConfigCommands
             await context.EditResponseAsync("Your settings were saved successfully.");
         }
 
-        [Command("get-settings"), Description("Get all configured settings per direct message.")]
+        [Command("get-settings"), Description("Get all configured settings in a direct message.")]
         public async ValueTask GetSettingsAsync(CommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -315,7 +315,7 @@ public sealed class ConfigCommands
             await context.EditResponseAsync("I sent you an overview with all the settings in private. Be aware of sensitive data.");
         }
 
-        [Command("reset-settings"), Description("Reset all of your settings, you have to add everything again.")]
+        [Command("reset-settings"), Description("Reset all of your settings, you have to reconfigure everything again.")]
         public async ValueTask ResetSettingsAsync(CommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));

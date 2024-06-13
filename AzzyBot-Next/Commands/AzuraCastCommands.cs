@@ -71,7 +71,7 @@ public sealed class AzuraCastCommands
             await context.RespondAsync("I initiated the cache refresh, please wait a little for it to occur.");
         }
 
-        [Command("force-update-check"), Description("Forces the bot to search for AzuraCast Updates.")]
+        [Command("force-update-check"), Description("Force the bot to search for AzuraCast Updates.")]
         public async ValueTask ForceUpdateCheckAsync(CommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -92,7 +92,7 @@ public sealed class AzuraCastCommands
         private readonly AzuraCastApiService _azuraCast = azuraCast;
         private readonly DbActions _dbActions = dbActions;
 
-        [Command("now-playing"), Description("Get the currently playing song on the station.")]
+        [Command("now-playing"), Description("Get the currently playing song on the selected station.")]
         public async ValueTask GetNowPlayingAsync
             (
             CommandContext context,
