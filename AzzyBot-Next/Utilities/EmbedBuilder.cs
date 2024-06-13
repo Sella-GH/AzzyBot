@@ -332,7 +332,9 @@ public static class EmbedBuilder
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(commands.Count, nameof(commands));
 
         const string preTitle = "Command List For";
-        string title = $"{preTitle} {commands[0].SubCommand} Module";
+
+        // Make the first letter an uppercase one and append the rest
+        string title = $"{preTitle} {string.Concat(commands[0].SubCommand[0].ToString().ToUpperInvariant(), commands[0].SubCommand.AsSpan(1))} Group";
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
         foreach (AzzyHelpRecord command in commands)
