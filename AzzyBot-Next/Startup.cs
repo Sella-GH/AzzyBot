@@ -40,6 +40,12 @@ public static class Startup
         };
         HostApplicationBuilder appBuilder = Host.CreateApplicationBuilder(appSettings);
 
+        if (isDocker)
+        {
+            // Give the database time to start up
+            await Task.Delay(TimeSpan.FromSeconds(15));
+        }
+
         #region Add logging
 
         appBuilder.Logging.AzzyBotLogging(isDev, forceDebug);
@@ -53,12 +59,6 @@ public static class Startup
         appBuilder.Services.AzzyBotServices();
 
         #endregion Add services
-
-        if (isDocker)
-        {
-            // Give the database time to start up
-            await Task.Delay(TimeSpan.FromSeconds(3));
-        }
 
         using IHost app = appBuilder.Build();
         app.ApplyDbMigrations();
