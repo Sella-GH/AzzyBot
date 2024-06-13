@@ -32,7 +32,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
         _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecksAsync));
 
         List<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
-        foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast is not null).Select(g => g.AzuraCast!))
+        foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.IsOnline == true).Select(g => g.AzuraCast!))
         {
             foreach (AzuraCastStationEntity station in azuraCast.Stations.Where(s => s.Checks.FileChanges))
             {
@@ -134,7 +134,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
         }
 
         DiscordEmbed embed = EmbedBuilder.BuildAzuraCastFileChangesEmbed(stationName, addedFiles.Count, removedFiles.Count);
-        await _botService.SendMessageAsync(channelId, $"Changes in the files of station **{stationName}** detected. Check the details below.", [embed], paths);
+        await _botService.SendMessageAsync(channelId, $"Changes in the files of station **{stationName}**({stationId}) detected. Check the details below.", [embed], paths);
         await FileOperations.WriteToFileAsync(Path.Combine(_azuraCast.FilePath, $"{stationDbId}-{stationId}-files.json"), JsonSerializer.Serialize(onlineFiles, _serializerOptions));
     }
 }

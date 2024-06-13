@@ -17,6 +17,14 @@ public sealed class AzuraCastApiService(WebRequestService webService)
     public string FilePath { get; } = Path.Combine(Environment.CurrentDirectory, "Modules", "AzuraCast", "Files");
     //private readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
 
+    private static Dictionary<string, string> CreateHeader(string apiKey)
+    {
+        return new()
+        {
+            ["X-API-Key"] = apiKey
+        };
+    }
+
     private async Task<string> FetchFromApiAsync(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
@@ -27,14 +35,6 @@ public sealed class AzuraCastApiService(WebRequestService webService)
             throw new InvalidOperationException($"API response is empty, url: {url}");
 
         return body;
-    }
-
-    private static Dictionary<string, string> CreateHeader(string apiKey)
-    {
-        return new()
-        {
-            ["X-API-Key"] = apiKey
-        };
     }
 
     private async Task<T> FetchFromApiAsync<T>(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)

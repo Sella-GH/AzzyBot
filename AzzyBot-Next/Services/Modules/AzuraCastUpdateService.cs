@@ -28,7 +28,7 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
         _logger.BackgroundServiceWorkItem(nameof(QueueAzuraCastUpdatesAsync));
 
         List<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
-        foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.Checks.Updates == true).Select(g => g.AzuraCast!))
+        foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.IsOnline == true && g.AzuraCast.Checks.Updates).Select(g => g.AzuraCast!))
         {
             _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForAzuraCastUpdatesAsync(azuraCast, ct)));
         }
