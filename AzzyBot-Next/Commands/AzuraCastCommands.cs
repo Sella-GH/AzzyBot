@@ -34,7 +34,7 @@ public sealed class AzuraCastCommands
         private readonly AzzyBackgroundService _backgroundService = backgroundService;
         private readonly DbActions _dbActions = dbActions;
 
-        [Command("force-cache-refresh"), Description("Force the bot to refresh it's local song cache for a specific station."), AzuraCastOnlineCheck]
+        [Command("force-cache-refresh"), Description("Force the bot to refresh it's local song cache for a specific station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
         public async ValueTask ForceCacheRefreshAsync
         (
             CommandContext context,
@@ -51,7 +51,7 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync("I initiated the cache refresh, please wait a little for it to occur.");
         }
 
-        [Command("force-online-check"), Description("Force the bot to check if the AzuraCast instance is online.")]
+        [Command("force-online-check"), Description("Force the bot to check if the AzuraCast instance is online."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast)]
         public async ValueTask ForceOnlineCheckAsync(CommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -64,7 +64,7 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync("I initiated the online check for the AzuraCast instance, please wait a little for the result.");
         }
 
-        [Command("force-update-check"), Description("Force the bot to search for AzuraCast Updates."), AzuraCastOnlineCheck]
+        [Command("force-update-check"), Description("Force the bot to search for AzuraCast Updates."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
         public async ValueTask ForceUpdateCheckAsync(CommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -77,7 +77,7 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync("I initiated the check for AzuraCast Updates, please wait a little.\nThere won't be an answer if there are no updates available.");
         }
 
-        [Command("hardware-stats"), Description("Get the hardware stats of the running server."), AzuraCastOnlineCheck]
+        [Command("hardware-stats"), Description("Get the hardware stats of the running server."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
         public async ValueTask GetHardwareStatsAsync(CommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -105,7 +105,7 @@ public sealed class AzuraCastCommands
         private readonly AzuraCastApiService _azuraCast = azuraCast;
         private readonly DbActions _dbActions = dbActions;
 
-        [Command("now-playing"), Description("Get the currently playing song on the selected station.")]
+        [Command("now-playing"), Description("Get the currently playing song on the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
         public async ValueTask GetNowPlayingAsync
             (
             CommandContext context,
