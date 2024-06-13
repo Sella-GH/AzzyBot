@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace AzzyBot.Utilities.Records.AzuraCast;
 
-public sealed record HardwareStatsRecord
+public sealed record AzuraHardwareStatsRecord
 {
     [JsonPropertyName("cpu")]
     public required CpuData Cpu { get; init; }

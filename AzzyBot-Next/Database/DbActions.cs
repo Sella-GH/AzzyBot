@@ -41,7 +41,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         }
     }
 
-    public Task<bool> AddAzuraCastAsync(ulong guildId, Uri baseUrl, string apiKey, ulong outagesId)
+    public Task<bool> AddAzuraCastAsync(ulong guildId, Uri baseUrl, string apiKey, ulong notificationId, ulong outagesId, bool serverStatus, bool updates, bool changelog)
     {
         ArgumentNullException.ThrowIfNull(baseUrl, nameof(baseUrl));
 
@@ -53,8 +53,17 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             {
                 BaseUrl = Crypto.Encrypt(baseUrl.OriginalString),
                 AdminApiKey = Crypto.Encrypt(apiKey),
+                NotificationChannelId = notificationId,
                 OutagesChannelId = outagesId,
                 GuildId = guild.Id
+            };
+
+            azuraCast.Checks = new()
+            {
+                ServerStatus = serverStatus,
+                Updates = updates,
+                UpdatesShowChangelog = changelog,
+                AzuraCastId = azuraCast.Id
             };
 
             guild.AzuraCastSet = true;
@@ -64,7 +73,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, string name, ulong requestsId, bool hls, bool showPlaylist, bool fileChanges, bool serverStatus, bool updates, bool updatesChangelog, string? apiKey)
+    public Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, string name, ulong requestsId, bool hls, bool showPlaylist, bool fileChanges, string? apiKey = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -84,9 +93,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             station.Checks = new()
             {
                 FileChanges = fileChanges,
-                ServerStatus = serverStatus,
-                Updates = updates,
-                UpdatesShowChangelog = updatesChangelog,
                 StationId = station.Id
             };
 
@@ -94,20 +100,20 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> AddAzuraCastMountPointAsync(ulong guildId, int stationId, string mountName, string mount)
+    public Task<bool> AddAzuraCastStationMountPointAsync(ulong guildId, int stationId, string mountName, string mount)
     {
         return ExecuteDbActionAsync(async context =>
         {
             AzuraCastStationEntity station = await GetAzuraCastStationAsync(guildId, stationId);
 
-            AzuraCastMountEntity mountPoint = new()
+            AzuraCastStationMountEntity mountPoint = new()
             {
                 Name = Crypto.Encrypt(mountName),
                 Mount = Crypto.Encrypt(mount),
                 StationId = station.Id
             };
 
-            await context.AzuraCastMounts.AddAsync(mountPoint);
+            await context.AzuraCastStationMounts.AddAsync(mountPoint);
         });
     }
 
@@ -146,9 +152,9 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     {
         return ExecuteDbActionAsync(async context =>
         {
-            AzuraCastMountEntity mount = await GetAzuraCastMountAsync(guildId, stationId, mountId);
+            AzuraCastStationMountEntity mount = await GetAzuraCastStationMountAsync(guildId, stationId, mountId);
 
-            context.AzuraCastMounts.Remove(mount);
+            context.AzuraCastStationMounts.Remove(mount);
         });
     }
 
@@ -182,25 +188,11 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         return guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast settings not found in databse");
     }
 
-    public async Task<AzuraCastChecksEntity> GetAzuraCastChecksAsync(ulong guildId, int stationId)
+    public async Task<AzuraCastChecksEntity> GetAzuraCastChecksAsync(ulong guildId)
     {
-        AzuraCastStationEntity station = await GetAzuraCastStationAsync(guildId, stationId);
+        AzuraCastEntity azuraCast = await GetAzuraCastAsync(guildId);
 
-        return station.Checks;
-    }
-
-    public async Task<AzuraCastMountEntity> GetAzuraCastMountAsync(ulong guildId, int stationId, int mountId)
-    {
-        AzuraCastStationEntity station = await GetAzuraCastStationAsync(guildId, stationId);
-
-        return station.Mounts.FirstOrDefault(m => m.Id == mountId) ?? throw new InvalidOperationException("Mount not found in database");
-    }
-
-    public async Task<List<AzuraCastMountEntity>> GetAzuraCastMountsAsync(ulong guildId, int stationId)
-    {
-        AzuraCastStationEntity station = await GetAzuraCastStationAsync(guildId, stationId);
-
-        return [.. station.Mounts];
+        return azuraCast.Checks;
     }
 
     public async Task<AzuraCastStationEntity> GetAzuraCastStationAsync(ulong guildId, int stationId)
@@ -215,6 +207,27 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         AzuraCastEntity azuraCast = await GetAzuraCastAsync(guildId);
 
         return [.. azuraCast.Stations];
+    }
+
+    public async Task<AzuraCastStationChecksEntity> GetAzuraCastStationChecksAsync(ulong guildId, int stationId)
+    {
+        AzuraCastStationEntity station = await GetAzuraCastStationAsync(guildId, stationId);
+
+        return station.Checks;
+    }
+
+    public async Task<AzuraCastStationMountEntity> GetAzuraCastStationMountAsync(ulong guildId, int stationId, int mountId)
+    {
+        AzuraCastStationEntity station = await GetAzuraCastStationAsync(guildId, stationId);
+
+        return station.Mounts.FirstOrDefault(m => m.Id == mountId) ?? throw new InvalidOperationException("Mount not found in database");
+    }
+
+    public async Task<List<AzuraCastStationMountEntity>> GetAzuraCastStationMountsAsync(ulong guildId, int stationId)
+    {
+        AzuraCastStationEntity station = await GetAzuraCastStationAsync(guildId, stationId);
+
+        return [.. station.Mounts];
     }
 
     public async Task<GuildsEntity> GetGuildAsync(ulong guildId)
@@ -240,7 +253,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             : guilds.Where(g => !g.IsDebugAllowed).ToList();
     }
 
-    public Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl, string? apiKey, ulong? outagesId)
+    public Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl = null, string? apiKey = null, ulong? notificationId = null, ulong? outagesId = null, bool? isOnline = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -252,21 +265,24 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             if (!string.IsNullOrWhiteSpace(apiKey))
                 azuraCast.AdminApiKey = Crypto.Encrypt(apiKey);
 
+            if (notificationId.HasValue)
+                azuraCast.NotificationChannelId = notificationId.Value;
+
             if (outagesId.HasValue)
                 azuraCast.OutagesChannelId = outagesId.Value;
+
+            if (isOnline.HasValue)
+                azuraCast.IsOnline = isOnline.Value;
 
             context.AzuraCast.Update(azuraCast);
         });
     }
 
-    public Task<bool> UpdateAzuraCastChecksAsync(ulong guildId, int stationId, bool? fileChanges, bool? serverStatus, bool? updates, bool? updatesChangelog)
+    public Task<bool> UpdateAzuraCastChecksAsync(ulong guildId, bool? serverStatus = null, bool? updates = null, bool? changelog = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
-            AzuraCastChecksEntity checks = await GetAzuraCastChecksAsync(guildId, stationId);
-
-            if (fileChanges.HasValue)
-                checks.FileChanges = fileChanges.Value;
+            AzuraCastChecksEntity checks = await GetAzuraCastChecksAsync(guildId);
 
             if (serverStatus.HasValue)
                 checks.ServerStatus = serverStatus.Value;
@@ -274,14 +290,14 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             if (updates.HasValue)
                 checks.Updates = updates.Value;
 
-            if (updatesChangelog.HasValue)
-                checks.UpdatesShowChangelog = updatesChangelog.Value;
+            if (changelog.HasValue)
+                checks.UpdatesShowChangelog = changelog.Value;
 
             context.AzuraCastChecks.Update(checks);
         });
     }
 
-    public Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId, string? name, string? apiKey, ulong? requestId, bool? hls, bool? playlist)
+    public Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? name = null, string? apiKey = null, ulong? requestId = null, bool? hls = null, bool? playlist = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -309,7 +325,20 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> UpdateGuildAsync(ulong guildId, ulong? errorChannelId, bool? isDebug)
+    public Task<bool> UpdateAzuraCastStationChecksAsync(ulong guildId, int stationId, bool? fileChanges = null)
+    {
+        return ExecuteDbActionAsync(async context =>
+        {
+            AzuraCastStationChecksEntity checks = await GetAzuraCastStationChecksAsync(guildId, stationId);
+
+            if (fileChanges.HasValue)
+                checks.FileChanges = fileChanges.Value;
+
+            context.AzuraCastStationChecks.Update(checks);
+        });
+    }
+
+    public Task<bool> UpdateGuildAsync(ulong guildId, ulong? errorChannelId = null, bool? isDebug = null)
     {
         return ExecuteDbActionAsync(async context =>
         {

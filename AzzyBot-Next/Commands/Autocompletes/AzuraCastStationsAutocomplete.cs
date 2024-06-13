@@ -18,9 +18,18 @@ public sealed class AzuraCastStationsAutocomplete(DbActions dbActions) : IAutoCo
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
-        List<AzuraCastStationEntity> stationsInDb = await _dbActions.GetAzuraCastStationsAsync(context.Guild.Id);
-
+        // TODO Solve this more clean and nicer when it's possible
         Dictionary<string, object> results = [];
+        List<AzuraCastStationEntity> stationsInDb;
+        try
+        {
+            stationsInDb = await _dbActions.GetAzuraCastStationsAsync(context.Guild.Id);
+        }
+        catch (InvalidOperationException)
+        {
+            return results;
+        }
+
         foreach (AzuraCastStationEntity station in stationsInDb)
         {
             results.Add(Crypto.Decrypt(station.Name), station.Id);

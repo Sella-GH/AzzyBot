@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;
 
-public sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotService botService, WebRequestService webService, ILogger<UpdaterService> logger)
+public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettingsRecord settings, DiscordBotService botService, WebRequestService webService)
 {
     private readonly ILogger<UpdaterService> _logger = logger;
     private readonly AzzyBotSettingsRecord _settings = settings;
@@ -40,14 +40,14 @@ public sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotSer
             return;
         }
 
-        UpdateRecord? updaterRecord;
+        AzzyUpdateRecord? updaterRecord;
         if (isPreview)
         {
-            updaterRecord = JsonSerializer.Deserialize<List<UpdateRecord>>(body)?[0];
+            updaterRecord = JsonSerializer.Deserialize<List<AzzyUpdateRecord>>(body)?[0];
         }
         else
         {
-            updaterRecord = JsonSerializer.Deserialize<UpdateRecord>(body);
+            updaterRecord = JsonSerializer.Deserialize<AzzyUpdateRecord>(body);
         }
 
         if (updaterRecord is null)
@@ -74,7 +74,7 @@ public sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotSer
             _azzyNotifyCounter = 0;
         }
 
-        if (!ChecKUpdateNotification(_azzyNotifyCounter, _lastAzzyUpdateNotificationTime))
+        if (!CheckUpdateNotification(_azzyNotifyCounter, _lastAzzyUpdateNotificationTime))
             return;
 
         _lastAzzyUpdateNotificationTime = DateTime.Now;
@@ -108,7 +108,7 @@ public sealed class UpdaterService(AzzyBotSettingsRecord settings, DiscordBotSer
         await _botService.SendMessageAsync(channelId, null, embeds);
     }
 
-    private static bool ChecKUpdateNotification(int notifyCounter, in DateTime lastNotificationTime)
+    private static bool CheckUpdateNotification(int notifyCounter, in DateTime lastNotificationTime)
     {
         DateTime now = DateTime.Now;
         bool dayNotification = false;

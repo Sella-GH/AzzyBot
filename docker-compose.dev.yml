@@ -13,6 +13,7 @@ services:
       - AzzyBot-Db-Nw
       - AzzyBot-Nw
     volumes:
+      - ./AzzyBot/Modules/AzuraCast/Files:/app/Modules/AzuraCast/Files
       - ./AzzyBot/Logs:/app/Logs
       - ./AzzyBot/Settings:/app/Settings
 

@@ -7,11 +7,10 @@ public sealed class AzuraCastChecksEntity
 {
     public int Id { get; set; }
 
-    public bool FileChanges { get; set; }
     public bool ServerStatus { get; set; }
     public bool Updates { get; set; }
     public bool UpdatesShowChangelog { get; set; }
 
-    public int StationId { get; set; }
-    public AzuraCastStationEntity Station { get; set; } = null!;
+    public int AzuraCastId { get; set; }
+    public AzuraCastEntity AzuraCast { get; set; } = null!;
 }

@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace AzzyBot.Utilities.Records.AzuraCast;
 
-public sealed record PlaylistRecord
+public sealed record AzuraPlaylistRecord
 {
     [JsonPropertyName("name")]
     public string Name { get; init; } = string.Empty;

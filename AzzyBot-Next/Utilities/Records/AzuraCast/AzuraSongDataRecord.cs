@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace AzzyBot.Utilities.Records.AzuraCast;
 
-public record SongDataRecord
+public record AzuraSongDataRecord
 {
     [JsonPropertyName("duration")]
     public int Duration { get; init; }

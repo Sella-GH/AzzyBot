@@ -1,25 +1,33 @@
 ## 2.0.0-preview2
 ### Breaking Changes
-- Your Database needs a complete reset, please DROP it and start from scratch.
+- Your Database needs a complete reset, please DROP it and start from scratch
+  - You'll likely experience this a few more times until the final release
+  - No, I won't provide migration scripts for preview versions unless I'm fully confident that the database structure is somewhat final
 
 ### General
+- Greatly reworked the way how background checks, features and other stuff is handled
 - The integrated updater is now able to identify preview versions
-- The `AzuraCast` module is finally added!
-  - Now you can finally use the bot again and work with it
+- Unified the config command names of the AzuraCast stuff
+  - Yes, this means that the command names have changed
+  - Also the whole background check configuration shifted from one database table to others
 
 ### Additions
-- New commands:
-  - `azuracast hardware-stats` - Shows the usage statistics of the hardware
-  - `music nowplaying` - Shows the currently played stuff from the choosen station
-- AzuraCast Admin Api Key added
-  - This is a required field if you want to set up AzuraCast in the bot. Ensure it has the view admin info permission inside AzuraCast
+- The `AzuraCast` module is finally added!
+  - Now you can use the bot again and work with it like before (just in better)
+  - Implemented new commands, new background checks and a lot of API stuff
+- AzuraCast Admin Api Key to AzuraCast configuration added
+  - This is a required field if you want to set up AzuraCast in the bot. Ensure it has the `view` permission for the admin panel inside AzuraCast
+- Setting to control the logfile cleaning after specified days (default 7)
 
 ### Improvements
-- AzuraCast Station Api Key is now optional
-  - Because the Admin Api Key is required the station one is now optional. However if you do not add a station one the admin one will be used!
+- AzuraCast Station Api Key in AzuraCastStation configuration is now optional
+  - Because the Admin Api Key is required, the station one is now optional. However if you do not add a station specific key the admin key will be used!
+- File logging now uses a shared static StreamWriter
+  - This should improve the performance and stability of logging
 
 ## Fixes
 - Guild Database Entity was not updated when AzuraCast was activated or disabled
+- Some autocomplete exceptions
 
 ## 2.0.0-preview1.1
 ### General

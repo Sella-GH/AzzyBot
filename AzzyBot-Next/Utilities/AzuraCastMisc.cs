@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using AzzyBot.Utilities.Enums;
 
 namespace AzzyBot.Utilities;
 
@@ -27,5 +28,15 @@ public static class AzuraCastMisc
         }
 
         return bar.ToString();
+    }
+
+    public static string ReadableBool(bool value, ReadbleBool type)
+    {
+        return type switch
+        {
+            ReadbleBool.EnabledDisabled => (value) ? "Enabled" : "Disabled",
+            ReadbleBool.YesNo => (value) ? "Yes" : "No",
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null),
+        };
     }
 }

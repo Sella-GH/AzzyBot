@@ -29,7 +29,7 @@ public sealed class CoreCommands
         private readonly DbActions _dbActions = dbActions;
         private readonly ILogger<CoreGroup> _logger = logger;
 
-        [Command("help"), Description("Gives an overview about all the available commands.")]
+        [Command("help"), Description("Gives you an overview about all the available commands.")]
         public async ValueTask HelpAsync
             (
             CommandContext context,

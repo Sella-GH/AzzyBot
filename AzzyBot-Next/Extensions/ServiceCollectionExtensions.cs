@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Database;
 using AzzyBot.Services;
+using AzzyBot.Services.Interfaces;
 using AzzyBot.Services.Modules;
+using AzzyBot.Services.Queues;
 using AzzyBot.Settings;
 using AzzyBot.Utilities;
 using AzzyBot.Utilities.Encryption;
@@ -32,8 +34,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<CoreServiceHost>();
         services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
 
-        services.AddSingleton<AzuraCastService>();
-
         string connectionString = GetConnectionString(settings.Database?.Host, settings.Database?.Port, settings.Database?.User, settings.Database?.Password, settings.Database?.DatabaseName);
         CheckIfDatabaseIsOnline(connectionString);
 
@@ -46,6 +46,16 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<WebRequestService>();
         services.AddSingleton<UpdaterService>();
+
+        services.AddSingleton<AzuraCastApiService>();
+        services.AddSingleton<AzuraCastFileService>();
+        services.AddSingleton<AzuraCastPingService>();
+        services.AddSingleton<AzuraCastUpdateService>();
+        services.AddSingleton<AzzyBackgroundService>();
+        services.AddSingleton<AzzyBackgroundServiceHost>();
+        services.AddHostedService(s => s.GetRequiredService<AzzyBackgroundServiceHost>());
+        services.AddSingleton<IQueuedBackgroundTask>(_ => new QueuedBackgroundTask());
+
         services.AddSingleton<TimerServiceHost>();
         services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());
     }

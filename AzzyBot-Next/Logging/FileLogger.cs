@@ -1,19 +1,48 @@
 using System;
 using System.IO;
+using System.Text;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Logging;
 
-public sealed class FileLogger(string name, Func<FileLoggerConfiguration> getConfig) : ILogger
+public sealed class FileLogger : ILogger
 {
-    private readonly string _name = name;
-    private readonly object _lock = new();
+    private readonly string _name;
+    private readonly Func<FileLoggerConfiguration> _getConfig;
+    private static StreamWriter? LogStream;
+    private static readonly object Lock = new();
+
+    public FileLogger(string name, Func<FileLoggerConfiguration> getConfig)
+    {
+        ArgumentNullException.ThrowIfNull(name, nameof(name));
+        ArgumentNullException.ThrowIfNull(getConfig, nameof(getConfig));
+
+        _name = name;
+        _getConfig = getConfig;
+    }
+
+    private static void InitializeLogWriter(Func<FileLoggerConfiguration> getConfig)
+    {
+        if (LogStream is not null)
+            return;
+
+        lock (Lock)
+        {
+            FileLoggerConfiguration config = getConfig();
+            string logFilePath = GetLogFilePath(config.Directory);
+            LogStream = new StreamWriter(logFilePath, true, Encoding.UTF8)
+            {
+                AutoFlush = true,
+                NewLine = Environment.NewLine
+            };
+        }
+    }
 
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull
         => default!;
 
     public bool IsEnabled(LogLevel logLevel)
-        => logLevel != LogLevel.None && !string.IsNullOrWhiteSpace(getConfig().Directory);
+        => logLevel != LogLevel.None && !string.IsNullOrWhiteSpace(_getConfig().Directory);
 
     private static string GetLogFilePath(string directory)
         => Path.Combine(directory, $"{DateTime.Now:yyyy-MM-dd}.log");
@@ -25,13 +54,15 @@ public sealed class FileLogger(string name, Func<FileLoggerConfiguration> getCon
         if (!IsEnabled(logLevel))
             return;
 
-        lock (_lock)
-        {
-            FileLoggerConfiguration config = getConfig();
-            string message = formatter(state, exception);
-            string logMessage = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {logLevel}: {_name}[{eventId.Id}] {message}{Environment.NewLine}";
+        InitializeLogWriter(_getConfig);
 
-            File.AppendAllText(GetLogFilePath(config.Directory), logMessage);
+        lock (Lock)
+        {
+            string message = formatter(state, exception);
+            // Neccessary because otherwise the exception is eaten
+            string logMessage = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {logLevel}: {_name}[{eventId.Id}] {message}{exception}";
+
+            LogStream?.WriteLine(logMessage);
         }
     }
 }

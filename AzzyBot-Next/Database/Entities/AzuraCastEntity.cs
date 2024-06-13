@@ -11,7 +11,10 @@ public sealed class AzuraCastEntity
 
     public string BaseUrl { get; set; } = string.Empty;
     public string AdminApiKey { get; set; } = string.Empty;
+    public ulong NotificationChannelId { get; set; }
     public ulong OutagesChannelId { get; set; }
+    public bool IsOnline { get; set; }
+    public AzuraCastChecksEntity Checks { get; set; } = new();
     public ICollection<AzuraCastStationEntity> Stations { get; } = new List<AzuraCastStationEntity>();
 
     public int? GuildId { get; set; }
