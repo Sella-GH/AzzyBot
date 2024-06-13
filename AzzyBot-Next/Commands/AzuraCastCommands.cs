@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AzzyBot.Commands.Autocompletes;
 using AzzyBot.Commands.Checks;
@@ -118,16 +119,24 @@ public sealed class AzuraCastCommands
 
             GuildsEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id);
             AzuraCastEntity azuraCast = guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast is null");
-            if (!azuraCast.IsOnline)
-            {
-                await context.EditResponseAsync("This AzuraCast instance is currently offline, please try again later!");
-                return;
-            }
-
             AzuraCastStationEntity station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId) ?? throw new InvalidOperationException("Station is null");
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
-            AzuraNowPlayingDataRecord nowPlaying = await _azuraCast.GetNowPlayingAsync(new(baseUrl), stationId);
+            AzuraNowPlayingDataRecord? nowPlaying = null;
+            try
+            {
+                nowPlaying = await _azuraCast.GetNowPlayingAsync(new(baseUrl), stationId);
+            }
+            catch (HttpRequestException)
+            {
+                await context.EditResponseAsync("This station is currently offline.");
+            }
+
+            if (nowPlaying is null)
+            {
+                await context.EditResponseAsync("No song is currently playing.");
+                return;
+            }
 
             string? playlistName = null;
             if (station.ShowPlaylistInNowPlaying)
