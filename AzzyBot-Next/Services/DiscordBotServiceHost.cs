@@ -140,12 +140,8 @@ public sealed class DiscordBotServiceHost : IHostedService
         // These commands are for every server
         commandsExtension.AddCommands(typeof(ConfigCommands.ConfigGroup));
         commandsExtension.AddCommands(typeof(CoreCommands.CoreGroup));
-
-        List<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
-        IEnumerable<ulong> azuraCastGuilds = guilds.Where(g => g.AzuraCast is not null).Select(g => g.UniqueId);
-
-        commandsExtension.AddCommands(typeof(AzuraCastCommands.AzuraCastGroup), [.. azuraCastGuilds]);
-        commandsExtension.AddCommands(typeof(AzuraCastCommands.MusicGroup), [.. azuraCastGuilds]);
+        commandsExtension.AddCommands(typeof(AzuraCastCommands.AzuraCastGroup));
+        commandsExtension.AddCommands(typeof(AzuraCastCommands.MusicGroup));
 
         // Only add admin commands to the main server
         commandsExtension.AddCommand(typeof(AdminCommands.AdminGroup), _settings.ServerId);
@@ -153,6 +149,7 @@ public sealed class DiscordBotServiceHost : IHostedService
         // Only add debug commands if it's a dev build
         if (AzzyStatsSoftware.GetBotEnvironment == Environments.Development)
         {
+            List<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
             List<ulong> debugGuilds = guilds.Where(g => g.IsDebugAllowed).Select(g => g.UniqueId).ToList();
             if (!debugGuilds.Contains(_settings.ServerId))
                 debugGuilds.Add(_settings.ServerId);
