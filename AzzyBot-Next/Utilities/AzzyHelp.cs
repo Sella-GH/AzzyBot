@@ -48,7 +48,24 @@ public static class AzzyHelp
         Dictionary<string, List<AzzyHelpRecord>> records = [];
         foreach (string group in commandGroups)
         {
-            records.Add(group, GetCommands(commands[group].Subcommands, group, singleCommand));
+            Command command = commands[group];
+            List<AzzyHelpRecord> subCommands = [];
+            List<AzzyHelpRecord> subSubCommands = [];
+            foreach (Command subCommand in commands[group].Subcommands.Where(c => c.Subcommands.Count > 0))
+            {
+                subSubCommands.AddRange(GetCommands(subCommand.Subcommands, command.Name, singleCommand));
+            }
+
+            if (subSubCommands.Count > 0)
+            {
+                subCommands.AddRange(GetCommands(command.Subcommands.Where(c => c.Description is not "No description provided.").ToList(), command.Name, singleCommand));
+                subCommands.AddRange(subSubCommands);
+                records.Add(group, subCommands);
+            }
+            else
+            {
+                records.Add(group, GetCommands(command.Subcommands, command.Name, singleCommand));
+            }
         }
 
         return records;
