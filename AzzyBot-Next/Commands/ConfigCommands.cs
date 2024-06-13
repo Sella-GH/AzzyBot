@@ -59,7 +59,7 @@ public sealed class ConfigCommands
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             GuildsEntity guild = await _db.GetGuildAsync(guildId);
-            if (guild.AzuraCastSet)
+            if (guild.AzuraCast is not null)
             {
                 await context.EditResponseAsync("AzuraCast is already set up for your server.");
                 return;

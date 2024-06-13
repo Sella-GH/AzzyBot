@@ -450,8 +450,7 @@ public static class EmbedBuilder
         {
             ["Server ID"] = new(guild.UniqueId.ToString(CultureInfo.InvariantCulture)),
             ["Error Channel"] = new((guild.ErrorChannelId > 0) ? $"<#{guild.ErrorChannelId}>" : "Not set"),
-            ["Configuration Complete"] = new(AzuraCastMisc.ReadableBool(guild.ConfigSet, ReadbleBool.YesNo)),
-            ["AzuraCast Activated"] = new(AzuraCastMisc.ReadableBool(guild.AzuraCastSet, ReadbleBool.YesNo))
+            ["Configuration Complete"] = new(AzuraCastMisc.ReadableBool(guild.ConfigSet, ReadbleBool.YesNo))
         };
 
         return CreateBasicEmbed(title, description, DiscordColor.White, null, null, null, fields);

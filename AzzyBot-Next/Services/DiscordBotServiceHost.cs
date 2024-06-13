@@ -6,6 +6,7 @@ using AzzyBot.Commands;
 using AzzyBot.Commands.Checks;
 using AzzyBot.Commands.Converters;
 using AzzyBot.Database;
+using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
 using AzzyBot.Settings;
 using AzzyBot.Utilities;
@@ -23,6 +24,7 @@ using DSharpPlus.Interactivity.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace AzzyBot.Services;
 
@@ -136,17 +138,27 @@ public sealed class DiscordBotServiceHost : IHostedService
         commandsExtension.CommandErrored += CommandErroredAsync;
 
         // These commands are for every server
-        commandsExtension.AddCommands(typeof(AzuraCastCommands.AzuraCastGroup));
-        commandsExtension.AddCommands(typeof(AzuraCastCommands.MusicGroup));
         commandsExtension.AddCommands(typeof(ConfigCommands.ConfigGroup));
         commandsExtension.AddCommands(typeof(CoreCommands.CoreGroup));
+
+        List<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
+        IEnumerable<ulong> azuraCastGuilds = guilds.Where(g => g.AzuraCast is not null).Select(g => g.UniqueId);
+
+        commandsExtension.AddCommands(typeof(AzuraCastCommands.AzuraCastGroup), [.. azuraCastGuilds]);
+        commandsExtension.AddCommands(typeof(AzuraCastCommands.MusicGroup), [.. azuraCastGuilds]);
 
         // Only add admin commands to the main server
         commandsExtension.AddCommand(typeof(AdminCommands.AdminGroup), _settings.ServerId);
 
         // Only add debug commands if it's a dev build
-        if (AzzyStatsSoftware.GetBotName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase))
-            commandsExtension.AddCommands(typeof(DebugCommands.DebugGroup), _settings.ServerId);
+        if (AzzyStatsSoftware.GetBotEnvironment == Environments.Development)
+        {
+            List<ulong> debugGuilds = guilds.Where(g => g.IsDebugAllowed).Select(g => g.UniqueId).ToList();
+            if (!debugGuilds.Contains(_settings.ServerId))
+                debugGuilds.Add(_settings.ServerId);
+
+            commandsExtension.AddCommands(typeof(DebugCommands.DebugGroup), [.. debugGuilds]);
+        }
 
         commandsExtension.AddCheck<AzuraCastOnlineCheck>();
 

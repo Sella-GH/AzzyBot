@@ -180,9 +180,6 @@ namespace AzzyBot.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("AzuraCastSet")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<bool>("ConfigSet")
                         .HasColumnType("tinyint(1)");
 
