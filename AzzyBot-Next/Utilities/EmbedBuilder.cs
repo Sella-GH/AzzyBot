@@ -9,6 +9,7 @@ using AzzyBot.Utilities.Encryption;
 using AzzyBot.Utilities.Records;
 using AzzyBot.Utilities.Records.AzuraCast;
 using DSharpPlus.Entities;
+using AzzyBot.Utilities.Enums;
 
 namespace AzzyBot.Utilities;
 
@@ -449,8 +450,8 @@ public static class EmbedBuilder
         {
             ["Server ID"] = new(guild.UniqueId.ToString(CultureInfo.InvariantCulture)),
             ["Error Channel"] = new((guild.ErrorChannelId > 0) ? $"<#{guild.ErrorChannelId}>" : "Not set"),
-            ["Configuration Complete"] = new(guild.ConfigSet.ToString()),
-            ["AzuraCast Activated"] = new(guild.AzuraCastSet.ToString())
+            ["Configuration Complete"] = new(AzuraCastMisc.ReadableBool(guild.ConfigSet, ReadbleBool.YesNo)),
+            ["AzuraCast Activated"] = new(AzuraCastMisc.ReadableBool(guild.AzuraCastSet, ReadbleBool.YesNo))
         };
 
         return CreateBasicEmbed(title, description, DiscordColor.White, null, null, null, fields);
@@ -468,7 +469,7 @@ public static class EmbedBuilder
             ["Admin Api Key"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.AdminApiKey)) ? Crypto.Decrypt(azuraCast.AdminApiKey) : "Not set")}||"),
             ["Notification Channel"] = new((azuraCast.NotificationChannelId > 0) ? $"<#{azuraCast.NotificationChannelId}>" : "Not set"),
             ["Outages Channel"] = new((azuraCast.OutagesChannelId > 0) ? $"<#{azuraCast.OutagesChannelId}>" : "Not set"),
-            ["Automatic Checks"] = new($"- Server Status: {azuraCast.Checks.ServerStatus}\n- Updates: {azuraCast.Checks.Updates}\n- Updates Changelog: {azuraCast.Checks.UpdatesShowChangelog}")
+            ["Automatic Checks"] = new($"- Server Status: {AzuraCastMisc.ReadableBool(azuraCast.Checks.ServerStatus, ReadbleBool.EnabledDisabled)}\n- Updates: {AzuraCastMisc.ReadableBool(azuraCast.Checks.Updates, ReadbleBool.EnabledDisabled)}\n- Updates Changelog: {AzuraCastMisc.ReadableBool(azuraCast.Checks.UpdatesShowChangelog, ReadbleBool.EnabledDisabled)}")
         };
 
         embeds.Add(CreateBasicEmbed(title, string.Empty, DiscordColor.White, null, null, null, fields));
@@ -482,8 +483,8 @@ public static class EmbedBuilder
                 ["Station ID"] = new(station.StationId.ToString(CultureInfo.InvariantCulture)),
                 ["Api key"] = new($"||{((!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : "Not set")}||"),
                 ["Music Requests Channel"] = new((station.RequestsChannelId > 0) ? $"<#{station.RequestsChannelId}>" : "Not set"),
-                ["Prefer HLS Streaming"] = new(station.PreferHls.ToString()),
-                ["Show Playlist In Now Playing"] = new(station.ShowPlaylistInNowPlaying.ToString()),
+                ["Prefer HLS Streaming"] = new(AzuraCastMisc.ReadableBool(station.PreferHls, ReadbleBool.EnabledDisabled)),
+                ["Show Playlist In Now Playing"] = new(AzuraCastMisc.ReadableBool(station.ShowPlaylistInNowPlaying, ReadbleBool.EnabledDisabled)),
                 ["Automatic Checks"] = new($"- File Changes: {station.Checks.FileChanges}"),
                 ["Mount Points"] = new((station.Mounts.Count > 0) ? string.Join('\n', station.Mounts.Select(x => $"- {Crypto.Decrypt(x.Name)}: {Crypto.Decrypt(x.Mount)}")) : "No Mount Points added")
             };
