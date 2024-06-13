@@ -16,9 +16,11 @@ public static class AzzyHelp
         return command switch
         {
             "admin" => adminServer,
+            "azuracast" => permissions.HasPermission(DiscordPermissions.Administrator),
             "config" => permissions.HasPermission(DiscordPermissions.Administrator),
             "core" => true,
             "debug" => approvedDebug && permissions.HasPermission(DiscordPermissions.Administrator),
+            "music" => true,
             _ => false,
         };
     }
@@ -57,12 +59,12 @@ public static class AzzyHelp
         List<AzzyHelpRecord> records = [];
         foreach (Command command in commands)
         {
-            string description = command.Description ?? "No description provided";
+            string description = command.Description ?? "No description provided.";
             Dictionary<string, string> parameters = [];
             foreach (CommandParameter parameter in command.Parameters)
             {
                 string paramName = parameter.Name ?? "No name provided";
-                string paramDescription = parameter.Description ?? "No description provided";
+                string paramDescription = parameter.Description ?? "No description provided.";
                 if (parameter.DefaultValue.HasValue)
                 {
                     paramName += " (optional)";
