@@ -130,11 +130,6 @@ public sealed class AzuraCastCommands
             catch (HttpRequestException)
             {
                 await context.EditResponseAsync("This station is currently offline.");
-            }
-
-            if (nowPlaying is null)
-            {
-                await context.EditResponseAsync("No song is currently playing.");
                 return;
             }
 
