@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
+using AzzyBot.Utilities.Enums;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
@@ -9,12 +10,13 @@ using DSharpPlus.Entities;
 
 namespace AzzyBot.Commands.Checks;
 
-public sealed class AzuraCastOnlineCheck(DbActions dbActions) : IContextCheck<AzuraCastOnlineCheckAttribute>
+public sealed class ModuleActivatedCheck(DbActions dbActions) : IContextCheck<ModuleActivatedCheckAttribute>
 {
     private readonly DbActions _dbActions = dbActions;
 
-    public async ValueTask<string?> ExecuteCheckAsync(AzuraCastOnlineCheckAttribute attribute, CommandContext context)
+    public async ValueTask<string?> ExecuteCheckAsync(ModuleActivatedCheckAttribute attribute, CommandContext context)
     {
+        ArgumentNullException.ThrowIfNull(attribute, nameof(attribute));
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
@@ -36,13 +38,17 @@ public sealed class AzuraCastOnlineCheck(DbActions dbActions) : IContextCheck<Az
         if (guild is null)
             return "Guild is null!";
 
-        AzuraCastEntity? azuraCast = guild.AzuraCast;
-        if (azuraCast is null)
-            return "AzuraCast is null!";
+        switch (attribute.Module)
+        {
+            case AzzyModules.AzuraCast:
+                AzuraCastEntity? azuraCast = guild.AzuraCast;
+                if (azuraCast is null)
+                    return "AzuraCast is null!";
 
-        if (azuraCast.IsOnline)
-            return null;
+                return null;
 
-        return "Offline";
+            default:
+                return "Module not found!";
+        }
     }
 }

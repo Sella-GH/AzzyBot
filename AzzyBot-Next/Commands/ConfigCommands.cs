@@ -4,10 +4,12 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using AzzyBot.Commands.Autocompletes;
+using AzzyBot.Commands.Checks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
 using AzzyBot.Utilities;
+using AzzyBot.Utilities.Enums;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ArgumentModifiers;
 using DSharpPlus.Commands.ContextChecks;
@@ -71,7 +73,7 @@ public sealed class ConfigCommands
             await context.FollowupAsync("Your AzuraCast installation was added successfully and your data has been encrypted.");
         }
 
-        [Command("add-azuracast-station"), Description("Add an AzuraCast station to your instance.")]
+        [Command("add-azuracast-station"), Description("Add an AzuraCast station to your instance."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
         public async ValueTask AddAzuraCastStationAsync
             (
             CommandContext context,
@@ -90,11 +92,9 @@ public sealed class ConfigCommands
 
             if (requestsChannel is null)
             {
-                await context.RespondAsync("You have to select a request channel first!");
+                await context.EditResponseAsync("You have to select a request channel first!");
                 return;
             }
-
-            await context.DeferResponseAsync();
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             await _db.AddAzuraCastStationAsync(guildId, station, stationName, requestsChannel.Id, hls, showPlaylist, fileChanges, apiKey);
@@ -103,7 +103,7 @@ public sealed class ConfigCommands
             await context.FollowupAsync("Your station was added successfully. Your station name and api key have been encrypted. Your request was also deleted for security reasons.");
         }
 
-        [Command("add-azuracast-station-mount"), Description("Add an AzuraCast mount point to the selected station.")]
+        [Command("add-azuracast-station-mount"), Description("Add an AzuraCast mount point to the selected station."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
         public async ValueTask AddAzuraCastStationMountAsync
             (
             CommandContext context,
@@ -116,22 +116,18 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(AddAzuraCastStationMountAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             await _db.AddAzuraCastStationMountPointAsync(guildId, station, mountName, mount);
 
             await context.EditResponseAsync("Your mount point was added successfully.");
         }
 
-        [Command("delete-azuracast"), Description("Delete the existing AzuraCast setup.")]
+        [Command("delete-azuracast"), Description("Delete the existing AzuraCast setup."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
         public async ValueTask DeleteAzuraCastAsync(CommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
             _logger.CommandRequested(nameof(DeleteAzuraCastAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             await _db.DeleteAzuraCastAsync(guildId);
@@ -139,7 +135,7 @@ public sealed class ConfigCommands
             await context.EditResponseAsync("Your AzuraCast setup was deleted successfully.");
         }
 
-        [Command("delete-azuracast-station"), Description("Delete an existing station.")]
+        [Command("delete-azuracast-station"), Description("Delete an existing station."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
         public async ValueTask DeleteAzuraCastStationAsync
             (
             CommandContext context,
@@ -150,15 +146,13 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(DeleteAzuraCastStationAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             await _db.DeleteAzuraCastStationAsync(guildId, station);
 
             await context.EditResponseAsync("Your station was deleted successfully.");
         }
 
-        [Command("delete-azuracast-station-mount"), Description("Delete an existing mount point from a station.")]
+        [Command("delete-azuracast-station-mount"), Description("Delete an existing mount point from a station."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
         public async ValueTask DeleteAzuraCastStationMountAsync
             (
             CommandContext context,
@@ -170,15 +164,13 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(DeleteAzuraCastStationMountAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             await _db.DeleteAzuraCastMountAsync(guildId, station, mountId);
 
             await context.EditResponseAsync("Your mount point was deleted successfully.");
         }
 
-        [Command("modify-azuracast"), Description("Modify the general AzuraCast settings.")]
+        [Command("modify-azuracast"), Description("Modify the general AzuraCast settings."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
         public async ValueTask UpdateAzuraCastAsync
             (
             CommandContext context,
@@ -192,8 +184,6 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(UpdateAzuraCastAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             await _db.UpdateAzuraCastAsync(guildId, url, apiKey, notificationsChannel?.Id, outagesChannel?.Id);
 
@@ -201,7 +191,7 @@ public sealed class ConfigCommands
             await context.FollowupAsync("Your AzuraCast settings were saved successfully and have been encrypted.");
         }
 
-        [Command("modify-azuracast-checks"), Description("Modify the automatic checks for your AzuraCast instance.")]
+        [Command("modify-azuracast-checks"), Description("Modify the automatic checks for your AzuraCast instance."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
         public async ValueTask UpdateAzuraCastChecksAsync
             (
             CommandContext context,
@@ -214,15 +204,13 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(UpdateAzuraCastChecksAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             await _db.UpdateAzuraCastChecksAsync(guildId, serverStatus, updates, updatesChangelog);
 
             await context.EditResponseAsync("Your settings were saved successfully.");
         }
 
-        [Command("modify-azuracast-station"), Description("Modify one station you already added.")]
+        [Command("modify-azuracast-station"), Description("Modify one station you already added."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
         public async ValueTask UpdateAzuraCastStationAsync
             (
             CommandContext context,
@@ -239,8 +227,6 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(UpdateAzuraCastStationAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             await _db.UpdateAzuraCastStationAsync(guildId, station, stationId, stationName, apiKey, requestsChannel?.Id, hls, showPlaylist);
 
@@ -248,7 +234,7 @@ public sealed class ConfigCommands
             await context.FollowupAsync("Your settings were saved successfully. Your station name and api key have been encrypted. Your request was also deleted for security reasons.");
         }
 
-        [Command("modify-azuracast-station-checks"), Description("Modify the automatic checks inside a station.")]
+        [Command("modify-azuracast-station-checks"), Description("Modify the automatic checks inside a station."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
         public async ValueTask UpdateAzuraCastStationChecksAsync
             (
             CommandContext context,
@@ -259,8 +245,6 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
             _logger.CommandRequested(nameof(UpdateAzuraCastStationChecksAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             await _db.UpdateAzuraCastStationChecksAsync(guildId, station, fileChanges);

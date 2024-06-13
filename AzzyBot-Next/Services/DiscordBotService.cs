@@ -254,6 +254,10 @@ public sealed class DiscordBotService
                     await context.EditResponseAsync($"The AzuraCast instance is currently offline!\nPlease contact {context.Guild.Owner.Mention}");
                     break;
 
+                case ModuleActivatedCheckAttribute:
+                    await context.EditResponseAsync("This module is not activated, you are unable to use commands from it.");
+                    break;
+
                 default:
                     await AcknowledgeExceptionAsync(context);
                     break;

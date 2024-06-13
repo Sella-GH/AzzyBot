@@ -25,7 +25,7 @@ namespace AzzyBot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class AzuraCastCommands
 {
-    [Command("azuracast"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
+    [Command("azuracast"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator), ModuleActivatedCheck(AzzyModules.AzuraCast)]
     public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCast, AzzyBackgroundService backgroundService, DbActions dbActions)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
@@ -93,11 +93,11 @@ public sealed class AzuraCastCommands
 
             await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, context.Guild.Id);
 
-            await context.RespondAsync("I initiated the online check for the AzuraCast instance, please wait a little for the result.");
+            await context.EditResponseAsync("I initiated the online check for the AzuraCast instance, please wait a little for the result.");
         }
     }
 
-    [Command("music"), RequireGuild, AzuraCastOnlineCheck]
+    [Command("music"), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
     public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastApiService azuraCast, DbActions dbActions)
     {
         private readonly ILogger<MusicGroup> _logger = logger;
