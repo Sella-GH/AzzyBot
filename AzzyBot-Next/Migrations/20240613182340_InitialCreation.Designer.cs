@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AzzyBot.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20240611160354_InitialCreation")]
+    [Migration("20240613182340_InitialCreation")]
     partial class InitialCreation
     {
         /// <inheritdoc />
@@ -182,9 +182,6 @@ namespace AzzyBot.Migrations
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("AzuraCastSet")
-                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("ConfigSet")
                         .HasColumnType("tinyint(1)");

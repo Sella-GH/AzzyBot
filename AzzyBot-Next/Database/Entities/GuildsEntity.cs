@@ -11,6 +11,5 @@ public sealed class GuildsEntity
     public ulong ErrorChannelId { get; set; }
     public bool IsDebugAllowed { get; set; }
     public bool ConfigSet { get; set; }
-    public bool AzuraCastSet { get; set; }
     public AzuraCastEntity? AzuraCast { get; set; }
 }
