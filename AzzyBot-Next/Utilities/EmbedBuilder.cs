@@ -211,13 +211,13 @@ public static class EmbedBuilder
         StringBuilder body = new();
         foreach (string line in revChangelog)
         {
-            body.AppendLine(line);
+            body.AppendLine(CultureInfo.InvariantCulture, $"- {line}");
         }
 
         if (title.Length + body.Length > 6000)
             body = new($"The changelog is too big to display it in an Embed, you can view it [here]({((isRolling) ? AzuraCastRollingUrl : AzuraCastStableUrl)})");
 
-        return CreateBasicEmbed(title, body.ToString(), DiscordColor.White, AzuraCastPic);
+        return CreateBasicEmbed(title, body.ToString(), DiscordColor.White);
     }
 
     public static async Task<DiscordEmbed> BuildAzzyHardwareStatsEmbedAsync(Uri avaUrl)
