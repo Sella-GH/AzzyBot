@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Commands;
+using AzzyBot.Commands.Checks;
 using AzzyBot.Commands.Converters;
 using AzzyBot.Database;
 using AzzyBot.Logging;
@@ -11,6 +12,7 @@ using AzzyBot.Utilities;
 using DSharpPlus;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.EventArgs;
+using DSharpPlus.Commands.Exceptions;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
@@ -146,6 +148,8 @@ public sealed class DiscordBotServiceHost : IHostedService
         if (AzzyStatsSoftware.GetBotName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase))
             commandsExtension.AddCommands(typeof(DebugCommands.DebugGroup), _settings.ServerId);
 
+        commandsExtension.AddCheck<AzuraCastOnlineCheck>();
+
         SlashCommandProcessor slashCommandProcessor = new();
         slashCommandProcessor.AddConverter<Uri>(new UriArgumentConverter());
 
@@ -201,13 +205,19 @@ public sealed class DiscordBotServiceHost : IHostedService
             return;
         }
 
-        if (ex is DiscordException)
+        switch (ex)
         {
-            await _botService.LogExceptionAsync(ex, now, slashContext, guildId, ((DiscordException)e.Exception).JsonMessage);
-        }
-        else
-        {
-            await _botService.LogExceptionAsync(ex, now, slashContext, guildId);
+            case ChecksFailedException checksFailed:
+                await _botService.RespondToChecksExceptionAsync(checksFailed, slashContext);
+                break;
+
+            case DiscordException:
+                await _botService.LogExceptionAsync(ex, now, slashContext, guildId, ((DiscordException)e.Exception).JsonMessage);
+                break;
+
+            default:
+                await _botService.LogExceptionAsync(ex, now, slashContext, guildId);
+                break;
         }
     }
 

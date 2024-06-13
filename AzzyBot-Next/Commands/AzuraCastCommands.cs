@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Commands.Autocompletes;
+using AzzyBot.Commands.Checks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
@@ -32,15 +33,13 @@ public sealed class AzuraCastCommands
         private readonly AzzyBackgroundService _backgroundService = backgroundService;
         private readonly DbActions _dbActions = dbActions;
 
-        [Command("hardware-stats"), Description("Get the hardware stats of the running server.")]
+        [Command("hardware-stats"), Description("Get the hardware stats of the running server."), AzuraCastOnlineCheck]
         public async ValueTask GetHardwareStatsAsync(CommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
             ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
             _logger.CommandRequested(nameof(GetHardwareStatsAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
 
             GuildsEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id);
             AzuraCastEntity azuraCast = guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast is null");
@@ -54,7 +53,7 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync(embed);
         }
 
-        [Command("force-cache-refresh"), Description("Force the bot to refresh it's local song cache for a specific station.")]
+        [Command("force-cache-refresh"), Description("Force the bot to refresh it's local song cache for a specific station."), AzuraCastOnlineCheck]
         public async ValueTask ForceCacheRefreshAsync
         (
             CommandContext context,
@@ -68,10 +67,10 @@ public sealed class AzuraCastCommands
 
             await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, context.Guild.Id, stationId);
 
-            await context.RespondAsync("I initiated the cache refresh, please wait a little for it to occur.");
+            await context.EditResponseAsync("I initiated the cache refresh, please wait a little for it to occur.");
         }
 
-        [Command("force-update-check"), Description("Force the bot to search for AzuraCast Updates.")]
+        [Command("force-update-check"), Description("Force the bot to search for AzuraCast Updates."), AzuraCastOnlineCheck]
         public async ValueTask ForceUpdateCheckAsync(CommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -81,11 +80,24 @@ public sealed class AzuraCastCommands
 
             await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, context.Guild.Id);
 
-            await context.RespondAsync("I initiated the check for AzuraCast Updates, please wait a little.\nThere won't be an answer if there are no updates available.");
+            await context.EditResponseAsync("I initiated the check for AzuraCast Updates, please wait a little.\nThere won't be an answer if there are no updates available.");
+        }
+
+        [Command("force-online-check"), Description("Force the bot to check if the AzuraCast instance is online.")]
+        public async ValueTask ForceOnlineCheckAsync(CommandContext context)
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+
+            _logger.CommandRequested(nameof(ForceOnlineCheckAsync), context.User.GlobalName);
+
+            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, context.Guild.Id);
+
+            await context.RespondAsync("I initiated the online check for the AzuraCast instance, please wait a little for the result.");
         }
     }
 
-    [Command("music"), RequireGuild]
+    [Command("music"), RequireGuild, AzuraCastOnlineCheck]
     public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastApiService azuraCast, DbActions dbActions)
     {
         private readonly ILogger<MusicGroup> _logger = logger;
@@ -104,10 +116,14 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(GetNowPlayingAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
             GuildsEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id);
             AzuraCastEntity azuraCast = guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast is null");
+            if (!azuraCast.IsOnline)
+            {
+                await context.EditResponseAsync("This AzuraCast instance is currently offline, please try again later!");
+                return;
+            }
+
             AzuraCastStationEntity station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId) ?? throw new InvalidOperationException("Station is null");
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 

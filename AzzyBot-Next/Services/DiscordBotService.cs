@@ -6,12 +6,15 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using AzzyBot.Commands.Checks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
 using AzzyBot.Settings;
 using AzzyBot.Utilities;
 using DSharpPlus;
+using DSharpPlus.Commands.ContextChecks;
+using DSharpPlus.Commands.Exceptions;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
@@ -232,6 +235,30 @@ public sealed class DiscordBotService
         }
 
         return false;
+    }
+
+    public async Task RespondToChecksExceptionAsync(ChecksFailedException ex, SlashCommandContext context)
+    {
+        ArgumentNullException.ThrowIfNull(ex, nameof(ex));
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+
+        if (!CheckIfClientIsConnected)
+            return;
+
+        foreach (ContextCheckFailedData data in ex.Errors)
+        {
+            switch (data.ContextCheckAttribute)
+            {
+                case AzuraCastOnlineCheckAttribute:
+                    await context.EditResponseAsync($"The AzuraCast instance is currently offline!\nPlease contact {context.Guild.Owner.Mention}");
+                    break;
+
+                default:
+                    await AcknowledgeExceptionAsync(context);
+                    break;
+            }
+        }
     }
 
     public async Task<bool> SendMessageAsync(ulong channelId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, IMention[]? mentions = null)
