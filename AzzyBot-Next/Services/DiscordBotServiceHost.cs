@@ -137,14 +137,14 @@ public sealed class DiscordBotServiceHost : IHostedService
 
         commandsExtension.CommandErrored += CommandErroredAsync;
 
-        // These commands are for every server
-        commandsExtension.AddCommands(typeof(ConfigCommands.ConfigGroup));
-        commandsExtension.AddCommands(typeof(CoreCommands.CoreGroup));
-        commandsExtension.AddCommands(typeof(AzuraCastCommands.AzuraCastGroup));
-        commandsExtension.AddCommands(typeof(AzuraCastCommands.MusicGroup));
-
         // Only add admin commands to the main server
         commandsExtension.AddCommand(typeof(AdminCommands.AdminGroup), _settings.ServerId);
+
+        // These commands are for every server
+        commandsExtension.AddCommands(typeof(AzuraCastCommands.AzuraCastGroup));
+        commandsExtension.AddCommands(typeof(AzuraCastCommands.MusicGroup));
+        commandsExtension.AddCommands(typeof(ConfigCommands.ConfigGroup));
+        commandsExtension.AddCommands(typeof(CoreCommands.CoreGroup));
 
         // Only add debug commands if it's a dev build
         if (AzzyStatsSoftware.GetBotEnvironment == Environments.Development)

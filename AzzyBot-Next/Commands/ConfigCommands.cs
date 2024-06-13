@@ -135,7 +135,7 @@ public sealed class ConfigCommands
             await context.EditResponseAsync("Your AzuraCast setup was deleted successfully.");
         }
 
-        [Command("delete-azuracast-station"), Description("Delete an existing station."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
+        [Command("delete-azuracast-station"), Description("Delete an existing AzuraCast station."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
         public async ValueTask DeleteAzuraCastStationAsync
             (
             CommandContext context,
@@ -152,7 +152,7 @@ public sealed class ConfigCommands
             await context.EditResponseAsync("Your station was deleted successfully.");
         }
 
-        [Command("delete-azuracast-station-mount"), Description("Delete an existing mount point from a station."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
+        [Command("delete-azuracast-station-mount"), Description("Delete an existing AzuraCast mount point from a station."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
         public async ValueTask DeleteAzuraCastStationMountAsync
             (
             CommandContext context,
@@ -210,7 +210,7 @@ public sealed class ConfigCommands
             await context.EditResponseAsync("Your settings were saved successfully.");
         }
 
-        [Command("modify-azuracast-station"), Description("Modify one station you already added."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
+        [Command("modify-azuracast-station"), Description("Modify one AzuraCast station you already added."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
         public async ValueTask UpdateAzuraCastStationAsync
             (
             CommandContext context,
@@ -234,7 +234,7 @@ public sealed class ConfigCommands
             await context.FollowupAsync("Your settings were saved successfully. Your station name and api key have been encrypted. Your request was also deleted for security reasons.");
         }
 
-        [Command("modify-azuracast-station-checks"), Description("Modify the automatic checks inside a station."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
+        [Command("modify-azuracast-station-checks"), Description("Modify the automatic checks inside an AzuraCast station."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
         public async ValueTask UpdateAzuraCastStationChecksAsync
             (
             CommandContext context,

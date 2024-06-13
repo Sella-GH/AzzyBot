@@ -70,19 +70,6 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync("I initiated the cache refresh, please wait a little for it to occur.");
         }
 
-        [Command("force-update-check"), Description("Force the bot to search for AzuraCast Updates."), AzuraCastOnlineCheck]
-        public async ValueTask ForceUpdateCheckAsync(CommandContext context)
-        {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
-
-            _logger.CommandRequested(nameof(ForceUpdateCheckAsync), context.User.GlobalName);
-
-            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, context.Guild.Id);
-
-            await context.EditResponseAsync("I initiated the check for AzuraCast Updates, please wait a little.\nThere won't be an answer if there are no updates available.");
-        }
-
         [Command("force-online-check"), Description("Force the bot to check if the AzuraCast instance is online.")]
         public async ValueTask ForceOnlineCheckAsync(CommandContext context)
         {
@@ -94,6 +81,19 @@ public sealed class AzuraCastCommands
             await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, context.Guild.Id);
 
             await context.EditResponseAsync("I initiated the online check for the AzuraCast instance, please wait a little for the result.");
+        }
+
+        [Command("force-update-check"), Description("Force the bot to search for AzuraCast Updates."), AzuraCastOnlineCheck]
+        public async ValueTask ForceUpdateCheckAsync(CommandContext context)
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+
+            _logger.CommandRequested(nameof(ForceUpdateCheckAsync), context.User.GlobalName);
+
+            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, context.Guild.Id);
+
+            await context.EditResponseAsync("I initiated the check for AzuraCast Updates, please wait a little.\nThere won't be an answer if there are no updates available.");
         }
     }
 
