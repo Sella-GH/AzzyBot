@@ -18,12 +18,14 @@
 - AzuraCast Admin Api Key to AzuraCast configuration added
   - This is a required field if you want to set up AzuraCast in the bot. Ensure it has the `view` permission for the admin panel inside AzuraCast
 - Setting to control the logfile cleaning after specified days (default 7)
+- Checks if modules are activated or not before excuting commands
 
 ### Improvements
 - AzuraCast Station Api Key in AzuraCastStation configuration is now optional
   - Because the Admin Api Key is required, the station one is now optional. However if you do not add a station specific key the admin key will be used!
 - File logging now uses a shared static StreamWriter
   - This should improve the performance and stability of logging
+- The `core help` command is now ready for the future
 
 ## Fixes
 - Guild Database Entity was not updated when AzuraCast was activated or disabled
