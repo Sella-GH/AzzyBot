@@ -36,7 +36,7 @@ public sealed class AzuraCastCommands
         private readonly AzzyBackgroundService _backgroundService = backgroundService;
         private readonly DbActions _dbActions = dbActions;
 
-        [Command("export-playlists"), Description("Export all playlists from the selected AzuraCast station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+        [Command("export-playlists"), Description("Export all playlists from the selected AzuraCast station into a zip file."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
         public async ValueTask ExportPlaylistsAsync
         (
             CommandContext context,
@@ -67,7 +67,6 @@ public sealed class AzuraCastCommands
                 List<string> filePaths = [];
                 foreach (AzuraPlaylistRecord playlist in playlists)
                 {
-                    string playlistName = playlist.Name;
                     Uri playlistUrl = (format is "m3u") ? playlist.Links.Export.M3U : playlist.Links.Export.PLS;
                     string fileName = Path.Combine(tempDir, $"{azuraCast.Id}-{station.Id}-{playlist.ShortName}.{format}");
                     filePaths.Add(fileName);
@@ -82,10 +81,15 @@ public sealed class AzuraCastCommands
                 DiscordMessageBuilder builder = new();
                 builder.WithContent($"Here are the exported playlists of {Crypto.Decrypt(station.Name)}!").AddFile(fileStream);
 
+                try
+                {
                 await context.EditResponseAsync(builder);
-
+                }
+                finally
+                {
                 await builder.DisposeAsync();
                 await fileStream.DisposeAsync();
+                }
 
                 FileOperations.DeleteFiles(filePaths);
             }
