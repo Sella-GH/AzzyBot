@@ -87,7 +87,7 @@ public sealed class AzuraCastCommands
 
             FileStream fileStream = new(Path.Combine(_azuraCast.FilePath, zFileName), FileMode.Open, FileAccess.Read);
             DiscordMessageBuilder builder = new();
-            string message = ((filePaths.Count > 1) ? "Here are the playlists " : "Here is your desired playlist ") + $"from **{Crypto.Decrypt(acStation.Name)}**";
+            string message = ((filePaths.Count > 1) ? "Here are the playlists " : "Here is your desired playlist ") + $"from station **{Crypto.Decrypt(acStation.Name)}**";
             builder.WithContent(message).AddFile(fileStream);
 
             try

@@ -14,7 +14,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
 {
     private readonly WebRequestService _webService = webService;
 
-    public string FilePath { get; } = Path.Combine(Environment.CurrentDirectory, "Modules", "AzuraCast", "Files");
+    public string FilePath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "AzuraCast", "Files");
     //private readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
 
     private static Dictionary<string, string> CreateHeader(string apiKey)
