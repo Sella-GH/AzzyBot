@@ -81,7 +81,7 @@ public sealed class AzuraCastCommands
                 await _azuraCast.DownloadPlaylistAsync(playlistUrl, apiKey, fileName);
             }
 
-            string zFileName = $"{azuraCast.Id}-{acStation.Id}-{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_{((filePaths.Count > 1) ? "Playlists" : "Playlist")}.zip";
+            string zFileName = $"{azuraCast.Id}-{acStation.Id}-{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_{((filePaths.Count > 1) ? "Playlists" : "Playlist")}_{format}.zip";
             FileOperations.CreateZipFile(zFileName, _azuraCast.FilePath, tempDir);
             filePaths.Add(Path.Combine(_azuraCast.FilePath, zFileName));
 

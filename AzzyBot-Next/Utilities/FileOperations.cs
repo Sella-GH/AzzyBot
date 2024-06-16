@@ -25,10 +25,17 @@ public static class FileOperations
         ArgumentException.ThrowIfNullOrWhiteSpace(zipFileDir, nameof(zipFileDir));
         ArgumentException.ThrowIfNullOrWhiteSpace(filesDir, nameof(filesDir));
 
-        string dir = Path.Combine(zipFileDir, zipFileName);
-        ZipFile.CreateFromDirectory(filesDir, dir, CompressionLevel.NoCompression, false, Encoding.UTF8);
-        if (!File.Exists(dir))
-            throw new FileNotFoundException($"The zip file {dir} was not created.");
+        string zipPath = Path.Combine(zipFileDir, zipFileName);
+        using FileStream stream = new(zipPath, FileMode.Create);
+        using ZipArchive zipFile = new(stream, ZipArchiveMode.Create, false, Encoding.UTF8);
+        foreach (string file in Directory.GetFiles(filesDir))
+        {
+            string fileName = Path.GetFileName(file);
+            zipFile.CreateEntryFromFile(file, fileName, CompressionLevel.NoCompression);
+        }
+
+        if (!File.Exists(zipPath))
+            throw new FileNotFoundException($"The zip file {zipPath} was not created.");
     }
 
     public static void DeleteFile(string path)
