@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace AzzyBot.Utilities;
@@ -15,6 +17,18 @@ public static class FileOperations
         await File.WriteAllTextAsync(tempFilePath, content);
 
         return tempFilePath;
+    }
+
+    public static void CreateZipFile(string zipFileName, string zipFileDir, string filesDir)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(zipFileName, nameof(zipFileName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(zipFileDir, nameof(zipFileDir));
+        ArgumentException.ThrowIfNullOrWhiteSpace(filesDir, nameof(filesDir));
+
+        string dir = Path.Combine(zipFileDir, zipFileName);
+        ZipFile.CreateFromDirectory(filesDir, dir, CompressionLevel.NoCompression, false, Encoding.UTF8);
+        if (!File.Exists(dir))
+            throw new FileNotFoundException($"The zip file {dir} was not created.");
     }
 
     public static void DeleteFile(string path)
@@ -44,5 +58,17 @@ public static class FileOperations
         ArgumentException.ThrowIfNullOrWhiteSpace(content, nameof(content));
 
         await File.WriteAllTextAsync(path, content);
+    }
+
+    public static async Task WriteToFilesAsync(string directoryPath, IReadOnlyDictionary<string, string> files)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(directoryPath, nameof(directoryPath));
+        ArgumentNullException.ThrowIfNull(files, nameof(files));
+
+        foreach (KeyValuePair<string, string> file in files)
+        {
+            string filePath = Path.Combine(directoryPath, file.Key);
+            await File.WriteAllTextAsync(filePath, file.Value);
+        }
     }
 }

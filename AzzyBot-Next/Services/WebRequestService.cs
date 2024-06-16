@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -52,6 +53,38 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
     {
         _httpClientV4?.Dispose();
         _httpClient?.Dispose();
+    }
+
+    public async Task<bool> DownloadAsync(Uri url, string downloadPath, Dictionary<string, string>? headers = null)
+    {
+        AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
+
+        if (headers is not null)
+            AddHeaders(headers, addressFamily);
+
+        HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
+
+        try
+        {
+            using HttpResponseMessage response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            await using Stream contentStream = await response.Content.ReadAsStreamAsync();
+            await using FileStream fileStream = new(downloadPath, FileMode.Create, FileAccess.Write);
+            await contentStream.CopyToAsync(fileStream);
+
+            return true;
+        }
+        catch (InvalidOperationException)
+        {
+            _logger.WebInvalidUri(url);
+            throw;
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
+            throw;
+        }
     }
 
     public async Task<string> GetWebAsync(Uri url, Dictionary<string, string>? headers = null)

@@ -58,6 +58,14 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return JsonSerializer.Deserialize<List<T>>(body) ?? throw new InvalidOperationException($"Could not deserialize body: {body}");
     }
 
+    public async Task DownloadPlaylistAsync(Uri url, string apiKey, string downloadPath)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentException.ThrowIfNullOrWhiteSpace(downloadPath, nameof(downloadPath));
+
+        await _webService.DownloadAsync(url, downloadPath, CreateHeader(apiKey));
+    }
+
     public async Task<IReadOnlyList<AzuraFilesRecord>> GetFilesLocalAsync(int databaseId, int stationId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
