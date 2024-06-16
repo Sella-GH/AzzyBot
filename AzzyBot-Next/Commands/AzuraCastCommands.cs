@@ -82,17 +82,13 @@ public sealed class AzuraCastCommands
             }
 
             string zFileName = $"{azuraCast.Id}-{acStation.Id}-{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_{((filePaths.Count > 1) ? "Playlists" : "Playlist")}_{format}.zip";
-            Console.WriteLine(zFileName);
-
             await FileOperations.CreateZipFileAsync(zFileName, _azuraCast.FilePath, tempDir);
             filePaths.Add(Path.Combine(_azuraCast.FilePath, zFileName));
 
             FileStream fileStream = new(Path.Combine(_azuraCast.FilePath, zFileName), FileMode.Open, FileAccess.Read);
-            Console.WriteLine(fileStream.Name);
-
             DiscordMessageBuilder builder = new();
             string message = ((filePaths.Count > 1) ? "Here are the playlists " : "Here is your desired playlist ") + $"from station **{Crypto.Decrypt(acStation.Name)}**";
-            builder.WithContent(message).AddFile(fileStream);
+            builder.WithContent(message).AddFile(zFileName, fileStream, AddFileOptions.CloseStream);
 
             try
             {
