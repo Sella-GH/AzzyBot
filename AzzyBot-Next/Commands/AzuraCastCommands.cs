@@ -40,9 +40,9 @@ public sealed class AzuraCastCommands
         public async ValueTask ExportPlaylistsAsync
         (
             CommandContext context,
-            [Description("The station of which you want to export the playlists."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId,
+            [Description("The station of which you want to export the playlists."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
             [Description("Choose if you want to export the plalylist in M3U or PLS format."), SlashChoiceProvider(typeof(AzuraExportPlaylistProvider))] string format,
-            [Description("Select if you want to export all playlists.")] bool allPlaylists = true
+            [Description("Select the playlist you want to export."), SlashAutoCompleteProvider(typeof(AzuraCastPlaylistAutocomplete))] int? userPlaylist = null
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -52,47 +52,55 @@ public sealed class AzuraCastCommands
 
             GuildsEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id);
             AzuraCastEntity azuraCast = guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId) ?? throw new InvalidOperationException("Station is null");
-            string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+            AzuraCastStationEntity acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station) ?? throw new InvalidOperationException("Station is null");
+            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
-
-            IReadOnlyList<AzuraPlaylistRecord> playlists = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, stationId);
-
             string tempDir = Path.Combine(_azuraCast.FilePath, "Temp");
             if (!Directory.Exists(tempDir))
                 Directory.CreateDirectory(tempDir);
 
-            if (allPlaylists)
+            List<string> filePaths = [];
+            IReadOnlyList<AzuraPlaylistRecord> playlists = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, station);
+            if (userPlaylist is null)
             {
-                List<string> filePaths = [];
                 foreach (AzuraPlaylistRecord playlist in playlists)
                 {
                     Uri playlistUrl = (format is "m3u") ? playlist.Links.Export.M3U : playlist.Links.Export.PLS;
-                    string fileName = Path.Combine(tempDir, $"{azuraCast.Id}-{station.Id}-{playlist.ShortName}.{format}");
+                    string fileName = Path.Combine(tempDir, $"{azuraCast.Id}-{acStation.Id}-{playlist.ShortName}.{format}");
                     filePaths.Add(fileName);
                     await _azuraCast.DownloadPlaylistAsync(playlistUrl, apiKey, fileName);
                 }
+            }
+            else
+            {
+                AzuraPlaylistRecord playlist = playlists.FirstOrDefault(p => p.Id == userPlaylist) ?? throw new InvalidOperationException("Playlist not found");
 
-                string zFileName = $"{azuraCast.Id}-{station.Id}-{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_Playlists.zip";
-                FileOperations.CreateZipFile(zFileName, _azuraCast.FilePath, tempDir);
-                filePaths.Add(Path.Combine(_azuraCast.FilePath, zFileName));
+                Uri playlistUrl = (format is "m3u") ? playlist.Links.Export.M3U : playlist.Links.Export.PLS;
+                string fileName = Path.Combine(tempDir, $"{azuraCast.Id}-{acStation.Id}-{playlist.ShortName}.{format}");
+                filePaths.Add(fileName);
+                await _azuraCast.DownloadPlaylistAsync(playlistUrl, apiKey, fileName);
+            }
 
-                FileStream fileStream = new(Path.Combine(_azuraCast.FilePath, zFileName), FileMode.Open, FileAccess.Read);
-                DiscordMessageBuilder builder = new();
-                builder.WithContent($"Here are the exported playlists of {Crypto.Decrypt(station.Name)}!").AddFile(fileStream);
+            string zFileName = $"{azuraCast.Id}-{acStation.Id}-{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_{((filePaths.Count > 1) ? "Playlists" : "Playlist")}.zip";
+            FileOperations.CreateZipFile(zFileName, _azuraCast.FilePath, tempDir);
+            filePaths.Add(Path.Combine(_azuraCast.FilePath, zFileName));
 
-                try
-                {
+            FileStream fileStream = new(Path.Combine(_azuraCast.FilePath, zFileName), FileMode.Open, FileAccess.Read);
+            DiscordMessageBuilder builder = new();
+            string message = ((filePaths.Count > 1) ? "Here are the playlists " : "Here is your desired playlist ") + $"from **{Crypto.Decrypt(acStation.Name)}**";
+            builder.WithContent(message).AddFile(fileStream);
+
+            try
+            {
                 await context.EditResponseAsync(builder);
-                }
-                finally
-                {
+            }
+            finally
+            {
                 await builder.DisposeAsync();
                 await fileStream.DisposeAsync();
-                }
-
-                FileOperations.DeleteFiles(filePaths);
             }
+
+            FileOperations.DeleteFiles(filePaths);
         }
 
         [Command("force-cache-refresh"), Description("Force the bot to refresh it's local song cache for a specific station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]

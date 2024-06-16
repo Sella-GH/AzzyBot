@@ -8,7 +8,6 @@ using AzzyBot.Database.Entities;
 using AzzyBot.Utilities.Encryption;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
-using DSharpPlus.Entities;
 
 namespace AzzyBot.Commands.Autocompletes;
 
