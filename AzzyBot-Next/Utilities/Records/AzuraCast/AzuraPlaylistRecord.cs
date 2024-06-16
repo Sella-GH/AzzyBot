@@ -24,10 +24,10 @@ public sealed record AzuraPlaylistRecord
 public sealed record AzuraPlaylistLinkRecord
 {
     [JsonPropertyName("self")]
-    public Uri Self { get; init; } = new Uri(string.Empty);
+    public Uri Self { get; init; } = new Uri("https://github.com");
 
     [JsonPropertyName("toggle")]
-    public Uri Toggle { get; init; } = new Uri(string.Empty);
+    public Uri Toggle { get; init; } = new Uri("https://github.com");
 
     [JsonPropertyName("export")]
     public AzuraPlaylistLinkExportRecord Export { get; init; } = new AzuraPlaylistLinkExportRecord();
@@ -36,8 +36,8 @@ public sealed record AzuraPlaylistLinkRecord
 public sealed record AzuraPlaylistLinkExportRecord
 {
     [JsonPropertyName("pls")]
-    public Uri PLS { get; init; } = new Uri(string.Empty);
+    public Uri PLS { get; init; } = new Uri("https://github.com");
 
     [JsonPropertyName("m3u")]
-    public Uri M3U { get; init; } = new Uri(string.Empty);
+    public Uri M3U { get; init; } = new Uri("https://github.com");
 }
