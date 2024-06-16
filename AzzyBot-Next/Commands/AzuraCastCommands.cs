@@ -82,7 +82,7 @@ public sealed class AzuraCastCommands
             }
 
             string zFileName = $"{azuraCast.Id}-{acStation.Id}-{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_{((filePaths.Count > 1) ? "Playlists" : "Playlist")}_{format}.zip";
-            FileOperations.CreateZipFile(zFileName, _azuraCast.FilePath, tempDir);
+            await FileOperations.CreateZipFileAsync(zFileName, _azuraCast.FilePath, tempDir);
             filePaths.Add(Path.Combine(_azuraCast.FilePath, zFileName));
 
             FileStream fileStream = new(Path.Combine(_azuraCast.FilePath, zFileName), FileMode.Open, FileAccess.Read);
