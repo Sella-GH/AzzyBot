@@ -78,11 +78,14 @@ public sealed class AzuraCastCommands
                 FileOperations.CreateZipFile(zFileName, _azuraCast.FilePath, tempDir);
                 filePaths.Add(Path.Combine(_azuraCast.FilePath, zFileName));
 
-                await using FileStream fileStream = new(Path.Combine(_azuraCast.FilePath, zFileName), FileMode.Open, FileAccess.Read);
-                await using DiscordMessageBuilder builder = new();
+                FileStream fileStream = new(Path.Combine(_azuraCast.FilePath, zFileName), FileMode.Open, FileAccess.Read);
+                DiscordMessageBuilder builder = new();
                 builder.WithContent($"Here are the exported playlists of {Crypto.Decrypt(station.Name)}!").AddFile(fileStream);
 
                 await context.EditResponseAsync(builder);
+
+                await builder.DisposeAsync();
+                await fileStream.DisposeAsync();
 
                 FileOperations.DeleteFiles(filePaths);
             }
