@@ -38,6 +38,17 @@ public static class FileOperations
         File.Delete(path);
     }
 
+    public static void DeleteFiles(IReadOnlyList<string> paths)
+    {
+        ArgumentNullException.ThrowIfNull(paths, nameof(paths));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(paths.Count, nameof(paths));
+
+        foreach (string path in paths)
+        {
+            File.Delete(path);
+        }
+    }
+
     public static Task<string> GetFileContentAsync(string path)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path, nameof(path));

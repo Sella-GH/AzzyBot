@@ -9,8 +9,8 @@ public sealed class AzuraExportPlaylistProvider : IChoiceProvider
 {
     private readonly IReadOnlyDictionary<string, object> _exportProvider = new Dictionary<string, object>()
     {
-        ["M3U"] = 0,
-        ["PLS"] = 1
+        ["M3U"] = "m3u",
+        ["PLS"] = "pls"
     };
 
     public ValueTask<IReadOnlyDictionary<string, object>> ProvideAsync(CommandParameter parameter) => ValueTask.FromResult(_exportProvider);

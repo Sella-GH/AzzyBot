@@ -41,7 +41,7 @@ public sealed class AzuraCastCommands
         (
             CommandContext context,
             [Description("The station of which you want to export the playlists."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId,
-            [Description("Choose if you want to export the plalylist in M3U or PLS format."), SlashChoiceProvider(typeof(AzuraExportPlaylistProvider))] int format,
+            [Description("Choose if you want to export the plalylist in M3U or PLS format."), SlashChoiceProvider(typeof(AzuraExportPlaylistProvider))] string format,
             [Description("Select if you want to export all playlists.")] bool allPlaylists = true
         )
         {
@@ -64,16 +64,19 @@ public sealed class AzuraCastCommands
 
             if (allPlaylists)
             {
+                List<string> filePaths = [];
                 foreach (AzuraPlaylistRecord playlist in playlists)
                 {
                     string playlistName = playlist.Name;
-                    Uri playlistUrl = (format is 0) ? playlist.Links.Export.M3U : playlist.Links.Export.PLS;
-                    string fileName = Path.Combine(tempDir, $"{azuraCast.Id}-{station.Id}-{playlist.ShortName}");
+                    Uri playlistUrl = (format is "m3u") ? playlist.Links.Export.M3U : playlist.Links.Export.PLS;
+                    string fileName = Path.Combine(tempDir, $"{azuraCast.Id}-{station.Id}-{playlist.ShortName}.{format}");
+                    filePaths.Add(fileName);
                     await _azuraCast.DownloadPlaylistAsync(playlistUrl, apiKey, fileName);
                 }
 
                 string zFileName = $"{azuraCast.Id}-{station.Id}-{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_Playlists.zip";
-                FileOperations.CreateZipFile(zFileName, tempDir, _azuraCast.FilePath);
+                FileOperations.CreateZipFile(zFileName, _azuraCast.FilePath, tempDir);
+                filePaths.Add(Path.Combine(_azuraCast.FilePath, zFileName));
 
                 await using FileStream fileStream = new(Path.Combine(_azuraCast.FilePath, zFileName), FileMode.Open, FileAccess.Read);
                 await using DiscordMessageBuilder builder = new();
@@ -81,7 +84,7 @@ public sealed class AzuraCastCommands
 
                 await context.EditResponseAsync(builder);
 
-                return;
+                FileOperations.DeleteFiles(filePaths);
             }
         }
 
