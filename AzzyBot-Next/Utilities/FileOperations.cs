@@ -26,6 +26,8 @@ public static class FileOperations
         ArgumentException.ThrowIfNullOrWhiteSpace(filesDir, nameof(filesDir));
 
         string zipPath = Path.Combine(zipFileDir, zipFileName);
+        Console.WriteLine(zipPath);
+
         await using FileStream stream = new(zipPath, FileMode.Create);
         using ZipArchive zipFile = new(stream, ZipArchiveMode.Create, false, Encoding.UTF8);
         foreach (string file in Directory.GetFiles(filesDir))
