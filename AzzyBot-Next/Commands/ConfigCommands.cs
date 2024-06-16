@@ -8,6 +8,7 @@ using AzzyBot.Commands.Checks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
+using AzzyBot.Services.Modules;
 using AzzyBot.Utilities;
 using AzzyBot.Utilities.Enums;
 using DSharpPlus.Commands;
@@ -23,10 +24,11 @@ namespace AzzyBot.Commands;
 public sealed class ConfigCommands
 {
     [Command("config"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
-    public sealed class ConfigGroup(DbActions db, ILogger<ConfigGroup> logger)
+    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzzyBackgroundService backgroundService, DbActions db)
     {
-        private readonly DbActions _db = db;
         private readonly ILogger<ConfigGroup> _logger = logger;
+        private readonly AzzyBackgroundService _backgroundService = backgroundService;
+        private readonly DbActions _db = db;
 
         [Command("add-azuracast"), Description("Add an AzuraCast instance to your server. This is a requirement to use the features.")]
         public async ValueTask AddAzuraCastAsync
@@ -71,6 +73,8 @@ public sealed class ConfigCommands
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your AzuraCast installation was added successfully and your data has been encrypted.");
+
+            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guild.UniqueId);
         }
 
         [Command("add-azuracast-station"), Description("Add an AzuraCast station to your instance."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
