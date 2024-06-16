@@ -31,7 +31,7 @@ public static class FileOperations
         foreach (string file in Directory.GetFiles(filesDir))
         {
             string fileName = Path.GetFileName(file);
-            zipFile.CreateEntryFromFile(file, fileName, CompressionLevel.NoCompression);
+            zipFile.CreateEntryFromFile(file, fileName, CompressionLevel.SmallestSize);
         }
 
         if (!File.Exists(zipPath))
