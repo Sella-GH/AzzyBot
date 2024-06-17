@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Extensions.Hosting;
@@ -17,7 +17,7 @@ public static class AzzyStatsSoftware
     {
         using Process? process = Process.GetCurrentProcess();
 
-        return Math.Round(process.WorkingSet64 / (1024.0 * 1024.0 * 1024.0), 2);
+        return Math.Round(process.PrivateMemorySize64 / (1024.0 * 1024.0 * 1024.0), 2);
     }
 
     public static DateTime GetBotUptime()
