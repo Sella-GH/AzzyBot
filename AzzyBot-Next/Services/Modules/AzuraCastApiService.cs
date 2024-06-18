@@ -58,6 +58,15 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return JsonSerializer.Deserialize<List<T>>(body) ?? throw new InvalidOperationException($"Could not deserialize body: {body}");
     }
 
+    private async Task UpdateFromApiAsync(Uri baseUrl, string endpoint, string? content = null, Dictionary<string, string>? headers = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
+
+        Uri uri = new($"{baseUrl}api/{endpoint}");
+        bool success = (string.IsNullOrWhiteSpace(content)) ? await _webService.PutWebAsync(uri, content, headers) : await _webService.PostWebAsync(uri, content, headers);
+
+    }
+
     public async Task DownloadPlaylistAsync(Uri url, string apiKey, string downloadPath)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
@@ -139,5 +148,16 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Updates}";
 
         return FetchFromApiAsync<AzuraUpdateRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+    }
+
+    public async Task TogglePlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playlistId, nameof(playlistId));
+
+        AzuraPlaylistRecord playlist = await GetPlaylistAsync(baseUrl, apiKey, stationId, playlistId);
+
+        await 
     }
 }

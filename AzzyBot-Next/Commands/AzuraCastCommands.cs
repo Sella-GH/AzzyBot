@@ -165,6 +165,30 @@ public sealed class AzuraCastCommands
 
             await context.EditResponseAsync(embed);
         }
+
+        [Command("switch-playlist"), Description("Switch the current playlist of the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+        public async ValueTask SwitchPlaylistAsync
+        (
+            CommandContext context,
+            [Description("The station of which you want to switch the playlist."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId,
+            [Description("The playlist you want to switch to."), SlashAutoCompleteProvider(typeof(AzuraCastPlaylistAutocomplete))] int playlistId
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+
+            _logger.CommandRequested(nameof(SwitchPlaylistAsync), context.User.GlobalName);
+
+            GuildsEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id);
+            AzuraCastEntity azuraCast = guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast is null");
+            AzuraCastStationEntity station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId) ?? throw new InvalidOperationException("Station is null");
+            string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+            string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
+
+            await _azuraCast.SwitchPlaylistAsync(new(baseUrl), apiKey, stationId, playlistId);
+
+            await context.EditResponseAsync($"I switched the playlist of station **{station.Name}** to the new playlist.");
+        }
     }
 
     [Command("music"), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
