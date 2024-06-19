@@ -13,8 +13,12 @@ public static class AzzyStatsSoftware
     public static string GetBotName => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductName ?? "Bot name not found";
     public static string GetBotVersion => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion ?? "Bot version not found";
 
-    public static double GetBotMemoryUsage
-        => Math.Round(GC.GetTotalAllocatedBytes(true) / (1024.0 * 1024.0 * 1024.0), 2);
+    public static double GetBotMemoryUsage()
+    {
+        using Process azzy = Process.GetCurrentProcess();
+
+        return Math.Round(azzy.WorkingSet64 / (1024.0 * 1024.0 * 1024.0), 2);
+    }
 
     public static DateTime GetBotUptime()
     {
