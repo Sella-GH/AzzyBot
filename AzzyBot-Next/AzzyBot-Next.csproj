@@ -6,6 +6,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
+		<TreatWarningsAsErrors>nullable</TreatWarningsAsErrors>
     <IsPublishable>True</IsPublishable>
     <Platforms>x64;ARM64;AnyCPU</Platforms>
     <PlatformTarget>AnyCPU</PlatformTarget>
