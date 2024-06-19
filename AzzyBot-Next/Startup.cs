@@ -43,7 +43,7 @@ public static class Startup
         if (isDocker)
         {
             // Give the database time to start up
-            await Task.Delay(TimeSpan.FromSeconds(15));
+            await Task.Delay(TimeSpan.FromSeconds(30));
         }
 
         #region Add logging
