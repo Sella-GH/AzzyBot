@@ -14,7 +14,7 @@ public static class AzzyStatsSoftware
     public static string GetBotVersion => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion ?? "Bot version not found";
 
     public static double GetBotMemoryUsage
-        => Math.Round(GC.GetTotalMemory(false) / (1024.0 * 1024.0 * 1024.0), 2);
+        => Math.Round(GC.GetTotalAllocatedBytes(true) / (1024.0 * 1024.0 * 1024.0), 2);
 
     public static DateTime GetBotUptime()
     {
