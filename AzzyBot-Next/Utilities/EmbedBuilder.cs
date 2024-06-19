@@ -378,7 +378,7 @@ public static class EmbedBuilder
             // Row 5
             ["Language"] = new("C# 12.0", true),
             ["Source Code"] = new(sourceCode, true),
-            ["Memory Usage"] = new($"{AzzyStatsSoftware.GetBotMemoryUsage()} GB", true),
+            ["Memory Usage"] = new($"{AzzyStatsSoftware.GetBotMemoryUsage} GB", true),
 
             // Row 6
             ["Compilation Date"] = new($"<t:{Converter.ConvertToUnixTime(compileDate)}>", false),
