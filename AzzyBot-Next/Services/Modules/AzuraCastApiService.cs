@@ -151,15 +151,16 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return FetchFromApiAsync<AzuraUpdateRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
-    public async Task SwitchPlaylistsAsync(Uri baseUrl, string apiKey, int stationId, int playlistId, bool removeOld)
+    public async Task<string> SwitchPlaylistsAsync(Uri baseUrl, string apiKey, int stationId, int playlistId, bool removeOld)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playlistId, nameof(playlistId));
 
+        IReadOnlyList<AzuraPlaylistRecord> playlists = await GetPlaylistsAsync(baseUrl, apiKey, stationId);
+
         if (removeOld)
         {
-            IReadOnlyList<AzuraPlaylistRecord> playlists = await GetPlaylistsAsync(baseUrl, apiKey, stationId);
             foreach (AzuraPlaylistRecord playlist in playlists.Where(p => p.IsEnabled))
             {
                 await TogglePlaylistAsync(baseUrl, apiKey, stationId, playlist.Id);
@@ -167,6 +168,8 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         }
 
         await TogglePlaylistAsync(baseUrl, apiKey, stationId, playlistId);
+
+        return playlists.FirstOrDefault(p => p.Id == playlistId)?.Name ?? string.Empty;
     }
 
     public async Task TogglePlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId)

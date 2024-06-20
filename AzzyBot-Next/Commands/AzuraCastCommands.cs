@@ -186,9 +186,9 @@ public sealed class AzuraCastCommands
             string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
-            await _azuraCast.SwitchPlaylistsAsync(new(baseUrl), apiKey, stationId, playlistId, removeOld);
+            string playlistName = await _azuraCast.SwitchPlaylistsAsync(new(baseUrl), apiKey, stationId, playlistId, removeOld);
 
-            await context.EditResponseAsync($"I switched the playlist of station **{station.Name}** to the new playlist.");
+            await context.EditResponseAsync($"I switched the playlist of station **{station.Name}** to **{playlistName}**.");
         }
     }
 
