@@ -162,7 +162,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
 
         if (removeOld)
         {
-            foreach (AzuraPlaylistRecord playlist in playlists.Where(p => p.IsEnabled))
+            foreach (AzuraPlaylistRecord playlist in playlists.Where(p => p.IsEnabled && p.Id != playlistId))
             {
                 await TogglePlaylistAsync(baseUrl, apiKey, stationId, playlist.Id);
                 states.Add(new(playlist.Name, !playlist.IsEnabled));
