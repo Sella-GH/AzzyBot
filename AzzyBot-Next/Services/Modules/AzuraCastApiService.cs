@@ -58,11 +58,9 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return JsonSerializer.Deserialize<List<T>>(body) ?? throw new InvalidOperationException($"Could not deserialize body: {body}");
     }
 
-    private async Task PostToApiAsync(Uri baseUrl, string endpoint, string content, Dictionary<string, string> headers)
+    private async Task PostToApiAsync(Uri baseUrl, string endpoint, string? content = null, Dictionary<string, string>? headers = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
-        ArgumentException.ThrowIfNullOrWhiteSpace(content, nameof(content));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(headers.Count, nameof(headers));
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
         bool success = await _webService.PostWebAsync(uri, content, headers);
@@ -75,7 +73,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
-        bool success = (string.IsNullOrWhiteSpace(content)) ? await _webService.PutWebAsync(uri, content, headers) : await _webService.PutWebAsync(uri, content, headers);
+        bool success = await _webService.PutWebAsync(uri, content, headers);
         if (!success)
             throw new InvalidOperationException($"Failed PUT to API, url: {uri}");
     }
@@ -161,6 +159,16 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Updates}";
 
         return GetFromApiAsync<AzuraUpdateRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+    }
+
+    public async Task SkipSongAsync(Uri baseUrl, string apiKey, int stationId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+
+        string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Backend}/{ApiEndpoints.Skip}";
+
+        await PostToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
     }
 
     public async Task<List<AzuraPlaylistStateRecord>> SwitchPlaylistsAsync(Uri baseUrl, string apiKey, int stationId, int playlistId, bool removeOld)
