@@ -142,6 +142,7 @@ public sealed class DiscordBotServiceHost : IHostedService
 
         // These commands are for every server
         commandsExtension.AddCommands(typeof(AzuraCastCommands.AzuraCastGroup));
+        commandsExtension.AddCommands(typeof(AzuraCastCommands.DjGroup));
         commandsExtension.AddCommands(typeof(AzuraCastCommands.MusicGroup));
         commandsExtension.AddCommands(typeof(ConfigCommands.ConfigGroup));
         commandsExtension.AddCommands(typeof(CoreCommands.CoreGroup));

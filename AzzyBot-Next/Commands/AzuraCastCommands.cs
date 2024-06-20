@@ -166,6 +166,14 @@ public sealed class AzuraCastCommands
 
             await context.EditResponseAsync(embed);
         }
+    }
+
+    [Command("dj"), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+    public sealed class DjGroup(ILogger<DjGroup> logger, AzuraCastApiService azuraCast, DbActions dbActions)
+    {
+        private readonly ILogger<DjGroup> _logger = logger;
+        private readonly AzuraCastApiService _azuraCast = azuraCast;
+        private readonly DbActions _dbActions = dbActions;
 
         [Command("switch-playlist"), Description("Switch the current playlist of the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
         public async ValueTask SwitchPlaylistAsync
