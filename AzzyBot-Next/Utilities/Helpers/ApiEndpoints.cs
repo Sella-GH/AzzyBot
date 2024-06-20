@@ -11,5 +11,6 @@ public static class ApiEndpoints
     public const string Stats = "stats";
     public const string Station = "station";
     public const string Stations = "stations";
+    public const string Toggle = "toggle";
     public const string Updates = "updates";
 }

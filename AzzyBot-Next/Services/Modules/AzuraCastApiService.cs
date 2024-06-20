@@ -64,7 +64,8 @@ public sealed class AzuraCastApiService(WebRequestService webService)
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
         bool success = (string.IsNullOrWhiteSpace(content)) ? await _webService.PutWebAsync(uri, content, headers) : await _webService.PostWebAsync(uri, content, headers);
-
+        if (!success)
+            throw new InvalidOperationException($"Failed to update API, url: {uri}");
     }
 
     public async Task DownloadPlaylistAsync(Uri url, string apiKey, string downloadPath)
@@ -150,14 +151,32 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return FetchFromApiAsync<AzuraUpdateRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
+    public async Task SwitchPlaylistsAsync(Uri baseUrl, string apiKey, int stationId, int playlistId, bool removeOld)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playlistId, nameof(playlistId));
+
+        if (removeOld)
+        {
+            IReadOnlyList<AzuraPlaylistRecord> playlists = await GetPlaylistsAsync(baseUrl, apiKey, stationId);
+            foreach (AzuraPlaylistRecord playlist in playlists.Where(p => p.IsEnabled))
+            {
+                await TogglePlaylistAsync(baseUrl, apiKey, stationId, playlist.Id);
+            }
+        }
+
+        await TogglePlaylistAsync(baseUrl, apiKey, stationId, playlistId);
+    }
+
     public async Task TogglePlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playlistId, nameof(playlistId));
 
-        AzuraPlaylistRecord playlist = await GetPlaylistAsync(baseUrl, apiKey, stationId, playlistId);
+        string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Playlist}/{playlistId}/{ApiEndpoints.Toggle}";
 
-        await 
+        await UpdateFromApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
     }
 }

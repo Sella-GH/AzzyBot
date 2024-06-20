@@ -129,7 +129,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
         try
         {
-            using HttpContent httpContent = new StringContent(content, Encoding.UTF8, MediaType);
+            using HttpContent httpContent = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaType);
             using HttpResponseMessage response = await client.PostAsync(url, httpContent);
             if (response.IsSuccessStatusCode)
                 return true;
@@ -161,7 +161,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
         try
         {
-            using HttpContent httpContent = new StringContent(content, Encoding.UTF8, MediaType);
+            using HttpContent httpContent = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaType);
             using HttpResponseMessage response = await client.PutAsync(url, httpContent);
             if (response.IsSuccessStatusCode)
                 return true;

@@ -171,7 +171,8 @@ public sealed class AzuraCastCommands
         (
             CommandContext context,
             [Description("The station of which you want to switch the playlist."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId,
-            [Description("The playlist you want to switch to."), SlashAutoCompleteProvider(typeof(AzuraCastPlaylistAutocomplete))] int playlistId
+            [Description("The playlist you want to switch to."), SlashAutoCompleteProvider(typeof(AzuraCastPlaylistAutocomplete))] int playlistId,
+            [Description("Choose if you want to disable all other active playlists from the station. Defaults to Yes.")] bool removeOld = true
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -185,7 +186,7 @@ public sealed class AzuraCastCommands
             string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
-            await _azuraCast.SwitchPlaylistAsync(new(baseUrl), apiKey, stationId, playlistId);
+            await _azuraCast.SwitchPlaylistsAsync(new(baseUrl), apiKey, stationId, playlistId, removeOld);
 
             await context.EditResponseAsync($"I switched the playlist of station **{station.Name}** to the new playlist.");
         }
