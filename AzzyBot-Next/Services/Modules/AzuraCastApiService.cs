@@ -58,6 +58,18 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return JsonSerializer.Deserialize<List<T>>(body) ?? throw new InvalidOperationException($"Could not deserialize body: {body}");
     }
 
+    private async Task PostToApiAsync(Uri baseUrl, string endpoint, string content, Dictionary<string, string> headers)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
+        ArgumentException.ThrowIfNullOrWhiteSpace(content, nameof(content));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(headers.Count, nameof(headers));
+
+        Uri uri = new($"{baseUrl}api/{endpoint}");
+        bool success = await _webService.PostWebAsync(uri, content, headers);
+        if (!success)
+            throw new InvalidOperationException($"Failed POST to API, url: {uri}");
+    }
+
     private async Task UpdateFromApiAsync(Uri baseUrl, string endpoint, string? content = null, Dictionary<string, string>? headers = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
