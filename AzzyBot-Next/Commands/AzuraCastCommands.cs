@@ -184,10 +184,11 @@ public sealed class AzuraCastCommands
             AzuraCastStationEntity station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId) ?? throw new InvalidOperationException("Station is null");
             string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
+            string stationName = Crypto.Decrypt(station.Name);
 
             string playlistName = await _azuraCast.SwitchPlaylistsAsync(new(baseUrl), apiKey, stationId, playlistId, removeOld);
 
-            await context.EditResponseAsync($"I switched the playlist of station **{station.Name}** to **{playlistName}**.");
+            await context.EditResponseAsync($"I switched the playlist of station **{stationName}** to **{playlistName}**.");
         }
     }
 
