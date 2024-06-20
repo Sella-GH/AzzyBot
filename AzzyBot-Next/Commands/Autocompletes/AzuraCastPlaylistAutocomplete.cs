@@ -23,7 +23,7 @@ public sealed class AzuraCastPlaylistAutocomplete(AzuraCastApiService azuraCast,
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
-        int stationId = Convert.ToInt32(context.Options.Single(o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
+        int stationId = Convert.ToInt32(context.Options.Single(o => o.Name is "stationId" && o.Value is not null).Value, CultureInfo.InvariantCulture);
         if (stationId == 0)
             return new Dictionary<string, object>();
 

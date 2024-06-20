@@ -40,7 +40,7 @@ public sealed class AzuraCastCommands
         public async ValueTask ExportPlaylistsAsync
         (
             CommandContext context,
-            [Description("The station of which you want to export the playlists."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
+            [Description("The station of which you want to export the playlists."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId,
             [Description("Choose if you want to export the plalylist in M3U or PLS format."), SlashChoiceProvider(typeof(AzuraExportPlaylistProvider))] string format,
             [Description("Select the playlist you want to export."), SlashAutoCompleteProvider(typeof(AzuraCastPlaylistAutocomplete))] int? userPlaylist = null
         )
@@ -52,7 +52,7 @@ public sealed class AzuraCastCommands
 
             GuildsEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id);
             AzuraCastEntity azuraCast = guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastStationEntity acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId) ?? throw new InvalidOperationException("Station is null");
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
             string tempDir = Path.Combine(_azuraCast.FilePath, "Temp");
@@ -60,7 +60,7 @@ public sealed class AzuraCastCommands
                 Directory.CreateDirectory(tempDir);
 
             List<string> filePaths = [];
-            IReadOnlyList<AzuraPlaylistRecord> playlists = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, station);
+            IReadOnlyList<AzuraPlaylistRecord> playlists = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, stationId);
             if (userPlaylist is null)
             {
                 foreach (AzuraPlaylistRecord playlist in playlists)
