@@ -151,25 +151,29 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return FetchFromApiAsync<AzuraUpdateRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
-    public async Task<string> SwitchPlaylistsAsync(Uri baseUrl, string apiKey, int stationId, int playlistId, bool removeOld)
+    public async Task<List<AzuraPlaylistStateRecord>> SwitchPlaylistsAsync(Uri baseUrl, string apiKey, int stationId, int playlistId, bool removeOld)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playlistId, nameof(playlistId));
 
         IReadOnlyList<AzuraPlaylistRecord> playlists = await GetPlaylistsAsync(baseUrl, apiKey, stationId);
+        List<AzuraPlaylistStateRecord> states = [];
 
         if (removeOld)
         {
             foreach (AzuraPlaylistRecord playlist in playlists.Where(p => p.IsEnabled))
             {
                 await TogglePlaylistAsync(baseUrl, apiKey, stationId, playlist.Id);
+                states.Add(new(playlist.Name, !playlist.IsEnabled));
             }
         }
 
-        await TogglePlaylistAsync(baseUrl, apiKey, stationId, playlistId);
+        AzuraPlaylistRecord current = playlists.FirstOrDefault(p => p.Id == playlistId) ?? throw new InvalidOperationException($"Playlist with id {playlistId} not found.");
+        await TogglePlaylistAsync(baseUrl, apiKey, stationId, current.Id);
+        states.Add(new(current.Name, !current.IsEnabled));
 
-        return playlists.FirstOrDefault(p => p.Id == playlistId)?.Name ?? string.Empty;
+        return states;
     }
 
     public async Task TogglePlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId)

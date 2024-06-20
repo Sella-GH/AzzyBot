@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Commands.Autocompletes;
 using AzzyBot.Commands.Checks;
@@ -186,9 +188,15 @@ public sealed class AzuraCastCommands
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
             string stationName = Crypto.Decrypt(station.Name);
 
-            string playlistName = await _azuraCast.SwitchPlaylistsAsync(new(baseUrl), apiKey, stationId, playlistId, removeOld);
+            List<AzuraPlaylistStateRecord> states = await _azuraCast.SwitchPlaylistsAsync(new(baseUrl), apiKey, stationId, playlistId, removeOld);
+            StringBuilder message = new();
+            message.AppendLine(CultureInfo.InvariantCulture, $"I switched the {((states.Count is 1) ? "playlist" : "playlists")} for **{stationName}**.");
+            foreach (AzuraPlaylistStateRecord state in states)
+            {
+                message.AppendLine(CultureInfo.InvariantCulture, $"**{state.PlaylistName}** is now **{((state.PlaylistState) ? "enabled" : "disabled")}**.");
+            }
 
-            await context.EditResponseAsync($"I switched the playlist of station **{stationName}** to **{playlistName}**.");
+            await context.EditResponseAsync(message.ToString());
         }
     }
 
