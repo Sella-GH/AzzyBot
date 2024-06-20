@@ -25,7 +25,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         };
     }
 
-    private async Task<string> FetchFromApiAsync(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
+    private async Task<string> GetFromApiAsync(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
@@ -37,7 +37,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return body;
     }
 
-    private async Task<T> FetchFromApiAsync<T>(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
+    private async Task<T> GetFromApiAsync<T>(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
@@ -49,11 +49,11 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return JsonSerializer.Deserialize<T>(body) ?? throw new InvalidOperationException($"Could not deserialize body: {body}");
     }
 
-    private async Task<IReadOnlyList<T>> FetchFromApiListAsync<T>(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
+    private async Task<IReadOnlyList<T>> GetFromApiListAsync<T>(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
-        string body = await FetchFromApiAsync(baseUrl, endpoint, headers);
+        string body = await GetFromApiAsync(baseUrl, endpoint, headers);
 
         return JsonSerializer.Deserialize<List<T>>(body) ?? throw new InvalidOperationException($"Could not deserialize body: {body}");
     }
@@ -70,14 +70,14 @@ public sealed class AzuraCastApiService(WebRequestService webService)
             throw new InvalidOperationException($"Failed POST to API, url: {uri}");
     }
 
-    private async Task UpdateFromApiAsync(Uri baseUrl, string endpoint, string? content = null, Dictionary<string, string>? headers = null)
+    private async Task PutToApiAsync(Uri baseUrl, string endpoint, string? content = null, Dictionary<string, string>? headers = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
         bool success = (string.IsNullOrWhiteSpace(content)) ? await _webService.PutWebAsync(uri, content, headers) : await _webService.PutWebAsync(uri, content, headers);
         if (!success)
-            throw new InvalidOperationException($"Failed to update API, url: {uri}");
+            throw new InvalidOperationException($"Failed PUT to API, url: {uri}");
     }
 
     public async Task DownloadPlaylistAsync(Uri url, string apiKey, string downloadPath)
@@ -113,7 +113,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
 
         string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Files}";
 
-        return FetchFromApiListAsync<AzuraFilesRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+        return GetFromApiListAsync<AzuraFilesRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
     public Task<AzuraHardwareStatsRecord> GetHardwareStatsAsync(Uri baseUrl, string apiKey)
@@ -122,7 +122,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
 
         const string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Server}/{ApiEndpoints.Stats}";
 
-        return FetchFromApiAsync<AzuraHardwareStatsRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+        return GetFromApiAsync<AzuraHardwareStatsRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
     public Task<AzuraNowPlayingDataRecord> GetNowPlayingAsync(Uri baseUrl, int stationId)
@@ -131,7 +131,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
 
         string endpoint = $"{ApiEndpoints.NowPlaying}/{stationId}";
 
-        return FetchFromApiAsync<AzuraNowPlayingDataRecord>(baseUrl, endpoint);
+        return GetFromApiAsync<AzuraNowPlayingDataRecord>(baseUrl, endpoint);
     }
 
     public Task<AzuraPlaylistRecord> GetPlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId)
@@ -141,7 +141,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
 
         string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Playlist}/{playlistId}";
 
-        return FetchFromApiAsync<AzuraPlaylistRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+        return GetFromApiAsync<AzuraPlaylistRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
     public Task<IReadOnlyList<AzuraPlaylistRecord>> GetPlaylistsAsync(Uri baseUrl, string apiKey, int stationId)
@@ -151,7 +151,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
 
         string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Playlists}";
 
-        return FetchFromApiListAsync<AzuraPlaylistRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+        return GetFromApiListAsync<AzuraPlaylistRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
     public Task<AzuraUpdateRecord> GetUpdatesAsync(Uri baseUrl, string apiKey)
@@ -160,7 +160,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
 
         string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Updates}";
 
-        return FetchFromApiAsync<AzuraUpdateRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+        return GetFromApiAsync<AzuraUpdateRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
     public async Task<List<AzuraPlaylistStateRecord>> SwitchPlaylistsAsync(Uri baseUrl, string apiKey, int stationId, int playlistId, bool removeOld)
@@ -196,6 +196,6 @@ public sealed class AzuraCastApiService(WebRequestService webService)
 
         string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Playlist}/{playlistId}/{ApiEndpoints.Toggle}";
 
-        await UpdateFromApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
+        await PutToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
     }
 }
