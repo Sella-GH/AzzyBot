@@ -63,7 +63,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
-        bool success = (string.IsNullOrWhiteSpace(content)) ? await _webService.PutWebAsync(uri, content, headers) : await _webService.PostWebAsync(uri, content, headers);
+        bool success = (string.IsNullOrWhiteSpace(content)) ? await _webService.PutWebAsync(uri, content, headers) : await _webService.PutWebAsync(uri, content, headers);
         if (!success)
             throw new InvalidOperationException($"Failed to update API, url: {uri}");
     }
