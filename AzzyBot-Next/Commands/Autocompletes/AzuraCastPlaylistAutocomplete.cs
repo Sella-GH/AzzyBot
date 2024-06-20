@@ -53,7 +53,7 @@ public sealed class AzuraCastPlaylistAutocomplete(AzuraCastApiService azuraCast,
             if (!string.IsNullOrWhiteSpace(search) && !playlist.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            results.Add(playlist.Name, playlist.Id);
+            results.Add($"{playlist.Name} ({((playlist.IsEnabled) ? "Enabled" : "Disabled")})", playlist.Id);
         }
 
         return results;
