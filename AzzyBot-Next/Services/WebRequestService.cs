@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Mime;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -17,7 +18,7 @@ namespace AzzyBot.Services;
 public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisposable
 {
     private readonly ILogger _logger = logger;
-    private const string MediaType = "application/json";
+    private const string MediaType = MediaTypeNames.Application.Json;
 
     /// <summary>
     /// Forcing this client to use IPv4, only TCP ports because HTTP and HTTPS are usually TCP.
