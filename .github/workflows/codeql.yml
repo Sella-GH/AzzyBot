@@ -94,3 +94,4 @@ jobs:
       uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{matrix.language}}"
+        checkout_path: "/home/runner/work/AzzyBot/AzzyBot/AzzyBot-Next"
