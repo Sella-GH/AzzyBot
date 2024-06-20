@@ -186,6 +186,12 @@ public sealed class AzuraCastCommands
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
             AzuraNowPlayingDataRecord nowPlaying = await _azuraCast.GetNowPlayingAsync(new(baseUrl), stationId);
+            if (nowPlaying.NowPlaying.Duration - nowPlaying.NowPlaying.Elapsed <= 5)
+            {
+                await context.EditResponseAsync("This song is almost over - please wait!");
+                return;
+            }
+
             await _azuraCast.SkipSongAsync(new(baseUrl), apiKey, stationId);
 
             await context.EditResponseAsync($"I skipped **{nowPlaying.NowPlaying.Song.Title}** by **{nowPlaying.NowPlaying.Song.Artist}**.");
