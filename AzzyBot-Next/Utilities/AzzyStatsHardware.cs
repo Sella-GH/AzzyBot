@@ -249,7 +249,7 @@ public static class AzzyStatsHardware
         return networkSpeeds;
     }
 
-    public static string GetSystemOs => Environment.OSVersion.VersionString;
+    public static string GetSystemOs => RuntimeInformation.OSDescription;
     public static string GetSystemOsArch => RuntimeInformation.OSArchitecture.ToString();
     public static DateTime GetSystemUptime => DateTime.Now.AddMilliseconds(-Environment.TickCount64);
 }
