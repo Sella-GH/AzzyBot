@@ -5,25 +5,25 @@ namespace AzzyBot.Utilities.Records.AzuraCast;
 public sealed record AzuraNowPlayingDataRecord
 {
     [JsonPropertyName("now_playing")]
-    public NowPlayingRecord NowPlaying { get; init; } = new();
+    public AzuraNowPlayingRecord NowPlaying { get; init; } = new();
 
     [JsonPropertyName("listeners")]
-    public NowPlayingListenersRecord Listeners { get; init; } = new();
+    public AzuraNowPlayingListenersRecord Listeners { get; init; } = new();
 
     [JsonPropertyName("live")]
-    public NowPlayingLiveRecord Live { get; init; } = new();
+    public AzuraNowPlayingLiveRecord Live { get; init; } = new();
 
     [JsonPropertyName("is_online")]
     public bool IsOnline { get; init; }
 }
 
-public sealed record NowPlayingListenersRecord
+public sealed record AzuraNowPlayingListenersRecord
 {
     [JsonPropertyName("unique")]
     public int Current { get; init; }
 }
 
-public sealed record NowPlayingLiveRecord
+public sealed record AzuraNowPlayingLiveRecord
 {
     [JsonPropertyName("is_live")]
     public bool IsLive { get; init; }
@@ -38,7 +38,7 @@ public sealed record NowPlayingLiveRecord
     public string Art { get; init; } = string.Empty;
 }
 
-public sealed record NowPlayingRecord : AzuraSongDataRecord
+public sealed record AzuraNowPlayingRecord : AzuraSongDataRecord
 {
     [JsonPropertyName("elapsed")]
     public int Elapsed { get; init; }

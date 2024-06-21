@@ -1,7 +1,13 @@
 ﻿namespace AzzyBot.Utilities.Records.AzuraCast;
 
-public sealed record AzuraPlaylistStateRecord(string name, bool state)
+public sealed record AzuraPlaylistStateRecord
 {
-    public string PlaylistName { get; init; } = name;
-    public bool PlaylistState { get; init; } = state;
+    public string PlaylistName { get; init; }
+    public bool PlaylistState { get; init; }
+
+    public AzuraPlaylistStateRecord(string playlistName, bool playlistState)
+    {
+        PlaylistName = playlistName;
+        PlaylistState = playlistState;
+    }
 }

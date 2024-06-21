@@ -127,7 +127,7 @@ public static class EmbedBuilder
         fields.Add("Disk Usage", new(diskUsage.ToString(), false));
 
         StringBuilder networkUsage = new();
-        foreach (NetworkData network in stats.Network)
+        foreach (AzuraNetworkData network in stats.Network)
         {
             networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Received: {network.Received.Speed.Readable}");
             networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Transmitted: {network.Transmitted.Speed.Readable}");

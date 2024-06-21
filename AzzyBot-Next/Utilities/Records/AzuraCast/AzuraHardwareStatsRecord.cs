@@ -6,31 +6,31 @@ namespace AzzyBot.Utilities.Records.AzuraCast;
 public sealed record AzuraHardwareStatsRecord
 {
     [JsonPropertyName("cpu")]
-    public required CpuData Cpu { get; init; }
+    public required AzuraCpuData Cpu { get; init; }
 
     [JsonPropertyName("memory")]
-    public required MemoryData Memory { get; init; }
+    public required AzuraMemoryData Memory { get; init; }
 
     [JsonPropertyName("disk")]
-    public required DiskData Disk { get; init; }
+    public required AzuraDiskData Disk { get; init; }
 
     [JsonPropertyName("network")]
-    public required IReadOnlyList<NetworkData> Network { get; init; }
+    public required IReadOnlyList<AzuraNetworkData> Network { get; init; }
 }
 
-public sealed record CpuData
+public sealed record AzuraCpuData
 {
     [JsonPropertyName("total")]
-    public required CpuTotalData Total { get; init; }
+    public required AzuraCpuTotalData Total { get; init; }
 
     [JsonPropertyName("cores")]
-    public required IReadOnlyList<CoreData> Cores { get; init; }
+    public required IReadOnlyList<AzuraCoreData> Cores { get; init; }
 
     [JsonPropertyName("load")]
     public required IReadOnlyList<double> Load { get; init; }
 }
 
-public record CpuTotalData
+public record AzuraCpuTotalData
 {
     [JsonPropertyName("usage")]
     public required string Usage { get; init; }
@@ -42,21 +42,21 @@ public record CpuTotalData
     public required string Steal { get; init; }
 }
 
-public sealed record CoreData : CpuTotalData;
+public sealed record AzuraCoreData : AzuraCpuTotalData;
 
-public sealed record MemoryData
+public sealed record AzuraMemoryData
 {
     [JsonPropertyName("readable")]
-    public required ReadableDiskData Readable { get; init; }
+    public required AzuraReadableDiskData Readable { get; init; }
 }
 
-public sealed record DiskData
+public sealed record AzuraDiskData
 {
     [JsonPropertyName("readable")]
-    public required ReadableDiskData Readable { get; init; }
+    public required AzuraReadableDiskData Readable { get; init; }
 }
 
-public record ReadableDiskData
+public record AzuraReadableDiskData
 {
     [JsonPropertyName("total")]
     public required string Total { get; init; }
@@ -68,32 +68,32 @@ public record ReadableDiskData
     public required string Used { get; init; }
 }
 
-public sealed record ReadableMemoryData : ReadableDiskData
+public sealed record AzuraReadableMemoryData : AzuraReadableDiskData
 {
     [JsonPropertyName("Cached")]
     public required string Cached { get; init; }
 }
 
-public sealed record NetworkData
+public sealed record AzuraNetworkData
 {
     [JsonPropertyName("interface_name")]
     public required string InterfaceName { get; set; }
 
     [JsonPropertyName("received")]
-    public required TransmissionData Received { get; set; }
+    public required AzuraTransmissionData Received { get; set; }
 
     [JsonPropertyName("transmitted")]
-    public required TransmissionData Transmitted { get; set; }
+    public required AzuraTransmissionData Transmitted { get; set; }
 }
 
-public sealed record SpeedData
+public sealed record AzuraSpeedData
 {
     [JsonPropertyName("readable")]
     public required string Readable { get; init; }
 }
 
-public sealed record TransmissionData
+public sealed record AzuraTransmissionData
 {
     [JsonPropertyName("speed")]
-    public required SpeedData Speed { get; init; }
+    public required AzuraSpeedData Speed { get; init; }
 }

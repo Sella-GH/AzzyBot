@@ -11,10 +11,10 @@ public record AzuraSongDataRecord
     public string Playlist { get; init; } = string.Empty;
 
     [JsonPropertyName("song")]
-    public SongDetailedRecord Song { get; init; } = new();
+    public AzuraSongDetailedRecord Song { get; init; } = new();
 }
 
-public sealed record SongDetailedRecord : SongSimpleRecord
+public sealed record AzuraSongDetailedRecord : AzuraSongSimpleRecord
 {
     [JsonPropertyName("id")]
     public string Id { get; init; } = string.Empty;
@@ -23,7 +23,7 @@ public sealed record SongDetailedRecord : SongSimpleRecord
     public string Art { get; init; } = string.Empty;
 }
 
-public record SongSimpleRecord
+public record AzuraSongSimpleRecord
 {
     [JsonPropertyName("text")]
     public string Text { get; init; } = string.Empty;
