@@ -59,25 +59,25 @@ public static class EmbedBuilder
         ArgumentException.ThrowIfNullOrWhiteSpace(stationName, nameof(stationName));
 
         const string title = "File Changes";
-        string addedFiles = "No files were added.";
-        string removedFiles = "No files were removed.";
+        string addedFiles = "**No** files were added.";
+        string removedFiles = "**No** files were removed.";
 
         if (added == 1)
         {
-            addedFiles = "1 file was added.";
+            addedFiles = "**1** file was added.";
         }
         else if (added > 1)
         {
-            addedFiles = $"{added} files were added.";
+            addedFiles = $"**{added}** files were added.";
         }
 
         if (removed == 1)
         {
-            removedFiles = "1 file was removed.";
+            removedFiles = "**1** file was removed.";
         }
         else if (removed > 1)
         {
-            removedFiles = $"{removed} files were removed.";
+            removedFiles = $"**{removed}** files were removed.";
         }
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
@@ -104,34 +104,34 @@ public static class EmbedBuilder
 
         for (int i = 0; i < stats.Cpu.Cores.Count; i++)
         {
-            cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Core {i + 1}: {stats.Cpu.Cores[i].Usage}%");
+            cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Core {i + 1}: **{stats.Cpu.Cores[i].Usage}**%");
         }
 
-        cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Steal: {stats.Cpu.Total.Steal}%");
-        cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: {stats.Cpu.Total.Usage}%");
+        cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Steal: **{stats.Cpu.Total.Steal}**%");
+        cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Cpu.Total.Usage}**%");
         fields.Add("CPU Usage", new(cpuUsage.ToString(), false));
 
-        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"1-Min: {Math.Round(stats.Cpu.Load[0], 2)}");
-        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"5-Min: {Math.Round(stats.Cpu.Load[1], 2)}");
-        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"15-Min: {Math.Round(stats.Cpu.Load[2], 2)}");
+        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"1-Min: **{Math.Round(stats.Cpu.Load[0], 2)}**");
+        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"5-Min: **{Math.Round(stats.Cpu.Load[1], 2)}**");
+        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"15-Min: **{Math.Round(stats.Cpu.Load[2], 2)}**");
         fields.Add("CPU Load", new(cpuLoads.ToString(), false));
 
-        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Used: {stats.Memory.Readable.Used}");
-        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Free: {stats.Memory.Readable.Free}");
-        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: {stats.Memory.Readable.Total}");
-        fields.Add("Memory Usage", new(memoryUsage.ToString(), false));
+        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Used: **{stats.Memory.Readable.Used}**");
+        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Free: **{stats.Memory.Readable.Free}**");
+        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Memory.Readable.Total}**");
+        fields.Add("Memory Usage", new(memoryUsage.ToString(), true));
 
-        diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Used: {stats.Disk.Readable.Used}");
-        diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Free: {stats.Disk.Readable.Free}");
-        diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: {stats.Disk.Readable.Total}");
-        fields.Add("Disk Usage", new(diskUsage.ToString(), false));
+        diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Used: **{stats.Disk.Readable.Used}**");
+        diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Free: **{stats.Disk.Readable.Free}**");
+        diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Disk.Readable.Total}**");
+        fields.Add("Disk Usage", new(diskUsage.ToString(), true));
 
         StringBuilder networkUsage = new();
         foreach (AzuraNetworkData network in stats.Network)
         {
-            networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Received: {network.Received.Speed.Readable}");
-            networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Transmitted: {network.Transmitted.Speed.Readable}");
-            fields.Add(network.InterfaceName, new(networkUsage.ToString(), false));
+            networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Received: **{network.Received.Speed.Readable}**");
+            networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Transmitted: **{network.Transmitted.Speed.Readable}**");
+            fields.Add($"**{network.InterfaceName}**", new(networkUsage.ToString(), true));
             networkUsage.Clear();
         }
 
@@ -183,9 +183,9 @@ public static class EmbedBuilder
         ArgumentNullException.ThrowIfNull(update, nameof(update));
 
         const string title = "AzuraCast Updates Available";
-        string description = $"Your AzuraCast installation needs {update.RollingUpdatesList.Count} updates.";
+        string description = $"Your AzuraCast installation needs **{update.RollingUpdatesList.Count}** updates.";
         if (update.RollingUpdatesList.Count == 1)
-            description = "Your AzuraCast installation needs 1 update.";
+            description = "Your AzuraCast installation needs **1** update.";
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
@@ -216,7 +216,7 @@ public static class EmbedBuilder
         }
 
         if (title.Length + body.Length > 6000)
-            body = new($"The changelog is too big to display it in an Embed, you can view it [here]({((isRolling) ? AzuraCastRollingUrl : AzuraCastStableUrl)})");
+            body = new($"The changelog is too big to display it in an Embed, you can view it [here]({((isRolling) ? AzuraCastRollingUrl : AzuraCastStableUrl)}).");
 
         return CreateBasicEmbed(title, body.ToString(), DiscordColor.White);
     }
