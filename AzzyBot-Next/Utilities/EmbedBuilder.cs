@@ -99,41 +99,44 @@ public static class EmbedBuilder
         StringBuilder cpuLoads = new();
         StringBuilder memoryUsage = new();
         StringBuilder diskUsage = new();
+        StringBuilder networkUsage = new();
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
+
+        cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Total usage: **{stats.Cpu.Total.Usage}**%");
+        cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Stolen: **{stats.Cpu.Total.Steal}**%");
 
         for (int i = 0; i < stats.Cpu.Cores.Count; i++)
         {
             cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Core {i + 1}: **{stats.Cpu.Cores[i].Usage}**%");
         }
 
-        cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Steal: **{stats.Cpu.Total.Steal}**%");
-        cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Cpu.Total.Usage}**%");
         fields.Add("CPU Usage", new(cpuUsage.ToString(), false));
 
-        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"1-Min: **{Math.Round(stats.Cpu.Load[0], 2)}**");
-        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"5-Min: **{Math.Round(stats.Cpu.Load[1], 2)}**");
-        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"15-Min: **{Math.Round(stats.Cpu.Load[2], 2)}**");
+        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"1-Min-Load: **{Math.Round(stats.Cpu.Load[0], 2)}**");
+        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"5-Min-Load: **{Math.Round(stats.Cpu.Load[1], 2)}**");
+        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"15-Min-Load: **{Math.Round(stats.Cpu.Load[2], 2)}**");
         fields.Add("CPU Load", new(cpuLoads.ToString(), false));
 
+        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Memory.Readable.Total}**");
         memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Used: **{stats.Memory.Readable.Used}**");
         memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Free: **{stats.Memory.Readable.Free}**");
-        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Memory.Readable.Total}**");
         fields.Add("Memory Usage", new(memoryUsage.ToString(), true));
 
+        diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Disk.Readable.Total}**");
         diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Used: **{stats.Disk.Readable.Used}**");
         diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Free: **{stats.Disk.Readable.Free}**");
-        diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Disk.Readable.Total}**");
         fields.Add("Disk Usage", new(diskUsage.ToString(), true));
 
-        StringBuilder networkUsage = new();
         foreach (AzuraNetworkData network in stats.Network)
         {
+            networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Interface: **{network.InterfaceName}**");
             networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Received: **{network.Received.Speed.Readable}**");
             networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Transmitted: **{network.Transmitted.Speed.Readable}**");
-            fields.Add($"**{network.InterfaceName}**", new(networkUsage.ToString(), true));
-            networkUsage.Clear();
+            networkUsage.AppendLine();
         }
+
+        fields.Add("Network Usage", new(networkUsage.ToString(), false));
 
         return CreateBasicEmbed(title, null, DiscordColor.Orange, AzuraCastPic, null, null, fields);
     }
