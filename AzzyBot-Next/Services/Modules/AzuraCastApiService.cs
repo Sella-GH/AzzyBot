@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AzzyBot.Utilities;
 using AzzyBot.Utilities.Helpers;
 using AzzyBot.Utilities.Records.AzuraCast;
+using DSharpPlus.Commands;
 
 namespace AzzyBot.Services.Modules;
 
@@ -181,22 +182,25 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         await PostToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
     }
 
-    public async Task StartStationAsync(Uri baseUrl, string apiKey, int stationId)
+    public async Task StartStationAsync(Uri baseUrl, string apiKey, int stationId, CommandContext context)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
 
         string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Station}/{stationId}";
         AzuraAdminStationConfigRecord config = await GetFromApiAsync<AzuraAdminStationConfigRecord>(baseUrl, endpoint, CreateHeader(apiKey));
         config.IsEnabled = true;
-
         await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, _jsonOptions), CreateHeader(apiKey));
 
-        endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Restart}";
+        await context.EditResponseAsync("Step 1: I activated the station, please wait for setup.");
+        await Task.Delay(TimeSpan.FromSeconds(3));
 
+        endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Restart}";
         await PostToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
 
-        await Task.Delay(5000);
+        await context.EditResponseAsync("Step 2: I started the station, just wait a little more time.");
+        await Task.Delay(TimeSpan.FromSeconds(10));
 
         endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Status}";
         AzuraStationStatusRecord status = await GetFromApiAsync<AzuraStationStatusRecord>(baseUrl, endpoint, CreateHeader(apiKey));

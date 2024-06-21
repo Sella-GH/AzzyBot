@@ -177,7 +177,7 @@ public sealed class AzuraCastCommands
             string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
-            await _azuraCast.StartStationAsync(new(baseUrl), apiKey, stationId);
+            await _azuraCast.StartStationAsync(new(baseUrl), apiKey, stationId, context);
 
             await context.EditResponseAsync($"I started the station **{Crypto.Decrypt(station.Name)}**.");
         }
