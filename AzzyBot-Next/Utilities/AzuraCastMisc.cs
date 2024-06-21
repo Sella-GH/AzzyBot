@@ -37,6 +37,7 @@ public static class AzuraCastMisc
         string result = type switch
         {
             ReadbleBool.EnabledDisabled => (value) ? "Enabled" : "Disabled",
+            ReadbleBool.StartedStopped => (value) ? "Started" : "Stopped",
             ReadbleBool.YesNo => (value) ? "Yes" : "No",
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, null),
         };
