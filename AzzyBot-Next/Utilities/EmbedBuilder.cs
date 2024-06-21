@@ -116,7 +116,7 @@ public static class EmbedBuilder
         cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"1-Min-Load: **{Math.Round(stats.Cpu.Load[0], 2)}**");
         cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"5-Min-Load: **{Math.Round(stats.Cpu.Load[1], 2)}**");
         cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"15-Min-Load: **{Math.Round(stats.Cpu.Load[2], 2)}**");
-        fields.Add("CPU Load", new(cpuLoads.ToString(), false));
+        fields.Add("CPU Load", new(cpuLoads.ToString(), true));
 
         memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Memory.Readable.Total}**");
         memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Used: **{stats.Memory.Readable.Used}**");
