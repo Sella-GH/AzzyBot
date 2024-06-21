@@ -15,7 +15,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
     private readonly WebRequestService _webService = webService;
 
     public string FilePath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "AzuraCast", "Files");
-    //private readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
+    private readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
 
     private static Dictionary<string, string> CreateHeader(string apiKey)
     {
@@ -152,6 +152,16 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return GetFromApiListAsync<AzuraPlaylistRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
+    public Task<AzuraAdminStationConfigRecord> GetStationAdminConfigAsync(Uri baseUrl, string apiKey, int stationId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+
+        string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Station}/{stationId}";
+
+        return GetFromApiAsync<AzuraAdminStationConfigRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+    }
+
     public Task<AzuraUpdateRecord> GetUpdatesAsync(Uri baseUrl, string apiKey)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
@@ -169,6 +179,42 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Backend}/{ApiEndpoints.Skip}";
 
         await PostToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
+    }
+
+    public async Task StartStationAsync(Uri baseUrl, string apiKey, int stationId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+
+        string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Station}/{stationId}";
+        AzuraAdminStationConfigRecord config = await GetFromApiAsync<AzuraAdminStationConfigRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+        config.IsEnabled = true;
+
+        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, _jsonOptions), CreateHeader(apiKey));
+
+        endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Restart}";
+
+        await PostToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
+
+        await Task.Delay(5000);
+
+        endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Status}";
+        AzuraStationStatusRecord status = await GetFromApiAsync<AzuraStationStatusRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+        if (!status.BackendRunning || !status.FrontendRunning)
+            throw new InvalidOperationException("Station failed to start.");
+    }
+
+    public async Task StopStationAsync(Uri baseUrl, string apiKey, int stationId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+
+        string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Station}/{stationId}";
+
+        AzuraAdminStationConfigRecord config = await GetFromApiAsync<AzuraAdminStationConfigRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+        config.IsEnabled = false;
+
+        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, _jsonOptions), CreateHeader(apiKey));
     }
 
     public async Task<List<AzuraPlaylistStateRecord>> SwitchPlaylistsAsync(Uri baseUrl, string apiKey, int stationId, int playlistId, bool removeOld)

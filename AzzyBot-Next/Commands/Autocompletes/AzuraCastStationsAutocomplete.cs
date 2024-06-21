@@ -3,14 +3,19 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
+using AzzyBot.Services.Modules;
+using AzzyBot.Utilities;
 using AzzyBot.Utilities.Encryption;
+using AzzyBot.Utilities.Enums;
+using AzzyBot.Utilities.Records.AzuraCast;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 
 namespace AzzyBot.Commands.Autocompletes;
 
-public sealed class AzuraCastStationsAutocomplete(DbActions dbActions) : IAutoCompleteProvider
+public sealed class AzuraCastStationsAutocomplete(AzuraCastApiService azuraCast, DbActions dbActions) : IAutoCompleteProvider
 {
+    private readonly AzuraCastApiService _azuraCast = azuraCast;
     private readonly DbActions _dbActions = dbActions;
 
     public async ValueTask<IReadOnlyDictionary<string, object>> AutoCompleteAsync(AutoCompleteContext context)
@@ -30,9 +35,13 @@ public sealed class AzuraCastStationsAutocomplete(DbActions dbActions) : IAutoCo
             return results;
         }
 
+        Uri baseUrl = new(Crypto.Decrypt(stationsInDb[0].AzuraCast.BaseUrl));
+        string apiKey = Crypto.Decrypt(stationsInDb[0].AzuraCast.AdminApiKey);
+
         foreach (AzuraCastStationEntity station in stationsInDb)
         {
-            results.Add(Crypto.Decrypt(station.Name), station.Id);
+            AzuraAdminStationConfigRecord config = await _azuraCast.GetStationAdminConfigAsync(baseUrl, apiKey, station.StationId);
+            results.Add($"{Crypto.Decrypt(station.Name)} ({AzuraCastMisc.ReadableBool(config.IsEnabled, ReadbleBool.StartedStopped, true)})", station.Id);
         }
 
         return results;
