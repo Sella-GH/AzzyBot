@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Services.Modules;
+using AzzyBot.Utilities;
 using AzzyBot.Utilities.Encryption;
+using AzzyBot.Utilities.Enums;
 using AzzyBot.Utilities.Records.AzuraCast;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
@@ -53,7 +55,7 @@ public sealed class AzuraCastPlaylistAutocomplete(AzuraCastApiService azuraCast,
             if (!string.IsNullOrWhiteSpace(search) && !playlist.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            results.Add($"{playlist.Name} ({((playlist.IsEnabled) ? "Enabled" : "Disabled")})", playlist.Id);
+            results.Add($"{playlist.Name} ({AzuraCastMisc.ReadableBool(playlist.IsEnabled, ReadbleBool.EnabledDisabled, true)})", playlist.Id);
         }
 
         return results;

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using AzzyBot.Utilities.Enums;
 
@@ -30,13 +31,16 @@ public static class AzuraCastMisc
         return bar.ToString();
     }
 
-    public static string ReadableBool(bool value, ReadbleBool type)
+    [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Make it more universal")]
+    public static string ReadableBool(bool value, ReadbleBool type, bool lower = false)
     {
-        return type switch
+        string result = type switch
         {
             ReadbleBool.EnabledDisabled => (value) ? "Enabled" : "Disabled",
             ReadbleBool.YesNo => (value) ? "Yes" : "No",
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, null),
         };
+
+        return (lower) ? result.ToLowerInvariant() : result;
     }
 }
