@@ -5,7 +5,7 @@ using AzzyBot.Utilities.Enums;
 
 namespace AzzyBot.Utilities;
 
-public static class AzuraCastMisc
+public static class Misc
 {
     public static string GetProgressBar(double number, double elapsed, double duration)
     {

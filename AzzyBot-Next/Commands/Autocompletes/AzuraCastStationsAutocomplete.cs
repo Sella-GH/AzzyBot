@@ -48,7 +48,7 @@ public sealed class AzuraCastStationsAutocomplete(AzuraCastApiService azuraCast,
             if (command is "stop-station" && !config.IsEnabled)
                 continue;
 
-            results.Add($"{Crypto.Decrypt(station.Name)} ({AzuraCastMisc.ReadableBool(config.IsEnabled, ReadbleBool.StartedStopped, true)})", station.Id);
+            results.Add($"{Crypto.Decrypt(station.Name)} ({Misc.ReadableBool(config.IsEnabled, ReadbleBool.StartedStopped, true)})", station.Id);
         }
 
         return results;

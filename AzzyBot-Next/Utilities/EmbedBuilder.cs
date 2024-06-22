@@ -103,8 +103,8 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
 
-        cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Total usage: **{stats.Cpu.Total.Usage}**%");
         cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Stolen: **{stats.Cpu.Total.Steal}**%");
+        cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Total usage: **{stats.Cpu.Total.Usage}**%");
 
         for (int i = 0; i < stats.Cpu.Cores.Count; i++)
         {
@@ -170,7 +170,7 @@ public static class EmbedBuilder
 
             string songDuration = duration.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
             string songElapsed = elapsed.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
-            string progressBar = AzuraCastMisc.GetProgressBar(14, elapsed.TotalSeconds, duration.TotalSeconds);
+            string progressBar = Misc.GetProgressBar(14, elapsed.TotalSeconds, duration.TotalSeconds);
 
             fields.Add("Duration", new($"{progressBar} `[{songElapsed} / {songDuration}]`"));
 
@@ -230,14 +230,14 @@ public static class EmbedBuilder
         const string notLinux = "To display more information you need to have a linux os.";
         string os = AzzyStatsHardware.GetSystemOs;
         string osArch = AzzyStatsHardware.GetSystemOsArch;
-        string isDocker = AzzyStatsHardware.CheckIfDocker.ToString();
+        bool isDocker = AzzyStatsHardware.CheckIfDocker;
         long uptime = Converter.ConvertToUnixTime(AzzyStatsHardware.GetSystemUptime);
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
             ["Operating System"] = new(os, true),
             ["Architecture"] = new(osArch, true),
-            ["Is Docker?"] = new(isDocker, true),
+            ["Dockerized?"] = new(Misc.ReadableBool(isDocker, ReadbleBool.YesNo), true),
             ["System Uptime"] = new($"<t:{uptime}>", false)
         };
 
@@ -260,14 +260,14 @@ public static class EmbedBuilder
 
                 if (counter == 0)
                 {
-                    cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Total usage: **{kvp.Value}**%");
+                    cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Total: **{kvp.Value}%**");
                     continue;
                 }
 
-                cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Core {counter}: **{kvp.Value}**%");
+                cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Core {counter}: **{kvp.Value}%**");
             }
 
-            fields.Add("CPU Usage", new(cpuUsageBuilder.ToString(), false));
+            fields.Add("CPU Usage", new(cpuUsageBuilder.ToString(), true));
         }
 
         if (cpuTemp.Count > 0)
@@ -275,27 +275,27 @@ public static class EmbedBuilder
             StringBuilder cpuTempBuilder = new();
             foreach (KeyValuePair<string, double> kvp in cpuTemp)
             {
-                cpuTempBuilder.AppendLine(CultureInfo.InvariantCulture, $"{kvp.Key}: **{kvp.Value}** °C");
+                cpuTempBuilder.AppendLine(CultureInfo.InvariantCulture, $"{kvp.Key}: **{kvp.Value} °C**");
             }
 
-            fields.Add("Temperatures", new(cpuTempBuilder.ToString(), false));
+            fields.Add("Temperatures", new(cpuTempBuilder.ToString(), true));
         }
 
         if (cpuLoads is not null)
         {
-            string cpuLoad = $"1-Min-Load: **{cpuLoads.OneMin}**\n5-Min-Load: **{cpuLoads.FiveMin}**\n15-Min-Load: **{cpuLoads.FifteenMin}**";
+            string cpuLoad = $"1-Min: **{cpuLoads.OneMin}**\n5-Min: **{cpuLoads.FiveMin}**\n15-Min: **{cpuLoads.FifteenMin}**";
             fields.Add("CPU Load", new(cpuLoad, true));
         }
 
         if (memory is not null)
         {
-            string memoryUsage = $"Total: **{memory.Total}** GB\nUsed: **{memory.Used}** GB\nFree: **{Math.Round(memory.Total - memory.Used, 2)}** GB";
+            string memoryUsage = $"Total: **{memory.Total} GB**\nUsed: **{memory.Used} GB**\nFree: **{Math.Round(memory.Total - memory.Used, 2)} GB**";
             fields.Add("Memory Usage", new(memoryUsage, true));
         }
 
         if (disk is not null)
         {
-            string diskUsage = $"Total: **{disk.TotalSize}** GB\nUsed: **{disk.TotalUsedSpace}** GB\nFree: **{disk.TotalFreeSpace}** GB";
+            string diskUsage = $"Total: **{disk.TotalSize} GB**\nUsed: **{disk.TotalUsedSpace} GB**\nFree: **{disk.TotalFreeSpace} GB**";
             fields.Add("Disk Usage", new(diskUsage, true));
         }
 
@@ -304,7 +304,7 @@ public static class EmbedBuilder
             StringBuilder networkUsageBuilder = new();
             foreach (KeyValuePair<string, AzzyNetworkSpeedRecord> kvp in networkUsage)
             {
-                networkUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Interface: **{kvp.Key}**\nReceived: **{kvp.Value.Received}** KB/s\nTransmitted: **{kvp.Value.Transmitted}** KB/s\n");
+                networkUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Interface: **{kvp.Key}**\nReceived: **{kvp.Value.Received} KB**\nTransmitted: **{kvp.Value.Transmitted} KB**\n");
             }
 
             fields.Add("Network Usage", new(networkUsageBuilder.ToString(), false));
@@ -363,30 +363,24 @@ public static class EmbedBuilder
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
             // Row 1
-            ["Name"] = new(AzzyStatsSoftware.GetBotName, true),
+            ["Uptime"] = new($"<t:{Converter.ConvertToUnixTime(AzzyStatsSoftware.GetBotUptime())}>", true),
 
             // Row 2
-            ["Uptime"] = new($"<t:{Converter.ConvertToUnixTime(AzzyStatsSoftware.GetBotUptime())}>", false),
-
-            // Row 3
             ["Bot Version"] = new(AzzyStatsSoftware.GetBotVersion, true),
             [".NET Version"] = new(AzzyStatsSoftware.GetBotDotNetVersion, true),
             ["D#+ Version"] = new(dspVersion, true),
 
-            // Row 4
+            // Row 3
             ["Authors"] = new(formattedAuthors, true),
             ["Repository"] = new($"[GitHub]({botUrl})", true),
             ["Environment"] = new(AzzyStatsSoftware.GetBotEnvironment, true),
 
-            // Row 5
-            ["Language"] = new("C# 12.0", true),
+            // Row 4
             ["Source Code"] = new(sourceCode, true),
             ["Memory Usage"] = new($"{AzzyStatsSoftware.GetBotMemoryUsage()} GB", true),
+            ["Compilation Date"] = new($"<t:{Converter.ConvertToUnixTime(compileDate)}>", true),
 
-            // Row 6
-            ["Compilation Date"] = new($"<t:{Converter.ConvertToUnixTime(compileDate)}>", false),
-
-            // Row 7
+            // Row 5
             ["AzzyBot GitHub Commit"] = new(formattedCommit, false)
         };
 
@@ -455,7 +449,7 @@ public static class EmbedBuilder
         {
             ["Server ID"] = new(guild.UniqueId.ToString(CultureInfo.InvariantCulture)),
             ["Error Channel"] = new((guild.ErrorChannelId > 0) ? $"<#{guild.ErrorChannelId}>" : "Not set"),
-            ["Configuration Complete"] = new(AzuraCastMisc.ReadableBool(guild.ConfigSet, ReadbleBool.YesNo))
+            ["Configuration Complete"] = new(Misc.ReadableBool(guild.ConfigSet, ReadbleBool.YesNo))
         };
 
         return CreateBasicEmbed(title, description, DiscordColor.White, null, null, null, fields);
@@ -473,7 +467,7 @@ public static class EmbedBuilder
             ["Admin Api Key"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.AdminApiKey)) ? Crypto.Decrypt(azuraCast.AdminApiKey) : "Not set")}||"),
             ["Notification Channel"] = new((azuraCast.NotificationChannelId > 0) ? $"<#{azuraCast.NotificationChannelId}>" : "Not set"),
             ["Outages Channel"] = new((azuraCast.OutagesChannelId > 0) ? $"<#{azuraCast.OutagesChannelId}>" : "Not set"),
-            ["Automatic Checks"] = new($"- Server Status: {AzuraCastMisc.ReadableBool(azuraCast.Checks.ServerStatus, ReadbleBool.EnabledDisabled)}\n- Updates: {AzuraCastMisc.ReadableBool(azuraCast.Checks.Updates, ReadbleBool.EnabledDisabled)}\n- Updates Changelog: {AzuraCastMisc.ReadableBool(azuraCast.Checks.UpdatesShowChangelog, ReadbleBool.EnabledDisabled)}")
+            ["Automatic Checks"] = new($"- Server Status: {Misc.ReadableBool(azuraCast.Checks.ServerStatus, ReadbleBool.EnabledDisabled)}\n- Updates: {Misc.ReadableBool(azuraCast.Checks.Updates, ReadbleBool.EnabledDisabled)}\n- Updates Changelog: {Misc.ReadableBool(azuraCast.Checks.UpdatesShowChangelog, ReadbleBool.EnabledDisabled)}")
         };
 
         embeds.Add(CreateBasicEmbed(title, string.Empty, DiscordColor.White, null, null, null, fields));
@@ -487,9 +481,9 @@ public static class EmbedBuilder
                 ["Station ID"] = new(station.StationId.ToString(CultureInfo.InvariantCulture)),
                 ["Api key"] = new($"||{((!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : "Not set")}||"),
                 ["Music Requests Channel"] = new((station.RequestsChannelId > 0) ? $"<#{station.RequestsChannelId}>" : "Not set"),
-                ["Prefer HLS Streaming"] = new(AzuraCastMisc.ReadableBool(station.PreferHls, ReadbleBool.EnabledDisabled)),
-                ["Show Playlist In Now Playing"] = new(AzuraCastMisc.ReadableBool(station.ShowPlaylistInNowPlaying, ReadbleBool.EnabledDisabled)),
-                ["Automatic Checks"] = new($"- File Changes: {AzuraCastMisc.ReadableBool(station.Checks.FileChanges, ReadbleBool.EnabledDisabled)}"),
+                ["Prefer HLS Streaming"] = new(Misc.ReadableBool(station.PreferHls, ReadbleBool.EnabledDisabled)),
+                ["Show Playlist In Now Playing"] = new(Misc.ReadableBool(station.ShowPlaylistInNowPlaying, ReadbleBool.EnabledDisabled)),
+                ["Automatic Checks"] = new($"- File Changes: {Misc.ReadableBool(station.Checks.FileChanges, ReadbleBool.EnabledDisabled)}"),
                 ["Mount Points"] = new((station.Mounts.Count > 0) ? string.Join('\n', station.Mounts.Select(x => $"- {Crypto.Decrypt(x.Name)}: {Crypto.Decrypt(x.Mount)}")) : "No Mount Points added")
             };
 

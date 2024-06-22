@@ -269,7 +269,7 @@ public sealed class AzuraCastCommands
             message.AppendLine(CultureInfo.InvariantCulture, $"I switched the {((states.Count is 1) ? "playlist" : "playlists")} for **{stationName}**.");
             foreach (AzuraPlaylistStateRecord state in states)
             {
-                message.AppendLine(CultureInfo.InvariantCulture, $"**{state.PlaylistName}** is now **{AzuraCastMisc.ReadableBool(state.PlaylistState, ReadbleBool.EnabledDisabled, true)}**.");
+                message.AppendLine(CultureInfo.InvariantCulture, $"**{state.PlaylistName}** is now **{Misc.ReadableBool(state.PlaylistState, ReadbleBool.EnabledDisabled, true)}**.");
             }
 
             await context.EditResponseAsync(message.ToString());
