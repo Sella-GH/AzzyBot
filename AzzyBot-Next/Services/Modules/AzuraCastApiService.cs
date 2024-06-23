@@ -66,14 +66,8 @@ public sealed class AzuraCastApiService(WebRequestService webService)
 
         IReadOnlyList<string> files = FileOperations.GetFilesInDirectory(FilePath);
         string fileName = $"{databaseId}-{stationId}-files.json";
-        if (!File.Exists(fileName))
-            return string.Empty;
 
-        string file = files.FirstOrDefault(f => f.Contains(fileName, StringComparison.OrdinalIgnoreCase)) ?? string.Empty;
-        if (string.IsNullOrWhiteSpace(file))
-            throw new InvalidOperationException($"Could not find file for database id {databaseId} and station id {stationId}.");
-
-        return file;
+        return files.FirstOrDefault(f => f.Contains(fileName, StringComparison.OrdinalIgnoreCase)) ?? string.Empty;
     }
 
     private async Task PostToApiAsync(Uri baseUrl, string endpoint, string? content = null, Dictionary<string, string>? headers = null)
