@@ -181,6 +181,25 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, message, DiscordColor.Aquamarine, new(thumbnailUrl), null, null, fields);
     }
 
+    public static DiscordEmbed BuildAzuraCastMusicSearchSongEmbed(AzuraRequestRecord song)
+    {
+        ArgumentNullException.ThrowIfNull(song, nameof(song));
+
+        const string title = "Song Search";
+        const string description = "Here is the song you requested.";
+
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
+        {
+            ["Song"] = new(song.Song.Title),
+            ["By"] = new(song.Song.Artist)
+        };
+
+        if (!string.IsNullOrWhiteSpace(song.Song.Album))
+            fields.Add("On", new(song.Song.Album));
+
+        return CreateBasicEmbed(title, description, DiscordColor.Aquamarine, new(song.Song.Art), null, null, fields);
+    }
+
     public static DiscordEmbed BuildAzuraCastUpdatesAvailableEmbed(AzuraUpdateRecord update)
     {
         ArgumentNullException.ThrowIfNull(update, nameof(update));

@@ -23,6 +23,9 @@ using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
+using DSharpPlus.EventArgs;
+using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands;
@@ -320,6 +323,47 @@ public sealed class AzuraCastCommands
             }
 
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicNowPlayingEmbed(nowPlaying, playlistName);
+
+            await context.EditResponseAsync(embed);
+        }
+
+        [Command("search-song"), Description("Search for a song on the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+        public async ValueTask SearchSongAsync
+        (
+            CommandContext context,
+            [Description("The station of which you want to search for a song."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId,
+            [Description("The song you want to search for."), SlashAutoCompleteProvider(typeof(AzuraCastRequestAutocomplete))] string song
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+
+            _logger.CommandRequested(nameof(SearchSongAsync), context.User.GlobalName);
+
+            GuildsEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id);
+            AzuraCastEntity azuraCast = guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast is null");
+            AzuraCastStationEntity station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId) ?? throw new InvalidOperationException("Station is null");
+            string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+            Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
+
+            AzuraRequestRecord songRequest = await _azuraCast.GetRequestableSongAsync(baseUrl, apiKey, stationId, song);
+            DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicSearchSongEmbed(songRequest);
+
+            DiscordButtonComponent button = new(DiscordButtonStyle.Success, "request_song", "Request Song");
+            await using DiscordMessageBuilder builder = new();
+            builder.AddEmbed(embed);
+            builder.AddComponents(button);
+
+            DiscordMessage message = await context.EditResponseAsync(builder);
+            InteractivityResult<ComponentInteractionCreateEventArgs> result = await message.WaitForButtonAsync(context.User, TimeSpan.FromMinutes(1));
+
+            if (!result.TimedOut)
+            {
+                await _azuraCast.RequestSongAsync(baseUrl, stationId, songRequest.RequestId);
+                await context.FollowupAsync("I requested the song for you.");
+
+                return;
+            }
 
             await context.EditResponseAsync(embed);
         }

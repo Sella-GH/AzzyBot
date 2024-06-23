@@ -8,6 +8,8 @@ public static class ApiEndpoints
     public const string NowPlaying = "nowplaying";
     public const string Playlist = "playlist";
     public const string Playlists = "playlists";
+    public const string Request = "request";
+    public const string Requests = "requests";
     public const string Restart = "restart";
     public const string Server = "server";
     public const string Skip = "skip";

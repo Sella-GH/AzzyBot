@@ -7,6 +7,12 @@ public sealed record AzuraFilesRecord
     [JsonPropertyName("unique_id")]
     public required string UniqueId { get; init; }
 
+    [JsonPropertyName("album")]
+    public string Album { get; init; } = string.Empty;
+
+    [JsonPropertyName("lengh_text")]
+    public string Length { get; init; } = string.Empty;
+
     [JsonPropertyName("path")]
     public required string Path { get; init; }
 
@@ -18,7 +24,4 @@ public sealed record AzuraFilesRecord
 
     [JsonPropertyName("title")]
     public required string Title { get; init; }
-
-    [JsonPropertyName("album")]
-    public string Album { get; init; } = string.Empty;
 }

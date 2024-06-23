@@ -59,6 +59,19 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return JsonSerializer.Deserialize<List<T>>(body) ?? throw new InvalidOperationException($"Could not deserialize body: {body}");
     }
 
+    private string GetLocalFile(int databaseId, int stationId)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(databaseId, nameof(databaseId));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+
+        IReadOnlyList<string> files = FileOperations.GetFilesInDirectory(FilePath);
+        string file = files.FirstOrDefault(f => f.Contains($"{databaseId}-{stationId}-file.json", StringComparison.OrdinalIgnoreCase)) ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(file))
+            throw new InvalidOperationException($"Could not find file for database id {databaseId} and station id {stationId}.");
+
+        return file;
+    }
+
     private async Task PostToApiAsync(Uri baseUrl, string endpoint, string? content = null, Dictionary<string, string>? headers = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
@@ -91,12 +104,8 @@ public sealed class AzuraCastApiService(WebRequestService webService)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        IReadOnlyList<string> files = FileOperations.GetFilesInDirectory(FilePath);
+        string file = GetLocalFile(databaseId, stationId);
         List<AzuraFilesRecord> records = [];
-
-        string file = files.FirstOrDefault(f => f.Contains($"{databaseId}-{stationId}-files.json", StringComparison.OrdinalIgnoreCase)) ?? string.Empty;
-        if (string.IsNullOrWhiteSpace(file))
-            return records;
 
         string content = await FileOperations.GetFileContentAsync(file);
         if (string.IsNullOrWhiteSpace(content))
@@ -153,6 +162,66 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return GetFromApiListAsync<AzuraPlaylistRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
+    public async Task<AzuraRequestRecord> GetRequestableSongAsync(Uri baseUrl, string apiKey, int stationId, string? songId = null, string? name = null, string? artist = null, string? album = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+
+        IReadOnlyList<AzuraRequestRecord> songs = await GetRequestableSongsAsync(baseUrl, apiKey, stationId);
+        AzuraRequestRecord? song = songs.FirstOrDefault(s =>
+            (songId is null || s.Song.Id == songId) &&
+            (name is null || s.Song.Title == name) &&
+            (artist is null || s.Song.Artist == artist) &&
+            (album is null || s.Song.Album == album)
+            );
+
+        return song ?? throw new InvalidOperationException($"Song {name} not found.");
+    }
+
+    public Task<IReadOnlyList<AzuraRequestRecord>> GetRequestableSongsAsync(Uri baseUrl, string apiKey, int stationId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+
+        string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Requests}";
+
+        return GetFromApiListAsync<AzuraRequestRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+    }
+
+    public async Task<AzuraSongDetailedRecord> GetSongInfoAsync(Uri baseUrl, string apiKey, int stationId, bool online, string? songId = null, string? name = null, string? artist = null, string? album = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+
+        IReadOnlyList<AzuraFilesRecord> songs = [];
+        if (online)
+        {
+            songs = await GetFilesOnlineAsync(baseUrl, apiKey, stationId);
+        }
+        else
+        {
+            songs = await GetFilesLocalAsync(1, stationId);
+        }
+
+        AzuraFilesRecord? song = songs.FirstOrDefault(s =>
+            (songId is null || s.SongId == songId) &&
+            (name is null || s.Title == name) &&
+            (artist is null || s.Artist == artist) &&
+            (album is null || s.Album == album)
+            ) ??
+            throw new InvalidOperationException($"Song {name} not found.");
+
+        return new()
+        {
+            Id = song.SongId,
+            Album = song.Album,
+            Artist = song.Artist,
+            Title = song.Title,
+            Text = $"{song.Title} - {song.Artist}"
+        };
+    }
+
     public Task<AzuraAdminStationConfigRecord> GetStationAdminConfigAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
@@ -170,6 +239,16 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Updates}";
 
         return GetFromApiAsync<AzuraUpdateRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+    }
+
+    public async Task RequestSongAsync(Uri baseUrl, int stationId, string songId)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(songId, nameof(songId));
+
+        string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Request}/{songId}";
+
+        await PostToApiAsync(baseUrl, endpoint);
     }
 
     public async Task SkipSongAsync(Uri baseUrl, string apiKey, int stationId)

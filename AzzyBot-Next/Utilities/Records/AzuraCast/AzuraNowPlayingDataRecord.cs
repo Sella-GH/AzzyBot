@@ -38,8 +38,17 @@ public sealed record AzuraNowPlayingLiveRecord
     public string Art { get; init; } = string.Empty;
 }
 
-public sealed record AzuraNowPlayingRecord : AzuraSongDataRecord
+public sealed record AzuraNowPlayingRecord
 {
+    [JsonPropertyName("duration")]
+    public int Duration { get; init; }
+
+    [JsonPropertyName("playlist")]
+    public string Playlist { get; init; } = string.Empty;
+
+    [JsonPropertyName("song")]
+    public AzuraSongDetailedRecord Song { get; init; } = new();
+
     [JsonPropertyName("elapsed")]
     public int Elapsed { get; init; }
 }
