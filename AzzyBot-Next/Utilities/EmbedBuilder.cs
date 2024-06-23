@@ -111,7 +111,7 @@ public static class EmbedBuilder
             cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Core {i + 1}: **{stats.Cpu.Cores[i].Usage}**%");
         }
 
-        fields.Add("CPU Usage", new(cpuUsage.ToString(), false));
+        fields.Add("CPU Usage", new(cpuUsage.ToString()));
 
         cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"1-Min: **{Math.Round(stats.Cpu.Load[0], 2)}**");
         cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"5-Min: **{Math.Round(stats.Cpu.Load[1], 2)}**");
@@ -136,7 +136,7 @@ public static class EmbedBuilder
             networkUsage.AppendLine();
         }
 
-        fields.Add("Network Usage", new(networkUsage.ToString(), false));
+        fields.Add("Network Usage", new(networkUsage.ToString()));
 
         return CreateBasicEmbed(title, null, DiscordColor.Orange, AzuraCastPic, null, null, fields);
     }
@@ -151,12 +151,12 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
-            ["Song"] = new(data.NowPlaying.Song.Title, false),
-            ["By"] = new(data.NowPlaying.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), false)
+            ["Song"] = new(data.NowPlaying.Song.Title),
+            ["By"] = new(data.NowPlaying.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase))
         };
 
         if (!string.IsNullOrWhiteSpace(data.NowPlaying.Song.Album))
-            fields.Add("On", new(data.NowPlaying.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), false));
+            fields.Add("On", new(data.NowPlaying.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase)));
 
         if (!string.IsNullOrWhiteSpace(data.NowPlaying.Song.Genre))
             fields.Add("Genre", new(data.NowPlaying.Song.Genre));
@@ -193,12 +193,12 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
-            ["Song"] = new(song.Song.Title, false),
-            ["By"] = new(song.Song.Artist, false)
+            ["Song"] = new(song.Song.Title),
+            ["By"] = new(song.Song.Artist)
         };
 
         if (!string.IsNullOrWhiteSpace(song.Song.Album))
-            fields.Add("On", new(song.Song.Album, false));
+            fields.Add("On", new(song.Song.Album));
 
         if (!string.IsNullOrWhiteSpace(song.Song.Genre))
             fields.Add("Genre", new(song.Song.Genre));
@@ -266,7 +266,7 @@ public static class EmbedBuilder
             ["Operating System"] = new(os, true),
             ["Architecture"] = new(osArch, true),
             ["Dockerized?"] = new(Misc.ReadableBool(isDocker, ReadbleBool.YesNo), true),
-            ["System Uptime"] = new($"<t:{uptime}>", false)
+            ["System Uptime"] = new($"<t:{uptime}>")
         };
 
         if (!AzzyStatsHardware.CheckIfLinuxOs)
@@ -335,7 +335,7 @@ public static class EmbedBuilder
                 networkUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Interface: **{kvp.Key}**\nReceived: **{kvp.Value.Received} KB**\nTransmitted: **{kvp.Value.Transmitted} KB**\n");
             }
 
-            fields.Add("Network Usage", new(networkUsageBuilder.ToString(), false));
+            fields.Add("Network Usage", new(networkUsageBuilder.ToString()));
         }
 
         return CreateBasicEmbed(title, null, DiscordColor.Orange, avaUrl, null, null, fields);
@@ -351,7 +351,7 @@ public static class EmbedBuilder
         Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
         foreach (KeyValuePair<string, string> kvp in command.Parameters)
         {
-            fields.Add(kvp.Key, new(kvp.Value, false));
+            fields.Add(kvp.Key, new(kvp.Value));
         }
 
         return CreateBasicEmbed(title, description, DiscordColor.Blurple, null, null, null, fields);
@@ -390,26 +390,17 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
-            // Row 1
             ["Uptime"] = new($"<t:{Converter.ConvertToUnixTime(AzzyStatsSoftware.GetBotUptime())}>", true),
-
-            // Row 2
             ["Bot Version"] = new(AzzyStatsSoftware.GetBotVersion, true),
             [".NET Version"] = new(AzzyStatsSoftware.GetBotDotNetVersion, true),
             ["D#+ Version"] = new(dspVersion, true),
-
-            // Row 3
             ["Authors"] = new(formattedAuthors, true),
             ["Repository"] = new($"[GitHub]({botUrl})", true),
             ["Environment"] = new(AzzyStatsSoftware.GetBotEnvironment, true),
-
-            // Row 4
             ["Source Code"] = new(sourceCode, true),
             ["Memory Usage"] = new($"{AzzyStatsSoftware.GetBotMemoryUsage()} GB", true),
             ["Compilation Date"] = new($"<t:{Converter.ConvertToUnixTime(compileDate)}>", true),
-
-            // Row 5
-            ["AzzyBot GitHub Commit"] = new(formattedCommit, false)
+            ["AzzyBot GitHub Commit"] = new(formattedCommit)
         };
 
         return CreateBasicEmbed(title, null, DiscordColor.Orange, avaUrl, null, null, fields);
