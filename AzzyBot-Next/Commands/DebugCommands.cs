@@ -70,7 +70,7 @@ public sealed class DebugCommands
 
             await context.DeferResponseAsync();
 
-            await _webRequestService.GetWebAsync(url);
+            await _webRequestService.GetWebAsync(url, null, true);
 
             await context.EditResponseAsync($"Web service test for *{url}* was successful!");
         }

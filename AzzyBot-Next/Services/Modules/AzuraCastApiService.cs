@@ -31,7 +31,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
         Uri url = new($"{baseUrl}api/{endpoint}");
-        string body = await _webService.GetWebAsync(url, headers);
+        string body = await _webService.GetWebAsync(url, headers, true);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException($"API response is empty, url: {url}");
 
@@ -43,7 +43,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
-        string body = await _webService.GetWebAsync(uri, headers);
+        string body = await _webService.GetWebAsync(uri, headers, true);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException($"API response is empty, url: {uri}");
 
@@ -77,7 +77,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
-        bool success = await _webService.PostWebAsync(uri, content, headers);
+        bool success = await _webService.PostWebAsync(uri, content, headers, true);
         if (!success)
             throw new InvalidOperationException($"Failed POST to API, url: {uri}");
     }
@@ -87,7 +87,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
-        bool success = await _webService.PutWebAsync(uri, content, headers);
+        bool success = await _webService.PutWebAsync(uri, content, headers, true);
         if (!success)
             throw new InvalidOperationException($"Failed PUT to API, url: {uri}");
     }
@@ -97,7 +97,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentException.ThrowIfNullOrWhiteSpace(downloadPath, nameof(downloadPath));
 
-        await _webService.DownloadAsync(url, downloadPath, CreateHeader(apiKey));
+        await _webService.DownloadAsync(url, downloadPath, CreateHeader(apiKey), true);
     }
 
     public async Task<IReadOnlyList<AzuraFilesRecord>> GetFilesLocalAsync(int databaseId, int stationId)

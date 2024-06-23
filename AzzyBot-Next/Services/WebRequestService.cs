@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Net.Sockets;
 using System.Text;
@@ -58,13 +59,10 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         _httpClient?.Dispose();
     }
 
-    public async Task<bool> DownloadAsync(Uri url, string downloadPath, Dictionary<string, string>? headers = null)
+    public async Task<bool> DownloadAsync(Uri url, string downloadPath, Dictionary<string, string>? headers = null, bool acceptJson = false)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
-
-        if (headers is not null)
-            AddHeaders(headers, addressFamily);
-
+        AddHeaders(addressFamily, headers, acceptJson);
         HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
 
         try
@@ -90,13 +88,10 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task<string> GetWebAsync(Uri url, Dictionary<string, string>? headers = null)
+    public async Task<string> GetWebAsync(Uri url, Dictionary<string, string>? headers = null, bool acceptJson = false)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
-
-        if (headers is not null)
-            AddHeaders(headers, addressFamily);
-
+        AddHeaders(addressFamily, headers, acceptJson);
         HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
 
         try
@@ -119,13 +114,10 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task<bool> PostWebAsync(Uri url, string? content = null, Dictionary<string, string>? headers = null)
+    public async Task<bool> PostWebAsync(Uri url, string? content = null, Dictionary<string, string>? headers = null, bool acceptJson = false)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
-
-        if (headers is not null)
-            AddHeaders(headers, addressFamily);
-
+        AddHeaders(addressFamily, headers, acceptJson);
         HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
 
         try
@@ -146,18 +138,15 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
         catch (HttpRequestException ex)
         {
-            _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
+            _logger.WebRequestFailed(HttpMethod.Post, ex.Message, url);
             throw;
         }
     }
 
-    public async Task<bool> PutWebAsync(Uri url, string? content = null, Dictionary<string, string>? headers = null)
+    public async Task<bool> PutWebAsync(Uri url, string? content = null, Dictionary<string, string>? headers = null, bool acceptJson = false)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
-
-        if (headers is not null)
-            AddHeaders(headers, addressFamily);
-
+        AddHeaders(addressFamily, headers, acceptJson);
         HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
 
         try
@@ -178,20 +167,23 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
         catch (HttpRequestException ex)
         {
-            _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
+            _logger.WebRequestFailed(HttpMethod.Put, ex.Message, url);
             throw;
         }
     }
 
-    private void AddHeaders(Dictionary<string, string> headers, AddressFamily addressFamily)
+    private void AddHeaders(AddressFamily addressFamily, Dictionary<string, string>? headers = null, bool acceptJson = false)
     {
-        ArgumentNullException.ThrowIfNull(headers, nameof(headers));
-
         string botName = AzzyStatsSoftware.GetBotName;
         string botVersion = AzzyStatsSoftware.GetBotVersion;
         HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
         client.DefaultRequestHeaders.Clear();
         client.DefaultRequestHeaders.UserAgent.Add(new(botName, botVersion));
+        if (acceptJson)
+            client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(MediaType));
+
+        if (headers is null)
+            return;
 
         foreach (KeyValuePair<string, string> header in headers)
         {

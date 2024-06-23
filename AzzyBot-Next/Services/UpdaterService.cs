@@ -33,7 +33,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
             ["User-Agent"] = AzzyStatsSoftware.GetBotName
         };
 
-        string body = await _webService.GetWebAsync((isPreview) ? _previewUrl : _latestUrl, headers);
+        string body = await _webService.GetWebAsync((isPreview) ? _previewUrl : _latestUrl, headers, true);
         if (string.IsNullOrWhiteSpace(body))
         {
             _logger.OnlineVersionEmpty();

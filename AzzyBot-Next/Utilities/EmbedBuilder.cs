@@ -104,7 +104,7 @@ public static class EmbedBuilder
         Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
 
         cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Stolen: **{stats.Cpu.Total.Steal}**%");
-        cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Total usage: **{stats.Cpu.Total.Usage}**%");
+        cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Cpu.Total.Usage}**%");
 
         for (int i = 0; i < stats.Cpu.Cores.Count; i++)
         {
@@ -113,9 +113,9 @@ public static class EmbedBuilder
 
         fields.Add("CPU Usage", new(cpuUsage.ToString(), false));
 
-        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"1-Min-Load: **{Math.Round(stats.Cpu.Load[0], 2)}**");
-        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"5-Min-Load: **{Math.Round(stats.Cpu.Load[1], 2)}**");
-        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"15-Min-Load: **{Math.Round(stats.Cpu.Load[2], 2)}**");
+        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"1-Min: **{Math.Round(stats.Cpu.Load[0], 2)}**");
+        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"5-Min: **{Math.Round(stats.Cpu.Load[1], 2)}**");
+        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"15-Min: **{Math.Round(stats.Cpu.Load[2], 2)}**");
         fields.Add("CPU Load", new(cpuLoads.ToString(), true));
 
         memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Memory.Readable.Total}**");
