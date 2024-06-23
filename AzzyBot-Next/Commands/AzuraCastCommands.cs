@@ -371,13 +371,13 @@ public sealed class AzuraCastCommands
             string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
 
-            // Needed because when disabled it throws an exception
+            AzuraAdminStationConfigRecord stationConfig = await _azuraCast.GetStationAdminConfigAsync(baseUrl, apiKey, stationId);
             AzuraRequestRecord songRequest;
-            try
+            if (stationConfig.EnableRequests)
             {
                 songRequest = await _azuraCast.GetRequestableSongAsync(baseUrl, apiKey, stationId, song);
             }
-            catch (HttpRequestException)
+            else
             {
                 AzuraSongDataRecord songData = await _azuraCast.GetSongInfoAsync(baseUrl, apiKey, station.Id, stationId, false, song);
                 songRequest = new()
@@ -388,7 +388,6 @@ public sealed class AzuraCastCommands
             }
 
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicSearchSongEmbed(songRequest);
-            AzuraAdminStationConfigRecord stationConfig = await _azuraCast.GetStationAdminConfigAsync(baseUrl, apiKey, stationId);
             if (!stationConfig.EnableRequests)
             {
                 await context.EditResponseAsync(embed);

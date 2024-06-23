@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Database;
@@ -76,12 +75,13 @@ public sealed class AzuraCastRequestAutocomplete(AzuraCastApiService azuraCast, 
             }
         }
 
-        try
+        AzuraAdminStationConfigRecord config = await _azuraCast.GetStationAdminConfigAsync(new(baseUrl), apiKey, stationId);
+        if (config.EnableRequests)
         {
             IReadOnlyList<AzuraRequestRecord> requests = await _azuraCast.GetRequestableSongsAsync(new(baseUrl), apiKey, stationId);
             AddResultsFromSong(requests);
         }
-        catch (HttpRequestException)
+        else
         {
             IReadOnlyList<AzuraFilesRecord> files = await _azuraCast.GetFilesLocalAsync(station.Id, station.StationId);
             AddResultsFromSong(files);
