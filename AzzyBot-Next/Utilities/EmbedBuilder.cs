@@ -151,12 +151,15 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
-            ["Song"] = new(data.NowPlaying.Song.Title, true),
-            ["By"] = new(data.NowPlaying.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true)
+            ["Song"] = new(data.NowPlaying.Song.Title, false),
+            ["By"] = new(data.NowPlaying.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), false)
         };
 
         if (!string.IsNullOrWhiteSpace(data.NowPlaying.Song.Album))
-            fields.Add("On", new(data.NowPlaying.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true));
+            fields.Add("On", new(data.NowPlaying.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), false));
+
+        if (!string.IsNullOrWhiteSpace(data.NowPlaying.Song.Genre))
+            fields.Add("Genre", new(data.NowPlaying.Song.Genre));
 
         if (data.Live.IsLive)
         {
@@ -190,12 +193,12 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
-            ["Song"] = new(song.Song.Title, true),
-            ["By"] = new(song.Song.Artist, true)
+            ["Song"] = new(song.Song.Title, false),
+            ["By"] = new(song.Song.Artist, false)
         };
 
         if (!string.IsNullOrWhiteSpace(song.Song.Album))
-            fields.Add("On", new(song.Song.Album, true));
+            fields.Add("On", new(song.Song.Album, false));
 
         if (!string.IsNullOrWhiteSpace(song.Song.Genre))
             fields.Add("Genre", new(song.Song.Genre));
