@@ -59,9 +59,6 @@ public sealed class AzuraCastRequestAutocomplete(AzuraCastApiService azuraCast, 
             if (!string.IsNullOrWhiteSpace(request.Song.Artist))
                 song.Append(CultureInfo.InvariantCulture, $" - {request.Song.Artist}");
 
-            if (!string.IsNullOrWhiteSpace(request.Song.Album))
-                song.Append(CultureInfo.InvariantCulture, $" ({request.Song.Album})");
-
             results.Add(song.ToString(), request.Song.Id);
             song.Clear();
         }

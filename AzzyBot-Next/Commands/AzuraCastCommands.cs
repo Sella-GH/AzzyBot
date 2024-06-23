@@ -327,6 +327,7 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync(embed);
         }
 
+        // TODO: Update AzuraCast and try out again
         [Command("search-song"), Description("Search for a song on the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
         public async ValueTask SearchSongAsync
         (
