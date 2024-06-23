@@ -404,8 +404,13 @@ public sealed class AzuraCastCommands
             if (!result.TimedOut)
             {
                 await _azuraCast.RequestSongAsync(baseUrl, stationId, songRequest.RequestId);
+
                 await context.EditResponseAsync(embed);
-                await context.FollowupAsync("I requested the song for you.");
+                await using DiscordInteractionResponseBuilder interaction = new()
+                {
+                    Content = "I requested the song for you."
+                };
+                await result.Result.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource, interaction);
 
                 return;
             }
