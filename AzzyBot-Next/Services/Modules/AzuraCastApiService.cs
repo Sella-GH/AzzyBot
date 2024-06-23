@@ -65,7 +65,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
         IReadOnlyList<string> files = FileOperations.GetFilesInDirectory(FilePath);
-        string file = files.FirstOrDefault(f => f.Contains($"{databaseId}-{stationId}-file.json", StringComparison.OrdinalIgnoreCase)) ?? string.Empty;
+        string file = files.FirstOrDefault(f => f.Contains($"{databaseId}-{stationId}-files.json", StringComparison.OrdinalIgnoreCase)) ?? string.Empty;
         if (string.IsNullOrWhiteSpace(file))
             throw new InvalidOperationException($"Could not find file for database id {databaseId} and station id {stationId}.");
 
@@ -188,22 +188,14 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return GetFromApiListAsync<AzuraRequestRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
-    public async Task<AzuraSongDetailedRecord> GetSongInfoAsync(Uri baseUrl, string apiKey, int stationId, bool online, string? songId = null, string? name = null, string? artist = null, string? album = null)
+    public async Task<AzuraSongDetailedRecord> GetSongInfoAsync(Uri baseUrl, string apiKey, int databaseId, int stationId, bool online, string? songId = null, string? name = null, string? artist = null, string? album = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(databaseId, nameof(databaseId));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
         ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
 
-        IReadOnlyList<AzuraFilesRecord> songs = [];
-        if (online)
-        {
-            songs = await GetFilesOnlineAsync(baseUrl, apiKey, stationId);
-        }
-        else
-        {
-            songs = await GetFilesLocalAsync(1, stationId);
-        }
-
+        IReadOnlyList<AzuraFilesRecord> songs = (online) ? await GetFilesOnlineAsync(baseUrl, apiKey, stationId) : await GetFilesLocalAsync(databaseId, stationId);
         AzuraFilesRecord? song = songs.FirstOrDefault(s =>
             (songId is null || s.SongId == songId) &&
             (name is null || s.Title == name) &&
