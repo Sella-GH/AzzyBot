@@ -60,7 +60,6 @@ public sealed class AzuraCastRequestAutocomplete(AzuraCastApiService azuraCast, 
                 bool isRequest = song is AzuraRequestRecord;
                 string title = (isRequest) ? (song as AzuraRequestRecord)?.Song.Title ?? string.Empty : (song as AzuraFilesRecord)?.Title ?? string.Empty;
                 string artist = (isRequest) ? (song as AzuraRequestRecord)?.Song.Artist ?? string.Empty : (song as AzuraFilesRecord)?.Artist ?? string.Empty;
-                string album = (isRequest) ? (song as AzuraRequestRecord)?.Song.Album ?? string.Empty : (song as AzuraFilesRecord)?.Album ?? string.Empty;
                 string uniqueId = (isRequest) ? (song as AzuraRequestRecord)?.Song.SongId ?? string.Empty : (song as AzuraFilesRecord)?.UniqueId ?? string.Empty;
 
                 if (!string.IsNullOrWhiteSpace(search) && (!title.Contains(search, StringComparison.OrdinalIgnoreCase) && !artist.Contains(search, StringComparison.OrdinalIgnoreCase)))
