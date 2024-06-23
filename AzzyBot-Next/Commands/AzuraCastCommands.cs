@@ -327,7 +327,6 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync(embed);
         }
 
-        // TODO: Update AzuraCast and try out again
         [Command("search-song"), Description("Search for a song on the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
         public async ValueTask SearchSongAsync
         (
@@ -350,21 +349,23 @@ public sealed class AzuraCastCommands
             AzuraRequestRecord songRequest = await _azuraCast.GetRequestableSongAsync(baseUrl, apiKey, stationId, song);
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicSearchSongEmbed(songRequest);
 
-            DiscordButtonComponent button = new(DiscordButtonStyle.Success, "request_song", "Request Song");
-            await using DiscordMessageBuilder builder = new();
-            builder.AddEmbed(embed);
-            builder.AddComponents(button);
+            // TODO: Check out why the song requests aren't working and fix it
 
-            DiscordMessage message = await context.EditResponseAsync(builder);
-            InteractivityResult<ComponentInteractionCreateEventArgs> result = await message.WaitForButtonAsync(context.User, TimeSpan.FromMinutes(1));
+            //DiscordButtonComponent button = new(DiscordButtonStyle.Success, "request_song", "Request Song");
+            //await using DiscordMessageBuilder builder = new();
+            //builder.AddEmbed(embed);
+            //builder.AddComponents(button);
 
-            if (!result.TimedOut)
-            {
-                await _azuraCast.RequestSongAsync(baseUrl, stationId, songRequest.RequestId);
-                await context.FollowupAsync("I requested the song for you.");
+            //DiscordMessage message = await context.EditResponseAsync(builder);
+            //InteractivityResult<ComponentInteractionCreateEventArgs> result = await message.WaitForButtonAsync(context.User, TimeSpan.FromMinutes(1));
 
-                return;
-            }
+            //if (!result.TimedOut)
+            //{
+            //    await _azuraCast.RequestSongAsync(baseUrl, stationId, songRequest.RequestId);
+            //    await context.FollowupAsync("I requested the song for you.");
+
+            //    return;
+            //}
 
             await context.EditResponseAsync(embed);
         }
