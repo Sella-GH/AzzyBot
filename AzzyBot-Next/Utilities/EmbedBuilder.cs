@@ -190,12 +190,18 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
-            ["Song"] = new(song.Song.Title),
-            ["By"] = new(song.Song.Artist)
+            ["Song"] = new(song.Song.Title, true),
+            ["By"] = new(song.Song.Artist, true)
         };
 
         if (!string.IsNullOrWhiteSpace(song.Song.Album))
-            fields.Add("On", new(song.Song.Album));
+            fields.Add("On", new(song.Song.Album, true));
+
+        if (!string.IsNullOrWhiteSpace(song.Song.Genre))
+            fields.Add("Genre", new(song.Song.Genre));
+
+        if (!string.IsNullOrWhiteSpace(song.Song.Isrc))
+            fields.Add("ISRC", new(song.Song.Isrc));
 
         return CreateBasicEmbed(title, description, DiscordColor.Aquamarine, new(song.Song.Art), null, null, fields);
     }

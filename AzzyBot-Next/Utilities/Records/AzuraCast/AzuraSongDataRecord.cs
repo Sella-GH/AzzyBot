@@ -2,17 +2,11 @@ using System.Text.Json.Serialization;
 
 namespace AzzyBot.Utilities.Records.AzuraCast;
 
-public sealed record AzuraSongDetailedRecord : AzuraSongSimpleRecord
+public sealed record AzuraSongDataRecord
 {
     [JsonPropertyName("id")]
     public string Id { get; init; } = string.Empty;
 
-    [JsonPropertyName("art")]
-    public string Art { get; init; } = string.Empty;
-}
-
-public record AzuraSongSimpleRecord
-{
     [JsonPropertyName("text")]
     public string Text { get; set; } = string.Empty;
 
@@ -24,4 +18,13 @@ public record AzuraSongSimpleRecord
 
     [JsonPropertyName("album")]
     public string Album { get; set; } = string.Empty;
+
+    [JsonPropertyName("genre")]
+    public string Genre { get; set; } = string.Empty;
+
+    [JsonPropertyName("isrc")]
+    public string Isrc { get; set; } = string.Empty;
+
+    [JsonPropertyName("art")]
+    public string Art { get; init; } = string.Empty;
 }

@@ -47,7 +47,7 @@ public sealed record AzuraNowPlayingRecord
     public string Playlist { get; init; } = string.Empty;
 
     [JsonPropertyName("song")]
-    public AzuraSongDetailedRecord Song { get; init; } = new();
+    public AzuraSongDataRecord Song { get; init; } = new();
 
     [JsonPropertyName("elapsed")]
     public int Elapsed { get; init; }

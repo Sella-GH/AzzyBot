@@ -13,5 +13,5 @@ public sealed record AzuraRequestRecord
     public required string RequestUrl { get; init; }
 
     [JsonPropertyName("song")]
-    public required AzuraSongDetailedRecord Song { get; init; }
+    public required AzuraSongDataRecord Song { get; init; }
 }

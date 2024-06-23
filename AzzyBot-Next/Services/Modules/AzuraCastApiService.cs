@@ -188,7 +188,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return GetFromApiListAsync<AzuraRequestRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
-    public async Task<AzuraSongDetailedRecord> GetSongInfoAsync(Uri baseUrl, string apiKey, int databaseId, int stationId, bool online, string? songId = null, string? name = null, string? artist = null, string? album = null)
+    public async Task<AzuraSongDataRecord> GetSongInfoAsync(Uri baseUrl, string apiKey, int databaseId, int stationId, bool online, string? songId = null, string? name = null, string? artist = null, string? album = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(databaseId, nameof(databaseId));
@@ -264,13 +264,13 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         config.IsEnabled = true;
         await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, _jsonOptions), CreateHeader(apiKey));
 
-        await context.EditResponseAsync("Step 1: I activated the station, please wait for setup.");
+        await context.EditResponseAsync("I activated the station, please wait for setup.");
         await Task.Delay(TimeSpan.FromSeconds(3));
 
         endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Restart}";
         await PostToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
 
-        await context.EditResponseAsync("Step 2: I started the station, just wait a little more time.");
+        await context.EditResponseAsync("I started the station, just a little more time.");
         await Task.Delay(TimeSpan.FromSeconds(10));
 
         endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Status}";
