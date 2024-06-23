@@ -504,7 +504,7 @@ public static class EmbedBuilder
             {
                 ["Station Name"] = new(Crypto.Decrypt(station.Name)),
                 ["Station ID"] = new(station.StationId.ToString(CultureInfo.InvariantCulture)),
-                ["Api key"] = new($"||{((!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : "Not set")}||"),
+                ["Station Api Key"] = new($"||{((!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : "Not set")}||"),
                 ["Music Requests Channel"] = new((station.RequestsChannelId > 0) ? $"<#{station.RequestsChannelId}>" : "Not set"),
                 ["Prefer HLS Streaming"] = new(Misc.ReadableBool(station.PreferHls, ReadbleBool.EnabledDisabled)),
                 ["Show Playlist In Now Playing"] = new(Misc.ReadableBool(station.ShowPlaylistInNowPlaying, ReadbleBool.EnabledDisabled)),
