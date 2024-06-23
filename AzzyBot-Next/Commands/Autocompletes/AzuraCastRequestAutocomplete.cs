@@ -63,7 +63,7 @@ public sealed class AzuraCastRequestAutocomplete(AzuraCastApiService azuraCast, 
                 string album = (isRequest) ? (song as AzuraRequestRecord)?.Song.Album ?? string.Empty : (song as AzuraFilesRecord)?.Album ?? string.Empty;
                 string uniqueId = (isRequest) ? (song as AzuraRequestRecord)?.Song.SongId ?? string.Empty : (song as AzuraFilesRecord)?.UniqueId ?? string.Empty;
 
-                if (!string.IsNullOrWhiteSpace(search) && (!title.Contains(search, StringComparison.OrdinalIgnoreCase) && !artist.Contains(search, StringComparison.OrdinalIgnoreCase) && !album.Contains(search, StringComparison.OrdinalIgnoreCase)))
+                if (!string.IsNullOrWhiteSpace(search) && (!title.Contains(search, StringComparison.OrdinalIgnoreCase) && !artist.Contains(search, StringComparison.OrdinalIgnoreCase)))
                     continue;
 
                 songResult.Append(CultureInfo.InvariantCulture, $"{title}");

@@ -405,7 +405,6 @@ public sealed class AzuraCastCommands
             {
                 await _azuraCast.RequestSongAsync(baseUrl, stationId, songRequest.RequestId);
 
-                await context.EditResponseAsync(embed);
                 await using DiscordInteractionResponseBuilder interaction = new()
                 {
                     Content = "I requested the song for you."
