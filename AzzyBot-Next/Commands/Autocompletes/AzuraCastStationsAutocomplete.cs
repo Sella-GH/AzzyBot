@@ -38,17 +38,24 @@ public sealed class AzuraCastStationsAutocomplete(AzuraCastApiService azuraCast,
         Uri baseUrl = new(Crypto.Decrypt(stationsInDb[0].AzuraCast.BaseUrl));
         string apiKey = Crypto.Decrypt(stationsInDb[0].AzuraCast.AdminApiKey);
         string command = context.Command.Name;
-
         foreach (AzuraCastStationEntity station in stationsInDb)
         {
             AzuraAdminStationConfigRecord config = await _azuraCast.GetStationAdminConfigAsync(baseUrl, apiKey, station.StationId);
-            if (command is "start-station" && config.IsEnabled)
-                continue;
 
-            if (command is "stop-station" && !config.IsEnabled)
-                continue;
+            switch (command)
+            {
+                case "start-station" when config.IsEnabled:
+                case "stop-station" when !config.IsEnabled:
+                    continue;
 
-            results.Add($"{Crypto.Decrypt(station.Name)} ({Misc.ReadableBool(config.IsEnabled, ReadbleBool.StartedStopped, true)})", station.Id);
+                case "toggle-song-requests":
+                    results.Add($"{Crypto.Decrypt(station.Name)} ({Misc.ReadableBool(config.EnableRequests, ReadbleBool.EnabledDisabled, true)})", station.Id);
+                    break;
+
+                default:
+                    results.Add($"{Crypto.Decrypt(station.Name)} ({Misc.ReadableBool(config.IsEnabled, ReadbleBool.StartedStopped, true)})", station.Id);
+                    break;
+            }
         }
 
         return results;

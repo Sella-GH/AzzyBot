@@ -233,6 +233,17 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return GetFromApiAsync<AzuraUpdateRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
+    public async Task ModifyStationAdminConfigAsync(Uri baseUrl, string apiKey, int stationId, AzuraAdminStationConfigRecord config)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentNullException.ThrowIfNull(config, nameof(config));
+
+        string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Station}/{stationId}";
+
+        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, _jsonOptions), CreateHeader(apiKey));
+    }
+
     public async Task RequestSongAsync(Uri baseUrl, int stationId, string songId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
@@ -262,7 +273,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Station}/{stationId}";
         AzuraAdminStationConfigRecord config = await GetFromApiAsync<AzuraAdminStationConfigRecord>(baseUrl, endpoint, CreateHeader(apiKey));
         config.IsEnabled = true;
-        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, _jsonOptions), CreateHeader(apiKey));
+        await ModifyStationAdminConfigAsync(baseUrl, apiKey, stationId, config);
 
         await context.EditResponseAsync("I activated the station, please wait for setup.");
         await Task.Delay(TimeSpan.FromSeconds(3));
@@ -289,7 +300,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         AzuraAdminStationConfigRecord config = await GetFromApiAsync<AzuraAdminStationConfigRecord>(baseUrl, endpoint, CreateHeader(apiKey));
         config.IsEnabled = false;
 
-        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, _jsonOptions), CreateHeader(apiKey));
+        await ModifyStationAdminConfigAsync(baseUrl, apiKey, stationId, config);
     }
 
     public async Task<List<AzuraPlaylistStateRecord>> SwitchPlaylistsAsync(Uri baseUrl, string apiKey, int stationId, int playlistId, bool removeOld)

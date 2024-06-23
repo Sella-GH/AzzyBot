@@ -207,6 +207,30 @@ public sealed class AzuraCastCommands
 
             await context.EditResponseAsync($"I stopped the station **{Crypto.Decrypt(station.Name)}**.");
         }
+
+        [Command("toggle-song-requests"), Description("Enable or disable song requests for the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+        public async ValueTask ToggleSongRequestsAsync
+        (
+            CommandContext context,
+            [Description("The station you want to toggle song requests for."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+
+            _logger.CommandRequested(nameof(ToggleSongRequestsAsync), context.User.GlobalName);
+
+            GuildsEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id);
+            AzuraCastEntity azuraCast = guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast is null");
+            AzuraCastStationEntity station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId) ?? throw new InvalidOperationException("Station is null");
+            string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+            string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
+
+            AzuraAdminStationConfigRecord stationConfig = await _azuraCast.GetStationAdminConfigAsync(new(baseUrl), apiKey, stationId);
+            await _azuraCast.ModifyStationAdminConfigAsync(new(baseUrl), apiKey, stationId, stationConfig);
+
+            await context.EditResponseAsync($"I {Misc.ReadableBool(!stationConfig.EnableRequests, ReadbleBool.EnabledDisabled, true)} song requests for station **{Crypto.Decrypt(station.Name)}**.");
+        }
     }
 
     [Command("dj"), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
@@ -348,6 +372,12 @@ public sealed class AzuraCastCommands
 
             AzuraRequestRecord songRequest = await _azuraCast.GetRequestableSongAsync(baseUrl, apiKey, stationId, song);
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicSearchSongEmbed(songRequest);
+            AzuraAdminStationConfigRecord stationConfig = await _azuraCast.GetStationAdminConfigAsync(baseUrl, apiKey, stationId);
+            if (!stationConfig.EnableRequests)
+            {
+                await context.EditResponseAsync(embed);
+                return;
+            }
 
             DiscordButtonComponent button = new(DiscordButtonStyle.Success, "request_song", "Request Song");
             await using DiscordMessageBuilder builder = new();
