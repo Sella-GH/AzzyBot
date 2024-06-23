@@ -410,6 +410,7 @@ public sealed class AzuraCastCommands
                     Content = "I requested the song for you."
                 };
                 await result.Result.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource, interaction);
+                await context.EditResponseAsync(embed);
 
                 return;
             }
