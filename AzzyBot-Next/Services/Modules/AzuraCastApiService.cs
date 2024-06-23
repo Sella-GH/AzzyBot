@@ -65,7 +65,11 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
         IReadOnlyList<string> files = FileOperations.GetFilesInDirectory(FilePath);
-        string file = files.FirstOrDefault(f => f.Contains($"{databaseId}-{stationId}-files.json", StringComparison.OrdinalIgnoreCase)) ?? string.Empty;
+        string fileName = $"{databaseId}-{stationId}-files.json";
+        if (!File.Exists(fileName))
+            return string.Empty;
+
+        string file = files.FirstOrDefault(f => f.Contains(fileName, StringComparison.OrdinalIgnoreCase)) ?? string.Empty;
         if (string.IsNullOrWhiteSpace(file))
             throw new InvalidOperationException($"Could not find file for database id {databaseId} and station id {stationId}.");
 
@@ -104,8 +108,10 @@ public sealed class AzuraCastApiService(WebRequestService webService)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        string file = GetLocalFile(databaseId, stationId);
         List<AzuraFilesRecord> records = [];
+        string file = GetLocalFile(databaseId, stationId);
+        if (string.IsNullOrWhiteSpace(file))
+            return records;
 
         string content = await FileOperations.GetFileContentAsync(file);
         if (string.IsNullOrWhiteSpace(content))
