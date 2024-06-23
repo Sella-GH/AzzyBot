@@ -52,7 +52,7 @@ public sealed class AzuraCastRequestAutocomplete(AzuraCastApiService azuraCast, 
             if (results.Count == 25)
                 break;
 
-            if (!string.IsNullOrWhiteSpace(search) && (!request.Song.Title.Contains(search, StringComparison.OrdinalIgnoreCase) || !request.Song.Artist.Contains(search, StringComparison.OrdinalIgnoreCase) || !request.Song.Album.Contains(search, StringComparison.OrdinalIgnoreCase)))
+            if (!string.IsNullOrWhiteSpace(search) && (!request.Song.Title.Contains(search, StringComparison.OrdinalIgnoreCase) && !request.Song.Artist.Contains(search, StringComparison.OrdinalIgnoreCase) && !request.Song.Album.Contains(search, StringComparison.OrdinalIgnoreCase)))
                 continue;
 
             song.Append(CultureInfo.InvariantCulture, $"{request.Song.Title}");
