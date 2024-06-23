@@ -401,10 +401,10 @@ public sealed class AzuraCastCommands
 
             DiscordMessage message = await context.EditResponseAsync(builder);
             InteractivityResult<ComponentInteractionCreateEventArgs> result = await message.WaitForButtonAsync(context.User, TimeSpan.FromMinutes(1));
-
             if (!result.TimedOut)
             {
                 await _azuraCast.RequestSongAsync(baseUrl, stationId, songRequest.RequestId);
+                await context.EditResponseAsync(embed);
                 await context.FollowupAsync("I requested the song for you.");
 
                 return;
