@@ -230,7 +230,7 @@ public sealed class AzuraCastCommands
             stationConfig.EnableRequests = !stationConfig.EnableRequests;
             await _azuraCast.ModifyStationAdminConfigAsync(new(baseUrl), apiKey, stationId, stationConfig);
 
-            await context.EditResponseAsync($"I {Misc.ReadableBool(!stationConfig.EnableRequests, ReadbleBool.EnabledDisabled, true)} song requests for station **{Crypto.Decrypt(station.Name)}**.");
+            await context.EditResponseAsync($"I {Misc.ReadableBool(stationConfig.EnableRequests, ReadbleBool.EnabledDisabled, true)} song requests for station **{Crypto.Decrypt(station.Name)}**.");
         }
     }
 
