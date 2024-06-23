@@ -174,7 +174,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
     private void AddHeaders(AddressFamily addressFamily, Dictionary<string, string>? headers = null, bool acceptJson = false)
     {
-        string botName = AzzyStatsSoftware.GetBotName;
+        string botName = AzzyStatsSoftware.GetBotName.Replace("Bot", string.Empty, StringComparison.OrdinalIgnoreCase);
         string botVersion = AzzyStatsSoftware.GetBotVersion;
         HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
         client.DefaultRequestHeaders.Clear();

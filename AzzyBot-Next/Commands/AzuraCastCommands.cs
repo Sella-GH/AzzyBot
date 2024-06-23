@@ -349,23 +349,21 @@ public sealed class AzuraCastCommands
             AzuraRequestRecord songRequest = await _azuraCast.GetRequestableSongAsync(baseUrl, apiKey, stationId, song);
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicSearchSongEmbed(songRequest);
 
-            // TODO: Check out why the song requests aren't working and fix it
+            DiscordButtonComponent button = new(DiscordButtonStyle.Success, "request_song", "Request Song");
+            await using DiscordMessageBuilder builder = new();
+            builder.AddEmbed(embed);
+            builder.AddComponents(button);
 
-            //DiscordButtonComponent button = new(DiscordButtonStyle.Success, "request_song", "Request Song");
-            //await using DiscordMessageBuilder builder = new();
-            //builder.AddEmbed(embed);
-            //builder.AddComponents(button);
+            DiscordMessage message = await context.EditResponseAsync(builder);
+            InteractivityResult<ComponentInteractionCreateEventArgs> result = await message.WaitForButtonAsync(context.User, TimeSpan.FromMinutes(1));
 
-            //DiscordMessage message = await context.EditResponseAsync(builder);
-            //InteractivityResult<ComponentInteractionCreateEventArgs> result = await message.WaitForButtonAsync(context.User, TimeSpan.FromMinutes(1));
+            if (!result.TimedOut)
+            {
+                await _azuraCast.RequestSongAsync(baseUrl, stationId, songRequest.RequestId);
+                await context.FollowupAsync("I requested the song for you.");
 
-            //if (!result.TimedOut)
-            //{
-            //    await _azuraCast.RequestSongAsync(baseUrl, stationId, songRequest.RequestId);
-            //    await context.FollowupAsync("I requested the song for you.");
-
-            //    return;
-            //}
+                return;
+            }
 
             await context.EditResponseAsync(embed);
         }
