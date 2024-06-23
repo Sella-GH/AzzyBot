@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Database;
@@ -45,22 +46,45 @@ public sealed class AzuraCastRequestAutocomplete(AzuraCastApiService azuraCast, 
 
         string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(station.AzuraCast.AdminApiKey);
         string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
-        IReadOnlyList<AzuraRequestRecord> requests = await _azuraCast.GetRequestableSongsAsync(new(baseUrl), apiKey, stationId);
-        StringBuilder song = new();
-        foreach (AzuraRequestRecord request in requests)
+        StringBuilder songResult = new();
+
+        void AddResultsFromSong<T>(IReadOnlyList<T> songs)
         {
-            if (results.Count == 25)
-                break;
+            foreach (T song in songs)
+            {
+                if (results.Count == 25)
+                    break;
 
-            if (!string.IsNullOrWhiteSpace(search) && (!request.Song.Title.Contains(search, StringComparison.OrdinalIgnoreCase) && !request.Song.Artist.Contains(search, StringComparison.OrdinalIgnoreCase) && !request.Song.Album.Contains(search, StringComparison.OrdinalIgnoreCase)))
-                continue;
+                if (song is null)
+                    continue;
 
-            song.Append(CultureInfo.InvariantCulture, $"{request.Song.Title}");
-            if (!string.IsNullOrWhiteSpace(request.Song.Artist))
-                song.Append(CultureInfo.InvariantCulture, $" - {request.Song.Artist}");
+                bool isRequest = song is AzuraRequestRecord;
+                string title = (isRequest) ? (song as AzuraRequestRecord)?.Song.Title ?? string.Empty : (song as AzuraFilesRecord)?.Title ?? string.Empty;
+                string artist = (isRequest) ? (song as AzuraRequestRecord)?.Song.Artist ?? string.Empty : (song as AzuraFilesRecord)?.Artist ?? string.Empty;
+                string album = (isRequest) ? (song as AzuraRequestRecord)?.Song.Album ?? string.Empty : (song as AzuraFilesRecord)?.Album ?? string.Empty;
+                string uniqueId = (isRequest) ? (song as AzuraRequestRecord)?.Song.SongId ?? string.Empty : (song as AzuraFilesRecord)?.UniqueId ?? string.Empty;
 
-            results.Add(song.ToString(), request.Song.Id);
-            song.Clear();
+                if (!string.IsNullOrWhiteSpace(search) && (!title.Contains(search, StringComparison.OrdinalIgnoreCase) && !artist.Contains(search, StringComparison.OrdinalIgnoreCase) && !album.Contains(search, StringComparison.OrdinalIgnoreCase)))
+                    continue;
+
+                songResult.Append(CultureInfo.InvariantCulture, $"{title}");
+                if (!string.IsNullOrWhiteSpace(artist))
+                    songResult.Append(CultureInfo.InvariantCulture, $" - {artist}");
+
+                results.Add(songResult.ToString(), uniqueId);
+                songResult.Clear();
+            }
+        }
+
+        try
+        {
+            IReadOnlyList<AzuraRequestRecord> requests = await _azuraCast.GetRequestableSongsAsync(new(baseUrl), apiKey, stationId);
+            AddResultsFromSong(requests);
+        }
+        catch (HttpRequestException)
+        {
+            IReadOnlyList<AzuraFilesRecord> files = await _azuraCast.GetFilesLocalAsync(station.Id, station.StationId);
+            AddResultsFromSong(files);
         }
 
         return results;

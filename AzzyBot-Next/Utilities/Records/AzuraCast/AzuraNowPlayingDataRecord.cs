@@ -5,16 +5,16 @@ namespace AzzyBot.Utilities.Records.AzuraCast;
 public sealed record AzuraNowPlayingDataRecord
 {
     [JsonPropertyName("now_playing")]
-    public AzuraNowPlayingRecord NowPlaying { get; init; } = new();
+    public required AzuraNowPlayingRecord NowPlaying { get; init; }
 
     [JsonPropertyName("listeners")]
-    public AzuraNowPlayingListenersRecord Listeners { get; init; } = new();
+    public required AzuraNowPlayingListenersRecord Listeners { get; init; }
 
     [JsonPropertyName("live")]
-    public AzuraNowPlayingLiveRecord Live { get; init; } = new();
+    public required AzuraNowPlayingLiveRecord Live { get; init; }
 
     [JsonPropertyName("is_online")]
-    public bool IsOnline { get; init; }
+    public required bool IsOnline { get; init; }
 }
 
 public sealed record AzuraNowPlayingListenersRecord
@@ -26,7 +26,7 @@ public sealed record AzuraNowPlayingListenersRecord
 public sealed record AzuraNowPlayingLiveRecord
 {
     [JsonPropertyName("is_live")]
-    public bool IsLive { get; init; }
+    public required bool IsLive { get; init; }
 
     [JsonPropertyName("streamer_name")]
     public string StreamerName { get; init; } = string.Empty;
@@ -35,20 +35,20 @@ public sealed record AzuraNowPlayingLiveRecord
     public int? BroadcastStart { get; init; }
 
     [JsonPropertyName("broadcast_end")]
-    public string Art { get; init; } = string.Empty;
+    public string? Art { get; init; }
 }
 
 public sealed record AzuraNowPlayingRecord
 {
     [JsonPropertyName("duration")]
-    public int Duration { get; init; }
+    public required int Duration { get; init; }
 
     [JsonPropertyName("playlist")]
     public string Playlist { get; init; } = string.Empty;
 
     [JsonPropertyName("song")]
-    public AzuraSongDataRecord Song { get; init; } = new();
+    public required AzuraSongDataRecord Song { get; init; }
 
     [JsonPropertyName("elapsed")]
-    public int Elapsed { get; init; }
+    public required int Elapsed { get; init; }
 }

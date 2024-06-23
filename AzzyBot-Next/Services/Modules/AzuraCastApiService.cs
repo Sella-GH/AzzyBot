@@ -169,7 +169,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
 
         IReadOnlyList<AzuraRequestRecord> songs = await GetRequestableSongsAsync(baseUrl, apiKey, stationId);
         AzuraRequestRecord? song = songs.FirstOrDefault(s =>
-            (songId is null || s.Song.Id == songId) &&
+            (songId is null || s.Song.SongId == songId) &&
             (name is null || s.Song.Title == name) &&
             (artist is null || s.Song.Artist == artist) &&
             (album is null || s.Song.Album == album)
@@ -188,15 +188,15 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return GetFromApiListAsync<AzuraRequestRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
-    public async Task<AzuraSongDataRecord> GetSongInfoAsync(Uri baseUrl, string apiKey, int databaseId, int stationId, bool online, string? songId = null, string? name = null, string? artist = null, string? album = null)
+    public async Task<AzuraSongDataRecord> GetSongInfoAsync(Uri baseUrl, string apiKey, int databaseId, int stationId, bool online, string? uniqueId = null, string? songId = null, string? name = null, string? artist = null, string? album = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(databaseId, nameof(databaseId));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
-        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
 
         IReadOnlyList<AzuraFilesRecord> songs = (online) ? await GetFilesOnlineAsync(baseUrl, apiKey, stationId) : await GetFilesLocalAsync(databaseId, stationId);
         AzuraFilesRecord? song = songs.FirstOrDefault(s =>
+            (uniqueId is null || s.UniqueId == uniqueId) &&
             (songId is null || s.SongId == songId) &&
             (name is null || s.Title == name) &&
             (artist is null || s.Artist == artist) &&
@@ -206,11 +206,13 @@ public sealed class AzuraCastApiService(WebRequestService webService)
 
         return new()
         {
-            Id = song.SongId,
+            UniqueId = song.UniqueId,
+            SongId = song.SongId,
             Album = song.Album,
             Artist = song.Artist,
             Title = song.Title,
-            Text = $"{song.Title} - {song.Artist}"
+            Text = $"{song.Title} - {song.Artist}",
+            Art = song.Art
         };
     }
 

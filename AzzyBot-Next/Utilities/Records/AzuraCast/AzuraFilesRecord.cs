@@ -10,6 +10,9 @@ public sealed record AzuraFilesRecord
     [JsonPropertyName("song_id")]
     public required string SongId { get; init; }
 
+    [JsonPropertyName("art")]
+    public required string Art { get; init; }
+
     [JsonPropertyName("path")]
     public required string Path { get; init; }
 
