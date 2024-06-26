@@ -391,11 +391,14 @@ public sealed class AzuraCastCommands
             bool isRequested;
             bool isPlayed = false;
 
+            _logger.LogDebug(stationConfig.RequestThreshold.ToString());
+
             if (stationConfig.RequestThreshold is not 0)
             {
                 IReadOnlyList<AzuraRequestQueueItemRecord> requestsPlayed = await _azuraCast.GetStationRequestItemsAsync(baseUrl, apiKey, stationId, true);
-                TimeSpan threshold = TimeSpan.FromTicks(DateTime.Now.AddHours(-stationConfig.RequestThreshold).Ticks);
-                isPlayed = requestsPlayed.Any(r => (r.Track.SongId == songRequest.Song.SongId || r.Track.UniqueId == songRequest.Song.UniqueId) && Converter.ConvertFromUnixTime(Convert.ToInt64(r.PlayedAt)) >= threshold);
+                long threshold = Converter.ConvertToUnixTime(DateTime.Now.AddMinutes(stationConfig.RequestThreshold));
+                _logger.LogDebug(threshold.ToString());
+                isPlayed = requestsPlayed.Any(r => (r.Track.SongId == songRequest.Song.SongId || r.Track.UniqueId == songRequest.Song.UniqueId) && r.Timestamp >= threshold);
             }
 
             IReadOnlyList<AzuraStationQueueItemDetailedRecord> queue = await _azuraCast.GetStationQueueAsync(baseUrl, apiKey, stationId);
@@ -409,7 +412,7 @@ public sealed class AzuraCastCommands
             _logger.LogDebug(isPlayed.ToString());
 
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicSearchSongEmbed(songRequest);
-            if (!stationConfig.EnableRequests || !isQueued || !isRequested || !isPlayed)
+            if (!stationConfig.EnableRequests && (isQueued || isRequested || isPlayed))
             {
                 await context.EditResponseAsync(embed);
                 return;
