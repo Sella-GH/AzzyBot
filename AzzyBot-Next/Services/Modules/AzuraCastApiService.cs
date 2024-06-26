@@ -226,6 +226,16 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return GetFromApiAsync<AzuraAdminStationConfigRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
+    public Task<IReadOnlyList<AzuraStationQueueItemDetailedRecord>> GetStationQueueAsync(Uri baseUrl, string apiKey, int stationId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+
+        string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Queue}";
+
+        return GetFromApiListAsync<AzuraStationQueueItemDetailedRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+    }
+
     public Task<AzuraUpdateRecord> GetUpdatesAsync(Uri baseUrl, string apiKey)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));

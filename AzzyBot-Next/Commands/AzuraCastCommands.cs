@@ -387,6 +387,7 @@ public sealed class AzuraCastCommands
                 };
             }
 
+            IReadOnlyList<AzuraStationQueueItemDetailedRecord> queue = await _azuraCast.GetStationQueueAsync(baseUrl, apiKey, stationId);
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicSearchSongEmbed(songRequest);
             if (!stationConfig.EnableRequests)
             {
