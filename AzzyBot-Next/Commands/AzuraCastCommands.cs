@@ -404,7 +404,7 @@ public sealed class AzuraCastCommands
             isRequested = requestsPending.Any(r => r.Track.SongId == songRequest.Song.SongId || r.Track.UniqueId == songRequest.Song.UniqueId);
 
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicSearchSongEmbed(songRequest);
-            if (!stationConfig.EnableRequests || isQueued || isRequested || isPlayed)
+            if (!stationConfig.EnableRequests || !isQueued || !isRequested || !isPlayed)
             {
                 await context.EditResponseAsync(embed);
                 return;
