@@ -151,7 +151,7 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
-            ["Song"] = new(data.NowPlaying.Song.Title),
+            ["Title"] = new(data.NowPlaying.Song.Title),
             ["By"] = new(data.NowPlaying.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase))
         };
 
@@ -194,7 +194,7 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
-            ["Song"] = new(song.Song.Title),
+            ["Title"] = new(song.Song.Title),
             ["By"] = new(song.Song.Artist)
         };
 
