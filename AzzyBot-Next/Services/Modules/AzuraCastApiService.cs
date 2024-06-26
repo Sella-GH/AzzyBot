@@ -119,7 +119,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Files}";
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}";
 
         return GetFromApiListAsync<AzuraFilesRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
@@ -128,7 +128,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
 
-        const string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Server}/{ApiEndpoints.Stats}";
+        const string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Server}/{AzuraApiEndpoints.Stats}";
 
         return GetFromApiAsync<AzuraHardwareStatsRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
@@ -137,7 +137,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        string endpoint = $"{ApiEndpoints.NowPlaying}/{stationId}";
+        string endpoint = $"{AzuraApiEndpoints.NowPlaying}/{stationId}";
 
         return GetFromApiAsync<AzuraNowPlayingDataRecord>(baseUrl, endpoint);
     }
@@ -147,7 +147,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Playlist}/{playlistId}";
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlist}/{playlistId}";
 
         return GetFromApiAsync<AzuraPlaylistRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
@@ -157,7 +157,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Playlists}";
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlists}";
 
         return GetFromApiListAsync<AzuraPlaylistRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
@@ -183,7 +183,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Requests}";
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Requests}";
 
         return GetFromApiListAsync<AzuraRequestRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
@@ -221,7 +221,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Station}/{stationId}";
+        string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}";
 
         return GetFromApiAsync<AzuraAdminStationConfigRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
@@ -231,7 +231,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Queue}";
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}";
 
         return GetFromApiListAsync<AzuraStationQueueItemDetailedRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
@@ -240,7 +240,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
 
-        string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Updates}";
+        string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Updates}";
 
         return GetFromApiAsync<AzuraUpdateRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
@@ -251,7 +251,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
         ArgumentNullException.ThrowIfNull(config, nameof(config));
 
-        string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Station}/{stationId}";
+        string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}";
 
         await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, _jsonOptions), CreateHeader(apiKey));
     }
@@ -261,7 +261,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
         ArgumentException.ThrowIfNullOrWhiteSpace(songId, nameof(songId));
 
-        string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Request}/{songId}";
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Request}/{songId}";
 
         await PostToApiAsync(baseUrl, endpoint);
     }
@@ -271,7 +271,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Backend}/{ApiEndpoints.Skip}";
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Backend}/{AzuraApiEndpoints.Skip}";
 
         await PostToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
     }
@@ -282,7 +282,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
-        string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Station}/{stationId}";
+        string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}";
         AzuraAdminStationConfigRecord config = await GetFromApiAsync<AzuraAdminStationConfigRecord>(baseUrl, endpoint, CreateHeader(apiKey));
         config.IsEnabled = true;
         await ModifyStationAdminConfigAsync(baseUrl, apiKey, stationId, config);
@@ -290,13 +290,13 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         await context.EditResponseAsync("I activated the station, please wait for setup.");
         await Task.Delay(TimeSpan.FromSeconds(3));
 
-        endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Restart}";
+        endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Restart}";
         await PostToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
 
         await context.EditResponseAsync("I started the station, just a little more time.");
         await Task.Delay(TimeSpan.FromSeconds(10));
 
-        endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Status}";
+        endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Status}";
         AzuraStationStatusRecord status = await GetFromApiAsync<AzuraStationStatusRecord>(baseUrl, endpoint, CreateHeader(apiKey));
         if (!status.BackendRunning || !status.FrontendRunning)
             throw new InvalidOperationException("Station failed to start.");
@@ -307,7 +307,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        string endpoint = $"{ApiEndpoints.Admin}/{ApiEndpoints.Station}/{stationId}";
+        string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}";
 
         AzuraAdminStationConfigRecord config = await GetFromApiAsync<AzuraAdminStationConfigRecord>(baseUrl, endpoint, CreateHeader(apiKey));
         config.IsEnabled = false;
@@ -346,7 +346,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playlistId, nameof(playlistId));
 
-        string endpoint = $"{ApiEndpoints.Station}/{stationId}/{ApiEndpoints.Playlist}/{playlistId}/{ApiEndpoints.Toggle}";
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlist}/{playlistId}/{AzuraApiEndpoints.Toggle}";
 
         await PutToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
     }
