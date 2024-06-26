@@ -99,6 +99,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             using (HttpResponseMessage response = await client.GetAsync(url))
             {
                 response.EnsureSuccessStatusCode();
+
                 return await response.Content.ReadAsStringAsync();
             }
         }

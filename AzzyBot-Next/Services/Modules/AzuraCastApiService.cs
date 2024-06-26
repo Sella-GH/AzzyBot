@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AzzyBot.Utilities;
@@ -31,9 +32,15 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
         Uri url = new($"{baseUrl}api/{endpoint}");
-        string body = await _webService.GetWebAsync(url, headers, true);
-        if (string.IsNullOrWhiteSpace(body))
-            throw new InvalidOperationException($"API response is empty, url: {url}");
+        string body;
+        try
+        {
+            body = await _webService.GetWebAsync(url, headers, true);
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new InvalidOperationException($"Failed GET from API, url: {url}", ex);
+        }
 
         return body;
     }
@@ -75,9 +82,14 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
-        bool success = await _webService.PostWebAsync(uri, content, headers, true);
-        if (!success)
-            throw new InvalidOperationException($"Failed POST to API, url: {uri}");
+        try
+        {
+            await _webService.PostWebAsync(uri, content, headers, true);
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new InvalidOperationException($"Failed POST to API, url: {uri}", ex);
+        }
     }
 
     private async Task PutToApiAsync(Uri baseUrl, string endpoint, string? content = null, Dictionary<string, string>? headers = null)
@@ -85,9 +97,14 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
-        bool success = await _webService.PutWebAsync(uri, content, headers, true);
-        if (!success)
-            throw new InvalidOperationException($"Failed PUT to API, url: {uri}");
+        try
+        {
+            await _webService.PutWebAsync(uri, content, headers, true);
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new InvalidOperationException($"Failed PUT to API, url: {uri}", ex);
+        }
     }
 
     public async Task DownloadPlaylistAsync(Uri url, string apiKey, string downloadPath)
