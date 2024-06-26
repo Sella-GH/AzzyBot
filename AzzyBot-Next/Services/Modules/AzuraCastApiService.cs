@@ -231,7 +231,7 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}";
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}?{AzuraApiFilters.RowCount}=0";
 
         return GetFromApiListAsync<AzuraStationQueueItemDetailedRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
