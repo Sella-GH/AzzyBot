@@ -226,6 +226,16 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         return GetFromApiAsync<AzuraAdminStationConfigRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
+    public Task<IReadOnlyList<AzuraStationHistoryItemRecord>> GetStationHistoryAsync(Uri baseUrl, string apiKey, int stationId, in DateTime start, in DateTime end)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}?{AzuraApiFilters.RowCount}=0&{AzuraApiFilters.Start}={start:O}&{AzuraApiFilters.End}={end:O}";
+
+        return GetFromApiListAsync<AzuraStationHistoryItemRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+    }
+
     public Task<IReadOnlyList<AzuraStationQueueItemDetailedRecord>> GetStationQueueAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
@@ -234,6 +244,18 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}?{AzuraApiFilters.RowCount}=0";
 
         return GetFromApiListAsync<AzuraStationQueueItemDetailedRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+    }
+
+    public Task<IReadOnlyList<AzuraRequestQueueItemRecord>> GetStationRequestItemsAsync(Uri baseUrl, string apiKey, int stationId, bool history)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+
+        string endpoint = (history)
+            ? $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}?{AzuraApiFilters.Type}={AzuraApiFilters.Pending}&{AzuraApiFilters.RowCount}=0"
+            : $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}?{AzuraApiFilters.Type}={AzuraApiFilters.History}&{AzuraApiFilters.RowCount}=0";
+
+        return GetFromApiListAsync<AzuraRequestQueueItemRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
     public Task<AzuraUpdateRecord> GetUpdatesAsync(Uri baseUrl, string apiKey)
