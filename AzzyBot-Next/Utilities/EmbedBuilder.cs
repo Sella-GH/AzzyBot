@@ -184,7 +184,7 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, message, DiscordColor.Aquamarine, new(thumbnailUrl), null, null, fields);
     }
 
-    public static DiscordEmbed BuildAzuraCastMusicSearchSongEmbed(AzuraRequestRecord song, bool isQueued)
+    public static DiscordEmbed BuildAzuraCastMusicSearchSongEmbed(AzuraRequestRecord song, bool isQueued, bool isPlayed)
     {
         ArgumentNullException.ThrowIfNull(song, nameof(song));
 
@@ -209,6 +209,9 @@ public static class EmbedBuilder
 
         if (isQueued)
             footerText = "This song is already queued and will be played soon!";
+
+        if (isPlayed)
+            footerText = "This song was played in the last couple of minutes. Give it a break!";
 
         return CreateBasicEmbed(title, description, DiscordColor.Aquamarine, new(song.Song.Art), footerText, null, fields);
     }
