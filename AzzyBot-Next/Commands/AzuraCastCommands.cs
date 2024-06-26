@@ -391,28 +391,20 @@ public sealed class AzuraCastCommands
             bool isRequested;
             bool isPlayed = false;
 
-            _logger.LogDebug(stationConfig.RequestThreshold.ToString());
-
             if (stationConfig.RequestThreshold is not 0)
             {
                 IReadOnlyList<AzuraRequestQueueItemRecord> requestsPlayed = await _azuraCast.GetStationRequestItemsAsync(baseUrl, apiKey, stationId, true);
                 long threshold = Converter.ConvertToUnixTime(DateTime.Now.AddMinutes(stationConfig.RequestThreshold));
-                _logger.LogDebug(threshold.ToString());
                 isPlayed = requestsPlayed.Any(r => (r.Track.SongId == songRequest.Song.SongId || r.Track.UniqueId == songRequest.Song.UniqueId) && r.Timestamp >= threshold);
             }
 
             IReadOnlyList<AzuraStationQueueItemDetailedRecord> queue = await _azuraCast.GetStationQueueAsync(baseUrl, apiKey, stationId);
             IReadOnlyList<AzuraRequestQueueItemRecord> requestsPending = await _azuraCast.GetStationRequestItemsAsync(baseUrl, apiKey, stationId, false);
-            isQueued = queue.Any(q => q.Song.SongId == songRequest.Song.SongId || q.Song.UniqueId == songRequest.Song.UniqueId);
-            isRequested = requestsPending.Any(r => r.Track.SongId == songRequest.Song.SongId || r.Track.UniqueId == songRequest.Song.UniqueId);
+            isQueued = queue.Any(q => q.Song.SongId == songRequest.Song.SongId && q.Song.UniqueId == songRequest.Song.UniqueId);
+            isRequested = requestsPending.Any(r => r.Track.SongId == songRequest.Song.SongId && r.Track.UniqueId == songRequest.Song.UniqueId);
 
-            _logger.LogDebug(stationConfig.EnableRequests.ToString());
-            _logger.LogDebug(isQueued.ToString());
-            _logger.LogDebug(isRequested.ToString());
-            _logger.LogDebug(isPlayed.ToString());
-
-            DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicSearchSongEmbed(songRequest);
-            if (!stationConfig.EnableRequests && (isQueued || isRequested || isPlayed))
+            DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicSearchSongEmbed(songRequest, isQueued || isRequested);
+            if (!stationConfig.EnableRequests || (isQueued || isRequested || isPlayed))
             {
                 await context.EditResponseAsync(embed);
                 return;

@@ -252,8 +252,8 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
         string endpoint = (history)
-            ? $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}?{AzuraApiFilters.Type}={AzuraApiFilters.Pending}"
-            : $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}?{AzuraApiFilters.Type}={AzuraApiFilters.History}";
+            ? $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}?{AzuraApiFilters.Type}={AzuraApiFilters.History}"
+            : $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}?{AzuraApiFilters.Type}={AzuraApiFilters.Pending}";
 
         return GetFromApiListAsync<AzuraRequestQueueItemRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }

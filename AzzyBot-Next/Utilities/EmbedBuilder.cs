@@ -184,12 +184,13 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, message, DiscordColor.Aquamarine, new(thumbnailUrl), null, null, fields);
     }
 
-    public static DiscordEmbed BuildAzuraCastMusicSearchSongEmbed(AzuraRequestRecord song)
+    public static DiscordEmbed BuildAzuraCastMusicSearchSongEmbed(AzuraRequestRecord song, bool isQueued)
     {
         ArgumentNullException.ThrowIfNull(song, nameof(song));
 
         const string title = "Song Search";
         const string description = "Here is the song you requested.";
+        string? footerText = null;
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
@@ -206,7 +207,10 @@ public static class EmbedBuilder
         if (!string.IsNullOrWhiteSpace(song.Song.Isrc))
             fields.Add("ISRC", new(song.Song.Isrc));
 
-        return CreateBasicEmbed(title, description, DiscordColor.Aquamarine, new(song.Song.Art), null, null, fields);
+        if (isQueued)
+            footerText = "This song is already queued and will be played soon!";
+
+        return CreateBasicEmbed(title, description, DiscordColor.Aquamarine, new(song.Song.Art), footerText, null, fields);
     }
 
     public static DiscordEmbed BuildAzuraCastUpdatesAvailableEmbed(AzuraUpdateRecord update)
