@@ -38,17 +38,8 @@ public sealed record AzuraNowPlayingLiveRecord
     public string? Art { get; init; }
 }
 
-public sealed record AzuraNowPlayingRecord
+public sealed record AzuraNowPlayingRecord : AzuraStationQueueItemRecord
 {
-    [JsonPropertyName("duration")]
-    public required int Duration { get; init; }
-
-    [JsonPropertyName("playlist")]
-    public string Playlist { get; init; } = string.Empty;
-
-    [JsonPropertyName("song")]
-    public required AzuraSongDataRecord Song { get; init; }
-
     [JsonPropertyName("elapsed")]
     public required int Elapsed { get; init; }
 }
