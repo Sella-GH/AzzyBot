@@ -387,9 +387,26 @@ public sealed class AzuraCastCommands
                 };
             }
 
+            bool isQueued;
+            bool isRequested;
+            bool isPlayed = false;
+
+            if (stationConfig.RequestThreshold is not 0)
+            {
+                IReadOnlyList<AzuraRequestQueueItemRecord> requestsPlayed = await _azuraCast.GetStationRequestItemsAsync(baseUrl, apiKey, stationId, true);
+                TimeSpan threshold = TimeSpan.FromTicks(DateTime.Now.AddHours(-stationConfig.RequestThreshold).Ticks);
+                isPlayed = requestsPlayed.Any(r => (r.Track.SongId == songRequest.Song.SongId || r.Track.UniqueId == songRequest.Song.UniqueId) && Converter.ConvertFromUnixTime(Convert.ToInt64(r.PlayedAt)) >= threshold);
+            }
+
             IReadOnlyList<AzuraStationQueueItemDetailedRecord> queue = await _azuraCast.GetStationQueueAsync(baseUrl, apiKey, stationId);
+            IReadOnlyList<AzuraRequestQueueItemRecord> requestsPending = await _azuraCast.GetStationRequestItemsAsync(baseUrl, apiKey, stationId, false);
+            isQueued = queue.Any(q => q.Song.SongId == songRequest.Song.SongId || q.Song.UniqueId == songRequest.Song.UniqueId);
+            isRequested = requestsPending.Any(r => r.Track.SongId == songRequest.Song.SongId || r.Track.UniqueId == songRequest.Song.UniqueId);
+
+            DateTime currentTime = DateTime.Now;
+
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicSearchSongEmbed(songRequest);
-            if (!stationConfig.EnableRequests)
+            if (!stationConfig.EnableRequests || isQueued || isRequested || isPlayed)
             {
                 await context.EditResponseAsync(embed);
                 return;
