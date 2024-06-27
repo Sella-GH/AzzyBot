@@ -7,9 +7,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services.Modules;
 
-public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLifetime, ILogger<AzzyBackgroundService> logger, AzuraCastFileService azuraCastFileService, AzuraCastPingService azuraCastPingService, AzuraCastUpdateService updaterService)
+public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLifetime, ILogger<AzzyBackgroundService> logger, AzuraCastApiService azuraCastApiService, AzuraCastFileService azuraCastFileService, AzuraCastPingService azuraCastPingService, AzuraCastUpdateService updaterService)
 {
     private readonly ILogger<AzzyBackgroundService> _logger = logger;
+    private readonly AzuraCastApiService _apiService = azuraCastApiService;
     private readonly AzuraCastFileService _fileService = azuraCastFileService;
     private readonly AzuraCastPingService _pingService = azuraCastPingService;
     private readonly AzuraCastUpdateService _updaterService = updaterService;
@@ -24,6 +25,18 @@ public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLi
 
         switch (checks)
         {
+            case AzuraCastChecks.CheckForApiPermissions:
+                if (guildId == 0)
+                {
+                    await _apiService.QueueApiPermissionChecksAsync();
+                }
+                else
+                {
+                    await _apiService.QueueApiPermissionChecksAsync(guildId, stationId);
+                }
+
+                break;
+
             case AzuraCastChecks.CheckForFileChanges:
                 if (guildId == 0)
                 {

@@ -99,6 +99,30 @@ public sealed class AzuraCastCommands
             FileOperations.DeleteFiles(filePaths);
         }
 
+        [Command("force-api-permission-check"), Description("Force the bot to check if the entered api key has access to all required permissions."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+        public async ValueTask ForceApiPermissionCheckAsync
+        (
+            CommandContext context,
+            [Description("The station of which you want to check the api key."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int? stationId = null
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+
+            _logger.CommandRequested(nameof(ForceApiPermissionCheckAsync), context.User.GlobalName);
+
+            await context.EditResponseAsync("I initiated the permission check, please wait a little for the result.");
+
+            if (stationId is null)
+            {
+                await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForApiPermissions);
+            }
+            else
+            {
+                await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForApiPermissions, context.Guild.Id, stationId.Value);
+            }
+        }
+
         [Command("force-cache-refresh"), Description("Force the bot to refresh it's local song cache for a specific station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
         public async ValueTask ForceCacheRefreshAsync
         (
@@ -111,9 +135,9 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceCacheRefreshAsync), context.User.GlobalName);
 
-            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, context.Guild.Id, stationId);
-
             await context.EditResponseAsync("I initiated the cache refresh, please wait a little for it to occur.");
+
+            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, context.Guild.Id, stationId);
         }
 
         [Command("force-online-check"), Description("Force the bot to check if the AzuraCast instance is online."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast)]
@@ -124,9 +148,9 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceOnlineCheckAsync), context.User.GlobalName);
 
-            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, context.Guild.Id);
-
             await context.EditResponseAsync("I initiated the online check for the AzuraCast instance, please wait a little for the result.");
+
+            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, context.Guild.Id);
         }
 
         [Command("force-update-check"), Description("Force the bot to search for AzuraCast Updates."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
@@ -137,9 +161,9 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceUpdateCheckAsync), context.User.GlobalName);
 
-            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, context.Guild.Id);
-
             await context.EditResponseAsync("I initiated the check for AzuraCast Updates, please wait a little.\nThere won't be an answer if there are no updates available.");
+
+            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, context.Guild.Id);
         }
 
         [Command("hardware-stats"), Description("Get the hardware stats of the running server."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]

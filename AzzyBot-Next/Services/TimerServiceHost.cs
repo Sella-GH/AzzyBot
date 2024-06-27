@@ -71,6 +71,12 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBackg
             // Properly wait if there's an exception or not
             await Task.Delay(TimeSpan.FromSeconds(5));
 
+            _logger.GlobalTimerCheckForAzuraCastApi();
+            await _azuraCastBackgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForApiPermissions);
+
+            // Wait again
+            await Task.Delay(TimeSpan.FromSeconds(5));
+
             if (now - _lastAzuraCastFileCheck >= TimeSpan.FromHours(0.98))
             {
                 _logger.GlobalTimerCheckForAzuraCastFiles();

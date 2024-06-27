@@ -59,7 +59,44 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         _httpClient?.Dispose();
     }
 
-    public async Task<bool> DownloadAsync(Uri url, string downloadPath, Dictionary<string, string>? headers = null, bool acceptJson = false)
+    public async Task<IReadOnlyList<bool>> CheckForApiPermissionsAsync(IReadOnlyList<Uri> urls, Dictionary<string, string> headers)
+    {
+        ArgumentNullException.ThrowIfNull(urls, nameof(urls));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(urls.Count, nameof(urls));
+
+        List<bool> results = new(urls.Count);
+        foreach (Uri url in urls)
+        {
+            bool success = false;
+
+            try
+            {
+                HttpResponseMessage? response = null;
+                AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
+                AddHeaders(addressFamily, headers, true);
+                HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
+
+                response = await client.GetAsync(url);
+                success = response.IsSuccessStatusCode;
+            }
+            catch (InvalidOperationException)
+            {
+                _logger.WebInvalidUri(url);
+                success = false;
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
+                success = false;
+            }
+
+            results.Add(success);
+        }
+
+        return results;
+    }
+
+    public async Task DownloadAsync(Uri url, string downloadPath, Dictionary<string, string>? headers = null, bool acceptJson = false)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson);
@@ -73,8 +110,6 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             await using Stream contentStream = await response.Content.ReadAsStreamAsync();
             await using FileStream fileStream = new(downloadPath, FileMode.Create, FileAccess.Write);
             await contentStream.CopyToAsync(fileStream);
-
-            return true;
         }
         catch (InvalidOperationException)
         {
@@ -115,7 +150,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task<bool> PostWebAsync(Uri url, string? content = null, Dictionary<string, string>? headers = null, bool acceptJson = false)
+    public async Task PostWebAsync(Uri url, string? content = null, Dictionary<string, string>? headers = null, bool acceptJson = false)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson);
@@ -126,11 +161,9 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             using HttpContent httpContent = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaType);
             using HttpResponseMessage response = await client.PostAsync(url, httpContent);
             if (response.IsSuccessStatusCode)
-                return true;
+                return;
 
             _logger.WebRequestFailed(HttpMethod.Post, response.ReasonPhrase ?? string.Empty, url);
-
-            return false;
         }
         catch (InvalidOperationException)
         {
@@ -144,7 +177,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task<bool> PutWebAsync(Uri url, string? content = null, Dictionary<string, string>? headers = null, bool acceptJson = false)
+    public async Task PutWebAsync(Uri url, string? content = null, Dictionary<string, string>? headers = null, bool acceptJson = false)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson);
@@ -155,11 +188,9 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             using HttpContent httpContent = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaType);
             using HttpResponseMessage response = await client.PutAsync(url, httpContent);
             if (response.IsSuccessStatusCode)
-                return true;
+                return;
 
             _logger.WebRequestFailed(HttpMethod.Put, response.ReasonPhrase ?? string.Empty, url);
-
-            return false;
         }
         catch (InvalidOperationException)
         {

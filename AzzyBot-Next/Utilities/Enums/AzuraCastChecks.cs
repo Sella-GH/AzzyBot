@@ -2,6 +2,7 @@
 
 public enum AzuraCastChecks
 {
+    CheckForApiPermissions,
     CheckForFileChanges,
     CheckForOnlineStatus,
     CheckForUpdates

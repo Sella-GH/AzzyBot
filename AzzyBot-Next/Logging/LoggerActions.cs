@@ -32,6 +32,9 @@ public static partial class LoggerActions
     [LoggerMessage(15, LogLevel.Debug, "Global timer checking for AzuraCast instance status")]
     public static partial void GlobalTimerCheckForAzuraCastStatus(this ILogger<TimerServiceHost> logger);
 
+    [LoggerMessage(16, LogLevel.Debug, "Global timer checking for AzuraCast api permissions")]
+    public static partial void GlobalTimerCheckForAzuraCastApi(this ILogger<TimerServiceHost> logger);
+
     [LoggerMessage(20, LogLevel.Debug, "BackgroundServiceHost started")]
     public static partial void BackgroundServiceHostStart(this ILogger<AzzyBackgroundServiceHost> logger);
 

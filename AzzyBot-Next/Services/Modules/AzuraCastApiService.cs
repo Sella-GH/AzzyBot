@@ -1,19 +1,29 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using AzzyBot.Database;
+using AzzyBot.Database.Entities;
+using AzzyBot.Logging;
 using AzzyBot.Utilities;
+using AzzyBot.Utilities.Encryption;
 using AzzyBot.Utilities.Helpers;
 using AzzyBot.Utilities.Records.AzuraCast;
 using DSharpPlus.Commands;
+using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services.Modules;
 
-public sealed class AzuraCastApiService(WebRequestService webService)
+public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbActions dbActions, DiscordBotService botService, WebRequestService webService)
 {
+    private readonly ILogger<AzuraCastApiService> _logger = logger;
+    private readonly DbActions _dbActions = dbActions;
+    private readonly DiscordBotService _botService = botService;
     private readonly WebRequestService _webService = webService;
 
     public string FilePath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "AzuraCast", "Files");
@@ -25,6 +35,93 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         {
             ["X-API-Key"] = apiKey
         };
+    }
+
+    private async ValueTask CheckForApiPermissionsAsync(AzuraCastEntity azuraCast)
+    {
+        await CheckForAdminApiPermissionsAsync(azuraCast);
+        foreach (AzuraCastStationEntity station in azuraCast.Stations)
+        {
+            await CheckForStationApiPermissionsAsync(station);
+        }
+    }
+
+    private async ValueTask CheckForApiPermissionsAsync(AzuraCastStationEntity station)
+        => await CheckForStationApiPermissionsAsync(station);
+
+    private async ValueTask CheckForAdminApiPermissionsAsync(AzuraCastEntity azuraCast)
+    {
+        string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
+        List<Uri> apis = [];
+        apis.Add(new($"{baseUrl}/api/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Server}/{AzuraApiEndpoints.Stats}"));
+        apis.Add(new($"{baseUrl}/api/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Stations}"));
+
+        if (azuraCast.Checks.Updates)
+            apis.Add(new($"{baseUrl}/api/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Updates}"));
+
+        IReadOnlyList<string> missing = await ExecuteApiPermissionCheckAsync(apis, Crypto.Decrypt(azuraCast.AdminApiKey));
+        if (missing.Count is 0)
+            return;
+
+        StringBuilder builder = new();
+        builder.AppendLine("I can't access the following administrative endpoints:");
+        foreach (string api in missing)
+        {
+            builder.AppendLine(api);
+        }
+
+        builder.AppendLine("Please review your permission set.");
+
+        await _botService.SendMessageAsync(azuraCast.NotificationChannelId, builder.ToString());
+    }
+
+    private async ValueTask CheckForStationApiPermissionsAsync(AzuraCastStationEntity station)
+    {
+        string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
+        int stationId = station.StationId;
+        List<Uri> apis = [];
+        apis.Add(new($"{baseUrl}/api/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}"));
+        apis.Add(new($"{baseUrl}/api/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlists}"));
+        apis.Add(new($"{baseUrl}/api/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}"));
+        apis.Add(new($"{baseUrl}/api/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}"));
+        apis.Add(new($"{baseUrl}/api/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Requests}"));
+        apis.Add(new($"{baseUrl}/api/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Status}"));
+
+        if (station.Checks.FileChanges)
+            apis.Add(new($"{baseUrl}/api/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}"));
+
+        string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? station.AzuraCast.AdminApiKey : station.ApiKey;
+        IReadOnlyList<string> missing = await ExecuteApiPermissionCheckAsync(apis, Crypto.Decrypt(apiKey));
+        if (missing.Count == 0)
+            return;
+
+        StringBuilder builder = new();
+        builder.AppendLine(CultureInfo.InvariantCulture, $"I can't access the following endpoints for station **{Crypto.Decrypt(station.Name)}**:");
+        foreach (string api in missing)
+        {
+            builder.AppendLine(api);
+        }
+
+        builder.AppendLine("Please review your permission set.");
+
+        await _botService.SendMessageAsync(station.AzuraCast.NotificationChannelId, builder.ToString());
+    }
+
+    private async ValueTask<IReadOnlyList<string>> ExecuteApiPermissionCheckAsync(IReadOnlyList<Uri> apis, string apiKey)
+    {
+        ArgumentNullException.ThrowIfNull(apis, nameof(apis));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(apis.Count, nameof(apis));
+
+        IReadOnlyList<bool> checks = await _webService.CheckForApiPermissionsAsync(apis, CreateHeader(apiKey));
+        List<string> missing = [];
+        for (int i = 0; i < checks.Count; i++)
+        {
+            if (!checks[i])
+                missing.Add(apis[i].AbsolutePath);
+        }
+
+        return missing;
     }
 
     private async Task<string> GetFromApiAsync(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
@@ -104,6 +201,40 @@ public sealed class AzuraCastApiService(WebRequestService webService)
         catch (HttpRequestException ex)
         {
             throw new InvalidOperationException($"Failed PUT to API, url: {uri}", ex);
+        }
+    }
+
+    public async Task QueueApiPermissionChecksAsync()
+    {
+        _logger.BackgroundServiceWorkItem(nameof(QueueApiPermissionChecksAsync));
+
+        List<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
+        foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.IsOnline == true).Select(g => g.AzuraCast!))
+        {
+            _ = Task.Run(async () => await CheckForApiPermissionsAsync(azuraCast));
+        }
+    }
+
+    public async Task QueueApiPermissionChecksAsync(ulong guildId, int stationId = 0)
+    {
+        _logger.BackgroundServiceWorkItem(nameof(QueueApiPermissionChecksAsync));
+
+        GuildsEntity guild = await _dbActions.GetGuildAsync(guildId);
+        if (guild.AzuraCast is null)
+            return;
+
+        IEnumerable<AzuraCastStationEntity> stations = guild.AzuraCast.Stations;
+        if (stationId is not 0)
+        {
+            AzuraCastStationEntity? station = stations.FirstOrDefault(s => s.StationId == stationId);
+            if (station is null)
+                return;
+
+            _ = Task.Run(async () => await CheckForApiPermissionsAsync(station));
+        }
+        else
+        {
+            _ = Task.Run(async () => await CheckForApiPermissionsAsync(guild.AzuraCast));
         }
     }
 
