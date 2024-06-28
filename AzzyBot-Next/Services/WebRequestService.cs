@@ -73,7 +73,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             {
                 HttpResponseMessage? response = null;
                 AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
-                AddHeaders(addressFamily, headers, true);
+                AddHeaders(addressFamily, headers, true, true);
                 HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
 
                 response = await client.GetAsync(url);
@@ -96,10 +96,10 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         return results;
     }
 
-    public async Task DownloadAsync(Uri url, string downloadPath, Dictionary<string, string>? headers = null, bool acceptJson = false)
+    public async Task DownloadAsync(Uri url, string downloadPath, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
-        AddHeaders(addressFamily, headers, acceptJson);
+        AddHeaders(addressFamily, headers, acceptJson, noCache);
         HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
 
         try
@@ -123,10 +123,10 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task<string> GetWebAsync(Uri url, Dictionary<string, string>? headers = null, bool acceptJson = false)
+    public async Task<string> GetWebAsync(Uri url, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
-        AddHeaders(addressFamily, headers, acceptJson);
+        AddHeaders(addressFamily, headers, acceptJson, noCache);
         HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
 
         try
@@ -150,10 +150,10 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task PostWebAsync(Uri url, string? content = null, Dictionary<string, string>? headers = null, bool acceptJson = false)
+    public async Task PostWebAsync(Uri url, string? content = null, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
-        AddHeaders(addressFamily, headers, acceptJson);
+        AddHeaders(addressFamily, headers, acceptJson, noCache);
         HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
 
         try
@@ -177,10 +177,10 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task PutWebAsync(Uri url, string? content = null, Dictionary<string, string>? headers = null, bool acceptJson = false)
+    public async Task PutWebAsync(Uri url, string? content = null, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
-        AddHeaders(addressFamily, headers, acceptJson);
+        AddHeaders(addressFamily, headers, acceptJson, noCache);
         HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
 
         try
@@ -204,7 +204,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    private void AddHeaders(AddressFamily addressFamily, Dictionary<string, string>? headers = null, bool acceptJson = false)
+    private void AddHeaders(AddressFamily addressFamily, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         string botName = AzzyStatsSoftware.GetBotName.Replace("Bot", string.Empty, StringComparison.OrdinalIgnoreCase);
         string botVersion = AzzyStatsSoftware.GetBotVersion;
@@ -213,6 +213,12 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         client.DefaultRequestHeaders.UserAgent.Add(new(botName, botVersion));
         if (acceptJson)
             client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(MediaType));
+
+        if (noCache)
+        {
+            client.DefaultRequestHeaders.CacheControl = new() { NoCache = true };
+            client.DefaultRequestHeaders.Pragma.Add(new("no-cache"));
+        }
 
         if (headers is null)
             return;
