@@ -457,13 +457,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         config.IsEnabled = true;
         await ModifyStationAdminConfigAsync(baseUrl, apiKey, stationId, config);
 
-        await context.EditResponseAsync("I activated the station, please wait for setup.");
-        await Task.Delay(TimeSpan.FromSeconds(3));
-
-        endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Restart}";
-        await PostToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
-
-        await context.EditResponseAsync("I started the station, just a little more time.");
+        await context.EditResponseAsync("I activated the station, please wait for it to start up.");
         await Task.Delay(TimeSpan.FromSeconds(10));
 
         endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Status}";
