@@ -17,15 +17,7 @@ public static class FileOperations
         ArgumentNullException.ThrowIfNull(content, nameof(content));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(content.Count, nameof(content));
 
-        string filePath;
-        if (!string.IsNullOrWhiteSpace(path))
-        {
-            filePath = Path.Combine(Path.GetTempPath(), path);
-        }
-        else
-        {
-            filePath = Path.GetTempFileName();
-        }
+        string filePath = (!string.IsNullOrWhiteSpace(path)) ? Path.Combine(Path.GetTempPath(), path) : Path.GetTempFileName();
 
         await using StreamWriter writer = new(filePath);
         CsvConfiguration config = new(CultureInfo.InvariantCulture)
