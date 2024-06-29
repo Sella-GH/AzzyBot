@@ -130,8 +130,6 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
         try
         {
-            AddressFamily addressFamily = await GetPreferredIpMethodAsync(uri);
-
             using Ping ping = new();
             PingReply reply = await ping.SendPingAsync(uri.Host, 1000);
 
