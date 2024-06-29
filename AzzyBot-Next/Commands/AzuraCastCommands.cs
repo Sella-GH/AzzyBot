@@ -340,7 +340,7 @@ public sealed class AzuraCastCommands
         (
             CommandContext context,
             [Description("The station of which you want to see the song history."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId,
-            [Description("The date of which you want to see the song history in the format YYYY-MM-DD. Defaults to current day.")] string? date = null
+            [Description("The date of which you want to see the song history in the format YYYY-MM-DD.")] string? date = null
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
