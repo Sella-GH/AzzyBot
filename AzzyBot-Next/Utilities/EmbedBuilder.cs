@@ -102,6 +102,7 @@ public static class EmbedBuilder
         StringBuilder networkUsage = new();
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
+        fields.Add("Ping", new($"{stats.Ping} ms"));
 
         cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Stolen: **{stats.Cpu.Total.Steal}**%");
         cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Cpu.Total.Usage}**%");

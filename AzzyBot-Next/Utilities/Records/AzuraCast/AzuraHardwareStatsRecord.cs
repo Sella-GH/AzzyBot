@@ -5,6 +5,8 @@ namespace AzzyBot.Utilities.Records.AzuraCast;
 
 public sealed record AzuraHardwareStatsRecord
 {
+    public long Ping { get; set; }
+
     [JsonPropertyName("cpu")]
     public required AzuraCpuData Cpu { get; init; }
 

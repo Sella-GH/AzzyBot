@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Mime;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -119,6 +120,31 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         catch (HttpRequestException ex)
         {
             _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
+            throw;
+        }
+    }
+
+    public async Task<long> GetPingAsync(Uri uri)
+    {
+        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
+
+        try
+        {
+            AddressFamily addressFamily = await GetPreferredIpMethodAsync(uri);
+
+            using Ping ping = new();
+            PingReply reply = await ping.SendPingAsync(uri.Host, 1000, new byte[32], new PingOptions(30, true));
+
+            return reply.RoundtripTime;
+        }
+        catch (InvalidOperationException)
+        {
+            _logger.WebInvalidUri(uri);
+            throw;
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.WebRequestFailed(HttpMethod.Get, ex.Message, uri);
             throw;
         }
     }
