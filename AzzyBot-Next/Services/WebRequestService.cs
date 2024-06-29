@@ -133,7 +133,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             AddressFamily addressFamily = await GetPreferredIpMethodAsync(uri);
 
             using Ping ping = new();
-            PingReply reply = await ping.SendPingAsync(uri.Host, 1000, new byte[32], new PingOptions(30, true));
+            PingReply reply = await ping.SendPingAsync(uri.Host, 1000);
 
             return reply.RoundtripTime;
         }
