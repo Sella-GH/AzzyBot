@@ -1,14 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
+using CsvHelper;
+using CsvHelper.Configuration;
 
 namespace AzzyBot.Utilities;
 
 public static class FileOperations
 {
+    public static async Task<string> CreateCsvFileAsync<T>(IReadOnlyList<T> content, string? path = null)
+    {
+        ArgumentNullException.ThrowIfNull(content, nameof(content));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(content.Count, nameof(content));
+
+        string filePath;
+        if (!string.IsNullOrWhiteSpace(path))
+        {
+            filePath = Path.Combine(Path.GetTempPath(), path);
+        }
+        else
+        {
+            filePath = Path.GetTempFileName();
+        }
+
+        await using StreamWriter writer = new(filePath);
+        CsvConfiguration config = new(CultureInfo.InvariantCulture)
+        {
+            Encoding = Encoding.UTF8,
+            InjectionOptions = InjectionOptions.Escape
+        };
+        await using CsvWriter csv = new(writer, config);
+        await csv.WriteRecordsAsync(content);
+
+        return filePath;
+    }
+
     public static async Task<string> CreateTempFileAsync(string content, string? fileName = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(content, nameof(content));
