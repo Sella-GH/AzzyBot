@@ -287,6 +287,17 @@ public static class EmbedBuilder
         AzzyDiskUsageRecord disk = AzzyStatsHardware.GetSystemDiskUsage();
         Dictionary<string, AzzyNetworkSpeedRecord> networkUsage = await AzzyStatsHardware.GetSystemNetworkUsageAsync();
 
+        if (cpuTemp.Count > 0)
+        {
+            StringBuilder cpuTempBuilder = new();
+            foreach (KeyValuePair<string, double> kvp in cpuTemp)
+            {
+                cpuTempBuilder.AppendLine(CultureInfo.InvariantCulture, $"{kvp.Key}: **{kvp.Value} °C**");
+            }
+
+            fields.Add("Temperatures", new(cpuTempBuilder.ToString(), false));
+        }
+
         if (cpuUsage.Count > 0)
         {
             StringBuilder cpuUsageBuilder = new();
@@ -304,17 +315,6 @@ public static class EmbedBuilder
             }
 
             fields.Add("CPU Usage", new(cpuUsageBuilder.ToString(), true));
-        }
-
-        if (cpuTemp.Count > 0)
-        {
-            StringBuilder cpuTempBuilder = new();
-            foreach (KeyValuePair<string, double> kvp in cpuTemp)
-            {
-                cpuTempBuilder.AppendLine(CultureInfo.InvariantCulture, $"{kvp.Key}: **{kvp.Value} °C**");
-            }
-
-            fields.Add("Temperatures", new(cpuTempBuilder.ToString(), true));
         }
 
         if (cpuLoads is not null)
