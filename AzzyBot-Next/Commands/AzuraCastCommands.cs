@@ -368,7 +368,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            IReadOnlyList<AzuraStationHistoryExportRecord> exportHistory = history.Select(h => new AzuraStationHistoryExportRecord() { PlayedAt = Converter.ConvertFromUnixTime(h.PlayedAt), Song = h.Song, SongRequest = h.IsRequest, Streamer = h.Streamer, Playlist = h.Playlist }).Reverse().ToList();
+            IReadOnlyList<AzuraStationHistoryExportRecord> exportHistory = history.Select(h => new AzuraStationHistoryExportRecord() { Date = DateOnly.FromDateTime(DateTime.Today), PlayedAt = Converter.ConvertFromUnixTime(h.PlayedAt), Song = h.Song, SongRequest = h.IsRequest, Streamer = h.Streamer, Playlist = h.Playlist }).Reverse().ToList();
             string fileName = $"{station.Id}-{station.StationId}_SongHistory_{dateTime:yyyy-MM-dd}.csv";
             string filePath = await FileOperations.CreateCsvFileAsync(exportHistory, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
