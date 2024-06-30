@@ -361,19 +361,19 @@ public sealed class AzuraCastCommands
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
             string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
 
-            IReadOnlyList<AzuraStationHistoryItemRecord> history = await _azuraCast.GetStationHistoryAsync(new(baseUrl), apiKey, stationId, dateTime, dateTime.AddDays(1));
+            IReadOnlyList<AzuraStationHistoryItemRecord> history = await _azuraCast.GetStationHistoryAsync(new(baseUrl), apiKey, stationId, dateTime.Date, dateTime.Date.AddDays(1));
             if (history.Count is 0)
             {
                 await context.EditResponseAsync("There is no song history for this day.");
                 return;
             }
 
-            IReadOnlyList<AzuraStationHistoryExportRecord> exportHistory = history.Select(h => new AzuraStationHistoryExportRecord() { Date = dateTime, PlayedAt = Converter.ConvertFromUnixTime(h.PlayedAt), Song = h.Song, SongRequest = h.IsRequest, Streamer = h.Streamer, Playlist = h.Playlist }).Reverse().ToList();
-            string fileName = $"{station.Id}-{station.StationId}_SongHistory_{dateTime}.csv";
+            IReadOnlyList<AzuraStationHistoryExportRecord> exportHistory = history.Select(h => new AzuraStationHistoryExportRecord() { Date = dateTime.Date, PlayedAt = Converter.ConvertFromUnixTime(h.PlayedAt), Song = h.Song, SongRequest = h.IsRequest, Streamer = h.Streamer, Playlist = h.Playlist }).Reverse().ToList();
+            string fileName = $"{station.Id}-{station.StationId}_SongHistory_{dateTime.Date}.csv";
             string filePath = await FileOperations.CreateCsvFileAsync(exportHistory, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
             await using DiscordMessageBuilder builder = new();
-            builder.WithContent($"Here is the song history for station **{Crypto.Decrypt(station.Name)}** ({station.StationId}) on **{dateTime:yyyy-MM-dd}**.");
+            builder.WithContent($"Here is the song history for station **{Crypto.Decrypt(station.Name)}** ({station.StationId}) on **{dateTime.Date}**.");
             builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
             await context.EditResponseAsync(builder);
 
