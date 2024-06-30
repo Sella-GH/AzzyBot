@@ -22,7 +22,7 @@ public sealed record AzuraStationHistoryItemRecord : AzuraStationQueueItemRecord
 public sealed record AzuraStationHistoryExportRecord
 {
     public TimeSpan PlayedAt { get; set; } = TimeSpan.Zero;
-    public AzuraSongDataRecord? Song { get; set; }
+    public AzuraSongBasicDataRecord? Song { get; set; }
     public bool SongRequest { get; set; }
     public string Streamer { get; set; } = string.Empty;
     public string Playlist { get; set; } = string.Empty;
