@@ -381,6 +381,54 @@ public sealed class AzuraCastCommands
             FileOperations.DeleteFile(filePath);
         }
 
+        [Command("get-songs-in-playlist"), Description("Get all songs in the selected playlist."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+        public async ValueTask GetSongsInPlaylistAsync
+        (
+            CommandContext context,
+            [Description("The station of which you want to see the songs in the playlist."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId,
+            [Description("The playlist you want to see the songs from."), SlashAutoCompleteProvider(typeof(AzuraCastPlaylistAutocomplete))] int playlistId
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+
+            _logger.CommandRequested(nameof(GetSongsInPlaylistAsync), context.User.GlobalName);
+
+            GuildsEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id);
+            AzuraCastEntity azuraCast = guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast is null");
+            AzuraCastStationEntity station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId) ?? throw new InvalidOperationException("Station is null");
+            string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
+            string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+
+            AzuraPlaylistRecord playlist;
+            try
+            {
+                playlist = await _azuraCast.GetPlaylistAsync(new(baseUrl), apiKey, stationId, playlistId);
+            }
+            catch (HttpRequestException)
+            {
+                await context.EditResponseAsync("This playlist does not exist.");
+                return;
+            }
+
+            IReadOnlyList<AzuraFilesRecord> songs = await _azuraCast.GetSongsInPlaylistAsync(new(baseUrl), apiKey, stationId, playlist);
+            if (songs.Count is 0)
+            {
+                await context.EditResponseAsync("There are no songs in this playlist.");
+                return;
+            }
+
+            string fileName = $"{station.Id}-{station.StationId}_PlaylistSongs_{playlistId}.csv";
+            string filePath = await FileOperations.CreateCsvFileAsync(songs, fileName);
+            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
+            await using DiscordMessageBuilder builder = new();
+            builder.WithContent($"Here are the songs in playlist **{playlist.Name}**.");
+            builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
+            await context.EditResponseAsync(builder);
+
+            FileOperations.DeleteFile(filePath);
+        }
+
         [Command("now-playing"), Description("Get the currently playing song on the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
         public async ValueTask GetNowPlayingAsync
             (
