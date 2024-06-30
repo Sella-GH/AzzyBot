@@ -360,20 +360,21 @@ public sealed class AzuraCastCommands
             AzuraCastStationEntity station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId) ?? throw new InvalidOperationException("Station is null");
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
             string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+            string dateString = dateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
-            IReadOnlyList<AzuraStationHistoryItemRecord> history = await _azuraCast.GetStationHistoryAsync(new(baseUrl), apiKey, stationId, dateTime.Date, dateTime.Date.AddDays(1));
+            IReadOnlyList<AzuraStationHistoryItemRecord> history = await _azuraCast.GetStationHistoryAsync(new(baseUrl), apiKey, stationId, dateTime, dateTime.AddDays(1));
             if (history.Count is 0)
             {
-                await context.EditResponseAsync("There is no song history for this day.");
+                await context.EditResponseAsync($"There is no song history for **{dateString}**.");
                 return;
             }
 
-            IReadOnlyList<AzuraStationHistoryExportRecord> exportHistory = history.Select(h => new AzuraStationHistoryExportRecord() { Date = dateTime.Date, PlayedAt = Converter.ConvertFromUnixTime(h.PlayedAt), Song = h.Song, SongRequest = h.IsRequest, Streamer = h.Streamer, Playlist = h.Playlist }).Reverse().ToList();
-            string fileName = $"{station.Id}-{station.StationId}_SongHistory_{dateTime.Date}.csv";
+            IReadOnlyList<AzuraStationHistoryExportRecord> exportHistory = history.Select(h => new AzuraStationHistoryExportRecord() { Date = dateString, PlayedAt = Converter.ConvertFromUnixTime(h.PlayedAt), Song = h.Song, SongRequest = h.IsRequest, Streamer = h.Streamer, Playlist = h.Playlist }).Reverse().ToList();
+            string fileName = $"{station.Id}-{station.StationId}_SongHistory_{dateString}.csv";
             string filePath = await FileOperations.CreateCsvFileAsync(exportHistory, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
             await using DiscordMessageBuilder builder = new();
-            builder.WithContent($"Here is the song history for station **{Crypto.Decrypt(station.Name)}** ({station.StationId}) on **{dateTime.Date}**.");
+            builder.WithContent($"Here is the song history for station **{Crypto.Decrypt(station.Name)}** ({station.StationId}) on **{dateString}**.");
             builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
             await context.EditResponseAsync(builder);
 
