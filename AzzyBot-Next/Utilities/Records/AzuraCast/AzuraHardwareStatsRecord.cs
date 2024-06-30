@@ -49,7 +49,7 @@ public sealed record AzuraCoreData : AzuraCpuTotalData;
 public sealed record AzuraMemoryData
 {
     [JsonPropertyName("readable")]
-    public required AzuraReadableDiskData Readable { get; init; }
+    public required AzuraReadableMemoryData Readable { get; init; }
 }
 
 public sealed record AzuraDiskData

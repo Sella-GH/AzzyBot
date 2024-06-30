@@ -14,9 +14,6 @@ public sealed record AzuraUpdateRecord
     [JsonPropertyName("needs_rolling_update")]
     public required bool NeedsRollingUpdate { get; init; }
 
-    [JsonPropertyName("rolling_updates_available")]
-    public required int RollingUpdatesAvailable { get; init; }
-
     [JsonPropertyName("rolling_updates_list")]
     public IReadOnlyList<string> RollingUpdatesList { get; init; } = [];
 

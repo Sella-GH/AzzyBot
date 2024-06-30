@@ -23,12 +23,6 @@ public sealed record AzuraPlaylistRecord
 
 public sealed record AzuraPlaylistLinkRecord
 {
-    [JsonPropertyName("self")]
-    public Uri Self { get; init; } = new Uri("https://github.com");
-
-    [JsonPropertyName("toggle")]
-    public Uri Toggle { get; init; } = new Uri("https://github.com");
-
     [JsonPropertyName("export")]
     public AzuraPlaylistLinkExportRecord Export { get; init; } = new AzuraPlaylistLinkExportRecord();
 }
