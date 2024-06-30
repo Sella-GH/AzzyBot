@@ -21,7 +21,7 @@ public sealed record AzuraStationHistoryItemRecord : AzuraStationQueueItemRecord
 
 public sealed record AzuraStationHistoryExportRecord
 {
-    public DateOnly Date { get; init; }
+    public DateTime Date { get; init; }
     public TimeSpan PlayedAt { get; set; } = TimeSpan.Zero;
     public AzuraSongBasicDataRecord? Song { get; set; }
     public bool SongRequest { get; set; }

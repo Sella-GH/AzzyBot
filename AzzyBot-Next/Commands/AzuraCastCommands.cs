@@ -346,7 +346,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context, nameof(context));
             ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
-            DateTime dateTime = DateTime.Today;
+            DateTime dateTime = DateTime.Today.Date;
             if (date is not null && !DateTime.TryParse(date, out dateTime))
             {
                 await context.EditResponseAsync("The date format is invalid. Please use the format YYYY-MM-DD.");
@@ -368,8 +368,8 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            IReadOnlyList<AzuraStationHistoryExportRecord> exportHistory = history.Select(h => new AzuraStationHistoryExportRecord() { Date = DateOnly.FromDateTime(DateTime.Today), PlayedAt = Converter.ConvertFromUnixTime(h.PlayedAt), Song = h.Song, SongRequest = h.IsRequest, Streamer = h.Streamer, Playlist = h.Playlist }).Reverse().ToList();
-            string fileName = $"{station.Id}-{station.StationId}_SongHistory_{dateTime:yyyy-MM-dd}.csv";
+            IReadOnlyList<AzuraStationHistoryExportRecord> exportHistory = history.Select(h => new AzuraStationHistoryExportRecord() { Date = dateTime, PlayedAt = Converter.ConvertFromUnixTime(h.PlayedAt), Song = h.Song, SongRequest = h.IsRequest, Streamer = h.Streamer, Playlist = h.Playlist }).Reverse().ToList();
+            string fileName = $"{station.Id}-{station.StationId}_SongHistory_{dateTime}.csv";
             string filePath = await FileOperations.CreateCsvFileAsync(exportHistory, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
             await using DiscordMessageBuilder builder = new();
