@@ -316,7 +316,7 @@ public static class EmbedBuilder
                 cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Core {counter}: **{kvp.Value}%**");
             }
 
-            fields.Add("CPU Usage", new(cpuUsageBuilder.ToString(), true));
+            fields.Add("CPU Usage", new(cpuUsageBuilder.ToString(), false));
         }
 
         if (cpuLoads is not null)
