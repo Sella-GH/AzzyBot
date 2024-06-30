@@ -411,7 +411,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            IReadOnlyList<AzuraFilesRecord> songs = await _azuraCast.GetSongsInPlaylistAsync(new(baseUrl), apiKey, stationId, playlist);
+            IReadOnlyList<AzuraSongBasicDataRecord> songs = await _azuraCast.GetSongsInPlaylistAsync(new(baseUrl), apiKey, stationId, playlist);
             if (songs.Count is 0)
             {
                 await context.EditResponseAsync("There are no songs in this playlist.");
