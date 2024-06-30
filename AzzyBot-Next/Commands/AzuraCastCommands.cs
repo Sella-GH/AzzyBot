@@ -418,7 +418,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            string fileName = $"{station.Id}-{station.StationId}_PlaylistSongs_{playlistId}.csv";
+            string fileName = $"{station.Id}-{station.StationId}_PlaylistSongs_{playlist.ShortName}.csv";
             string filePath = await FileOperations.CreateCsvFileAsync(songs, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
             await using DiscordMessageBuilder builder = new();
