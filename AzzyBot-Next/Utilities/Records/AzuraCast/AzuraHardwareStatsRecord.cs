@@ -72,7 +72,7 @@ public record AzuraReadableDiskData
 
 public sealed record AzuraReadableMemoryData : AzuraReadableDiskData
 {
-    [JsonPropertyName("Cached")]
+    [JsonPropertyName("cached")]
     public required string Cached { get; init; }
 }
 
