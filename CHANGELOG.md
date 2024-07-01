@@ -19,6 +19,7 @@
   - This is a required field if you want to set up AzuraCast in the bot. Ensure it has the `view` permission for the admin panel inside AzuraCast
 - Setting to control the logfile cleaning after specified days (default 7)
 - Checks if modules are activated or not before excuting commands
+- New database settings for servers to modify in `core`
 
 ### Improvements
 - AzuraCast Station Api Key in AzuraCastStation configuration is now optional
