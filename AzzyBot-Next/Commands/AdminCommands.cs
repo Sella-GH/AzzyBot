@@ -88,7 +88,7 @@ public sealed class AdminCommands
                     return;
                 }
 
-                await _dbActions.UpdateGuildAsync(guildIdValue, null, true);
+                await _dbActions.UpdateGuildAsync(guildIdValue, null, null, null, true);
 
                 await context.EditResponseAsync($"{_botService.GetDiscordGuild(guildIdValue)?.Name} added to debug servers.");
             }
@@ -142,7 +142,7 @@ public sealed class AdminCommands
                     return;
                 }
 
-                await _dbActions.UpdateGuildAsync(guildIdValue, null, false);
+                await _dbActions.UpdateGuildAsync(guildIdValue, null, null, null, false);
 
                 await context.EditResponseAsync($"{_botService.GetDiscordGuild(guildIdValue)?.Name} removed from debug servers.");
             }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Database.Entities;
@@ -41,7 +42,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         }
     }
 
-    public Task<bool> AddAzuraCastAsync(ulong guildId, Uri baseUrl, string apiKey, ulong notificationId, ulong outagesId, bool serverStatus, bool updates, bool changelog)
+    public Task<bool> AddAzuraCastAsync(ulong guildId, Uri baseUrl, string apiKey, ulong instanceOwner, ulong instanceAdminGroup, ulong notificationId, ulong outagesId, bool serverStatus, bool updates, bool changelog)
     {
         ArgumentNullException.ThrowIfNull(baseUrl, nameof(baseUrl));
 
@@ -53,6 +54,8 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             {
                 BaseUrl = Crypto.Encrypt(baseUrl.OriginalString),
                 AdminApiKey = Crypto.Encrypt(apiKey),
+                InstanceOwner = Crypto.Encrypt(instanceOwner.ToString(CultureInfo.InvariantCulture)),
+                InstanceAdminGroup = instanceAdminGroup,
                 NotificationChannelId = notificationId,
                 OutagesChannelId = outagesId,
                 GuildId = guild.Id
@@ -70,7 +73,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, string name, ulong requestsId, bool hls, bool showPlaylist, bool fileChanges, string? apiKey = null)
+    public Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, string name, ulong stationOwner, ulong stationAdminGroup, ulong requestsId, bool hls, bool showPlaylist, bool fileChanges, string? apiKey = null, ulong? stationDjGroup = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -81,9 +84,13 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 StationId = stationId,
                 Name = Crypto.Encrypt(name),
                 ApiKey = (string.IsNullOrWhiteSpace(apiKey)) ? string.Empty : Crypto.Encrypt(apiKey),
+                StationOwner = Crypto.Encrypt(stationOwner.ToString(CultureInfo.InvariantCulture)),
+                StationAdminGroup = stationAdminGroup,
+                StationDjGroup = stationDjGroup ?? 0,
                 RequestsChannelId = requestsId,
                 PreferHls = hls,
                 ShowPlaylistInNowPlaying = showPlaylist,
+                LastSkipTime = DateTime.MinValue,
                 AzuraCastId = azura.Id
             };
 
@@ -247,7 +254,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             : guilds.Where(g => !g.IsDebugAllowed).ToList();
     }
 
-    public Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl = null, string? apiKey = null, ulong? notificationId = null, ulong? outagesId = null, bool? isOnline = null)
+    public Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl = null, string? apiKey = null, ulong? instanceOwner = null, ulong? instanceAdminGroup = null, ulong? notificationId = null, ulong? outagesId = null, bool? isOnline = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -258,6 +265,12 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             if (!string.IsNullOrWhiteSpace(apiKey))
                 azuraCast.AdminApiKey = Crypto.Encrypt(apiKey);
+
+            if (instanceOwner.HasValue)
+                azuraCast.InstanceOwner = Crypto.Encrypt(instanceOwner.Value.ToString(CultureInfo.InvariantCulture));
+
+            if (instanceAdminGroup.HasValue)
+                azuraCast.InstanceAdminGroup = instanceAdminGroup.Value;
 
             if (notificationId.HasValue)
                 azuraCast.NotificationChannelId = notificationId.Value;
@@ -291,7 +304,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? name = null, string? apiKey = null, ulong? requestId = null, bool? hls = null, bool? playlist = null)
+    public Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? name = null, string? apiKey = null, ulong? stationOwner = null, ulong? stationAdminGroup = null, ulong? stationDjGroup = null, ulong? requestId = null, bool? hls = null, bool? playlist = null, DateTime? lastSkipTime = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -306,6 +319,15 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             if (!string.IsNullOrWhiteSpace(apiKey))
                 azuraStation.ApiKey = Crypto.Encrypt(apiKey);
 
+            if (stationOwner.HasValue)
+                azuraStation.StationOwner = Crypto.Encrypt(stationOwner.Value.ToString(CultureInfo.InvariantCulture));
+
+            if (stationAdminGroup.HasValue)
+                azuraStation.StationAdminGroup = stationAdminGroup.Value;
+
+            if (stationDjGroup.HasValue)
+                azuraStation.StationDjGroup = stationDjGroup.Value;
+
             if (requestId.HasValue)
                 azuraStation.RequestsChannelId = requestId.Value;
 
@@ -314,6 +336,9 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             if (playlist.HasValue)
                 azuraStation.ShowPlaylistInNowPlaying = playlist.Value;
+
+            if (lastSkipTime.HasValue)
+                azuraStation.LastSkipTime = lastSkipTime.Value;
 
             context.AzuraCastStations.Update(azuraStation);
         });
@@ -332,7 +357,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> UpdateGuildAsync(ulong guildId, ulong? errorChannelId = null, bool? isDebug = null)
+    public Task<bool> UpdateGuildAsync(ulong guildId, ulong? adminRoleId = null, ulong? adminNotifiyChannelId = null, ulong? errorChannelId = null, bool? isDebug = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -340,6 +365,12 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             if (!guild.ConfigSet)
                 guild.ConfigSet = true;
+
+            if (adminRoleId.HasValue)
+                guild.AdminRoleId = adminRoleId.Value;
+
+            if (adminNotifiyChannelId.HasValue)
+                guild.AdminNotifyChannelId = adminNotifiyChannelId.Value;
 
             if (errorChannelId.HasValue)
                 guild.ErrorChannelId = errorChannelId.Value;

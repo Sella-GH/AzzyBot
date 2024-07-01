@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -21,6 +22,8 @@ namespace AzzyBot.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     UniqueId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
+                    AdminRoleId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
+                    AdminNotifyChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     ErrorChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     IsDebugAllowed = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     ConfigSet = table.Column<bool>(type: "tinyint(1)", nullable: false)
@@ -41,6 +44,9 @@ namespace AzzyBot.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     AdminApiKey = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    InstanceOwner = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    InstanceAdminGroup = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     NotificationChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     OutagesChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     IsOnline = table.Column<bool>(type: "tinyint(1)", nullable: false),
@@ -91,9 +97,14 @@ namespace AzzyBot.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ApiKey = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    StationOwner = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    StationAdminGroup = table.Column<ulong>(type: "bigint unsigned", nullable: false),
+                    StationDjGroup = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     RequestsChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     PreferHls = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     ShowPlaylistInNowPlaying = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    LastSkipTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     AzuraCastId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>

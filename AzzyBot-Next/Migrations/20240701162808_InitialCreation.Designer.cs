@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AzzyBot.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20240613182340_InitialCreation")]
+    [Migration("20240701162808_InitialCreation")]
     partial class InitialCreation
     {
         /// <inheritdoc />
@@ -72,6 +72,13 @@ namespace AzzyBot.Migrations
                     b.Property<int?>("GuildId")
                         .HasColumnType("int");
 
+                    b.Property<ulong>("InstanceAdminGroup")
+                        .HasColumnType("bigint unsigned");
+
+                    b.Property<string>("InstanceOwner")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<bool>("IsOnline")
                         .HasColumnType("tinyint(1)");
 
@@ -126,6 +133,9 @@ namespace AzzyBot.Migrations
                     b.Property<int>("AzuraCastId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("LastSkipTime")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -139,8 +149,18 @@ namespace AzzyBot.Migrations
                     b.Property<bool>("ShowPlaylistInNowPlaying")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<ulong>("StationAdminGroup")
+                        .HasColumnType("bigint unsigned");
+
+                    b.Property<ulong>("StationDjGroup")
+                        .HasColumnType("bigint unsigned");
+
                     b.Property<int>("StationId")
                         .HasColumnType("int");
+
+                    b.Property<string>("StationOwner")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -182,6 +202,12 @@ namespace AzzyBot.Migrations
                         .HasColumnType("int");
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<ulong>("AdminNotifyChannelId")
+                        .HasColumnType("bigint unsigned");
+
+                    b.Property<ulong>("AdminRoleId")
+                        .HasColumnType("bigint unsigned");
 
                     b.Property<bool>("ConfigSet")
                         .HasColumnType("tinyint(1)");
