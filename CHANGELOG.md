@@ -27,6 +27,7 @@
 - File logging now uses a shared static StreamWriter
   - This should improve the performance and stability of logging
 - The `core help` command is now ready for the future
+- You can now specify your timezone (TZ=) inside the docker compose file
 
 ### Fixes
 - Guild Database Entity was not updated when AzuraCast was activated or disabled
