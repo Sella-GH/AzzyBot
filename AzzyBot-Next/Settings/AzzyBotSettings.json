@@ -3,6 +3,7 @@
     "ServerId": 0,
     "ErrorChannelId": 0,
     "NotificationChannelId": 0,
+    "LogRetentionDays": 7,
     "Database": {
         "EncryptionKey": "",
         "Host": "localhost",

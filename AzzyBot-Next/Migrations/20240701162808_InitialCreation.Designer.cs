@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AzzyBot.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20240606122854_InitialCreation")]
+    [Migration("20240701162808_InitialCreation")]
     partial class InitialCreation
     {
         /// <inheritdoc />
@@ -33,14 +33,11 @@ namespace AzzyBot.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("FileChanges")
-                        .HasColumnType("tinyint(1)");
+                    b.Property<int>("AzuraCastId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("ServerStatus")
                         .HasColumnType("tinyint(1)");
-
-                    b.Property<int>("StationId")
-                        .HasColumnType("int");
 
                     b.Property<bool>("Updates")
                         .HasColumnType("tinyint(1)");
@@ -50,7 +47,7 @@ namespace AzzyBot.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StationId")
+                    b.HasIndex("AzuraCastId")
                         .IsUnique();
 
                     b.ToTable("AzuraCastChecks");
@@ -64,12 +61,29 @@ namespace AzzyBot.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AdminApiKey")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("BaseUrl")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<int?>("GuildId")
                         .HasColumnType("int");
+
+                    b.Property<ulong>("InstanceAdminGroup")
+                        .HasColumnType("bigint unsigned");
+
+                    b.Property<string>("InstanceOwner")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsOnline")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<ulong>("NotificationChannelId")
+                        .HasColumnType("bigint unsigned");
 
                     b.Property<ulong>("OutagesChannelId")
                         .HasColumnType("bigint unsigned");
@@ -82,7 +96,80 @@ namespace AzzyBot.Migrations
                     b.ToTable("AzuraCast");
                 });
 
-            modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastMountEntity", b =>
+            modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastStationChecksEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("FileChanges")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<int>("StationId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StationId")
+                        .IsUnique();
+
+                    b.ToTable("AzuraCastStationChecks");
+                });
+
+            modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastStationEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApiKey")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("AzuraCastId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LastSkipTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("PreferHls")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<ulong>("RequestsChannelId")
+                        .HasColumnType("bigint unsigned");
+
+                    b.Property<bool>("ShowPlaylistInNowPlaying")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<ulong>("StationAdminGroup")
+                        .HasColumnType("bigint unsigned");
+
+                    b.Property<ulong>("StationDjGroup")
+                        .HasColumnType("bigint unsigned");
+
+                    b.Property<int>("StationId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("StationOwner")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AzuraCastId");
+
+                    b.ToTable("AzuraCastStations");
+                });
+
+            modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastStationMountEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -105,45 +192,7 @@ namespace AzzyBot.Migrations
 
                     b.HasIndex("StationId");
 
-                    b.ToTable("AzuraCastMounts");
-                });
-
-            modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastStationEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ApiKey")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("AzuraCastId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<bool>("PreferHls")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<ulong>("RequestsChannelId")
-                        .HasColumnType("bigint unsigned");
-
-                    b.Property<bool>("ShowPlaylistInNowPlaying")
-                        .HasColumnType("tinyint(1)");
-
-                    b.Property<int>("StationId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AzuraCastId");
-
-                    b.ToTable("AzuraCastStations");
+                    b.ToTable("AzuraCastStationMounts");
                 });
 
             modelBuilder.Entity("AzzyBot.Database.Entities.GuildsEntity", b =>
@@ -154,8 +203,11 @@ namespace AzzyBot.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("AzuraCastSet")
-                        .HasColumnType("tinyint(1)");
+                    b.Property<ulong>("AdminNotifyChannelId")
+                        .HasColumnType("bigint unsigned");
+
+                    b.Property<ulong>("AdminRoleId")
+                        .HasColumnType("bigint unsigned");
 
                     b.Property<bool>("ConfigSet")
                         .HasColumnType("tinyint(1)");
@@ -176,13 +228,13 @@ namespace AzzyBot.Migrations
 
             modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastChecksEntity", b =>
                 {
-                    b.HasOne("AzzyBot.Database.Entities.AzuraCastStationEntity", "Station")
+                    b.HasOne("AzzyBot.Database.Entities.AzuraCastEntity", "AzuraCast")
                         .WithOne("Checks")
-                        .HasForeignKey("AzzyBot.Database.Entities.AzuraCastChecksEntity", "StationId")
+                        .HasForeignKey("AzzyBot.Database.Entities.AzuraCastChecksEntity", "AzuraCastId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Station");
+                    b.Navigation("AzuraCast");
                 });
 
             modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastEntity", b =>
@@ -194,11 +246,11 @@ namespace AzzyBot.Migrations
                     b.Navigation("Guild");
                 });
 
-            modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastMountEntity", b =>
+            modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastStationChecksEntity", b =>
                 {
                     b.HasOne("AzzyBot.Database.Entities.AzuraCastStationEntity", "Station")
-                        .WithMany("Mounts")
-                        .HasForeignKey("StationId")
+                        .WithOne("Checks")
+                        .HasForeignKey("AzzyBot.Database.Entities.AzuraCastStationChecksEntity", "StationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -216,8 +268,22 @@ namespace AzzyBot.Migrations
                     b.Navigation("AzuraCast");
                 });
 
+            modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastStationMountEntity", b =>
+                {
+                    b.HasOne("AzzyBot.Database.Entities.AzuraCastStationEntity", "Station")
+                        .WithMany("Mounts")
+                        .HasForeignKey("StationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Station");
+                });
+
             modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastEntity", b =>
                 {
+                    b.Navigation("Checks")
+                        .IsRequired();
+
                     b.Navigation("Stations");
                 });
 

@@ -8,9 +8,10 @@ public sealed class GuildsEntity
     public int Id { get; set; }
 
     public ulong UniqueId { get; set; }
+    public ulong AdminRoleId { get; set; }
+    public ulong AdminNotifyChannelId { get; set; }
     public ulong ErrorChannelId { get; set; }
     public bool IsDebugAllowed { get; set; }
     public bool ConfigSet { get; set; }
-    public bool AzuraCastSet { get; set; }
     public AzuraCastEntity? AzuraCast { get; set; }
 }

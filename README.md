@@ -1,10 +1,6 @@
 <br/>
 <p align="center">
   <h3 align="center">AzzyBot</h3>
-
-  <p align="center">
-    <img src="https://github.com/Sella-GH/AzzyBot/blob/main/Assets/Azzy_Logo.png" height="512" width="512" />
-  </p>
   
   <p align="center">
     Kind of music bot for discord, written in C# and with DSharpPlus. This bot is dedicated for the use with <a href="https://github.com/AzuraCast/AzuraCast">AzuraCast</a> and does not work at it's fully glory without it. 

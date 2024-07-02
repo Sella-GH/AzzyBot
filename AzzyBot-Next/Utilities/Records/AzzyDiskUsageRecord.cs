@@ -1,12 +1,12 @@
 ﻿namespace AzzyBot.Utilities.Records;
 
-public sealed record DiskUsageRecord
+public sealed record AzzyDiskUsageRecord
 {
     public double TotalSize { get; init; }
     public double TotalFreeSpace { get; init; }
     public double TotalUsedSpace { get; init; }
 
-    public DiskUsageRecord(double totalSize, double totalFreeSpace, double totalUsedSpace)
+    public AzzyDiskUsageRecord(double totalSize, double totalFreeSpace, double totalUsedSpace)
     {
         TotalSize = totalSize;
         TotalFreeSpace = totalFreeSpace;

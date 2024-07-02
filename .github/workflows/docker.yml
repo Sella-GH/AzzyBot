@@ -2,10 +2,6 @@ name: Build Docker Image
 
 on:
   push:
-    branches:
-      - "main"
-      - "rel/**"
-      - "dev/**"
     paths:
       - "**.cs"
       - "**.csproj"
