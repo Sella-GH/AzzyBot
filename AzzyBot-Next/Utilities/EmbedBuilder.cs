@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -256,7 +256,7 @@ public static class EmbedBuilder
             body.AppendLine(CultureInfo.InvariantCulture, $"- {line}");
         }
 
-        if (title.Length + body.Length > 6000)
+        if (body.Length > 4096 || title.Length + body.Length > 6000)
             body = new($"The changelog is too big to display it in an Embed, you can view it [here]({((isRolling) ? AzuraCastRollingUrl : AzuraCastStableUrl)}).");
 
         return CreateBasicEmbed(title, body.ToString(), DiscordColor.White);
