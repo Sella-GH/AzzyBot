@@ -81,6 +81,17 @@ public sealed class DiscordBotService
         return member;
     }
 
+    public DiscordRole? GetDiscordRole(ulong guildId, ulong roleId)
+    {
+        DiscordGuild? guild = GetDiscordGuild(guildId);
+        DiscordRole? role = null;
+
+        if (guild is not null)
+            role = guild.GetRole(roleId);
+
+        return role;
+    }
+
     public async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, ulong guildId = 0, string? info = null)
     {
         ArgumentNullException.ThrowIfNull(ex, nameof(ex));
