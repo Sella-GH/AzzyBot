@@ -1,9 +1,8 @@
-﻿using System;
-using DSharpPlus.Commands.ContextChecks;
+﻿using DSharpPlus.Commands.ContextChecks;
 
 namespace AzzyBot;
 
-public class AzuraCastDiscordPermCheckAttribute : ContextCheckAttribute
+public sealed class AzuraCastDiscordPermCheckAttribute : ContextCheckAttribute
 {
     public AzuraCastDiscordPerm Perm { get; set; }
 }
