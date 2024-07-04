@@ -122,7 +122,7 @@ public sealed class ConfigCommands
             await context.FollowupAsync("Your station was added successfully. Your station name and api key have been encrypted. Your request was also deleted for security reasons.");
         }
 
-        [Command("add-azuracast-station-mount"), Description("Add an AzuraCast mount point to the selected station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup, AzuraCastDiscordPerm.StationAdminGroup])]
+        [Command("add-azuracast-station-mount"), Description("Add an AzuraCast mount point to the selected station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask AddAzuraCastStationMountAsync
             (
             CommandContext context,
@@ -154,7 +154,7 @@ public sealed class ConfigCommands
             await context.EditResponseAsync("Your AzuraCast setup was deleted successfully.");
         }
 
-        [Command("delete-azuracast-station"), Description("Delete an existing AzuraCast station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup, AzuraCastDiscordPerm.StationAdminGroup])]
+        [Command("delete-azuracast-station"), Description("Delete an existing AzuraCast station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask DeleteAzuraCastStationAsync
             (
             CommandContext context,
@@ -171,7 +171,7 @@ public sealed class ConfigCommands
             await context.EditResponseAsync("Your station was deleted successfully.");
         }
 
-        [Command("delete-azuracast-station-mount"), Description("Delete an existing AzuraCast mount point from a station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup, AzuraCastDiscordPerm.StationAdminGroup])]
+        [Command("delete-azuracast-station-mount"), Description("Delete an existing AzuraCast mount point from a station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask DeleteAzuraCastStationMountAsync
             (
             CommandContext context,
@@ -242,7 +242,7 @@ public sealed class ConfigCommands
             await context.EditResponseAsync("Your settings were saved successfully.");
         }
 
-        [Command("modify-azuracast-station"), Description("Modify one AzuraCast station you already added."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup, AzuraCastDiscordPerm.StationAdminGroup])]
+        [Command("modify-azuracast-station"), Description("Modify one AzuraCast station you already added."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask UpdateAzuraCastStationAsync
             (
             CommandContext context,
@@ -273,7 +273,7 @@ public sealed class ConfigCommands
             await context.FollowupAsync("Your settings were saved successfully. Your station name and api key have been encrypted. Your request was also deleted for security reasons.");
         }
 
-        [Command("modify-azuracast-station-checks"), Description("Modify the automatic checks inside an AzuraCast station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup, AzuraCastDiscordPerm.StationAdminGroup])]
+        [Command("modify-azuracast-station-checks"), Description("Modify the automatic checks inside an AzuraCast station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask UpdateAzuraCastStationChecksAsync
             (
             CommandContext context,
