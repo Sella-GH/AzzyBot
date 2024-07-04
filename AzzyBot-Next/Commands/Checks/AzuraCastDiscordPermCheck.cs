@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Services;
-using AzzyBot.Utilities.Encryption;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
@@ -26,18 +25,8 @@ public class AzuraCastDiscordPermCheck(DbActions dbActions, DiscordBotService di
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
         ArgumentNullException.ThrowIfNull(context.Member, nameof(context.Member));
 
-        if (context is SlashCommandContext ctx)
-        {
-            switch (ctx.Interaction.ResponseState)
-            {
-                case DiscordInteractionResponseState.Unacknowledged:
-                    await context.DeferResponseAsync();
-                    return null;
-
-                case DiscordInteractionResponseState.Replied:
-                    return "Already replied";
-            }
-        }
+        if (context is SlashCommandContext ctx && ctx.Interaction.ResponseState is DiscordInteractionResponseState.Unacknowledged)
+            await context.DeferResponseAsync();
 
         int stationId = Convert.ToInt32(context.Arguments.Single(o => o.Key.Name is "station_id" && o.Value is not null).Value, CultureInfo.InvariantCulture);
         ulong guildId = context.Guild.Id;

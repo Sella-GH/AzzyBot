@@ -18,18 +18,8 @@ public sealed class AzuraCastOnlineCheck(DbActions dbActions) : IContextCheck<Az
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
-        if (context is SlashCommandContext ctx)
-        {
-            switch (ctx.Interaction.ResponseState)
-            {
-                case DiscordInteractionResponseState.Unacknowledged:
-                    await context.DeferResponseAsync();
-                    return null;
-
-                case DiscordInteractionResponseState.Replied:
-                    return "Already replied";
-            }
-        }
+        if (context is SlashCommandContext ctx && ctx.Interaction.ResponseState is DiscordInteractionResponseState.Unacknowledged)
+            await context.DeferResponseAsync();
 
         ulong guildId = context.Guild.Id;
         GuildsEntity guild = await _dbActions.GetGuildAsync(guildId);

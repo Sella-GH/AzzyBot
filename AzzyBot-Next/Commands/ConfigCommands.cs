@@ -214,6 +214,9 @@ public sealed class ConfigCommands
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your AzuraCast settings were saved successfully and have been encrypted.");
+
+            if (url is not null)
+                await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guildId);
         }
 
         [Command("modify-azuracast-checks"), Description("Modify the automatic checks for your AzuraCast instance."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
