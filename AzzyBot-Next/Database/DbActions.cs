@@ -53,7 +53,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             {
                 BaseUrl = Crypto.Encrypt(baseUrl.OriginalString),
                 AdminApiKey = Crypto.Encrypt(apiKey),
-                InstanceAdminGroup = instanceAdminGroup,
+                InstanceAdminRoleId = instanceAdminGroup,
                 NotificationChannelId = notificationId,
                 OutagesChannelId = outagesId,
                 GuildId = guild.Id
@@ -82,8 +82,8 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 StationId = stationId,
                 Name = Crypto.Encrypt(name),
                 ApiKey = (string.IsNullOrWhiteSpace(apiKey)) ? string.Empty : Crypto.Encrypt(apiKey),
-                StationAdminGroup = stationAdminGroup,
-                StationDjGroup = stationDjGroup ?? 0,
+                StationAdminRoleId = stationAdminGroup,
+                StationDjRoleId = stationDjGroup ?? 0,
                 RequestsChannelId = requestsId,
                 PreferHls = hls,
                 ShowPlaylistInNowPlaying = showPlaylist,
@@ -264,7 +264,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 azuraCast.AdminApiKey = Crypto.Encrypt(apiKey);
 
             if (instanceAdminGroup.HasValue)
-                azuraCast.InstanceAdminGroup = instanceAdminGroup.Value;
+                azuraCast.InstanceAdminRoleId = instanceAdminGroup.Value;
 
             if (notificationId.HasValue)
                 azuraCast.NotificationChannelId = notificationId.Value;
@@ -314,10 +314,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 azuraStation.ApiKey = Crypto.Encrypt(apiKey);
 
             if (stationAdminGroup.HasValue)
-                azuraStation.StationAdminGroup = stationAdminGroup.Value;
+                azuraStation.StationAdminRoleId = stationAdminGroup.Value;
 
             if (stationDjGroup.HasValue)
-                azuraStation.StationDjGroup = stationDjGroup.Value;
+                azuraStation.StationDjRoleId = stationDjGroup.Value;
 
             if (requestId.HasValue)
                 azuraStation.RequestsChannelId = requestId.Value;

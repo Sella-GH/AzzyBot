@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AzzyBot.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20240704111538_InitialCreation")]
+    [Migration("20240704193600_InitialCreation")]
     partial class InitialCreation
     {
         /// <inheritdoc />
@@ -72,7 +72,7 @@ namespace AzzyBot.Migrations
                     b.Property<int?>("GuildId")
                         .HasColumnType("int");
 
-                    b.Property<ulong>("InstanceAdminGroup")
+                    b.Property<ulong>("InstanceAdminRoleId")
                         .HasColumnType("bigint unsigned");
 
                     b.Property<bool>("IsOnline")
@@ -145,10 +145,10 @@ namespace AzzyBot.Migrations
                     b.Property<bool>("ShowPlaylistInNowPlaying")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<ulong>("StationAdminGroup")
+                    b.Property<ulong>("StationAdminRoleId")
                         .HasColumnType("bigint unsigned");
 
-                    b.Property<ulong>("StationDjGroup")
+                    b.Property<ulong>("StationDjRoleId")
                         .HasColumnType("bigint unsigned");
 
                     b.Property<int>("StationId")

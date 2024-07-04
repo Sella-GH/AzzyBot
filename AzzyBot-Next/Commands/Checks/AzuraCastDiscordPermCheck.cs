@@ -70,19 +70,19 @@ public class AzuraCastDiscordPermCheck(DbActions dbActions, DiscordBotService di
         switch (perm)
         {
             case AzuraCastDiscordPerm.InstanceAdminGroup:
-                if (userRoles.Contains(_botService.GetDiscordRole(guild.UniqueId, azuraCast.InstanceAdminGroup)))
+                if (userRoles.Contains(_botService.GetDiscordRole(guild.UniqueId, azuraCast.InstanceAdminRoleId)))
                     return null;
 
                 break;
 
             case AzuraCastDiscordPerm.StationAdminGroup:
-                if (userRoles.Contains(_botService.GetDiscordRole(guild.UniqueId, station.StationAdminGroup)))
+                if (userRoles.Contains(_botService.GetDiscordRole(guild.UniqueId, station.StationAdminRoleId)))
                     return null;
 
                 break;
 
             case AzuraCastDiscordPerm.StationDJGroup:
-                if (userRoles.Contains(_botService.GetDiscordRole(guild.UniqueId, station.StationDjGroup)))
+                if (userRoles.Contains(_botService.GetDiscordRole(guild.UniqueId, station.StationDjRoleId)))
                     return null;
 
                 break;

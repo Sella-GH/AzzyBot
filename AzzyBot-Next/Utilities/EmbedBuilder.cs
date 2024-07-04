@@ -496,7 +496,7 @@ public static class EmbedBuilder
         {
             ["Base Url"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.BaseUrl)) ? Crypto.Decrypt(azuraCast.BaseUrl) : "Not set")}||"),
             ["Admin Api Key"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.AdminApiKey)) ? Crypto.Decrypt(azuraCast.AdminApiKey) : "Not set")}||"),
-            ["Instance Admin Group"] = new((azuraCast.InstanceAdminGroup > 0) ? $"<@&{azuraCast.InstanceAdminGroup}>" : "Not set"),
+            ["Instance Admin Role"] = new((azuraCast.InstanceAdminRoleId > 0) ? $"<@&{azuraCast.InstanceAdminRoleId}>" : "Not set"),
             ["Notification Channel"] = new((azuraCast.NotificationChannelId > 0) ? $"<#{azuraCast.NotificationChannelId}>" : "Not set"),
             ["Outages Channel"] = new((azuraCast.OutagesChannelId > 0) ? $"<#{azuraCast.OutagesChannelId}>" : "Not set"),
             ["Automatic Checks"] = new($"- Server Status: {Misc.ReadableBool(azuraCast.Checks.ServerStatus, ReadbleBool.EnabledDisabled)}\n- Updates: {Misc.ReadableBool(azuraCast.Checks.Updates, ReadbleBool.EnabledDisabled)}\n- Updates Changelog: {Misc.ReadableBool(azuraCast.Checks.UpdatesShowChangelog, ReadbleBool.EnabledDisabled)}")
@@ -512,8 +512,8 @@ public static class EmbedBuilder
                 ["Station Name"] = new(Crypto.Decrypt(station.Name)),
                 ["Station ID"] = new(station.StationId.ToString(CultureInfo.InvariantCulture)),
                 ["Station Api Key"] = new($"||{((!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : "Not set")}||"),
-                ["Station Admin Group"] = new((station.StationAdminGroup > 0) ? $"<@&{station.StationAdminGroup}>" : "Not set"),
-                ["Station DJ Role"] = new((station.StationDjGroup > 0) ? $"<@&{station.StationDjGroup}>" : "Not set"),
+                ["Station Admin Role"] = new((station.StationAdminRoleId > 0) ? $"<@&{station.StationAdminRoleId}>" : "Not set"),
+                ["Station DJ Role"] = new((station.StationDjRoleId > 0) ? $"<@&{station.StationDjRoleId}>" : "Not set"),
                 ["Music Requests Channel"] = new((station.RequestsChannelId > 0) ? $"<#{station.RequestsChannelId}>" : "Not set"),
                 ["Prefer HLS Streaming"] = new(Misc.ReadableBool(station.PreferHls, ReadbleBool.EnabledDisabled)),
                 ["Show Playlist In Now Playing"] = new(Misc.ReadableBool(station.ShowPlaylistInNowPlaying, ReadbleBool.EnabledDisabled)),
