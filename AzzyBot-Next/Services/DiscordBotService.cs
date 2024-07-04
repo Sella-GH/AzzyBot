@@ -261,8 +261,12 @@ public sealed class DiscordBotService
         {
             switch (data.ContextCheckAttribute)
             {
+                case AzuraCastDiscordPermCheckAttribute:
+                    await context.EditResponseAsync($"You don't have the required permissions to execute this command!\nPlease contact {context.Guild.Owner.Mention}.");
+                    break;
+
                 case AzuraCastOnlineCheckAttribute:
-                    await context.EditResponseAsync($"The AzuraCast instance is currently offline!\nPlease contact {context.Guild.Owner.Mention}");
+                    await context.EditResponseAsync($"The AzuraCast instance is currently offline!\nPlease contact {context.Guild.Owner.Mention}.");
                     break;
 
                 case ModuleActivatedCheckAttribute:
