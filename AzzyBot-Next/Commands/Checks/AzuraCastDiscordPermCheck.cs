@@ -54,11 +54,10 @@ public class AzuraCastDiscordPermCheck(DbActions dbActions, DiscordBotService di
             return "Station is null!";
 
         string? result = null;
-        string userId = context.User.Id.ToString(CultureInfo.InvariantCulture);
         IEnumerable<DiscordRole> userRoles = context.Member.Roles;
         foreach (AzuraCastDiscordPerm perm in attribute.Perms)
         {
-            result = CheckPermission(perm, guild, azuraCast, station, userId, userRoles);
+            result = CheckPermission(perm, guild, azuraCast, station, userRoles);
             if (result is not null)
                 break;
         }
@@ -66,24 +65,12 @@ public class AzuraCastDiscordPermCheck(DbActions dbActions, DiscordBotService di
         return result;
     }
 
-    private string? CheckPermission(AzuraCastDiscordPerm perm, GuildsEntity guild, AzuraCastEntity azuraCast, AzuraCastStationEntity station, string userId, IEnumerable<DiscordRole> userRoles)
+    private string? CheckPermission(AzuraCastDiscordPerm perm, GuildsEntity guild, AzuraCastEntity azuraCast, AzuraCastStationEntity station, IEnumerable<DiscordRole> userRoles)
     {
         switch (perm)
         {
-            case AzuraCastDiscordPerm.InstanceOwner:
-                if (userId == Crypto.Decrypt(azuraCast.InstanceOwner))
-                    return null;
-
-                break;
-
             case AzuraCastDiscordPerm.InstanceAdminGroup:
                 if (userRoles.Contains(_botService.GetDiscordRole(guild.UniqueId, azuraCast.InstanceAdminGroup)))
-                    return null;
-
-                break;
-
-            case AzuraCastDiscordPerm.StationOwner:
-                if (userId == Crypto.Decrypt(station.StationOwner))
                     return null;
 
                 break;

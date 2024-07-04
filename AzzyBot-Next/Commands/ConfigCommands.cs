@@ -36,7 +36,6 @@ public sealed class ConfigCommands
             CommandContext context,
             [Description("Set the base Url, an example: https://demo.azuracast.com/")] Uri url,
             [Description("Add an administrator api key. It's enough when it has the permission to access system information.")] string apiKey,
-            [Description("Select the user who owns this instance.")] DiscordUser instanceOwner,
             [Description("Select the group that has the admin permissions on this instance.")] DiscordRole instanceAdminGroup,
             [Description("Select a channel to get general notifications about your azuracast installation."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel notificationChannel,
             [Description("Select a channel to get notifications when your azuracast installation is down."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel outagesChannel,
@@ -48,12 +47,6 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
             _logger.CommandRequested(nameof(AddAzuraCastAsync), context.User.GlobalName);
-
-            if (instanceOwner is null)
-            {
-                await context.RespondAsync("You have to select an instance owner first!");
-                return;
-            }
 
             if (instanceAdminGroup is null)
             {
@@ -83,7 +76,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            await _db.AddAzuraCastAsync(guildId, url, apiKey, instanceOwner.Id, instanceAdminGroup.Id, notificationChannel.Id, outagesChannel.Id, serverStatus, updates, updatesChangelog);
+            await _db.AddAzuraCastAsync(guildId, url, apiKey, instanceAdminGroup.Id, notificationChannel.Id, outagesChannel.Id, serverStatus, updates, updatesChangelog);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your AzuraCast installation was added successfully and your data has been encrypted.");
@@ -91,13 +84,12 @@ public sealed class ConfigCommands
             await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guild.UniqueId);
         }
 
-        [Command("add-azuracast-station"), Description("Add an AzuraCast station to your instance."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
+        [Command("add-azuracast-station"), Description("Add an AzuraCast station to your instance."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask AddAzuraCastStationAsync
             (
             CommandContext context,
             [Description("Enter the station id of your azuracast station.")] int station,
             [Description("Enter the name of the new station.")] string stationName,
-            [Description("Selece the user who owns this station.")] DiscordUser owner,
             [Description("Select the group that has the admin permissions on this station.")] DiscordRole adminGroup,
             [Description("Select a channel to get music requests when a request is not found on the server."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel requestsChannel,
             [Description("Enable or disable the preference of HLS streams if you add an able mount point.")] bool hls,
@@ -110,12 +102,6 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
             _logger.CommandRequested(nameof(AddAzuraCastStationAsync), context.User.GlobalName);
-
-            if (owner is null)
-            {
-                await context.EditResponseAsync("You have to select an owner first!");
-                return;
-            }
 
             if (adminGroup is null)
             {
@@ -130,13 +116,13 @@ public sealed class ConfigCommands
             }
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.AddAzuraCastStationAsync(guildId, station, stationName, owner.Id, adminGroup.Id, requestsChannel.Id, hls, showPlaylist, fileChanges, apiKey, djGroup?.Id);
+            await _db.AddAzuraCastStationAsync(guildId, station, stationName, adminGroup.Id, requestsChannel.Id, hls, showPlaylist, fileChanges, apiKey, djGroup?.Id);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your station was added successfully. Your station name and api key have been encrypted. Your request was also deleted for security reasons.");
         }
 
-        [Command("add-azuracast-station-mount"), Description("Add an AzuraCast mount point to the selected station."), ModuleActivatedCheck(AzzyModules.AzuraCast)]
+        [Command("add-azuracast-station-mount"), Description("Add an AzuraCast mount point to the selected station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup, AzuraCastDiscordPerm.StationAdminGroup])]
         public async ValueTask AddAzuraCastStationMountAsync
             (
             CommandContext context,
@@ -209,7 +195,6 @@ public sealed class ConfigCommands
             CommandContext context,
             [Description("Update the base Url, an example: https://demo.azuracast.com/")] Uri? url = null,
             [Description("Update the administrator api key. It's enough when it has the permission to access system info.")] string? apiKey = null,
-            [Description("Update the user who owns this instance.")] DiscordUser? instanceOwner = null,
             [Description("Update the group that has the admin permissions on this instance.")] DiscordRole? instanceAdminGroup = null,
             [Description("Update the channel to get general notifications about your azuracast instance."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? notificationsChannel = null,
             [Description("Update the channel to get notifications when your azuracast instance is down."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? outagesChannel = null
@@ -220,7 +205,7 @@ public sealed class ConfigCommands
             _logger.CommandRequested(nameof(UpdateAzuraCastAsync), context.User.GlobalName);
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.UpdateAzuraCastAsync(guildId, url, apiKey, instanceOwner?.Id, instanceAdminGroup?.Id, notificationsChannel?.Id, outagesChannel?.Id);
+            await _db.UpdateAzuraCastAsync(guildId, url, apiKey, instanceAdminGroup?.Id, notificationsChannel?.Id, outagesChannel?.Id);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your AzuraCast settings were saved successfully and have been encrypted.");
@@ -253,7 +238,6 @@ public sealed class ConfigCommands
             [Description("Modify the station id.")] int? stationId = null,
             [Description("Modify the name.")] string? stationName = null,
             [Description("Modify the api key.")] string? apiKey = null,
-            [Description("Modify the user who owns this station.")] DiscordUser? owner = null,
             [Description("Modify the group that has the admin permissions on this station.")] DiscordRole? adminGroup = null,
             [Description("Modify the group that has the dj permissions on this station.")] DiscordRole? djGroup = null,
             [Description("Modify the channel to get music requests when a request is not found on the server."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? requestsChannel = null,
@@ -266,7 +250,7 @@ public sealed class ConfigCommands
             _logger.CommandRequested(nameof(UpdateAzuraCastStationAsync), context.User.GlobalName);
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.UpdateAzuraCastStationAsync(guildId, station, stationId, stationName, apiKey, owner?.Id, adminGroup?.Id, djGroup?.Id, requestsChannel?.Id, hls, showPlaylist);
+            await _db.UpdateAzuraCastStationAsync(guildId, station, stationId, stationName, apiKey, adminGroup?.Id, djGroup?.Id, requestsChannel?.Id, hls, showPlaylist);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your settings were saved successfully. Your station name and api key have been encrypted. Your request was also deleted for security reasons.");

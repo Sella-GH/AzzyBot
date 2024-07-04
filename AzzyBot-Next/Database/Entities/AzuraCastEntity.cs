@@ -11,7 +11,6 @@ public sealed class AzuraCastEntity
 
     public string BaseUrl { get; set; } = string.Empty;
     public string AdminApiKey { get; set; } = string.Empty;
-    public string InstanceOwner { get; set; } = string.Empty;
     public ulong InstanceAdminGroup { get; set; }
     public ulong NotificationChannelId { get; set; }
     public ulong OutagesChannelId { get; set; }

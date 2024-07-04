@@ -44,8 +44,6 @@ namespace AzzyBot.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     AdminApiKey = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    InstanceOwner = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     InstanceAdminGroup = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     NotificationChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     OutagesChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
@@ -96,8 +94,6 @@ namespace AzzyBot.Migrations
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ApiKey = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    StationOwner = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     StationAdminGroup = table.Column<ulong>(type: "bigint unsigned", nullable: false),
                     StationDjGroup = table.Column<ulong>(type: "bigint unsigned", nullable: false),

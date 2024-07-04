@@ -12,7 +12,6 @@ public sealed class AzuraCastStationEntity
     public int StationId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string ApiKey { get; set; } = string.Empty;
-    public string StationOwner { get; set; } = string.Empty;
     public ulong StationAdminGroup { get; set; }
     public ulong StationDjGroup { get; set; }
     public AzuraCastStationChecksEntity Checks { get; set; } = new();
