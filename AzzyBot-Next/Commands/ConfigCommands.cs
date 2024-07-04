@@ -201,7 +201,6 @@ public sealed class ConfigCommands
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
-            
             _logger.CommandRequested(nameof(UpdateAzuraCastAsync), context.User.GlobalName);
             if (url is null && apiKey is null && instanceAdminGroup is null && notificationsChannel is null && outagesChannel is null)
             {
