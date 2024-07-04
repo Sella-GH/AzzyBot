@@ -14,7 +14,13 @@ public static class Startup
         string environment = AzzyStatsSoftware.GetBotEnvironment;
         bool isDev = environment == Environments.Development;
         bool isDocker = AzzyStatsHardware.CheckIfDocker;
-        bool forceDebug;
+        bool forceDebug = (isDocker) ? (Environment.GetEnvironmentVariable("FORCE_DEBUG") == "true") : (args?.Length > 0 && args[0] is "-forceDebug");
+
+        if (isDocker)
+        {
+            // Give the database time to start up
+            await Task.Delay(TimeSpan.FromSeconds(30));
+        }
 
         // https://stackoverflow.com/a/71786309
         // It works!
@@ -27,15 +33,6 @@ public static class Startup
         }
         */
 
-        if (isDocker)
-        {
-            forceDebug = Environment.GetEnvironmentVariable("FORCE_DEBUG") == "true";
-        }
-        else
-        {
-            forceDebug = args?.Length > 0 && args[0] is "-forceDebug";
-        }
-
         HostApplicationBuilderSettings appSettings = new()
         {
             ContentRootPath = Directory.GetCurrentDirectory(),
@@ -43,12 +40,6 @@ public static class Startup
             EnvironmentName = (isDev) ? Environments.Development : Environments.Production
         };
         HostApplicationBuilder appBuilder = Host.CreateApplicationBuilder(appSettings);
-
-        if (isDocker)
-        {
-            // Give the database time to start up
-            await Task.Delay(TimeSpan.FromSeconds(30));
-        }
 
         #region Add logging
 
