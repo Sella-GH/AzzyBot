@@ -29,6 +29,8 @@ public sealed class AzuraCastStationsAutocomplete(AzuraCastApiService azuraCast,
         try
         {
             stationsInDb = await _dbActions.GetAzuraCastStationsAsync(context.Guild.Id);
+            if (stationsInDb.Count is 0)
+                return results;
         }
         catch (InvalidOperationException)
         {

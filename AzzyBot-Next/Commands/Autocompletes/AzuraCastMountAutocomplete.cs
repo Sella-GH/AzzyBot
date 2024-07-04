@@ -30,6 +30,8 @@ public sealed class AzuraCastMountAutocomplete(DbActions dbActions) : IAutoCompl
         try
         {
             mountsInDb = await _dbActions.GetAzuraCastStationMountsAsync(context.Guild.Id, stationId);
+            if (mountsInDb.Count is 0)
+                return results;
         }
         catch (InvalidOperationException)
         {
