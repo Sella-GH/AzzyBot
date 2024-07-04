@@ -201,8 +201,13 @@ public sealed class ConfigCommands
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
-
+            
             _logger.CommandRequested(nameof(UpdateAzuraCastAsync), context.User.GlobalName);
+            if (url is null && apiKey is null && instanceAdminGroup is null && notificationsChannel is null && outagesChannel is null)
+            {
+                await context.RespondAsync("You have to provide at least one parameter to update.");
+                return;
+            }
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             await _db.UpdateAzuraCastAsync(guildId, url, apiKey, instanceAdminGroup?.Id, notificationsChannel?.Id, outagesChannel?.Id);
@@ -223,6 +228,11 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
             _logger.CommandRequested(nameof(UpdateAzuraCastChecksAsync), context.User.GlobalName);
+            if (serverStatus is null && updates is null && updatesChangelog is null)
+            {
+                await context.RespondAsync("You have to provide at least one parameter to update.");
+                return;
+            }
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             await _db.UpdateAzuraCastChecksAsync(guildId, serverStatus, updates, updatesChangelog);
@@ -248,6 +258,11 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
             _logger.CommandRequested(nameof(UpdateAzuraCastStationAsync), context.User.GlobalName);
+            if (stationId is null && stationName is null && apiKey is null && adminGroup is null && djGroup is null && requestsChannel is null && hls is null && showPlaylist is null)
+            {
+                await context.RespondAsync("You have to provide at least one parameter to update.");
+                return;
+            }
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             await _db.UpdateAzuraCastStationAsync(guildId, station, stationId, stationName, apiKey, adminGroup?.Id, djGroup?.Id, requestsChannel?.Id, hls, showPlaylist);
@@ -267,6 +282,11 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
             _logger.CommandRequested(nameof(UpdateAzuraCastStationChecksAsync), context.User.GlobalName);
+            if (fileChanges is null)
+            {
+                await context.RespondAsync("You have to provide at least one parameter to update.");
+                return;
+            }
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             await _db.UpdateAzuraCastStationChecksAsync(guildId, station, fileChanges);
@@ -286,6 +306,11 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
             _logger.CommandRequested(nameof(UpdateCoreAsync), context.User.GlobalName);
+            if (adminRole is null && adminChannel is null && errorChannel is null)
+            {
+                await context.RespondAsync("You have to provide at least one parameter to update.");
+                return;
+            }
 
             await context.DeferResponseAsync();
 
