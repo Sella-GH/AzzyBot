@@ -12,6 +12,9 @@
             "program": "${workspaceFolder}/artifacts/bin/AzzyBot-Next/Debug/AzzyBot-Dev.dll",
             "args": [],
             "cwd": "${workspaceFolder}/artifacts/bin/AzzyBot-Next/Debug",
+            "env": {
+                "DYLD_LIBRARY_PATH": "/opt/homebrew/opt/openssl@3/lib"
+            },
             "console": "externalTerminal",
             "stopAtEntry": false,
         },
