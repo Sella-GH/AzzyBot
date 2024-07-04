@@ -273,7 +273,7 @@ public sealed class DiscordBotService
 
                     if (info.Length is 2 && info[0] is "Instance")
                     {
-                        message = message.Replace("{0}", $"@<{azuraCast.InstanceAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
+                        message = message.Replace("{0}", $"<@&{azuraCast.InstanceAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
                     }
                     else if (info.Length is 3)
                     {
@@ -286,11 +286,11 @@ public sealed class DiscordBotService
 
                         if (info[0] is "Admin")
                         {
-                            message = message.Replace("{0}", $"@<{station.StationAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
+                            message = message.Replace("{0}", $"<@&{station.StationAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
                         }
                         else if (info[0] is "DJ")
                         {
-                            message = message.Replace("{0}", $"@<{station.StationDjRoleId}>", StringComparison.OrdinalIgnoreCase);
+                            message = message.Replace("{0}", $"<@&{station.StationDjRoleId}>", StringComparison.OrdinalIgnoreCase);
                         }
                     }
 
