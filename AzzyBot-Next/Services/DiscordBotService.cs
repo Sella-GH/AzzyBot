@@ -262,7 +262,39 @@ public sealed class DiscordBotService
             switch (data.ContextCheckAttribute)
             {
                 case AzuraCastDiscordPermCheckAttribute:
-                    await context.EditResponseAsync($"You don't have the required permissions to execute this command!\nPlease contact {context.Guild.Owner.Mention}.");
+                    string message = "You don't have the required permissions to execute this command!\nPlease contact {0}.";
+                    string[] info = data.ErrorMessage.Split(':');
+                    AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id);
+                    if (azuraCast is null)
+                    {
+                        await context.EditResponseAsync($"AzuraCast is not configured for this server!\nPlease contact {context.Guild.Owner.Mention}.");
+                        break;
+                    }
+
+                    if (info.Length is 2 && info[0] is "Instance")
+                    {
+                        message = message.Replace("{0}", $"@<{azuraCast.InstanceAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
+                    }
+                    else if (info.Length is 3)
+                    {
+                        AzuraCastStationEntity? station = azuraCast.Stations.FirstOrDefault(s => s.StationId == Convert.ToInt32(info[1], CultureInfo.InvariantCulture));
+                        if (station is null)
+                        {
+                            await context.EditResponseAsync($"The station with ID {info[1]} does not exist!\nPlease contact @<{azuraCast.InstanceAdminRoleId}>.");
+                            break;
+                        }
+
+                        if (info[0] is "Admin")
+                        {
+                            message = message.Replace("{0}", $"@<{station.StationAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
+                        }
+                        else if (info[0] is "DJ")
+                        {
+                            message = message.Replace("{0}", $"@<{station.StationDjRoleId}>", StringComparison.OrdinalIgnoreCase);
+                        }
+                    }
+
+                    await context.EditResponseAsync(message);
                     break;
 
                 case AzuraCastOnlineCheckAttribute:

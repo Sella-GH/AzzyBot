@@ -95,6 +95,19 @@ public class AzuraCastDiscordPermCheck(DbActions dbActions, DiscordBotService di
         if (perm == AzuraCastDiscordPerm.StationDJGroup && (isInstanceAdmin || isStationAdmin || isStationDj))
             return null;
 
-        return "No permission";
+        if (perm == AzuraCastDiscordPerm.InstanceAdminGroup)
+        {
+            return "Instance";
+        }
+        else if (perm == AzuraCastDiscordPerm.StationAdminGroup)
+        {
+            return $"Station:{station.Id}";
+        }
+        else if (perm == AzuraCastDiscordPerm.StationDJGroup)
+        {
+            return $"DJ:{station.Id}";
+        }
+
+        return "Invalid permission!";
     }
 }
