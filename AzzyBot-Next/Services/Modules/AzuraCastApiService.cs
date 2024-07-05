@@ -261,9 +261,16 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}/" + ((requestId is 0) ? requestId : AzuraApiEndpoints.Clear);
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}/" + ((requestId is 0) ? AzuraApiEndpoints.Clear : requestId);
 
-        await DeleteToApiAsync(baseUrl, endpoint, CreateHeader(apiKey));
+        if (requestId is 0)
+        {
+            await PostToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
+        }
+        else
+        {
+            await DeleteToApiAsync(baseUrl, endpoint, CreateHeader(apiKey));
+        }
     }
 
     public async Task DownloadPlaylistAsync(Uri url, string apiKey, string downloadPath)
