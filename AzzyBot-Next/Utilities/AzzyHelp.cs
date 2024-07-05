@@ -20,6 +20,7 @@ public static class AzzyHelp
             "config" => permissions.HasPermission(DiscordPermissions.Administrator),
             "core" => true,
             "debug" => approvedDebug && permissions.HasPermission(DiscordPermissions.Administrator),
+            "dj" => true,
             "music" => true,
             _ => false,
         };
