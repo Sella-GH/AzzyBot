@@ -349,7 +349,8 @@ public sealed class ConfigCommands
             DiscordMember member = context.Member ?? throw new InvalidOperationException("Member is null");
 
             GuildsEntity guild = await _db.GetGuildAsync(guildId);
-            DiscordEmbed guildEmbed = EmbedBuilder.BuildGetSettingsGuildEmbed(guildName, guild);
+            DiscordRole? adminRole = context.Guild.GetRole(guild.AdminRoleId);
+            DiscordEmbed guildEmbed = EmbedBuilder.BuildGetSettingsGuildEmbed(guildName, guild, $"{adminRole?.Name} ({adminRole?.Id})");
 
             await using DiscordMessageBuilder messageBuilder = new();
             messageBuilder.AddEmbeds([guildEmbed]);
