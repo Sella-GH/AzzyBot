@@ -224,7 +224,7 @@ public sealed class AzuraCastCommands
 
             await _azuraCast.StartStationAsync(new(baseUrl), apiKey, stationId, context);
 
-            await context.EditResponseAsync($"I started the station **{Crypto.Decrypt(station.Name)}**.");
+            await context.FollowupAsync($"I started the station **{Crypto.Decrypt(station.Name)}**.");
         }
 
         [Command("stop-station"), Description("Stop the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]

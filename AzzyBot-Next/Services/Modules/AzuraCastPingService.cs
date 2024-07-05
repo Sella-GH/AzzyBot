@@ -53,7 +53,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
 
         try
         {
-            Uri url = new($"{Crypto.Decrypt(azuraCast.BaseUrl)}/api");
+            Uri url = new($"{Crypto.Decrypt(azuraCast.BaseUrl)}/api/status");
             string response = string.Empty;
 
             try
