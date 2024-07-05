@@ -534,6 +534,6 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Updates}";
 
-        await PostToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
+        await PutToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
     }
 }
