@@ -56,7 +56,6 @@ public sealed class AzuraCastRequestAutocomplete(AzuraCastApiService azuraCast, 
                 if (song is null)
                     continue;
 
-                bool isRequest = song is AzuraRequestRecord;
                 string title = string.Empty;
                 string artist = string.Empty;
                 string uniqueId = string.Empty;
