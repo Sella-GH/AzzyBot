@@ -9,4 +9,10 @@ public sealed record AzuraTrackRecord
 
     [JsonPropertyName("song_id")]
     public required string SongId { get; init; }
+
+    [JsonPropertyName("artist")]
+    public required string Artist { get; init; }
+
+    [JsonPropertyName("title")]
+    public required string Title { get; init; }
 }

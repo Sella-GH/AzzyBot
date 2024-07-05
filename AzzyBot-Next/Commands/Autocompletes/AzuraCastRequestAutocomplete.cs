@@ -57,9 +57,28 @@ public sealed class AzuraCastRequestAutocomplete(AzuraCastApiService azuraCast, 
                     continue;
 
                 bool isRequest = song is AzuraRequestRecord;
-                string title = (isRequest) ? (song as AzuraRequestRecord)?.Song.Title ?? string.Empty : (song as AzuraFilesRecord)?.Title ?? string.Empty;
-                string artist = (isRequest) ? (song as AzuraRequestRecord)?.Song.Artist ?? string.Empty : (song as AzuraFilesRecord)?.Artist ?? string.Empty;
-                string uniqueId = (isRequest) ? (song as AzuraRequestRecord)?.Song.SongId ?? string.Empty : (song as AzuraFilesRecord)?.UniqueId ?? string.Empty;
+                string title = string.Empty;
+                string artist = string.Empty;
+                string uniqueId = string.Empty;
+                int requestId = 0;
+                if (song is AzuraRequestRecord request)
+                {
+                    title = request.Song.Title ?? string.Empty;
+                    artist = request.Song.Artist ?? string.Empty;
+                    uniqueId = request.Song.SongId ?? string.Empty;
+                }
+                else if (song is AzuraFilesRecord file)
+                {
+                    title = file.Title ?? string.Empty;
+                    artist = file.Artist ?? string.Empty;
+                    uniqueId = file.UniqueId ?? string.Empty;
+                }
+                else if (song is AzuraRequestQueueItemRecord requestQueueItem)
+                {
+                    title = requestQueueItem.Track.Title ?? string.Empty;
+                    artist = requestQueueItem.Track.Artist ?? string.Empty;
+                    requestId = requestQueueItem.Id;
+                }
 
                 if (!string.IsNullOrWhiteSpace(search) && (!title.Contains(search, StringComparison.OrdinalIgnoreCase) && !artist.Contains(search, StringComparison.OrdinalIgnoreCase)))
                     continue;
@@ -68,7 +87,7 @@ public sealed class AzuraCastRequestAutocomplete(AzuraCastApiService azuraCast, 
                 if (!string.IsNullOrWhiteSpace(artist))
                     songResult.Append(CultureInfo.InvariantCulture, $" - {artist}");
 
-                results.Add(songResult.ToString(), uniqueId);
+                results.Add(songResult.ToString(), (string.IsNullOrWhiteSpace(uniqueId)) ? requestId : uniqueId);
                 songResult.Clear();
             }
         }
