@@ -72,6 +72,7 @@ public class AzuraCastDiscordPermCheck(DbActions dbActions, DiscordBotService di
             case "azuracast start-station":
             case "azuracast stop-station":
             case "azuracast toggle-song-requests":
+            case "azuracast update-instance":
             case "config add-azuracast-station":
             case "config add-azuracast-station-mount":
             case "config modify-azuracast-station":

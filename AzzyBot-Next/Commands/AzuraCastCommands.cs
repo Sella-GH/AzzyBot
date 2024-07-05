@@ -286,6 +286,30 @@ public sealed class AzuraCastCommands
 
             await context.EditResponseAsync($"I {Misc.ReadableBool(stationConfig.EnableRequests, ReadbleBool.EnabledDisabled, true)} song requests for station **{Crypto.Decrypt(station.Name)}**.");
         }
+
+        [Command("update-instance"), Description("Update the AzuraCast instance to the latest version."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
+        public async ValueTask UpdateInstanceAsync(CommandContext context)
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+
+            _logger.CommandRequested(nameof(UpdateInstanceAsync), context.User.GlobalName);
+
+            GuildsEntity? guild = await _dbActions.GetGuildAsync(context.Guild.Id);
+            if (guild is null)
+            {
+                await context.EditResponseAsync("Server not found in database.");
+                return;
+            }
+
+            AzuraCastEntity azuraCast = guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast is null");
+            string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
+            string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
+
+            await _azuraCast.UpdateInstanceAsync(new(baseUrl), apiKey);
+
+            await context.EditResponseAsync("I initiated the update check for the AzuraCast instance, please wait a little.");
+        }
     }
 
     [Command("dj"), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]

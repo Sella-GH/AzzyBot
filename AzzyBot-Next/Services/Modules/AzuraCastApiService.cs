@@ -527,4 +527,13 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
 
         await PutToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
     }
+
+    public async Task UpdateInstanceAsync(Uri baseUrl, string apiKey)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+
+        string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Updates}";
+
+        await PostToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
+    }
 }
