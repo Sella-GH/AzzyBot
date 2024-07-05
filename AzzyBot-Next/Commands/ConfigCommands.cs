@@ -72,7 +72,13 @@ public sealed class ConfigCommands
             }
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            GuildsEntity guild = await _db.GetGuildAsync(guildId);
+            GuildsEntity? guild = await _db.GetGuildAsync(guildId);
+            if (guild is null)
+            {
+                await context.EditResponseAsync("Server not found in database.");
+                return;
+            }
+
             if (!guild.ConfigSet)
             {
                 await context.DeleteResponseAsync();
@@ -348,7 +354,13 @@ public sealed class ConfigCommands
             string guildName = context.Guild.Name;
             DiscordMember member = context.Member ?? throw new InvalidOperationException("Member is null");
 
-            GuildsEntity guild = await _db.GetGuildAsync(guildId);
+            GuildsEntity? guild = await _db.GetGuildAsync(guildId);
+            if (guild is null)
+            {
+                await context.EditResponseAsync("Server not found in database.");
+                return;
+            }
+
             DiscordRole? adminRole = context.Guild.GetRole(guild.AdminRoleId);
             DiscordEmbed guildEmbed = EmbedBuilder.BuildGetSettingsGuildEmbed(guildName, guild, $"{adminRole?.Name} ({adminRole?.Id})");
 

@@ -24,7 +24,7 @@ public sealed class ModuleActivatedCheck(DbActions dbActions) : IContextCheck<Mo
             await context.DeferResponseAsync();
 
         ulong guildId = context.Guild.Id;
-        GuildsEntity guild = await _dbActions.GetGuildAsync(guildId);
+        GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId);
         if (guild is null)
             return "Guild is null!";
 

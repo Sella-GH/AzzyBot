@@ -40,8 +40,8 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
 
         _logger.BackgroundServiceWorkItem(nameof(QueueAzuraCastUpdatesAsync));
 
-        GuildsEntity guild = await _dbActions.GetGuildAsync(guildId);
-        if (guild.AzuraCast is null)
+        GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId);
+        if (guild is null || guild.AzuraCast is null)
             return;
 
         if (guild.AzuraCast.Checks.Updates)

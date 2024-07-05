@@ -47,8 +47,8 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
 
         _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecksAsync));
 
-        GuildsEntity guild = await _dbActions.GetGuildAsync(guildId);
-        if (guild.AzuraCast is null)
+        GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId);
+        if (guild is null || guild.AzuraCast is null)
             return;
 
         IEnumerable<AzuraCastStationEntity> stations = guild.AzuraCast.Stations.Where(s => s.Checks.FileChanges);

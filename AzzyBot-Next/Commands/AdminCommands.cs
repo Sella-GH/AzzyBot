@@ -81,7 +81,13 @@ public sealed class AdminCommands
 
                 await context.DeferResponseAsync();
 
-                GuildsEntity guildEntity = await _dbActions.GetGuildAsync(guildIdValue);
+                GuildsEntity? guildEntity = await _dbActions.GetGuildAsync(guildIdValue);
+                if (guildEntity is null)
+                {
+                    await context.EditResponseAsync("Server not found in database.");
+                    return;
+                }
+
                 if (guildEntity.IsDebugAllowed)
                 {
                     await context.EditResponseAsync("Server is already specified as debug.");
@@ -135,7 +141,13 @@ public sealed class AdminCommands
 
                 await context.DeferResponseAsync();
 
-                GuildsEntity guildEntity = await _dbActions.GetGuildAsync(guildIdValue);
+                GuildsEntity? guildEntity = await _dbActions.GetGuildAsync(guildIdValue);
+                if (guildEntity is null)
+                {
+                    await context.EditResponseAsync("Server not found in database.");
+                    return;
+                }
+
                 if (!guildEntity.IsDebugAllowed)
                 {
                     await context.EditResponseAsync("Server is not specified as debug.");

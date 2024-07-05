@@ -36,8 +36,8 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
 
         _logger.BackgroundServiceWorkItem(nameof(QueueInstancePingAsync));
 
-        GuildsEntity guild = await _dbActions.GetGuildAsync(guildId);
-        if (guild.AzuraCast is null)
+        GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId);
+        if (guild is null || guild.AzuraCast is null)
             return;
 
         if (guild.AzuraCast.Checks.ServerStatus)

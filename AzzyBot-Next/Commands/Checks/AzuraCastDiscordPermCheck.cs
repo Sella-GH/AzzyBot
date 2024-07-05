@@ -30,7 +30,7 @@ public class AzuraCastDiscordPermCheck(DbActions dbActions, DiscordBotService di
 
         int stationId = Convert.ToInt32(context.Arguments.SingleOrDefault(o => o.Key.Name is "station_id" && o.Value is not null).Value, CultureInfo.InvariantCulture);
         ulong guildId = context.Guild.Id;
-        GuildsEntity guild = await _dbActions.GetGuildAsync(guildId);
+        GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId);
         if (guild is null)
             return "Guild is null!";
 
