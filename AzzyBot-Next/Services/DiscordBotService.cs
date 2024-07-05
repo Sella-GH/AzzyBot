@@ -261,8 +261,12 @@ public sealed class DiscordBotService
         if (!CheckIfClientIsConnected)
             return;
 
+        bool breakLoop = false;
         foreach (ContextCheckFailedData data in ex.Errors)
         {
+            if (breakLoop)
+                break;
+
             switch (data.ContextCheckAttribute)
             {
                 case AzuraCastDiscordPermCheckAttribute:
@@ -272,6 +276,7 @@ public sealed class DiscordBotService
                     if (azuraCast is null)
                     {
                         await context.EditResponseAsync($"AzuraCast is not configured for this server!\nPlease contact {context.Guild.Owner.Mention}.");
+                        breakLoop = true;
                         break;
                     }
 
@@ -285,6 +290,7 @@ public sealed class DiscordBotService
                         if (station is null)
                         {
                             await context.EditResponseAsync($"The station with ID {info[1]} does not exist!\nPlease contact @<{azuraCast.InstanceAdminRoleId}>.");
+                            breakLoop = true;
                             break;
                         }
 
@@ -303,14 +309,17 @@ public sealed class DiscordBotService
 
                 case AzuraCastOnlineCheckAttribute:
                     await context.EditResponseAsync($"The AzuraCast instance is currently offline!\nPlease contact {context.Guild.Owner.Mention}.");
+                    breakLoop = true;
                     break;
 
                 case ModuleActivatedCheckAttribute:
                     await context.EditResponseAsync("This module is not activated, you are unable to use commands from it.");
+                    breakLoop = true;
                     break;
 
                 default:
                     await AcknowledgeExceptionAsync(context);
+                    breakLoop = true;
                     break;
             }
         }
