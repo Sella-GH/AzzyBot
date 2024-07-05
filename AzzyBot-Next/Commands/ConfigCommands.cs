@@ -48,44 +48,49 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(AddAzuraCastAsync), context.User.GlobalName);
 
+            await context.DeferResponseAsync();
+
             if (instanceAdminGroup is null)
             {
-                await context.RespondAsync("You have to select an instance admin group first!");
+                await context.DeleteResponseAsync();
+                await context.FollowupAsync("You have to select an instance admin group first!");
                 return;
             }
 
             if (notificationChannel is null)
             {
-                await context.RespondAsync("You have to select a notification channel first!");
+                await context.DeleteResponseAsync();
+                await context.FollowupAsync("You have to select a notification channel first!");
                 return;
             }
 
             if (outagesChannel is null)
             {
-                await context.RespondAsync("You have to select an outages channel first!");
+                await context.DeleteResponseAsync();
+                await context.FollowupAsync("You have to select an outages channel first!");
                 return;
             }
-
-            await context.DeferResponseAsync();
 
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
             GuildsEntity guild = await _db.GetGuildAsync(guildId);
             if (!guild.ConfigSet)
             {
-                await context.EditResponseAsync("You have to set the core settings first!");
+                await context.DeleteResponseAsync();
+                await context.FollowupAsync("You have to set the core settings first!");
                 return;
             }
 
             if (guild.AzuraCast is not null)
             {
-                await context.EditResponseAsync("AzuraCast is already set up for your server.");
+                await context.DeleteResponseAsync();
+                await context.FollowupAsync("AzuraCast is already set up for your server.");
                 return;
             }
 
             await _db.AddAzuraCastAsync(guildId, url, apiKey, instanceAdminGroup.Id, notificationChannel.Id, outagesChannel.Id, serverStatus, updates, updatesChangelog);
 
             await context.DeleteResponseAsync();
-            await context.FollowupAsync("Your AzuraCast installation was added successfully and your data has been encrypted.");
+            await context.FollowupAsync("Your AzuraCast installation was added successfully and private data has been encrypted.");
 
             await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guild.UniqueId);
         }
@@ -111,13 +116,15 @@ public sealed class ConfigCommands
 
             if (adminGroup is null)
             {
-                await context.EditResponseAsync("You have to select an admin group first!");
+                await context.DeleteResponseAsync();
+                await context.FollowupAsync("You have to select an admin group first!");
                 return;
             }
 
             if (requestsChannel is null)
             {
-                await context.EditResponseAsync("You have to select a request channel first!");
+                await context.DeleteResponseAsync();
+                await context.FollowupAsync("You have to select a request channel first!");
                 return;
             }
 
@@ -125,7 +132,7 @@ public sealed class ConfigCommands
             await _db.AddAzuraCastStationAsync(guildId, station, stationName, adminGroup.Id, requestsChannel.Id, hls, showPlaylist, fileChanges, apiKey, djGroup?.Id);
 
             await context.DeleteResponseAsync();
-            await context.FollowupAsync("Your station was added successfully. Your station name and api key have been encrypted. Your request was also deleted for security reasons.");
+            await context.FollowupAsync("Your station was added successfully and private data has been encrypted.");
         }
 
         [Command("add-azuracast-station-mount"), Description("Add an AzuraCast mount point to the selected station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -218,7 +225,7 @@ public sealed class ConfigCommands
             await _db.UpdateAzuraCastAsync(guildId, url, apiKey, instanceAdminGroup?.Id, notificationsChannel?.Id, outagesChannel?.Id);
 
             await context.DeleteResponseAsync();
-            await context.FollowupAsync("Your AzuraCast settings were saved successfully and have been encrypted.");
+            await context.FollowupAsync("Your AzuraCast settings were saved successfully and private data has been encrypted.");
 
             if (url is not null)
                 await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guildId);
@@ -276,7 +283,7 @@ public sealed class ConfigCommands
             await _db.UpdateAzuraCastStationAsync(guildId, station, stationId, stationName, apiKey, adminGroup?.Id, djGroup?.Id, requestsChannel?.Id, hls, showPlaylist);
 
             await context.DeleteResponseAsync();
-            await context.FollowupAsync("Your settings were saved successfully. Your station name and api key have been encrypted. Your request was also deleted for security reasons.");
+            await context.FollowupAsync("Your settings were saved successfully and private data has been encrypted.");
         }
 
         [Command("modify-azuracast-station-checks"), Description("Modify the automatic checks inside an AzuraCast station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
