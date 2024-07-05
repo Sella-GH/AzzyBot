@@ -189,7 +189,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         }
     }
 
-    private async Task PutToApiAsync(Uri baseUrl, string endpoint, string? content = null, Dictionary<string, string>? headers = null)
+    private async Task PutToApiAsync(Uri baseUrl, string endpoint, string? content = null, Dictionary<string, string>? headers = null, bool ignoreException = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
@@ -200,6 +200,9 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         }
         catch (HttpRequestException ex)
         {
+            if (ignoreException)
+                return;
+
             throw new InvalidOperationException($"Failed PUT to API, url: {uri}", ex);
         }
     }
@@ -534,6 +537,23 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Updates}";
 
-        await PutToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
+        await PutToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey), true);
+
+        bool online = false;
+        AzuraStatusRecord status;
+        while (!online)
+        {
+            await Task.Delay(TimeSpan.FromSeconds(10));
+
+            try
+            {
+                status = await GetFromApiAsync<AzuraStatusRecord>(baseUrl, AzuraApiEndpoints.Status);
+                online = status.Online == "true";
+            }
+            catch (InvalidOperationException)
+            {
+                online = false;
+            }
+        }
     }
 }

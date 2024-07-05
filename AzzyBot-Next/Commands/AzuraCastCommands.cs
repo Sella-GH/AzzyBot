@@ -306,9 +306,11 @@ public sealed class AzuraCastCommands
             string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
+            await context.EditResponseAsync("I initiated the update for the AzuraCast instance. Please wait a little until it restarts.");
+
             await _azuraCast.UpdateInstanceAsync(new(baseUrl), apiKey);
 
-            await context.EditResponseAsync("I initiated the update check for the AzuraCast instance, please wait a little.");
+            await context.FollowupAsync("The update was successful. The instance is online again.");
         }
     }
 
