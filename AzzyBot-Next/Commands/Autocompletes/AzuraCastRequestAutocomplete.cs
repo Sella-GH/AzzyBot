@@ -30,7 +30,6 @@ public sealed class AzuraCastRequestAutocomplete(AzuraCastApiService azuraCast, 
 
         Dictionary<string, object> results = [];
         string search = context.UserInput;
-
         AzuraCastStationEntity? station;
         try
         {
@@ -72,6 +71,14 @@ public sealed class AzuraCastRequestAutocomplete(AzuraCastApiService azuraCast, 
                 results.Add(songResult.ToString(), uniqueId);
                 songResult.Clear();
             }
+        }
+
+        if (context.Command.Name is "delete-song-request")
+        {
+            IReadOnlyList<AzuraRequestQueueItemRecord> requests = await _azuraCast.GetStationRequestItemsAsync(new(baseUrl), apiKey, stationId, false);
+            AddResultsFromSong(requests);
+
+            return results;
         }
 
         AzuraAdminStationConfigRecord config = await _azuraCast.GetStationAdminConfigAsync(new(baseUrl), apiKey, stationId);

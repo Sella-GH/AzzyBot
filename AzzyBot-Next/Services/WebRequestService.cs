@@ -97,6 +97,32 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         return results;
     }
 
+    public async Task DeleteAsync(Uri uri, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    {
+        AddressFamily addressFamily = await GetPreferredIpMethodAsync(uri);
+        AddHeaders(addressFamily, headers, acceptJson, noCache);
+        HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
+
+        try
+        {
+            using HttpResponseMessage response = await client.DeleteAsync(uri);
+            if (response.IsSuccessStatusCode)
+                return;
+
+            _logger.WebRequestFailed(HttpMethod.Delete, response.ReasonPhrase ?? string.Empty, uri);
+        }
+        catch (InvalidOperationException)
+        {
+            _logger.WebInvalidUri(uri);
+            throw;
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.WebRequestFailed(HttpMethod.Delete, ex.Message, uri);
+            throw;
+        }
+    }
+
     public async Task DownloadAsync(Uri url, string downloadPath, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);

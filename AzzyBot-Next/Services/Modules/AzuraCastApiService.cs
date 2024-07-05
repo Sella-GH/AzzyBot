@@ -124,6 +124,21 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         return missing;
     }
 
+    private async Task DeleteToApiAsync(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
+
+        Uri uri = new($"{baseUrl}api/{endpoint}");
+        try
+        {
+            await _webService.DeleteAsync(uri, headers, true);
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new InvalidOperationException($"Failed DELETE to API, url: {uri}", ex);
+        }
+    }
+
     private async Task<string> GetFromApiAsync(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
@@ -239,6 +254,16 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         {
             _ = Task.Run(async () => await CheckForApiPermissionsAsync(guild.AzuraCast));
         }
+    }
+
+    public async Task DeleteStationSongRequestAsync(Uri baseUrl, string apiKey, int stationId, int requestId = 0)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Request}/" + ((requestId is 0) ? requestId : AzuraApiEndpoints.Clear);
+
+        await DeleteToApiAsync(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
     public async Task DownloadPlaylistAsync(Uri url, string apiKey, string downloadPath)

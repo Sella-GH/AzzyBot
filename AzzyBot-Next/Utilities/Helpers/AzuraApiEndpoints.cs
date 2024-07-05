@@ -4,6 +4,7 @@ public static class AzuraApiEndpoints
 {
     public const string Admin = "admin";
     public const string Backend = "backend";
+    public const string Clear = "clear";
     public const string Files = "files";
     public const string History = "history";
     public const string NowPlaying = "nowplaying";

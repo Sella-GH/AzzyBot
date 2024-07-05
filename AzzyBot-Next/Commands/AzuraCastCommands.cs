@@ -328,6 +328,42 @@ public sealed class AzuraCastCommands
         private readonly AzuraCastApiService _azuraCast = azuraCast;
         private readonly DbActions _dbActions = dbActions;
 
+        [Command("delete-song-request"), Description("Delete a song request from the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationDJGroup, AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        public async ValueTask DeleteSongRequestAsync
+        (
+            CommandContext context,
+            [Description("The station of which you want to delete the song request."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId,
+            [Description("The request id of the song you want to delete."), SlashAutoCompleteProvider(typeof(AzuraCastRequestAutocomplete))] int requestId = 0
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+
+            _logger.CommandRequested(nameof(DeleteSongRequestAsync), context.User.GlobalName);
+
+            GuildsEntity? guild = await _dbActions.GetGuildAsync(context.Guild.Id);
+            if (guild is null)
+            {
+                await context.EditResponseAsync("Server not found in database.");
+                return;
+            }
+
+            AzuraCastEntity azuraCast = guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast is null");
+            AzuraCastStationEntity station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId) ?? throw new InvalidOperationException("Station is null");
+            string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+            string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
+
+            await _azuraCast.DeleteStationSongRequestAsync(new(baseUrl), apiKey, stationId, requestId);
+
+            if (requestId is 0)
+            {
+                await context.EditResponseAsync("I deleted all song requests.");
+                return;
+            }
+
+            await context.EditResponseAsync($"I deleted the song request with the id **{requestId}**.");
+        }
+
         [Command("skip-song"), Description("Skips the current song of the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationDJGroup, AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask SkipSongAsync
         (
