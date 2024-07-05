@@ -486,7 +486,7 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.White, null, null, null, fields);
     }
 
-    public static IReadOnlyList<DiscordEmbed> BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast)
+    public static IReadOnlyList<DiscordEmbed> BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast, string instanceRole, IReadOnlyDictionary<ulong, string> stationRoles)
     {
         ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
 
@@ -496,7 +496,7 @@ public static class EmbedBuilder
         {
             ["Base Url"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.BaseUrl)) ? Crypto.Decrypt(azuraCast.BaseUrl) : "Not set")}||"),
             ["Admin Api Key"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.AdminApiKey)) ? Crypto.Decrypt(azuraCast.AdminApiKey) : "Not set")}||"),
-            ["Instance Admin Role"] = new((azuraCast.InstanceAdminRoleId > 0) ? $"<@&{azuraCast.InstanceAdminRoleId}>" : "Not set"),
+            ["Instance Admin Role"] = new((!string.IsNullOrWhiteSpace(instanceRole)) ? $"{instanceRole}" : "Not set"),
             ["Notification Channel"] = new((azuraCast.NotificationChannelId > 0) ? $"<#{azuraCast.NotificationChannelId}>" : "Not set"),
             ["Outages Channel"] = new((azuraCast.OutagesChannelId > 0) ? $"<#{azuraCast.OutagesChannelId}>" : "Not set"),
             ["Automatic Checks"] = new($"- Server Status: {Misc.ReadableBool(azuraCast.Checks.ServerStatus, ReadbleBool.EnabledDisabled)}\n- Updates: {Misc.ReadableBool(azuraCast.Checks.Updates, ReadbleBool.EnabledDisabled)}\n- Updates Changelog: {Misc.ReadableBool(azuraCast.Checks.UpdatesShowChangelog, ReadbleBool.EnabledDisabled)}")
@@ -507,18 +507,49 @@ public static class EmbedBuilder
         const string stationTitle = "AzuraCast Stations";
         foreach (AzuraCastStationEntity station in azuraCast.Stations)
         {
+            string stationName = Crypto.Decrypt(station.Name);
+            string stationId = station.StationId.ToString(CultureInfo.InvariantCulture);
+            string stationApiKey = $"||{((!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : "Not set")}||";
+            string stationAdminRole;
+            if (station.StationAdminRoleId > 0)
+            {
+                string role = stationRoles.FirstOrDefault(x => x.Key == station.StationAdminRoleId).Value;
+                stationAdminRole = (role is not null) ? $"<@&{role}>" : "Not set";
+            }
+            else
+            {
+                stationAdminRole = "Not set";
+            }
+
+            string stationDjRole;
+            if (station.StationDjRoleId > 0)
+            {
+                string role = stationRoles.FirstOrDefault(x => x.Key == station.StationDjRoleId).Value;
+                stationDjRole = (role is not null) ? $"<@&{role}>" : "Not set";
+            }
+            else
+            {
+                stationDjRole = "Not set";
+            }
+
+            string requestsChannel = (station.RequestsChannelId > 0) ? $"<#{station.RequestsChannelId}>" : "Not set";
+            string preferHls = Misc.ReadableBool(station.PreferHls, ReadbleBool.EnabledDisabled);
+            string showPlaylist = Misc.ReadableBool(station.ShowPlaylistInNowPlaying, ReadbleBool.EnabledDisabled);
+            string fileChanges = Misc.ReadableBool(station.Checks.FileChanges, ReadbleBool.EnabledDisabled);
+            string mounts = (station.Mounts.Count > 0) ? string.Join('\n', station.Mounts.Select(x => $"- {Crypto.Decrypt(x.Name)}: {Crypto.Decrypt(x.Mount)}")) : "No Mount Points added";
+
             fields = new()
             {
-                ["Station Name"] = new(Crypto.Decrypt(station.Name)),
-                ["Station ID"] = new(station.StationId.ToString(CultureInfo.InvariantCulture)),
-                ["Station Api Key"] = new($"||{((!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : "Not set")}||"),
-                ["Station Admin Role"] = new((station.StationAdminRoleId > 0) ? $"<@&{station.StationAdminRoleId}>" : "Not set"),
-                ["Station DJ Role"] = new((station.StationDjRoleId > 0) ? $"<@&{station.StationDjRoleId}>" : "Not set"),
-                ["Music Requests Channel"] = new((station.RequestsChannelId > 0) ? $"<#{station.RequestsChannelId}>" : "Not set"),
-                ["Prefer HLS Streaming"] = new(Misc.ReadableBool(station.PreferHls, ReadbleBool.EnabledDisabled)),
-                ["Show Playlist In Now Playing"] = new(Misc.ReadableBool(station.ShowPlaylistInNowPlaying, ReadbleBool.EnabledDisabled)),
-                ["Automatic Checks"] = new($"- File Changes: {Misc.ReadableBool(station.Checks.FileChanges, ReadbleBool.EnabledDisabled)}"),
-                ["Mount Points"] = new((station.Mounts.Count > 0) ? string.Join('\n', station.Mounts.Select(x => $"- {Crypto.Decrypt(x.Name)}: {Crypto.Decrypt(x.Mount)}")) : "No Mount Points added")
+                ["Station Name"] = new(stationName),
+                ["Station ID"] = new(stationId),
+                ["Station Api Key"] = new(stationApiKey),
+                ["Station Admin Role"] = new(stationAdminRole),
+                ["Station DJ Role"] = new(stationDjRole),
+                ["Music Requests Channel"] = new(requestsChannel),
+                ["Prefer HLS Streaming"] = new(preferHls),
+                ["Show Playlist In Now Playing"] = new(showPlaylist),
+                ["Automatic Checks"] = new($"- File Changes: {fileChanges}"),
+                ["Mount Points"] = new(mounts)
             };
 
             embeds.Add(CreateBasicEmbed(stationTitle, string.Empty, DiscordColor.White, null, null, null, fields));

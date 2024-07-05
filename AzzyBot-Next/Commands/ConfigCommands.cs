@@ -350,7 +350,17 @@ public sealed class ConfigCommands
             if (guild.AzuraCast is not null)
             {
                 AzuraCastEntity azuraCast = guild.AzuraCast;
-                IReadOnlyList<DiscordEmbed> azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(azuraCast);
+                Dictionary<ulong, string> stationRoles = [];
+                foreach (AzuraCastStationEntity station in azuraCast.Stations)
+                {
+                    DiscordRole? stationAdminRole = context.Guild.GetRole(station.StationAdminRoleId);
+                    DiscordRole? stationDjRole = context.Guild.GetRole(station.StationDjRoleId);
+                    stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? string.Empty);
+                    stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? string.Empty);
+                }
+
+                DiscordRole? instanceAdminRole = context.Guild.GetRole(azuraCast.InstanceAdminRoleId);
+                IReadOnlyList<DiscordEmbed> azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(azuraCast, $"{instanceAdminRole?.Name} ({instanceAdminRole?.Id})", stationRoles);
 
                 messageBuilder.AddEmbeds(azuraEmbed);
             }
