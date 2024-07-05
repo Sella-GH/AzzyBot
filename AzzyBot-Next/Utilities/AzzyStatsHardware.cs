@@ -13,6 +13,7 @@ public static class AzzyStatsHardware
 {
     public static bool CheckIfDocker => Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER", EnvironmentVariableTarget.Process) == "true";
     public static bool CheckIfLinuxOs => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+    public static bool CheckIfMacOs => RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
     public static bool CheckIfWindowsOs => RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
     public static async Task<Dictionary<int, double>> GetSystemCpuAsync()
@@ -140,7 +141,7 @@ public static class AzzyStatsHardware
         return result;
     }
 
-    public static async Task<CpuLoadRecord> GetSystemCpuLoadAsync()
+    public static async Task<AzzyCpuLoadRecord> GetSystemCpuLoadAsync()
     {
         string loadInfoLines = await File.ReadAllTextAsync(Path.Combine("/proc", "loadavg"));
         string[] loadInfoParts = loadInfoLines.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -151,7 +152,7 @@ public static class AzzyStatsHardware
         return new(oneMin, fiveMin, fifteenMin);
     }
 
-    public static DiskUsageRecord GetSystemDiskUsage()
+    public static AzzyDiskUsageRecord GetSystemDiskUsage()
     {
         foreach (DriveInfo drive in DriveInfo.GetDrives().Where(d => d.IsReady && d.Name == "/"))
         {
@@ -165,7 +166,7 @@ public static class AzzyStatsHardware
         return new(0, 0, 0);
     }
 
-    public static async Task<MemoryUsageRecord> GetSystemMemoryUsageAsync()
+    public static async Task<AzzyMemoryUsageRecord> GetSystemMemoryUsageAsync()
     {
         string[] memoryInfoLines = await File.ReadAllLinesAsync(Path.Combine("/proc", "meminfo"));
         long memTotalKb = 0;
@@ -204,15 +205,15 @@ public static class AzzyStatsHardware
         return new(memTotalGb, memUsedGb);
     }
 
-    public static async Task<Dictionary<string, NetworkSpeedRecord>> GetSystemNetworkUsageAsync()
+    public static async Task<Dictionary<string, AzzyNetworkSpeedRecord>> GetSystemNetworkUsageAsync()
     {
         const int delayInMs = 1000;
         const int bytesPerKbit = 125;
 
-        static async Task<Dictionary<string, NetworkStatsRecord>> ReadNetworkStatsAsync()
+        static async Task<Dictionary<string, AzzyNetworkStatsRecord>> ReadNetworkStatsAsync()
         {
             string[] lines = await File.ReadAllLinesAsync(Path.Combine("/proc", "net", "dev"));
-            Dictionary<string, NetworkStatsRecord> networkStats = [];
+            Dictionary<string, AzzyNetworkStatsRecord> networkStats = [];
 
             for (int i = 2; i < lines.Length; i++)
             {
@@ -231,12 +232,12 @@ public static class AzzyStatsHardware
             return networkStats;
         }
 
-        Dictionary<string, NetworkStatsRecord> prevNetworkStats = await ReadNetworkStatsAsync();
+        Dictionary<string, AzzyNetworkStatsRecord> prevNetworkStats = await ReadNetworkStatsAsync();
         await Task.Delay(delayInMs);
-        Dictionary<string, NetworkStatsRecord> currNetworkStats = await ReadNetworkStatsAsync();
+        Dictionary<string, AzzyNetworkStatsRecord> currNetworkStats = await ReadNetworkStatsAsync();
 
-        Dictionary<string, NetworkSpeedRecord> networkSpeeds = [];
-        foreach (KeyValuePair<string, NetworkStatsRecord> kvp in prevNetworkStats)
+        Dictionary<string, AzzyNetworkSpeedRecord> networkSpeeds = [];
+        foreach (KeyValuePair<string, AzzyNetworkStatsRecord> kvp in prevNetworkStats)
         {
             string networkName = kvp.Key;
             double rxSpeedKbits = (currNetworkStats[networkName].Received - kvp.Value.Received) * 8.0 / bytesPerKbit / (delayInMs / 1000.0);
@@ -248,7 +249,7 @@ public static class AzzyStatsHardware
         return networkSpeeds;
     }
 
-    public static string GetSystemOs => Environment.OSVersion.VersionString;
+    public static string GetSystemOs => RuntimeInformation.OSDescription;
     public static string GetSystemOsArch => RuntimeInformation.OSArchitecture.ToString();
     public static DateTime GetSystemUptime => DateTime.Now.AddMilliseconds(-Environment.TickCount64);
 }

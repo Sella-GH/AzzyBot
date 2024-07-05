@@ -20,13 +20,15 @@ body :
         - "1.9.x"
         - "1.10.x"
         - "2.0.0-preview1"
+        - "2.0.0-preview1.1"
+        - "2.0.0-preview2"
     validations :
       required : true
 
   - type : dropdown
     id : deploy-version
     attributes :
-      label : "Deployement version"
+      label : "Deployement Version"
       description : "Which deployement version are you using?"
       options :
         - Docker
@@ -37,7 +39,7 @@ body :
   - type : dropdown
     id : operating-system
     attributes :
-      label : "Operating system"
+      label : "Operating System"
       description : "Which operating system are you using?"
       options :
         - Linux
@@ -45,6 +47,15 @@ body :
         - Windows
     validations :
       required : true
+
+  - type: input
+    id: operating-system-version
+    attributes:
+      label: "Operating System Version"
+      description: "Which version of the operating system are you using?"
+      plaeceholder: "e.g. Windows 11 Pro 23H2 Build 22635.3790 (use winver) // Debian 12.5 // MacOs 14.5"
+    validations:
+      required: true
 
   - type : dropdown
     id : operating-system-arch
@@ -60,16 +71,17 @@ body :
   - type : input
     id : bug-description
     attributes :
-     label : "Describe the bug"
-     description : "A clear and concise description of what the bug is."
+     label : "Describe The Bug"
+     description : "A clear and concise description of what the bug is.\nPlease make sure to provide as much information as possible."
+     placeholder : "The bot crashes when [...]"
     validations :
      required : true
 
   - type : textarea
     id : bug-reproducing
     attributes :
-     label : "To reproduce"
-     description : "Steps to reproduce the behavior."
+     label : "Reproduction Steps"
+     description : "Steps to reproduce the behavior.\nIf applicable, add screenshots to help explain your issue"
      placeholder : |
       1. Go to "..."
       2. Click on "..."
@@ -78,25 +90,20 @@ body :
     validations :
       required : true
 
-  - type : input
+  - type : textarea
     id : expected-behavior
     attributes :
-     label : "Expected behavior"
-     description : "A clear and concise description of what you expected to happen."
+     label : "Expected Behavior"
+     description : "A clear and concise description of what you expected to happen.\nPlease make sure to provide as much information as possible."
+     placeholder : "I expected the bot to [...]"
     validations :
-     required : true
-
-  - type : textarea
-    id : screenshots
-    attributes :
-     label : "Screenshots"
-     description : "If applicable, add screenshots to help explain your issue."
+     required : true"
 
   - type : textarea
     id : logs
     attributes :
-     label : "Relevant log output"
-     description : "If applicable, add relevant log output to help explain your issue."
+     label : "Relevant Log Output"
+     description : "If applicable, add relevant log output of the logging file to help explain your issue.\nPlease make sure to remove any sensitive information."
      render : shell
       
   - type : textarea
@@ -104,3 +111,4 @@ body :
     attributes :
      label : "Additional information"
      description : "Add additional information if you want to provide some."
+     placeholder : "I've also noticed that [...]"

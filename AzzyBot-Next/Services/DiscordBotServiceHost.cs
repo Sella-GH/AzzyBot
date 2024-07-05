@@ -4,14 +4,17 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Commands;
+using AzzyBot.Commands.Checks;
 using AzzyBot.Commands.Converters;
 using AzzyBot.Database;
+using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
 using AzzyBot.Settings;
 using AzzyBot.Utilities;
 using DSharpPlus;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.EventArgs;
+using DSharpPlus.Commands.Exceptions;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
@@ -134,16 +137,30 @@ public sealed class DiscordBotServiceHost : IHostedService
 
         commandsExtension.CommandErrored += CommandErroredAsync;
 
-        // These commands are for every server
-        commandsExtension.AddCommands(typeof(ConfigCommands.ConfigGroup));
-        commandsExtension.AddCommands(typeof(CoreCommands.CoreGroup));
-
         // Only add admin commands to the main server
         commandsExtension.AddCommand(typeof(AdminCommands.AdminGroup), _settings.ServerId);
 
+        // These commands are for every server
+        commandsExtension.AddCommands(typeof(AzuraCastCommands.AzuraCastGroup));
+        commandsExtension.AddCommands(typeof(AzuraCastCommands.DjGroup));
+        commandsExtension.AddCommands(typeof(AzuraCastCommands.MusicGroup));
+        commandsExtension.AddCommands(typeof(ConfigCommands.ConfigGroup));
+        commandsExtension.AddCommands(typeof(CoreCommands.CoreGroup));
+
         // Only add debug commands if it's a dev build
-        if (AzzyStatsSoftware.GetBotName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase))
-            commandsExtension.AddCommands(typeof(DebugCommands.DebugGroup), _settings.ServerId);
+        if (AzzyStatsSoftware.GetBotEnvironment == Environments.Development)
+        {
+            List<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
+            List<ulong> debugGuilds = guilds.Where(g => g.IsDebugAllowed).Select(g => g.UniqueId).ToList();
+            if (!debugGuilds.Contains(_settings.ServerId))
+                debugGuilds.Add(_settings.ServerId);
+
+            commandsExtension.AddCommands(typeof(DebugCommands.DebugGroup), [.. debugGuilds]);
+        }
+
+        commandsExtension.AddCheck<AzuraCastDiscordPermCheck>();
+        commandsExtension.AddCheck<AzuraCastOnlineCheck>();
+        commandsExtension.AddCheck<ModuleActivatedCheck>();
 
         SlashCommandProcessor slashCommandProcessor = new();
         slashCommandProcessor.AddConverter<Uri>(new UriArgumentConverter());
@@ -184,6 +201,7 @@ public sealed class DiscordBotServiceHost : IHostedService
     private async Task CommandErroredAsync(CommandsExtension c, CommandErroredEventArgs e)
     {
         _logger.CommandsError();
+        _logger.CommandsErrorType(e.Exception.GetType().Name);
 
         if (_botService is null)
             return;
@@ -200,13 +218,19 @@ public sealed class DiscordBotServiceHost : IHostedService
             return;
         }
 
-        if (ex is DiscordException)
+        switch (ex)
         {
-            await _botService.LogExceptionAsync(ex, now, slashContext, guildId, ((DiscordException)e.Exception).JsonMessage);
-        }
-        else
-        {
-            await _botService.LogExceptionAsync(ex, now, slashContext, guildId);
+            case ChecksFailedException checksFailed:
+                await _botService.RespondToChecksExceptionAsync(checksFailed, slashContext);
+                break;
+
+            case DiscordException:
+                await _botService.LogExceptionAsync(ex, now, slashContext, guildId, ((DiscordException)e.Exception).JsonMessage);
+                break;
+
+            default:
+                await _botService.LogExceptionAsync(ex, now, slashContext, guildId);
+                break;
         }
     }
 

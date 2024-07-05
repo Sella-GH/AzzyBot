@@ -28,7 +28,9 @@ public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings, DbActio
         IEnumerable<DiscordUser> botOwners = context.Client.CurrentApplication.Owners ?? throw new InvalidOperationException("Invalid bot owners");
         ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Invalid guild id");
         DiscordMember member = context.Member ?? throw new InvalidOperationException("Invalid member");
-        GuildsEntity guild = await _dbActions.GetGuildAsync(guildId);
+        GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId);
+        if (guild is null)
+            return results;
 
         bool adminServer = false;
         foreach (DiscordUser _ in botOwners.Where(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId))

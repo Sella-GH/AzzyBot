@@ -16,9 +16,12 @@ public static class AzzyHelp
         return command switch
         {
             "admin" => adminServer,
+            "azuracast" => permissions.HasPermission(DiscordPermissions.Administrator),
             "config" => permissions.HasPermission(DiscordPermissions.Administrator),
             "core" => true,
             "debug" => approvedDebug && permissions.HasPermission(DiscordPermissions.Administrator),
+            "dj" => true,
+            "music" => true,
             _ => false,
         };
     }
@@ -37,47 +40,65 @@ public static class AzzyHelp
         ArgumentOutOfRangeException.ThrowIfZero(commands.Count, nameof(commands));
         ArgumentException.ThrowIfNullOrWhiteSpace(commandName, nameof(commandName));
 
-        return GetCommandGroups(commands, adminServer, approvedDebug, member).FirstOrDefault(r => r.Value.Any(c => c.Name == commandName)).Value.FirstOrDefault() ?? throw new InvalidOperationException("Command not found");
+        return GetCommandGroups(commands, adminServer, approvedDebug, member, true).FirstOrDefault(r => r.Value.Any(c => c.Name == commandName)).Value.FirstOrDefault() ?? throw new InvalidOperationException("Command not found");
     }
 
-    private static Dictionary<string, List<AzzyHelpRecord>> GetCommandGroups(IReadOnlyDictionary<string, Command> commands, bool adminServer, bool approvedDebug, DiscordMember member)
+    private static Dictionary<string, List<AzzyHelpRecord>> GetCommandGroups(IReadOnlyDictionary<string, Command> commands, bool adminServer, bool approvedDebug, DiscordMember member, bool singleCommand = false)
     {
         List<string> commandGroups = commands.Where(c => c.Value.Subcommands.Count > 0 && CheckIfMemberHasPermission(adminServer, approvedDebug, member, c.Value.Name)).Select(c => c.Value.Name).ToList();
         Dictionary<string, List<AzzyHelpRecord>> records = [];
         foreach (string group in commandGroups)
         {
-            records.Add(group, GetCommands(commands[group].Subcommands, group));
+            Command command = commands[group];
+            List<AzzyHelpRecord> subCommands = GetCommands(command.Subcommands.Where(c => c.Description is not "No description provided.").ToList(), command.Name, singleCommand);
+            foreach (Command subCommand in command.Subcommands.Where(c => c.Subcommands.Count > 0))
+            {
+                subCommands.AddRange(GetCommands(subCommand.Subcommands, command.Name, singleCommand));
+            }
+
+            records.Add(group, subCommands);
         }
 
         return records;
     }
 
-    private static List<AzzyHelpRecord> GetCommands(IReadOnlyList<Command> commands, string subCommand = "")
+    private static List<AzzyHelpRecord> GetCommands(IReadOnlyList<Command> commands, string subCommand = "", bool singleCommand = false)
     {
         List<AzzyHelpRecord> records = [];
         foreach (Command command in commands)
         {
-            string description = command.Description ?? "No description provided";
+            string description = command.Description ?? "No description provided.";
             Dictionary<string, string> parameters = [];
-            foreach (CommandParameter parameter in command.Parameters)
-            {
-                string paramName = parameter.Name ?? "No name provided";
-                string paramDescription = parameter.Description ?? "No description provided";
-                if (parameter.DefaultValue.HasValue)
-                {
-                    paramName += " (optional)";
-                }
-                else
-                {
-                    paramName += " (required)";
-                }
-
-                parameters.Add(paramName, paramDescription);
-            }
+            if (singleCommand)
+                parameters = GetCommandParameters(command);
 
             records.Add(new AzzyHelpRecord(subCommand, command.FullName, description, parameters));
         }
 
         return records;
+    }
+
+    private static Dictionary<string, string> GetCommandParameters(Command command)
+    {
+        ArgumentNullException.ThrowIfNull(command, nameof(command));
+
+        Dictionary<string, string> parameters = [];
+        foreach (CommandParameter parameter in command.Parameters)
+        {
+            string paramName = parameter.Name ?? "No name provided";
+            string paramDescription = parameter.Description ?? "No description provided.";
+            if (parameter.DefaultValue.HasValue)
+            {
+                paramName += " (optional)";
+            }
+            else
+            {
+                paramName += " (required)";
+            }
+
+            parameters.Add(paramName, paramDescription);
+        }
+
+        return parameters;
     }
 }

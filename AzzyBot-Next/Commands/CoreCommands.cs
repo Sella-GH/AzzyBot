@@ -29,7 +29,7 @@ public sealed class CoreCommands
         private readonly DbActions _dbActions = dbActions;
         private readonly ILogger<CoreGroup> _logger = logger;
 
-        [Command("help"), Description("Gives an overview about all the available commands.")]
+        [Command("help"), Description("Gives you an overview about all the available commands.")]
         public async ValueTask HelpAsync
             (
             CommandContext context,
@@ -45,7 +45,12 @@ public sealed class CoreCommands
             IEnumerable<DiscordUser> botOwners = context.Client.CurrentApplication.Owners ?? throw new InvalidOperationException("Invalid bot owners");
             ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Invalid guild id");
             DiscordMember member = context.Member ?? throw new InvalidOperationException("Invalid member");
-            GuildsEntity guild = await _dbActions.GetGuildAsync(guildId);
+            GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId);
+            if (guild is null)
+            {
+                await context.EditResponseAsync("Server not found in database.");
+                return;
+            }
 
             bool adminServer = false;
             foreach (DiscordUser _ in botOwners.Where(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId))

@@ -1,11 +1,11 @@
 ﻿namespace AzzyBot.Utilities.Records;
 
-public sealed record MemoryUsageRecord
+public sealed record AzzyMemoryUsageRecord
 {
     public double Total { get; init; }
     public double Used { get; init; }
 
-    public MemoryUsageRecord(double total, double used)
+    public AzzyMemoryUsageRecord(double total, double used)
     {
         Total = total;
         Used = used;

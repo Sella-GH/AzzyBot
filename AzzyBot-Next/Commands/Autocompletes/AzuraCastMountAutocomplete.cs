@@ -8,7 +8,6 @@ using AzzyBot.Database.Entities;
 using AzzyBot.Utilities.Encryption;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
-using DSharpPlus.Entities;
 
 namespace AzzyBot.Commands.Autocompletes;
 
@@ -25,10 +24,21 @@ public sealed class AzuraCastMountAutocomplete(DbActions dbActions) : IAutoCompl
         if (stationId == 0)
             return new Dictionary<string, object>();
 
-        List<AzuraCastMountEntity> mountsInDb = await _dbActions.GetAzuraCastMountsAsync(context.Guild.Id, stationId);
-
+        // TODO Solve this more clean and nicer when it's possible
         Dictionary<string, object> results = [];
-        foreach (AzuraCastMountEntity mount in mountsInDb)
+        List<AzuraCastStationMountEntity> mountsInDb;
+        try
+        {
+            mountsInDb = await _dbActions.GetAzuraCastStationMountsAsync(context.Guild.Id, stationId);
+            if (mountsInDb.Count is 0)
+                return results;
+        }
+        catch (InvalidOperationException)
+        {
+            return results;
+        }
+
+        foreach (AzuraCastStationMountEntity mount in mountsInDb)
         {
             results.Add(Crypto.Decrypt(mount.Name), mount.Id);
         }

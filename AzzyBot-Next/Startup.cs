@@ -14,16 +14,24 @@ public static class Startup
         string environment = AzzyStatsSoftware.GetBotEnvironment;
         bool isDev = environment == Environments.Development;
         bool isDocker = AzzyStatsHardware.CheckIfDocker;
-        bool forceDebug;
+        bool forceDebug = (isDocker) ? (Environment.GetEnvironmentVariable("FORCE_DEBUG") == "true") : (args?.Length > 0 && args[0] is "-forceDebug");
 
         if (isDocker)
         {
-            forceDebug = Environment.GetEnvironmentVariable("FORCE_DEBUG") == "true";
+            // Give the database time to start up
+            await Task.Delay(TimeSpan.FromSeconds(30));
         }
-        else
+
+        // https://stackoverflow.com/a/71786309
+        // It works!
+        /*
+        if (AzzyStatsHardware.CheckIfMacOs && (!isDev || isDocker))
         {
-            forceDebug = args?.Length > 0 && args[0] is "-forceDebug";
+            await Console.Error.WriteLineAsync("This bot does not support macOS.");
+            await Console.Error.WriteLineAsync("Please use another platform for it, as this one can't handle the security requirements of the AES encryption standard.");
+            return;
         }
+        */
 
         HostApplicationBuilderSettings appSettings = new()
         {
@@ -46,12 +54,6 @@ public static class Startup
         appBuilder.Services.AzzyBotServices();
 
         #endregion Add services
-
-        if (isDocker)
-        {
-            // Give the database time to start up
-            await Task.Delay(TimeSpan.FromSeconds(3));
-        }
 
         using IHost app = appBuilder.Build();
         app.ApplyDbMigrations();

@@ -6,12 +6,15 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using AzzyBot.Commands.Checks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
 using AzzyBot.Settings;
 using AzzyBot.Utilities;
 using DSharpPlus;
+using DSharpPlus.Commands.ContextChecks;
+using DSharpPlus.Commands.Exceptions;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
@@ -78,6 +81,17 @@ public sealed class DiscordBotService
         return member;
     }
 
+    public DiscordRole? GetDiscordRole(ulong guildId, ulong roleId)
+    {
+        DiscordGuild? guild = GetDiscordGuild(guildId);
+        DiscordRole? role = null;
+
+        if (guild is not null)
+            role = guild.GetRole(roleId);
+
+        return role;
+    }
+
     public async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, ulong guildId = 0, string? info = null)
     {
         ArgumentNullException.ThrowIfNull(ex, nameof(ex));
@@ -105,7 +119,9 @@ public sealed class DiscordBotService
         }
         else if (guildId is not 0)
         {
-            GuildsEntity guild = await _db.GetGuildAsync(guildId);
+            GuildsEntity? guild = await _db.GetGuildAsync(guildId);
+            if (guild is null)
+                return false;
 
             if (guild.ErrorChannelId is not 0)
                 errorChannelId = guild.ErrorChannelId;
@@ -135,7 +151,7 @@ public sealed class DiscordBotService
             if (!messageSent)
                 _logger.UnableToSendMessage("Error message was not sent");
 
-            FileOperations.DeleteTempFilePath(tempFilePath);
+            FileOperations.DeleteFile(tempFilePath);
 
             return true;
         }
@@ -184,7 +200,9 @@ public sealed class DiscordBotService
         }
         else if (guildId is not 0)
         {
-            GuildsEntity guild = await _db.GetGuildAsync(guildId);
+            GuildsEntity? guild = await _db.GetGuildAsync(guildId);
+            if (guild is null)
+                return false;
 
             if (guild.ErrorChannelId is not 0)
                 errorChannelId = guild.ErrorChannelId;
@@ -218,7 +236,7 @@ public sealed class DiscordBotService
             if (!messageSent)
                 _logger.UnableToSendMessage("Error message was not sent");
 
-            FileOperations.DeleteTempFilePath(tempFilePath);
+            FileOperations.DeleteFile(tempFilePath);
 
             return true;
         }
@@ -232,6 +250,79 @@ public sealed class DiscordBotService
         }
 
         return false;
+    }
+
+    public async Task RespondToChecksExceptionAsync(ChecksFailedException ex, SlashCommandContext context)
+    {
+        ArgumentNullException.ThrowIfNull(ex, nameof(ex));
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+
+        if (!CheckIfClientIsConnected)
+            return;
+
+        bool breakLoop = false;
+        foreach (ContextCheckFailedData data in ex.Errors)
+        {
+            if (breakLoop)
+                break;
+
+            switch (data.ContextCheckAttribute)
+            {
+                case AzuraCastDiscordPermCheckAttribute:
+                    string message = "You don't have the required permissions to execute this command!\nPlease contact {0}.";
+                    string[] info = data.ErrorMessage.Split(':');
+                    AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id);
+                    if (azuraCast is null)
+                    {
+                        await context.EditResponseAsync($"AzuraCast is not configured for this server!\nPlease contact {context.Guild.Owner.Mention}.");
+                        breakLoop = true;
+                        break;
+                    }
+
+                    if (info.Length is 2 && info[0] is "Instance")
+                    {
+                        message = message.Replace("{0}", $"<@&{azuraCast.InstanceAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
+                    }
+                    else if (info.Length is 3)
+                    {
+                        AzuraCastStationEntity? station = azuraCast.Stations.FirstOrDefault(s => s.StationId == Convert.ToInt32(info[1], CultureInfo.InvariantCulture));
+                        if (station is null)
+                        {
+                            await context.EditResponseAsync($"The station with ID {info[1]} does not exist!\nPlease contact @<{azuraCast.InstanceAdminRoleId}>.");
+                            breakLoop = true;
+                            break;
+                        }
+
+                        if (info[0] is "Admin")
+                        {
+                            message = message.Replace("{0}", $"<@&{station.StationAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
+                        }
+                        else if (info[0] is "DJ")
+                        {
+                            message = message.Replace("{0}", $"<@&{station.StationDjRoleId}>", StringComparison.OrdinalIgnoreCase);
+                        }
+                    }
+
+                    await context.EditResponseAsync(message);
+                    break;
+
+                case AzuraCastOnlineCheckAttribute:
+                    await context.EditResponseAsync($"The AzuraCast instance is currently offline!\nPlease contact {context.Guild.Owner.Mention}.");
+                    breakLoop = true;
+                    break;
+
+                case ModuleActivatedCheckAttribute:
+                    await context.EditResponseAsync("This module is not activated, you are unable to use commands from it.");
+                    breakLoop = true;
+                    break;
+
+                default:
+                    await AcknowledgeExceptionAsync(context);
+                    breakLoop = true;
+                    break;
+            }
+        }
     }
 
     public async Task<bool> SendMessageAsync(ulong channelId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, IMention[]? mentions = null)
@@ -305,7 +396,7 @@ public sealed class DiscordBotService
 
             foreach (string path in filePaths)
             {
-                FileOperations.DeleteTempFilePath(path);
+                FileOperations.DeleteFile(path);
             }
         }
 

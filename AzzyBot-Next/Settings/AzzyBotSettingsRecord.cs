@@ -9,6 +9,7 @@ public sealed record AzzyBotSettingsRecord
     public required ulong ServerId { get; init; }
     public required ulong ErrorChannelId { get; init; }
     public required ulong NotificationChannelId { get; init; }
+    public required int LogRetentionDays { get; init; }
     public DatabaseSettings? Database { get; init; }
     public DiscordStatus? DiscordStatus { get; init; }
     public required CoreUpdater Updater { get; init; }

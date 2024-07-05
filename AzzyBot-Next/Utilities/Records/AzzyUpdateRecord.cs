@@ -2,7 +2,7 @@
 
 namespace AzzyBot.Utilities.Records;
 
-public sealed record UpdateRecord
+public sealed record AzzyUpdateRecord
 {
     [JsonPropertyName("name")]
     public required string Name { get; init; }
