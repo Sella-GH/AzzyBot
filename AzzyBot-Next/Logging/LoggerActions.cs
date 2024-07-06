@@ -68,8 +68,8 @@ public static partial class LoggerActions
     [LoggerMessage(101, LogLevel.Information, "AzzyBot is ready to accept commands")]
     public static partial void BotReady(this ILogger<DiscordBotServiceHost> logger);
 
-    [LoggerMessage(102, LogLevel.Information, "Invite me using the following url: https://discord.com/api/oauth2/authorize?client_id={id}&permissions=268438528&scope=applications.commands%20bot")]
-    public static partial void InviteUrl(this ILogger<DiscordBotServiceHost> logger, ulong id);
+    [LoggerMessage(102, LogLevel.Information, "Invite me using the following url: {invite}")]
+    public static partial void InviteUrl(this ILogger<DiscordBotServiceHost> logger, string invite);
 
     [LoggerMessage(103, LogLevel.Information, "Command {command} requested by {user} to execute")]
     public static partial void CommandRequested(this ILogger logger, string command, string user);
