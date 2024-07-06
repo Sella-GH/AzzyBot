@@ -133,7 +133,7 @@ jobs:
         uses: kzrnm/get-net-sdk-project-versions-action@v2
         id: get-version
         with:
-          proj-path: AzzyBot-Next/AzzyBot-Next.csproj
+          proj-path: src/AzzyBot-Next/AzzyBot-Next.csproj
 
       - name: Set version
         id: set-version
