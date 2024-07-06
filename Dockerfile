@@ -2,8 +2,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim AS build
 USER root
 RUN apt update && apt upgrade -y && apt autoremove -y
-WORKDIR /src
-COPY ./AzzyBot-Next ./
+WORKDIR /build
+COPY ./src/AzzyBot-Next ./
 RUN dotnet restore ./AzzyBot-Next.csproj
 ARG ARCH
 ARG CONFIG
@@ -20,7 +20,7 @@ RUN apt install -y --no-install-recommends iputils-ping
 
 # Copy the built app
 WORKDIR /app
-COPY --from=build /src/out .
+COPY --from=build /build/out .
 
 # Add commit, timestamp and lines of code
 ARG COMMIT
