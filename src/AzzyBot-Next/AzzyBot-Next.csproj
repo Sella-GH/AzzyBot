@@ -13,7 +13,7 @@
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <Authors>Sella-GH, AzzyBot Contributors</Authors>
-    <Version>2.0.0-preview1.1</Version>
+    <Version>2.0.0-preview2</Version>
     <Copyright>© 2024 - $(Authors)</Copyright>
     <Product>AzzyBot-Next</Product>
     <Description>Kind of music bot for discord, written in C# and with DSharpPlus. This bot is dedicated for the use with AzuraCast and does not work at it's fully glory without it.</Description>
