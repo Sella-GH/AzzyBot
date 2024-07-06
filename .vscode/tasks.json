@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/AzzyBot/AzzyBot.csproj"
+                "${workspaceFolder}/src/AzzyBot/AzzyBot.csproj"
             ],
             "problemMatcher": "$msCompile"
         },
@@ -17,7 +17,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/AzzyBot-Next/AzzyBot-Next.csproj"
+                "${workspaceFolder}/src/AzzyBot-Next/AzzyBot-Next.csproj"
             ],
             "problemMatcher": "$msCompile"
         }
