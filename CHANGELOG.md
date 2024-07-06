@@ -1,3 +1,14 @@
+## 2.0.0-preview3
+### Breaking Changes
+- The database has switched from MariaDB to PostgreSQL
+  - You already know what that means (DATA DELETION)
+  - Please clean your docker system too after you shut down the bot
+    - docker system prune -a -f --volumes
+    - docker volume prune -a -f
+
+### Fixes
+- `azuracast update-instace` says the station is already up-to-date but it's not
+
 ## 2.0.0-preview2
 ### Breaking Changes
 - Your Database needs a complete reset, please DROP it and start from scratch
