@@ -44,7 +44,7 @@ jobs:
       
      - name: Publish Debug
        run: |
-         dotnet publish /home/runner/work/AzzyBot/AzzyBot/AzzyBot-Next/AzzyBot-Next.csproj -c Debug -r ${{ matrix.os }}-${{ matrix.arch }}
+         dotnet publish /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot-Next/AzzyBot-Next.csproj -c Debug -r ${{ matrix.os }}-${{ matrix.arch }}
 
      #- name: Download and extract Lavalink
      #  run: |
@@ -102,11 +102,11 @@ jobs:
          mv ./SECURITY.md ./docker-zip/SECURITY.md
          mkdir -p ./docker-zip/AzzyBot/Modules/AzuraCast/Files
          #mkdir -p ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins
-         #mv ./AzzyBot/Modules/MusicStreaming/Files/application.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/application.yml
-         #mv ./AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
+         #mv ./src/AzzyBot/Modules/MusicStreaming/Files/application.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/application.yml
+         #mv ./src/AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
          #wget -qO ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
          mkdir -p ./docker-zip/AzzyBot-Next/Settings
-         mv ./AzzyBot-Next/Settings/AzzyBotSettings.json ./docker-zip/AzzyBot-Next/Settings/AzzyBotSettings.json
+         mv ./src/AzzyBot-Next/Settings/AzzyBotSettings.json ./docker-zip/AzzyBot-Next/Settings/AzzyBotSettings.json
 
      - name: Archive docker-zip artifact
        uses: actions/upload-artifact@v4

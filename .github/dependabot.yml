@@ -32,7 +32,7 @@ updates:
     open-pull-requests-limit: 25
 
   - package-ecosystem: "nuget" # See documentation for possible values
-    directory: "/AzzyBot" # Location of package manifests
+    directory: "/src/AzzyBot" # Location of package manifests
     schedule:
       interval: "daily"
     assignees:
@@ -90,7 +90,7 @@ updates:
     open-pull-requests-limit: 25
 
   - package-ecosystem: "nuget" # See documentation for possible values
-    directory: "/AzzyBot-Next" # Location of package manifests
+    directory: "/src/AzzyBot-Next" # Location of package manifests
     schedule:
       interval: "daily"
     assignees:
