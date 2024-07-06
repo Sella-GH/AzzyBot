@@ -1,6 +1,6 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -12,43 +12,37 @@ namespace AzzyBot.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterDatabase()
-                .Annotation("MySql:CharSet", "utf8mb4");
-
             migrationBuilder.CreateTable(
                 name: "Guilds",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    UniqueId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
-                    AdminRoleId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
-                    AdminNotifyChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
-                    ErrorChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
-                    IsDebugAllowed = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    ConfigSet = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UniqueId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
+                    AdminRoleId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
+                    AdminNotifyChannelId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
+                    ErrorChannelId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
+                    IsDebugAllowed = table.Column<bool>(type: "boolean", nullable: false),
+                    ConfigSet = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Guilds", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
+                });
 
             migrationBuilder.CreateTable(
                 name: "AzuraCast",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    BaseUrl = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    AdminApiKey = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    InstanceAdminRoleId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
-                    NotificationChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
-                    OutagesChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
-                    IsOnline = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    GuildId = table.Column<int>(type: "int", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    BaseUrl = table.Column<string>(type: "text", nullable: false),
+                    AdminApiKey = table.Column<string>(type: "text", nullable: false),
+                    InstanceAdminRoleId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
+                    NotificationChannelId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
+                    OutagesChannelId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
+                    IsOnline = table.Column<bool>(type: "boolean", nullable: false),
+                    GuildId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -58,19 +52,18 @@ namespace AzzyBot.Migrations
                         column: x => x.GuildId,
                         principalTable: "Guilds",
                         principalColumn: "Id");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
+                });
 
             migrationBuilder.CreateTable(
                 name: "AzuraCastChecks",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    ServerStatus = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    Updates = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    UpdatesShowChangelog = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    AzuraCastId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ServerStatus = table.Column<bool>(type: "boolean", nullable: false),
+                    Updates = table.Column<bool>(type: "boolean", nullable: false),
+                    UpdatesShowChangelog = table.Column<bool>(type: "boolean", nullable: false),
+                    AzuraCastId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -81,27 +74,24 @@ namespace AzzyBot.Migrations
                         principalTable: "AzuraCast",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
+                });
 
             migrationBuilder.CreateTable(
                 name: "AzuraCastStations",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    StationId = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ApiKey = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    StationAdminRoleId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
-                    StationDjRoleId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
-                    RequestsChannelId = table.Column<ulong>(type: "bigint unsigned", nullable: false),
-                    PreferHls = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    ShowPlaylistInNowPlaying = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    LastSkipTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    AzuraCastId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    StationId = table.Column<int>(type: "integer", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    ApiKey = table.Column<string>(type: "text", nullable: false),
+                    StationAdminRoleId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
+                    StationDjRoleId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
+                    RequestsChannelId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
+                    PreferHls = table.Column<bool>(type: "boolean", nullable: false),
+                    ShowPlaylistInNowPlaying = table.Column<bool>(type: "boolean", nullable: false),
+                    LastSkipTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    AzuraCastId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -112,17 +102,16 @@ namespace AzzyBot.Migrations
                         principalTable: "AzuraCast",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
+                });
 
             migrationBuilder.CreateTable(
                 name: "AzuraCastStationChecks",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    FileChanges = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    StationId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    FileChanges = table.Column<bool>(type: "boolean", nullable: false),
+                    StationId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -133,20 +122,17 @@ namespace AzzyBot.Migrations
                         principalTable: "AzuraCastStations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
+                });
 
             migrationBuilder.CreateTable(
                 name: "AzuraCastStationMounts",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Mount = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    StationId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Mount = table.Column<string>(type: "text", nullable: false),
+                    StationId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -157,8 +143,7 @@ namespace AzzyBot.Migrations
                         principalTable: "AzuraCastStations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AzuraCast_GuildId",

@@ -3,16 +3,16 @@ using System;
 using AzzyBot.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace AzzyBot.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20240704193600_InitialCreation")]
+    [Migration("20240706180132_InitialCreation")]
     partial class InitialCreation
     {
         /// <inheritdoc />
@@ -21,29 +21,29 @@ namespace AzzyBot.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.6")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("AzzyBot.Database.Entities.AzuraCastChecksEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<int>("AzuraCastId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<bool>("ServerStatus")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("Updates")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("UpdatesShowChangelog")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.HasKey("Id");
 
@@ -57,32 +57,32 @@ namespace AzzyBot.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("AdminApiKey")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("BaseUrl")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int?>("GuildId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    b.Property<ulong>("InstanceAdminRoleId")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("InstanceAdminRoleId")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<bool>("IsOnline")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
-                    b.Property<ulong>("NotificationChannelId")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("NotificationChannelId")
+                        .HasColumnType("numeric(20,0)");
 
-                    b.Property<ulong>("OutagesChannelId")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("OutagesChannelId")
+                        .HasColumnType("numeric(20,0)");
 
                     b.HasKey("Id");
 
@@ -96,15 +96,15 @@ namespace AzzyBot.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("FileChanges")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
                     b.Property<int>("StationId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -118,41 +118,41 @@ namespace AzzyBot.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ApiKey")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("AzuraCastId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("LastSkipTime")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<bool>("PreferHls")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
-                    b.Property<ulong>("RequestsChannelId")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("RequestsChannelId")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<bool>("ShowPlaylistInNowPlaying")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
-                    b.Property<ulong>("StationAdminRoleId")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("StationAdminRoleId")
+                        .HasColumnType("numeric(20,0)");
 
-                    b.Property<ulong>("StationDjRoleId")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("StationDjRoleId")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<int>("StationId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -165,20 +165,20 @@ namespace AzzyBot.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Mount")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("text");
 
                     b.Property<int>("StationId")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -191,27 +191,27 @@ namespace AzzyBot.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<ulong>("AdminNotifyChannelId")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("AdminNotifyChannelId")
+                        .HasColumnType("numeric(20,0)");
 
-                    b.Property<ulong>("AdminRoleId")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("AdminRoleId")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<bool>("ConfigSet")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
-                    b.Property<ulong>("ErrorChannelId")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("ErrorChannelId")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<bool>("IsDebugAllowed")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("boolean");
 
-                    b.Property<ulong>("UniqueId")
-                        .HasColumnType("bigint unsigned");
+                    b.Property<decimal>("UniqueId")
+                        .HasColumnType("numeric(20,0)");
 
                     b.HasKey("Id");
 

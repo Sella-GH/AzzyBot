@@ -14,7 +14,6 @@ using AzzyBot.Utilities.Encryption;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MySqlConnector;
 
 namespace AzzyBot.Extensions;
 
@@ -37,7 +36,7 @@ public static class ServiceCollectionExtensions
         string connectionString = GetConnectionString(settings.Database?.Host, settings.Database?.Port, settings.Database?.User, settings.Database?.Password, settings.Database?.DatabaseName);
         CheckIfDatabaseIsOnline(connectionString);
 
-        services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+        services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseNpgsql(connectionString));
         services.AddSingleton<DbActions>();
 
         services.AddSingleton<DiscordBotService>();
@@ -138,10 +137,10 @@ public static class ServiceCollectionExtensions
         {
             try
             {
-                using AzzyDbContext context = new(new DbContextOptionsBuilder<AzzyDbContext>().UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)).Options);
+                using AzzyDbContext context = new(new DbContextOptionsBuilder<AzzyDbContext>().UseNpgsql(connectionString).Options);
                 isOnline = true;
             }
-            catch (MySqlException)
+            catch (Exception)
             {
                 Console.Out.WriteLine("Database is not online yet. Retrying in 5 seconds...");
                 Task.Delay(TimeSpan.FromSeconds(5)).Wait();
@@ -155,7 +154,7 @@ public static class ServiceCollectionExtensions
             host = "AzzyBot-Db";
 
         if (port is 0)
-            port = 3306;
+            port = 5432;
 
         if (string.IsNullOrWhiteSpace(user))
             user = "azzybot";
