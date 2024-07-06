@@ -157,7 +157,15 @@ jobs:
           # Extract the latest changelog entry from CHANGELOG.md
           latest_entry=$(awk 'BEGIN {found=0} /^## / {if (found) exit; found=1} {if (found) print}' CHANGELOG.md)
           echo "$latest_entry" > latest_changelog.md
-          echo "latest_entry=${latest_entry}" >> "$GITHUB_OUTPUT"
+          
+          # Extract title for release
+          release_title=$(echo "$latest_entry" | awk 'NR==2')
+          
+          # Ensure safe output handling for multiline strings
+          echo "latest_entry<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$latest_entry" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+          echo "release_title=$release_title" >> "$GITHUB_ENV"
 
       - name: Create Release
         id: create_release_action
