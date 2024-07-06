@@ -582,7 +582,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
                 status = await GetFromApiAsync<AzuraStatusRecord>(baseUrl, AzuraApiEndpoints.Status);
                 online = status.Online == "true";
             }
-            catch (InvalidOperationException)
+            catch (HttpRequestException)
             {
                 online = false;
             }
