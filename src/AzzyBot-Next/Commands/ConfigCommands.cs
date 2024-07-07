@@ -343,16 +343,17 @@ public sealed class ConfigCommands
         public async ValueTask GetSettingsAsync(CommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+            ArgumentNullException.ThrowIfNull(context.Member, nameof(context.Member));
 
             _logger.CommandRequested(nameof(GetSettingsAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
 
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
+            ulong guildId = context.Guild.Id;
             string guildName = context.Guild.Name;
-            DiscordMember member = context.Member ?? throw new InvalidOperationException("Member is null");
-
-            GuildsEntity? guild = await _db.GetGuildAsync(guildId);
+            DiscordMember member = context.Member;
+            GuildsEntity? guild = await _db.GetGuildAsync(guildId, true);
             if (guild is null)
             {
                 await context.EditResponseAsync("Server not found in database.");
