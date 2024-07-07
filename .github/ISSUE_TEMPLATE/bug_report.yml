@@ -6,7 +6,7 @@ assignees : Sella-GH
 body :
   - type : markdown
     attributes :
-      value: |
+     value: |
         Thank you very much for reporting an issue regarding Azzy.
         Please note that this form is only intended to be used for bug reports.
         If you want to suggest a feature, please use the [following form](https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=enhancement&projects=&template=feature_request.yml&title=%5BFEATURE%5D).
@@ -14,59 +14,59 @@ body :
   - type : dropdown
     id : version
     attributes :
-      label : "Version"
-      description : "Which version of Azzy are you using?"
-      options :
-        - "1.9.x"
-        - "1.10.x"
-        - "2.0.0-preview1"
-        - "2.0.0-preview1.1"
-        - "2.0.0-preview2"
+     label : "Version"
+     description : "Which version of Azzy are you using?"
+     options :
+       - "1.9.x"
+       - "1.10.x"
+       - "2.0.0-preview1"
+       - "2.0.0-preview1.1"
+       - "2.0.0-preview2"
     validations :
-      required : true
+     required : true
 
   - type : dropdown
     id : deploy-version
     attributes :
-      label : "Deployement Version"
-      description : "Which deployement version are you using?"
-      options :
-        - Docker
-        - Native
+     label : "Deployement Version"
+     description : "Which deployement version are you using?"
+     options :
+       - Docker
+       - Native
     validations :
-      required : true
+     required : true
 
   - type : dropdown
     id : operating-system
     attributes :
-      label : "Operating System"
-      description : "Which operating system are you using?"
-      options :
-        - Linux
-        - MacOS
-        - Windows
+     label : "Operating System"
+     description : "Which operating system are you using?"
+     options :
+       - Linux
+       - MacOS
+       - Windows
     validations :
-      required : true
+     required : true
 
   - type: input
     id: operating-system-version
     attributes:
-      label: "Operating System Version"
-      description: "Which version of the operating system are you using?"
-      plaeceholder: "e.g. Windows 11 Pro 23H2 Build 22635.3790 (use winver) // Debian 12.5 // MacOs 14.5"
+     label: "Operating System Version"
+     description: "Which version of the operating system are you using?"
+     plaeceholder: "e.g. Windows 11 Pro 23H2 Build 22635.3790 (use winver) // Debian 12.5 // MacOs 14.5"
     validations:
-      required: true
+     required: true
 
   - type : dropdown
     id : operating-system-arch
     attributes :
-      label : "Architecture"
-      description : "Which architecture are you using?"
-      options :
-        - ARM64
-        - x64
+     label : "Architecture"
+     description : "Which architecture are you using?"
+     options :
+       - ARM64
+       - x64
     validations :
-      required : true
+     required : true
 
   - type : input
     id : bug-description
