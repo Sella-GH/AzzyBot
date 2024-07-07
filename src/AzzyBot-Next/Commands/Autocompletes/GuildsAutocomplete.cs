@@ -30,7 +30,7 @@ public sealed class GuildsAutocomplete(DbActions dbActions, DiscordBotService bo
                 guildsInDb = await _dbActions.GetGuildsWithDebugAsync(false);
                 break;
 
-            case "admin debug-server remove-server":
+            case "admin debug-servers remove-server":
                 guildsInDb = await _dbActions.GetGuildsWithDebugAsync(true);
                 break;
         }

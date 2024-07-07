@@ -17,6 +17,7 @@
             },
             "console": "externalTerminal",
             "stopAtEntry": false,
+            "enableStepFiltering": false
         },
         {
             "name": "Process attacher",

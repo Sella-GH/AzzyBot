@@ -6,8 +6,12 @@
     - docker system prune -a -f --volumes
     - docker volume prune -a -f
 
+### General
+- Reworked the whole background database structure to make it easier, faster and less ressource-consuming
+
 ### Fixes
 - `azuracast update-instace` says the station is already up-to-date but it's not
+- `admin debug-servers remove-servers` autocomplete not working
 
 ## 2.0.0-preview2
 ### Breaking Changes
