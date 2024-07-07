@@ -13,9 +13,9 @@ using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 
 namespace AzzyBot.Commands.Autocompletes;
 
-public sealed class AzuraCastStationsAutocomplete(AzuraCastApiService azuraCast, DbActions dbActions) : IAutoCompleteProvider
+public sealed class AzuraCastStationsAutocomplete(AzuraCastApiService azuraCastApi, DbActions dbActions) : IAutoCompleteProvider
 {
-    private readonly AzuraCastApiService _azuraCast = azuraCast;
+    private readonly AzuraCastApiService _azuraCast = azuraCastApi;
     private readonly DbActions _dbActions = dbActions;
 
     public async ValueTask<IReadOnlyDictionary<string, object>> AutoCompleteAsync(AutoCompleteContext context)
@@ -25,6 +25,10 @@ public sealed class AzuraCastStationsAutocomplete(AzuraCastApiService azuraCast,
 
         // TODO Solve this more clean and nicer when it's possible
         Dictionary<string, object> results = [];
+        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
+        if (azuraCast is null)
+            return results;
+
         IReadOnlyList<AzuraCastStationEntity> stationsInDb;
         try
         {
@@ -37,14 +41,13 @@ public sealed class AzuraCastStationsAutocomplete(AzuraCastApiService azuraCast,
             return results;
         }
 
-        Uri baseUrl = new(Crypto.Decrypt(stationsInDb[0].AzuraCast.BaseUrl));
-        string apiKey = Crypto.Decrypt(stationsInDb[0].AzuraCast.AdminApiKey);
-        string command = context.Command.Name;
+        Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
+        string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
         foreach (AzuraCastStationEntity station in stationsInDb)
         {
             AzuraAdminStationConfigRecord config = await _azuraCast.GetStationAdminConfigAsync(baseUrl, apiKey, station.StationId);
 
-            switch (command)
+            switch (context.Command.Name)
             {
                 case "start-station" when config.IsEnabled:
                 case "stop-station" when !config.IsEnabled:

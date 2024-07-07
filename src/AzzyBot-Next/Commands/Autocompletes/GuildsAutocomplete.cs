@@ -23,7 +23,6 @@ public sealed class GuildsAutocomplete(DbActions dbActions, DiscordBotService bo
 
         IReadOnlyList<GuildsEntity> guildsInDb = [];
         IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
-
         switch (context.Command.FullName)
         {
             case "admin debug-servers add-server":
