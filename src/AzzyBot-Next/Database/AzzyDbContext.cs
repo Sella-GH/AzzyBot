@@ -1,5 +1,4 @@
-﻿// using System;
-using AzzyBot.Database.Entities;
+﻿using AzzyBot.Database.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace AzzyBot.Database;
@@ -20,19 +19,4 @@ public sealed class AzzyDbContext : DbContext
     public DbSet<AzuraCastStationEntity> AzuraCastStations { get; set; }
     public DbSet<AzuraCastStationChecksEntity> AzuraCastStationChecks { get; set; }
     public DbSet<AzuraCastStationMountEntity> AzuraCastStationMounts { get; set; }
-
-    /*
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        ArgumentNullException.ThrowIfNull(modelBuilder, nameof(modelBuilder));
-
-        modelBuilder.Entity<GuildsEntity>().Navigation(g => g.AzuraCast).AutoInclude();
-        modelBuilder.Entity<AzuraCastEntity>().Navigation(a => a.Stations).AutoInclude();
-        modelBuilder.Entity<AzuraCastEntity>().Navigation(a => a.Checks).AutoInclude();
-        modelBuilder.Entity<AzuraCastStationEntity>().Navigation(s => s.Checks).AutoInclude();
-        modelBuilder.Entity<AzuraCastStationEntity>().Navigation(s => s.Mounts).AutoInclude();
-
-        base.OnModelCreating(modelBuilder);
-    }
-    */
 }
