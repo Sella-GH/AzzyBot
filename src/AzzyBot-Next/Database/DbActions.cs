@@ -329,11 +329,30 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         return guild;
     }
 
-    public async Task<IReadOnlyList<GuildsEntity>> GetGuildsAsync()
+    public async Task<IReadOnlyList<GuildsEntity>> GetGuildsAsync(bool loadEverything = false)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        return await context.Guilds.ToListAsync();
+        List<GuildsEntity> guilds = await context.Guilds.ToListAsync();
+        if (loadEverything)
+        {
+            foreach (GuildsEntity guild in guilds)
+            {
+                await context.Entry(guild).Reference(g => g.AzuraCast).LoadAsync();
+                if (guild.AzuraCast is not null)
+                {
+                    await context.Entry(guild.AzuraCast).Collection(a => a.Stations).LoadAsync();
+                    await context.Entry(guild.AzuraCast).Reference(a => a.Checks).LoadAsync();
+                    foreach (AzuraCastStationEntity station in guild.AzuraCast.Stations)
+                    {
+                        await context.Entry(station).Reference(s => s.Checks).LoadAsync();
+                        await context.Entry(station).Collection(s => s.Mounts).LoadAsync();
+                    }
+                }
+            }
+        }
+
+        return guilds;
     }
 
     public async Task<IReadOnlyList<GuildsEntity>> GetGuildsWithDebugAsync(bool isDebug = true)
