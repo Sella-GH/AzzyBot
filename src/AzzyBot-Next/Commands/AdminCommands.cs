@@ -108,7 +108,7 @@ public sealed class AdminCommands
 
                 await context.DeferResponseAsync();
 
-                List<GuildsEntity> dbGuilds = await _dbActions.GetGuildsWithDebugAsync();
+                IReadOnlyList<GuildsEntity> dbGuilds = await _dbActions.GetGuildsWithDebugAsync();
                 if (dbGuilds.Count == 0)
                 {
                     await context.EditResponseAsync("No debug servers found.");

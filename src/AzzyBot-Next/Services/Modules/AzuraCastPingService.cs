@@ -23,7 +23,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
 
     public async ValueTask QueueInstancePingAsync()
     {
-        List<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
+        IReadOnlyList<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
         foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.Checks.ServerStatus == true).Select(g => g.AzuraCast!))
         {
             _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await PingInstanceAsync(azuraCast, ct)));

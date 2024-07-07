@@ -26,7 +26,7 @@ public sealed class AzuraCastMountAutocomplete(DbActions dbActions) : IAutoCompl
 
         // TODO Solve this more clean and nicer when it's possible
         Dictionary<string, object> results = [];
-        List<AzuraCastStationMountEntity> mountsInDb;
+        IReadOnlyList<AzuraCastStationMountEntity> mountsInDb;
         try
         {
             mountsInDb = await _dbActions.GetAzuraCastStationMountsAsync(context.Guild.Id, stationId);

@@ -154,8 +154,7 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(AddAzuraCastStationMountAsync), context.User.GlobalName);
 
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.AddAzuraCastStationMountPointAsync(guildId, station, mountName, mount);
+            await _db.AddAzuraCastStationMountPointAsync(station, mountName, mount);
 
             await context.EditResponseAsync("Your mount point was added successfully.");
         }
@@ -184,12 +183,12 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(DeleteAzuraCastStationAsync), context.User.GlobalName);
 
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.DeleteAzuraCastStationAsync(guildId, station);
+            await _db.DeleteAzuraCastStationAsync(station);
 
             await context.EditResponseAsync("Your station was deleted successfully.");
         }
 
+        [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Needed in the mount autocomplete provider")]
         [Command("delete-azuracast-station-mount"), Description("Delete an existing AzuraCast mount point from a station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask DeleteAzuraCastStationMountAsync
             (
@@ -202,8 +201,7 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(DeleteAzuraCastStationMountAsync), context.User.GlobalName);
 
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.DeleteAzuraCastMountAsync(guildId, station, mountId);
+            await _db.DeleteAzuraCastMountAsync(mountId);
 
             await context.EditResponseAsync("Your mount point was deleted successfully.");
         }

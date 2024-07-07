@@ -151,8 +151,8 @@ public sealed class DiscordBotServiceHost : IHostedService
         // Only add debug commands if it's a dev build
         if (AzzyStatsSoftware.GetBotEnvironment == Environments.Development)
         {
-            List<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
-            List<ulong> debugGuilds = guilds.Where(g => g.IsDebugAllowed).Select(g => g.UniqueId).ToList();
+            IReadOnlyList<GuildsEntity> guilds = await _dbActions.GetGuildsWithDebugAsync();
+            List<ulong> debugGuilds = guilds.Select(g => g.UniqueId).ToList();
             if (!debugGuilds.Contains(_settings.ServerId))
                 debugGuilds.Add(_settings.ServerId);
 

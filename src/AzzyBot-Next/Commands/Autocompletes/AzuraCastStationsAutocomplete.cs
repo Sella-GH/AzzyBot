@@ -25,7 +25,7 @@ public sealed class AzuraCastStationsAutocomplete(AzuraCastApiService azuraCast,
 
         // TODO Solve this more clean and nicer when it's possible
         Dictionary<string, object> results = [];
-        List<AzuraCastStationEntity> stationsInDb;
+        IReadOnlyList<AzuraCastStationEntity> stationsInDb;
         try
         {
             stationsInDb = await _dbActions.GetAzuraCastStationsAsync(context.Guild.Id);
