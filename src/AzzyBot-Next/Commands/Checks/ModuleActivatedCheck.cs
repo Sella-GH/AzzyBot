@@ -23,15 +23,10 @@ public sealed class ModuleActivatedCheck(DbActions dbActions) : IContextCheck<Mo
         if (context is SlashCommandContext ctx && ctx.Interaction.ResponseState is DiscordInteractionResponseState.Unacknowledged)
             await context.DeferResponseAsync();
 
-        ulong guildId = context.Guild.Id;
-        GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId);
-        if (guild is null)
-            return "Guild is null!";
-
         switch (attribute.Module)
         {
             case AzzyModules.AzuraCast:
-                AzuraCastEntity? azuraCast = guild.AzuraCast;
+                AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
                 if (azuraCast is null)
                     return "AzuraCast is null!";
 

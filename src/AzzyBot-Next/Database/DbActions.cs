@@ -236,8 +236,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
         AzuraCastEntity? azuraCast = context.Guilds.Where(g => g.UniqueId == guildId).Select(g => g.AzuraCast).FirstOrDefault();
+        if (azuraCast is null)
+            return [];
 
-        return [.. azuraCast?.Stations];
+        return [.. azuraCast.Stations];
     }
 
     public async Task<AzuraCastStationChecksEntity?> GetAzuraCastStationChecksAsync(ulong guildId, int stationId)
@@ -263,8 +265,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
         AzuraCastEntity? azuraCast = context.Guilds.Where(g => g.UniqueId == guildId).Select(g => g.AzuraCast).FirstOrDefault();
+        if (azuraCast is null)
+            return [];
 
-        return [.. azuraCast?.Stations.FirstOrDefault(s => s.StationId == stationId)?.Mounts];
+        return [.. azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId)?.Mounts];
     }
 
     public async Task<GuildsEntity?> GetGuildAsync(ulong guildId)

@@ -1,4 +1,4 @@
-﻿using System;
+﻿// using System;
 using AzzyBot.Database.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +21,7 @@ public sealed class AzzyDbContext : DbContext
     public DbSet<AzuraCastStationChecksEntity> AzuraCastStationChecks { get; set; }
     public DbSet<AzuraCastStationMountEntity> AzuraCastStationMounts { get; set; }
 
+    /*
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ArgumentNullException.ThrowIfNull(modelBuilder, nameof(modelBuilder));
@@ -33,4 +34,5 @@ public sealed class AzzyDbContext : DbContext
 
         base.OnModelCreating(modelBuilder);
     }
+    */
 }
