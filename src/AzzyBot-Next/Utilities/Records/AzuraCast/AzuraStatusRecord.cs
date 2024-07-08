@@ -5,5 +5,5 @@ namespace AzzyBot;
 public record AzuraStatusRecord
 {
     [JsonPropertyName("online")]
-    public required string Online { get; init; }
+    public required bool Online { get; init; }
 }
