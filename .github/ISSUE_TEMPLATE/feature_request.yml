@@ -14,8 +14,8 @@ body :
   - type : textarea
     id : feature-description
     attributes :
-     label : "Explain Yoor Issue"
-     description : "A clear and concise description of what the issue is. You are able to link existing GitHub issues with a # ."
+     label : "Explain Your Issue"
+     description : "A clear and concise description of what the issue is. You are able to link existing GitHub issues with a #."
      placeholder : "I'm always frustrated when [...]"
     validations :
      required : true
