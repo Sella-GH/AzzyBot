@@ -7,7 +7,6 @@ namespace AzzyBot.Modules.Core;
 /// <summary>
 /// Contains miscellaneous utility methods for the core module.
 /// </summary>
-[SuppressMessage("Roslynator", "RCS0036:Remove blank line between single-line declarations of same kind.", Justification = "Readability")]
 internal static class CoreMisc
 {
     /// <summary>
