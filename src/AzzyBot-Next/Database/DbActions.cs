@@ -232,6 +232,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
         return await context.Guilds
+            .AsNoTracking()
             .Where(g => g.UniqueId == guildId)
             .OrderBy(g => g.Id)
             .Select(g => g.AzuraCast)
@@ -243,6 +244,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
         AzuraCastEntity? azuraCast = await context.Guilds
+            .AsNoTracking()
             .Where(g => g.UniqueId == guildId)
             .OrderBy(g => g.Id)
             .Select(g => g.AzuraCast)
@@ -263,6 +265,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
         AzuraCastEntity? azuraCast = await context.Guilds
+            .AsNoTracking()
             .Where(g => g.UniqueId == guildId)
             .OrderBy(g => g.Id)
             .Select(g => g.AzuraCast)
@@ -283,6 +286,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
         AzuraCastEntity? azuraCast = await context.Guilds
+            .AsNoTracking()
             .Where(g => g.UniqueId == guildId)
             .OrderBy(g => g.Id)
             .Select(g => g.AzuraCast)
@@ -303,6 +307,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
         AzuraCastEntity? azuraCast = await context.Guilds
+            .AsNoTracking()
             .Where(g => g.UniqueId == guildId)
             .OrderBy(g => g.Id)
             .Select(g => g.AzuraCast)
@@ -331,6 +336,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
         AzuraCastEntity? azuraCast = await context.Guilds
+            .AsNoTracking()
             .Where(g => g.UniqueId == guildId)
             .OrderBy(g => g.Id)
             .Select(g => g.AzuraCast)
@@ -359,6 +365,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
         GuildsEntity? guild = await context.Guilds
+            .AsNoTracking()
             .OrderBy(g => g.Id)
             .FirstOrDefaultAsync(g => g.UniqueId == guildId);
 
@@ -402,6 +409,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
         List<GuildsEntity> guilds = await context.Guilds
+            .AsNoTracking()
             .OrderBy(g => g.Id)
             .ToListAsync();
 
@@ -445,6 +453,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
         return await context.Guilds
+            .AsNoTracking()
             .Where(g => g.IsDebugAllowed == isDebug)
             .OrderBy(g => g.Id)
             .ToListAsync();
