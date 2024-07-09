@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Services;
+using AzzyBot.Utilities.Enums;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Entities;
 
-namespace AzzyBot;
+namespace AzzyBot.Commands.Checks;
 
 public class AzuraCastDiscordPermCheck(DbActions dbActions, DiscordBotService discordBotService) : IContextCheck<AzuraCastDiscordPermCheckAttribute>
 {

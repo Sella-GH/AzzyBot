@@ -1,4 +1,4 @@
-﻿namespace AzzyBot;
+﻿namespace AzzyBot.Utilities.Helpers;
 
 public static class AzuraApiFilters
 {

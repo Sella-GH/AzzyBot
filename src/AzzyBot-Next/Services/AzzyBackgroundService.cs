@@ -1,11 +1,12 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Logging;
+using AzzyBot.Services.Modules;
 using AzzyBot.Utilities.Enums;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace AzzyBot.Services.Modules;
+namespace AzzyBot.Services;
 
 public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLifetime, ILogger<AzzyBackgroundService> logger, AzuraCastApiService azuraCastApiService, AzuraCastFileService azuraCastFileService, AzuraCastPingService azuraCastPingService, AzuraCastUpdateService updaterService)
 {

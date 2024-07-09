@@ -47,7 +47,7 @@ public sealed class AzuraCastStationEntity
     /// <summary>
     /// A <see cref="ICollection<>"/> of associated <see cref="AzuraCastStationMountEntity"/> database items.
     /// </summary>
-    public ICollection<AzuraCastStationMountEntity> Mounts { get; } = new List<AzuraCastStationMountEntity>();
+    public ICollection<AzuraCastStationMountEntity> Mounts { get; } = [];
 
     /// <summary>
     /// The <see cref="DiscordChannel"/> id of the <see cref="DiscordChannel"/> to which not-available music-requests should be sent.

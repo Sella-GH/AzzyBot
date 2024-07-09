@@ -1,4 +1,4 @@
-﻿namespace AzzyBot;
+﻿namespace AzzyBot.Utilities.Enums;
 
 public enum AzuraCastDiscordPerm
 {

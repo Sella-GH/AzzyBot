@@ -50,7 +50,7 @@ public sealed class AzuraCastEntity
     /// <summary>
     /// A <see cref="ICollection<>"/> of the associated <see cref="AzuraCastStationEntity"/> database items.
     /// </summary>
-    public ICollection<AzuraCastStationEntity> Stations { get; } = new List<AzuraCastStationEntity>();
+    public ICollection<AzuraCastStationEntity> Stations { get; } = [];
 
     /// <summary>
     /// The database id of the parenting <see cref="GuildsEntity"/> database item.

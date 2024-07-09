@@ -7,7 +7,7 @@ using AzzyBot.Services.Interfaces;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace AzzyBot.Services.Modules;
+namespace AzzyBot.Services;
 
 public sealed class AzzyBackgroundServiceHost(ILogger<AzzyBackgroundServiceHost> logger, IQueuedBackgroundTask taskQueue, DiscordBotService discordBotService) : BackgroundService
 {

@@ -14,6 +14,7 @@ using AzzyBot.Commands.Choices;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
+using AzzyBot.Services;
 using AzzyBot.Services.Modules;
 using AzzyBot.Utilities;
 using AzzyBot.Utilities.Encryption;

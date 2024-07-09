@@ -8,7 +8,7 @@ using AzzyBot.Commands.Checks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
-using AzzyBot.Services.Modules;
+using AzzyBot.Services;
 using AzzyBot.Utilities;
 using AzzyBot.Utilities.Enums;
 using DSharpPlus.Commands;
