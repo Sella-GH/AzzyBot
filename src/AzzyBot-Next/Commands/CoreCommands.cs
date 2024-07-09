@@ -37,14 +37,17 @@ public sealed class CoreCommands
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Client.CurrentApplication.Owners, nameof(context.Client.CurrentApplication.Owners));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+            ArgumentNullException.ThrowIfNull(context.Member, nameof(context.Member));
 
             _logger.CommandRequested(nameof(HelpAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
 
-            IEnumerable<DiscordUser> botOwners = context.Client.CurrentApplication.Owners ?? throw new InvalidOperationException("Invalid bot owners");
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Invalid guild id");
-            DiscordMember member = context.Member ?? throw new InvalidOperationException("Invalid member");
+            IEnumerable<DiscordUser> botOwners = context.Client.CurrentApplication.Owners;
+            ulong guildId = context.Guild.Id;
+            DiscordMember member = context.Member;
             GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId);
             if (guild is null)
             {

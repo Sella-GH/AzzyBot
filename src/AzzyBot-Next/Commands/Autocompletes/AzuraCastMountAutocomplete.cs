@@ -20,13 +20,13 @@ public sealed class AzuraCastMountAutocomplete(DbActions dbActions) : IAutoCompl
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
+        Dictionary<string, object> results = [];
         int stationId = Convert.ToInt32(context.Options.Single(o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
         if (stationId == 0)
-            return new Dictionary<string, object>();
+            return results;
 
         // TODO Solve this more clean and nicer when it's possible
-        Dictionary<string, object> results = [];
-        List<AzuraCastStationMountEntity> mountsInDb;
+        IReadOnlyList<AzuraCastStationMountEntity> mountsInDb;
         try
         {
             mountsInDb = await _dbActions.GetAzuraCastStationMountsAsync(context.Guild.Id, stationId);

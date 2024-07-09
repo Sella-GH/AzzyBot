@@ -226,7 +226,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
     {
         _logger.BackgroundServiceWorkItem(nameof(QueueApiPermissionChecksAsync));
 
-        List<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
+        IReadOnlyList<GuildsEntity> guilds = await _dbActions.GetGuildsAsync(true);
         foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.IsOnline == true).Select(g => g.AzuraCast!))
         {
             _ = Task.Run(async () => await CheckForApiPermissionsAsync(azuraCast));
@@ -237,14 +237,14 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
     {
         _logger.BackgroundServiceWorkItem(nameof(QueueApiPermissionChecksAsync));
 
-        GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId);
+        GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId, true);
         if (guild is null || guild.AzuraCast is null)
             return;
 
         IEnumerable<AzuraCastStationEntity> stations = guild.AzuraCast.Stations;
         if (stationId is not 0)
         {
-            AzuraCastStationEntity? station = stations.FirstOrDefault(s => s.StationId == stationId);
+            AzuraCastStationEntity? station = stations.FirstOrDefault(s => s.Id == stationId);
             if (station is null)
                 return;
 
@@ -580,9 +580,9 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
             try
             {
                 status = await GetFromApiAsync<AzuraStatusRecord>(baseUrl, AzuraApiEndpoints.Status);
-                online = status.Online == "true";
+                online = status.Online;
             }
-            catch (InvalidOperationException)
+            catch (HttpRequestException)
             {
                 online = false;
             }

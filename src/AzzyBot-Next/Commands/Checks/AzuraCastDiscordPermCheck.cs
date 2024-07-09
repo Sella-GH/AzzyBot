@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Services;
+using AzzyBot.Utilities.Enums;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Entities;
 
-namespace AzzyBot;
+namespace AzzyBot.Commands.Checks;
 
 public class AzuraCastDiscordPermCheck(DbActions dbActions, DiscordBotService discordBotService) : IContextCheck<AzuraCastDiscordPermCheckAttribute>
 {
@@ -29,19 +30,14 @@ public class AzuraCastDiscordPermCheck(DbActions dbActions, DiscordBotService di
             await context.DeferResponseAsync();
 
         int stationId = Convert.ToInt32(context.Arguments.SingleOrDefault(o => o.Key.Name is "station_id" && o.Value is not null).Value, CultureInfo.InvariantCulture);
-        ulong guildId = context.Guild.Id;
-        GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId);
-        if (guild is null)
-            return "Guild is null!";
-
-        AzuraCastEntity? azuraCast = guild.AzuraCast;
+        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
         if (azuraCast is null)
             return "AzuraCast is null!";
 
         AzuraCastStationEntity? station = new();
         if (context.Command.FullName.StartsWith("config modify-azuracast-station", StringComparison.OrdinalIgnoreCase))
         {
-            station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId);
+            station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId);
             if (station is null)
                 return "Station is null!";
         }
@@ -50,7 +46,7 @@ public class AzuraCastDiscordPermCheck(DbActions dbActions, DiscordBotService di
         IEnumerable<DiscordRole> userRoles = context.Member.Roles;
         foreach (AzuraCastDiscordPerm perm in attribute.Perms)
         {
-            result = CheckPermission(perm, guild, azuraCast, station, userRoles.ToList(), context.Command.FullName);
+            result = CheckPermission(perm, context.Guild.Id, azuraCast, station, userRoles.ToList(), context.Command.FullName);
             if (result is not null)
                 break;
         }
@@ -58,9 +54,9 @@ public class AzuraCastDiscordPermCheck(DbActions dbActions, DiscordBotService di
         return result;
     }
 
-    private string? CheckPermission(AzuraCastDiscordPerm perm, GuildsEntity guild, AzuraCastEntity azuraCast, AzuraCastStationEntity station, IReadOnlyList<DiscordRole> userRoles, string commandName)
+    private string? CheckPermission(AzuraCastDiscordPerm perm, ulong guildId, AzuraCastEntity azuraCast, AzuraCastStationEntity station, IReadOnlyList<DiscordRole> userRoles, string commandName)
     {
-        bool isInstanceAdmin = userRoles.Contains(_botService.GetDiscordRole(guild.UniqueId, azuraCast.InstanceAdminRoleId));
+        bool isInstanceAdmin = userRoles.Contains(_botService.GetDiscordRole(guildId, azuraCast.InstanceAdminRoleId));
         bool isStationAdmin = false;
         bool isStationDj = false;
 
@@ -78,12 +74,12 @@ public class AzuraCastDiscordPermCheck(DbActions dbActions, DiscordBotService di
             case "config modify-azuracast-station":
             case "config modify-azuracast-station-checks":
             case "config delete-azuracast-station-mount":
-                isStationAdmin = userRoles.Contains(_botService.GetDiscordRole(guild.UniqueId, station.StationAdminRoleId));
+                isStationAdmin = userRoles.Contains(_botService.GetDiscordRole(guildId, station.StationAdminRoleId));
                 break;
 
             case "dj skip-song":
             case "dj switch-playlist":
-                isStationDj = userRoles.Contains(_botService.GetDiscordRole(guild.UniqueId, station.StationDjRoleId));
+                isStationDj = userRoles.Contains(_botService.GetDiscordRole(guildId, station.StationDjRoleId));
                 break;
         }
 

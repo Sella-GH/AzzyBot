@@ -1,6 +1,6 @@
 {
     "csharp.debug.sourceFileMap":
     {
-        "./": "${workspaceFolder}/AzzyBot-Next/"
+        "./": "${workspaceFolder}/src/AzzyBot-Next/"
     }
 }

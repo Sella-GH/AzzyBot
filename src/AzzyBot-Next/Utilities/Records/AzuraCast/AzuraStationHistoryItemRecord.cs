@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
-using AzzyBot.Utilities.Records.AzuraCast;
 
-namespace AzzyBot;
+namespace AzzyBot.Utilities.Records.AzuraCast;
 
 public sealed record AzuraStationHistoryItemRecord : AzuraStationQueueItemRecord
 {

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 using AzzyBot.Database;
 using AzzyBot.Services;
 using AzzyBot.Services.Interfaces;
@@ -14,7 +13,6 @@ using AzzyBot.Utilities.Encryption;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MySqlConnector;
 
 namespace AzzyBot.Extensions;
 
@@ -35,9 +33,7 @@ public static class ServiceCollectionExtensions
         services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
 
         string connectionString = GetConnectionString(settings.Database?.Host, settings.Database?.Port, settings.Database?.User, settings.Database?.Password, settings.Database?.DatabaseName);
-        CheckIfDatabaseIsOnline(connectionString);
-
-        services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+        services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseNpgsql(connectionString));
         services.AddSingleton<DbActions>();
 
         services.AddSingleton<DiscordBotService>();
@@ -130,32 +126,13 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(stats);
     }
 
-    private static void CheckIfDatabaseIsOnline(string connectionString)
-    {
-        bool isOnline = false;
-
-        while (!isOnline)
-        {
-            try
-            {
-                using AzzyDbContext context = new(new DbContextOptionsBuilder<AzzyDbContext>().UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)).Options);
-                isOnline = true;
-            }
-            catch (MySqlException)
-            {
-                Console.Out.WriteLine("Database is not online yet. Retrying in 5 seconds...");
-                Task.Delay(TimeSpan.FromSeconds(5)).Wait();
-            }
-        }
-    }
-
     private static string GetConnectionString(string? host, int? port, string? user, string? password, string? database)
     {
         if (string.IsNullOrWhiteSpace(host))
             host = "AzzyBot-Db";
 
         if (port is 0)
-            port = 3306;
+            port = 5432;
 
         if (string.IsNullOrWhiteSpace(user))
             user = "azzybot";
@@ -167,7 +144,7 @@ public static class ServiceCollectionExtensions
         if (string.IsNullOrWhiteSpace(database))
             database = "azzybot";
 
-        return $"Server={host};Port={port};User={user};Password={password};Database={database};";
+        return $"Host={host};Port={port};Database={database};Username={user};Password={password};";
     }
 
     private static IConfiguration GetConfiguration(string path)

@@ -67,7 +67,7 @@ public sealed class AdminCommands
             private readonly ILogger<AdminDebugServers> _logger = logger;
 
             [Command("add-server"), Description("Adds the permission to execute debug commands to a server.")]
-            public async ValueTask AddDebugGuildsAsync(CommandContext context, [Description("Select the server you want to add."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId = "")
+            public async ValueTask AddDebugGuildsAsync(CommandContext context, [Description("Select the server you want to add."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId)
             {
                 ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -108,7 +108,7 @@ public sealed class AdminCommands
 
                 await context.DeferResponseAsync();
 
-                List<GuildsEntity> dbGuilds = await _dbActions.GetGuildsWithDebugAsync();
+                IReadOnlyList<GuildsEntity> dbGuilds = await _dbActions.GetGuildsWithDebugAsync();
                 if (dbGuilds.Count == 0)
                 {
                     await context.EditResponseAsync("No debug servers found.");
@@ -127,7 +127,7 @@ public sealed class AdminCommands
             }
 
             [Command("remove-server"), Description("Removes the permission to execute debug commands from a server.")]
-            public async ValueTask RemoveDebugGuildsAsync(CommandContext context, [Description("Select the server you want to remove."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId = "")
+            public async ValueTask RemoveDebugGuildsAsync(CommandContext context, [Description("Select the server you want to remove."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId)
             {
                 ArgumentNullException.ThrowIfNull(context, nameof(context));
 

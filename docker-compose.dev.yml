@@ -20,20 +20,19 @@ services:
 
   AzzyBot-Db:
     container_name: AzzyBot-Db
-    image: mariadb:lts
+    image: postgres:16-alpine
     pull_policy: always
     restart: unless-stopped
     environment:
-      - MYSQL_ROOT_PASSWORD=thisIsR00!P@ssw0rd
-      - MYSQL_DATABASE=azzybot
-      - MYSQL_USER=azzybot
-      - MYSQL_PASSWORD=thisIsAzzyB0!P@ssw0rd
+      - POSTGRES_DB=azzybot
+      - POSTGRES_USER=azzybot
+      - POSTGRES_PASSWORD=thisIsAzzyB0!P@ssw0rd
       - TZ=Europe/Berlin
     networks:
       - AzzyBot-Db-Nw
     hostname: AzzyBot-Db
     volumes:
-      - azzybot_data:/var/lib/mysql
+      - azzybot_data:/var/lib/postgresql/data
 
 networks:
   AzzyBot-Db-Nw:

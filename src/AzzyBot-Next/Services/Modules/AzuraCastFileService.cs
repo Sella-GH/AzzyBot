@@ -31,7 +31,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
     {
         _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecksAsync));
 
-        List<GuildsEntity> guilds = await _dbActions.GetGuildsAsync();
+        IReadOnlyList<GuildsEntity> guilds = await _dbActions.GetGuildsAsync(true);
         foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.IsOnline == true).Select(g => g.AzuraCast!))
         {
             foreach (AzuraCastStationEntity station in azuraCast.Stations.Where(s => s.Checks.FileChanges))
@@ -47,14 +47,14 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
 
         _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecksAsync));
 
-        GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId);
+        GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId, true);
         if (guild is null || guild.AzuraCast is null)
             return;
 
         IEnumerable<AzuraCastStationEntity> stations = guild.AzuraCast.Stations.Where(s => s.Checks.FileChanges);
         if (stationId is not 0)
         {
-            AzuraCastStationEntity? station = stations.FirstOrDefault(s => s.StationId == stationId);
+            AzuraCastStationEntity? station = stations.FirstOrDefault(s => s.Id == stationId);
             if (station is null)
                 return;
 

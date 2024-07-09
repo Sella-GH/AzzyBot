@@ -8,7 +8,7 @@ using AzzyBot.Commands.Checks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
-using AzzyBot.Services.Modules;
+using AzzyBot.Services;
 using AzzyBot.Utilities;
 using AzzyBot.Utilities.Enums;
 using DSharpPlus.Commands;
@@ -45,6 +45,7 @@ public sealed class ConfigCommands
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
             _logger.CommandRequested(nameof(AddAzuraCastAsync), context.User.GlobalName);
 
@@ -71,7 +72,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
+            ulong guildId = context.Guild.Id;
             GuildsEntity? guild = await _db.GetGuildAsync(guildId);
             if (guild is null)
             {
@@ -86,7 +87,8 @@ public sealed class ConfigCommands
                 return;
             }
 
-            if (guild.AzuraCast is not null)
+            AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(guildId);
+            if (azuraCast is not null)
             {
                 await context.DeleteResponseAsync();
                 await context.FollowupAsync("AzuraCast is already set up for your server.");
@@ -117,6 +119,7 @@ public sealed class ConfigCommands
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
             _logger.CommandRequested(nameof(AddAzuraCastStationAsync), context.User.GlobalName);
 
@@ -134,8 +137,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.AddAzuraCastStationAsync(guildId, station, stationName, adminGroup.Id, requestsChannel.Id, hls, showPlaylist, fileChanges, apiKey, djGroup?.Id);
+            await _db.AddAzuraCastStationAsync(context.Guild.Id, station, stationName, adminGroup.Id, requestsChannel.Id, hls, showPlaylist, fileChanges, apiKey, djGroup?.Id);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your station was added successfully and private data has been encrypted.");
@@ -154,8 +156,7 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(AddAzuraCastStationMountAsync), context.User.GlobalName);
 
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.AddAzuraCastStationMountPointAsync(guildId, station, mountName, mount);
+            await _db.AddAzuraCastStationMountPointAsync(station, mountName, mount);
 
             await context.EditResponseAsync("Your mount point was added successfully.");
         }
@@ -164,11 +165,11 @@ public sealed class ConfigCommands
         public async ValueTask DeleteAzuraCastAsync(CommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
             _logger.CommandRequested(nameof(DeleteAzuraCastAsync), context.User.GlobalName);
 
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.DeleteAzuraCastAsync(guildId);
+            await _db.DeleteAzuraCastAsync(context.Guild.Id);
 
             await context.EditResponseAsync("Your AzuraCast setup was deleted successfully.");
         }
@@ -184,12 +185,12 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(DeleteAzuraCastStationAsync), context.User.GlobalName);
 
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.DeleteAzuraCastStationAsync(guildId, station);
+            await _db.DeleteAzuraCastStationAsync(station);
 
             await context.EditResponseAsync("Your station was deleted successfully.");
         }
 
+        [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Needed in the mount autocomplete provider")]
         [Command("delete-azuracast-station-mount"), Description("Delete an existing AzuraCast mount point from a station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask DeleteAzuraCastStationMountAsync
             (
@@ -202,8 +203,7 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(DeleteAzuraCastStationMountAsync), context.User.GlobalName);
 
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.DeleteAzuraCastMountAsync(guildId, station, mountId);
+            await _db.DeleteAzuraCastMountAsync(mountId);
 
             await context.EditResponseAsync("Your mount point was deleted successfully.");
         }
@@ -220,21 +220,23 @@ public sealed class ConfigCommands
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+
             _logger.CommandRequested(nameof(UpdateAzuraCastAsync), context.User.GlobalName);
+
             if (url is null && apiKey is null && instanceAdminGroup is null && notificationsChannel is null && outagesChannel is null)
             {
                 await context.RespondAsync("You have to provide at least one parameter to update.");
                 return;
             }
 
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.UpdateAzuraCastAsync(guildId, url, apiKey, instanceAdminGroup?.Id, notificationsChannel?.Id, outagesChannel?.Id);
+            await _db.UpdateAzuraCastAsync(context.Guild.Id, url, apiKey, instanceAdminGroup?.Id, notificationsChannel?.Id, outagesChannel?.Id);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your AzuraCast settings were saved successfully and private data has been encrypted.");
 
             if (url is not null)
-                await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guildId);
+                await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, context.Guild.Id);
         }
 
         [Command("modify-azuracast-checks"), Description("Modify the automatic checks for your AzuraCast instance."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -247,16 +249,17 @@ public sealed class ConfigCommands
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
             _logger.CommandRequested(nameof(UpdateAzuraCastChecksAsync), context.User.GlobalName);
+
             if (serverStatus is null && updates is null && updatesChangelog is null)
             {
                 await context.RespondAsync("You have to provide at least one parameter to update.");
                 return;
             }
 
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.UpdateAzuraCastChecksAsync(guildId, serverStatus, updates, updatesChangelog);
+            await _db.UpdateAzuraCastChecksAsync(context.Guild.Id, serverStatus, updates, updatesChangelog);
 
             await context.EditResponseAsync("Your settings were saved successfully.");
         }
@@ -277,16 +280,17 @@ public sealed class ConfigCommands
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
             _logger.CommandRequested(nameof(UpdateAzuraCastStationAsync), context.User.GlobalName);
+
             if (stationId is null && stationName is null && apiKey is null && adminGroup is null && djGroup is null && requestsChannel is null && hls is null && showPlaylist is null)
             {
                 await context.RespondAsync("You have to provide at least one parameter to update.");
                 return;
             }
 
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.UpdateAzuraCastStationAsync(guildId, station, stationId, stationName, apiKey, adminGroup?.Id, djGroup?.Id, requestsChannel?.Id, hls, showPlaylist);
+            await _db.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, stationName, apiKey, adminGroup?.Id, djGroup?.Id, requestsChannel?.Id, hls, showPlaylist);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your settings were saved successfully and private data has been encrypted.");
@@ -301,16 +305,17 @@ public sealed class ConfigCommands
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
             _logger.CommandRequested(nameof(UpdateAzuraCastStationChecksAsync), context.User.GlobalName);
+
             if (fileChanges is null)
             {
                 await context.RespondAsync("You have to provide at least one parameter to update.");
                 return;
             }
 
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.UpdateAzuraCastStationChecksAsync(guildId, station, fileChanges);
+            await _db.UpdateAzuraCastStationChecksAsync(context.Guild.Id, station, fileChanges);
 
             await context.EditResponseAsync("Your settings were saved successfully.");
         }
@@ -325,8 +330,10 @@ public sealed class ConfigCommands
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
             _logger.CommandRequested(nameof(UpdateCoreAsync), context.User.GlobalName);
+
             if (adminRole is null && adminChannel is null && errorChannel is null)
             {
                 await context.RespondAsync("You have to provide at least one parameter to update.");
@@ -335,8 +342,7 @@ public sealed class ConfigCommands
 
             await context.DeferResponseAsync();
 
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.UpdateGuildAsync(guildId, adminRole?.Id, adminChannel?.Id, errorChannel?.Id);
+            await _db.UpdateGuildAsync(context.Guild.Id, adminRole?.Id, adminChannel?.Id, errorChannel?.Id);
 
             await context.EditResponseAsync("Your settings were saved successfully.");
         }
@@ -345,16 +351,17 @@ public sealed class ConfigCommands
         public async ValueTask GetSettingsAsync(CommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+            ArgumentNullException.ThrowIfNull(context.Member, nameof(context.Member));
 
             _logger.CommandRequested(nameof(GetSettingsAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
 
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
+            ulong guildId = context.Guild.Id;
             string guildName = context.Guild.Name;
-            DiscordMember member = context.Member ?? throw new InvalidOperationException("Member is null");
-
-            GuildsEntity? guild = await _db.GetGuildAsync(guildId);
+            DiscordMember member = context.Member;
+            GuildsEntity? guild = await _db.GetGuildAsync(guildId, true);
             if (guild is null)
             {
                 await context.EditResponseAsync("Server not found in database.");
@@ -394,14 +401,14 @@ public sealed class ConfigCommands
         public async ValueTask ResetSettingsAsync(CommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
             _logger.CommandRequested(nameof(ResetSettingsAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
 
-            ulong guildId = context.Guild?.Id ?? throw new InvalidOperationException("Guild is null");
-            await _db.DeleteGuildAsync(guildId);
-            await _db.AddGuildAsync(guildId);
+            await _db.DeleteGuildAsync(context.Guild.Id);
+            await _db.AddGuildAsync(context.Guild.Id);
 
             await context.EditResponseAsync("Your settings were reset successfully.\nRemember that you have to set all the configurations again.");
         }

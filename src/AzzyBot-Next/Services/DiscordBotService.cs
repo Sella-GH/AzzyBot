@@ -286,7 +286,7 @@ public sealed class DiscordBotService
                     }
                     else if (info.Length is 3)
                     {
-                        AzuraCastStationEntity? station = azuraCast.Stations.FirstOrDefault(s => s.StationId == Convert.ToInt32(info[1], CultureInfo.InvariantCulture));
+                        AzuraCastStationEntity? station = await _db.GetAzuraCastStationAsync(context.Guild.Id, Convert.ToInt32(info[1], CultureInfo.InvariantCulture));
                         if (station is null)
                         {
                             await context.EditResponseAsync($"The station with ID {info[1]} does not exist!\nPlease contact @<{azuraCast.InstanceAdminRoleId}>.");

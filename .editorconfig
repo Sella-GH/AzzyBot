@@ -17,7 +17,7 @@ end_of_line = crlf
 [*{_AssemblyInfo.cs,.notsupported.cs,AsmOffsets.cs}]
 generated_code = true
 
-[/AzzyBot-Next/Migrations/**]
+[src/AzzyBot-Next/Migrations/**]
 generated_code = true
 
 # C# files
