@@ -409,7 +409,7 @@ public static class EmbedBuilder
             ["Environment"] = new(AzzyStatsSoftware.GetBotEnvironment, true),
             ["Source Code"] = new(sourceCode, true),
             ["Memory Usage"] = new($"{AzzyStatsSoftware.GetBotMemoryUsage()} GB", true),
-            ["Compilation Date"] = new($"<t:{Converter.ConvertToUnixTime(compileDate)}>", true),
+            ["Compilation Date"] = new($"<t:{Converter.ConvertToUnixTime(compileDate.ToLocalTime())}>", true),
             ["AzzyBot GitHub Commit"] = new(formattedCommit)
         };
 
@@ -426,7 +426,7 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
-            ["Release Date"] = new($"<t:{Converter.ConvertToUnixTime(updateDate)}>"),
+            ["Release Date"] = new($"<t:{Converter.ConvertToUnixTime(updateDate.ToLocalTime())}>"),
             ["Your Version"] = new(yourVersion),
             ["New Version"] = new(version)
         };
