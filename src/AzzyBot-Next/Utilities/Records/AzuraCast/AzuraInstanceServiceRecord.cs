@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace AzzyBot;
+namespace AzzyBot.Utilities.Records.AzuraCast;
 
 public sealed record AzuraInstanceServiceRecord
 {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace AzzyBot.Settings;
@@ -14,7 +15,8 @@ public sealed record AzzyBotStatsRecord
     [JsonPropertyName(nameof(LocCs))]
     public int LocCs { get; init; }
 
-    public AzzyBotStatsRecord(string commit, in DateTime compilationDate, int locCs)
+    [SuppressMessage("Roslynator", "RCS1231:Make parameter ref read-only", Justification = "This is a constructor and does not allow referencing.")]
+    public AzzyBotStatsRecord(string commit, DateTime compilationDate, int locCs)
     {
         Commit = commit;
         CompilationDate = compilationDate;
