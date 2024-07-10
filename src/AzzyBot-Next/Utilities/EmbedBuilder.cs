@@ -400,7 +400,7 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
-            ["Uptime"] = new($"<t:{Converter.ConvertToUnixTime(AzzyStatsSoftware.GetBotUptime())}>", true),
+            ["Uptime"] = new($"<t:{Converter.ConvertToUnixTime(AzzyStatsSoftware.GetBotUptime().ToLocalTime())}>", true),
             ["Bot Version"] = new(AzzyStatsSoftware.GetBotVersion, true),
             [".NET Version"] = new(AzzyStatsSoftware.GetBotDotNetVersion, true),
             ["D#+ Version"] = new(dspVersion, true),
