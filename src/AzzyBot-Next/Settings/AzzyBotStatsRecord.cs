@@ -6,11 +6,18 @@ namespace AzzyBot.Settings;
 public sealed record AzzyBotStatsRecord
 {
     [JsonPropertyName(nameof(Commit))]
-    public required string Commit { get; init; }
+    public string Commit { get; init; }
 
     [JsonPropertyName(nameof(CompilationDate))]
-    public required DateTime CompilationDate { get; init; }
+    public DateTime CompilationDate { get; init; }
 
     [JsonPropertyName(nameof(LocCs))]
-    public required int LocCs { get; init; }
+    public int LocCs { get; init; }
+
+    public AzzyBotStatsRecord(string commit, in DateTime compilationDate, int locCs)
+    {
+        Commit = commit;
+        CompilationDate = compilationDate;
+        LocCs = locCs;
+    }
 }

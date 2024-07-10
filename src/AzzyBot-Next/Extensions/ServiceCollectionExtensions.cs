@@ -109,18 +109,22 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(settings);
     }
 
-    public static void AzzyBotStats(this IServiceCollection services)
+    public static void AzzyBotStats(this IServiceCollection services, bool isDev)
     {
-        string path = Path.Combine("Modules", "Core", "Files", "AzzyBotStats.json");
-
-        AzzyBotStatsRecord? stats = GetConfiguration(path).Get<AzzyBotStatsRecord>();
-        if (stats is null)
+        AzzyBotStatsRecord? stats = new("Unkown", DateTime.Now, 0);
+        if (!isDev)
         {
-            Console.Error.Write("There is something wrong with your configuration. Did you followed the installation instructions?");
-            if (!AzzyStatsHardware.CheckIfLinuxOs)
-                Console.ReadKey();
+            string path = Path.Combine("Modules", "Core", "Files", "AzzyBotStats.json");
 
-            Environment.Exit(1);
+            stats = GetConfiguration(path).Get<AzzyBotStatsRecord>();
+            if (stats is null)
+            {
+                Console.Error.Write("There is something wrong with your configuration. Did you followed the installation instructions?");
+                if (!AzzyStatsHardware.CheckIfLinuxOs)
+                    Console.ReadKey();
+
+                Environment.Exit(1);
+            }
         }
 
         services.AddSingleton(stats);

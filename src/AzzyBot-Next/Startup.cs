@@ -50,7 +50,7 @@ public static class Startup
         #region Add services
 
         appBuilder.Services.AzzyBotSettings(isDev, isDocker);
-        appBuilder.Services.AzzyBotStats();
+        appBuilder.Services.AzzyBotStats(isDev);
         appBuilder.Services.AzzyBotServices();
 
         #endregion Add services
