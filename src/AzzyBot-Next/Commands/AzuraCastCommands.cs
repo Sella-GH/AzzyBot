@@ -550,7 +550,7 @@ public sealed class AzuraCastCommands
             if (stationConfig.RequestThreshold is not 0)
             {
                 IReadOnlyList<AzuraRequestQueueItemRecord> requestsPlayed = await _azuraCast.GetStationRequestItemsAsync(baseUrl, apiKey, stationId, true);
-                long threshold = Converter.ConvertToUnixTime(DateTime.Now.AddMinutes(-stationConfig.RequestThreshold));
+                long threshold = Converter.ConvertToUnixTime(DateTime.UtcNow.AddMinutes(-stationConfig.RequestThreshold));
                 isPlayed = requestsPlayed.Any(r => (r.Track.SongId == songRequest.Song.SongId || r.Track.UniqueId == songRequest.Song.UniqueId) && r.Timestamp >= threshold);
             }
 
