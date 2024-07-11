@@ -19,6 +19,7 @@
 ### Fixes
 - `azuracast update-instace` says the station is already up-to-date but it's not
 - `admin debug-servers remove-servers` autocomplete not working
+- `config get-settings` looks now correct when displaying roles from AzuraCast and Core
 
 ## 2.0.0-preview2 - 2024-07-06
 ### Breaking Changes
