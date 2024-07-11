@@ -344,7 +344,7 @@ public sealed class AzuraCastCommands
             CommandContext context,
             [Description("The station of which you want to switch the playlist."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId,
             [Description("The playlist you want to switch to."), SlashAutoCompleteProvider(typeof(AzuraCastPlaylistAutocomplete))] int playlistId,
-            [Description("Choose if you want to disable all other active playlists from the station. Defaults to Yes."), SlashChoiceProvider<BooleanYesNoStateProvider>] bool removeOld = true
+            [Description("Choose if you want to disable all other active playlists from the station. Defaults to Yes."), SlashChoiceProvider<BooleanYesNoStateProvider>] int removeOld = 0
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -358,7 +358,7 @@ public sealed class AzuraCastCommands
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
             string stationName = Crypto.Decrypt(station.Name);
 
-            List<AzuraPlaylistStateRecord> states = await _azuraCast.SwitchPlaylistsAsync(new(baseUrl), apiKey, stationId, playlistId, removeOld);
+            List<AzuraPlaylistStateRecord> states = await _azuraCast.SwitchPlaylistsAsync(new(baseUrl), apiKey, stationId, playlistId, removeOld is 1);
             StringBuilder message = new();
             message.AppendLine(CultureInfo.InvariantCulture, $"I switched the {((states.Count is 1) ? "playlist" : "playlists")} for **{stationName}**.");
             foreach (AzuraPlaylistStateRecord state in states)

@@ -9,8 +9,8 @@ public sealed class BooleanYesNoStateProvider : IChoiceProvider
 {
     private readonly IReadOnlyDictionary<string, object> _booleanStates = new Dictionary<string, object>()
     {
-        ["Yes"] = true,
-        ["No"] = false
+        ["Yes"] = 1,
+        ["No"] = 2
     };
 
     public ValueTask<IReadOnlyDictionary<string, object>> ProvideAsync(CommandParameter parameter) => ValueTask.FromResult(_booleanStates);
