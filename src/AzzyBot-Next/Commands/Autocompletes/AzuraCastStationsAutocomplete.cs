@@ -41,10 +41,17 @@ public sealed class AzuraCastStationsAutocomplete(AzuraCastApiService azuraCastA
             return results;
         }
 
+        string search = context.UserInput;
         Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
         string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
         foreach (AzuraCastStationEntity station in stationsInDb)
         {
+            if (results.Count == 25)
+                break;
+
+            if (!string.IsNullOrWhiteSpace(search) && !Crypto.Decrypt(station.Name).Contains(search, StringComparison.OrdinalIgnoreCase))
+                continue;
+
             AzuraAdminStationConfigRecord config = await _azuraCast.GetStationAdminConfigAsync(baseUrl, apiKey, station.StationId);
 
             switch (context.Command.Name)

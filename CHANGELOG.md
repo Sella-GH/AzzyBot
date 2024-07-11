@@ -15,6 +15,7 @@
 - Changed some "True/False" boolean choices to "Enable/Disable" or "Yes/No"
 - Removed debug responses from answers
 - Removed the started/stopped additions in some autocompletes
+- All autocompletes are now searchable
 
 ### Fixes
 - `azuracast update-instace` says the station is already up-to-date but it's not

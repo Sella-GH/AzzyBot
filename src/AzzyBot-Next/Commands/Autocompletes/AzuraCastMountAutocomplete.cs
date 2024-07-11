@@ -38,8 +38,15 @@ public sealed class AzuraCastMountAutocomplete(DbActions dbActions) : IAutoCompl
             return results;
         }
 
+        string search = context.UserInput;
         foreach (AzuraCastStationMountEntity mount in mountsInDb)
         {
+            if (results.Count == 25)
+                break;
+
+            if (!string.IsNullOrWhiteSpace(search) && !Crypto.Decrypt(mount.Name).Contains(search, StringComparison.OrdinalIgnoreCase))
+                continue;
+
             results.Add(Crypto.Decrypt(mount.Name), mount.Id);
         }
 

@@ -34,9 +34,16 @@ public sealed class GuildsAutocomplete(DbActions dbActions, DiscordBotService bo
                 break;
         }
 
+        string search = context.UserInput;
         Dictionary<string, object> results = [];
         foreach (GuildsEntity guildDb in guildsInDb.Where(g => guilds.ContainsKey(g.UniqueId)))
         {
+            if (results.Count == 25)
+                break;
+
+            if (!string.IsNullOrWhiteSpace(search) && !guilds[guildDb.UniqueId].Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+                continue;
+
             results.Add(guilds[guildDb.UniqueId].Name, guildDb.UniqueId.ToString(CultureInfo.InvariantCulture));
         }
 
