@@ -261,68 +261,54 @@ public sealed class DiscordBotService
         if (!CheckIfClientIsConnected)
             return;
 
-        bool breakLoop = false;
-        foreach (ContextCheckFailedData data in ex.Errors)
+        ContextCheckFailedData? moduleActivatedCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is ModuleActivatedCheckAttribute);
+        if (moduleActivatedCheck is not null)
         {
-            if (breakLoop)
-                break;
-
-            switch (data.ContextCheckAttribute)
-            {
-                case AzuraCastDiscordPermCheckAttribute:
-                    string message = "You don't have the required permissions to execute this command!\nPlease contact {0}.";
-                    string[] info = data.ErrorMessage.Split(':');
-                    AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id);
-                    if (azuraCast is null)
-                    {
-                        await context.EditResponseAsync($"AzuraCast is not configured for this server!\nPlease contact {context.Guild.Owner.Mention}.");
-                        breakLoop = true;
-                        break;
-                    }
-
-                    if (info.Length is 2 && info[0] is "Instance")
-                    {
-                        message = message.Replace("{0}", $"<@&{azuraCast.InstanceAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
-                    }
-                    else if (info.Length is 3)
-                    {
-                        AzuraCastStationEntity? station = await _db.GetAzuraCastStationAsync(context.Guild.Id, Convert.ToInt32(info[1], CultureInfo.InvariantCulture));
-                        if (station is null)
-                        {
-                            await context.EditResponseAsync($"The station with ID {info[1]} does not exist!\nPlease contact @<{azuraCast.InstanceAdminRoleId}>.");
-                            breakLoop = true;
-                            break;
-                        }
-
-                        if (info[0] is "Admin")
-                        {
-                            message = message.Replace("{0}", $"<@&{station.StationAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
-                        }
-                        else if (info[0] is "DJ")
-                        {
-                            message = message.Replace("{0}", $"<@&{station.StationDjRoleId}>", StringComparison.OrdinalIgnoreCase);
-                        }
-                    }
-
-                    await context.EditResponseAsync(message);
-                    break;
-
-                case AzuraCastOnlineCheckAttribute:
-                    await context.EditResponseAsync($"The AzuraCast instance is currently offline!\nPlease contact {context.Guild.Owner.Mention}.");
-                    breakLoop = true;
-                    break;
-
-                case ModuleActivatedCheckAttribute:
-                    await context.EditResponseAsync("This module is not activated, you are unable to use commands from it.");
-                    breakLoop = true;
-                    break;
-
-                default:
-                    await AcknowledgeExceptionAsync(context);
-                    breakLoop = true;
-                    break;
-            }
+            await context.EditResponseAsync("This module is not activated, you are unable to use commands from it.");
+            return;
         }
+
+        ContextCheckFailedData? azuraCastOnlineCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is AzuraCastOnlineCheckAttribute);
+        if (azuraCastOnlineCheck is not null)
+        {
+            await context.EditResponseAsync("The AzuraCast instance is currently offline!\nPlease contact {context.Guild.Owner.Mention}.");
+            return;
+        }
+
+        ContextCheckFailedData? azuraCastDiscordPermCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is AzuraCastDiscordPermCheckAttribute);
+        if (azuraCastDiscordPermCheck is not null)
+        {
+            string message = "You don't have the required permissions to execute this command!\nPlease contact {0}.";
+            string[] info = azuraCastDiscordPermCheck.ErrorMessage.Split(':');
+            AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id);
+            if (azuraCast is null)
+                return;
+
+            if (info.Length is 2 && info[0] is "Instance")
+            {
+                message = message.Replace("{0}", $"<@&{azuraCast.InstanceAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
+            }
+            else if (info.Length is 3)
+            {
+                AzuraCastStationEntity? station = await _db.GetAzuraCastStationAsync(context.Guild.Id, Convert.ToInt32(info[1], CultureInfo.InvariantCulture));
+                if (station is null)
+                    return;
+
+                if (info[0] is "Admin")
+                {
+                    message = message.Replace("{0}", $"<@&{station.StationAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
+                }
+                else if (info[0] is "DJ")
+                {
+                    message = message.Replace("{0}", $"<@&{station.StationDjRoleId}>", StringComparison.OrdinalIgnoreCase);
+                }
+            }
+
+            await context.EditResponseAsync(message);
+            return;
+        }
+
+        await AcknowledgeExceptionAsync(context);
     }
 
     public async Task<bool> SendMessageAsync(ulong channelId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, IMention[]? mentions = null)

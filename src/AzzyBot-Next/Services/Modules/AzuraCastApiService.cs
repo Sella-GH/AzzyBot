@@ -454,6 +454,35 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         return GetFromApiListAsync<AzuraRequestQueueItemRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
+    public async Task<AzuraSystemLogRecord?> GetSystemLogAsync(Uri baseUrl, string apiKey, string logName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentException.ThrowIfNullOrWhiteSpace(logName, nameof(logName));
+
+        string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Log}/{logName}";
+
+        AzuraSystemLogRecord? log;
+        try
+        {
+            log = await GetFromApiAsync<AzuraSystemLogRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+        }
+        catch (HttpRequestException)
+        {
+            return null;
+        }
+
+        return log;
+    }
+
+    public Task<AzuraSystemLogsRecord> GetSystemLogsAsync(Uri baseUrl, string apiKey)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+
+        string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Logs}";
+
+        return GetFromApiAsync<AzuraSystemLogsRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+    }
+
     public Task<AzuraUpdateRecord> GetUpdatesAsync(Uri baseUrl, string apiKey)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));

@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using AzzyBot.Commands.Autocompletes;
 using AzzyBot.Commands.Checks;
+using AzzyBot.Commands.Choices;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
@@ -39,9 +40,9 @@ public sealed class ConfigCommands
             [Description("Select the group that has the admin permissions on this instance.")] DiscordRole instanceAdminGroup,
             [Description("Select a channel to get general notifications about your azuracast installation."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel notificationChannel,
             [Description("Select a channel to get notifications when your azuracast installation is down."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel outagesChannel,
-            [Description("Enable or disable the automatic check if the AzuraCast instance of your server is down.")] bool serverStatus,
-            [Description("Enable or disable the automatic check for AzuraCast updates.")] bool updates,
-            [Description("Enable or disable the addition of the changelog to the posted AzuraCast updates.")] bool updatesChangelog
+            [Description("Enable or disable the automatic check if the AzuraCast instance of your server is down."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int serverStatus,
+            [Description("Enable or disable the automatic check for AzuraCast updates."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int updates,
+            [Description("Enable or disable the addition of the changelog to the posted AzuraCast updates."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int updatesChangelog
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -95,7 +96,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            await _db.AddAzuraCastAsync(guildId, url, apiKey, instanceAdminGroup.Id, notificationChannel.Id, outagesChannel.Id, serverStatus, updates, updatesChangelog);
+            await _db.AddAzuraCastAsync(guildId, url, apiKey, instanceAdminGroup.Id, notificationChannel.Id, outagesChannel.Id, serverStatus is 1, updates is 1, updatesChangelog is 1);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your AzuraCast installation was added successfully and private data has been encrypted.");
@@ -111,9 +112,9 @@ public sealed class ConfigCommands
             [Description("Enter the name of the new station.")] string stationName,
             [Description("Select the group that has the admin permissions on this station.")] DiscordRole adminGroup,
             [Description("Select a channel to get music requests when a request is not found on the server."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel requestsChannel,
-            [Description("Enable or disable the preference of HLS streams if you add an able mount point.")] bool hls,
-            [Description("Enable or disable the showing of the playlist in the nowplaying embed.")] bool showPlaylist,
-            [Description("Enable or disable the automatic check if files have been changed.")] bool fileChanges,
+            [Description("Enable or disable the preference of HLS streams if you add an able mount point."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int hls,
+            [Description("Enable or disable the showing of the playlist in the nowplaying embed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int showPlaylist,
+            [Description("Enable or disable the automatic check if files have been changed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int fileChanges,
             [Description("Enter the api key of the new station. This is optional if the admin one has the permission.")] string? apiKey = null,
             [Description("Select the group that has the dj permissions on this station.")] DiscordRole? djGroup = null
             )
@@ -137,7 +138,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            await _db.AddAzuraCastStationAsync(context.Guild.Id, station, stationName, adminGroup.Id, requestsChannel.Id, hls, showPlaylist, fileChanges, apiKey, djGroup?.Id);
+            await _db.AddAzuraCastStationAsync(context.Guild.Id, station, stationName, adminGroup.Id, requestsChannel.Id, hls is 1, showPlaylist is 1, fileChanges is 1, apiKey, djGroup?.Id);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your station was added successfully and private data has been encrypted.");
@@ -243,9 +244,9 @@ public sealed class ConfigCommands
         public async ValueTask UpdateAzuraCastChecksAsync
             (
             CommandContext context,
-            [Description("Enable or disable the automatic check if the AzuraCast instance of your server is down.")] bool? serverStatus = null,
-            [Description("Enable or disable the automatic check for AzuraCast updates.")] bool? updates = null,
-            [Description("Enable or disable the addition of the changelog to the posted AzuraCast updates.")] bool? updatesChangelog = null
+            [Description("Enable or disable the automatic check if the AzuraCast instance of your server is down."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int serverStatus = 0,
+            [Description("Enable or disable the automatic check for AzuraCast updates."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int updates = 0,
+            [Description("Enable or disable the addition of the changelog to the posted AzuraCast updates."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int updatesChangelog = 0
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -253,13 +254,44 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(UpdateAzuraCastChecksAsync), context.User.GlobalName);
 
-            if (serverStatus is null && updates is null && updatesChangelog is null)
+            if (serverStatus is 0 && updates is 0 && updatesChangelog is 0)
             {
                 await context.RespondAsync("You have to provide at least one parameter to update.");
                 return;
             }
 
-            await _db.UpdateAzuraCastChecksAsync(context.Guild.Id, serverStatus, updates, updatesChangelog);
+            bool? enableServerStatus = null;
+            bool? enableUpdates = null;
+            bool? enableUpdatesChangelog = null;
+
+            if (serverStatus is 1)
+            {
+                enableServerStatus = true;
+            }
+            else if (serverStatus is 2)
+            {
+                enableServerStatus = false;
+            }
+
+            if (updates is 1)
+            {
+                enableUpdates = true;
+            }
+            else if (updates is 2)
+            {
+                enableUpdates = false;
+            }
+
+            if (updatesChangelog is 1)
+            {
+                enableUpdatesChangelog = true;
+            }
+            else if (updatesChangelog is 2)
+            {
+                enableUpdatesChangelog = false;
+            }
+
+            await _db.UpdateAzuraCastChecksAsync(context.Guild.Id, enableServerStatus, enableUpdates, enableUpdatesChangelog);
 
             await context.EditResponseAsync("Your settings were saved successfully.");
         }
@@ -275,8 +307,8 @@ public sealed class ConfigCommands
             [Description("Modify the group that has the admin permissions on this station.")] DiscordRole? adminGroup = null,
             [Description("Modify the group that has the dj permissions on this station.")] DiscordRole? djGroup = null,
             [Description("Modify the channel to get music requests when a request is not found on the server."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? requestsChannel = null,
-            [Description("Enable or disable the preference of HLS streams if you add an able mount point.")] bool? hls = null,
-            [Description("Enable or disable the showing of the playlist in the nowplaying embed.")] bool? showPlaylist = null
+            [Description("Enable or disable the preference of HLS streams if you add an able mount point."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int hls = 0,
+            [Description("Enable or disable the showing of the playlist in the nowplaying embed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int showPlaylist = 0
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -284,13 +316,34 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(UpdateAzuraCastStationAsync), context.User.GlobalName);
 
-            if (stationId is null && stationName is null && apiKey is null && adminGroup is null && djGroup is null && requestsChannel is null && hls is null && showPlaylist is null)
+            if (stationId is null && stationName is null && apiKey is null && adminGroup is null && djGroup is null && requestsChannel is null && hls is 0 && showPlaylist is 0)
             {
                 await context.RespondAsync("You have to provide at least one parameter to update.");
                 return;
             }
 
-            await _db.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, stationName, apiKey, adminGroup?.Id, djGroup?.Id, requestsChannel?.Id, hls, showPlaylist);
+            bool? preferHls = null;
+            bool? showPlaylistInEmbed = null;
+
+            if (hls is 1)
+            {
+                preferHls = true;
+            }
+            else if (hls is 2)
+            {
+                preferHls = false;
+            }
+
+            if (showPlaylist is 1)
+            {
+                showPlaylistInEmbed = true;
+            }
+            else if (showPlaylist is 2)
+            {
+                showPlaylistInEmbed = false;
+            }
+
+            await _db.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, stationName, apiKey, adminGroup?.Id, djGroup?.Id, requestsChannel?.Id, preferHls, showPlaylistInEmbed);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your settings were saved successfully and private data has been encrypted.");
@@ -301,7 +354,7 @@ public sealed class ConfigCommands
             (
             CommandContext context,
             [Description("Choose the station you want to modify the checks."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
-            [Description("Enable or disable the automatic check if files have been changed.")] bool? fileChanges = null
+            [Description("Enable or disable the automatic check if files have been changed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int fileChanges = 0
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -309,13 +362,23 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(UpdateAzuraCastStationChecksAsync), context.User.GlobalName);
 
-            if (fileChanges is null)
+            if (fileChanges is 0)
             {
                 await context.RespondAsync("You have to provide at least one parameter to update.");
                 return;
             }
 
-            await _db.UpdateAzuraCastStationChecksAsync(context.Guild.Id, station, fileChanges);
+            bool? enableFileChanges = null;
+            if (fileChanges is 1)
+            {
+                enableFileChanges = true;
+            }
+            else if (fileChanges is 2)
+            {
+                enableFileChanges = false;
+            }
+
+            await _db.UpdateAzuraCastStationChecksAsync(context.Guild.Id, station, enableFileChanges);
 
             await context.EditResponseAsync("Your settings were saved successfully.");
         }

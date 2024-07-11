@@ -29,7 +29,6 @@ public sealed class AzuraCastRequestAutocomplete(AzuraCastApiService azuraCast, 
         if (stationId == 0)
             return results;
 
-        string search = context.UserInput;
         AzuraCastStationEntity? station;
         try
         {
@@ -42,6 +41,7 @@ public sealed class AzuraCastRequestAutocomplete(AzuraCastApiService azuraCast, 
             return results;
         }
 
+        string search = context.UserInput;
         string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(station.AzuraCast.AdminApiKey);
         string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
         StringBuilder songResult = new();

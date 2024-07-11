@@ -30,7 +30,6 @@ public sealed class AzuraCastPlaylistAutocomplete(AzuraCastApiService azuraCast,
         if (stationId == 0)
             return results;
 
-        string search = context.UserInput;
         AzuraCastStationEntity? station;
         try
         {
@@ -43,6 +42,7 @@ public sealed class AzuraCastPlaylistAutocomplete(AzuraCastApiService azuraCast,
             return results;
         }
 
+        string search = context.UserInput;
         string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(station.AzuraCast.AdminApiKey);
         string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
         IReadOnlyList<AzuraPlaylistRecord> playlists = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, stationId);

@@ -159,6 +159,40 @@ public sealed class AzuraCastCommands
             await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, context.Guild.Id);
         }
 
+        [Command("get-system-logs"), Description("Get the system logs of the AzuraCast instance."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
+        public async ValueTask GetSystemLogsAsync
+        (
+            CommandContext context,
+            [Description("The system log you want to see."), SlashAutoCompleteProvider(typeof(AzuraCastSystemLogAutocomplete))] string logName
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+
+            _logger.CommandRequested(nameof(GetSystemLogsAsync), context.User.GlobalName);
+
+            AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
+            string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
+            string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
+
+            AzuraSystemLogRecord? systemLog = await _azuraCast.GetSystemLogAsync(new(baseUrl), apiKey, logName);
+            if (systemLog is null)
+            {
+                await context.EditResponseAsync("This system log is empty and cannot be viewed.");
+                return;
+            }
+
+            string fileName = $"{azuraCast.Id}_{logName}_{DateTime.Now:yyyy-MM-dd_hh-mm-ss}.log";
+            string filePath = await FileOperations.CreateTempFileAsync(systemLog.Content, fileName);
+            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
+            await using DiscordMessageBuilder builder = new();
+            builder.WithContent($"Here is the requested system log ({logName}).");
+            builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
+            await context.EditResponseAsync(builder);
+
+            FileOperations.DeleteFile(filePath);
+        }
+
         [Command("hardware-stats"), Description("Get the hardware stats of the running server."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
         public async ValueTask GetHardwareStatsAsync(CommandContext context)
         {
@@ -269,7 +303,7 @@ public sealed class AzuraCastCommands
 
             await _azuraCast.UpdateInstanceAsync(new(baseUrl), apiKey);
 
-            await context.FollowupAsync("The update was successful. The instance is online again.");
+            await context.FollowupAsync("The update was successful. Your instance is fully ready again.");
         }
     }
 
@@ -344,7 +378,7 @@ public sealed class AzuraCastCommands
             CommandContext context,
             [Description("The station of which you want to switch the playlist."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId,
             [Description("The playlist you want to switch to."), SlashAutoCompleteProvider(typeof(AzuraCastPlaylistAutocomplete))] int playlistId,
-            [Description("Choose if you want to disable all other active playlists from the station. Defaults to Yes.")] bool removeOld = true
+            [Description("Choose if you want to disable all other active playlists from the station. Defaults to Yes."), SlashChoiceProvider<BooleanYesNoStateProvider>] int removeOld = 0
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -358,7 +392,7 @@ public sealed class AzuraCastCommands
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
             string stationName = Crypto.Decrypt(station.Name);
 
-            List<AzuraPlaylistStateRecord> states = await _azuraCast.SwitchPlaylistsAsync(new(baseUrl), apiKey, stationId, playlistId, removeOld);
+            List<AzuraPlaylistStateRecord> states = await _azuraCast.SwitchPlaylistsAsync(new(baseUrl), apiKey, stationId, playlistId, removeOld is 1);
             StringBuilder message = new();
             message.AppendLine(CultureInfo.InvariantCulture, $"I switched the {((states.Count is 1) ? "playlist" : "playlists")} for **{stationName}**.");
             foreach (AzuraPlaylistStateRecord state in states)
@@ -415,7 +449,7 @@ public sealed class AzuraCastCommands
             string filePath = await FileOperations.CreateCsvFileAsync(exportHistory, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
             await using DiscordMessageBuilder builder = new();
-            builder.WithContent($"Here is the song history for station **{Crypto.Decrypt(station.Name)}** ({station.StationId}) on **{dateString}**.");
+            builder.WithContent($"Here is the song history for station **{Crypto.Decrypt(station.Name)}** on **{dateString}**.");
             builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
             await context.EditResponseAsync(builder);
 
@@ -550,7 +584,7 @@ public sealed class AzuraCastCommands
             if (stationConfig.RequestThreshold is not 0)
             {
                 IReadOnlyList<AzuraRequestQueueItemRecord> requestsPlayed = await _azuraCast.GetStationRequestItemsAsync(baseUrl, apiKey, stationId, true);
-                long threshold = Converter.ConvertToUnixTime(DateTime.Now.AddMinutes(-stationConfig.RequestThreshold));
+                long threshold = Converter.ConvertToUnixTime(DateTime.UtcNow.AddMinutes(-stationConfig.RequestThreshold));
                 isPlayed = requestsPlayed.Any(r => (r.Track.SongId == songRequest.Song.SongId || r.Track.UniqueId == songRequest.Song.UniqueId) && r.Timestamp >= threshold);
             }
 

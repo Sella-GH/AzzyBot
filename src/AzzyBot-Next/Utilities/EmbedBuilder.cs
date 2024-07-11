@@ -400,7 +400,7 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
-            ["Uptime"] = new($"<t:{Converter.ConvertToUnixTime(AzzyStatsSoftware.GetBotUptime())}>", true),
+            ["Uptime"] = new($"<t:{Converter.ConvertToUnixTime(AzzyStatsSoftware.GetBotUptime().ToLocalTime())}>", true),
             ["Bot Version"] = new(AzzyStatsSoftware.GetBotVersion, true),
             [".NET Version"] = new(AzzyStatsSoftware.GetBotDotNetVersion, true),
             ["D#+ Version"] = new(dspVersion, true),
@@ -409,7 +409,7 @@ public static class EmbedBuilder
             ["Environment"] = new(AzzyStatsSoftware.GetBotEnvironment, true),
             ["Source Code"] = new(sourceCode, true),
             ["Memory Usage"] = new($"{AzzyStatsSoftware.GetBotMemoryUsage()} GB", true),
-            ["Compilation Date"] = new($"<t:{Converter.ConvertToUnixTime(compileDate)}>", true),
+            ["Compilation Date"] = new($"<t:{Converter.ConvertToUnixTime(compileDate.ToLocalTime())}>", true),
             ["AzzyBot GitHub Commit"] = new(formattedCommit)
         };
 
@@ -426,7 +426,7 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
-            ["Release Date"] = new($"<t:{Converter.ConvertToUnixTime(updateDate)}>"),
+            ["Release Date"] = new($"<t:{Converter.ConvertToUnixTime(updateDate.ToLocalTime())}>"),
             ["Your Version"] = new(yourVersion),
             ["New Version"] = new(version)
         };
@@ -477,7 +477,7 @@ public static class EmbedBuilder
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
             ["Server ID"] = new(guild.UniqueId.ToString(CultureInfo.InvariantCulture)),
-            ["Admin Role"] = new((!string.IsNullOrWhiteSpace(adminRole)) ? adminRole : "Not set"),
+            ["Admin Role"] = new((!string.IsNullOrWhiteSpace(adminRole) || adminRole is not "()") ? adminRole : "Not set"),
             ["Admin Notify Channel"] = new((guild.AdminNotifyChannelId > 0) ? $"<#{guild.AdminNotifyChannelId}>" : "Not set"),
             ["Error Channel"] = new((guild.ErrorChannelId > 0) ? $"<#{guild.ErrorChannelId}>" : "Not set"),
             ["Configuration Complete"] = new(Misc.ReadableBool(guild.ConfigSet, ReadbleBool.YesNo))
@@ -496,7 +496,7 @@ public static class EmbedBuilder
         {
             ["Base Url"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.BaseUrl)) ? Crypto.Decrypt(azuraCast.BaseUrl) : "Not set")}||"),
             ["Admin Api Key"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.AdminApiKey)) ? Crypto.Decrypt(azuraCast.AdminApiKey) : "Not set")}||"),
-            ["Instance Admin Role"] = new((!string.IsNullOrWhiteSpace(instanceRole)) ? instanceRole : "Not set"),
+            ["Instance Admin Role"] = new((!string.IsNullOrWhiteSpace(instanceRole) || instanceRole is not "()") ? instanceRole : "Not set"),
             ["Notification Channel"] = new((azuraCast.NotificationChannelId > 0) ? $"<#{azuraCast.NotificationChannelId}>" : "Not set"),
             ["Outages Channel"] = new((azuraCast.OutagesChannelId > 0) ? $"<#{azuraCast.OutagesChannelId}>" : "Not set"),
             ["Automatic Checks"] = new($"- Server Status: {Misc.ReadableBool(azuraCast.Checks.ServerStatus, ReadbleBool.EnabledDisabled)}\n- Updates: {Misc.ReadableBool(azuraCast.Checks.Updates, ReadbleBool.EnabledDisabled)}\n- Updates Changelog: {Misc.ReadableBool(azuraCast.Checks.UpdatesShowChangelog, ReadbleBool.EnabledDisabled)}")
@@ -514,7 +514,8 @@ public static class EmbedBuilder
             if (station.StationAdminRoleId > 0)
             {
                 string role = stationRoles.FirstOrDefault(x => x.Key == station.StationAdminRoleId).Value;
-                stationAdminRole = (role is not null) ? $"<@&{role}>" : "Not set";
+                ulong roleId = stationRoles.FirstOrDefault(x => x.Key == station.StationAdminRoleId).Key;
+                stationAdminRole = (role is not null) ? $"{role} ({roleId})" : "Not set";
             }
             else
             {
@@ -525,7 +526,8 @@ public static class EmbedBuilder
             if (station.StationDjRoleId > 0)
             {
                 string role = stationRoles.FirstOrDefault(x => x.Key == station.StationDjRoleId).Value;
-                stationDjRole = (role is not null) ? $"<@&{role}>" : "Not set";
+                ulong roleId = stationRoles.FirstOrDefault(x => x.Key == station.StationDjRoleId).Key;
+                stationDjRole = (role is not null) ? $"{role} ({roleId})" : "Not set";
             }
             else
             {

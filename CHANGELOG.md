@@ -9,11 +9,23 @@
 ### General
 - Reworked the whole background database structure to make it easier, faster and less ressource-consuming
 
+### Additions
+- `azuracast get-system-logs` You are now able to view system logs of your instance
+
+### Improvements
+- AzuraCast command checks are now reviewed by priority
+  - If the module is not activated the answer will be shouted first now
+- Changed some "True/False" boolean choices to "Enable/Disable" or "Yes/No"
+- Removed debug responses from answers
+- Removed the started/stopped additions in some autocompletes
+- All autocompletes are now searchable
+
 ### Fixes
 - `azuracast update-instace` says the station is already up-to-date but it's not
 - `admin debug-servers remove-servers` autocomplete not working
+- `config get-settings` looks now correct when displaying roles from AzuraCast and Core
 
-## 2.0.0-preview2
+## 2.0.0-preview2 - 2024-07-06
 ### Breaking Changes
 - Your Database needs a complete reset, please DROP it and start from scratch
   - You'll likely experience this a few more times until the final release
@@ -48,7 +60,7 @@
 - Guild Database Entity was not updated when AzuraCast was activated or disabled
 - Some autocomplete exceptions
 
-## 2.0.0-preview1.1
+## 2.0.0-preview1.1 - 2024-06-06
 ### General
 - Your Database needs a complete reset, please DROP it and start from scratch.
 
@@ -68,7 +80,7 @@
   - `admin debug-servers add-server`
   - `admin debug-servers remove-server`
 
-## 2.0.0-preview1
+## 2.0.0-preview1 - 2024-06-01
 ### General
 - Complete rewrite of the bot using newest technologies
 - Included a database to store your settings and other important data

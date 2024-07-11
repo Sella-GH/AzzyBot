@@ -7,6 +7,8 @@ public static class AzuraApiEndpoints
     public const string Clear = "clear";
     public const string Files = "files";
     public const string History = "history";
+    public const string Log = "log";
+    public const string Logs = "logs";
     public const string NowPlaying = "nowplaying";
     public const string Queue = "queue";
     public const string Playlist = "playlist";
@@ -16,6 +18,7 @@ public static class AzuraApiEndpoints
     public const string Requests = "requests";
     public const string Restart = "restart";
     public const string Server = "server";
+    public const string Services = "services";
     public const string Skip = "skip";
     public const string Station = "station";
     public const string Stations = "stations";

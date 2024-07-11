@@ -41,10 +41,17 @@ public sealed class AzuraCastStationsAutocomplete(AzuraCastApiService azuraCastA
             return results;
         }
 
+        string search = context.UserInput;
         Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
         string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
         foreach (AzuraCastStationEntity station in stationsInDb)
         {
+            if (results.Count == 25)
+                break;
+
+            if (!string.IsNullOrWhiteSpace(search) && !Crypto.Decrypt(station.Name).Contains(search, StringComparison.OrdinalIgnoreCase))
+                continue;
+
             AzuraAdminStationConfigRecord config = await _azuraCast.GetStationAdminConfigAsync(baseUrl, apiKey, station.StationId);
 
             switch (context.Command.Name)
@@ -53,12 +60,17 @@ public sealed class AzuraCastStationsAutocomplete(AzuraCastApiService azuraCastA
                 case "stop-station" when !config.IsEnabled:
                     continue;
 
+                case "start-station" when !config.IsEnabled:
+                case "stop-station" when config.IsEnabled:
+                    results.Add($"{Crypto.Decrypt(station.Name)} ({Misc.ReadableBool(config.IsEnabled, ReadbleBool.StartedStopped, true)})", station.Id);
+                    break;
+
                 case "toggle-song-requests":
                     results.Add($"{Crypto.Decrypt(station.Name)} ({Misc.ReadableBool(config.EnableRequests, ReadbleBool.EnabledDisabled, true)})", station.Id);
                     break;
 
                 default:
-                    results.Add($"{Crypto.Decrypt(station.Name)} ({Misc.ReadableBool(config.IsEnabled, ReadbleBool.StartedStopped, true)})", station.Id);
+                    results.Add($"{Crypto.Decrypt(station.Name)}", station.Id);
                     break;
             }
         }
