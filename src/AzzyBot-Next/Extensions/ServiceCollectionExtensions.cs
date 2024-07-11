@@ -40,6 +40,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<DbActions>();
         services.AddTransient<DatabaseService>();
 
+        serviceProvider = services.BuildServiceProvider();
+
         if (!string.IsNullOrWhiteSpace(settings.Database?.NewEncryptionKey) && settings.Database.NewEncryptionKey != settings.Database.EncryptionKey)
         {
             await PerformDatabaseBackupAsync(serviceProvider);
