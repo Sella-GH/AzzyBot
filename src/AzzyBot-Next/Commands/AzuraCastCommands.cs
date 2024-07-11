@@ -267,9 +267,9 @@ public sealed class AzuraCastCommands
 
             await context.EditResponseAsync("I initiated the update for the AzuraCast instance. Please wait a little until it restarts.");
 
-            await _azuraCast.UpdateInstanceAsync(new(baseUrl), apiKey, context);
+            await _azuraCast.UpdateInstanceAsync(new(baseUrl), apiKey);
 
-            await context.FollowupAsync("All background services started successfully. The instance is fully ready again.");
+            await context.FollowupAsync("The update was successful. Your instance is fully ready again.");
         }
     }
 

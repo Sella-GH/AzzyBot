@@ -563,10 +563,9 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         await PutToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
     }
 
-    public async Task UpdateInstanceAsync(Uri baseUrl, string apiKey, CommandContext context)
+    public async Task UpdateInstanceAsync(Uri baseUrl, string apiKey)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Updates}";
 
@@ -582,26 +581,6 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
             {
                 status = await GetFromApiAsync<AzuraStatusRecord>(baseUrl, AzuraApiEndpoints.Status);
                 online = status.Online;
-            }
-            catch (HttpRequestException)
-            {
-                online = false;
-            }
-        }
-
-        await context.FollowupAsync("The instance update was successful, please wait for the background services to start.");
-
-        endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Services}";
-        IReadOnlyList<AzuraInstanceServiceRecord> services;
-        online = false;
-        while (!online)
-        {
-            await Task.Delay(TimeSpan.FromSeconds(10));
-
-            try
-            {
-                services = await GetFromApiListAsync<AzuraInstanceServiceRecord>(baseUrl, endpoint, CreateHeader(apiKey));
-                online = services.All(s => s.Running);
             }
             catch (HttpRequestException)
             {
