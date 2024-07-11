@@ -16,7 +16,16 @@ FROM mcr.microsoft.com/dotnet/runtime:8.0-bookworm-slim
 # Upgrade internal tools and packages first
 USER root
 RUN apt update && apt upgrade -y && apt autoremove -y
-RUN apt install -y --no-install-recommends iputils-ping postgresql-client
+
+# Install needed packages for postgresql
+RUN apt install -y --no-install-recommends curl ca-certificates
+RUN install -d /usr/share/postgresql-common/pgdg
+RUN curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc --fail https://www.postgresql.org/media/keys/ACCC4CF8.asc
+RUN sh -c 'echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+
+# Install additional packages
+RUN apt update && apt upgrade -y && apt autoremove -y
+RUN apt install -y --no-install-recommends iputils-ping postgresql-client-16
 
 # Copy the built app
 WORKDIR /app
