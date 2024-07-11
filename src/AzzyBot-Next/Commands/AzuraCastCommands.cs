@@ -159,6 +159,40 @@ public sealed class AzuraCastCommands
             await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, context.Guild.Id);
         }
 
+        [Command("get-system-logs"), Description("Get the system logs of the AzuraCast instance."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
+        public async ValueTask GetSystemLogsAsync
+        (
+            CommandContext context,
+            [Description("The system log you want to see."), SlashAutoCompleteProvider(typeof(AzuraCastSystemLogAutocomplete))] string logName
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+
+            _logger.CommandRequested(nameof(GetSystemLogsAsync), context.User.GlobalName);
+
+            AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
+            string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
+            string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
+
+            AzuraSystemLogRecord? systemLog = await _azuraCast.GetSystemLogAsync(new(baseUrl), apiKey, logName);
+            if (systemLog is null)
+            {
+                await context.EditResponseAsync("This system log is empty and cannot be viewed.");
+                return;
+            }
+
+            string fileName = $"{azuraCast.Id}_{logName}_{DateTime.Now:yyyy-MM-dd_hh-mm-ss}.log";
+            string filePath = await FileOperations.CreateTempFileAsync(systemLog.Content, fileName);
+            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
+            await using DiscordMessageBuilder builder = new();
+            builder.WithContent($"Here is the requested system log ({logName}).");
+            builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
+            await context.EditResponseAsync(builder);
+
+            FileOperations.DeleteFile(filePath);
+        }
+
         [Command("hardware-stats"), Description("Get the hardware stats of the running server."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
         public async ValueTask GetHardwareStatsAsync(CommandContext context)
         {

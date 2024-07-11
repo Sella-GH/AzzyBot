@@ -9,6 +9,9 @@
 ### General
 - Reworked the whole background database structure to make it easier, faster and less ressource-consuming
 
+### Additions
+- `azuracast get-system-logs` You are now able to view system logs of your instance
+
 ### Improvements
 - AzuraCast command checks are now reviewed by priority
   - If the module is not activated the answer will be shouted first now
