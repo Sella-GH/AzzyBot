@@ -5,7 +5,8 @@
     "NotificationChannelId": 0,
     "LogRetentionDays": 7,
     "Database": {
-        "EncryptionKey": ""
+        "EncryptionKey": "",
+        "NewEncryptionKey": ""
     },
     "DiscordStatus": {
         "Activity": 2,
