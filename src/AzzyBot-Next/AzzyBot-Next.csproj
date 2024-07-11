@@ -97,7 +97,7 @@
 
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="33.0.1" />
-    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02271" />
+    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02307" />
     <PackageReference Include="DSharpPlus.Commands" Version="5.0.0-nightly-02271" />
     <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02271" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7">
