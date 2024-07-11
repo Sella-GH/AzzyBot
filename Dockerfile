@@ -18,14 +18,14 @@ USER root
 RUN apt update && apt upgrade -y && apt autoremove -y
 
 # Install needed packages for postgresql
-RUN apt install -y --no-install-recommends curl ca-certificates
-RUN install -d /usr/share/postgresql-common/pgdg
-RUN curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc --fail https://www.postgresql.org/media/keys/ACCC4CF8.asc
-RUN sh -c 'echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+RUN apt install -y --no-install-recommends wget gnupg2
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+RUN apt update && apt install -y --no-install-recommends postgresql-client-16 && apt clean
+RUN rm -rf /var/lib/apt/lists/*
 
 # Install additional packages
-RUN apt update && apt upgrade -y && apt autoremove -y
-RUN apt install -y --no-install-recommends iputils-ping postgresql-client-16
+RUN apt install -y --no-install-recommends iputils-ping
 
 # Copy the built app
 WORKDIR /app
