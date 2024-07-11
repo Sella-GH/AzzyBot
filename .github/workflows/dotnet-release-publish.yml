@@ -101,6 +101,7 @@ jobs:
           mv ./LICENSE ./docker-zip/LICENSE
           mv ./README.md ./docker-zip/README.md
           mv ./SECURITY.md ./docker-zip/SECURITY.md
+          mkdir -p ./docker-zip/AzzyBot/Backups
           mkdir -p ./docker-zip/AzzyBot/Logs
           mkdir -p ./docker-zip/AzzyBot/Modules/AzuraCast/Files
           #mkdir -p ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins

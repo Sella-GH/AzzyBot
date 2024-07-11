@@ -16,7 +16,7 @@ FROM mcr.microsoft.com/dotnet/runtime:8.0-bookworm-slim
 # Upgrade internal tools and packages first
 USER root
 RUN apt update && apt upgrade -y && apt autoremove -y
-RUN apt install -y --no-install-recommends iputils-ping
+RUN apt install -y --no-install-recommends iputils-ping postgresql-client
 
 # Copy the built app
 WORKDIR /app
