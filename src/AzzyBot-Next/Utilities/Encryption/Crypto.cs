@@ -9,9 +9,9 @@ public static class Crypto
 {
     public static byte[] EncryptionKey = [];
 
-    public static string Encrypt(string plain)
+    public static string Encrypt(string plain, byte[]? newKey = null)
     {
-        using AesCcm aes = new(EncryptionKey);
+        using AesCcm aes = new(newKey ?? EncryptionKey);
 
         byte[] nonce = new byte[AesGcm.NonceByteSizes.MaxSize];
         RandomNumberGenerator.Fill(nonce);
@@ -23,11 +23,11 @@ public static class Crypto
         return new AesGcmCipher(nonce, tag, cipherBytes).ToString();
     }
 
-    public static string Decrypt(string cipher)
+    public static string Decrypt(string cipher, byte[]? newKey = null)
     {
         AesGcmCipher gcmCipher = AesGcmCipher.FromBase64String(cipher);
 
-        using AesCcm aes = new(EncryptionKey);
+        using AesCcm aes = new(newKey ?? EncryptionKey);
         byte[] plainBytes = new byte[gcmCipher.Cipher.Length];
         aes.Decrypt(gcmCipher.Nonce, gcmCipher.Cipher, gcmCipher.Tag, plainBytes);
 

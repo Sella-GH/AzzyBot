@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using AzzyBot.Database;
 using AzzyBot.Services;
 using AzzyBot.Services.Modules;
 using Microsoft.Extensions.Logging;
@@ -13,6 +14,12 @@ public static partial class LoggerActions
 
     [LoggerMessage(1, LogLevel.Debug, "{number} logfiles were deleted")]
     public static partial void LogfileDeleted(this ILogger<CoreServiceHost> logger, int number);
+
+    [LoggerMessage(2, LogLevel.Debug, "Starting database backup")]
+    public static partial void DatabaseStartBackup(this ILogger<DatabaseService> logger);
+
+    [LoggerMessage(3, LogLevel.Debug, "Database backup completed")]
+    public static partial void DatabaseBackupCompleted(this ILogger<DatabaseService> logger);
 
     [LoggerMessage(10, LogLevel.Debug, "Starting global timer")]
     public static partial void GlobalTimerStart(this ILogger<TimerServiceHost> logger);
@@ -118,6 +125,9 @@ public static partial class LoggerActions
 
     [LoggerMessage(320, LogLevel.Error, "Database transaction failed with error: ")]
     public static partial void DatabaseTransactionFailed(this ILogger logger, Exception ex);
+
+    [LoggerMessage(321, LogLevel.Error, "Database backup failed")]
+    public static partial void DatabaseBackupFailed(this ILogger<DatabaseService> logger);
 
     [LoggerMessage(400, LogLevel.Critical, "The given settings can't be parsed, are they filled out?")]
     public static partial void UnableToParseSettings(this ILogger<DiscordBotServiceHost> logger);
