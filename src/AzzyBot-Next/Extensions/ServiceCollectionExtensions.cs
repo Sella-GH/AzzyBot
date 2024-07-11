@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using AzzyBot.Database;
+using AzzyBot.Database.Entities;
 using AzzyBot.Services;
 using AzzyBot.Services.Interfaces;
 using AzzyBot.Services.Modules;
@@ -11,6 +13,7 @@ using AzzyBot.Settings;
 using AzzyBot.Utilities;
 using AzzyBot.Utilities.Encryption;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,7 +21,7 @@ namespace AzzyBot.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static void AzzyBotServices(this IServiceCollection services)
+    public static async void AzzyBotServices(this IServiceCollection services)
     {
         // Enable or disable modules based on the settings
         IServiceProvider serviceProvider = services.BuildServiceProvider();
@@ -35,6 +38,13 @@ public static class ServiceCollectionExtensions
         string connectionString = GetConnectionString(settings.Database?.Host, settings.Database?.Port, settings.Database?.User, settings.Database?.Password, settings.Database?.DatabaseName);
         services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseNpgsql(connectionString));
         services.AddSingleton<DbActions>();
+        services.AddTransient<DatabaseService>();
+
+        if (!string.IsNullOrWhiteSpace(settings.Database?.NewEncryptionKey) && settings.Database.NewEncryptionKey != settings.Database.EncryptionKey)
+        {
+            await PerformDatabaseBackupAsync(serviceProvider);
+            //await ReencryptDatabaseAsync(serviceProvider, settings);
+        }
 
         services.AddSingleton<DiscordBotService>();
         services.AddSingleton<DiscordBotServiceHost>();
@@ -81,7 +91,7 @@ public static class ServiceCollectionExtensions
         }
 
         // Check settings if something is missing
-        List<string> exclusions = [nameof(settings.DiscordStatus.StreamUrl)];
+        List<string> exclusions = [nameof(settings.Database.NewEncryptionKey), nameof(settings.DiscordStatus.StreamUrl)];
         if (isDocker)
         {
             exclusions.Add(nameof(settings.Database.Host));
@@ -159,5 +169,65 @@ public static class ServiceCollectionExtensions
         configBuilder.AddJsonFile(path, false, false);
 
         return configBuilder.Build();
+    }
+
+    private static async Task PerformDatabaseBackupAsync(IServiceProvider serviceProvider)
+    {
+        DatabaseService databaseService = serviceProvider.GetRequiredService<DatabaseService>();
+        await databaseService.BackupDatabaseAsync();
+    }
+
+    private static async Task ReencryptDatabaseAsync(IServiceProvider serviceProvider, AzzyBotSettingsRecord settings)
+    {
+        byte[] newEncryptionKey = Encoding.UTF8.GetBytes(settings.Database!.NewEncryptionKey);
+
+        using IServiceScope scope = serviceProvider.CreateScope();
+        AzzyDbContext context = scope.ServiceProvider.GetRequiredService<AzzyDbContext>();
+        await using IDbContextTransaction transaction = await context.Database.BeginTransactionAsync();
+
+        List<AzuraCastEntity> azuraCast = await context.AzuraCast.ToListAsync();
+        List<AzuraCastStationEntity> azuraCastStations = await context.AzuraCastStations.ToListAsync();
+        List<AzuraCastStationMountEntity> AzuraCastStationMounts = await context.AzuraCastStationMounts.ToListAsync();
+
+        try
+        {
+            foreach (AzuraCastEntity entity in azuraCast)
+            {
+                entity.BaseUrl = Crypto.Decrypt(entity.BaseUrl);
+                entity.BaseUrl = Crypto.Encrypt(entity.BaseUrl, newEncryptionKey);
+
+                entity.AdminApiKey = Crypto.Decrypt(entity.AdminApiKey);
+                entity.AdminApiKey = Crypto.Encrypt(entity.AdminApiKey, newEncryptionKey);
+            }
+
+            foreach (AzuraCastStationEntity entity in azuraCastStations)
+            {
+                entity.Name = Crypto.Decrypt(entity.Name);
+                entity.Name = Crypto.Encrypt(entity.Name, newEncryptionKey);
+
+                if (!string.IsNullOrWhiteSpace(entity.ApiKey))
+                {
+                    entity.ApiKey = Crypto.Decrypt(entity.ApiKey);
+                    entity.ApiKey = Crypto.Encrypt(entity.ApiKey, newEncryptionKey);
+                }
+            }
+
+            foreach (AzuraCastStationMountEntity entity in AzuraCastStationMounts)
+            {
+                entity.Mount = Crypto.Decrypt(entity.Mount);
+                entity.Mount = Crypto.Encrypt(entity.Mount, newEncryptionKey);
+
+                entity.Name = Crypto.Decrypt(entity.Name);
+                entity.Name = Crypto.Encrypt(entity.Name, newEncryptionKey);
+            }
+
+            await context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
+        {
+            await transaction.RollbackAsync();
+            throw new InvalidOperationException("An error occured while re-encrypting the database", ex);
+        }
     }
 }
