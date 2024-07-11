@@ -19,7 +19,7 @@ RUN apt update && apt upgrade -y && apt autoremove -y
 
 # Install needed packages for postgresql
 RUN apt install -y --no-install-recommends wget gnupg2
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt/ bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list
 RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 RUN apt update && apt install -y --no-install-recommends postgresql-client-16 && apt clean
 RUN rm -rf /var/lib/apt/lists/*
