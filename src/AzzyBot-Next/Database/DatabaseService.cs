@@ -9,10 +9,10 @@ using Npgsql;
 
 namespace AzzyBot.Database;
 
-public sealed class DatabaseService(ILogger<DatabaseService> logger, AzzyDbContext dbContext)
+public sealed class DatabaseService(IDbContextFactory<AzzyDbContext> dbContextFactory, ILogger<DatabaseService> logger)
 {
+    private readonly IDbContextFactory<AzzyDbContext> _dbContextFactory = dbContextFactory;
     private readonly ILogger<DatabaseService> _logger = logger;
-    private readonly AzzyDbContext _dbContext = dbContext;
 
     public async Task BackupDatabaseAsync()
     {
@@ -21,7 +21,8 @@ public sealed class DatabaseService(ILogger<DatabaseService> logger, AzzyDbConte
         if (Directory.Exists("Backups"))
             Directory.CreateDirectory("Backups");
 
-        NpgsqlConnectionStringBuilder builder = new(_dbContext.Database.GetDbConnection().ConnectionString);
+        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+        NpgsqlConnectionStringBuilder builder = new(context.Database.GetDbConnection().ConnectionString);
         string? host = builder.Host;
         string? userId = builder.Username;
         string? password = builder.Password;
