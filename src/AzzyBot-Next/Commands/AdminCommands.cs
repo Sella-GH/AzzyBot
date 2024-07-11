@@ -38,7 +38,7 @@ public sealed class AdminCommands
             [Description("Choose the status type which the bot should have."), SlashChoiceProvider<BotStatusProvider>] int status = 2,
             [Description("Enter a custom doing which is added after the activity type."), MinMaxLength(0, 128)] string doing = "Music",
             [Description("Enter a custom url. Only usable when having activity type streaming or watching!")] Uri? url = null,
-            [Description("Reset the status to default.")] bool reset = false
+            [Description("Reset the bot status to default."), SlashChoiceProvider<BooleanYesNoStateProvider>] bool reset = false
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));

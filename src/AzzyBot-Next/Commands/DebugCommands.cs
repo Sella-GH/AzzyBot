@@ -2,12 +2,14 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using AzzyBot.Commands.Choices;
 using AzzyBot.Logging;
 using AzzyBot.Services;
 using AzzyBot.Utilities.Encryption;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ArgumentModifiers;
 using DSharpPlus.Commands.ContextChecks;
+using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 
@@ -41,8 +43,8 @@ public sealed class DebugCommands
         public async ValueTask DebugTriggerExceptionAsync
             (
             CommandContext context,
-            [Description("Enable to defer the message before throwing the exception.")] bool throwAfterDefering = false,
-            [Description("Enable to throw the exception after a reply was already made.")] bool afterReply = false
+            [Description("Enable to defer the message before throwing the exception."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] bool throwAfterDefering = false,
+            [Description("Enable to throw the exception after a reply was already made."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] bool afterReply = false
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));

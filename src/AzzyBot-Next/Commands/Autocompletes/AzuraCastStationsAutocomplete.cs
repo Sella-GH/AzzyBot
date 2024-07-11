@@ -53,12 +53,17 @@ public sealed class AzuraCastStationsAutocomplete(AzuraCastApiService azuraCastA
                 case "stop-station" when !config.IsEnabled:
                     continue;
 
+                case "start-station" when !config.IsEnabled:
+                case "stop-station" when config.IsEnabled:
+                    results.Add($"{Crypto.Decrypt(station.Name)} ({Misc.ReadableBool(config.IsEnabled, ReadbleBool.StartedStopped, true)})", station.Id);
+                    break;
+
                 case "toggle-song-requests":
                     results.Add($"{Crypto.Decrypt(station.Name)} ({Misc.ReadableBool(config.EnableRequests, ReadbleBool.EnabledDisabled, true)})", station.Id);
                     break;
 
                 default:
-                    results.Add($"{Crypto.Decrypt(station.Name)} ({Misc.ReadableBool(config.IsEnabled, ReadbleBool.StartedStopped, true)})", station.Id);
+                    results.Add($"{Crypto.Decrypt(station.Name)}", station.Id);
                     break;
             }
         }

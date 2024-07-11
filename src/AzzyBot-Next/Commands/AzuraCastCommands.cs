@@ -344,7 +344,7 @@ public sealed class AzuraCastCommands
             CommandContext context,
             [Description("The station of which you want to switch the playlist."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId,
             [Description("The playlist you want to switch to."), SlashAutoCompleteProvider(typeof(AzuraCastPlaylistAutocomplete))] int playlistId,
-            [Description("Choose if you want to disable all other active playlists from the station. Defaults to Yes.")] bool removeOld = true
+            [Description("Choose if you want to disable all other active playlists from the station. Defaults to Yes."), SlashChoiceProvider<BooleanYesNoStateProvider>] bool removeOld = true
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -415,7 +415,7 @@ public sealed class AzuraCastCommands
             string filePath = await FileOperations.CreateCsvFileAsync(exportHistory, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
             await using DiscordMessageBuilder builder = new();
-            builder.WithContent($"Here is the song history for station **{Crypto.Decrypt(station.Name)}** ({station.StationId}) on **{dateString}**.");
+            builder.WithContent($"Here is the song history for station **{Crypto.Decrypt(station.Name)}** on **{dateString}**.");
             builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
             await context.EditResponseAsync(builder);
 

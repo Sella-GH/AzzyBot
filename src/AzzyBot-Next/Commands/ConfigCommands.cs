@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using AzzyBot.Commands.Autocompletes;
 using AzzyBot.Commands.Checks;
+using AzzyBot.Commands.Choices;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
@@ -39,9 +40,9 @@ public sealed class ConfigCommands
             [Description("Select the group that has the admin permissions on this instance.")] DiscordRole instanceAdminGroup,
             [Description("Select a channel to get general notifications about your azuracast installation."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel notificationChannel,
             [Description("Select a channel to get notifications when your azuracast installation is down."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel outagesChannel,
-            [Description("Enable or disable the automatic check if the AzuraCast instance of your server is down.")] bool serverStatus,
-            [Description("Enable or disable the automatic check for AzuraCast updates.")] bool updates,
-            [Description("Enable or disable the addition of the changelog to the posted AzuraCast updates.")] bool updatesChangelog
+            [Description("Enable or disable the automatic check if the AzuraCast instance of your server is down."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] bool serverStatus,
+            [Description("Enable or disable the automatic check for AzuraCast updates."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] bool updates,
+            [Description("Enable or disable the addition of the changelog to the posted AzuraCast updates."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] bool updatesChangelog
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -111,9 +112,9 @@ public sealed class ConfigCommands
             [Description("Enter the name of the new station.")] string stationName,
             [Description("Select the group that has the admin permissions on this station.")] DiscordRole adminGroup,
             [Description("Select a channel to get music requests when a request is not found on the server."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel requestsChannel,
-            [Description("Enable or disable the preference of HLS streams if you add an able mount point.")] bool hls,
-            [Description("Enable or disable the showing of the playlist in the nowplaying embed.")] bool showPlaylist,
-            [Description("Enable or disable the automatic check if files have been changed.")] bool fileChanges,
+            [Description("Enable or disable the preference of HLS streams if you add an able mount point."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] bool hls,
+            [Description("Enable or disable the showing of the playlist in the nowplaying embed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] bool showPlaylist,
+            [Description("Enable or disable the automatic check if files have been changed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] bool fileChanges,
             [Description("Enter the api key of the new station. This is optional if the admin one has the permission.")] string? apiKey = null,
             [Description("Select the group that has the dj permissions on this station.")] DiscordRole? djGroup = null
             )
@@ -243,9 +244,9 @@ public sealed class ConfigCommands
         public async ValueTask UpdateAzuraCastChecksAsync
             (
             CommandContext context,
-            [Description("Enable or disable the automatic check if the AzuraCast instance of your server is down.")] bool? serverStatus = null,
-            [Description("Enable or disable the automatic check for AzuraCast updates.")] bool? updates = null,
-            [Description("Enable or disable the addition of the changelog to the posted AzuraCast updates.")] bool? updatesChangelog = null
+            [Description("Enable or disable the automatic check if the AzuraCast instance of your server is down."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] bool? serverStatus = null,
+            [Description("Enable or disable the automatic check for AzuraCast updates."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] bool? updates = null,
+            [Description("Enable or disable the addition of the changelog to the posted AzuraCast updates."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] bool? updatesChangelog = null
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -275,8 +276,8 @@ public sealed class ConfigCommands
             [Description("Modify the group that has the admin permissions on this station.")] DiscordRole? adminGroup = null,
             [Description("Modify the group that has the dj permissions on this station.")] DiscordRole? djGroup = null,
             [Description("Modify the channel to get music requests when a request is not found on the server."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? requestsChannel = null,
-            [Description("Enable or disable the preference of HLS streams if you add an able mount point.")] bool? hls = null,
-            [Description("Enable or disable the showing of the playlist in the nowplaying embed.")] bool? showPlaylist = null
+            [Description("Enable or disable the preference of HLS streams if you add an able mount point."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] bool? hls = null,
+            [Description("Enable or disable the showing of the playlist in the nowplaying embed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] bool? showPlaylist = null
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -301,7 +302,7 @@ public sealed class ConfigCommands
             (
             CommandContext context,
             [Description("Choose the station you want to modify the checks."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
-            [Description("Enable or disable the automatic check if files have been changed.")] bool? fileChanges = null
+            [Description("Enable or disable the automatic check if files have been changed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] bool? fileChanges = null
             )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
