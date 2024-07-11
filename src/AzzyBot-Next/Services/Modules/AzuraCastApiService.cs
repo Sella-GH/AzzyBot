@@ -459,7 +459,6 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentException.ThrowIfNullOrWhiteSpace(logName, nameof(logName));
 
-        // Remove the leading slash and api from uri
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Log}/{logName}";
 
         AzuraSystemLogRecord? log;
