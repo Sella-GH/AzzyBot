@@ -97,7 +97,6 @@ jobs:
          mv ./CHANGELOG_HISTORY.md ./docker-zip/CHANGELOG_HISTORY.md
          mv ./docker-compose.dev.yml ./docker-zip/docker-compose.yml
          mv ./LICENSE ./docker-zip/LICENSE
-         mkdir -p ./docker-zip/AzzyBot/Backups
          mkdir -p ./docker-zip/AzzyBot/Logs
          mv ./README.md ./docker-zip/README.md
          mv ./SECURITY.md ./docker-zip/SECURITY.md
