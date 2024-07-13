@@ -1,4 +1,8 @@
-## 2.0.0-preview3
+## 2.0.0-preview4
+### General
+- Optimized the building process for better code performance
+
+## 2.0.0-preview3 - 2024-07-14
 ### Breaking Changes
 - The database has switched from MariaDB to PostgreSQL
   - You already know what that means (DATA DELETION)

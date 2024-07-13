@@ -48,18 +48,21 @@
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Docker</AssemblyName>
     <Product>AzzyBot-Next-Docker</Product>
+    <Optimize>True</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|ARM64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Docker</AssemblyName>
     <Product>AzzyBot-Next-Docker</Product>
+    <Optimize>True</Optimize>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|x64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Docker</AssemblyName>
     <Product>AzzyBot-Next-Docker</Product>
+    <Optimize>True</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker-debug|AnyCPU'">
@@ -83,16 +86,19 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot</AssemblyName>
+    <Optimize>True</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot</AssemblyName>
+    <Optimize>True</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot</AssemblyName>
+    <Optimize>True</Optimize>
   </PropertyGroup>
 
   <ItemGroup>
