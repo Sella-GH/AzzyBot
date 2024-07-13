@@ -575,7 +575,6 @@ public static class EmbedBuilder
             ["Humans"] = new(guild.Members.Count(m => !m.Value.IsBot).ToString(CultureInfo.InvariantCulture)),
             ["Bots"] = new(guild.Members.Count(m => m.Value.IsBot).ToString(CultureInfo.InvariantCulture)),
             ["Created At"] = new($"<t:{Converter.ConvertToUnixTime(guild.CreationTimestamp.Date)}>"),
-            ["Region"] = new(guild.VoiceRegion.Name)
         };
 
         return CreateBasicEmbed(title, description, DiscordColor.Green, new(guild.IconUrl), null, null, fields);
@@ -595,8 +594,7 @@ public static class EmbedBuilder
             ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture)),
             ["Humans"] = new(guild.Members.Count(m => !m.Value.IsBot).ToString(CultureInfo.InvariantCulture)),
             ["Bots"] = new(guild.Members.Count(m => m.Value.IsBot).ToString(CultureInfo.InvariantCulture)),
-            ["Created At"] = new($"<t:{Converter.ConvertToUnixTime(guild.CreationTimestamp.Date)}>"),
-            ["Region"] = new(guild.VoiceRegion.Name)
+            ["Created At"] = new($"<t:{Converter.ConvertToUnixTime(guild.CreationTimestamp.Date)}>")
         };
 
         return CreateBasicEmbed(title, description, DiscordColor.Red, new(guild.IconUrl), null, null, fields);
