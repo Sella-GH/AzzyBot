@@ -303,25 +303,25 @@ public sealed class DiscordBotServiceHost : IHostedService
     {
         ArgumentNullException.ThrowIfNull(_botService, nameof(_botService));
 
-        IReadOnlyList<DiscordGuild> guilds = await _dbActions.AddGuildsAsync(e.Guilds);
-        if (guilds.Count == 0)
-            return;
-
         DiscordEmbed embed;
-        foreach (DiscordGuild guild in guilds)
+        IReadOnlyList<DiscordGuild> addedGuilds = await _dbActions.AddGuildsAsync(e.Guilds);
+        if (addedGuilds.Count is not 0)
         {
-            embed = EmbedBuilder.BuildGuildAddedEmbed(guild);
-            await _botService.SendMessageAsync(_settings.NotificationChannelId, null, [embed]);
+            foreach (DiscordGuild guild in addedGuilds)
+            {
+                embed = EmbedBuilder.BuildGuildAddedEmbed(guild);
+                await _botService.SendMessageAsync(_settings.NotificationChannelId, null, [embed]);
+            }
         }
 
         IReadOnlyList<DiscordGuild> removedGuilds = await _dbActions.DeleteGuildsAsync(e.Guilds);
-        if (removedGuilds.Count == 0)
-            return;
-
-        foreach (DiscordGuild guild in removedGuilds)
+        if (removedGuilds.Count is not 0)
         {
-            embed = EmbedBuilder.BuildGuildRemovedEmbed(guild);
-            await _botService.SendMessageAsync(_settings.NotificationChannelId, null, [embed]);
+            foreach (DiscordGuild guild in removedGuilds)
+            {
+                embed = EmbedBuilder.BuildGuildRemovedEmbed(guild);
+                await _botService.SendMessageAsync(_settings.NotificationChannelId, null, [embed]);
+            }
         }
     }
 }
