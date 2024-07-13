@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace AzzyBot.Settings;
 
@@ -13,13 +14,16 @@ public sealed record AzzyBotSettingsRecord
     public DatabaseSettings? Database { get; init; }
     public DiscordStatus? DiscordStatus { get; init; }
     public required CoreUpdater Updater { get; init; }
+
+    [JsonIgnore]
+    public string? SettingsFile { get; set; }
 }
 
 [SuppressMessage("Roslynator", "RCS1181:Convert comment to documentation comment", Justification = "Informational comment")]
 public sealed record DatabaseSettings
 {
-    public required string EncryptionKey { get; init; } // 32 Characters
-    public string NewEncryptionKey { get; init; } = string.Empty; // 32 Characters
+    public required string EncryptionKey { get; set; } // 32 Characters
+    public string? NewEncryptionKey { get; set; } // 32 Characters
     public string Host { get; init; } = string.Empty;
     public int Port { get; init; }
     public string User { get; init; } = string.Empty;

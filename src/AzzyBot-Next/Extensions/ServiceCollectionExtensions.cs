@@ -79,6 +79,8 @@ public static class ServiceCollectionExtensions
             Environment.Exit(1);
         }
 
+        settings.SettingsFile = path;
+
         // Check settings if something is missing
         List<string> exclusions = [nameof(settings.Database.NewEncryptionKey), nameof(settings.DiscordStatus.StreamUrl)];
         if (isDocker)
