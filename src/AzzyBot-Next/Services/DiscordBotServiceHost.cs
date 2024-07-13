@@ -291,11 +291,7 @@ public sealed class DiscordBotServiceHost : IHostedService
             return;
         }
 
-        _logger.LogDebug(e.Guild.Id.ToString());
-        _logger.LogDebug(e.Guild.Name);
-        _logger.LogDebug(e.Guild.MemberCount.ToString());
-        _logger.LogDebug(e.Guild.OwnerId.ToString());
-        _logger.LogDebug(e.Guild.CreationTimestamp.ToString());
+        _logger.LogDebug(e.Guild.Owner.Mention);
 
         _logger.GuildDeleted(e.Guild.Name);
 

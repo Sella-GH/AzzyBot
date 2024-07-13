@@ -574,10 +574,14 @@ public static class EmbedBuilder
             ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture)),
             ["Humans"] = new(guild.Members.Count(m => !m.Value.IsBot).ToString(CultureInfo.InvariantCulture)),
             ["Bots"] = new(guild.Members.Count(m => m.Value.IsBot).ToString(CultureInfo.InvariantCulture)),
-            ["Created At"] = new($"<t:{Converter.ConvertToUnixTime(guild.CreationTimestamp.Date)}>"),
+            ["Created At"] = new($"<t:{Converter.ConvertToUnixTime(guild.CreationTimestamp.Date)}>")
         };
 
-        return CreateBasicEmbed(title, description, DiscordColor.Green, new(guild.IconUrl), null, null, fields);
+        Uri? iconUrl = null;
+        if (guild.IconUrl is not null)
+            iconUrl = new(guild.IconUrl);
+
+        return CreateBasicEmbed(title, description, DiscordColor.Green, iconUrl, null, null, fields);
     }
 
     public static DiscordEmbed BuildGuildRemovedEmbed(DiscordGuild guild)
@@ -591,12 +595,9 @@ public static class EmbedBuilder
         {
             ["Guild ID"] = new(guild.Id.ToString(CultureInfo.InvariantCulture)),
             ["Owner"] = new(guild.Owner.Mention),
-            ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture)),
-            ["Humans"] = new(guild.Members.Count(m => !m.Value.IsBot).ToString(CultureInfo.InvariantCulture)),
-            ["Bots"] = new(guild.Members.Count(m => m.Value.IsBot).ToString(CultureInfo.InvariantCulture)),
-            ["Created At"] = new($"<t:{Converter.ConvertToUnixTime(guild.CreationTimestamp.Date)}>")
+            ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture))
         };
 
-        return CreateBasicEmbed(title, description, DiscordColor.Red, new(guild.IconUrl), null, null, fields);
+        return CreateBasicEmbed(title, description, DiscordColor.Red, null, null, null, fields);
     }
 }
