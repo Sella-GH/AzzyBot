@@ -159,7 +159,12 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
         bool success = await ExecuteDbActionAsync(async context => await context.Guilds.AddRangeAsync(newGuilds));
 
-        return (success) ? newGuilds.ConvertAll(g => guilds[g.UniqueId]): [];
+        List<DiscordGuild> addedGuilds = newGuilds
+            .Where(guild => guilds.ContainsKey(guild.UniqueId))
+            .Select(guild => guilds[guild.UniqueId])
+            .ToList();
+
+        return (success) ? addedGuilds : [];
     }
 
     public Task<bool> DeleteAzuraCastAsync(ulong guildId)
@@ -255,14 +260,19 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             {
                 if (guild.AzuraCast is not null)
                     context.AzuraCast.Remove(guild.AzuraCast);
-
-                context.Guilds.Remove(guild);
             }
+
+            context.Guilds.RemoveRange(guildsToDelete);
 
             return Task.CompletedTask;
         });
 
-        return (success) ? guildsToDelete.ConvertAll(g => guilds[g.UniqueId]): [];
+        List<DiscordGuild> deletedGuilds = guildsToDelete
+            .Where(guild => guilds.ContainsKey(guild.UniqueId))
+            .Select(guild => guilds[guild.UniqueId])
+            .ToList();
+
+        return (success) ? deletedGuilds : [];
     }
 
     public async Task<AzuraCastEntity?> GetAzuraCastAsync(ulong guildId)
