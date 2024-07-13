@@ -237,7 +237,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public async Task<IReadOnlyList<DiscordGuild>> DeleteGuildsAsync(IReadOnlyDictionary<ulong, DiscordGuild> guilds)
+    public async Task<IReadOnlyList<ulong>> DeleteGuildsAsync(IReadOnlyDictionary<ulong, DiscordGuild> guilds)
     {
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
 
@@ -267,9 +267,9 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             return Task.CompletedTask;
         });
 
-        List<DiscordGuild> deletedGuilds = guildsToDelete
-            .Where(guild => guilds.ContainsKey(guild.UniqueId))
-            .Select(guild => guilds[guild.UniqueId])
+        List<ulong> deletedGuilds = guildsToDelete
+            .Where(guild => !guilds.ContainsKey(guild.UniqueId))
+            .Select(guld => guld.UniqueId)
             .ToList();
 
         return (success) ? deletedGuilds : [];

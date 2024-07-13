@@ -584,18 +584,20 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.Gold, iconUrl, null, null, fields);
     }
 
-    public static DiscordEmbed BuildGuildRemovedEmbed(DiscordGuild guild)
+    public static DiscordEmbed BuildGuildRemovedEmbed(ulong guildId, DiscordGuild? guild = null)
     {
-        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId, nameof(guildId));
 
         const string title = "Guild Removed";
-        string description = $"I was removed from **{guild.Name}**.";
+        string description = $"I was removed from **{((!string.IsNullOrWhiteSpace(guild?.Name)) ? guild.Name : guildId)}**.";
 
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
+        if (guild is not null)
         {
-            ["Guild ID"] = new(guild.Id.ToString(CultureInfo.InvariantCulture)),
-            ["Owner"] = new($"<@{guild.OwnerId}>")
-        };
+            fields.Add("Guild ID", new(guild.Id.ToString(CultureInfo.InvariantCulture)));
+            fields.Add("Removal Date", new($"<t:{Converter.ConvertToUnixTime(DateTime.Now)}>"));
+            fields.Add("Owner", new("<@!{guild.OwnerId}>"));
+        }
 
         return CreateBasicEmbed(title, description, DiscordColor.Gold, null, null, null, fields);
     }

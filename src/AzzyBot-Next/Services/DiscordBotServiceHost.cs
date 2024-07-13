@@ -295,7 +295,7 @@ public sealed class DiscordBotServiceHost : IHostedService
 
         await _dbActions.DeleteGuildAsync(e.Guild.Id);
 
-        DiscordEmbed embed = EmbedBuilder.BuildGuildRemovedEmbed(e.Guild);
+        DiscordEmbed embed = EmbedBuilder.BuildGuildRemovedEmbed(e.Guild.Id, e.Guild);
         await _botService.SendMessageAsync(_settings.NotificationChannelId, null, [embed]);
     }
 
@@ -314,10 +314,10 @@ public sealed class DiscordBotServiceHost : IHostedService
             }
         }
 
-        IReadOnlyList<DiscordGuild> removedGuilds = await _dbActions.DeleteGuildsAsync(e.Guilds);
+        IReadOnlyList<ulong> removedGuilds = await _dbActions.DeleteGuildsAsync(e.Guilds);
         if (removedGuilds.Count is not 0)
         {
-            foreach (DiscordGuild guild in removedGuilds)
+            foreach (ulong guild in removedGuilds)
             {
                 embed = EmbedBuilder.BuildGuildRemovedEmbed(guild);
                 await _botService.SendMessageAsync(_settings.NotificationChannelId, null, [embed]);
