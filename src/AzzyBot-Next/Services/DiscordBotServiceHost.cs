@@ -273,7 +273,7 @@ public sealed class DiscordBotServiceHost : IHostedService
         _logger.GuildCreated(e.Guild.Name);
 
         await _dbActions.AddGuildAsync(e.Guild.Id);
-        await e.Guild.Owner.SendMessageAsync("Thank you for adding me to your server! Before you can make use of me, you have to set my settings first.\n\nPlease use the command `settings set` for this.\nOnly you are able to execute this command right now.");
+        await e.Guild.Owner.SendMessageAsync("Thank you for adding me to your server! Before you can make good use of me, you have to set my settings first.\n\nPlease use the command `config modify-core` for this.\nOnly you are able to execute this command right now.");
     }
 
     private async Task ClientGuildDeletedAsync(DiscordClient c, GuildDeleteEventArgs e)

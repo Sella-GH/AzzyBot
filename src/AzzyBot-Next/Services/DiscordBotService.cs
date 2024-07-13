@@ -31,7 +31,7 @@ public sealed class DiscordBotService
     private readonly DiscordClient _client;
     private const string BugReportUrl = "https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D";
     private const string BugReportMessage = $"Send a [bug report]({BugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
-    private const string ErrorChannelNotConfigured = $"**If you're seeing this message then I am not configured correctly!**\nTell your server admin to run */config config-core*\n\n{BugReportMessage}";
+    private const string ErrorChannelNotConfigured = $"**If you're seeing this message then I am not configured correctly!**\nTell your server admin to run */config modify-core*\n\n{BugReportMessage}";
 
     public DiscordBotService(AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotServiceHost botServiceHost, ILogger<DiscordBotService> logger)
     {
@@ -64,7 +64,7 @@ public sealed class DiscordBotService
         if (guildId is 0)
             guildId = _settings.ServerId;
 
-        return GetDiscordGuilds.Select(g => g.Value).FirstOrDefault(g => g.Id.Equals(guildId));
+        return GetDiscordGuilds.Select(g => g.Value).FirstOrDefault(g => g.Id == guildId);
     }
 
     public IReadOnlyDictionary<ulong, DiscordGuild> GetDiscordGuilds
