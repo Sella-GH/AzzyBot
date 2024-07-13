@@ -164,11 +164,7 @@ public sealed class AdminCommands
         }
 
         [Command("get-joined-server"), Description("Displays all servers the bot is in.")]
-        public async ValueTask GetJoinedGuildsAsync
-        (
-            CommandContext context,
-            [Description("Select the server you want to get more information about."), SlashAutoCompleteProvider<GuildsAutocomplete>] string? serverId = null
-        )
+        public async ValueTask GetJoinedGuildsAsync(CommandContext context, [Description("Select the server you want to get more information about."), SlashAutoCompleteProvider<GuildsAutocomplete>] string? serverId = null)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
