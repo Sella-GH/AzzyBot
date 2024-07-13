@@ -16,6 +16,7 @@
 
 ### Additions
 - `azuracast get-system-logs` You are now able to view system logs of your instance
+- New notifications when the bot joins or leaves servers
 
 ### Improvements
 - AzuraCast command checks are now reviewed by priority
@@ -29,6 +30,8 @@
 - `azuracast update-instace` says the station is already up-to-date but it's not
 - `admin debug-servers remove-servers` autocomplete not working
 - `config get-settings` looks now correct when displaying roles from AzuraCast and Core
+- Typo in the parameter description `format` of `azuracast export-playlists`
+- Autocomplete of `core help` not working
 
 ## 2.0.0-preview2 - 2024-07-06
 ### Breaking Changes
