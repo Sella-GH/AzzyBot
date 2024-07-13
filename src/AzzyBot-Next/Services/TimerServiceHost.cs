@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Logging;
-using AzzyBot.Services.Modules;
 using AzzyBot.Utilities;
 using AzzyBot.Utilities.Enums;
 using Microsoft.Extensions.Hosting;

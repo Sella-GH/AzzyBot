@@ -16,6 +16,12 @@
 
 ### Additions
 - `azuracast get-system-logs` You are now able to view system logs of your instance
+- `admin get-joined-server` You are now able to see all servers in which the bot is
+- `admin remove-joined-serber` You are now able to remove the bot from certain servers
+- `admin send-bot-wide-message` You are now able to send a message to all server owners and channels (if they specified it)
+  - **Please, for the sake of anything, use this thing only when there is something extremly important to tell everyone**!
+  - *No, it's not your birthday, marriage or something else. It's when the bot goes down for maintenance or similar stuff*
+- New notifications when the bot joins or leaves servers
 
 ### Improvements
 - AzuraCast command checks are now reviewed by priority
@@ -29,6 +35,8 @@
 - `azuracast update-instace` says the station is already up-to-date but it's not
 - `admin debug-servers remove-servers` autocomplete not working
 - `config get-settings` looks now correct when displaying roles from AzuraCast and Core
+- Typo in the parameter description `format` of `azuracast export-playlists`
+- Autocomplete of `core help` not working
 
 ## 2.0.0-preview2 - 2024-07-06
 ### Breaking Changes

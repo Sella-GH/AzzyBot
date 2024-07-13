@@ -36,15 +36,31 @@ public sealed class GuildsAutocomplete(DbActions dbActions, DiscordBotService bo
 
         string search = context.UserInput;
         Dictionary<string, object> results = [];
-        foreach (GuildsEntity guildDb in guildsInDb.Where(g => guilds.ContainsKey(g.UniqueId)))
+        if (context.Command.FullName is "admin get-joined-server" or "admin remove-joined-server")
         {
-            if (results.Count == 25)
-                break;
+            foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds)
+            {
+                if (results.Count == 25)
+                    break;
 
-            if (!string.IsNullOrWhiteSpace(search) && !guilds[guildDb.UniqueId].Name.Contains(search, StringComparison.OrdinalIgnoreCase))
-                continue;
+                if (!string.IsNullOrWhiteSpace(search) && !guild.Value.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+                    continue;
 
-            results.Add(guilds[guildDb.UniqueId].Name, guildDb.UniqueId.ToString(CultureInfo.InvariantCulture));
+                results.Add(guild.Value.Name, guild.Key.ToString(CultureInfo.InvariantCulture));
+            }
+        }
+        else
+        {
+            foreach (GuildsEntity guildDb in guildsInDb.Where(g => guilds.ContainsKey(g.UniqueId)))
+            {
+                if (results.Count == 25)
+                    break;
+
+                if (!string.IsNullOrWhiteSpace(search) && !guilds[guildDb.UniqueId].Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                results.Add(guilds[guildDb.UniqueId].Name, guildDb.UniqueId.ToString(CultureInfo.InvariantCulture));
+            }
         }
 
         return results;

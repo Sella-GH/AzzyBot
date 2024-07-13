@@ -59,7 +59,6 @@ public sealed class FileLogger : ILogger
         lock (Lock)
         {
             string message = formatter(state, exception);
-            // Neccessary because otherwise the exception is eaten
             string logMessage = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {logLevel}: {_name}[{eventId.Id}] {message}{exception}";
 
             LogStream?.WriteLine(logMessage);
