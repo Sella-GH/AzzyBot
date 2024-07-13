@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
 using AzzyBot.Utilities.Encryption;
+using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
@@ -138,23 +139,27 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     public Task<bool> AddGuildAsync(ulong guildId)
         => ExecuteDbActionAsync(async context => await context.Guilds.AddAsync(new() { UniqueId = guildId }));
 
-    public async Task<bool> AddGuildsAsync(IReadOnlyList<ulong> guildIds)
+    public async Task<IReadOnlyList<DiscordGuild>> AddGuildsAsync(IReadOnlyDictionary<ulong, DiscordGuild> guilds)
     {
+        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
+
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        List<GuildsEntity> guilds = await context.Guilds
+        List<GuildsEntity> existingGuilds = await context.Guilds
             .OrderBy(g => g.Id)
             .ToListAsync();
 
-        List<GuildsEntity> newGuilds = guildIds
-            .Where(guild => !guilds.Select(g => g.UniqueId).Contains(guild))
+        List<GuildsEntity> newGuilds = guilds.Keys
+            .Where(guild => !existingGuilds.Select(g => g.UniqueId).Contains(guild))
             .Select(guild => new GuildsEntity() { UniqueId = guild })
             .ToList();
 
-        if (newGuilds.Count == 0)
-            return true;
+        if (newGuilds.Count is 0)
+            return [];
 
-        return await ExecuteDbActionAsync(async context => await context.Guilds.AddRangeAsync(newGuilds));
+        bool success = await ExecuteDbActionAsync(async context => await context.Guilds.AddRangeAsync(newGuilds));
+
+        return (success) ? newGuilds.ConvertAll(g => guilds[g.UniqueId]): [];
     }
 
     public Task<bool> DeleteAzuraCastAsync(ulong guildId)

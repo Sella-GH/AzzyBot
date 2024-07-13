@@ -270,19 +270,42 @@ public sealed class DiscordBotServiceHost : IHostedService
 
     private async Task ClientGuildCreatedAsync(DiscordClient c, GuildCreateEventArgs e)
     {
+        ArgumentNullException.ThrowIfNull(_botService, nameof(_botService));
+
         _logger.GuildCreated(e.Guild.Name);
 
         await _dbActions.AddGuildAsync(e.Guild.Id);
         await e.Guild.Owner.SendMessageAsync("Thank you for adding me to your server! Before you can make good use of me, you have to set my settings first.\n\nPlease use the command `config modify-core` for this.\nOnly you are able to execute this command right now.");
+
+        DiscordEmbed embed = EmbedBuilder.BuildGuildAddedEmbed(e.Guild);
+        await _botService.SendMessageAsync(_settings.NotificationChannelId, null, [embed]);
     }
 
     private async Task ClientGuildDeletedAsync(DiscordClient c, GuildDeleteEventArgs e)
     {
+        ArgumentNullException.ThrowIfNull(_botService, nameof(_botService));
+
         _logger.GuildDeleted(e.Guild.Name);
 
         await _dbActions.DeleteGuildAsync(e.Guild.Id);
+
+        DiscordEmbed embed = EmbedBuilder.BuildGuildRemovedEmbed(e.Guild);
+        await _botService.SendMessageAsync(_settings.NotificationChannelId, null, [embed]);
     }
 
     private async Task ClientGuildDownloadCompletedAsync(DiscordClient c, GuildDownloadCompletedEventArgs e)
-        => await _dbActions.AddGuildsAsync(e.Guilds.Select(g => g.Value.Id).ToList());
+    {
+        ArgumentNullException.ThrowIfNull(_botService, nameof(_botService));
+
+        IReadOnlyList<DiscordGuild> guilds = await _dbActions.AddGuildsAsync(e.Guilds);
+        if (guilds.Count == 0)
+            return;
+
+        DiscordEmbed embed;
+        foreach (DiscordGuild guild in guilds)
+        {
+            embed = EmbedBuilder.BuildGuildAddedEmbed(guild);
+            await _botService.SendMessageAsync(_settings.NotificationChannelId, null, [embed]);
+        }
+    }
 }

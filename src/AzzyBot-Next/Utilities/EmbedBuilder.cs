@@ -559,4 +559,46 @@ public static class EmbedBuilder
 
         return embeds;
     }
+
+    public static DiscordEmbed BuildGuildAddedEmbed(DiscordGuild guild)
+    {
+        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
+
+        const string title = "New Guild Added";
+        string description = $"I was added to **{guild.Name}** ({guild.Id}).";
+
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
+        {
+            ["Guild ID"] = new(guild.Id.ToString(CultureInfo.InvariantCulture)),
+            ["Owner"] = new(guild.Owner.Mention),
+            ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture)),
+            ["Humans"] = new(guild.Members.Count(m => !m.Value.IsBot).ToString(CultureInfo.InvariantCulture)),
+            ["Bots"] = new(guild.Members.Count(m => m.Value.IsBot).ToString(CultureInfo.InvariantCulture)),
+            ["Created At"] = new($"<t:{Converter.ConvertToUnixTime(guild.CreationTimestamp.Date)}>"),
+            ["Region"] = new(guild.VoiceRegion.Name)
+        };
+
+        return CreateBasicEmbed(title, description, DiscordColor.Green, new(guild.IconUrl), null, null, fields);
+    }
+
+    public static DiscordEmbed BuildGuildRemovedEmbed(DiscordGuild guild)
+    {
+        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
+
+        const string title = "Guild Removed";
+        string description = $"I was removed from **{guild.Name}** ({guild.Id}).";
+
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
+        {
+            ["Guild ID"] = new(guild.Id.ToString(CultureInfo.InvariantCulture)),
+            ["Owner"] = new(guild.Owner.Mention),
+            ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture)),
+            ["Humans"] = new(guild.Members.Count(m => !m.Value.IsBot).ToString(CultureInfo.InvariantCulture)),
+            ["Bots"] = new(guild.Members.Count(m => m.Value.IsBot).ToString(CultureInfo.InvariantCulture)),
+            ["Created At"] = new($"<t:{Converter.ConvertToUnixTime(guild.CreationTimestamp.Date)}>"),
+            ["Region"] = new(guild.VoiceRegion.Name)
+        };
+
+        return CreateBasicEmbed(title, description, DiscordColor.Red, new(guild.IconUrl), null, null, fields);
+    }
 }
