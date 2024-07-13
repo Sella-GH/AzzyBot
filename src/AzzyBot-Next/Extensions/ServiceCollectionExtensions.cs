@@ -20,7 +20,6 @@ public static class ServiceCollectionExtensions
 {
     public static void AzzyBotServices(this IServiceCollection services)
     {
-        // Enable or disable modules based on the settings
         IServiceProvider serviceProvider = services.BuildServiceProvider();
         AzzyBotSettingsRecord settings = serviceProvider.GetRequiredService<AzzyBotSettingsRecord>();
 
@@ -80,8 +79,10 @@ public static class ServiceCollectionExtensions
             Environment.Exit(1);
         }
 
+        settings.SettingsFile = path;
+
         // Check settings if something is missing
-        List<string> exclusions = [nameof(settings.DiscordStatus.StreamUrl)];
+        List<string> exclusions = [nameof(settings.Database.NewEncryptionKey), nameof(settings.DiscordStatus.StreamUrl)];
         if (isDocker)
         {
             exclusions.Add(nameof(settings.Database.Host));

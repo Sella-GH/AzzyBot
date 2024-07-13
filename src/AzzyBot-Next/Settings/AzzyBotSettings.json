@@ -6,6 +6,7 @@
     "LogRetentionDays": 7,
     "Database": {
         "EncryptionKey": "",
+        "NewEncryptionKey": "",
         "Host": "localhost",
         "Port": 5432,
         "User": "azzybot",

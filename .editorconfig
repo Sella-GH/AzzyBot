@@ -990,6 +990,10 @@ dotnet_diagnostic.rcs9010.severity = suggestion
 # Specify ExportCodeFixProviderAttribute.Name
 dotnet_diagnostic.rcs9011.severity = suggestion
 
+# Json files
+[*.{json,JSON}]
+indent_size = 2
+
 # Xml project files
 [*.{csproj,vbproj,vcxproj,vcxproj.filters,proj,nativeproj,locproj}]
 indent_size = 2

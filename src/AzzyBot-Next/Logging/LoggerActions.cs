@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using AzzyBot.Database;
 using AzzyBot.Services;
 using AzzyBot.Services.Modules;
 using Microsoft.Extensions.Logging;
@@ -76,6 +77,12 @@ public static partial class LoggerActions
 
     [LoggerMessage(104, LogLevel.Information, "Commands error is: {ex}")]
     public static partial void CommandsErrorType(this ILogger<DiscordBotServiceHost> logger, string ex);
+
+    [LoggerMessage(105, LogLevel.Information, "Starting Database Reencryption")]
+    public static partial void DatabaseReencryptionStart(this ILogger<CoreServiceHost> logger);
+
+    [LoggerMessage(106, LogLevel.Information, "Database Reencryption completed")]
+    public static partial void DatabaseReencryptionComplete(this ILogger<CoreServiceHost> logger);
 
     [LoggerMessage(110, LogLevel.Information, "AzzyBot joined the following Guild: {guild}")]
     public static partial void GuildCreated(this ILogger<DiscordBotServiceHost> logger, string guild);

@@ -20,6 +20,7 @@ on:
       - "**.props"
       - "**.sln"
       - "**/codeql.yml"
+  workflow_dispatch:
 
 jobs:
   analyze:
