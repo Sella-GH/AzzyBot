@@ -78,7 +78,7 @@ jobs:
       - name: Get correct dockerfile
         id: runtime
         run: |
-          if ${{ steps.config.outputs.config }} == "Docker"; then
+          if [[ "${{ steps.config.outputs.config }}" == "Docker" ]]; then
             echo "runtime=Dockerfile" >> "$GITHUB_OUTPUT"
           else
             echo "runtime=dev.Dockerfile" >> "$GITHUB_OUTPUT"
@@ -187,7 +187,7 @@ jobs:
       - name: Get correct dockerfile
         id: runtime
         run: |
-          if ${{ steps.config.outputs.config }} == "Docker"; then
+          if [[ "${{ steps.config.outputs.config }}" == "Docker" ]]; then
             echo "runtime=Dockerfile" >> "$GITHUB_OUTPUT"
           else
             echo "runtime=dev.Dockerfile" >> "$GITHUB_OUTPUT"
