@@ -18,6 +18,9 @@
 - `azuracast get-system-logs` You are now able to view system logs of your instance
 - `admin get-joined-server` You are now able to see all servers in which the bot is
 - `admin remove-joined-serber` You are now able to remove the bot from certain servers
+- `admin send-bot-wide-message` You are now able to send a message to all server owners and channels (if they specified it)
+  - **Please, for the sake of anything, use this thing only when there is something extremly important to tell everyone**!
+  - *No, it's not your birthday, marriage or something else. It's when the bot goes down for maintenance or similar stuff*
 - New notifications when the bot joins or leaves servers
 
 ### Improvements
