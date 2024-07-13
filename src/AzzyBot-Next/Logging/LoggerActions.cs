@@ -15,12 +15,6 @@ public static partial class LoggerActions
     [LoggerMessage(1, LogLevel.Debug, "{number} logfiles were deleted")]
     public static partial void LogfileDeleted(this ILogger<CoreServiceHost> logger, int number);
 
-    [LoggerMessage(2, LogLevel.Debug, "Starting database backup")]
-    public static partial void DatabaseStartBackup(this ILogger<DatabaseService> logger);
-
-    [LoggerMessage(3, LogLevel.Debug, "Database backup completed")]
-    public static partial void DatabaseBackupCompleted(this ILogger<DatabaseService> logger);
-
     [LoggerMessage(10, LogLevel.Debug, "Starting global timer")]
     public static partial void GlobalTimerStart(this ILogger<TimerServiceHost> logger);
 
@@ -84,6 +78,12 @@ public static partial class LoggerActions
     [LoggerMessage(104, LogLevel.Information, "Commands error is: {ex}")]
     public static partial void CommandsErrorType(this ILogger<DiscordBotServiceHost> logger, string ex);
 
+    [LoggerMessage(105, LogLevel.Information, "Starting Database Reencryption")]
+    public static partial void DatabaseReencryptionStart(this ILogger<CoreServiceHost> logger);
+
+    [LoggerMessage(106, LogLevel.Information, "Database Reencryption completed")]
+    public static partial void DatabaseReencryptionComplete(this ILogger<CoreServiceHost> logger);
+
     [LoggerMessage(110, LogLevel.Information, "AzzyBot joined the following Guild: {guild}")]
     public static partial void GuildCreated(this ILogger<DiscordBotServiceHost> logger, string guild);
 
@@ -125,9 +125,6 @@ public static partial class LoggerActions
 
     [LoggerMessage(320, LogLevel.Error, "Database transaction failed with error: ")]
     public static partial void DatabaseTransactionFailed(this ILogger logger, Exception ex);
-
-    [LoggerMessage(321, LogLevel.Error, "Database backup failed")]
-    public static partial void DatabaseBackupFailed(this ILogger<DatabaseService> logger);
 
     [LoggerMessage(400, LogLevel.Critical, "The given settings can't be parsed, are they filled out?")]
     public static partial void UnableToParseSettings(this ILogger<DiscordBotServiceHost> logger);
