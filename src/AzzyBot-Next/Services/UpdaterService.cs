@@ -40,16 +40,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
             return;
         }
 
-        AzzyUpdateRecord? updaterRecord;
-        if (isPreview)
-        {
-            updaterRecord = JsonSerializer.Deserialize<List<AzzyUpdateRecord>>(body)?[0];
-        }
-        else
-        {
-            updaterRecord = JsonSerializer.Deserialize<AzzyUpdateRecord>(body);
-        }
-
+        AzzyUpdateRecord? updaterRecord = (isPreview) ? JsonSerializer.Deserialize<List<AzzyUpdateRecord>>(body)?[0] : JsonSerializer.Deserialize<AzzyUpdateRecord>(body);
         if (updaterRecord is null)
         {
             _logger.OnlineVersionUnserializable();
