@@ -256,10 +256,9 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
         bool success = await ExecuteDbActionAsync(context =>
         {
-            foreach (GuildsEntity guild in guildsToDelete)
+            foreach (GuildsEntity guild in guildsToDelete.Where(guild => guild.AzuraCast is not null))
             {
-                if (guild.AzuraCast is not null)
-                    context.AzuraCast.Remove(guild.AzuraCast);
+                context.AzuraCast.Remove(guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast is null when it should not be."));
             }
 
             context.Guilds.RemoveRange(guildsToDelete);
