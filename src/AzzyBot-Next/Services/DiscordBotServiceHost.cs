@@ -36,7 +36,7 @@ public sealed class DiscordBotServiceHost : IHostedService
     private readonly AzzyBotSettingsRecord _settings;
     private readonly DbActions _dbActions;
     private DiscordBotService? _botService;
-    private const string NewGuildText = "Thank you for adding me to your server! Before you can make good use of me, you have to set my settings first.\n\nPlease use the command `config modify-core` for this.\nOnly you are able to execute this command right now.";
+    private const string NewGuildText = "Thank you for adding me to your server **%GUULD%**! Before you can make good use of me, you have to set my settings first.\n\nPlease use the command `config modify-core` for this.\nOnly you are able to execute this command right now.";
 
     public DiscordClient Client { get; init; }
 
@@ -276,7 +276,7 @@ public sealed class DiscordBotServiceHost : IHostedService
         _logger.GuildCreated(e.Guild.Name);
 
         await _dbActions.AddGuildAsync(e.Guild.Id);
-        await e.Guild.Owner.SendMessageAsync(NewGuildText);
+        await e.Guild.Owner.SendMessageAsync(NewGuildText.Replace("%GUULD%", e.Guild.Name, StringComparison.OrdinalIgnoreCase));
 
         DiscordEmbed embed = EmbedBuilder.BuildGuildAddedEmbed(e.Guild);
         await _botService.SendMessageAsync(_settings.NotificationChannelId, null, [embed]);
@@ -310,7 +310,7 @@ public sealed class DiscordBotServiceHost : IHostedService
         {
             foreach (DiscordGuild guild in addedGuilds)
             {
-                await guild.Owner.SendMessageAsync(NewGuildText);
+                await guild.Owner.SendMessageAsync(NewGuildText.Replace("%GUULD%", guild.Name, StringComparison.OrdinalIgnoreCase));
                 embed = EmbedBuilder.BuildGuildAddedEmbed(guild);
                 await _botService.SendMessageAsync(_settings.NotificationChannelId, null, [embed]);
             }
