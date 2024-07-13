@@ -565,7 +565,7 @@ public static class EmbedBuilder
         ArgumentNullException.ThrowIfNull(guild, nameof(guild));
 
         string title = (getInfo) ? "Guild Information" : "Guild Added";
-        string description = (getInfo) ? $"Here is everything I know about {guild.Name}" : $"I was added to **{guild.Name}**.";
+        string description = (getInfo) ? $"Here is everything I know about **{guild.Name}**" : $"I was added to **{guild.Name}**.";
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {

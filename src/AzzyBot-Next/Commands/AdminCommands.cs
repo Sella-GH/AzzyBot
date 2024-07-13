@@ -242,7 +242,7 @@ public sealed class AdminCommands
 
             await guild.LeaveAsync();
 
-            await context.EditResponseAsync($"I left {guild.Name}.");
+            await context.EditResponseAsync($"I left **{guild.Name}** ({guild.Id}).");
         }
     }
 }
