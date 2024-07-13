@@ -564,24 +564,24 @@ public static class EmbedBuilder
     {
         ArgumentNullException.ThrowIfNull(guild, nameof(guild));
 
-        const string title = "New Guild Added";
-        string description = $"I was added to **{guild.Name}** ({guild.Id}).";
+        const string title = "Guild Added";
+        string description = $"I was added to **{guild.Name}**.";
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
             ["Guild ID"] = new(guild.Id.ToString(CultureInfo.InvariantCulture)),
+            ["Creation Date"] = new($"<t:{Converter.ConvertToUnixTime(guild.CreationTimestamp.Date)}>"),
             ["Owner"] = new(guild.Owner.Mention),
-            ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture)),
-            ["Humans"] = new(guild.Members.Count(m => !m.Value.IsBot).ToString(CultureInfo.InvariantCulture)),
-            ["Bots"] = new(guild.Members.Count(m => m.Value.IsBot).ToString(CultureInfo.InvariantCulture)),
-            ["Created At"] = new($"<t:{Converter.ConvertToUnixTime(guild.CreationTimestamp.Date)}>")
+            ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture), true),
+            ["Humans"] = new(guild.Members.Count(m => !m.Value.IsBot).ToString(CultureInfo.InvariantCulture), true),
+            ["Bots"] = new(guild.Members.Count(m => m.Value.IsBot).ToString(CultureInfo.InvariantCulture), true)
         };
 
         Uri? iconUrl = null;
         if (guild.IconUrl is not null)
             iconUrl = new(guild.IconUrl);
 
-        return CreateBasicEmbed(title, description, DiscordColor.Green, iconUrl, null, null, fields);
+        return CreateBasicEmbed(title, description, DiscordColor.Gold, iconUrl, null, null, fields);
     }
 
     public static DiscordEmbed BuildGuildRemovedEmbed(DiscordGuild guild)
@@ -589,15 +589,14 @@ public static class EmbedBuilder
         ArgumentNullException.ThrowIfNull(guild, nameof(guild));
 
         const string title = "Guild Removed";
-        string description = $"I was removed from **{guild.Name}** ({guild.Id}).";
+        string description = $"I was removed from **{guild.Name}**.";
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
             ["Guild ID"] = new(guild.Id.ToString(CultureInfo.InvariantCulture)),
-            ["Owner"] = new(guild.Owner.Mention),
-            ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture))
+            ["Owner"] = new($"<@{guild.OwnerId}>")
         };
 
-        return CreateBasicEmbed(title, description, DiscordColor.Red, null, null, null, fields);
+        return CreateBasicEmbed(title, description, DiscordColor.Gold, null, null, null, fields);
     }
 }

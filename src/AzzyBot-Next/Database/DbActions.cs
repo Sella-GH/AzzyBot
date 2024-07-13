@@ -232,6 +232,39 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
+    public async Task<IReadOnlyList<DiscordGuild>> DeleteGuildsAsync(IReadOnlyDictionary<ulong, DiscordGuild> guilds)
+    {
+        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
+
+        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+
+        List<GuildsEntity> existingGuilds = await context.Guilds
+            .OrderBy(g => g.Id)
+            .ToListAsync();
+
+        List<GuildsEntity> guildsToDelete = existingGuilds
+            .Where(guild => !guilds.Keys.Contains(guild.UniqueId))
+            .ToList();
+
+        if (guildsToDelete.Count is 0)
+            return [];
+
+        bool success = await ExecuteDbActionAsync(context =>
+        {
+            foreach (GuildsEntity guild in guildsToDelete)
+            {
+                if (guild.AzuraCast is not null)
+                    context.AzuraCast.Remove(guild.AzuraCast);
+
+                context.Guilds.Remove(guild);
+            }
+
+            return Task.CompletedTask;
+        });
+
+        return (success) ? guildsToDelete.ConvertAll(g => guilds[g.UniqueId]): [];
+    }
+
     public async Task<AzuraCastEntity?> GetAzuraCastAsync(ulong guildId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
