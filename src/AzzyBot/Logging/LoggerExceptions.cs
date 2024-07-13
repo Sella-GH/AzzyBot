@@ -37,7 +37,7 @@ internal static class LoggerExceptions
             if (string.IsNullOrWhiteSpace(tempFilePath))
                 throw new IOException("Couldn't create temp file for StackTrace!");
 
-            if (!await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, $"<@{CoreSettings.OwnerUserId}> new error dropped in!", BuildErrorEmbed(ex.GetType().Name, message, timestamp, jsonMessage), [tempFilePath], true))
+            if (!await AzzyBot.SendMessageAsync(CoreSettings.ErrorChannelId, $"<@!{CoreSettings.OwnerUserId}> new error dropped in!", BuildErrorEmbed(ex.GetType().Name, message, timestamp, jsonMessage), [tempFilePath], true))
                 throw new InvalidOperationException("Exception message couldn't be sent!");
 
             if (!CoreFileOperations.DeleteTempFile(tempFilePath))
