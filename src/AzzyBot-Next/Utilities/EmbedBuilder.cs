@@ -560,12 +560,12 @@ public static class EmbedBuilder
         return embeds;
     }
 
-    public static DiscordEmbed BuildGuildAddedEmbed(DiscordGuild guild)
+    public static DiscordEmbed BuildGuildAddedEmbed(DiscordGuild guild, bool getInfo = false)
     {
         ArgumentNullException.ThrowIfNull(guild, nameof(guild));
 
-        const string title = "Guild Added";
-        string description = $"I was added to **{guild.Name}**.";
+        string title = (getInfo) ? "Guild Information" : "Guild Added";
+        string description = (getInfo) ? $"Here is everything I know about {guild.Name}" : $"I was added to **{guild.Name}**.";
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {

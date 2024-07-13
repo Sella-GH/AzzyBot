@@ -12,6 +12,7 @@ using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
 using AzzyBot.Services;
+using AzzyBot.Utilities;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ArgumentModifiers;
 using DSharpPlus.Commands.ContextChecks;
@@ -162,7 +163,11 @@ public sealed class AdminCommands
         }
 
         [Command("get-joined-server"), Description("Displays all servers the bot is in.")]
-        public async ValueTask GetJoinedGuildsAsync(CommandContext context)
+        public async ValueTask GetJoinedGuildsAsync
+        (
+            CommandContext context,
+            [Description("Select the server you want to get more information about."), SlashAutoCompleteProvider<GuildsAutocomplete>] string? serverId = null
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -174,6 +179,27 @@ public sealed class AdminCommands
             if (guilds.Count == 0)
             {
                 await context.EditResponseAsync("I am not in any server.");
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(serverId))
+            {
+                if (!ulong.TryParse(serverId, out ulong guildIdValue))
+                {
+                    await context.EditResponseAsync("Invalid server id.");
+                    return;
+                }
+
+                DiscordGuild? guild = _botService.GetDiscordGuild(guildIdValue);
+                if (guild is null)
+                {
+                    await context.EditResponseAsync("Server not found.");
+                    return;
+                }
+
+                DiscordEmbed embed = EmbedBuilder.BuildGuildAddedEmbed(guild, true);
+                await context.EditResponseAsync(embed);
+
                 return;
             }
 
