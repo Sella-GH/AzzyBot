@@ -8,6 +8,11 @@
 
 ### General
 - Reworked the whole background database structure to make it easier, faster and less ressource-consuming
+- Changing the database encryption key is now possible
+  - You have to add a new value to "NewEncryptionKey" in your settings.json
+  - The bot then starts to reencrypt every encrypted value with your new key
+  - PLEASE MAKE A BACKUP OF YOUR DATABASE BEFORE!
+  - Use [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) as a helper tool
 
 ### Additions
 - `azuracast get-system-logs` You are now able to view system logs of your instance
