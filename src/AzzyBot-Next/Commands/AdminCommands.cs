@@ -26,8 +26,9 @@ namespace AzzyBot.Commands;
 public sealed class AdminCommands
 {
     [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
-    public sealed class AdminGroup(DiscordBotService botService, DiscordBotServiceHost botServiceHost, ILogger<AdminGroup> logger)
+    public sealed class AdminGroup(DbActions dbActions, DiscordBotService botService, DiscordBotServiceHost botServiceHost, ILogger<AdminGroup> logger)
     {
+        private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
         private readonly DiscordBotServiceHost _botServiceHost = botServiceHost;
         private readonly ILogger<AdminGroup> _logger = logger;
@@ -215,11 +216,7 @@ public sealed class AdminCommands
         }
 
         [Command("remove-joined-server"), Description("Removes the bot from a server.")]
-        public async ValueTask RemoveJoinedGuildAsync
-        (
-            CommandContext context,
-            [Description("Select the server you want to remove."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId
-        )
+        public async ValueTask RemoveJoinedGuildAsync(CommandContext context, [Description("Select the server you want to remove."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -243,6 +240,43 @@ public sealed class AdminCommands
             await guild.LeaveAsync();
 
             await context.EditResponseAsync($"I left **{guild.Name}** ({guild.Id}).");
+        }
+
+        [Command("send-bot-wide-message"), Description("Sends a message to all servers the bot is in.")]
+        public async ValueTask SendBotWideMessageAsync(CommandContext context, [Description("The message you want to send."), MinMaxLength(1, 2000)] string message)
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+            _logger.CommandRequested(nameof(SendBotWideMessageAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
+            if (guilds.Count == 0)
+            {
+                await context.EditResponseAsync("I am not in any server.");
+                return;
+            }
+
+            IReadOnlyList<GuildsEntity> guildsEntities = await _dbActions.GetGuildsAsync();
+            foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds.Where(g => guildsEntities.Any(g => g.ConfigSet)))
+            {
+                GuildsEntity? dbGuild = guildsEntities.FirstOrDefault(g => g.UniqueId == guild.Key);
+                if (dbGuild is null)
+                {
+                    await context.EditResponseAsync("Server not found in database.");
+                    return;
+                }
+
+                await _botService.SendMessageAsync(dbGuild.AdminNotifyChannelId, message);
+            }
+
+            foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds.Where(g => guildsEntities.Any(g => !g.ConfigSet)))
+            {
+                await guild.Value.Owner.SendMessageAsync(message);
+            }
+
+            await context.EditResponseAsync("Message sent to all servers.");
         }
     }
 }
