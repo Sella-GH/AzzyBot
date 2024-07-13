@@ -16,6 +16,8 @@
 
 ### Additions
 - `azuracast get-system-logs` You are now able to view system logs of your instance
+- `admin get-joined-server` You are now able to see all servers in which the bot is
+- `admin remove-joined-serber` You are now able to remove the bot from certain servers
 - New notifications when the bot joins or leaves servers
 
 ### Improvements

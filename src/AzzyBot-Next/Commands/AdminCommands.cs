@@ -25,8 +25,9 @@ namespace AzzyBot.Commands;
 public sealed class AdminCommands
 {
     [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
-    public sealed class AdminGroup(DiscordBotServiceHost botServiceHost, ILogger<AdminGroup> logger)
+    public sealed class AdminGroup(DiscordBotService botService, DiscordBotServiceHost botServiceHost, ILogger<AdminGroup> logger)
     {
+        private readonly DiscordBotService _botService = botService;
         private readonly DiscordBotServiceHost _botServiceHost = botServiceHost;
         private readonly ILogger<AdminGroup> _logger = logger;
 
@@ -158,6 +159,64 @@ public sealed class AdminCommands
 
                 await context.EditResponseAsync($"{_botService.GetDiscordGuild(guildIdValue)?.Name} removed from debug servers.");
             }
+        }
+
+        [Command("get-joined-server"), Description("Displays all servers the bot is in.")]
+        public async ValueTask GetJoinedGuildsAsync(CommandContext context)
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+            _logger.CommandRequested(nameof(GetJoinedGuildsAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
+            if (guilds.Count == 0)
+            {
+                await context.EditResponseAsync("I am not in any server.");
+                return;
+            }
+
+            // TODO This is not suitable for more than a few houndred servers
+            StringBuilder stringBuilder = new();
+            stringBuilder.AppendLine("I am in the following servers:");
+            foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds)
+            {
+                stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"- {guild.Value.Name} ({guild.Key})");
+            }
+
+            await context.EditResponseAsync(stringBuilder.ToString());
+        }
+
+        [Command("remove-joined-server"), Description("Removes the bot from a server.")]
+        public async ValueTask RemoveJoinedGuildAsync
+        (
+            CommandContext context,
+            [Description("Select the server you want to remove."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+            _logger.CommandRequested(nameof(RemoveJoinedGuildAsync), context.User.GlobalName);
+
+            if (!ulong.TryParse(serverId, out ulong guildIdValue))
+            {
+                await context.RespondAsync("Invalid server id.");
+                return;
+            }
+
+            await context.DeferResponseAsync();
+
+            DiscordGuild? guild = _botService.GetDiscordGuild(guildIdValue);
+            if (guild is null)
+            {
+                await context.EditResponseAsync("Server not found.");
+                return;
+            }
+
+            await guild.LeaveAsync();
+
+            await context.EditResponseAsync($"I left {guild.Name}.");
         }
     }
 }
