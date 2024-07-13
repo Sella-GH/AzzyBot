@@ -25,7 +25,6 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
     private readonly AzuraCastApiService _azuraCast = azuraCast;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = discordBotService;
-    private readonly JsonSerializerOptions _serializerOptions = new() { WriteIndented = true };
 
     public async ValueTask QueueFileChangesChecksAsync()
     {
@@ -135,6 +134,6 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
 
         DiscordEmbed embed = EmbedBuilder.BuildAzuraCastFileChangesEmbed(stationName, addedFiles.Count, removedFiles.Count);
         await _botService.SendMessageAsync(channelId, $"Changes in the files of station **{stationName}**({stationId}) detected. Check the details below.", [embed], paths);
-        await FileOperations.WriteToFileAsync(Path.Combine(_azuraCast.FilePath, $"{stationDbId}-{stationId}-files.json"), JsonSerializer.Serialize(onlineFiles, _serializerOptions));
+        await FileOperations.WriteToFileAsync(Path.Combine(_azuraCast.FilePath, $"{stationDbId}-{stationId}-files.json"), JsonSerializer.Serialize(onlineFiles, FileOperations.JsonOptions));
     }
 }

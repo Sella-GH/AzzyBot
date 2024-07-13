@@ -66,6 +66,9 @@ public sealed class CoreServiceHost(IDbContextFactory<AzzyDbContext> dbContextFa
     private async Task ReencryptDatabaseAsync()
     {
         ArgumentNullException.ThrowIfNull(_settings.Database);
+        ArgumentException.ThrowIfNullOrWhiteSpace(_settings.Database.EncryptionKey, nameof(_settings.Database.EncryptionKey));
+        ArgumentException.ThrowIfNullOrWhiteSpace(_settings.Database.NewEncryptionKey, nameof(_settings.Database.NewEncryptionKey));
+        ArgumentException.ThrowIfNullOrWhiteSpace(_settings.SettingsFile, nameof(_settings.SettingsFile));
 
         _logger.DatabaseReencryptionStart();
 
@@ -118,6 +121,12 @@ public sealed class CoreServiceHost(IDbContextFactory<AzzyDbContext> dbContextFa
             await transaction.RollbackAsync();
             throw new InvalidOperationException("An error occured while re-encrypting the database", ex);
         }
+
+        Crypto.EncryptionKey = newEncryptionKey;
+        _settings.Database.EncryptionKey = _settings.Database.NewEncryptionKey;
+        _settings.Database.NewEncryptionKey = string.Empty;
+
+        await FileOperations.WriteToJsonFileAsync(_settings.SettingsFile, _settings);
 
         _logger.DatabaseReencryptionComplete();
     }

@@ -27,7 +27,6 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
     private readonly WebRequestService _webService = webService;
 
     public string FilePath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "AzuraCast", "Files");
-    private readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
 
     private static Dictionary<string, string> CreateHeader(string apiKey)
     {
@@ -500,7 +499,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}";
 
-        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, _jsonOptions), CreateHeader(apiKey));
+        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, FileOperations.JsonOptions), CreateHeader(apiKey));
     }
 
     public async Task RequestSongAsync(Uri baseUrl, int stationId, string songId)
