@@ -90,6 +90,9 @@ public static partial class LoggerActions
     [LoggerMessage(111, LogLevel.Information, "AzzyBot was removed from the following Guild: {guild}")]
     public static partial void GuildDeleted(this ILogger<DiscordBotServiceHost> logger, string guild);
 
+    [LoggerMessage(112, LogLevel.Information, "The following guild is unavailable due to an outage: {guild}")]
+    public static partial void GuildUnavailable(this ILogger<DiscordBotServiceHost> logger, string guild);
+
     [LoggerMessage(198, LogLevel.Information, "An update for Azzy is available! Please update now to version: {version} to get the latest fixes and improvements.")]
     public static partial void UpdateAvailable(this ILogger<UpdaterService> logger, string version);
 

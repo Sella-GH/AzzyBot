@@ -285,6 +285,18 @@ public sealed class DiscordBotServiceHost : IHostedService
     {
         ArgumentNullException.ThrowIfNull(_botService, nameof(_botService));
 
+        if (e.Unavailable)
+        {
+            _logger.GuildUnavailable(e.Guild.Name);
+            return;
+        }
+
+        _logger.LogDebug(e.Guild.Id.ToString());
+        _logger.LogDebug(e.Guild.Name);
+        _logger.LogDebug(e.Guild.MemberCount.ToString());
+        _logger.LogDebug(e.Guild.OwnerId.ToString());
+        _logger.LogDebug(e.Guild.CreationTimestamp.ToString());
+
         _logger.GuildDeleted(e.Guild.Name);
 
         await _dbActions.DeleteGuildAsync(e.Guild.Id);
