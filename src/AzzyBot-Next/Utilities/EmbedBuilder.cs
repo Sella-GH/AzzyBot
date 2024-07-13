@@ -572,9 +572,7 @@ public static class EmbedBuilder
             ["Guild ID"] = new(guild.Id.ToString(CultureInfo.InvariantCulture)),
             ["Creation Date"] = new($"<t:{Converter.ConvertToUnixTime(guild.CreationTimestamp.Date)}>"),
             ["Owner"] = new(guild.Owner.Mention),
-            ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture), true),
-            ["Humans"] = new(guild.Members.Count.ToString(CultureInfo.InvariantCulture), true),
-            ["Bots"] = new((guild.MemberCount - guild.Members.Count).ToString(CultureInfo.InvariantCulture), true)
+            ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture), true)
         };
 
         Uri? iconUrl = null;
