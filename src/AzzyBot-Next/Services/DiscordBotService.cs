@@ -259,12 +259,22 @@ public sealed class DiscordBotService
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
         if (!CheckIfClientIsConnected)
+        {
+            _logger.BotNotConnected();
             return;
+        }
 
         ContextCheckFailedData? moduleActivatedCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is ModuleActivatedCheckAttribute);
         if (moduleActivatedCheck is not null)
         {
             await context.EditResponseAsync("This module is not activated, you are unable to use commands from it.");
+            return;
+        }
+
+        AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id);
+        if (azuraCast is null)
+        {
+            _logger.DatabaseItemNotFound(nameof(AzuraCastEntity), context.Guild.Id);
             return;
         }
 
@@ -280,9 +290,6 @@ public sealed class DiscordBotService
         {
             string message = "You don't have the required permissions to execute this command!\nPlease contact {0}.";
             string[] info = azuraCastDiscordPermCheck.ErrorMessage.Split(':');
-            AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id);
-            if (azuraCast is null)
-                return;
 
             if (info.Length is 2 && info[0] is "Instance")
             {
@@ -292,7 +299,10 @@ public sealed class DiscordBotService
             {
                 AzuraCastStationEntity? station = await _db.GetAzuraCastStationAsync(context.Guild.Id, Convert.ToInt32(info[1], CultureInfo.InvariantCulture));
                 if (station is null)
+                {
+                    _logger.DatabaseItemNotFound(nameof(AzuraCastStationEntity), context.Guild.Id);
                     return;
+                }
 
                 if (info[0] is "Admin")
                 {
@@ -316,7 +326,10 @@ public sealed class DiscordBotService
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
 
         if (!CheckIfClientIsConnected)
+        {
+            _logger.BotNotConnected();
             return false;
+        }
 
         await using DiscordMessageBuilder builder = new();
 

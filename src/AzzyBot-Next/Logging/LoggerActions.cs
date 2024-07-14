@@ -99,11 +99,17 @@ public static partial class LoggerActions
     [LoggerMessage(199, LogLevel.Information, "Stopping AzzyBot")]
     public static partial void BotStopping(this ILogger<CoreServiceHost> logger);
 
-    [LoggerMessage(200, LogLevel.Warning, "Commands error occured!")]
+    [LoggerMessage(200, LogLevel.Warning, "AzzyBot is not connected to Discord!")]
+    public static partial void BotNotConnected(this ILogger logger);
+
+    [LoggerMessage(201, LogLevel.Warning, "Commands error occured!")]
     public static partial void CommandsError(this ILogger<DiscordBotServiceHost> logger);
 
-    [LoggerMessage(201, LogLevel.Warning, "Could not fetch channel for id {id}")]
+    [LoggerMessage(202, LogLevel.Warning, "Could not fetch channel for id {id}")]
     public static partial void ChannelNotFound(this ILogger<DiscordBotService> logger, ulong id);
+
+    [LoggerMessage(210, LogLevel.Warning, "Could not find database item {item} for guild {guild}")]
+    public static partial void DatabaseItemNotFound(this ILogger logger, string item, ulong guild);
 
     [LoggerMessage(290, LogLevel.Warning, "Latest online version of the bot is empty")]
     public static partial void OnlineVersionEmpty(this ILogger<UpdaterService> logger);
