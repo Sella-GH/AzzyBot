@@ -121,7 +121,10 @@ public sealed class DiscordBotService
         {
             GuildsEntity? guild = await _db.GetGuildAsync(guildId);
             if (guild is null)
+            {
+                _logger.DatabaseItemNotFound(nameof(GuildsEntity), guildId);
                 return false;
+            }
 
             if (guild.ErrorChannelId is not 0)
                 errorChannelId = guild.ErrorChannelId;
@@ -131,11 +134,17 @@ public sealed class DiscordBotService
                 DiscordGuild? dGuild = GetDiscordGuild(guildId);
                 DiscordMember? dMember = await GetDiscordMemberAsync(guildId, _client.CurrentUser.Id);
                 if (dMember is null)
+                {
+                    _logger.DiscordItemNotFound(nameof(DiscordMember), guildId);
                     return false;
+                }
 
                 errorChannelId = dGuild?.Channels.First(c => c.Value.Type.Equals(DiscordChannelType.Text) && c.Value.PermissionsFor(dMember).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages)).Value.Id ?? _settings.ErrorChannelId;
                 if (errorChannelId is 0)
+                {
+                    _logger.DiscordItemNotFound(nameof(DiscordChannel), guildId);
                     return false;
+                }
 
                 errorChannelConfigured = false;
             }
@@ -202,7 +211,10 @@ public sealed class DiscordBotService
         {
             GuildsEntity? guild = await _db.GetGuildAsync(guildId);
             if (guild is null)
+            {
+                _logger.DatabaseItemNotFound(nameof(GuildsEntity), guildId);
                 return false;
+            }
 
             if (guild.ErrorChannelId is not 0)
                 errorChannelId = guild.ErrorChannelId;
@@ -212,11 +224,17 @@ public sealed class DiscordBotService
                 DiscordGuild? dGuild = GetDiscordGuild(guildId);
                 DiscordMember? dMember = await GetDiscordMemberAsync(guildId, _client.CurrentUser.Id);
                 if (dMember is null)
+                {
+                    _logger.DiscordItemNotFound(nameof(DiscordMember), guildId);
                     return false;
+                }
 
                 errorChannelId = dGuild?.Channels.First(c => c.Value.Type.Equals(DiscordChannelType.Text) && c.Value.PermissionsFor(dMember).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages)).Value.Id ?? _settings.ErrorChannelId;
                 if (errorChannelId is 0)
+                {
+                    _logger.DiscordItemNotFound(nameof(DiscordChannel), guildId);
                     return false;
+                }
 
                 errorChannelConfigured = false;
             }
@@ -433,8 +451,7 @@ public sealed class DiscordBotService
 
     private static void ProcessOptions(IReadOnlyDictionary<CommandParameter, object?> paramaters, Dictionary<string, string> commandParameters)
     {
-        if (paramaters is null)
-            return;
+        ArgumentNullException.ThrowIfNull(paramaters, nameof(paramaters));
 
         foreach (KeyValuePair<CommandParameter, object?> pair in paramaters)
         {

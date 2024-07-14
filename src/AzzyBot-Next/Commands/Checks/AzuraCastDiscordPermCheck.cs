@@ -5,17 +5,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
+using AzzyBot.Logging;
 using AzzyBot.Services;
 using AzzyBot.Utilities.Enums;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands.Checks;
 
-public class AzuraCastDiscordPermCheck(DbActions dbActions, DiscordBotService discordBotService) : IContextCheck<AzuraCastDiscordPermCheckAttribute>
+public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger, DbActions dbActions, DiscordBotService discordBotService) : IContextCheck<AzuraCastDiscordPermCheckAttribute>
 {
+    private readonly ILogger<AzuraCastDiscordPermCheck> _logger = logger;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = discordBotService;
 
@@ -32,14 +35,20 @@ public class AzuraCastDiscordPermCheck(DbActions dbActions, DiscordBotService di
         int stationId = Convert.ToInt32(context.Arguments.SingleOrDefault(o => o.Key.Name is "station_id" && o.Value is not null).Value, CultureInfo.InvariantCulture);
         AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
         if (azuraCast is null)
+        {
+            _logger.DatabaseItemNotFound(nameof(AzuraCastEntity), context.Guild.Id);
             return "AzuraCast is null!";
+        }
 
         AzuraCastStationEntity? station = new();
         if (context.Command.FullName.StartsWith("config modify-azuracast-station", StringComparison.OrdinalIgnoreCase))
         {
             station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId);
             if (station is null)
+            {
+                _logger.DatabaseItemNotFound(nameof(AzuraCastStationEntity), context.Guild.Id);
                 return "Station is null!";
+            }
         }
 
         string? result = null;

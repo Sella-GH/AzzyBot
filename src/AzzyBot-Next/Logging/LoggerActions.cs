@@ -111,6 +111,9 @@ public static partial class LoggerActions
     [LoggerMessage(210, LogLevel.Warning, "Could not find database item {item} for guild {guild}")]
     public static partial void DatabaseItemNotFound(this ILogger logger, string item, ulong guild);
 
+    [LoggerMessage(220, LogLevel.Warning, "Could not find discord item {item} for guild {guild}")]
+    public static partial void DiscordItemNotFound(this ILogger logger, string item, ulong guild);
+
     [LoggerMessage(290, LogLevel.Warning, "Latest online version of the bot is empty")]
     public static partial void OnlineVersionEmpty(this ILogger<UpdaterService> logger);
 
