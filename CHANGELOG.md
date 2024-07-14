@@ -1,6 +1,18 @@
-## 2.0.0-preview4
+## 2.0.0-preview3.1
 ### General
 - Optimized the building process for better code performance
+- A new environment variable was added to skip the waiting time for the database at startup
+
+### Additions
+- More logging messages in case something goes absurdly wrong
+
+### Improvements
+- Ensures consistency over all commands regarding variable names
+- Errors now mention people and groups correctly
+
+### Fixes
+- Permission checks of AzuraCast commands not working
+- Roles not showing when checks fail
 
 ## 2.0.0-preview3 - 2024-07-14
 ### Breaking Changes

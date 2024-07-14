@@ -282,8 +282,8 @@ public sealed class DiscordBotService
             return;
         }
 
-        await using IDiscordMessageBuilder? builder = new DiscordMessageBuilder();
-        builder.AddMentions([new RoleMention(), new UserMention()]);
+        await using DiscordMessageBuilder builder = new();
+        builder.WithAllowedMention(RoleMention.All);
 
         ContextCheckFailedData? moduleActivatedCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is ModuleActivatedCheckAttribute);
         if (moduleActivatedCheck is not null)
