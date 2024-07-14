@@ -193,7 +193,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            FileOperations.DeleteFiles(_azuraCast.FilePath, $"{azuraCast.Id}");
+            FileOperations.DeleteFiles(_azuraCast.FilePath, $"{azuraCast.Id}-");
             await _db.DeleteAzuraCastAsync(context.Guild.Id);
 
             await context.EditResponseAsync("Your AzuraCast setup was deleted successfully.");
