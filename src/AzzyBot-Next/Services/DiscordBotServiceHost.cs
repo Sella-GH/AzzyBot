@@ -118,6 +118,7 @@ public sealed class DiscordBotServiceHost : IHostedService
 
         return new()
         {
+            Intents = DiscordIntents.Guilds,
             LoggerFactory = _loggerFactory,
             // Otherwise it stops reconnecting after 4 attempts
             // TODO Remove this when the new IoC Client is released #1908
