@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,6 +23,7 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = discordBotService;
 
+    [SuppressMessage("Style", "IDE0066:Convert switch statement to expression", Justification = "Better reading style")]
     public async ValueTask<string?> ExecuteCheckAsync(AzuraCastDiscordPermCheckAttribute attribute, CommandContext context)
     {
         ArgumentNullException.ThrowIfNull(attribute, nameof(attribute));
@@ -40,8 +42,35 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
             return "AzuraCast is null!";
         }
 
+        bool fillStation;
+        switch (context.Command.FullName)
+        {
+            case "azuracast export-playlists":
+            case "azuracast force-api-permission-check":
+            case "azuracast force-cache-refresh":
+            case "azuracast get-system-logs":
+            case "azuracast start-station":
+            case "azuracast stop-station":
+            case "azuracast toggle-song-requests":
+            case "azuracast update-instance":
+            case "config add-azuracast-station":
+            case "config add-azuracast-station-mount":
+            case "config modify-azuracast-station":
+            case "config modify-azuracast-station-checks":
+            case "config delete-azuracast-station-mount":
+            case "dj delete-song-request":
+            case "dj skip-song":
+            case "dj switch-playlist":
+                fillStation = true;
+                break;
+
+            default:
+                fillStation = false;
+                break;
+        }
+
         AzuraCastStationEntity? station = new();
-        if (context.Command.FullName.StartsWith("config modify-azuracast-station", StringComparison.OrdinalIgnoreCase))
+        if (fillStation)
         {
             station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId);
             if (station is null)
