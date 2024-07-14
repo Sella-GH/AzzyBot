@@ -2,6 +2,12 @@
 ### General
 - Removed not needed internal events, meaning the performance should be *slightly* better
 
+### Improvements
+- The local station cache file is now also deleted when the station or the instance is deleted
+
+### Fixes
+- Permission checks are now really working correctly
+
 ## 2.0.0-preview3.1 - 2024-07-14
 ### General
 - Optimized the building process for better code performance
