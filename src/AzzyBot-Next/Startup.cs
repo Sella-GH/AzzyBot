@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Extensions;
 using AzzyBot.Utilities;
@@ -14,9 +15,10 @@ public static class Startup
         string environment = AzzyStatsSoftware.GetBotEnvironment;
         bool isDev = environment == Environments.Development;
         bool isDocker = AzzyStatsHardware.CheckIfDocker;
-        bool forceDebug = (isDocker) ? (Environment.GetEnvironmentVariable("FORCE_DEBUG") == "true") : (args?.Length > 0 && args[0] is "-forceDebug");
+        bool forceDebug = (isDocker) ? (Environment.GetEnvironmentVariable("FORCE_DEBUG") == "true") : (args?.Length > 0 && args.Contains("-forceDebug"));
+        bool skipDbWaiting = Environment.GetEnvironmentVariable("SKIP_DB_WAITING") == "true";
 
-        if (isDocker)
+        if (isDocker && !skipDbWaiting)
         {
             // Give the database time to start up
             await Task.Delay(TimeSpan.FromSeconds(30));
