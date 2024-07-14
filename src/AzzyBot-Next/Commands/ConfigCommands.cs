@@ -442,7 +442,6 @@ public sealed class ConfigCommands
 
             if (guild.AzuraCast is not null)
             {
-                _logger.DatabaseAzuraCastNotFound(guildId);
                 AzuraCastEntity azuraCast = guild.AzuraCast;
                 Dictionary<ulong, string> stationRoles = [];
                 foreach (AzuraCastStationEntity station in azuraCast.Stations)
