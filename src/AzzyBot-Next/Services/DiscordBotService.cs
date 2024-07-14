@@ -307,9 +307,10 @@ public sealed class DiscordBotService
         if (azuraCastDiscordPermCheck is not null)
         {
             string message = "You don't have the required permissions to execute this command!\nPlease contact {0}.";
+            bool splittable = azuraCastDiscordPermCheck.ErrorMessage.Contains(':', StringComparison.OrdinalIgnoreCase);
             string[] info = azuraCastDiscordPermCheck.ErrorMessage.Split(':');
 
-            if (info.Length is 1 && info[0] is "Instance")
+            if (!splittable && azuraCastDiscordPermCheck.ErrorMessage is "Instance")
             {
                 message = message.Replace("{0}", $"<@&{azuraCast.InstanceAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
             }
