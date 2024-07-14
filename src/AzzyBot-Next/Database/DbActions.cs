@@ -38,7 +38,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             _logger.DatabaseTransactionFailed(ex);
             await transaction.RollbackAsync();
 
-            return false;
+            throw;
         }
     }
 
