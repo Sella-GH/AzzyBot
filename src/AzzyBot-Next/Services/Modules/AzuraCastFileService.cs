@@ -86,9 +86,9 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
             string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? station.AzuraCast.AdminApiKey : station.ApiKey;
 
             IReadOnlyList<AzuraFilesRecord> onlineFiles = await _azuraCast.GetFilesOnlineAsync(new(Crypto.Decrypt(station.AzuraCast.BaseUrl)), Crypto.Decrypt(apiKey), station.StationId);
-            IReadOnlyList<AzuraFilesRecord> localFiles = await _azuraCast.GetFilesLocalAsync(station.Id, station.StationId);
+            IReadOnlyList<AzuraFilesRecord> localFiles = await _azuraCast.GetFilesLocalAsync(station.AzuraCastId, station.Id, station.StationId);
 
-            await CheckIfFilesWereModifiedAsync(onlineFiles, localFiles, station.Id, station.StationId, Crypto.Decrypt(station.Name), station.RequestsChannelId);
+            await CheckIfFilesWereModifiedAsync(onlineFiles, localFiles, station, Crypto.Decrypt(station.Name), station.RequestsChannelId);
         }
         catch (OperationCanceledException)
         {
@@ -96,10 +96,8 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
         }
     }
 
-    private async ValueTask CheckIfFilesWereModifiedAsync(IReadOnlyList<AzuraFilesRecord> onlineFiles, IReadOnlyList<AzuraFilesRecord> localFiles, int stationDbId, int stationId, string stationName, ulong channelId)
+    private async ValueTask CheckIfFilesWereModifiedAsync(IReadOnlyList<AzuraFilesRecord> onlineFiles, IReadOnlyList<AzuraFilesRecord> localFiles, AzuraCastStationEntity station, string stationName, ulong channelId)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationDbId, nameof(stationDbId));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
         ArgumentException.ThrowIfNullOrWhiteSpace(stationName, nameof(stationName));
 
@@ -112,10 +110,10 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
         if (addedFiles.Count == 0 && removedFiles.Count == 0)
             return;
 
-        _logger.BackgroundServiceStationFilesChanged(stationDbId, stationId);
+        _logger.BackgroundServiceStationFilesChanged(station.Id, station.StationId);
 
-        string addedFileName = Path.Combine(_azuraCast.FilePath, $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}-{stationDbId}-{stationId}-added.txt");
-        string removedFileName = Path.Combine(_azuraCast.FilePath, $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}-{stationDbId}-{stationId}-removed.txt");
+        string addedFileName = Path.Combine(_azuraCast.FilePath, $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}-{station.AzuraCastId}-{station.Id}-{station.StationId}-added.txt");
+        string removedFileName = Path.Combine(_azuraCast.FilePath, $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}-{station.AzuraCastId}-{station.Id}-{station.StationId}-removed.txt");
         StringBuilder added = new();
         StringBuilder removed = new();
         List<string> paths = [];
@@ -140,6 +138,6 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
 
         DiscordEmbed embed = EmbedBuilder.BuildAzuraCastFileChangesEmbed(stationName, addedFiles.Count, removedFiles.Count);
         await _botService.SendMessageAsync(channelId, $"Changes in the files of station **{stationName}** detected. Check the details below.", [embed], paths);
-        await FileOperations.WriteToFileAsync(Path.Combine(_azuraCast.FilePath, $"{stationDbId}-{stationId}-files.json"), JsonSerializer.Serialize(onlineFiles, FileOperations.JsonOptions));
+        await FileOperations.WriteToFileAsync(Path.Combine(_azuraCast.FilePath, $"{station.AzuraCastId}-{station.Id}-{station.StationId}-files.json"), JsonSerializer.Serialize(onlineFiles, FileOperations.JsonOptions));
     }
 }

@@ -569,7 +569,7 @@ public sealed class AzuraCastCommands
             }
             else
             {
-                AzuraSongDataRecord songData = await _azuraCast.GetSongInfoAsync(baseUrl, apiKey, acStation.Id, station, false, song);
+                AzuraSongDataRecord songData = await _azuraCast.GetSongInfoAsync(baseUrl, apiKey, acStation, false, song);
                 songRequest = new()
                 {
                     Song = songData,
