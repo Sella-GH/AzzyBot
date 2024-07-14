@@ -87,6 +87,7 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
                 isStationAdmin = userRoles.Contains(_botService.GetDiscordRole(guildId, station.StationAdminRoleId));
                 break;
 
+            case "dj delete-song-request":
             case "dj skip-song":
             case "dj switch-playlist":
                 isStationDj = userRoles.Contains(_botService.GetDiscordRole(guildId, station.StationDjRoleId));
