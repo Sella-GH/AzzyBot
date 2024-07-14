@@ -282,10 +282,14 @@ public sealed class DiscordBotService
             return;
         }
 
+        await using IDiscordMessageBuilder? builder = new DiscordMessageBuilder();
+        builder.AddMentions([new RoleMention(), new UserMention()]);
+
         ContextCheckFailedData? moduleActivatedCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is ModuleActivatedCheckAttribute);
         if (moduleActivatedCheck is not null)
         {
-            await context.EditResponseAsync("This module is not activated, you are unable to use commands from it.");
+            builder.WithContent("This module is not activated, you are unable to use commands from it.");
+            await context.EditResponseAsync(builder);
             return;
         }
 
@@ -299,7 +303,8 @@ public sealed class DiscordBotService
         ContextCheckFailedData? azuraCastOnlineCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is AzuraCastOnlineCheckAttribute);
         if (azuraCastOnlineCheck is not null)
         {
-            await context.EditResponseAsync($"The AzuraCast instance is currently offline!\nPlease contact <@&{azuraCast.InstanceAdminRoleId}>.");
+            builder.WithContent($"The AzuraCast instance is currently offline!\nPlease contact <@&{azuraCast.InstanceAdminRoleId}>.");
+            await context.EditResponseAsync(builder);
             return;
         }
 
@@ -333,7 +338,8 @@ public sealed class DiscordBotService
                 }
             }
 
-            await context.EditResponseAsync(message);
+            builder.WithContent(message);
+            await context.EditResponseAsync(builder);
             return;
         }
 
