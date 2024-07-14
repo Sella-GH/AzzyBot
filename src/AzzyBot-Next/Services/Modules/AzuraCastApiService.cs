@@ -323,6 +323,13 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         return stats;
     }
 
+    public Task<AzuraStatusRecord> GetInstanceStatusAsync(Uri baseUrl)
+    {
+        const string endpoint = AzuraApiEndpoints.Status;
+
+        return GetFromApiAsync<AzuraStatusRecord>(baseUrl, endpoint);
+    }
+
     public Task<AzuraNowPlayingDataRecord> GetNowPlayingAsync(Uri baseUrl, int stationId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
@@ -613,7 +620,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
 
             try
             {
-                status = await GetFromApiAsync<AzuraStatusRecord>(baseUrl, AzuraApiEndpoints.Status);
+                status = await GetInstanceStatusAsync(baseUrl);
                 online = status.Online;
             }
             catch (HttpRequestException)
