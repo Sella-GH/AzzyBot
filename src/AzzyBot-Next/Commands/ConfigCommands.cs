@@ -185,6 +185,15 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(DeleteAzuraCastAsync), context.User.GlobalName);
 
+            AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
+
+            FileOperations.DeleteFiles(_azuraCast.FilePath, $"{azuraCast.Id}");
             await _db.DeleteAzuraCastAsync(context.Guild.Id);
 
             await context.EditResponseAsync("Your AzuraCast setup was deleted successfully.");

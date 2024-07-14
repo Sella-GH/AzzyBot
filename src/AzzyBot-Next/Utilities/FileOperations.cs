@@ -84,6 +84,17 @@ public static class FileOperations
         }
     }
 
+    public static void DeleteFiles(string path, string startingName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path, nameof(path));
+        ArgumentException.ThrowIfNullOrWhiteSpace(startingName, nameof(startingName));
+
+        foreach (string file in Directory.GetFiles(path, $"{startingName}*"))
+        {
+            File.Delete(file);
+        }
+    }
+
     public static Task<string> GetFileContentAsync(string path)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path, nameof(path));
