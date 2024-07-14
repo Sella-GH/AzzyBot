@@ -4,6 +4,7 @@
 
 ### Improvements
 - The local station cache file is now also deleted when the station or the instance is deleted
+- If you have activated "Always Write Playlists to Liquidsoap", the bot will wait for it before the station is completely started
 
 ### Fixes
 - Permission checks are now really working correctly
