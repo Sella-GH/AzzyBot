@@ -357,7 +357,7 @@ public sealed class AzuraCastCommands
 
             AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
             AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
-            if (DateTime.UtcNow.AddSeconds(-30) > acStation.LastSkipTime)
+            if (acStation.LastSkipTime.AddSeconds(30) > DateTime.UtcNow)
             {
                 await context.EditResponseAsync("You can only skip a song every 30 seconds.");
                 return;
