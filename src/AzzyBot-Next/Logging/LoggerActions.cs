@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using AzzyBot.Commands.Checks;
 using AzzyBot.Database;
 using AzzyBot.Services;
 using AzzyBot.Services.Modules;
@@ -53,6 +54,9 @@ public static partial class LoggerActions
 
     [LoggerMessage(31, LogLevel.Debug, "Instance {id} is {status}")]
     public static partial void BackgroundServiceInstanceStatus(this ILogger<AzuraCastPingService> logger, int id, string status);
+
+    [LoggerMessage(40, LogLevel.Debug, "AzuraCastDiscordPermission is {perm}")]
+    public static partial void AzuraCastDiscordPermission(this ILogger<AzuraCastDiscordPermCheck> logger, string perm);
 
     [LoggerMessage(90, LogLevel.Debug, "Stopping global timer")]
     public static partial void GlobalTimerStop(this ILogger<TimerServiceHost> logger);
