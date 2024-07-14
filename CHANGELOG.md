@@ -1,4 +1,8 @@
-## 2.0.0-preview3.1
+## 2.0.0-preview4
+### General
+- Removed not needed internal events, meaning the performance should be *slightly* better
+
+## 2.0.0-preview3.1 - 2024-07-14
 ### General
 - Optimized the building process for better code performance
 - A new environment variable was added to skip the waiting time for the database at startup
