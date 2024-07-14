@@ -281,7 +281,7 @@ public sealed class DiscordBotService
         ContextCheckFailedData? azuraCastOnlineCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is AzuraCastOnlineCheckAttribute);
         if (azuraCastOnlineCheck is not null)
         {
-            await context.EditResponseAsync("The AzuraCast instance is currently offline!\nPlease contact {context.Guild.Owner.Mention}.");
+            await context.EditResponseAsync($"The AzuraCast instance is currently offline!\nPlease contact <@&{azuraCast.InstanceAdminRoleId}>.");
             return;
         }
 
@@ -291,11 +291,11 @@ public sealed class DiscordBotService
             string message = "You don't have the required permissions to execute this command!\nPlease contact {0}.";
             string[] info = azuraCastDiscordPermCheck.ErrorMessage.Split(':');
 
-            if (info.Length is 2 && info[0] is "Instance")
+            if (info.Length is 1 && info[0] is "Instance")
             {
                 message = message.Replace("{0}", $"<@&{azuraCast.InstanceAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
             }
-            else if (info.Length is 3)
+            else if (info.Length is 2)
             {
                 AzuraCastStationEntity? station = await _db.GetAzuraCastStationAsync(context.Guild.Id, Convert.ToInt32(info[1], CultureInfo.InvariantCulture));
                 if (station is null)

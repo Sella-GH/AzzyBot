@@ -65,6 +65,7 @@ public class AzuraCastDiscordPermCheck(DbActions dbActions, DiscordBotService di
             case "azuracast export-playlists":
             case "azuracast force-api-permission-check":
             case "azuracast force-cache-refresh":
+            case "azuracast get-system-logs":
             case "azuracast start-station":
             case "azuracast stop-station":
             case "azuracast toggle-song-requests":
