@@ -53,10 +53,10 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
             case "azuracast stop-station":
             case "azuracast toggle-song-requests":
             case "azuracast update-instance":
-            case "config add-azuracast-station":
             case "config add-azuracast-station-mount":
             case "config modify-azuracast-station":
             case "config modify-azuracast-station-checks":
+            case "config delete-azuracast-station":
             case "config delete-azuracast-station-mount":
             case "dj delete-song-request":
             case "dj skip-song":
@@ -101,17 +101,14 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
         switch (commandName)
         {
             case "azuracast export-playlists":
-            case "azuracast force-api-permission-check":
             case "azuracast force-cache-refresh":
-            case "azuracast get-system-logs":
             case "azuracast start-station":
             case "azuracast stop-station":
             case "azuracast toggle-song-requests":
-            case "azuracast update-instance":
-            case "config add-azuracast-station":
             case "config add-azuracast-station-mount":
             case "config modify-azuracast-station":
             case "config modify-azuracast-station-checks":
+            case "config delete-azuracast-station":
             case "config delete-azuracast-station-mount":
                 isStationAdmin = userRoles.Contains(_botService.GetDiscordRole(guildId, station.StationAdminRoleId));
                 break;
