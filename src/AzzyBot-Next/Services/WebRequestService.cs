@@ -173,7 +173,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task<string> GetWebAsync(Uri url, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    public async Task<string> GetWebAsync(Uri url, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true, bool noLogging = false)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
@@ -195,7 +195,9 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
         catch (HttpRequestException ex)
         {
-            _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
+            if (!noLogging)
+                _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
+
             throw;
         }
     }

@@ -156,12 +156,12 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         return body;
     }
 
-    private async Task<T> GetFromApiAsync<T>(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
+    private async Task<T> GetFromApiAsync<T>(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null, bool noLogging = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
-        string body = await _webService.GetWebAsync(uri, headers, true);
+        string body = await _webService.GetWebAsync(uri, headers, true, noLogging);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException($"API response is empty, url: {uri}");
 
@@ -332,13 +332,13 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         return GetFromApiAsync<AzuraStatusRecord>(baseUrl, endpoint);
     }
 
-    public Task<AzuraNowPlayingDataRecord> GetNowPlayingAsync(Uri baseUrl, int stationId)
+    public Task<AzuraNowPlayingDataRecord> GetNowPlayingAsync(Uri baseUrl, int stationId, bool noLogging = false)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
         string endpoint = $"{AzuraApiEndpoints.NowPlaying}/{stationId}";
 
-        return GetFromApiAsync<AzuraNowPlayingDataRecord>(baseUrl, endpoint);
+        return GetFromApiAsync<AzuraNowPlayingDataRecord>(baseUrl, endpoint, null, noLogging);
     }
 
     public Task<AzuraPlaylistRecord> GetPlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId)
@@ -560,29 +560,31 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
 
         // Delay to ensure the station is fully started
         await Task.Delay(TimeSpan.FromSeconds(5));
-        AzuraNowPlayingDataRecord? nowPlaying = null;
-        try
-        {
-            nowPlaying = await GetNowPlayingAsync(baseUrl, stationId);
-        }
-        catch (HttpRequestException)
-        {
-            await context.EditResponseAsync("You have activated the option **\"Always Write Playlists to Liquidsoap\"** which means you have to wait more time until you can finally use your station.\nI inform you when it's finished.");
-        }
 
+        AzuraNowPlayingDataRecord? nowPlaying = null;
+        bool? firstTime = null;
         while (nowPlaying is null)
         {
             try
             {
-                nowPlaying = await GetNowPlayingAsync(baseUrl, stationId);
+                nowPlaying = await GetNowPlayingAsync(baseUrl, stationId, true);
             }
             catch (HttpRequestException)
             {
+                if (!firstTime.HasValue)
+                    firstTime = true;
+
+                if (firstTime.Value)
+                {
+                    await context.EditResponseAsync("You have activated the option \"**Always Write Playlists to Liquidsoap**\" which means you have to wait more time until you can finally use your station.\nI inform you when it's finished.");
+                    firstTime = false;
+                }
+
                 await Task.Delay(TimeSpan.FromSeconds(10));
             }
         }
 
-        await context.FollowupAsync("All playlists have been written back to liquidsoap.");
+        await context.EditResponseAsync("All playlists have been written back to liquidsoap.");
     }
 
     public async Task StopStationAsync(Uri baseUrl, string apiKey, int stationId)
