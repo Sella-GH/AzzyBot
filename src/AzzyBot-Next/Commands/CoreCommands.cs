@@ -31,10 +31,10 @@ public sealed class CoreCommands
 
         [Command("help"), Description("Gives you an overview about all the available commands.")]
         public async ValueTask HelpAsync
-            (
+        (
             CommandContext context,
             [Description("The command you want to get more information about."), SlashAutoCompleteProvider<AzzyHelpAutocomplete>] string? command = null
-            )
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
             ArgumentNullException.ThrowIfNull(context.Client.CurrentApplication.Owners, nameof(context.Client.CurrentApplication.Owners));
@@ -51,6 +51,7 @@ public sealed class CoreCommands
             GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId);
             if (guild is null)
             {
+                _logger.DatabaseGuildNotFound(guildId);
                 await context.EditResponseAsync("Server not found in database.");
                 return;
             }

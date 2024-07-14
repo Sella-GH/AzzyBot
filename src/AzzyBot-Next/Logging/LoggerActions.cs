@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+using AzzyBot.Commands.Checks;
 using AzzyBot.Database;
 using AzzyBot.Services;
 using AzzyBot.Services.Modules;
@@ -54,6 +55,9 @@ public static partial class LoggerActions
     [LoggerMessage(31, LogLevel.Debug, "Instance {id} is {status}")]
     public static partial void BackgroundServiceInstanceStatus(this ILogger<AzuraCastPingService> logger, int id, string status);
 
+    [LoggerMessage(40, LogLevel.Debug, "AzuraCastDiscordPermission is {perm}")]
+    public static partial void AzuraCastDiscordPermission(this ILogger<AzuraCastDiscordPermCheck> logger, string perm);
+
     [LoggerMessage(90, LogLevel.Debug, "Stopping global timer")]
     public static partial void GlobalTimerStop(this ILogger<TimerServiceHost> logger);
 
@@ -99,11 +103,35 @@ public static partial class LoggerActions
     [LoggerMessage(199, LogLevel.Information, "Stopping AzzyBot")]
     public static partial void BotStopping(this ILogger<CoreServiceHost> logger);
 
-    [LoggerMessage(200, LogLevel.Warning, "Commands error occured!")]
+    [LoggerMessage(200, LogLevel.Warning, "AzzyBot is not connected to Discord!")]
+    public static partial void BotNotConnected(this ILogger logger);
+
+    [LoggerMessage(201, LogLevel.Warning, "Commands error occured!")]
     public static partial void CommandsError(this ILogger<DiscordBotServiceHost> logger);
 
-    [LoggerMessage(201, LogLevel.Warning, "Could not fetch channel for id {id}")]
+    [LoggerMessage(202, LogLevel.Warning, "Could not fetch channel for id {id}")]
     public static partial void ChannelNotFound(this ILogger<DiscordBotService> logger, ulong id);
+
+    [LoggerMessage(210, LogLevel.Warning, "Could not find Guild item for guild {guild}")]
+    public static partial void DatabaseGuildNotFound(this ILogger logger, ulong guild);
+
+    [LoggerMessage(211, LogLevel.Warning, "Could not find AzuraCast item for guild {guild}")]
+    public static partial void DatabaseAzuraCastNotFound(this ILogger logger, ulong guild);
+
+    [LoggerMessage(212, LogLevel.Warning, "Could not find AzuraCast checks for guild {guild} in instance {instance}")]
+    public static partial void DatabaseAzuraCastChecksNotFound(this ILogger logger, ulong guild, int instance);
+
+    [LoggerMessage(213, LogLevel.Warning, "Could not find AzuraCast station {station} for guild {guild} in instance {instance}")]
+    public static partial void DatabaseAzuraCastStationNotFound(this ILogger logger, ulong guild, int instance, int station);
+
+    [LoggerMessage(214, LogLevel.Warning, "Could not find AzuraCast station checks for guild {guild} in instance {instance} at station {station}")]
+    public static partial void DatabaseAzuraCastStationChecksNotFound(this ILogger logger, ulong guild, int instance, int station);
+
+    [LoggerMessage(215, LogLevel.Warning, "Could not find AzuraCast station mount for guild {guild} in instance {instance} at station {station}")]
+    public static partial void DatabaseAzuraCastStationMountNotFound(this ILogger logger, ulong guild, int instance, int station);
+
+    [LoggerMessage(220, LogLevel.Warning, "Could not find discord item {item} for guild {guild}")]
+    public static partial void DiscordItemNotFound(this ILogger logger, string item, ulong guild);
 
     [LoggerMessage(290, LogLevel.Warning, "Latest online version of the bot is empty")]
     public static partial void OnlineVersionEmpty(this ILogger<UpdaterService> logger);

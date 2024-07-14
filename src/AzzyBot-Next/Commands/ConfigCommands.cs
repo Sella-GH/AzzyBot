@@ -33,7 +33,7 @@ public sealed class ConfigCommands
 
         [Command("add-azuracast"), Description("Add an AzuraCast instance to your server. This is a requirement to use the features.")]
         public async ValueTask AddAzuraCastAsync
-            (
+        (
             CommandContext context,
             [Description("Set the base Url, an example: https://demo.azuracast.com/")] Uri url,
             [Description("Add an administrator api key. It's enough when it has the permission to access system information.")] string apiKey,
@@ -43,7 +43,7 @@ public sealed class ConfigCommands
             [Description("Enable or disable the automatic check if the AzuraCast instance of your server is down."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int serverStatus,
             [Description("Enable or disable the automatic check for AzuraCast updates."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int updates,
             [Description("Enable or disable the addition of the changelog to the posted AzuraCast updates."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int updatesChangelog
-            )
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
             ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
@@ -77,6 +77,7 @@ public sealed class ConfigCommands
             GuildsEntity? guild = await _db.GetGuildAsync(guildId);
             if (guild is null)
             {
+                _logger.DatabaseGuildNotFound(guildId);
                 await context.EditResponseAsync("Server not found in database.");
                 return;
             }
@@ -91,6 +92,7 @@ public sealed class ConfigCommands
             AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(guildId);
             if (azuraCast is not null)
             {
+                _logger.DatabaseAzuraCastNotFound(guildId);
                 await context.DeleteResponseAsync();
                 await context.FollowupAsync("AzuraCast is already set up for your server.");
                 return;
@@ -106,7 +108,7 @@ public sealed class ConfigCommands
 
         [Command("add-azuracast-station"), Description("Add an AzuraCast station to your instance."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask AddAzuraCastStationAsync
-            (
+        (
             CommandContext context,
             [Description("Enter the station id of your azuracast station.")] int station,
             [Description("Enter the name of the new station.")] string stationName,
@@ -117,7 +119,7 @@ public sealed class ConfigCommands
             [Description("Enable or disable the automatic check if files have been changed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int fileChanges,
             [Description("Enter the api key of the new station. This is optional if the admin one has the permission.")] string? apiKey = null,
             [Description("Select the group that has the dj permissions on this station.")] DiscordRole? djGroup = null
-            )
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
             ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
@@ -146,12 +148,12 @@ public sealed class ConfigCommands
 
         [Command("add-azuracast-station-mount"), Description("Add an AzuraCast mount point to the selected station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask AddAzuraCastStationMountAsync
-            (
+        (
             CommandContext context,
             [Description("Choose the station you want to add the mount."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
             [Description("Enter the mount point name.")] string mountName,
             [Description("Enter the mount point stub.")] string mount
-            )
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -177,10 +179,10 @@ public sealed class ConfigCommands
 
         [Command("delete-azuracast-station"), Description("Delete an existing AzuraCast station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask DeleteAzuraCastStationAsync
-            (
+        (
             CommandContext context,
             [Description("Choose the station you want to delete."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station
-            )
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -194,11 +196,11 @@ public sealed class ConfigCommands
         [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Needed in the mount autocomplete provider")]
         [Command("delete-azuracast-station-mount"), Description("Delete an existing AzuraCast mount point from a station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask DeleteAzuraCastStationMountAsync
-            (
+        (
             CommandContext context,
             [Description("Select the station of the mount point."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
             [Description("Select the mount point you want to delete."), SlashAutoCompleteProvider<AzuraCastMountAutocomplete>] int mountId
-            )
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -211,14 +213,14 @@ public sealed class ConfigCommands
 
         [Command("modify-azuracast"), Description("Modify the general AzuraCast settings."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask UpdateAzuraCastAsync
-            (
+        (
             CommandContext context,
             [Description("Update the base Url, an example: https://demo.azuracast.com/")] Uri? url = null,
             [Description("Update the administrator api key. It's enough when it has the permission to access system info.")] string? apiKey = null,
             [Description("Update the group that has the admin permissions on this instance.")] DiscordRole? instanceAdminGroup = null,
             [Description("Update the channel to get general notifications about your azuracast instance."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? notificationsChannel = null,
             [Description("Update the channel to get notifications when your azuracast instance is down."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? outagesChannel = null
-            )
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
             ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
@@ -242,12 +244,12 @@ public sealed class ConfigCommands
 
         [Command("modify-azuracast-checks"), Description("Modify the automatic checks for your AzuraCast instance."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask UpdateAzuraCastChecksAsync
-            (
+        (
             CommandContext context,
             [Description("Enable or disable the automatic check if the AzuraCast instance of your server is down."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int serverStatus = 0,
             [Description("Enable or disable the automatic check for AzuraCast updates."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int updates = 0,
             [Description("Enable or disable the addition of the changelog to the posted AzuraCast updates."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int updatesChangelog = 0
-            )
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
             ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
@@ -298,7 +300,7 @@ public sealed class ConfigCommands
 
         [Command("modify-azuracast-station"), Description("Modify one AzuraCast station you already added."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask UpdateAzuraCastStationAsync
-            (
+        (
             CommandContext context,
             [Description("Choose the station you want to modify."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
             [Description("Modify the station id.")] int? stationId = null,
@@ -309,7 +311,7 @@ public sealed class ConfigCommands
             [Description("Modify the channel to get music requests when a request is not found on the server."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? requestsChannel = null,
             [Description("Enable or disable the preference of HLS streams if you add an able mount point."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int hls = 0,
             [Description("Enable or disable the showing of the playlist in the nowplaying embed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int showPlaylist = 0
-            )
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
             ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
@@ -351,11 +353,11 @@ public sealed class ConfigCommands
 
         [Command("modify-azuracast-station-checks"), Description("Modify the automatic checks inside an AzuraCast station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask UpdateAzuraCastStationChecksAsync
-            (
+        (
             CommandContext context,
             [Description("Choose the station you want to modify the checks."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
             [Description("Enable or disable the automatic check if files have been changed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int fileChanges = 0
-            )
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
             ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
@@ -385,12 +387,12 @@ public sealed class ConfigCommands
 
         [Command("modify-core"), Description("Modify the core settings of the bot.")]
         public async ValueTask UpdateCoreAsync
-            (
+        (
             CommandContext context,
             [Description("Select the role that has administrative permissions on the bot.")] DiscordRole? adminRole = null,
             [Description("Select a channel to get administrative notifications about the bot."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? adminChannel = null,
             [Description("Select a channel to get notifications when the bot runs into an issue."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? errorChannel = null
-            )
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
             ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
@@ -427,6 +429,7 @@ public sealed class ConfigCommands
             GuildsEntity? guild = await _db.GetGuildAsync(guildId, true);
             if (guild is null)
             {
+                _logger.DatabaseGuildNotFound(guildId);
                 await context.EditResponseAsync("Server not found in database.");
                 return;
             }

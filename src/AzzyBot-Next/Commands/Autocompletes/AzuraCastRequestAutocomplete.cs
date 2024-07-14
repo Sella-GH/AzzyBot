@@ -6,16 +6,19 @@ using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
+using AzzyBot.Logging;
 using AzzyBot.Services.Modules;
 using AzzyBot.Utilities.Encryption;
 using AzzyBot.Utilities.Records.AzuraCast;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
+using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands.Autocompletes;
 
-public sealed class AzuraCastRequestAutocomplete(AzuraCastApiService azuraCast, DbActions dbActions) : IAutoCompleteProvider
+public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocomplete> logger, AzuraCastApiService azuraCast, DbActions dbActions) : IAutoCompleteProvider
 {
+    private readonly ILogger<AzuraCastRequestAutocomplete> _logger = logger;
     private readonly AzuraCastApiService _azuraCast = azuraCast;
     private readonly DbActions _dbActions = dbActions;
 
@@ -25,7 +28,7 @@ public sealed class AzuraCastRequestAutocomplete(AzuraCastApiService azuraCast, 
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
         Dictionary<string, object> results = [];
-        int stationId = Convert.ToInt32(context.Options.Single(o => o.Name is "station_id" && o.Value is not null).Value, CultureInfo.InvariantCulture);
+        int stationId = Convert.ToInt32(context.Options.Single(o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
         if (stationId == 0)
             return results;
 
@@ -34,7 +37,10 @@ public sealed class AzuraCastRequestAutocomplete(AzuraCastApiService azuraCast, 
         {
             station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId);
             if (station is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, stationId);
                 return results;
+            }
         }
         catch (InvalidOperationException)
         {

@@ -121,7 +121,10 @@ public sealed class DiscordBotService
         {
             GuildsEntity? guild = await _db.GetGuildAsync(guildId);
             if (guild is null)
+            {
+                _logger.DatabaseGuildNotFound(guildId);
                 return false;
+            }
 
             if (guild.ErrorChannelId is not 0)
                 errorChannelId = guild.ErrorChannelId;
@@ -131,11 +134,17 @@ public sealed class DiscordBotService
                 DiscordGuild? dGuild = GetDiscordGuild(guildId);
                 DiscordMember? dMember = await GetDiscordMemberAsync(guildId, _client.CurrentUser.Id);
                 if (dMember is null)
+                {
+                    _logger.DiscordItemNotFound(nameof(DiscordMember), guildId);
                     return false;
+                }
 
                 errorChannelId = dGuild?.Channels.First(c => c.Value.Type.Equals(DiscordChannelType.Text) && c.Value.PermissionsFor(dMember).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages)).Value.Id ?? _settings.ErrorChannelId;
                 if (errorChannelId is 0)
+                {
+                    _logger.DiscordItemNotFound(nameof(DiscordChannel), guildId);
                     return false;
+                }
 
                 errorChannelConfigured = false;
             }
@@ -202,7 +211,10 @@ public sealed class DiscordBotService
         {
             GuildsEntity? guild = await _db.GetGuildAsync(guildId);
             if (guild is null)
+            {
+                _logger.DatabaseGuildNotFound(guildId);
                 return false;
+            }
 
             if (guild.ErrorChannelId is not 0)
                 errorChannelId = guild.ErrorChannelId;
@@ -212,11 +224,17 @@ public sealed class DiscordBotService
                 DiscordGuild? dGuild = GetDiscordGuild(guildId);
                 DiscordMember? dMember = await GetDiscordMemberAsync(guildId, _client.CurrentUser.Id);
                 if (dMember is null)
+                {
+                    _logger.DiscordItemNotFound(nameof(DiscordMember), guildId);
                     return false;
+                }
 
                 errorChannelId = dGuild?.Channels.First(c => c.Value.Type.Equals(DiscordChannelType.Text) && c.Value.PermissionsFor(dMember).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages)).Value.Id ?? _settings.ErrorChannelId;
                 if (errorChannelId is 0)
+                {
+                    _logger.DiscordItemNotFound(nameof(DiscordChannel), guildId);
                     return false;
+                }
 
                 errorChannelConfigured = false;
             }
@@ -259,19 +277,34 @@ public sealed class DiscordBotService
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
         if (!CheckIfClientIsConnected)
+        {
+            _logger.BotNotConnected();
             return;
+        }
+
+        await using DiscordMessageBuilder builder = new();
+        builder.WithAllowedMention(RoleMention.All);
 
         ContextCheckFailedData? moduleActivatedCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is ModuleActivatedCheckAttribute);
         if (moduleActivatedCheck is not null)
         {
-            await context.EditResponseAsync("This module is not activated, you are unable to use commands from it.");
+            builder.WithContent("This module is not activated, you are unable to use commands from it.");
+            await context.EditResponseAsync(builder);
+            return;
+        }
+
+        AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id);
+        if (azuraCast is null)
+        {
+            _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
             return;
         }
 
         ContextCheckFailedData? azuraCastOnlineCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is AzuraCastOnlineCheckAttribute);
         if (azuraCastOnlineCheck is not null)
         {
-            await context.EditResponseAsync("The AzuraCast instance is currently offline!\nPlease contact {context.Guild.Owner.Mention}.");
+            builder.WithContent($"The AzuraCast instance is currently offline!\nPlease contact <@&{azuraCast.InstanceAdminRoleId}>.");
+            await context.EditResponseAsync(builder);
             return;
         }
 
@@ -279,32 +312,34 @@ public sealed class DiscordBotService
         if (azuraCastDiscordPermCheck is not null)
         {
             string message = "You don't have the required permissions to execute this command!\nPlease contact {0}.";
+            bool splittable = azuraCastDiscordPermCheck.ErrorMessage.Contains(':', StringComparison.OrdinalIgnoreCase);
             string[] info = azuraCastDiscordPermCheck.ErrorMessage.Split(':');
-            AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id);
-            if (azuraCast is null)
-                return;
 
-            if (info.Length is 2 && info[0] is "Instance")
+            if (!splittable && azuraCastDiscordPermCheck.ErrorMessage is "Instance")
             {
                 message = message.Replace("{0}", $"<@&{azuraCast.InstanceAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
             }
-            else if (info.Length is 3)
+            else if (info.Length is 2)
             {
                 AzuraCastStationEntity? station = await _db.GetAzuraCastStationAsync(context.Guild.Id, Convert.ToInt32(info[1], CultureInfo.InvariantCulture));
                 if (station is null)
+                {
+                    _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, Convert.ToInt32(info[1], CultureInfo.InvariantCulture));
                     return;
+                }
 
-                if (info[0] is "Admin")
+                if (info[0] is "Station")
                 {
                     message = message.Replace("{0}", $"<@&{station.StationAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
                 }
                 else if (info[0] is "DJ")
                 {
-                    message = message.Replace("{0}", $"<@&{station.StationDjRoleId}>", StringComparison.OrdinalIgnoreCase);
+                    message = message.Replace("{0}", $"<@&{((station.StationDjRoleId is 0) ? station.StationAdminRoleId : station.StationDjRoleId)}>", StringComparison.OrdinalIgnoreCase);
                 }
             }
 
-            await context.EditResponseAsync(message);
+            builder.WithContent(message);
+            await context.EditResponseAsync(builder);
             return;
         }
 
@@ -316,7 +351,10 @@ public sealed class DiscordBotService
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
 
         if (!CheckIfClientIsConnected)
+        {
+            _logger.BotNotConnected();
             return false;
+        }
 
         await using DiscordMessageBuilder builder = new();
 
@@ -420,8 +458,7 @@ public sealed class DiscordBotService
 
     private static void ProcessOptions(IReadOnlyDictionary<CommandParameter, object?> paramaters, Dictionary<string, string> commandParameters)
     {
-        if (paramaters is null)
-            return;
+        ArgumentNullException.ThrowIfNull(paramaters, nameof(paramaters));
 
         foreach (KeyValuePair<CommandParameter, object?> pair in paramaters)
         {

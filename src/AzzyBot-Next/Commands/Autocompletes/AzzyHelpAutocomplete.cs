@@ -4,17 +4,20 @@ using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
+using AzzyBot.Logging;
 using AzzyBot.Settings;
 using AzzyBot.Utilities;
 using AzzyBot.Utilities.Records;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands.Autocompletes;
 
-public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings, DbActions dbActions) : IAutoCompleteProvider
+public sealed class AzzyHelpAutocomplete(ILogger<AzzyHelpAutocomplete> logger, AzzyBotSettingsRecord settings, DbActions dbActions) : IAutoCompleteProvider
 {
+    private readonly ILogger<AzzyHelpAutocomplete> _logger = logger;
     private readonly AzzyBotSettingsRecord _settings = settings;
     private readonly DbActions _dbActions = dbActions;
 
@@ -33,7 +36,10 @@ public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings, DbActio
         DiscordMember member = context.Member;
         GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId);
         if (guild is null)
+        {
+            _logger.DatabaseGuildNotFound(guildId);
             return results;
+        }
 
         bool adminServer = false;
         foreach (DiscordUser _ in botOwners.Where(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId))

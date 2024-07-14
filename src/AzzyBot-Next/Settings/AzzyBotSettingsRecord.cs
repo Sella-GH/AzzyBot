@@ -15,7 +15,7 @@ public sealed record AzzyBotSettingsRecord
     public DiscordStatus? DiscordStatus { get; init; }
     public required CoreUpdater Updater { get; init; }
 
-    [JsonIgnore]
+    [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
     public string? SettingsFile { get; set; }
 }
 
@@ -24,11 +24,21 @@ public sealed record DatabaseSettings
 {
     public required string EncryptionKey { get; set; } // 32 Characters
     public string? NewEncryptionKey { get; set; } // 32 Characters
-    public string Host { get; init; } = string.Empty;
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Host { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int Port { get; init; }
-    public string User { get; init; } = string.Empty;
-    public string Password { get; init; } = string.Empty;
-    public string DatabaseName { get; init; } = string.Empty;
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? User { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Password { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? DatabaseName { get; init; }
 }
 
 public sealed record DiscordStatus

@@ -2,14 +2,16 @@
 using System.Threading.Tasks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
+using AzzyBot.Logging;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands.Checks;
 
-public sealed class AzuraCastOnlineCheck(DbActions dbActions) : IContextCheck<AzuraCastOnlineCheckAttribute>
+public sealed class AzuraCastOnlineCheck(ILogger<AzuraCastOnlineCheck> logger, DbActions dbActions) : IContextCheck<AzuraCastOnlineCheckAttribute>
 {
     private readonly DbActions _dbActions = dbActions;
 
@@ -23,7 +25,10 @@ public sealed class AzuraCastOnlineCheck(DbActions dbActions) : IContextCheck<Az
 
         AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
         if (azuraCast is null)
+        {
+            logger.DatabaseAzuraCastNotFound(context.Guild.Id);
             return "AzuraCast is null!";
+        }
 
         if (azuraCast.IsOnline)
             return null;
