@@ -334,7 +334,7 @@ public sealed class DiscordBotService
                 }
                 else if (info[0] is "DJ")
                 {
-                    message = message.Replace("{0}", $"<@&{station.StationDjRoleId}>", StringComparison.OrdinalIgnoreCase);
+                    message = message.Replace("{0}", $"<@&{((station.StationDjRoleId is 0) ? station.StationAdminRoleId : station.StationDjRoleId)}>", StringComparison.OrdinalIgnoreCase);
                 }
             }
 
