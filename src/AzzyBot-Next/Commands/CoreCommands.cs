@@ -51,7 +51,7 @@ public sealed class CoreCommands
             GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId);
             if (guild is null)
             {
-                _logger.DatabaseItemNotFound(nameof(GuildsEntity), guildId);
+                _logger.DatabaseGuildNotFound(guildId);
                 await context.EditResponseAsync("Server not found in database.");
                 return;
             }

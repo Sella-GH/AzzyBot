@@ -32,7 +32,7 @@ public sealed class ModuleActivatedCheck(ILogger<ModuleActivatedCheck> logger, D
                 AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
                 if (azuraCast is null)
                 {
-                    _logger.DatabaseItemNotFound(nameof(AzuraCastEntity), context.Guild.Id);
+                    _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
                     return "AzuraCast is null!";
                 }
 

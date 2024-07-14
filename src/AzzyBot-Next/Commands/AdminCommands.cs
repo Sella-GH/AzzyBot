@@ -87,7 +87,7 @@ public sealed class AdminCommands
                 GuildsEntity? guildEntity = await _dbActions.GetGuildAsync(guildIdValue);
                 if (guildEntity is null)
                 {
-                    _logger.DatabaseItemNotFound(nameof(GuildsEntity), guildIdValue);
+                    _logger.DatabaseGuildNotFound(guildIdValue);
                     await context.EditResponseAsync("Server not found in database.");
                     return;
                 }
@@ -148,7 +148,7 @@ public sealed class AdminCommands
                 GuildsEntity? guildEntity = await _dbActions.GetGuildAsync(guildIdValue);
                 if (guildEntity is null)
                 {
-                    _logger.DatabaseItemNotFound(nameof(GuildsEntity), guildIdValue);
+                    _logger.DatabaseGuildNotFound(guildIdValue);
                     await context.EditResponseAsync("Server not found in database.");
                     return;
                 }

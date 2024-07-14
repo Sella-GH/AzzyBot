@@ -36,7 +36,7 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
         AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
         if (azuraCast is null)
         {
-            _logger.DatabaseItemNotFound(nameof(AzuraCastEntity), context.Guild.Id);
+            _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
             return "AzuraCast is null!";
         }
 
@@ -46,7 +46,7 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
             station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId);
             if (station is null)
             {
-                _logger.DatabaseItemNotFound(nameof(AzuraCastStationEntity), context.Guild.Id);
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, stationId);
                 return "Station is null!";
             }
         }

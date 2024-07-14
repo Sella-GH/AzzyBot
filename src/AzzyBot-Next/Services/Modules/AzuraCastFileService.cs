@@ -49,7 +49,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
         GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId, true);
         if (guild is null || guild.AzuraCast is null)
         {
-            _logger.DatabaseItemNotFound($"{nameof(GuildsEntity)} and {nameof(AzuraCastEntity)}", guildId);
+            _logger.DatabaseGuildNotFound(guildId);
             return;
         }
 
@@ -59,7 +59,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
             AzuraCastStationEntity? station = stations.FirstOrDefault(s => s.Id == stationId);
             if (station is null)
             {
-                _logger.DatabaseItemNotFound(nameof(AzuraCastStationEntity), guildId);
+                _logger.DatabaseAzuraCastStationNotFound(guildId, guild.AzuraCast.Id, stationId);
                 return;
             }
 

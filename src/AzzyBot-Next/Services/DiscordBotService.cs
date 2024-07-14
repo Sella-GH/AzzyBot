@@ -122,7 +122,7 @@ public sealed class DiscordBotService
             GuildsEntity? guild = await _db.GetGuildAsync(guildId);
             if (guild is null)
             {
-                _logger.DatabaseItemNotFound(nameof(GuildsEntity), guildId);
+                _logger.DatabaseGuildNotFound(guildId);
                 return false;
             }
 
@@ -212,7 +212,7 @@ public sealed class DiscordBotService
             GuildsEntity? guild = await _db.GetGuildAsync(guildId);
             if (guild is null)
             {
-                _logger.DatabaseItemNotFound(nameof(GuildsEntity), guildId);
+                _logger.DatabaseGuildNotFound(guildId);
                 return false;
             }
 
@@ -292,7 +292,7 @@ public sealed class DiscordBotService
         AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id);
         if (azuraCast is null)
         {
-            _logger.DatabaseItemNotFound(nameof(AzuraCastEntity), context.Guild.Id);
+            _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
             return;
         }
 
@@ -318,7 +318,7 @@ public sealed class DiscordBotService
                 AzuraCastStationEntity? station = await _db.GetAzuraCastStationAsync(context.Guild.Id, Convert.ToInt32(info[1], CultureInfo.InvariantCulture));
                 if (station is null)
                 {
-                    _logger.DatabaseItemNotFound(nameof(AzuraCastStationEntity), context.Guild.Id);
+                    _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, Convert.ToInt32(info[1], CultureInfo.InvariantCulture));
                     return;
                 }
 

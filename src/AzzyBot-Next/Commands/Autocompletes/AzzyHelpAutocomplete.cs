@@ -37,7 +37,7 @@ public sealed class AzzyHelpAutocomplete(ILogger<AzzyHelpAutocomplete> logger, A
         GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId);
         if (guild is null)
         {
-            _logger.DatabaseItemNotFound(nameof(GuildsEntity), guildId);
+            _logger.DatabaseGuildNotFound(guildId);
             return results;
         }
 

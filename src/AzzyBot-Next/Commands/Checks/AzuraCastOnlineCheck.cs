@@ -26,7 +26,7 @@ public sealed class AzuraCastOnlineCheck(ILogger<AzuraCastOnlineCheck> logger, D
         AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
         if (azuraCast is null)
         {
-            logger.DatabaseItemNotFound(nameof(AzuraCastEntity), context.Guild.Id);
+            logger.DatabaseAzuraCastNotFound(context.Guild.Id);
             return "AzuraCast is null!";
         }
 

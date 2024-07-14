@@ -31,7 +31,7 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
         AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
         if (azuraCast is null)
         {
-            _logger.DatabaseItemNotFound(nameof(AzuraCastEntity), context.Guild.Id);
+            _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
             return results;
         }
 

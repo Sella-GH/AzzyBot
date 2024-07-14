@@ -108,8 +108,23 @@ public static partial class LoggerActions
     [LoggerMessage(202, LogLevel.Warning, "Could not fetch channel for id {id}")]
     public static partial void ChannelNotFound(this ILogger<DiscordBotService> logger, ulong id);
 
-    [LoggerMessage(210, LogLevel.Warning, "Could not find database item {item} for guild {guild}")]
-    public static partial void DatabaseItemNotFound(this ILogger logger, string item, ulong guild);
+    [LoggerMessage(210, LogLevel.Warning, "Could not find Guild item for guild {guild}")]
+    public static partial void DatabaseGuildNotFound(this ILogger logger, ulong guild);
+
+    [LoggerMessage(211, LogLevel.Warning, "Could not find AzuraCast item for guild {guild}")]
+    public static partial void DatabaseAzuraCastNotFound(this ILogger logger, ulong guild);
+
+    [LoggerMessage(212, LogLevel.Warning, "Could not find AzuraCast checks for guild {guild} in instance {instance}")]
+    public static partial void DatabaseAzuraCastChecksNotFound(this ILogger logger, ulong guild, int instance);
+
+    [LoggerMessage(213, LogLevel.Warning, "Could not find AzuraCast station {station} for guild {guild} in instance {instance}")]
+    public static partial void DatabaseAzuraCastStationNotFound(this ILogger logger, ulong guild, int instance, int station);
+
+    [LoggerMessage(214, LogLevel.Warning, "Could not find AzuraCast station checks for guild {guild} in instance {instance} at station {station}")]
+    public static partial void DatabaseAzuraCastStationChecksNotFound(this ILogger logger, ulong guild, int instance, int station);
+
+    [LoggerMessage(215, LogLevel.Warning, "Could not find AzuraCast station mount for guild {guild} in instance {instance} at station {station}")]
+    public static partial void DatabaseAzuraCastStationMountNotFound(this ILogger logger, ulong guild, int instance, int station);
 
     [LoggerMessage(220, LogLevel.Warning, "Could not find discord item {item} for guild {guild}")]
     public static partial void DiscordItemNotFound(this ILogger logger, string item, ulong guild);

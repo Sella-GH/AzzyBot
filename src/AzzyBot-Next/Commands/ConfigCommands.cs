@@ -77,7 +77,7 @@ public sealed class ConfigCommands
             GuildsEntity? guild = await _db.GetGuildAsync(guildId);
             if (guild is null)
             {
-                _logger.DatabaseItemNotFound(nameof(GuildsEntity), guildId);
+                _logger.DatabaseGuildNotFound(guildId);
                 await context.EditResponseAsync("Server not found in database.");
                 return;
             }
@@ -92,7 +92,7 @@ public sealed class ConfigCommands
             AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(guildId);
             if (azuraCast is not null)
             {
-                _logger.DatabaseItemNotFound(nameof(AzuraCastEntity), guildId);
+                _logger.DatabaseAzuraCastNotFound(guildId);
                 await context.DeleteResponseAsync();
                 await context.FollowupAsync("AzuraCast is already set up for your server.");
                 return;
@@ -429,7 +429,7 @@ public sealed class ConfigCommands
             GuildsEntity? guild = await _db.GetGuildAsync(guildId, true);
             if (guild is null)
             {
-                _logger.DatabaseItemNotFound(nameof(GuildsEntity), guildId);
+                _logger.DatabaseGuildNotFound(guildId);
                 await context.EditResponseAsync("Server not found in database.");
                 return;
             }
@@ -442,7 +442,7 @@ public sealed class ConfigCommands
 
             if (guild.AzuraCast is not null)
             {
-                _logger.DatabaseItemNotFound(nameof(AzuraCastEntity), guildId);
+                _logger.DatabaseAzuraCastNotFound(guildId);
                 AzuraCastEntity azuraCast = guild.AzuraCast;
                 Dictionary<ulong, string> stationRoles = [];
                 foreach (AzuraCastStationEntity station in azuraCast.Stations)
