@@ -42,7 +42,10 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
 
         GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId, true);
         if (guild is null || guild.AzuraCast is null)
+        {
+            _logger.DatabaseItemNotFound($"{nameof(GuildsEntity)} and {nameof(AzuraCastEntity)}", guildId);
             return;
+        }
 
         if (guild.AzuraCast.Checks.Updates)
             _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForAzuraCastUpdatesAsync(guild.AzuraCast, ct)));

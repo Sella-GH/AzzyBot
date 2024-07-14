@@ -35,14 +35,14 @@ public sealed class AdminCommands
 
         [Command("change-bot-status"), Description("Change the global bot status according to your likes.")]
         public async ValueTask ChangeStatusAsync
-            (
+        (
             CommandContext context,
             [Description("Choose the activity type which the bot should have."), SlashChoiceProvider<BotActivityProvider>] int activity = 1,
             [Description("Choose the status type which the bot should have."), SlashChoiceProvider<BotStatusProvider>] int status = 2,
             [Description("Enter a custom doing which is added after the activity type."), MinMaxLength(0, 128)] string doing = "Music",
             [Description("Enter a custom url. Only usable when having activity type streaming or watching!")] Uri? url = null,
             [Description("Reset the bot status to default."), SlashChoiceProvider<BooleanYesNoStateProvider>] int reset = 0
-            )
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -87,6 +87,7 @@ public sealed class AdminCommands
                 GuildsEntity? guildEntity = await _dbActions.GetGuildAsync(guildIdValue);
                 if (guildEntity is null)
                 {
+                    _logger.DatabaseItemNotFound(nameof(GuildsEntity), guildIdValue);
                     await context.EditResponseAsync("Server not found in database.");
                     return;
                 }
@@ -147,6 +148,7 @@ public sealed class AdminCommands
                 GuildsEntity? guildEntity = await _dbActions.GetGuildAsync(guildIdValue);
                 if (guildEntity is null)
                 {
+                    _logger.DatabaseItemNotFound(nameof(GuildsEntity), guildIdValue);
                     await context.EditResponseAsync("Server not found in database.");
                     return;
                 }
@@ -190,6 +192,7 @@ public sealed class AdminCommands
                 DiscordGuild? guild = _botService.GetDiscordGuild(guildIdValue);
                 if (guild is null)
                 {
+                    _logger.DiscordItemNotFound(nameof(DiscordGuild), guildIdValue);
                     await context.EditResponseAsync("Server not found.");
                     return;
                 }
@@ -229,6 +232,7 @@ public sealed class AdminCommands
             DiscordGuild? guild = _botService.GetDiscordGuild(guildIdValue);
             if (guild is null)
             {
+                _logger.DiscordItemNotFound(nameof(DiscordGuild), guildIdValue);
                 await context.EditResponseAsync("Server not found.");
                 return;
             }

@@ -6,16 +6,19 @@ using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
+using AzzyBot.Logging;
 using AzzyBot.Services.Modules;
 using AzzyBot.Utilities.Encryption;
 using AzzyBot.Utilities.Records.AzuraCast;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
+using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands.Autocompletes;
 
-public sealed class AzuraCastRequestAutocomplete(AzuraCastApiService azuraCast, DbActions dbActions) : IAutoCompleteProvider
+public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocomplete> logger, AzuraCastApiService azuraCast, DbActions dbActions) : IAutoCompleteProvider
 {
+    private readonly ILogger<AzuraCastRequestAutocomplete> _logger = logger;
     private readonly AzuraCastApiService _azuraCast = azuraCast;
     private readonly DbActions _dbActions = dbActions;
 
@@ -34,7 +37,10 @@ public sealed class AzuraCastRequestAutocomplete(AzuraCastApiService azuraCast, 
         {
             station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId);
             if (station is null)
+            {
+                _logger.DatabaseItemNotFound(nameof(AzuraCastStationEntity), context.Guild.Id);
                 return results;
+            }
         }
         catch (InvalidOperationException)
         {

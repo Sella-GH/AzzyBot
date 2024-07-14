@@ -505,10 +505,10 @@ public sealed class AzuraCastCommands
 
         [Command("now-playing"), Description("Get the currently playing song on the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
         public async ValueTask GetNowPlayingAsync
-            (
+        (
             CommandContext context,
             [Description("The station of which you want to see what's played."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId
-            )
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
             ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));

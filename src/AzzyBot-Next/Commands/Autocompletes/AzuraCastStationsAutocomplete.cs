@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
+using AzzyBot.Logging;
 using AzzyBot.Services.Modules;
 using AzzyBot.Utilities;
 using AzzyBot.Utilities.Encryption;
@@ -10,11 +11,13 @@ using AzzyBot.Utilities.Enums;
 using AzzyBot.Utilities.Records.AzuraCast;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
+using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands.Autocompletes;
 
-public sealed class AzuraCastStationsAutocomplete(AzuraCastApiService azuraCastApi, DbActions dbActions) : IAutoCompleteProvider
+public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutocomplete> logger, AzuraCastApiService azuraCastApi, DbActions dbActions) : IAutoCompleteProvider
 {
+    private readonly ILogger<AzuraCastStationsAutocomplete> _logger = logger;
     private readonly AzuraCastApiService _azuraCast = azuraCastApi;
     private readonly DbActions _dbActions = dbActions;
 
@@ -27,7 +30,10 @@ public sealed class AzuraCastStationsAutocomplete(AzuraCastApiService azuraCastA
         Dictionary<string, object> results = [];
         AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
         if (azuraCast is null)
+        {
+            _logger.DatabaseItemNotFound(nameof(AzuraCastEntity), context.Guild.Id);
             return results;
+        }
 
         IReadOnlyList<AzuraCastStationEntity> stationsInDb;
         try

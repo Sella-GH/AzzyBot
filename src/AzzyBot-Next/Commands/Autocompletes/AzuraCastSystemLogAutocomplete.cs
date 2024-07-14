@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AzzyBot.Database;
 using AzzyBot.Database.Entities;
+using AzzyBot.Logging;
 using AzzyBot.Services.Modules;
 using AzzyBot.Utilities.Encryption;
 using AzzyBot.Utilities.Records.AzuraCast;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
+using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Commands.Autocompletes;
 
-public sealed class AzuraCastSystemLogAutocomplete(AzuraCastApiService azuraCastApi, DbActions dbActions) : IAutoCompleteProvider
+public sealed class AzuraCastSystemLogAutocomplete(ILogger<AzuraCastSystemLogAutocomplete> logger, AzuraCastApiService azuraCastApi, DbActions dbActions) : IAutoCompleteProvider
 {
+    private readonly ILogger<AzuraCastSystemLogAutocomplete> _logger = logger;
     private readonly AzuraCastApiService _azuraCastApi = azuraCastApi;
     private readonly DbActions _dbActions = dbActions;
 
@@ -24,7 +27,10 @@ public sealed class AzuraCastSystemLogAutocomplete(AzuraCastApiService azuraCast
         Dictionary<string, object> results = [];
         AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
         if (azuraCast is null)
+        {
+            _logger.DatabaseItemNotFound(nameof(GuildsEntity), context.Guild.Id);
             return results;
+        }
 
         string search = context.UserInput;
         Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));

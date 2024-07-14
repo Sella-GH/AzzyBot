@@ -48,14 +48,20 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
 
         GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId, true);
         if (guild is null || guild.AzuraCast is null)
+        {
+            _logger.DatabaseItemNotFound($"{nameof(GuildsEntity)} and {nameof(AzuraCastEntity)}", guildId);
             return;
+        }
 
         IEnumerable<AzuraCastStationEntity> stations = guild.AzuraCast.Stations.Where(s => s.Checks.FileChanges);
         if (stationId is not 0)
         {
             AzuraCastStationEntity? station = stations.FirstOrDefault(s => s.Id == stationId);
             if (station is null)
+            {
+                _logger.DatabaseItemNotFound(nameof(AzuraCastStationEntity), guildId);
                 return;
+            }
 
             _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForFileChangesAsync(station, ct)));
         }
