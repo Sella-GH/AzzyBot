@@ -46,7 +46,6 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
         switch (context.Command.FullName)
         {
             case "azuracast export-playlists":
-            case "azuracast force-api-permission-check":
             case "azuracast force-cache-refresh":
             case "azuracast get-system-logs":
             case "azuracast start-station":
