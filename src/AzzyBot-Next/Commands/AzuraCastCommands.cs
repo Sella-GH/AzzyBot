@@ -46,7 +46,7 @@ public sealed class AzuraCastCommands
         public async ValueTask ExportPlaylistsAsync
         (
             CommandContext context,
-            [Description("The station of which you want to export the playlists."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId,
+            [Description("The station of which you want to export the playlists."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
             [Description("Choose if you want to export the playlist in M3U or PLS format."), SlashChoiceProvider(typeof(AzuraExportPlaylistProvider))] string format,
             [Description("Select the playlist you want to export."), SlashAutoCompleteProvider(typeof(AzuraCastPlaylistAutocomplete))] int? userPlaylist = null
         )
@@ -57,7 +57,7 @@ public sealed class AzuraCastCommands
             _logger.CommandRequested(nameof(ExportPlaylistsAsync), context.User.GlobalName);
 
             AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
             string tempDir = Path.Combine(_azuraCast.FilePath, "Temp");
@@ -65,7 +65,7 @@ public sealed class AzuraCastCommands
                 Directory.CreateDirectory(tempDir);
 
             List<string> filePaths = [];
-            IReadOnlyList<AzuraPlaylistRecord> playlists = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, stationId);
+            IReadOnlyList<AzuraPlaylistRecord> playlists = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, station);
             if (userPlaylist is null)
             {
                 foreach (AzuraPlaylistRecord playlist in playlists)
@@ -103,7 +103,7 @@ public sealed class AzuraCastCommands
         public async ValueTask ForceApiPermissionCheckAsync
         (
             CommandContext context,
-            [Description("The station of which you want to check the api key."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId
+            [Description("The station of which you want to check the api key."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -113,14 +113,14 @@ public sealed class AzuraCastCommands
 
             await context.EditResponseAsync("I initiated the permission check, please wait a little for the result.");
 
-            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForApiPermissions, context.Guild.Id, stationId);
+            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForApiPermissions, context.Guild.Id, station);
         }
 
         [Command("force-cache-refresh"), Description("Force the bot to refresh it's local song cache for a specific station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask ForceCacheRefreshAsync
         (
             CommandContext context,
-            [Description("The station of which you want to refresh the cache."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId
+            [Description("The station of which you want to refresh the cache."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -130,7 +130,7 @@ public sealed class AzuraCastCommands
 
             await context.EditResponseAsync("I initiated the cache refresh, please wait a little for it to occur.");
 
-            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, context.Guild.Id, stationId);
+            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, context.Guild.Id, station);
         }
 
         [Command("force-online-check"), Description("Force the bot to check if the AzuraCast instance is online."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -216,7 +216,7 @@ public sealed class AzuraCastCommands
         public async ValueTask StartStationAsync
         (
             CommandContext context,
-            [Description("The station you want to start."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId
+            [Description("The station you want to start."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -225,20 +225,20 @@ public sealed class AzuraCastCommands
             _logger.CommandRequested(nameof(StartStationAsync), context.User.GlobalName);
 
             AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId) ?? throw new InvalidOperationException("Station is null");
-            string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
+            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
-            await _azuraCast.StartStationAsync(new(baseUrl), apiKey, stationId, context);
+            await _azuraCast.StartStationAsync(new(baseUrl), apiKey, station, context);
 
-            await context.FollowupAsync($"I started the station **{Crypto.Decrypt(station.Name)}**.");
+            await context.FollowupAsync($"I started the station **{Crypto.Decrypt(acStation.Name)}**.");
         }
 
         [Command("stop-station"), Description("Stop the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask StopStationAsync
         (
             CommandContext context,
-            [Description("The station you want to stop."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId
+            [Description("The station you want to stop."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -247,20 +247,20 @@ public sealed class AzuraCastCommands
             _logger.CommandRequested(nameof(StopStationAsync), context.User.GlobalName);
 
             AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId) ?? throw new InvalidOperationException("Station is null");
-            string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
+            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
-            await _azuraCast.StopStationAsync(new(baseUrl), apiKey, stationId);
+            await _azuraCast.StopStationAsync(new(baseUrl), apiKey, station);
 
-            await context.EditResponseAsync($"I stopped the station **{Crypto.Decrypt(station.Name)}**.");
+            await context.EditResponseAsync($"I stopped the station **{Crypto.Decrypt(acStation.Name)}**.");
         }
 
         [Command("toggle-song-requests"), Description("Enable or disable song requests for the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask ToggleSongRequestsAsync
         (
             CommandContext context,
-            [Description("The station you want to toggle song requests for."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId
+            [Description("The station you want to toggle song requests for."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -269,15 +269,15 @@ public sealed class AzuraCastCommands
             _logger.CommandRequested(nameof(ToggleSongRequestsAsync), context.User.GlobalName);
 
             AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId) ?? throw new InvalidOperationException("Station is null");
-            string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
+            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
-            AzuraAdminStationConfigRecord stationConfig = await _azuraCast.GetStationAdminConfigAsync(new(baseUrl), apiKey, stationId);
+            AzuraAdminStationConfigRecord stationConfig = await _azuraCast.GetStationAdminConfigAsync(new(baseUrl), apiKey, station);
             stationConfig.EnableRequests = !stationConfig.EnableRequests;
-            await _azuraCast.ModifyStationAdminConfigAsync(new(baseUrl), apiKey, stationId, stationConfig);
+            await _azuraCast.ModifyStationAdminConfigAsync(new(baseUrl), apiKey, station, stationConfig);
 
-            await context.EditResponseAsync($"I {Misc.ReadableBool(stationConfig.EnableRequests, ReadbleBool.EnabledDisabled, true)} song requests for station **{Crypto.Decrypt(station.Name)}**.");
+            await context.EditResponseAsync($"I {Misc.ReadableBool(stationConfig.EnableRequests, ReadbleBool.EnabledDisabled, true)} song requests for station **{Crypto.Decrypt(acStation.Name)}**.");
         }
 
         [Command("update-instance"), Description("Update the AzuraCast instance to the latest version."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -318,7 +318,7 @@ public sealed class AzuraCastCommands
         public async ValueTask DeleteSongRequestAsync
         (
             CommandContext context,
-            [Description("The station of which you want to delete the song request."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId,
+            [Description("The station of which you want to delete the song request."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
             [Description("The request id of the song you want to delete."), SlashAutoCompleteProvider(typeof(AzuraCastRequestAutocomplete))] int requestId = 0
         )
         {
@@ -328,11 +328,11 @@ public sealed class AzuraCastCommands
             _logger.CommandRequested(nameof(DeleteSongRequestAsync), context.User.GlobalName);
 
             AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId) ?? throw new InvalidOperationException("Station is null");
-            string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
+            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
-            await _azuraCast.DeleteStationSongRequestAsync(new(baseUrl), apiKey, stationId, requestId);
+            await _azuraCast.DeleteStationSongRequestAsync(new(baseUrl), apiKey, station, requestId);
 
             if (requestId is 0)
             {
@@ -347,7 +347,7 @@ public sealed class AzuraCastCommands
         public async ValueTask SkipSongAsync
         (
             CommandContext context,
-            [Description("The station of which you want to skip the song."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId
+            [Description("The station of which you want to skip the song."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -356,18 +356,18 @@ public sealed class AzuraCastCommands
             _logger.CommandRequested(nameof(SkipSongAsync), context.User.GlobalName);
 
             AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId) ?? throw new InvalidOperationException("Station is null");
-            string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
+            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
-            AzuraNowPlayingDataRecord nowPlaying = await _azuraCast.GetNowPlayingAsync(new(baseUrl), stationId);
+            AzuraNowPlayingDataRecord nowPlaying = await _azuraCast.GetNowPlayingAsync(new(baseUrl), station);
             if (nowPlaying.NowPlaying.Duration - nowPlaying.NowPlaying.Elapsed <= 5)
             {
                 await context.EditResponseAsync("This song is almost over - please wait!");
                 return;
             }
 
-            await _azuraCast.SkipSongAsync(new(baseUrl), apiKey, stationId);
+            await _azuraCast.SkipSongAsync(new(baseUrl), apiKey, station);
 
             await context.EditResponseAsync($"I skipped **{nowPlaying.NowPlaying.Song.Title}** by **{nowPlaying.NowPlaying.Song.Artist}**.");
         }
@@ -376,7 +376,7 @@ public sealed class AzuraCastCommands
         public async ValueTask SwitchPlaylistAsync
         (
             CommandContext context,
-            [Description("The station of which you want to switch the playlist."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId,
+            [Description("The station of which you want to switch the playlist."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
             [Description("The playlist you want to switch to."), SlashAutoCompleteProvider(typeof(AzuraCastPlaylistAutocomplete))] int playlistId,
             [Description("Choose if you want to disable all other active playlists from the station. Defaults to Yes."), SlashChoiceProvider<BooleanYesNoStateProvider>] int removeOld = 0
         )
@@ -387,12 +387,12 @@ public sealed class AzuraCastCommands
             _logger.CommandRequested(nameof(SwitchPlaylistAsync), context.User.GlobalName);
 
             AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId) ?? throw new InvalidOperationException("Station is null");
-            string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
+            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
-            string stationName = Crypto.Decrypt(station.Name);
+            string stationName = Crypto.Decrypt(acStation.Name);
 
-            List<AzuraPlaylistStateRecord> states = await _azuraCast.SwitchPlaylistsAsync(new(baseUrl), apiKey, stationId, playlistId, removeOld is 1);
+            List<AzuraPlaylistStateRecord> states = await _azuraCast.SwitchPlaylistsAsync(new(baseUrl), apiKey, station, playlistId, removeOld is 1);
             StringBuilder message = new();
             message.AppendLine(CultureInfo.InvariantCulture, $"I switched the {((states.Count is 1) ? "playlist" : "playlists")} for **{stationName}**.");
             foreach (AzuraPlaylistStateRecord state in states)
@@ -415,7 +415,7 @@ public sealed class AzuraCastCommands
         public async ValueTask GetSongHistoryAsync
         (
             CommandContext context,
-            [Description("The station of which you want to see the song history."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId,
+            [Description("The station of which you want to see the song history."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
             [Description("The date of which you want to see the song history in the format YYYY-MM-DD.")] string? date = null
         )
         {
@@ -432,12 +432,12 @@ public sealed class AzuraCastCommands
             _logger.CommandRequested(nameof(GetSongHistoryAsync), context.User.GlobalName);
 
             AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
-            string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string dateString = dateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
 
-            IReadOnlyList<AzuraStationHistoryItemRecord> history = await _azuraCast.GetStationHistoryAsync(new(baseUrl), apiKey, stationId, dateTime, dateTime.AddDays(1));
+            IReadOnlyList<AzuraStationHistoryItemRecord> history = await _azuraCast.GetStationHistoryAsync(new(baseUrl), apiKey, station, dateTime, dateTime.AddDays(1));
             if (history.Count is 0)
             {
                 await context.EditResponseAsync($"There is no song history for **{dateString}**.");
@@ -445,11 +445,11 @@ public sealed class AzuraCastCommands
             }
 
             IReadOnlyList<AzuraStationHistoryExportRecord> exportHistory = history.Select(h => new AzuraStationHistoryExportRecord() { Date = dateString, PlayedAt = Converter.ConvertFromUnixTime(h.PlayedAt), Song = h.Song, SongRequest = h.IsRequest, Streamer = h.Streamer, Playlist = h.Playlist }).Reverse().ToList();
-            string fileName = $"{station.Id}-{station.StationId}_SongHistory_{dateString}.csv";
+            string fileName = $"{acStation.Id}-{acStation.StationId}_SongHistory_{dateString}.csv";
             string filePath = await FileOperations.CreateCsvFileAsync(exportHistory, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
             await using DiscordMessageBuilder builder = new();
-            builder.WithContent($"Here is the song history for station **{Crypto.Decrypt(station.Name)}** on **{dateString}**.");
+            builder.WithContent($"Here is the song history for station **{Crypto.Decrypt(acStation.Name)}** on **{dateString}**.");
             builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
             await context.EditResponseAsync(builder);
 
@@ -460,7 +460,7 @@ public sealed class AzuraCastCommands
         public async ValueTask GetSongsInPlaylistAsync
         (
             CommandContext context,
-            [Description("The station of which you want to see the songs in the playlist."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId,
+            [Description("The station of which you want to see the songs in the playlist."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
             [Description("The playlist you want to see the songs from."), SlashAutoCompleteProvider(typeof(AzuraCastPlaylistAutocomplete))] int playlistId
         )
         {
@@ -470,14 +470,14 @@ public sealed class AzuraCastCommands
             _logger.CommandRequested(nameof(GetSongsInPlaylistAsync), context.User.GlobalName);
 
             AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
-            string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
 
             AzuraPlaylistRecord playlist;
             try
             {
-                playlist = await _azuraCast.GetPlaylistAsync(new(baseUrl), apiKey, stationId, playlistId);
+                playlist = await _azuraCast.GetPlaylistAsync(new(baseUrl), apiKey, station, playlistId);
             }
             catch (HttpRequestException)
             {
@@ -485,14 +485,14 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            IReadOnlyList<AzuraMediaItemRecord> songs = await _azuraCast.GetSongsInPlaylistAsync(new(baseUrl), apiKey, stationId, playlist);
+            IReadOnlyList<AzuraMediaItemRecord> songs = await _azuraCast.GetSongsInPlaylistAsync(new(baseUrl), apiKey, station, playlist);
             if (songs.Count is 0)
             {
                 await context.EditResponseAsync("There are no songs in this playlist.");
                 return;
             }
 
-            string fileName = $"{station.Id}-{station.StationId}_PlaylistSongs_{playlist.ShortName}.csv";
+            string fileName = $"{acStation.Id}-{acStation.StationId}_PlaylistSongs_{playlist.ShortName}.csv";
             string filePath = await FileOperations.CreateCsvFileAsync(songs, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
             await using DiscordMessageBuilder builder = new();
@@ -507,7 +507,7 @@ public sealed class AzuraCastCommands
         public async ValueTask GetNowPlayingAsync
         (
             CommandContext context,
-            [Description("The station of which you want to see what's played."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId
+            [Description("The station of which you want to see what's played."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -516,13 +516,13 @@ public sealed class AzuraCastCommands
             _logger.CommandRequested(nameof(GetNowPlayingAsync), context.User.GlobalName);
 
             AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
             AzuraNowPlayingDataRecord? nowPlaying = null;
             try
             {
-                nowPlaying = await _azuraCast.GetNowPlayingAsync(new(baseUrl), stationId);
+                nowPlaying = await _azuraCast.GetNowPlayingAsync(new(baseUrl), station);
             }
             catch (HttpRequestException)
             {
@@ -531,10 +531,10 @@ public sealed class AzuraCastCommands
             }
 
             string? playlistName = null;
-            if (station.ShowPlaylistInNowPlaying)
+            if (acStation.ShowPlaylistInNowPlaying)
             {
-                string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
-                IReadOnlyList<AzuraPlaylistRecord> playlist = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, stationId);
+                string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+                IReadOnlyList<AzuraPlaylistRecord> playlist = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, station);
                 playlistName = playlist.Where(p => p.Name == nowPlaying.NowPlaying.Playlist).Select(p => p.Name).FirstOrDefault();
             }
 
@@ -547,7 +547,7 @@ public sealed class AzuraCastCommands
         public async ValueTask SearchSongAsync
         (
             CommandContext context,
-            [Description("The station of which you want to search for a song."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int stationId,
+            [Description("The station of which you want to search for a song."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
             [Description("The song you want to search for."), SlashAutoCompleteProvider(typeof(AzuraCastRequestAutocomplete))] string song
         )
         {
@@ -557,19 +557,19 @@ public sealed class AzuraCastCommands
             _logger.CommandRequested(nameof(SearchSongAsync), context.User.GlobalName);
 
             AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId) ?? throw new InvalidOperationException("Station is null");
-            string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
+            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
 
-            AzuraAdminStationConfigRecord stationConfig = await _azuraCast.GetStationAdminConfigAsync(baseUrl, apiKey, stationId);
+            AzuraAdminStationConfigRecord stationConfig = await _azuraCast.GetStationAdminConfigAsync(baseUrl, apiKey, station);
             AzuraRequestRecord songRequest;
             if (stationConfig.EnableRequests)
             {
-                songRequest = await _azuraCast.GetRequestableSongAsync(baseUrl, apiKey, stationId, song);
+                songRequest = await _azuraCast.GetRequestableSongAsync(baseUrl, apiKey, station, song);
             }
             else
             {
-                AzuraSongDataRecord songData = await _azuraCast.GetSongInfoAsync(baseUrl, apiKey, station.Id, stationId, false, song);
+                AzuraSongDataRecord songData = await _azuraCast.GetSongInfoAsync(baseUrl, apiKey, acStation.Id, station, false, song);
                 songRequest = new()
                 {
                     Song = songData,
@@ -583,13 +583,13 @@ public sealed class AzuraCastCommands
 
             if (stationConfig.RequestThreshold is not 0)
             {
-                IReadOnlyList<AzuraRequestQueueItemRecord> requestsPlayed = await _azuraCast.GetStationRequestItemsAsync(baseUrl, apiKey, stationId, true);
+                IReadOnlyList<AzuraRequestQueueItemRecord> requestsPlayed = await _azuraCast.GetStationRequestItemsAsync(baseUrl, apiKey, station, true);
                 long threshold = Converter.ConvertToUnixTime(DateTime.UtcNow.AddMinutes(-stationConfig.RequestThreshold));
                 isPlayed = requestsPlayed.Any(r => (r.Track.SongId == songRequest.Song.SongId || r.Track.UniqueId == songRequest.Song.UniqueId) && r.Timestamp >= threshold);
             }
 
-            IReadOnlyList<AzuraStationQueueItemDetailedRecord> queue = await _azuraCast.GetStationQueueAsync(baseUrl, apiKey, stationId);
-            IReadOnlyList<AzuraRequestQueueItemRecord> requestsPending = await _azuraCast.GetStationRequestItemsAsync(baseUrl, apiKey, stationId, false);
+            IReadOnlyList<AzuraStationQueueItemDetailedRecord> queue = await _azuraCast.GetStationQueueAsync(baseUrl, apiKey, station);
+            IReadOnlyList<AzuraRequestQueueItemRecord> requestsPending = await _azuraCast.GetStationRequestItemsAsync(baseUrl, apiKey, station, false);
             isQueued = queue.Any(q => q.Song.SongId == songRequest.Song.SongId && q.Song.UniqueId == songRequest.Song.UniqueId);
             isRequested = requestsPending.Any(r => r.Track.SongId == songRequest.Song.SongId && r.Track.UniqueId == songRequest.Song.UniqueId);
 
@@ -609,7 +609,7 @@ public sealed class AzuraCastCommands
             InteractivityResult<ComponentInteractionCreateEventArgs> result = await message.WaitForButtonAsync(context.User, TimeSpan.FromMinutes(1));
             if (!result.TimedOut)
             {
-                await _azuraCast.RequestSongAsync(baseUrl, stationId, songRequest.RequestId);
+                await _azuraCast.RequestSongAsync(baseUrl, station, songRequest.RequestId);
 
                 await using DiscordInteractionResponseBuilder interaction = new()
                 {
