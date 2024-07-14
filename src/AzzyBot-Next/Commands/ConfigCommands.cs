@@ -144,6 +144,16 @@ public sealed class ConfigCommands
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your station was added successfully and private data has been encrypted.");
+
+            AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                return;
+            }
+
+            if (azuraCast.IsOnline)
+                await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, context.Guild.Id, station);
         }
 
         [Command("add-azuracast-station-mount"), Description("Add an AzuraCast mount point to the selected station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
