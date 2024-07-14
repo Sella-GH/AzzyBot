@@ -323,7 +323,7 @@ public sealed class DiscordBotService
                     return;
                 }
 
-                if (info[0] is "Admin")
+                if (info[0] is "Station")
                 {
                     message = message.Replace("{0}", $"<@&{station.StationAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
                 }
