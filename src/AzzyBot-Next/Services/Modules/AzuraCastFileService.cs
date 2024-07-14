@@ -56,7 +56,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
         IEnumerable<AzuraCastStationEntity> stations = guild.AzuraCast.Stations.Where(s => s.Checks.FileChanges);
         if (stationId is not 0)
         {
-            AzuraCastStationEntity? station = stations.FirstOrDefault(s => s.Id == stationId);
+            AzuraCastStationEntity? station = stations.FirstOrDefault(s => s.StationId == stationId);
             if (station is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(guildId, guild.AzuraCast.Id, stationId);
