@@ -70,9 +70,9 @@ jobs:
 
       - name: Add some basic information
         run: |
-          sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot-Next/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
-          sed -i 's\Compilation date not found\${{ steps.dateTime.outputs.time }}\g' ./artifacts/publish/AzzyBot-Next/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
-          sed -i 's\Lines of source code not found\${{ steps.loc_cs.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot-Next/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
+          sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot-Next.Bot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
+          sed -i 's\Compilation date not found\${{ steps.dateTime.outputs.time }}\g' ./artifacts/publish/AzzyBot-Next.Bot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
+          sed -i 's\Lines of source code not found\${{ steps.loc_cs.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot-Next.Bot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
@@ -80,7 +80,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-${{ matrix.os }}-${{ matrix.arch }}
-          path: ./artifacts/publish/AzzyBot-Next/release_${{ matrix.os }}-${{ matrix.arch }}
+          path: ./artifacts/publish/AzzyBot-Next.Bot/release_${{ matrix.os }}-${{ matrix.arch }}
 
   build-docker:
     name: Build docker .zip file
@@ -108,7 +108,7 @@ jobs:
           #mv ./src/AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
           #wget -qO ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
           mkdir -p ./docker-zip/AzzyBot/Settings
-          mv ./src/AzzyBot-Next/Settings/AzzyBotSettings-Docker.json ./docker-zip/AzzyBot/Settings/AzzyBotSettings-Docker.json
+          mv ./src/AzzyBot-Next.Bot/Settings/AzzyBotSettings-Docker.json ./docker-zip/AzzyBot/Settings/AzzyBotSettings-Docker.json
 
       - name: Archive docker-zip artifact
         uses: actions/upload-artifact@v4
@@ -133,7 +133,7 @@ jobs:
         uses: kzrnm/get-net-sdk-project-versions-action@v2
         id: get-version
         with:
-          proj-path: src/AzzyBot-Next/AzzyBot-Next.csproj
+          proj-path: src/AzzyBot-Next.Bot/AzzyBot-Next.Bot.csproj
 
       - name: Set version
         id: set-version
