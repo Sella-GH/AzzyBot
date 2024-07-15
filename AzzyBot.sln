@@ -1,4 +1,5 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
 # 17
 VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -6,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot", "src\AzzyBot\Azzy
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot-Next", "src\AzzyBot-Next\AzzyBot-Next.csproj", "{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzzyBot-Next.Database", "src\AzzyBot-Next.Database\AzzyBot-Next.Database.csproj", "{AEE73B92-94B6-4F6A-B29B-19C363B3D305}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot-Next.Data", "src\AzzyBot-Next.Data\AzzyBot-Next.Data.csproj", "{AEE73B92-94B6-4F6A-B29B-19C363B3D305}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzzyBot-Next.Core", "src\AzzyBot-Next.Core\AzzyBot-Next.Core.csproj", "{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -96,6 +99,30 @@ Global
 		{AEE73B92-94B6-4F6A-B29B-19C363B3D305}.Release|ARM64.Build.0 = Release|Any CPU
 		{AEE73B92-94B6-4F6A-B29B-19C363B3D305}.Release|x64.ActiveCfg = Release|Any CPU
 		{AEE73B92-94B6-4F6A-B29B-19C363B3D305}.Release|x64.Build.0 = Release|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Debug|x64.Build.0 = Debug|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Docker|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Docker|Any CPU.Build.0 = Debug|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Docker|ARM64.ActiveCfg = Debug|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Docker|ARM64.Build.0 = Debug|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Docker|x64.ActiveCfg = Debug|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Docker|x64.Build.0 = Debug|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Docker-debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Docker-debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Docker-debug|ARM64.ActiveCfg = Debug|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Docker-debug|ARM64.Build.0 = Debug|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Docker-debug|x64.ActiveCfg = Debug|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Docker-debug|x64.Build.0 = Debug|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Release|ARM64.Build.0 = Release|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Release|x64.ActiveCfg = Release|Any CPU
+		{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AzzyBot.Database.Entities;
+namespace AzzyBot.Data.Entities;
 
 public sealed class AzuraCastChecksEntity
 {

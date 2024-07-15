@@ -1,7 +1,7 @@
 ﻿using AzzyBot.Database.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace AzzyBot.Database;
+namespace AzzyBot.Data;
 
 public sealed class AzzyDbContext : DbContext
 {
