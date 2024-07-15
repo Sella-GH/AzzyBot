@@ -156,12 +156,12 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         return body;
     }
 
-    private async Task<T> GetFromApiAsync<T>(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
+    private async Task<T> GetFromApiAsync<T>(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null, bool noLogging = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
-        string body = await _webService.GetWebAsync(uri, headers, true);
+        string body = await _webService.GetWebAsync(uri, headers, true, noLogging);
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException($"API response is empty, url: {uri}");
 
@@ -177,13 +177,13 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         return JsonSerializer.Deserialize<List<T>>(body) ?? throw new InvalidOperationException($"Could not deserialize body: {body}");
     }
 
-    private string GetLocalFile(int databaseId, int stationId)
+    private string GetLocalFile(int azuraCastId, int databaseId, int stationId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(databaseId, nameof(databaseId));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
         IReadOnlyList<string> files = FileOperations.GetFilesInDirectory(FilePath);
-        string fileName = $"{databaseId}-{stationId}-files.json";
+        string fileName = $"{azuraCastId}-{databaseId}-{stationId}-files.json";
 
         return files.FirstOrDefault(f => f.Contains(fileName, StringComparison.OrdinalIgnoreCase)) ?? string.Empty;
     }
@@ -246,7 +246,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         IEnumerable<AzuraCastStationEntity> stations = guild.AzuraCast.Stations;
         if (stationId is not 0)
         {
-            AzuraCastStationEntity? station = stations.FirstOrDefault(s => s.Id == stationId);
+            AzuraCastStationEntity? station = stations.FirstOrDefault(s => s.StationId == stationId);
             if (station is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(guildId, guild.AzuraCast.Id, stationId);
@@ -286,12 +286,14 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         await _webService.DownloadAsync(url, downloadPath, CreateHeader(apiKey), true);
     }
 
-    public async Task<IReadOnlyList<AzuraFilesRecord>> GetFilesLocalAsync(int databaseId, int stationId)
+    public async Task<IReadOnlyList<AzuraFilesRecord>> GetFilesLocalAsync(int azuraCastId, int databaseId, int stationId)
     {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(azuraCastId, nameof(azuraCastId));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(databaseId, nameof(databaseId));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
         List<AzuraFilesRecord> records = [];
-        string file = GetLocalFile(databaseId, stationId);
+        string file = GetLocalFile(azuraCastId, databaseId, stationId);
         if (string.IsNullOrWhiteSpace(file))
             return records;
 
@@ -323,13 +325,20 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         return stats;
     }
 
-    public Task<AzuraNowPlayingDataRecord> GetNowPlayingAsync(Uri baseUrl, int stationId)
+    public Task<AzuraStatusRecord> GetInstanceStatusAsync(Uri baseUrl)
+    {
+        const string endpoint = AzuraApiEndpoints.Status;
+
+        return GetFromApiAsync<AzuraStatusRecord>(baseUrl, endpoint);
+    }
+
+    public Task<AzuraNowPlayingDataRecord> GetNowPlayingAsync(Uri baseUrl, int stationId, bool noLogging = false)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
         string endpoint = $"{AzuraApiEndpoints.NowPlaying}/{stationId}";
 
-        return GetFromApiAsync<AzuraNowPlayingDataRecord>(baseUrl, endpoint);
+        return GetFromApiAsync<AzuraNowPlayingDataRecord>(baseUrl, endpoint, null, noLogging);
     }
 
     public Task<AzuraPlaylistRecord> GetPlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId)
@@ -389,13 +398,12 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         return GetFromApiListAsync<AzuraMediaItemRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
-    public async Task<AzuraSongDataRecord> GetSongInfoAsync(Uri baseUrl, string apiKey, int databaseId, int stationId, bool online, string? uniqueId = null, string? songId = null, string? name = null, string? artist = null, string? album = null)
+    public async Task<AzuraSongDataRecord> GetSongInfoAsync(Uri baseUrl, string apiKey, AzuraCastStationEntity station, bool online, string? uniqueId = null, string? songId = null, string? name = null, string? artist = null, string? album = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(databaseId, nameof(databaseId));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentNullException.ThrowIfNull(station, nameof(station));
 
-        IReadOnlyList<AzuraFilesRecord> songs = (online) ? await GetFilesOnlineAsync(baseUrl, apiKey, stationId) : await GetFilesLocalAsync(databaseId, stationId);
+        IReadOnlyList<AzuraFilesRecord> songs = (online) ? await GetFilesOnlineAsync(baseUrl, apiKey, station.StationId) : await GetFilesLocalAsync(station.AzuraCastId, station.Id, station.StationId);
         AzuraFilesRecord? song = songs.FirstOrDefault(s =>
             (uniqueId is null || s.UniqueId == uniqueId) &&
             (songId is null || s.SongId == songId) &&
@@ -546,6 +554,37 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         AzuraStationStatusRecord status = await GetFromApiAsync<AzuraStationStatusRecord>(baseUrl, endpoint, CreateHeader(apiKey));
         if (!status.BackendRunning || !status.FrontendRunning)
             throw new InvalidOperationException("Station failed to start.");
+
+        if (!config.BackendConfig.WritePlaylistsToLiquidsoap)
+            return;
+
+        // Delay to ensure the station is fully started
+        await Task.Delay(TimeSpan.FromSeconds(5));
+
+        AzuraNowPlayingDataRecord? nowPlaying = null;
+        bool? firstTime = null;
+        while (nowPlaying is null)
+        {
+            try
+            {
+                nowPlaying = await GetNowPlayingAsync(baseUrl, stationId, true);
+            }
+            catch (HttpRequestException)
+            {
+                if (!firstTime.HasValue)
+                    firstTime = true;
+
+                if (firstTime.Value)
+                {
+                    await context.EditResponseAsync("You have activated the option \"**Always Write Playlists to Liquidsoap**\" which means you have to wait more time until you can finally use your station.\nI inform you when it's finished.");
+                    firstTime = false;
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(10));
+            }
+        }
+
+        await context.EditResponseAsync("All playlists have been written back to liquidsoap.");
     }
 
     public async Task StopStationAsync(Uri baseUrl, string apiKey, int stationId)
@@ -613,7 +652,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
 
             try
             {
-                status = await GetFromApiAsync<AzuraStatusRecord>(baseUrl, AzuraApiEndpoints.Status);
+                status = await GetInstanceStatusAsync(baseUrl);
                 online = status.Online;
             }
             catch (HttpRequestException)

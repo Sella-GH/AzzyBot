@@ -113,7 +113,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
         }
         else
         {
-            IReadOnlyList<AzuraFilesRecord> files = await _azuraCast.GetFilesLocalAsync(station.Id, station.StationId);
+            IReadOnlyList<AzuraFilesRecord> files = await _azuraCast.GetFilesLocalAsync(station.AzuraCastId, station.Id, station.StationId);
             AddResultsFromSong(files);
         }
 

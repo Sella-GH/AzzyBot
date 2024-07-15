@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Http;
 using AzzyBot.Commands.Checks;
-using AzzyBot.Database;
 using AzzyBot.Services;
 using AzzyBot.Services.Modules;
 using Microsoft.Extensions.Logging;
@@ -49,8 +48,8 @@ public static partial class LoggerActions
     [LoggerMessage(23, LogLevel.Debug, "Creating work items for: {item}")]
     public static partial void BackgroundServiceWorkItem(this ILogger logger, string item);
 
-    [LoggerMessage(30, LogLevel.Debug, "Station {dId}-{sId} has different files")]
-    public static partial void BackgroundServiceStationFilesChanged(this ILogger<AzuraCastFileService> logger, int dId, int sId);
+    [LoggerMessage(30, LogLevel.Debug, "Station {iId}-{dId}-{sId} has different files")]
+    public static partial void BackgroundServiceStationFilesChanged(this ILogger<AzuraCastFileService> logger, int iId, int dId, int sId);
 
     [LoggerMessage(31, LogLevel.Debug, "Instance {id} is {status}")]
     public static partial void BackgroundServiceInstanceStatus(this ILogger<AzuraCastPingService> logger, int id, string status);

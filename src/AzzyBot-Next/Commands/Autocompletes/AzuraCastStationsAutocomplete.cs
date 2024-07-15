@@ -68,15 +68,15 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
 
                 case "start-station" when !config.IsEnabled:
                 case "stop-station" when config.IsEnabled:
-                    results.Add($"{Crypto.Decrypt(station.Name)} ({Misc.ReadableBool(config.IsEnabled, ReadbleBool.StartedStopped, true)})", station.Id);
+                    results.Add($"{Crypto.Decrypt(station.Name)} ({Misc.ReadableBool(config.IsEnabled, ReadbleBool.StartedStopped, true)})", station.StationId);
                     break;
 
                 case "toggle-song-requests":
-                    results.Add($"{Crypto.Decrypt(station.Name)} ({Misc.ReadableBool(config.EnableRequests, ReadbleBool.EnabledDisabled, true)})", station.Id);
+                    results.Add($"{Crypto.Decrypt(station.Name)} ({Misc.ReadableBool(config.EnableRequests, ReadbleBool.EnabledDisabled, true)})", station.StationId);
                     break;
 
                 default:
-                    results.Add($"{Crypto.Decrypt(station.Name)}", station.Id);
+                    results.Add($"{Crypto.Decrypt(station.Name)}", station.StationId);
                     break;
             }
         }

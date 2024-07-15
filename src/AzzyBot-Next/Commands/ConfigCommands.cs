@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Threading.Tasks;
 using AzzyBot.Commands.Autocompletes;
 using AzzyBot.Commands.Checks;
@@ -10,6 +11,7 @@ using AzzyBot.Database;
 using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
 using AzzyBot.Services;
+using AzzyBot.Services.Modules;
 using AzzyBot.Utilities;
 using AzzyBot.Utilities.Enums;
 using DSharpPlus.Commands;
@@ -25,9 +27,10 @@ namespace AzzyBot.Commands;
 public sealed class ConfigCommands
 {
     [Command("config"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
-    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzzyBackgroundService backgroundService, DbActions db)
+    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCast, AzzyBackgroundService backgroundService, DbActions db)
     {
         private readonly ILogger<ConfigGroup> _logger = logger;
+        private readonly AzuraCastApiService _azuraCast = azuraCast;
         private readonly AzzyBackgroundService _backgroundService = backgroundService;
         private readonly DbActions _db = db;
 
@@ -144,9 +147,19 @@ public sealed class ConfigCommands
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your station was added successfully and private data has been encrypted.");
+
+            AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                return;
+            }
+
+            if (azuraCast.IsOnline)
+                await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, context.Guild.Id, station);
         }
 
-        [Command("add-azuracast-station-mount"), Description("Add an AzuraCast mount point to the selected station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("add-azuracast-station-mount"), Description("Add an AzuraCast mount point to the selected station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask AddAzuraCastStationMountAsync
         (
             CommandContext context,
@@ -172,6 +185,15 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(DeleteAzuraCastAsync), context.User.GlobalName);
 
+            AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
+
+            FileOperations.DeleteFiles(_azuraCast.FilePath, $"{azuraCast.Id}-");
             await _db.DeleteAzuraCastAsync(context.Guild.Id);
 
             await context.EditResponseAsync("Your AzuraCast setup was deleted successfully.");
@@ -185,9 +207,19 @@ public sealed class ConfigCommands
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
             _logger.CommandRequested(nameof(DeleteAzuraCastStationAsync), context.User.GlobalName);
 
+            AzuraCastStationEntity? acStation = await _db.GetAzuraCastStationAsync(context.Guild.Id, station);
+            if (acStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, station);
+                await context.EditResponseAsync("Station not found in database.");
+                return;
+            }
+
+            FileOperations.DeleteFile(Path.Combine(_azuraCast.FilePath, $"{acStation.AzuraCastId}-{acStation.Id}-{acStation.StationId}-files.json"));
             await _db.DeleteAzuraCastStationAsync(station);
 
             await context.EditResponseAsync("Your station was deleted successfully.");

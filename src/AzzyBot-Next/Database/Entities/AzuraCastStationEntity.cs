@@ -67,6 +67,9 @@ public sealed class AzuraCastStationEntity
     /// <summary>
     /// The last saved <see cref="DateTime"/> timestamp after a song was skipped.
     /// </summary>
+    /// <remarks>
+    /// Always use <see cref="DateTime.UtcNow"/> to set this value.
+    /// </remarks>
     public DateTime LastSkipTime { get; set; }
 
     /// <summary>

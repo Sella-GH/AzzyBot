@@ -9,17 +9,18 @@ using AzzyBot.Database.Entities;
 using AzzyBot.Logging;
 using AzzyBot.Services.Interfaces;
 using AzzyBot.Utilities.Encryption;
+using AzzyBot.Utilities.Records.AzuraCast;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services.Modules;
 
-public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, IQueuedBackgroundTask taskQueue, DbActions dbActions, DiscordBotService discordBotService, WebRequestService webRequestService)
+public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, IQueuedBackgroundTask taskQueue, AzuraCastApiService azuraCast, DbActions dbActions, DiscordBotService discordBotService)
 {
     private readonly ILogger<AzuraCastPingService> _logger = logger;
     private readonly IQueuedBackgroundTask _taskQueue = taskQueue;
+    private readonly AzuraCastApiService _azuraCast = azuraCast;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = discordBotService;
-    private readonly WebRequestService _webRequestService = webRequestService;
 
     public async ValueTask QueueInstancePingAsync()
     {
@@ -50,35 +51,32 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
     private async ValueTask PingInstanceAsync(AzuraCastEntity azuraCast, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
-        ArgumentNullException.ThrowIfNull(azuraCast.Guild, nameof(azuraCast.Guild));
-
         cancellationToken.ThrowIfCancellationRequested();
 
         try
         {
-            Uri url = new($"{Crypto.Decrypt(azuraCast.BaseUrl)}/api/status");
-            string response = string.Empty;
-
+            Uri uri = new(Crypto.Decrypt(azuraCast.BaseUrl));
+            AzuraStatusRecord? status = null;
             try
             {
-                response = await _webRequestService.GetWebAsync(url);
+                status = await _azuraCast.GetInstanceStatusAsync(uri);
             }
             catch (HttpRequestException)
             {
                 _logger.BackgroundServiceInstanceStatus(azuraCast.Id, "offline");
 
                 await _dbActions.UpdateAzuraCastAsync(azuraCast.Guild.UniqueId, null, null, null, null, null, false);
-                await _botService.SendMessageAsync(azuraCast.OutagesChannelId, $"AzuraCast instance **{Crypto.Decrypt(azuraCast.BaseUrl)}** is **down**!");
+                await _botService.SendMessageAsync(azuraCast.OutagesChannelId, $"AzuraCast instance **{uri}** is **down**!");
             }
 
-            if (!string.IsNullOrWhiteSpace(response))
+            if (status is not null)
             {
                 _logger.BackgroundServiceInstanceStatus(azuraCast.Id, "online");
 
                 if (!azuraCast.IsOnline)
                 {
                     await _dbActions.UpdateAzuraCastAsync(azuraCast.Guild.UniqueId, null, null, null, null, null, true);
-                    await _botService.SendMessageAsync(azuraCast.OutagesChannelId, $"AzuraCast instance **{Crypto.Decrypt(azuraCast.BaseUrl)}** is **up** again!");
+                    await _botService.SendMessageAsync(azuraCast.OutagesChannelId, $"AzuraCast instance **{uri}** is **up** again!");
                 }
             }
             else

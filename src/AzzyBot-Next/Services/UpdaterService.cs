@@ -99,7 +99,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
         await _botService.SendMessageAsync(channelId, null, embeds);
     }
 
-    private static bool CheckUpdateNotification(int notifyCounter, in DateTime lastNotificationTime)
+    public static bool CheckUpdateNotification(int notifyCounter, in DateTime lastNotificationTime)
     {
         DateTime now = DateTime.Now;
         bool dayNotification = false;

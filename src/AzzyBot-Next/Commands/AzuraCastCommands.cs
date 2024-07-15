@@ -357,6 +357,12 @@ public sealed class AzuraCastCommands
 
             AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
             AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
+            if (acStation.LastSkipTime.AddSeconds(30) > DateTime.UtcNow)
+            {
+                await context.EditResponseAsync("You can only skip a song every 30 seconds.");
+                return;
+            }
+
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
@@ -368,6 +374,8 @@ public sealed class AzuraCastCommands
             }
 
             await _azuraCast.SkipSongAsync(new(baseUrl), apiKey, station);
+
+            await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, null, null, null, null, null, null, null, null, DateTime.UtcNow);
 
             await context.EditResponseAsync($"I skipped **{nowPlaying.NowPlaying.Song.Title}** by **{nowPlaying.NowPlaying.Song.Artist}**.");
         }
@@ -569,7 +577,7 @@ public sealed class AzuraCastCommands
             }
             else
             {
-                AzuraSongDataRecord songData = await _azuraCast.GetSongInfoAsync(baseUrl, apiKey, acStation.Id, station, false, song);
+                AzuraSongDataRecord songData = await _azuraCast.GetSongInfoAsync(baseUrl, apiKey, acStation, false, song);
                 songRequest = new()
                 {
                     Song = songData,

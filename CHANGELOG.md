@@ -2,6 +2,14 @@
 ### General
 - Removed not needed internal events, meaning the performance should be *slightly* better
 
+### Improvements
+- The local station cache file is now also deleted when the station or the instance is deleted
+- If you have activated "Always Write Playlists to Liquidsoap", the bot will wait for it before the station is completely started
+- A timeout of 30s after each song skip has been added to prevent the bot from skipping songs too fast
+
+### Fixes
+- Permission checks are now really working correctly
+
 ## 2.0.0-preview3.1 - 2024-07-14
 ### General
 - Optimized the building process for better code performance
