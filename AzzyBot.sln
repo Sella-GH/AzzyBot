@@ -5,7 +5,7 @@ VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot", "src\AzzyBot\AzzyBot.csproj", "{91AAAF0E-4931-4247-BE86-74C595C7D5FC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot-Next", "src\AzzyBot-Next\AzzyBot-Next.csproj", "{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot-Next.Bot", "src\AzzyBot-Next.Bot\AzzyBot-Next.Bot.csproj", "{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot-Next.Data", "src\AzzyBot-Next.Data\AzzyBot-Next.Data.csproj", "{AEE73B92-94B6-4F6A-B29B-19C363B3D305}"
 EndProject
