@@ -1,8 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>AzzyBot</RootNamespace>
-    <OutputType>Exe</OutputType>
+    <RootNamespace>AzzyBot.Database</RootNamespace>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -15,7 +14,7 @@
     <Authors>Sella-GH, AzzyBot Contributors</Authors>
     <Version>2.0.0-preview3.1</Version>
     <Copyright>© 2024 - $(Authors)</Copyright>
-    <Product>AzzyBot-Next</Product>
+    <Product>AzzyBot-Next.Database</Product>
     <Description>Kind of music bot for discord, written in C# and with DSharpPlus. This bot is dedicated for the use with AzuraCast and does not work at it's fully glory without it.</Description>
     <RepositoryUrl>https://github.com/Sella-GH/AzzyBot</RepositoryUrl>
     <AnalysisLevel>latest-all</AnalysisLevel>
@@ -23,94 +22,88 @@
     <PathMap>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)=.</PathMap>
     <Configurations>Debug;Release;Docker;Docker-debug</Configurations>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <StartupObject>AzzyBot.Startup</StartupObject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <AssemblyName>AzzyBot-Dev</AssemblyName>
-    <Product>AzzyBot-Next-Dev</Product>
+    <AssemblyName>AzzyBot-Dev.Database</AssemblyName>
+    <Product>AzzyBot-Next-Dev.Database</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <AssemblyName>AzzyBot-Dev</AssemblyName>
-    <Product>AzzyBot-Next-Dev</Product>
+    <AssemblyName>AzzyBot-Dev.Database</AssemblyName>
+    <Product>AzzyBot-Next-Dev.Database</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <AssemblyName>AzzyBot-Dev</AssemblyName>
-    <Product>AzzyBot-Next-Dev</Product>
+    <AssemblyName>AzzyBot-Dev.Database</AssemblyName>
+    <Product>AzzyBot-Next-Dev.Database</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|AnyCPU'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <AssemblyName>AzzyBot-Docker</AssemblyName>
-    <Product>AzzyBot-Next-Docker</Product>
+    <AssemblyName>AzzyBot-Docker.Database</AssemblyName>
+    <Product>AzzyBot-Next-Docker.Database</Product>
     <Optimize>True</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|ARM64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <AssemblyName>AzzyBot-Docker</AssemblyName>
-    <Product>AzzyBot-Next-Docker</Product>
+    <AssemblyName>AzzyBot-Docker.Database</AssemblyName>
+    <Product>AzzyBot-Next-Docker.Database</Product>
     <Optimize>True</Optimize>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|x64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <AssemblyName>AzzyBot-Docker</AssemblyName>
-    <Product>AzzyBot-Next-Docker</Product>
+    <AssemblyName>AzzyBot-Docker.Database</AssemblyName>
+    <Product>AzzyBot-Next-Docker.Database</Product>
     <Optimize>True</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker-debug|AnyCPU'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <AssemblyName>AzzyBot-Docker-Dev</AssemblyName>
-    <Product>AzzyBot-Next-Docker-Dev</Product>
+    <AssemblyName>AzzyBot-Docker-Dev.Database</AssemblyName>
+    <Product>AzzyBot-Next-Docker-Dev.Database</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker-debug|ARM64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <AssemblyName>AzzyBot-Docker-Dev</AssemblyName>
-    <Product>AzzyBot-Next-Docker-Dev</Product>
+    <AssemblyName>AzzyBot-Docker-Dev.Database</AssemblyName>
+    <Product>AzzyBot-Next-Docker-Dev.Database</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker-debug|x64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <AssemblyName>AzzyBot-Docker-Dev</AssemblyName>
-    <Product>AzzyBot-Next-Docker-Dev</Product>
+    <AssemblyName>AzzyBot-Docker-Dev.Database</AssemblyName>
+    <Product>AzzyBot-Next-Docker-Dev.Database</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <AssemblyName>AzzyBot</AssemblyName>
+    <AssemblyName>AzzyBot.Database</AssemblyName>
     <Optimize>True</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <AssemblyName>AzzyBot</AssemblyName>
+    <AssemblyName>AzzyBot.Database</AssemblyName>
     <Optimize>True</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-    <AssemblyName>AzzyBot</AssemblyName>
+    <AssemblyName>AzzyBot.Database</AssemblyName>
     <Optimize>True</Optimize>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="33.0.1" />
-    <PackageReference Include="DSharpPlus" Version="5.0.0-nightly-02271" />
-    <PackageReference Include="DSharpPlus.Commands" Version="5.0.0-nightly-02271" />
-    <PackageReference Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02271" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
 	  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
     <PackageReference Include="Roslynator.Analyzers" Version="4.12.4">
       <PrivateAssets>all</PrivateAssets>
@@ -135,22 +128,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(ProjectRoot)\AzzyBot-Next.Database\AzzyBot-Next.Database.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Modules\Core\Files\AzzyBotStats.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Settings\AzzyBotSettings-Docker.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Settings\AzzyBotSettings-Dev.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Settings\AzzyBotSettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="$(ProjectRoot)\AzzyBot-Next\AzzyBot-Next.csproj" />
   </ItemGroup>
 
 </Project>
