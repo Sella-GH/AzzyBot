@@ -134,6 +134,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AzzyBot-Next.Core\AzzyBot-Next.Core.csproj" />
     <ProjectReference Include="..\AzzyBot-Next.Data\AzzyBot-Next.Data.csproj" />
   </ItemGroup>
 

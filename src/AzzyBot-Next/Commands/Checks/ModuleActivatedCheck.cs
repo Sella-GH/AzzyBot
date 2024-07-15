@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AzzyBot.Core.Logging;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
-using AzzyBot.Logging;
 using AzzyBot.Utilities.Enums;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;

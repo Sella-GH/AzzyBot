@@ -4,11 +4,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using AzzyBot.Core.Logging;
+using AzzyBot.Core.Services.Interfaces;
+using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
-using AzzyBot.Logging;
-using AzzyBot.Services.Interfaces;
-using AzzyBot.Utilities.Encryption;
 using AzzyBot.Utilities.Records.AzuraCast;
 using Microsoft.Extensions.Logging;
 

@@ -2,8 +2,8 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
-using AzzyBot.Logging;
-using AzzyBot.Utilities;
+using AzzyBot.Core.Logging;
+using AzzyBot.Core.Utilities;
 using AzzyBot.Utilities.Enums;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

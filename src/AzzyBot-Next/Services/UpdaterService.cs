@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
-using AzzyBot.Logging;
+using AzzyBot.Core.Logging;
+using AzzyBot.Core.Utilities;
 using AzzyBot.Settings;
 using AzzyBot.Utilities;
 using AzzyBot.Utilities.Records;

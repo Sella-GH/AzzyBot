@@ -2,8 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AzzyBot.Core.Extensions;
+using AzzyBot.Core.Utilities;
 using AzzyBot.Extensions;
-using AzzyBot.Utilities;
 using Microsoft.Extensions.Hosting;
 
 namespace AzzyBot;

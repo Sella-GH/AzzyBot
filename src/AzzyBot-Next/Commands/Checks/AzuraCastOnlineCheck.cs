@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
-using AzzyBot.Logging;
+using AzzyBot.Core.Logging;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;

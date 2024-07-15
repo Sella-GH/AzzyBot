@@ -11,8 +11,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using AzzyBot.Logging;
-using AzzyBot.Utilities;
+using AzzyBot.Core.Logging;
+using AzzyBot.Core.Utilities;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Services;

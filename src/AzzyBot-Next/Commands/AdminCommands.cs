@@ -10,15 +10,16 @@ using AzzyBot.Commands.Autocompletes;
 using AzzyBot.Commands.Choices;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
-using AzzyBot.Logging;
+using AzzyBot.Core.Logging;
 using AzzyBot.Services;
-using AzzyBot.Utilities;
+using AzzyBot.Core.Utilities;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ArgumentModifiers;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
+using AzzyBot.Utilities;
 
 namespace AzzyBot.Commands;
 

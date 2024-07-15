@@ -125,4 +125,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AzzyBot-Next.Core\AzzyBot-Next.Core.csproj" />
+  </ItemGroup>
+
 </Project>

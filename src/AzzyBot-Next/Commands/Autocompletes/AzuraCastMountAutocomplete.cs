@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
-using AzzyBot.Utilities.Encryption;
+using AzzyBot.Core.Utilities.Encryption;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 
