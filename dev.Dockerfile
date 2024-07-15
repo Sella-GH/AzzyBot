@@ -3,14 +3,14 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim AS build
 USER root
 RUN apt update && apt upgrade -y && apt autoremove -y
 WORKDIR /build
-COPY ./src/AzzyBot-Next ./AzzyBot-Next
+COPY ./src/AzzyBot-Next.Bot ./AzzyBot-Next.Bot
 COPY ./src/AzzyBot-Next.Core ./AzzyBot-Next.Core
 COPY ./src/AzzyBot-Next.Data ./AzzyBot-Next.Data
-RUN dotnet restore ./AzzyBot-Next/AzzyBot-Next.csproj
+RUN dotnet restore ./AzzyBot-Next.Bot/AzzyBot-Next.Bot.csproj
 ARG ARCH
 ARG CONFIG
 ARG OS
-RUN dotnet publish ./AzzyBot-Next.csproj -a $ARCH -c $CONFIG --os $OS -o out
+RUN dotnet publish ./AzzyBot-Next.Bot/AzzyBot-Next.Bot.csproj -a $ARCH -c $CONFIG --os $OS -o out
 
 # RUNNER IMAGE
 FROM mcr.microsoft.com/dotnet/runtime:8.0-bookworm-slim
