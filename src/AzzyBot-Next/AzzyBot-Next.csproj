@@ -135,7 +135,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(ProjectRoot)\AzzyBot-Next.Database\AzzyBot-Next.Database.csproj" />
+    <ProjectReference Include="..\AzzyBot-Next.Database\AzzyBot-Next.Database.csproj" />
   </ItemGroup>
 
   <ItemGroup>
