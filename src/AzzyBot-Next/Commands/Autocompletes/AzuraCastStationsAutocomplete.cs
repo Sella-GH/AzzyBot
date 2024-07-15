@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AzzyBot.Data;
-using AzzyBot.Data.Entities;
 using AzzyBot.Core.Logging;
-using AzzyBot.Services.Modules;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Core.Utilities.Enums;
+using AzzyBot.Data;
+using AzzyBot.Data.Entities;
+using AzzyBot.Services.Modules;
 using AzzyBot.Utilities.Records.AzuraCast;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;

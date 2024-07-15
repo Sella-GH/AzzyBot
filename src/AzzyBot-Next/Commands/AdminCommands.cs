@@ -8,18 +8,18 @@ using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Commands.Autocompletes;
 using AzzyBot.Commands.Choices;
+using AzzyBot.Core.Logging;
+using AzzyBot.Core.Utilities;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
-using AzzyBot.Core.Logging;
 using AzzyBot.Services;
-using AzzyBot.Core.Utilities;
+using AzzyBot.Utilities;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ArgumentModifiers;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
-using AzzyBot.Utilities;
 
 namespace AzzyBot.Commands;
 
