@@ -51,8 +51,6 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
     private async ValueTask PingInstanceAsync(AzuraCastEntity azuraCast, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
-        ArgumentNullException.ThrowIfNull(azuraCast.Guild, nameof(azuraCast.Guild));
-
         cancellationToken.ThrowIfCancellationRequested();
 
         try
