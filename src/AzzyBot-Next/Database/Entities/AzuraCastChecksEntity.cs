@@ -1,4 +1,6 @@
-﻿namespace AzzyBot.Database.Entities;
+﻿using System;
+
+namespace AzzyBot.Database.Entities;
 
 public sealed class AzuraCastChecksEntity
 {
@@ -21,6 +23,22 @@ public sealed class AzuraCastChecksEntity
     /// The state if the changelog should be added to the check for instance updates.
     /// </summary>
     public bool UpdatesShowChangelog { get; set; }
+
+    /// <summary>
+    /// The counter how often the update notification was sent already.
+    /// </summary>
+    /// <remarks>
+    /// This gets reset after no updates were found.
+    /// </remarks>
+    public int UpdateNotificationCounter { get; set; }
+
+    /// <summary>
+    /// The <see cref="DateTime"/> of the last update check.
+    /// </summary>
+    /// <remarks>
+    /// Always use <see cref="DateTime.UtcNow"/> to set this value.
+    /// </remarks>
+    public DateTime LastUpdateCheck { get; set; }
 
     /// <summary>
     /// The database id of the parenting <see cref="AzuraCastEntity"/> database item.

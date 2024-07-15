@@ -17,7 +17,7 @@ namespace AzzyBot.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.6")
+                .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -33,8 +33,14 @@ namespace AzzyBot.Migrations
                     b.Property<int>("AzuraCastId")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("LastUpdateCheck")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<bool>("ServerStatus")
                         .HasColumnType("boolean");
+
+                    b.Property<int>("UpdateNotificationCounter")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("Updates")
                         .HasColumnType("boolean");
@@ -66,7 +72,7 @@ namespace AzzyBot.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("GuildId")
+                    b.Property<int>("GuildId")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("InstanceAdminRoleId")
@@ -230,7 +236,9 @@ namespace AzzyBot.Migrations
                 {
                     b.HasOne("AzzyBot.Database.Entities.GuildsEntity", "Guild")
                         .WithOne("AzuraCast")
-                        .HasForeignKey("AzzyBot.Database.Entities.AzuraCastEntity", "GuildId");
+                        .HasForeignKey("AzzyBot.Database.Entities.AzuraCastEntity", "GuildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Guild");
                 });

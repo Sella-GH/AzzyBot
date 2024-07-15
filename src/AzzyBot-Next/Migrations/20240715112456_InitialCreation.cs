@@ -42,7 +42,7 @@ namespace AzzyBot.Migrations
                     NotificationChannelId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
                     OutagesChannelId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
                     IsOnline = table.Column<bool>(type: "boolean", nullable: false),
-                    GuildId = table.Column<int>(type: "integer", nullable: true)
+                    GuildId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -51,7 +51,8 @@ namespace AzzyBot.Migrations
                         name: "FK_AzuraCast_Guilds_GuildId",
                         column: x => x.GuildId,
                         principalTable: "Guilds",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -63,6 +64,8 @@ namespace AzzyBot.Migrations
                     ServerStatus = table.Column<bool>(type: "boolean", nullable: false),
                     Updates = table.Column<bool>(type: "boolean", nullable: false),
                     UpdatesShowChangelog = table.Column<bool>(type: "boolean", nullable: false),
+                    UpdateNotificationCounter = table.Column<int>(type: "integer", nullable: false),
+                    LastUpdateCheck = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     AzuraCastId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>

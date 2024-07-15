@@ -62,7 +62,16 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
             AzuraUpdateRecord update = await _azuraCastApiService.GetUpdatesAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), apiKey);
 
             if (!update.NeedsReleaseUpdate && !update.NeedsRollingUpdate)
+            {
+                await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, null, null, null, 0, DateTime.UtcNow);
                 return;
+            }
+
+            AzuraCastChecksEntity checks = azuraCast.Checks;
+            if (!UpdaterService.CheckUpdateNotification(checks.UpdateNotificationCounter, checks.LastUpdateCheck))
+                return;
+
+            await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, null, null, null, checks.UpdateNotificationCounter + 1, DateTime.UtcNow);
 
             List<DiscordEmbed> embeds = [EmbedBuilder.BuildAzuraCastUpdatesAvailableEmbed(update)];
             if (azuraCast.Checks.UpdatesShowChangelog)

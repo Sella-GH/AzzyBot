@@ -541,7 +541,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> UpdateAzuraCastChecksAsync(ulong guildId, bool? serverStatus = null, bool? updates = null, bool? changelog = null)
+    public Task<bool> UpdateAzuraCastChecksAsync(ulong guildId, bool? serverStatus = null, bool? updates = null, bool? changelog = null, int? updateNotificationCounter = null, DateTime? lastUpdateCheck = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -570,6 +570,12 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             if (changelog.HasValue)
                 checks.UpdatesShowChangelog = changelog.Value;
+
+            if (updateNotificationCounter.HasValue)
+                checks.UpdateNotificationCounter = updateNotificationCounter.Value;
+
+            if (lastUpdateCheck.HasValue)
+                checks.LastUpdateCheck = lastUpdateCheck.Value;
 
             context.AzuraCastChecks.Update(checks);
         });

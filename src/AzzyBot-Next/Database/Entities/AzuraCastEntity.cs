@@ -55,10 +55,10 @@ public sealed class AzuraCastEntity
     /// <summary>
     /// The database id of the parenting <see cref="GuildsEntity"/> database item.
     /// </summary>
-    public int? GuildId { get; set; }
+    public int GuildId { get; set; }
 
     /// <summary>
     /// The parenting <see cref="GuildsEntity"/> database item.
     /// </summary>
-    public GuildsEntity? Guild { get; set; }
+    public GuildsEntity Guild { get; set; } = null!;
 }
