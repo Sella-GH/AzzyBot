@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AzzyBot.Database.Entities;
+using AzzyBot.Data.Entities;
 using AzzyBot.Logging;
 using AzzyBot.Utilities.Encryption;
 using DSharpPlus.Entities;

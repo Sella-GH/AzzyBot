@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using AzzyBot.Database;
-using AzzyBot.Database.Entities;
+using AzzyBot.Data;
+using AzzyBot.Data.Entities;
 using AzzyBot.Logging;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;

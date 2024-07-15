@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AzzyBot.Database;
-using AzzyBot.Database.Entities;
+using AzzyBot.Data;
+using AzzyBot.Data.Entities;
 using AzzyBot.Logging;
 using AzzyBot.Services.Modules;
 using AzzyBot.Utilities.Encryption;

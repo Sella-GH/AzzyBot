@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using AzzyBot.Database.Entities;
+using AzzyBot.Data.Entities;
 using AzzyBot.Utilities.Encryption;
 using AzzyBot.Utilities.Enums;
 using AzzyBot.Utilities.Records;
