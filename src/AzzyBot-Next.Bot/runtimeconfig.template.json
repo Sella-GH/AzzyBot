@@ -6,7 +6,7 @@
         "System.GC.Server": true,
         "System.GC.Concurrent": true,
         "System.GC.NoAffinitize": true,
-        "System.GC.DynamicAdaptationMode": true,
+        "System.GC.DynamicAdaptationMode": 1,
         "System.Globalization.Invariant": false,
         "System.Net.Http.SocketsHttpHandler.Http2Support": true,
         "System.Net.SocketsHttpHandler.Http3Support": true
