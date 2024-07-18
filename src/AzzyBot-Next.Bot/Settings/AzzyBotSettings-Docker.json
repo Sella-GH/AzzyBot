@@ -1,0 +1,21 @@
+{
+    "BotToken": null,
+    "ServerId": 0,
+    "ErrorChannelId": 0,
+    "NotificationChannelId": 0,
+    "LogRetentionDays": 7,
+    "Database": {
+        "EncryptionKey": null,
+        "NewEncryptionKey": null
+    },
+    "DiscordStatus": {
+        "Activity": 2,
+        "Doing": "Music",
+        "Status": 1,
+        "StreamUrl": null
+    },
+    "Updater": {
+        "DisplayChangelog": true,
+        "DisplayInstructions": true
+    }
+}

@@ -90,7 +90,7 @@ updates:
     open-pull-requests-limit: 25
 
   - package-ecosystem: "nuget" # See documentation for possible values
-    directory: "/src/AzzyBot-Next" # Location of package manifests
+    directory: "/" # Location of package manifests
     schedule:
       interval: "daily"
     assignees:
@@ -116,18 +116,11 @@ updates:
         applies-to: version-updates
         patterns:
         - "Microsoft.*"
-        - "MySqlConnector"
-        - "Pomelo.*"
-        update-types:
-        - "minor"
-        - "patch"
+        - "Npgsql.*"
       Roslynator:
         applies-to: version-updates
         patterns:
         - "Roslynator.*"
-        update-types:
-        - "minor"
-        - "patch"
       Others:
         applies-to: version-updates
         exclude-patterns:
@@ -139,8 +132,5 @@ updates:
         - "Microsoft.*"
         - "Pomelo.*"
         - "Roslynator.*"
-        update-types:
-        - "minor"
-        - "patch"
     open-pull-requests-limit: 25
     milestone: 6
