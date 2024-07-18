@@ -47,11 +47,9 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
         {
             case "azuracast export-playlists":
             case "azuracast force-cache-refresh":
-            case "azuracast get-system-logs":
             case "azuracast start-station":
             case "azuracast stop-station":
             case "azuracast toggle-song-requests":
-            case "azuracast update-instance":
             case "config add-azuracast-station-mount":
             case "config modify-azuracast-station":
             case "config modify-azuracast-station-checks":
