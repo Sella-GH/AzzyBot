@@ -1,23 +1,23 @@
 {
-    "BotToken": "",
+    "BotToken": null,
     "ServerId": 0,
     "ErrorChannelId": 0,
     "NotificationChannelId": 0,
     "LogRetentionDays": 7,
     "Database": {
-        "EncryptionKey": "",
-        "NewEncryptionKey": "",
+        "EncryptionKey": null,
+        "NewEncryptionKey": null,
         "Host": "localhost",
         "Port": 5432,
         "User": "azzybot",
-        "Password": "",
+        "Password": null,
         "DatabaseName": "azzybot"
     },
     "DiscordStatus": {
         "Activity": 2,
         "Doing": "Music",
         "Status": 1,
-        "StreamUrl": ""
+        "StreamUrl": null
     },
     "Updater": {
         "DisplayChangelog": true,
