@@ -6,7 +6,7 @@ using AzzyBot.Bot.Utilities.Records.AzuraCast;
 namespace AzzyBot.Bot.Utilities;
 
 [SuppressMessage("Roslynator", "RCS1241:Implement non-generic counterpart", Justification = "Not needed")]
-public sealed class FileComparer : IEqualityComparer<AzuraFilesRecord>
+public sealed class AzuraFileComparer : IEqualityComparer<AzuraFilesRecord>
 {
     public bool Equals(AzuraFilesRecord? x, AzuraFilesRecord? y)
     {

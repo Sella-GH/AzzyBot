@@ -102,8 +102,8 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
         ArgumentException.ThrowIfNullOrWhiteSpace(stationName, nameof(stationName));
 
-        HashSet<AzuraFilesRecord> onlineHashSet = new(onlineFiles, new FileComparer());
-        HashSet<AzuraFilesRecord> localHashSet = new(localFiles, new FileComparer());
+        HashSet<AzuraFilesRecord> onlineHashSet = new(onlineFiles, new AzuraFileComparer());
+        HashSet<AzuraFilesRecord> localHashSet = new(localFiles, new AzuraFileComparer());
 
         List<AzuraFilesRecord> addedFiles = onlineHashSet.Except(localHashSet).ToList();
         List<AzuraFilesRecord> removedFiles = localHashSet.Except(onlineHashSet).ToList();
