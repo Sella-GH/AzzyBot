@@ -1,6 +1,7 @@
 ## 2.0.0-preview4
 ### General
 - Removed not needed internal events, meaning the performance should be *slightly* better
+- Restructured the whole codebase to make it more readable and maintainable
 
 ### Improvements
 - The local station cache file is now also deleted when the station or the instance is deleted
