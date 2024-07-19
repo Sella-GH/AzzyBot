@@ -9,8 +9,10 @@ using System.Net.Mime;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using Microsoft.Extensions.Logging;
@@ -252,6 +254,40 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         catch (HttpRequestException ex)
         {
             _logger.WebRequestFailed(HttpMethod.Put, ex.Message, url);
+            throw;
+        }
+    }
+
+    public async Task UploadAsync(Uri url, string fileName, string filePath, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    {
+        AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
+        AddHeaders(addressFamily, headers, acceptJson, noCache);
+        HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
+
+        try
+        {
+            using MultipartFormDataContent form = new($"Upload-----{DateTime.Now}");
+            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
+            using StreamContent streamContent = new(fileStream);
+            form.Add(streamContent, "file", fileName);
+
+            using HttpContent httpContent = new StringContent(JsonSerializer.Serialize<AzuraFileUploadRecord>(new(fileName, filePath)), Encoding.UTF8);
+            form.Add(httpContent);
+
+            using HttpResponseMessage response = await client.PostAsync(url, form);
+            if (response.IsSuccessStatusCode)
+                return;
+
+            _logger.WebRequestFailed(HttpMethod.Post, response.ReasonPhrase ?? string.Empty, url);
+        }
+        catch (InvalidOperationException)
+        {
+            _logger.WebInvalidUri(url);
+            throw;
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.WebRequestFailed(HttpMethod.Post, ex.Message, url);
             throw;
         }
     }

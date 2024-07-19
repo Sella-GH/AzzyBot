@@ -15,6 +15,7 @@ using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
 using DSharpPlus.Commands;
+using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
@@ -220,6 +221,21 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
             throw new InvalidOperationException($"Failed {HttpMethod.Put} to API, url: {uri}", ex);
         }
     }
+
+    private async Task UploadToApiAsync(Uri baseUrl, string endpoint, string fileName, string filePath, Dictionary<string, string>? headers = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileName, nameof(fileName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePath, nameof(filePath));
+
+        Uri uri = new($"{baseUrl}api/{endpoint}");
+        try
+        {
+            await _webService.UploadAsync(uri, fileName, filePath, headers);
+        }
+        catch (HttpRequestException ex)
+        {
+            throw new InvalidOperationException($"Failed {HttpMethod.Post} to API, url: {uri}", ex);
         }
     }
 
@@ -662,5 +678,18 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
                 online = false;
             }
         }
+    }
+
+    public async Task UploadFileAsync(Uri baseUrl, string apiKey, int stationId, DiscordAttachment file)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentNullException.ThrowIfNull(file, nameof(file));
+        ArgumentException.ThrowIfNullOrWhiteSpace(file.FileName, nameof(file.FileName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(file.Url, nameof(file.Url));
+
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}/{AzuraApiEndpoints.Upload}";
+
+        await UploadToApiAsync(baseUrl, endpoint, file.FileName, file.Url, CreateHeader(apiKey));
     }
 }
