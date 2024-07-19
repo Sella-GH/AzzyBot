@@ -266,17 +266,11 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
         try
         {
-            using MultipartFormDataContent form = new($"Upload-----{DateTime.Now}");
-            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
-            using StreamContent streamContent = new(fileStream);
-            form.Add(streamContent, "file", fileName);
-            await Console.Out.WriteLineAsync(await streamContent.ReadAsStringAsync());
+            byte[] fileBytes = await FileOperations.GetBase64BytesFromFileAsync(filePath);
+            string base64String = Convert.ToBase64String(fileBytes);
 
-            using HttpContent jsonPayload = new StringContent(JsonSerializer.Serialize<AzuraFileUploadRecord>(new("/", fileName)), Encoding.UTF8, MediaType);
-            await Console.Out.WriteLineAsync(await jsonPayload.ReadAsStringAsync());
-            form.Add(jsonPayload);
-
-            using HttpResponseMessage response = await client.PostAsync(url, form);
+            using HttpContent jsonPayload = new StringContent(JsonSerializer.Serialize<AzuraFileUploadRecord>(new($"/{fileName}", base64String)), Encoding.UTF8, MediaType);
+            using HttpResponseMessage response = await client.PostAsync(url, jsonPayload);
             if (response.IsSuccessStatusCode)
             {
                 await Console.Out.WriteLineAsync("Upload Successfully");
