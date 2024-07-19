@@ -270,8 +270,10 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
             using StreamContent streamContent = new(fileStream);
             form.Add(streamContent, "file", fileName);
+            await Console.Out.WriteLineAsync(await streamContent.ReadAsStringAsync());
 
-            using HttpContent jsonPayload = new StringContent(JsonSerializer.Serialize<AzuraFileUploadRecord>(new(fileName, filePath)), Encoding.UTF8, MediaType);
+            using HttpContent jsonPayload = new StringContent(JsonSerializer.Serialize<AzuraFileUploadRecord>(new("/", fileName)), Encoding.UTF8, MediaType);
+            await Console.Out.WriteLineAsync(await jsonPayload.ReadAsStringAsync());
             form.Add(jsonPayload);
 
             using HttpResponseMessage response = await client.PostAsync(url, form);
