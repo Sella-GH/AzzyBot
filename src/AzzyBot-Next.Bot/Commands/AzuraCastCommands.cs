@@ -339,7 +339,7 @@ public sealed class AzuraCastCommands
             string filePath = Path.Combine(Path.GetTempPath(), $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{azuraCast.GuildId}-{azuraCast.Id}-{acStation.Id}_{file.FileName}");
             await _webRequest.DownloadAsync(new(file.Url), filePath);
 
-            AzuraFilesRecord? uploadedFile = await _azuraCast.UploadFileAsync<AzuraFilesRecord>(new(baseUrl), apiKey, station, file.FileName, filePath);
+            AzuraFilesDetailedRecord? uploadedFile = await _azuraCast.UploadFileAsync<AzuraFilesDetailedRecord>(new(baseUrl), apiKey, station, file.FileName, filePath);
 
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastUploadFileEmbed(uploadedFile, file.FileSize, Crypto.Decrypt(acStation.Name));
 

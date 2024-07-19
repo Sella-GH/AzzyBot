@@ -2,7 +2,7 @@
 
 namespace AzzyBot.Bot.Utilities.Records.AzuraCast;
 
-public sealed record AzuraFilesRecord
+public record AzuraFilesRecord
 {
     [JsonPropertyName("unique_id")]
     public required string UniqueId { get; init; }
@@ -24,4 +24,16 @@ public sealed record AzuraFilesRecord
 
     [JsonPropertyName("album")]
     public string Album { get; init; } = string.Empty;
+}
+
+public sealed record AzuraFilesDetailedRecord : AzuraFilesRecord
+{
+    [JsonPropertyName("length_text")]
+    public required string Length { get; init; }
+
+    [JsonPropertyName("genre")]
+    public required string Genre { get; init; }
+
+    [JsonPropertyName("isrc")]
+    public required string Isrc { get; init; }
 }

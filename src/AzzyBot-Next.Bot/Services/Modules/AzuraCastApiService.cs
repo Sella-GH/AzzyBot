@@ -225,6 +225,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
     private async Task<string> UploadToApiAsync(Uri baseUrl, string endpoint, string fileName, string filePath, Dictionary<string, string>? headers = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileName, nameof(fileName));
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath, nameof(filePath));
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
