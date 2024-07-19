@@ -687,7 +687,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         ArgumentException.ThrowIfNullOrWhiteSpace(fileName, nameof(fileName));
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath, nameof(filePath));
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}/{AzuraApiEndpoints.Upload}";
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}";
 
         string result = await UploadToApiAsync(baseUrl, endpoint, fileName, filePath, CreateHeader(apiKey));
 
