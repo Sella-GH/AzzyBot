@@ -341,7 +341,7 @@ public sealed class AzuraCastCommands
             string filePath = Path.Combine(Path.GetTempPath(), $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{azuraCast.GuildId}-{azuraCast.Id}-{acStation.Id}_{file.FileName}");
             await _webRequest.DownloadAsync(new(file.Url), filePath);
 
-            await _azuraCast.UploadFileAsync(new(baseUrl), apiKey, station, filePath);
+            await _azuraCast.UploadFileAsync(new(baseUrl), apiKey, station, file.FileName, filePath);
 
             await context.EditResponseAsync($"I uploaded the file **{file.FileName}** to station **{Crypto.Decrypt(acStation.Name)}**.");
 
