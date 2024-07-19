@@ -282,7 +282,7 @@ public static class EmbedBuilder
         if (!string.IsNullOrWhiteSpace(file.Album))
             fields.Add("Album", new(file.Album));
 
-        fields.Add("Duration", new($"{file.Length} s"));
+        fields.Add("Duration", new(file.Length));
 
         if (!string.IsNullOrWhiteSpace(file.Genre))
             fields.Add("Genre", new(file.Genre));
@@ -290,7 +290,7 @@ public static class EmbedBuilder
         if (!string.IsNullOrWhiteSpace(file.Isrc))
             fields.Add("ISRC", new(file.Isrc));
 
-        fields.Add("File Size", new($"{Math.Round(fileSize / 1024.0, 2)} MB"));
+        fields.Add("File Size", new($"{Math.Round(fileSize / (1024.0 * 1024.0), 2)} MB"));
 
         return CreateBasicEmbed(title, description, DiscordColor.SpringGreen, new(file.Art), null, null, fields);
     }
