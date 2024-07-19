@@ -314,15 +314,16 @@ public sealed class AzuraCastCommands
         (
             CommandContext context,
             [Description("The station you want to upload the file to."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
-            [Description("The file you want to upload.")] params DiscordAttachment[] files
+            [Description("The file you want to upload.")] DiscordAttachment file
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
             ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
-            ArgumentNullException.ThrowIfNull(files, nameof(files));
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(files.Length, nameof(files));
+            ArgumentNullException.ThrowIfNull(file, nameof(file));
+            ArgumentException.ThrowIfNullOrWhiteSpace(file.FileName, nameof(file.FileName));
+            ArgumentException.ThrowIfNullOrWhiteSpace(file.Url, nameof(file.Url));
 
-            if (files.Any(f => f.FileSize > 52428800))
+            if (file.FileSize > 52428800)
             {
                 await context.EditResponseAsync("The file is too big. Please upload a file that is smaller than 50MB.");
                 return;
@@ -335,28 +336,16 @@ public sealed class AzuraCastCommands
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
-            List<string> filePaths = new(files.Length);
-            List<DiscordEmbed> embeds = new(files.Length);
+            string filePath = Path.Combine(Path.GetTempPath(), $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{azuraCast.GuildId}-{azuraCast.Id}-{acStation.Id}_{file.FileName}");
+            await _webRequest.DownloadAsync(new(file.Url), filePath);
 
-            string filePath;
-            AzuraFilesDetailedRecord? uploadedFile;
-            foreach (DiscordAttachment file in files)
-            {
-                filePath = Path.Combine(Path.GetTempPath(), $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{azuraCast.GuildId}-{azuraCast.Id}-{acStation.Id}_{file.FileName}");
-                await _webRequest.DownloadAsync(new(file.Url ?? string.Empty), filePath);
-                filePaths.Add(filePath);
+            AzuraFilesDetailedRecord? uploadedFile = await _azuraCast.UploadFileAsync<AzuraFilesDetailedRecord>(new(baseUrl), apiKey, station, file.FileName, filePath);
 
-                uploadedFile = await _azuraCast.UploadFileAsync<AzuraFilesDetailedRecord>(new(baseUrl), apiKey, station, file.FileName ?? string.Empty, filePath);
+            DiscordEmbed embed = EmbedBuilder.BuildAzuraCastUploadFileEmbed(uploadedFile, file.FileSize, Crypto.Decrypt(acStation.Name));
 
-                embeds.Add(EmbedBuilder.BuildAzuraCastUploadFileEmbed(uploadedFile, file.FileSize, Crypto.Decrypt(acStation.Name)));
-            }
+            await context.EditResponseAsync(embed);
 
-            await using DiscordMessageBuilder builder = new();
-            builder.AddEmbeds(embeds);
-
-            await context.EditResponseAsync(builder);
-
-            FileOperations.DeleteFiles(filePaths);
+            FileOperations.DeleteFile(filePath);
         }
     }
 
