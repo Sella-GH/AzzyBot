@@ -567,7 +567,9 @@ public static class EmbedBuilder
                 stationDjRole = "Not set";
             }
 
+            string fileUploadChannel = (station.FileUploadChannelId > 0) ? $"<#{station.FileUploadChannelId}>" : "Not set";
             string requestsChannel = (station.RequestsChannelId > 0) ? $"<#{station.RequestsChannelId}>" : "Not set";
+            string fileUploadPath = (!string.IsNullOrWhiteSpace(station.FileUploadPath)) ? station.FileUploadPath : "Not set";
             string preferHls = Misc.ReadableBool(station.PreferHls, ReadbleBool.EnabledDisabled);
             string showPlaylist = Misc.ReadableBool(station.ShowPlaylistInNowPlaying, ReadbleBool.EnabledDisabled);
             string fileChanges = Misc.ReadableBool(station.Checks.FileChanges, ReadbleBool.EnabledDisabled);
@@ -580,7 +582,9 @@ public static class EmbedBuilder
                 ["Station Api Key"] = new(stationApiKey),
                 ["Station Admin Role"] = new(stationAdminRole),
                 ["Station DJ Role"] = new(stationDjRole),
+                ["File Upload Channel"] = new(fileUploadChannel),
                 ["Music Requests Channel"] = new(requestsChannel),
+                ["File Upload Path"] = new(fileUploadPath),
                 ["Prefer HLS Streaming"] = new(preferHls),
                 ["Show Playlist In Now Playing"] = new(showPlaylist),
                 ["Automatic Checks"] = new($"- File Changes: {fileChanges}"),

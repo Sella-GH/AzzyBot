@@ -309,7 +309,7 @@ public sealed class AzuraCastCommands
             await context.FollowupAsync("The update was successful. Your instance is fully ready again.");
         }
 
-        [Command("upload-files"), Description("Upload a file to the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+        [Command("upload-files"), Description("Upload a file to the selected station."), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.AttachFiles), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
         public async ValueTask UploadFilesAsync
         (
             CommandContext context,
@@ -424,7 +424,7 @@ public sealed class AzuraCastCommands
 
             await _azuraCast.SkipSongAsync(new(baseUrl), apiKey, station);
 
-            await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, null, null, null, null, null, null, null, null, DateTime.UtcNow);
+            await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, null, null, null, null, null, null, null, null, null, null, DateTime.UtcNow);
 
             await context.EditResponseAsync($"I skipped **{nowPlaying.NowPlaying.Song.Title}** by **{nowPlaying.NowPlaying.Song.Artist}**.");
         }

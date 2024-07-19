@@ -121,6 +121,8 @@ public sealed class ConfigCommands
             [Description("Enable or disable the preference of HLS streams if you add an able mount point."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int hls,
             [Description("Enable or disable the showing of the playlist in the nowplaying embed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int showPlaylist,
             [Description("Enable or disable the automatic check if files have been changed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int fileChanges,
+            [Description("Select a channel where users are able to upload their own songs to your station."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? uploadChannel = null,
+            [Description("Enter a custom path where the user uploaded songs are stored.")] string? uploadPath = null,
             [Description("Enter the api key of the new station. This is optional if the admin one has the permission.")] string? apiKey = null,
             [Description("Select the group that has the dj permissions on this station.")] DiscordRole? djGroup = null
         )
@@ -144,7 +146,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            await _db.AddAzuraCastStationAsync(context.Guild.Id, station, stationName, adminGroup.Id, requestsChannel.Id, hls is 1, showPlaylist is 1, fileChanges is 1, apiKey, djGroup?.Id);
+            await _db.AddAzuraCastStationAsync(context.Guild.Id, station, stationName, adminGroup.Id, requestsChannel.Id, hls is 1, showPlaylist is 1, fileChanges is 1, uploadChannel?.Id, uploadPath, apiKey, djGroup?.Id);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your station was added successfully and private data has been encrypted.");
@@ -341,7 +343,9 @@ public sealed class ConfigCommands
             [Description("Modify the api key.")] string? apiKey = null,
             [Description("Modify the group that has the admin permissions on this station.")] DiscordRole? adminGroup = null,
             [Description("Modify the group that has the dj permissions on this station.")] DiscordRole? djGroup = null,
-            [Description("Modify the channel to get music requests when a request is not found on the server."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? requestsChannel = null,
+            [Description("Modify the channel where users are able to upload their own songs to your station."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? uploadChannel = null,
+            [Description("Modify the channel to get music requests when a request is not found in the station."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? requestsChannel = null,
+            [Description("Modify the custom path where the user uploaded songs are stored.")] string? uploadPath = null,
             [Description("Enable or disable the preference of HLS streams if you add an able mount point."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int hls = 0,
             [Description("Enable or disable the showing of the playlist in the nowplaying embed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int showPlaylist = 0
         )
@@ -378,7 +382,7 @@ public sealed class ConfigCommands
                 showPlaylistInEmbed = false;
             }
 
-            await _db.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, stationName, apiKey, adminGroup?.Id, djGroup?.Id, requestsChannel?.Id, preferHls, showPlaylistInEmbed);
+            await _db.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, stationName, apiKey, adminGroup?.Id, djGroup?.Id, uploadChannel?.Id, requestsChannel?.Id, uploadPath, preferHls, showPlaylistInEmbed);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your settings were saved successfully and private data has been encrypted.");

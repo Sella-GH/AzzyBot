@@ -77,7 +77,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, string name, ulong stationAdminGroup, ulong requestsId, bool hls, bool showPlaylist, bool fileChanges, string? apiKey = null, ulong? stationDjGroup = null)
+    public Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, string name, ulong stationAdminGroup, ulong requestsId, bool hls, bool showPlaylist, bool fileChanges, ulong? fileUploadId = null, string? fileUploadPath = null, string? apiKey = null, ulong? stationDjGroup = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -97,7 +97,9 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 ApiKey = (string.IsNullOrWhiteSpace(apiKey)) ? string.Empty : Crypto.Encrypt(apiKey),
                 StationAdminRoleId = stationAdminGroup,
                 StationDjRoleId = stationDjGroup ?? 0,
+                FileUploadChannelId = fileUploadId ?? 0,
                 RequestsChannelId = requestsId,
+                FileUploadPath = fileUploadPath ?? string.Empty,
                 PreferHls = hls,
                 ShowPlaylistInNowPlaying = showPlaylist,
                 LastSkipTime = DateTime.MinValue,
@@ -581,7 +583,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? name = null, string? apiKey = null, ulong? stationAdminGroup = null, ulong? stationDjGroup = null, ulong? requestId = null, bool? hls = null, bool? playlist = null, DateTime? lastSkipTime = null)
+    public Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? name = null, string? apiKey = null, ulong? stationAdminGroup = null, ulong? stationDjGroup = null, ulong? fileUploadId = null, ulong? requestId = null, string? fileUploadPath = null, bool? hls = null, bool? playlist = null, DateTime? lastSkipTime = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -617,8 +619,14 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             if (stationDjGroup.HasValue)
                 azuraStation.StationDjRoleId = stationDjGroup.Value;
 
+            if (fileUploadId.HasValue)
+                azuraStation.FileUploadChannelId = fileUploadId.Value;
+
             if (requestId.HasValue)
                 azuraStation.RequestsChannelId = requestId.Value;
+
+            if (!string.IsNullOrWhiteSpace(fileUploadPath))
+                azuraStation.FileUploadPath = fileUploadPath;
 
             if (hls.HasValue)
                 azuraStation.PreferHls = hls.Value;
