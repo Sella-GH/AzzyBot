@@ -222,7 +222,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         }
     }
 
-    private async Task UploadToApiAsync(Uri baseUrl, string endpoint, string fileName, string filePath, Dictionary<string, string>? headers = null)
+    private async Task<string> UploadToApiAsync(Uri baseUrl, string endpoint, string fileName, string filePath, Dictionary<string, string>? headers = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
         ArgumentException.ThrowIfNullOrWhiteSpace(fileName, nameof(fileName));
@@ -231,7 +231,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         Uri uri = new($"{baseUrl}api/{endpoint}");
         try
         {
-            await _webService.UploadAsync(uri, fileName, filePath, headers);
+            return await _webService.UploadAsync(uri, fileName, filePath, headers);
         }
         catch (HttpRequestException ex)
         {
@@ -680,7 +680,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         }
     }
 
-    public async Task UploadFileAsync(Uri baseUrl, string apiKey, int stationId, string fileName, string filePath)
+    public Task<string> UploadFileAsync(Uri baseUrl, string apiKey, int stationId, string fileName, string filePath)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
@@ -689,6 +689,6 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}/{AzuraApiEndpoints.Upload}";
 
-        await UploadToApiAsync(baseUrl, endpoint, fileName, filePath, CreateHeader(apiKey));
+        return UploadToApiAsync(baseUrl, endpoint, fileName, filePath, CreateHeader(apiKey));
     }
 }

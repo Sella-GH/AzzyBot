@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
@@ -323,9 +324,7 @@ public sealed class AzuraCastCommands
             ArgumentException.ThrowIfNullOrWhiteSpace(file.FileName, nameof(file.FileName));
             ArgumentException.ThrowIfNullOrWhiteSpace(file.Url, nameof(file.Url));
 
-            await context.EditResponseAsync(file.FileSize.ToString(CultureInfo.InvariantCulture));
-
-            if (file.FileSize > 50000000)
+            if (file.FileSize > 52428800)
             {
                 await context.EditResponseAsync("The file is too big. Please upload a file that is smaller than 50MB.");
                 return;
@@ -341,9 +340,17 @@ public sealed class AzuraCastCommands
             string filePath = Path.Combine(Path.GetTempPath(), $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{azuraCast.GuildId}-{azuraCast.Id}-{acStation.Id}_{file.FileName}");
             await _webRequest.DownloadAsync(new(file.Url), filePath);
 
-            await _azuraCast.UploadFileAsync(new(baseUrl), apiKey, station, file.FileName, filePath);
+            string fileInfo = await _azuraCast.UploadFileAsync(new(baseUrl), apiKey, station, file.FileName, filePath);
+            AzuraFilesRecord? uploadedFile = JsonSerializer.Deserialize<AzuraFilesRecord>(fileInfo);
+            if (uploadedFile is null)
+            {
+                await context.EditResponseAsync("The file could not be uploaded.");
+                return;
+            }
 
-            await context.EditResponseAsync($"I uploaded the file **{file.FileName}** to station **{Crypto.Decrypt(acStation.Name)}**.");
+            DiscordEmbed embed = EmbedBuilder.BuildAzuraCastUploadFileEmbed(uploadedFile, file.FileSize, Crypto.Decrypt(acStation.Name));
+
+            await context.EditResponseAsync(embed);
 
             FileOperations.DeleteFile(filePath);
         }

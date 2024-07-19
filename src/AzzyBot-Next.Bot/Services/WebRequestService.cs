@@ -8,6 +8,7 @@ using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -258,7 +259,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task UploadAsync(Uri url, string fileName, string filePath, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    public async Task<string> UploadAsync(Uri url, string fileName, string filePath, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
@@ -276,9 +277,11 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
             using HttpResponseMessage response = await client.PostAsync(url, form);
             if (response.IsSuccessStatusCode)
-                return;
+                return await response.Content.ReadAsStringAsync();
 
             _logger.WebRequestFailed(HttpMethod.Post, response.ReasonPhrase ?? string.Empty, url);
+
+            return string.Empty;
         }
         catch (InvalidOperationException)
         {

@@ -264,6 +264,29 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, body.ToString(), DiscordColor.White);
     }
 
+    public static DiscordEmbed BuildAzuraCastUploadFileEmbed(AzuraFilesRecord file, int fileSize, string stationName)
+    {
+        ArgumentNullException.ThrowIfNull(file, nameof(file));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(fileSize, nameof(fileSize));
+
+        const string title = "File Uploaded";
+        string description = $"The song **{file.Title}** by **{file.Artist}** was uploaded successfully.";
+
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
+        {
+            ["Station"] = new(stationName),
+            ["Title"] = new(file.Title),
+            ["Artist"] = new(file.Artist)
+        };
+
+        if (!string.IsNullOrWhiteSpace(file.Album))
+            fields.Add("Album", new(file.Album));
+
+        fields.Add("File Size", new($"{Math.Round(fileSize / (1024.0 * 1024.0 * 1024.0), 2)} MB"));
+
+        return CreateBasicEmbed(title, description, DiscordColor.SpringGreen, new(file.Art), null, null, fields);
+    }
+
     public static async Task<DiscordEmbed> BuildAzzyHardwareStatsEmbedAsync(Uri avaUrl)
     {
         const string title = "AzzyBot Hardware Stats";
