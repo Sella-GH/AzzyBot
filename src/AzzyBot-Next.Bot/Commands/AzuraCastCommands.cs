@@ -37,12 +37,13 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AzuraCastCommands
 {
     [Command("azuracast"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator), ModuleActivatedCheck(AzzyModules.AzuraCast)]
-    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCast, AzzyBackgroundService backgroundService, DbActions dbActions)
+    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCast, AzzyBackgroundService backgroundService, DbActions dbActions, WebRequestService webRequest)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCast = azuraCast;
         private readonly AzzyBackgroundService _backgroundService = backgroundService;
         private readonly DbActions _dbActions = dbActions;
+        private readonly WebRequestService _webRequest = webRequest;
 
         [Command("export-playlists"), Description("Export all playlists from the selected AzuraCast station into a zip file."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask ExportPlaylistsAsync
@@ -320,6 +321,15 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
             ArgumentNullException.ThrowIfNull(file, nameof(file));
             ArgumentException.ThrowIfNullOrWhiteSpace(file.FileName, nameof(file.FileName));
+            ArgumentException.ThrowIfNullOrWhiteSpace(file.Url, nameof(file.Url));
+
+            await context.EditResponseAsync(file.FileSize.ToString(CultureInfo.InvariantCulture));
+
+            if (file.FileSize > 50000000)
+            {
+                await context.EditResponseAsync("The file is too big. Please upload a file that is smaller than 50MB.");
+                return;
+            }
 
             _logger.CommandRequested(nameof(UploadFilesAsync), context.User.GlobalName);
 
@@ -328,9 +338,14 @@ public sealed class AzuraCastCommands
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
-            await _azuraCast.UploadFileAsync(new(baseUrl), apiKey, station, file);
+            string filePath = Path.Combine(Path.GetTempPath(), $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{azuraCast.GuildId}-{azuraCast.Id}-{acStation.Id}_{file.FileName}");
+            await _webRequest.DownloadAsync(new(file.Url), filePath);
+
+            await _azuraCast.UploadFileAsync(new(baseUrl), apiKey, station, filePath);
 
             await context.EditResponseAsync($"I uploaded the file **{file.FileName}** to station **{Crypto.Decrypt(acStation.Name)}**.");
+
+            FileOperations.DeleteFile(filePath);
         }
     }
 

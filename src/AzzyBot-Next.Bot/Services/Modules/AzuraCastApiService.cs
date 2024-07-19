@@ -680,16 +680,14 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         }
     }
 
-    public async Task UploadFileAsync(Uri baseUrl, string apiKey, int stationId, DiscordAttachment file)
+    public async Task UploadFileAsync(Uri baseUrl, string apiKey, int stationId, string filePath)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
-        ArgumentNullException.ThrowIfNull(file, nameof(file));
-        ArgumentException.ThrowIfNullOrWhiteSpace(file.FileName, nameof(file.FileName));
-        ArgumentException.ThrowIfNullOrWhiteSpace(file.Url, nameof(file.Url));
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePath, nameof(filePath));
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}/{AzuraApiEndpoints.Upload}";
 
-        await UploadToApiAsync(baseUrl, endpoint, file.FileName, file.Url, CreateHeader(apiKey));
+        await UploadToApiAsync(baseUrl, endpoint, Path.GetFileName(filePath), filePath, CreateHeader(apiKey));
     }
 }
