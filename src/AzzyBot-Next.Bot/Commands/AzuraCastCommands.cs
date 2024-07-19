@@ -307,6 +307,31 @@ public sealed class AzuraCastCommands
 
             await context.FollowupAsync("The update was successful. Your instance is fully ready again.");
         }
+
+        [Command("upload-files"), Description("Upload a file to the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        public async ValueTask UploadFilesAsync
+        (
+            CommandContext context,
+            [Description("The station you want to upload the file to."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
+            [Description("The file you want to upload.")] DiscordAttachment file
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+            ArgumentNullException.ThrowIfNull(file, nameof(file));
+            ArgumentException.ThrowIfNullOrWhiteSpace(file.FileName, nameof(file.FileName));
+
+            _logger.CommandRequested(nameof(UploadFilesAsync), context.User.GlobalName);
+
+            AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
+            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
+            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+            string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
+
+            await _azuraCast.UploadFileAsync(new(baseUrl), apiKey, station, file);
+
+            await context.EditResponseAsync($"I uploaded the file **{file.FileName}** to station **{Crypto.Decrypt(acStation.Name)}**.");
+        }
     }
 
     [Command("dj"), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
