@@ -130,11 +130,11 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         Uri uri = new($"{baseUrl}api/{endpoint}");
         try
         {
-            await _webService.DeleteAsync(uri, headers, true);
+            await _webService.DeleteAsync(uri, headers);
         }
         catch (HttpRequestException ex)
         {
-            throw new InvalidOperationException($"Failed DELETE to API, url: {uri}", ex);
+            throw new InvalidOperationException($"Failed {HttpMethod.Delete} to API, url: {uri}", ex);
         }
     }
 
@@ -150,7 +150,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         }
         catch (HttpRequestException ex)
         {
-            throw new InvalidOperationException($"Failed GET from API, url: {url}", ex);
+            throw new InvalidOperationException($"Failed {HttpMethod.Get} from API, url: {url}", ex);
         }
 
         return body;
@@ -195,11 +195,11 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         Uri uri = new($"{baseUrl}api/{endpoint}");
         try
         {
-            await _webService.PostWebAsync(uri, content, headers, true);
+            await _webService.PostWebAsync(uri, content, headers);
         }
         catch (HttpRequestException ex)
         {
-            throw new InvalidOperationException($"Failed POST to API, url: {uri}", ex);
+            throw new InvalidOperationException($"Failed {HttpMethod.Post} to API, url: {uri}", ex);
         }
     }
 
@@ -210,14 +210,16 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         Uri uri = new($"{baseUrl}api/{endpoint}");
         try
         {
-            await _webService.PutWebAsync(uri, content, headers, true);
+            await _webService.PutWebAsync(uri, content, headers);
         }
         catch (HttpRequestException ex)
         {
             if (ignoreException)
                 return;
 
-            throw new InvalidOperationException($"Failed PUT to API, url: {uri}", ex);
+            throw new InvalidOperationException($"Failed {HttpMethod.Put} to API, url: {uri}", ex);
+        }
+    }
         }
     }
 
