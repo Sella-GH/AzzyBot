@@ -340,6 +340,22 @@ public sealed class DiscordBotService
 
             builder.WithContent(message);
             await context.EditResponseAsync(builder);
+
+            return;
+        }
+
+        ContextCheckFailedData? azuraCastDiscordChannelCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is AzuraCastDiscordChannelCheckAttribute);
+        if (azuraCastDiscordChannelCheck is not null)
+        {
+            if (ulong.TryParse(azuraCastDiscordChannelCheck.ErrorMessage, out ulong channelId))
+            {
+                builder.WithContent($"This command is only usable in: <#{channelId}>");
+                await context.EditResponseAsync(builder);
+                return;
+            }
+
+            builder.WithContent("This command is unable to use in this channel!");
+            await context.EditResponseAsync(builder);
             return;
         }
 

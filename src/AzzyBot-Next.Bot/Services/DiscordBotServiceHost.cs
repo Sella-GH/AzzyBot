@@ -162,6 +162,7 @@ public sealed class DiscordBotServiceHost : IHostedService
             commandsExtension.AddCommands(typeof(DebugCommands.DebugGroup), [.. debugGuilds]);
         }
 
+        commandsExtension.AddCheck<AzuraCastDiscordChannelCheck>();
         commandsExtension.AddCheck<AzuraCastDiscordPermCheck>();
         commandsExtension.AddCheck<AzuraCastOnlineCheck>();
         commandsExtension.AddCheck<ModuleActivatedCheck>();
