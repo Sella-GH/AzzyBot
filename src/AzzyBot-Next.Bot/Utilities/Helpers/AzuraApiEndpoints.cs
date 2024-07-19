@@ -26,4 +26,5 @@ public static class AzuraApiEndpoints
     public const string Status = "status";
     public const string Toggle = "toggle";
     public const string Updates = "updates";
+    public const string Upload = "upload";
 }
