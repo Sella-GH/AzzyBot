@@ -329,6 +329,13 @@ public sealed class AzuraCastCommands
                 return;
             }
 
+            string[] allowedTypes = [".aac", ".flac", ".m4a", ".mp3", ".ogg", ".opus", ".wav"];
+            if (!allowedTypes.Contains(Path.GetExtension(file.FileName)))
+            {
+                await context.EditResponseAsync($"The file type is not allowed. Please upload a file with the following extensions: {string.Join(", ", allowedTypes)}");
+                return;
+            }
+
             _logger.CommandRequested(nameof(UploadFilesAsync), context.User.GlobalName);
 
             AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
