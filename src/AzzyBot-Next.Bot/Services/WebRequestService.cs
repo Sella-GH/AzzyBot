@@ -271,12 +271,17 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             using StreamContent streamContent = new(fileStream);
             form.Add(streamContent, "file", fileName);
 
-            using HttpContent httpContent = new StringContent(JsonSerializer.Serialize<AzuraFileUploadRecord>(new(fileName, filePath)), Encoding.UTF8);
-            form.Add(httpContent);
+            using HttpContent jsonPayload = new StringContent(JsonSerializer.Serialize<AzuraFileUploadRecord>(new(fileName, filePath)), Encoding.UTF8);
+            form.Add(jsonPayload);
 
             using HttpResponseMessage response = await client.PostAsync(url, form);
             if (response.IsSuccessStatusCode)
+            {
+                await Console.Out.WriteLineAsync("Upload Successfully");
+                await Console.Out.WriteLineAsync(await response.Content.ReadAsStringAsync());
+
                 return await response.Content.ReadAsStringAsync();
+            }
 
             _logger.WebRequestFailed(HttpMethod.Post, response.ReasonPhrase ?? string.Empty, url);
 

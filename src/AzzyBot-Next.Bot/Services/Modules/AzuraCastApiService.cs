@@ -231,7 +231,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         Uri uri = new($"{baseUrl}api/{endpoint}");
         try
         {
-            return await _webService.UploadAsync(uri, fileName, filePath, headers);
+            return await _webService.UploadAsync(uri, fileName, filePath, headers, true);
         }
         catch (HttpRequestException ex)
         {
