@@ -680,7 +680,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         }
     }
 
-    public Task<string> UploadFileAsync(Uri baseUrl, string apiKey, int stationId, string fileName, string filePath)
+    public async Task<T> UploadFileAsync<T>(Uri baseUrl, string apiKey, int stationId, string fileName, string filePath)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
@@ -689,6 +689,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}/{AzuraApiEndpoints.Upload}";
 
-        return UploadToApiAsync(baseUrl, endpoint, fileName, filePath, CreateHeader(apiKey));
+        string result = await UploadToApiAsync(baseUrl, endpoint, fileName, filePath, CreateHeader(apiKey));
+
+        return JsonSerializer.Deserialize<T>(result) ?? throw new InvalidOperationException($"Could not deserialize result: {result}");
     }
 }

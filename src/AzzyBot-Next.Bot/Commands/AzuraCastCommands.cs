@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
@@ -340,13 +339,7 @@ public sealed class AzuraCastCommands
             string filePath = Path.Combine(Path.GetTempPath(), $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{azuraCast.GuildId}-{azuraCast.Id}-{acStation.Id}_{file.FileName}");
             await _webRequest.DownloadAsync(new(file.Url), filePath);
 
-            string fileInfo = await _azuraCast.UploadFileAsync(new(baseUrl), apiKey, station, file.FileName, filePath);
-            AzuraFilesRecord? uploadedFile = JsonSerializer.Deserialize<AzuraFilesRecord>(fileInfo);
-            if (uploadedFile is null)
-            {
-                await context.EditResponseAsync("The file could not be uploaded.");
-                return;
-            }
+            AzuraFilesRecord? uploadedFile = await _azuraCast.UploadFileAsync<AzuraFilesRecord>(new(baseUrl), apiKey, station, file.FileName, filePath);
 
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastUploadFileEmbed(uploadedFile, file.FileSize, Crypto.Decrypt(acStation.Name));
 
