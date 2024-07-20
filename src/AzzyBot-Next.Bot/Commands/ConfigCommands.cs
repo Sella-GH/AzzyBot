@@ -268,7 +268,8 @@ public sealed class ConfigCommands
                 return;
             }
 
-            await _db.UpdateAzuraCastAsync(context.Guild.Id, url, apiKey, instanceAdminGroup?.Id, notificationsChannel?.Id, outagesChannel?.Id);
+            await _db.UpdateAzuraCastAsync(context.Guild.Id, url, apiKey);
+            await _db.UpdateAzuraCastPreferencesAsync(context.Guild.Id, instanceAdminGroup?.Id, notificationsChannel?.Id, outagesChannel?.Id);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your AzuraCast settings were saved successfully and private data has been encrypted.");
@@ -382,7 +383,8 @@ public sealed class ConfigCommands
                 showPlaylistInEmbed = false;
             }
 
-            await _db.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, stationName, apiKey, adminGroup?.Id, djGroup?.Id, uploadChannel?.Id, requestsChannel?.Id, uploadPath, preferHls, showPlaylistInEmbed);
+            await _db.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, stationName, apiKey);
+            await _db.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, adminGroup?.Id, djGroup?.Id, uploadChannel?.Id, requestsChannel?.Id, uploadPath, preferHls, showPlaylistInEmbed);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your settings were saved successfully and private data has been encrypted.");
@@ -444,7 +446,7 @@ public sealed class ConfigCommands
 
             await context.DeferResponseAsync();
 
-            await _db.UpdateGuildAsync(context.Guild.Id, adminRole?.Id, adminChannel?.Id, errorChannel?.Id);
+            await _db.UpdateGuildPreferencesAsync(context.Guild.Id, adminRole?.Id, adminChannel?.Id, errorChannel?.Id);
 
             await context.EditResponseAsync("Your settings were saved successfully.");
         }
@@ -471,7 +473,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            DiscordRole? adminRole = context.Guild.GetRole(guild.AdminRoleId);
+            DiscordRole? adminRole = context.Guild.GetRole(guild.Preferences.AdminRoleId);
             DiscordEmbed guildEmbed = EmbedBuilder.BuildGetSettingsGuildEmbed(guildName, guild, $"{adminRole?.Name} ({adminRole?.Id})");
 
             await using DiscordMessageBuilder messageBuilder = new();
@@ -483,13 +485,13 @@ public sealed class ConfigCommands
                 Dictionary<ulong, string> stationRoles = [];
                 foreach (AzuraCastStationEntity station in azuraCast.Stations)
                 {
-                    DiscordRole? stationAdminRole = context.Guild.GetRole(station.StationAdminRoleId);
-                    DiscordRole? stationDjRole = context.Guild.GetRole(station.StationDjRoleId);
+                    DiscordRole? stationAdminRole = context.Guild.GetRole(station.Preferences.StationAdminRoleId);
+                    DiscordRole? stationDjRole = context.Guild.GetRole(station.Preferences.StationDjRoleId);
                     stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? string.Empty);
                     stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? string.Empty);
                 }
 
-                DiscordRole? instanceAdminRole = context.Guild.GetRole(azuraCast.InstanceAdminRoleId);
+                DiscordRole? instanceAdminRole = context.Guild.GetRole(azuraCast.Preferences.InstanceAdminRoleId);
                 IReadOnlyList<DiscordEmbed> azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(azuraCast, $"{instanceAdminRole?.Name} ({instanceAdminRole?.Id})", stationRoles);
 
                 messageBuilder.AddEmbeds(azuraEmbed);

@@ -424,7 +424,7 @@ public sealed class AzuraCastCommands
 
             await _azuraCast.SkipSongAsync(new(baseUrl), apiKey, station);
 
-            await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, null, null, null, null, null, null, null, null, null, null, DateTime.UtcNow);
+            await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, null, null, null, DateTime.UtcNow);
 
             await context.EditResponseAsync($"I skipped **{nowPlaying.NowPlaying.Song.Title}** by **{nowPlaying.NowPlaying.Song.Artist}**.");
         }
@@ -574,6 +574,7 @@ public sealed class AzuraCastCommands
 
             AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
             AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastStationPreferencesEntity acStationPref = await _dbActions.GetAzuraCastStationPreferencesAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station preferences are null");
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
             AzuraNowPlayingDataRecord? nowPlaying = null;
@@ -588,7 +589,7 @@ public sealed class AzuraCastCommands
             }
 
             string? playlistName = null;
-            if (acStation.ShowPlaylistInNowPlaying)
+            if (acStationPref.ShowPlaylistInNowPlaying)
             {
                 string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
                 IReadOnlyList<AzuraPlaylistRecord> playlist = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, station);

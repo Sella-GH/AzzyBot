@@ -158,14 +158,14 @@ public sealed class AdminCommands
             IReadOnlyList<GuildEntity> guildsEntities = await _dbActions.GetGuildsAsync();
             foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds.Where(g => guildsEntities.Any(g => g.ConfigSet)))
             {
-                GuildEntity? dbGuild = guildsEntities.FirstOrDefault(g => g.UniqueId == guild.Key);
-                if (dbGuild is null)
+                GuildPreferencesEntity? guildPreferences = guildsEntities.FirstOrDefault(g => g.UniqueId == guild.Key)?.Preferences;
+                if (guildPreferences is null)
                 {
                     await context.EditResponseAsync("Server not found in database.");
                     return;
                 }
 
-                await _botService.SendMessageAsync(dbGuild.AdminNotifyChannelId, message);
+                await _botService.SendMessageAsync(guildPreferences.AdminNotifyChannelId, message);
             }
 
             foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds.Where(g => guildsEntities.Any(g => !g.ConfigSet)))
