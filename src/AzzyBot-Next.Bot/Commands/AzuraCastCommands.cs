@@ -309,7 +309,7 @@ public sealed class AzuraCastCommands
             await context.FollowupAsync("The update was successful. Your instance is fully ready again.");
         }
 
-        [Command("upload-files"), Description("Upload a file to the selected station."), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.AttachFiles), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+        [Command("upload-files"), Description("Upload a file to the selected station."), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.AttachFiles), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordChannelCheck]
         public async ValueTask UploadFilesAsync
         (
             CommandContext context,
