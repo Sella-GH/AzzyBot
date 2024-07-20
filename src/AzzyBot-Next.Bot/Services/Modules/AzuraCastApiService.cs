@@ -71,7 +71,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
 
         builder.AppendLine("Please review your permission set.");
 
-        await _botService.SendMessageAsync(azuraCast.NotificationChannelId, builder.ToString());
+        await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, builder.ToString());
     }
 
     private async ValueTask CheckForStationApiPermissionsAsync(AzuraCastStationEntity station)
@@ -103,7 +103,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
 
         builder.AppendLine("Please review your permission set.");
 
-        await _botService.SendMessageAsync(station.AzuraCast.NotificationChannelId, builder.ToString());
+        await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, builder.ToString());
     }
 
     private async ValueTask<IReadOnlyList<string>> ExecuteApiPermissionCheckAsync(IReadOnlyList<Uri> apis, string apiKey)

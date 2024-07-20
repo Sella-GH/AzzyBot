@@ -77,7 +77,7 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
             if (azuraCast.Checks.UpdatesShowChangelog)
                 embeds.Add(EmbedBuilder.BuildAzuraCastUpdatesChangelogEmbed(update.RollingUpdatesList, update.NeedsRollingUpdate));
 
-            await _botService.SendMessageAsync(azuraCast.NotificationChannelId, null, embeds);
+            await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, null, embeds);
         }
         catch (OperationCanceledException)
         {

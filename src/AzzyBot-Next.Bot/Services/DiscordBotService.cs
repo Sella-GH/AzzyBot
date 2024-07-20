@@ -119,15 +119,15 @@ public sealed class DiscordBotService
         }
         else if (guildId is not 0)
         {
-            GuildEntity? guild = await _db.GetGuildAsync(guildId);
-            if (guild is null)
+            GuildPreferencesEntity? guildPrefs = await _db.GetGuildPreferencesAsync(guildId);
+            if (guildPrefs is null)
             {
-                _logger.DatabaseGuildNotFound(guildId);
+                _logger.DatabaseGuildPreferencesNotFound(guildId);
                 return false;
             }
 
-            if (guild.ErrorChannelId is not 0)
-                errorChannelId = guild.ErrorChannelId;
+            if (guildPrefs.ErrorChannelId is not 0)
+                errorChannelId = guildPrefs.ErrorChannelId;
 
             if (errorChannelId == _settings.ErrorChannelId)
             {
@@ -209,15 +209,15 @@ public sealed class DiscordBotService
         }
         else if (guildId is not 0)
         {
-            GuildEntity? guild = await _db.GetGuildAsync(guildId);
-            if (guild is null)
+            GuildPreferencesEntity? guildPrefs = await _db.GetGuildPreferencesAsync(guildId);
+            if (guildPrefs is null)
             {
-                _logger.DatabaseGuildNotFound(guildId);
+                _logger.DatabaseGuildPreferencesNotFound(guildId);
                 return false;
             }
 
-            if (guild.ErrorChannelId is not 0)
-                errorChannelId = guild.ErrorChannelId;
+            if (guildPrefs.ErrorChannelId is not 0)
+                errorChannelId = guildPrefs.ErrorChannelId;
 
             if (errorChannelId is 0)
             {
@@ -293,7 +293,7 @@ public sealed class DiscordBotService
             return;
         }
 
-        AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id);
+        AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id, false, true, true, false, false, true);
         if (azuraCast is null)
         {
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
@@ -303,7 +303,7 @@ public sealed class DiscordBotService
         ContextCheckFailedData? azuraCastOnlineCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is AzuraCastOnlineCheckAttribute);
         if (azuraCastOnlineCheck is not null)
         {
-            builder.WithContent($"The AzuraCast instance is currently offline!\nPlease contact <@&{azuraCast.InstanceAdminRoleId}>.");
+            builder.WithContent($"The AzuraCast instance is currently offline!\nPlease contact <@&{azuraCast.Preferences.InstanceAdminRoleId}>.");
             await context.EditResponseAsync(builder);
             return;
         }
@@ -317,11 +317,11 @@ public sealed class DiscordBotService
 
             if (!splittable && azuraCastDiscordPermCheck.ErrorMessage is "Instance")
             {
-                message = message.Replace("{0}", $"<@&{azuraCast.InstanceAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
+                message = message.Replace("{0}", $"<@&{azuraCast.Preferences.InstanceAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
             }
             else if (info.Length is 2)
             {
-                AzuraCastStationEntity? station = await _db.GetAzuraCastStationAsync(context.Guild.Id, Convert.ToInt32(info[1], CultureInfo.InvariantCulture));
+                AzuraCastStationEntity? station = azuraCast.Stations.FirstOrDefault(s => s.StationId == Convert.ToInt32(info[1], CultureInfo.InvariantCulture));
                 if (station is null)
                 {
                     _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, Convert.ToInt32(info[1], CultureInfo.InvariantCulture));
@@ -330,11 +330,11 @@ public sealed class DiscordBotService
 
                 if (info[0] is "Station")
                 {
-                    message = message.Replace("{0}", $"<@&{station.StationAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
+                    message = message.Replace("{0}", $"<@&{station.Preferences.StationAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
                 }
                 else if (info[0] is "DJ")
                 {
-                    message = message.Replace("{0}", $"<@&{((station.StationDjRoleId is 0) ? station.StationAdminRoleId : station.StationDjRoleId)}>", StringComparison.OrdinalIgnoreCase);
+                    message = message.Replace("{0}", $"<@&{((station.Preferences.StationDjRoleId is 0) ? station.Preferences.StationAdminRoleId : station.Preferences.StationDjRoleId)}>", StringComparison.OrdinalIgnoreCase);
                 }
             }
 
