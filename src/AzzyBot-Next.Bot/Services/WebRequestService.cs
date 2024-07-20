@@ -258,7 +258,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task<string> UploadAsync(Uri url, string fileName, string filePath, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    public async Task<string> UploadAsync(Uri url, string file, string fileName, string filePath, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
@@ -266,10 +266,10 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
         try
         {
-            byte[] fileBytes = await FileOperations.GetBase64BytesFromFileAsync(filePath);
+            byte[] fileBytes = await FileOperations.GetBase64BytesFromFileAsync(file);
             string base64String = Convert.ToBase64String(fileBytes);
 
-            using HttpContent jsonPayload = new StringContent(JsonSerializer.Serialize<AzuraFileUploadRecord>(new($"/{fileName}", base64String)), Encoding.UTF8, MediaType);
+            using HttpContent jsonPayload = new StringContent(JsonSerializer.Serialize<AzuraFileUploadRecord>(new($"{filePath}/{fileName}", base64String)), Encoding.UTF8, MediaType);
             using HttpResponseMessage response = await client.PostAsync(url, jsonPayload);
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadAsStringAsync();

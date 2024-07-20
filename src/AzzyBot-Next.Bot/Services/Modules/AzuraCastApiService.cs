@@ -221,7 +221,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         }
     }
 
-    private async Task<string> UploadToApiAsync(Uri baseUrl, string endpoint, string fileName, string filePath, Dictionary<string, string>? headers = null)
+    private async Task<string> UploadToApiAsync(Uri baseUrl, string endpoint, string file, string fileName, string filePath, Dictionary<string, string>? headers = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
         ArgumentException.ThrowIfNullOrWhiteSpace(fileName, nameof(fileName));
@@ -230,7 +230,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         Uri uri = new($"{baseUrl}api/{endpoint}");
         try
         {
-            return await _webService.UploadAsync(uri, fileName, filePath, headers, true);
+            return await _webService.UploadAsync(uri, file, fileName, filePath, headers, true);
         }
         catch (HttpRequestException ex)
         {
@@ -679,7 +679,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         }
     }
 
-    public async Task<T> UploadFileAsync<T>(Uri baseUrl, string apiKey, int stationId, string fileName, string filePath)
+    public async Task<T> UploadFileAsync<T>(Uri baseUrl, string apiKey, int stationId, string file, string fileName, string filePath)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
@@ -688,7 +688,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}";
 
-        string result = await UploadToApiAsync(baseUrl, endpoint, fileName, filePath, CreateHeader(apiKey));
+        string result = await UploadToApiAsync(baseUrl, endpoint, file, fileName, filePath, CreateHeader(apiKey));
 
         return JsonSerializer.Deserialize<T>(result) ?? throw new InvalidOperationException($"Could not deserialize result: {result}");
     }

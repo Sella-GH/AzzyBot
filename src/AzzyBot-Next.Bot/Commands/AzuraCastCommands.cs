@@ -339,14 +339,15 @@ public sealed class AzuraCastCommands
             _logger.CommandRequested(nameof(UploadFilesAsync), context.User.GlobalName);
 
             AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station, false, false, true) ?? throw new InvalidOperationException("Station is null");
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
             string filePath = Path.Combine(Path.GetTempPath(), $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{azuraCast.GuildId}-{azuraCast.Id}-{acStation.Id}_{file.FileName}");
             await _webRequest.DownloadAsync(new(file.Url), filePath);
+            string uploadPath = (string.IsNullOrWhiteSpace(acStation.Preferences.FileUploadPath)) ? "/" : acStation.Preferences.FileUploadPath;
 
-            AzuraFilesDetailedRecord? uploadedFile = await _azuraCast.UploadFileAsync<AzuraFilesDetailedRecord>(new(baseUrl), apiKey, station, file.FileName, filePath);
+            AzuraFilesDetailedRecord? uploadedFile = await _azuraCast.UploadFileAsync<AzuraFilesDetailedRecord>(new(baseUrl), apiKey, station, filePath, file.FileName, uploadPath);
 
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastUploadFileEmbed(uploadedFile, file.FileSize, Crypto.Decrypt(acStation.Name));
 
