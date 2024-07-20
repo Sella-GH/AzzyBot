@@ -15,7 +15,6 @@ using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
 using DSharpPlus.Commands;
-using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;

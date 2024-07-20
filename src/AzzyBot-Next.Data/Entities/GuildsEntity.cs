@@ -30,11 +30,6 @@ public sealed class GuildsEntity
     public ulong ErrorChannelId { get; set; }
 
     /// <summary>
-    /// The state if this <see cref="DiscordGuild"/> has debug commands enabled.
-    /// </summary>
-    public bool IsDebugAllowed { get; set; }
-
-    /// <summary>
     /// The state if the core config was set.
     /// </summary>
     public bool ConfigSet { get; set; }

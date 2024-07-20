@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Core.Logging;
-using AzzyBot.Core.Utilities;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -16,7 +15,6 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBackg
     private readonly AzzyBackgroundService _azuraCastBackgroundService = azuraCastBackgroundService;
     private readonly DiscordBotService _discordBotService = discordBotService;
     private readonly UpdaterService _updaterService = updaterService;
-    private readonly bool _isDev = AzzyStatsSoftware.GetBotEnvironment == Environments.Development;
     private readonly Task _completedTask = Task.CompletedTask;
     private Timer? _timer;
     private DateTime _lastAzuraCastFileCheck = DateTime.MinValue;
@@ -56,7 +54,7 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBackg
         {
             DateTime now = DateTime.Now;
 
-            if (!_isDev && now - _lastAzzyBotUpdateCheck >= TimeSpan.FromHours(5.98))
+            if (now - _lastAzzyBotUpdateCheck >= TimeSpan.FromHours(5.98))
             {
                 _logger.GlobalTimerCheckForUpdates();
                 _lastAzzyBotUpdateCheck = now;

@@ -497,17 +497,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         return guilds;
     }
 
-    public async Task<IReadOnlyList<GuildsEntity>> GetGuildsWithDebugAsync(bool isDebug = true)
-    {
-        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
-
-        return await context.Guilds
-            .AsNoTracking()
-            .Where(g => g.IsDebugAllowed == isDebug)
-            .OrderBy(g => g.Id)
-            .ToListAsync();
-    }
-
     public Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl = null, string? apiKey = null, ulong? instanceAdminGroup = null, ulong? notificationId = null, ulong? outagesId = null, bool? isOnline = null)
     {
         return ExecuteDbActionAsync(async context =>
@@ -677,7 +666,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> UpdateGuildAsync(ulong guildId, ulong? adminRoleId = null, ulong? adminNotifiyChannelId = null, ulong? errorChannelId = null, bool? isDebug = null)
+    public Task<bool> UpdateGuildAsync(ulong guildId, ulong? adminRoleId = null, ulong? adminNotifiyChannelId = null, ulong? errorChannelId = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -699,9 +688,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             if (errorChannelId.HasValue)
                 guild.ErrorChannelId = errorChannelId.Value;
-
-            if (isDebug.HasValue)
-                guild.IsDebugAllowed = isDebug.Value;
 
             context.Guilds.Update(guild);
         });
