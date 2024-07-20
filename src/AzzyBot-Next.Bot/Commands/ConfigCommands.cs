@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -356,7 +356,7 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(UpdateAzuraCastStationAsync), context.User.GlobalName);
 
-            if (stationId is null && stationName is null && apiKey is null && adminGroup is null && djGroup is null && requestsChannel is null && hls is 0 && showPlaylist is 0)
+            if (stationId is null && stationName is null && apiKey is null && adminGroup is null && djGroup is null && uploadChannel is null && string.IsNullOrWhiteSpace(uploadPath) && requestsChannel is null && hls is 0 && showPlaylist is 0)
             {
                 await context.RespondAsync("You have to provide at least one parameter to update.");
                 return;
