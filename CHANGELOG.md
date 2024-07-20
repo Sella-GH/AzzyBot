@@ -1,12 +1,27 @@
 ## 2.0.0-preview4
+### Breaking Changes
+- Your Database needs a complete reset, please DROP it and start from scratch
+  - You'll likely experience this a few more times until the final release
+  - No, I won't provide migration scripts for preview versions unless I'm fully confident that the database structure is somewhat final
+
 ### General
 - Removed not needed internal events, meaning the performance should be *slightly* better
 - Restructured the whole codebase to make it more readable and maintainable
+- Refactored the database Entities a bit so they are separated into more tables
+- Greatly refactored the database actions in general (again)
+
+### Additions
+- You can now upload files to your AzuraCast Station using `azuracast upload-files`
+  - You are able to specify a specific channel where people are able to upload the files only
+
+### Removements
+- The `debug-server` command group including all commands
 
 ### Improvements
 - The local station cache file is now also deleted when the station or the instance is deleted
 - If you have activated "Always Write Playlists to Liquidsoap", the bot will wait for it before the station is completely started
 - A timeout of 30s after each song skip has been added to prevent the bot from skipping songs too fast
+- Removed useless code
 
 ### Fixes
 - Permission checks are now really working correctly
