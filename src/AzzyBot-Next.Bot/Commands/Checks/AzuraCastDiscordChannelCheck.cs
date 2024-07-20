@@ -29,18 +29,18 @@ public sealed class AzuraCastDiscordChannelCheck(ILogger<AzuraCastDiscordChannel
             await context.DeferResponseAsync();
 
         int stationId = Convert.ToInt32(context.Arguments.SingleOrDefault(o => o.Key.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
-        AzuraCastStationEntity? station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId);
-        if (station is null)
+        AzuraCastStationPreferencesEntity? prefs = await _dbActions.GetAzuraCastStationPreferencesAsync(context.Guild.Id, stationId);
+        if (prefs is null)
         {
-            _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, stationId);
-            return "AzuraCastStation is null!";
+            _logger.DatabaseAzuraCastStationPreferencesNotFound(context.Guild.Id, 0, stationId);
+            return "AzuraCast station preferences not found";
         }
 
         ulong channelId;
         switch (context.Command.Name)
         {
             case "upload-files":
-                channelId = station.FileUploadChannelId;
+                channelId = prefs.FileUploadChannelId;
                 break;
 
             default:

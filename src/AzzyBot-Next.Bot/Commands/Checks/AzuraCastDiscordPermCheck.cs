@@ -35,7 +35,7 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
             await context.DeferResponseAsync();
 
         int stationId = Convert.ToInt32(context.Arguments.SingleOrDefault(o => o.Key.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
-        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
+        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, false, true, true, false, false, true);
         if (azuraCast is null)
         {
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
@@ -69,7 +69,7 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
         AzuraCastStationEntity? station = new();
         if (fillStation)
         {
-            station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId);
+            station = azuraCast.Stations.SingleOrDefault(o => o.StationId == stationId);
             if (station is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, stationId);
@@ -91,7 +91,7 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
 
     private string? CheckPermission(AzuraCastDiscordPerm perm, ulong guildId, AzuraCastEntity azuraCast, AzuraCastStationEntity station, IReadOnlyList<DiscordRole> userRoles, string commandName)
     {
-        bool isInstanceAdmin = userRoles.Contains(_botService.GetDiscordRole(guildId, azuraCast.InstanceAdminRoleId));
+        bool isInstanceAdmin = userRoles.Contains(_botService.GetDiscordRole(guildId, azuraCast.Preferences.InstanceAdminRoleId));
         bool isStationAdmin = false;
         bool isStationDj = false;
 
@@ -107,13 +107,13 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
             case "config modify-azuracast-station-checks":
             case "config delete-azuracast-station":
             case "config delete-azuracast-station-mount":
-                isStationAdmin = userRoles.Contains(_botService.GetDiscordRole(guildId, station.StationAdminRoleId));
+                isStationAdmin = userRoles.Contains(_botService.GetDiscordRole(guildId, station.Preferences.StationAdminRoleId));
                 break;
 
             case "dj delete-song-request":
             case "dj skip-song":
             case "dj switch-playlist":
-                isStationDj = userRoles.Contains(_botService.GetDiscordRole(guildId, station.StationDjRoleId));
+                isStationDj = userRoles.Contains(_botService.GetDiscordRole(guildId, station.Preferences.StationDjRoleId));
                 break;
         }
 
