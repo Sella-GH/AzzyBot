@@ -45,12 +45,12 @@ public sealed class AzuraCastStationPreferencesEntity
     public ulong StationDjRoleId { get; set; }
 
     /// <summary>
-    /// The database id of the parenting <see cref="AzuraCastEntity"/> database item.
+    /// The database id of the parenting <see cref="AzuraCastStationEntity"/> database item.
     /// </summary>
-    public int AzuraCastId { get; set; }
+    public int StationId { get; set; }
 
     /// <summary>
-    /// The parenting <see cref="AzuraCastEntity"/> database item.
+    /// The parenting <see cref="AzuraCastStationEntity"/> database item.
     /// </summary>
-    public AzuraCastEntity AzuraCast { get; set; } = null!;
+    public AzuraCastStationEntity Station { get; set; } = null!;
 }
