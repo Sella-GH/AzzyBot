@@ -1,0 +1,56 @@
+﻿using DSharpPlus.Entities;
+
+namespace AzzyBot.Data.Entities;
+
+public sealed class AzuraCastStationPreferencesEntity
+{
+    /// <summary>
+    /// The database id.
+    /// </summary>
+    public int Id { get; set; }
+
+    /// <summary>
+    /// The <see cref="DiscordChannel"/> id of the <see cref="DiscordChannel"/> in which users are able to upload files to the station.
+    /// </summary>
+    public ulong FileUploadChannelId { get; set; }
+
+    /// <summary>
+    /// The path where uploaded files are stored on the AzuraCast station.
+    /// </summary>
+    public string FileUploadPath { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The state if HLS streams should be prefered when listening to this station.
+    /// </summary>
+    public bool PreferHls { get; set; }
+
+    /// <summary>
+    /// The <see cref="DiscordChannel"/> id of the <see cref="DiscordChannel"/> to which not-available music-requests should be sent.
+    /// </summary>
+    public ulong RequestsChannelId { get; set; }
+
+    /// <summary>
+    /// The state if the name of the playlist should be shown in the NowPlaying embed.
+    /// </summary>
+    public bool ShowPlaylistInNowPlaying { get; set; }
+
+    /// <summary>
+    /// The <see cref="DiscordRole"/> id of the <see cref="DiscordRole"/> with administrative permissions on the station.
+    /// </summary>
+    public ulong StationAdminRoleId { get; set; }
+
+    /// <summary>
+    /// The <see cref="DiscordRole"/> id of the <see cref="DiscordRole"/> with djing permissions on the station.
+    /// </summary>
+    public ulong StationDjRoleId { get; set; }
+
+    /// <summary>
+    /// The database id of the parenting <see cref="AzuraCastEntity"/> database item.
+    /// </summary>
+    public int AzuraCastId { get; set; }
+
+    /// <summary>
+    /// The parenting <see cref="AzuraCastEntity"/> database item.
+    /// </summary>
+    public AzuraCastEntity AzuraCast { get; set; } = null!;
+}

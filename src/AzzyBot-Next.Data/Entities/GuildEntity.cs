@@ -15,24 +15,14 @@ public sealed class GuildEntity
     public ulong UniqueId { get; set; }
 
     /// <summary>
-    /// The <see cref="DiscordRole"/> id of the administrative <see cref="DiscordRole"/> of the <see cref="DiscordGuild"/>.
-    /// </summary>
-    public ulong AdminRoleId { get; set; }
-
-    /// <summary>
-    /// The <see cref="DiscordChannel"/> id of the adminstrative <see cref="DiscordChannel"/>.
-    /// </summary>
-    public ulong AdminNotifyChannelId { get; set; }
-
-    /// <summary>
-    /// The <see cref="DiscordChannel"/> id of the <see cref="DiscordChannel"/> where errors are posted.
-    /// </summary>
-    public ulong ErrorChannelId { get; set; }
-
-    /// <summary>
     /// The state if the core config was set.
     /// </summary>
     public bool ConfigSet { get; set; }
+
+    /// <summary>
+    /// The user-defined preferences of the <see cref="GuildEntity"/> object.
+    /// </summary>
+    public GuildPreferencesEntity Preferences { get; set; } = new();
 
     /// <summary>
     /// The possible <see cref="AzuraCastEntity"/> database item.
