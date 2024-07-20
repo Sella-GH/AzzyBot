@@ -59,9 +59,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             {
                 BaseUrl = Crypto.Encrypt(baseUrl.OriginalString),
                 AdminApiKey = Crypto.Encrypt(apiKey),
-                InstanceAdminRoleId = instanceAdminGroup,
-                NotificationChannelId = notificationId,
-                OutagesChannelId = outagesId,
                 GuildId = guild.Id
             };
 
@@ -70,6 +67,14 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 ServerStatus = serverStatus,
                 Updates = updates,
                 UpdatesShowChangelog = changelog,
+                AzuraCastId = azuraCast.Id
+            };
+
+            azuraCast.Preferences = new()
+            {
+                InstanceAdminRoleId = instanceAdminGroup,
+                NotificationChannelId = notificationId,
+                OutagesChannelId = outagesId,
                 AzuraCastId = azuraCast.Id
             };
 
@@ -95,13 +100,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 StationId = stationId,
                 Name = Crypto.Encrypt(name),
                 ApiKey = (string.IsNullOrWhiteSpace(apiKey)) ? string.Empty : Crypto.Encrypt(apiKey),
-                StationAdminRoleId = stationAdminGroup,
-                StationDjRoleId = stationDjGroup ?? 0,
-                FileUploadChannelId = fileUploadId ?? 0,
-                RequestsChannelId = requestsId,
-                FileUploadPath = fileUploadPath ?? string.Empty,
-                PreferHls = hls,
-                ShowPlaylistInNowPlaying = showPlaylist,
                 LastSkipTime = DateTime.MinValue,
                 AzuraCastId = azura.Id
             };
@@ -110,6 +108,17 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             {
                 FileChanges = fileChanges,
                 StationId = station.Id
+            };
+
+            station.Preferences = new()
+            {
+                FileUploadChannelId = fileUploadId ?? 0,
+                FileUploadPath = fileUploadPath ?? string.Empty,
+                PreferHls = hls,
+                RequestsChannelId = requestsId,
+                ShowPlaylistInNowPlaying = showPlaylist,
+                StationAdminRoleId = stationAdminGroup,
+                StationDjRoleId = stationDjGroup ?? 0
             };
 
             await context.AzuraCastStations.AddAsync(station);
@@ -288,6 +297,27 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             .FirstOrDefaultAsync();
     }
 
+    public async Task<AzuraCastPreferencesEntity?> GetAzuraCastPreferencesAsync(ulong guildId)
+    {
+        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+
+        AzuraCastEntity? azuraCast = await context.Guilds
+            .AsNoTracking()
+            .Where(g => g.UniqueId == guildId)
+            .OrderBy(g => g.Id)
+            .Select(g => g.AzuraCast)
+            .FirstOrDefaultAsync();
+
+        if (azuraCast is null)
+            return null;
+
+        await context.Entry(azuraCast)
+            .Reference(a => a.Preferences)
+            .LoadAsync();
+
+        return azuraCast.Preferences;
+    }
+
     public async Task<AzuraCastStationEntity?> GetAzuraCastStationAsync(ulong guildId, int stationId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
@@ -380,6 +410,35 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         return station.Mounts.FirstOrDefault(m => m.Id == mountId);
     }
 
+    public async Task<AzuraCastStationPreferencesEntity?> GetAzuraCastStationPreferencesAsync(ulong guildId, int stationId)
+    {
+        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+
+        AzuraCastEntity? azuraCast = await context.Guilds
+            .AsNoTracking()
+            .Where(g => g.UniqueId == guildId)
+            .OrderBy(g => g.Id)
+            .Select(g => g.AzuraCast)
+            .FirstOrDefaultAsync();
+
+        if (azuraCast is null)
+            return null;
+
+        await context.Entry(azuraCast)
+            .Collection(a => a.Stations)
+            .LoadAsync();
+
+        AzuraCastStationEntity? station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId);
+        if (station is null)
+            return null;
+
+        await context.Entry(station)
+            .Reference(s => s.Preferences)
+            .LoadAsync();
+
+        return station.Preferences;
+    }
+
     public async Task<IReadOnlyList<AzuraCastStationMountEntity>> GetAzuraCastStationMountsAsync(ulong guildId, int stationId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
@@ -424,17 +483,25 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         if (loadEverything)
         {
             await context.Entry(guild)
+                .Reference(g => g.Preferences)
+                .LoadAsync();
+
+            await context.Entry(guild)
                 .Reference(g => g.AzuraCast)
                 .LoadAsync();
 
             if (guild.AzuraCast is not null)
             {
                 await context.Entry(guild.AzuraCast)
-                    .Collection(a => a.Stations)
+                    .Reference(a => a.Checks)
                     .LoadAsync();
 
                 await context.Entry(guild.AzuraCast)
-                    .Reference(a => a.Checks)
+                    .Reference(a => a.Preferences)
+                    .LoadAsync();
+
+                await context.Entry(guild.AzuraCast)
+                    .Collection(a => a.Stations)
                     .LoadAsync();
 
                 foreach (AzuraCastStationEntity station in guild.AzuraCast.Stations)
@@ -445,6 +512,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
                     await context.Entry(station)
                         .Collection(s => s.Mounts)
+                        .LoadAsync();
+
+                    await context.Entry(station)
+                        .Reference(s => s.Preferences)
                         .LoadAsync();
                 }
             }
@@ -467,17 +538,25 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             foreach (GuildEntity guild in guilds)
             {
                 await context.Entry(guild)
+                    .Reference(g => g.Preferences)
+                    .LoadAsync();
+
+                await context.Entry(guild)
                     .Reference(g => g.AzuraCast)
                     .LoadAsync();
 
                 if (guild.AzuraCast is not null)
                 {
                     await context.Entry(guild.AzuraCast)
-                        .Collection(a => a.Stations)
+                        .Reference(a => a.Checks)
                         .LoadAsync();
 
                     await context.Entry(guild.AzuraCast)
-                        .Reference(a => a.Checks)
+                        .Reference(a => a.Preferences)
+                        .LoadAsync();
+
+                    await context.Entry(guild.AzuraCast)
+                        .Collection(a => a.Stations)
                         .LoadAsync();
 
                     foreach (AzuraCastStationEntity station in guild.AzuraCast.Stations)
@@ -489,6 +568,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                         await context.Entry(station)
                             .Collection(s => s.Mounts)
                             .LoadAsync();
+
+                        await context.Entry(station)
+                            .Reference(s => s.Preferences)
+                            .LoadAsync();
                     }
                 }
             }
@@ -497,7 +580,19 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         return guilds;
     }
 
-    public Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl = null, string? apiKey = null, ulong? instanceAdminGroup = null, ulong? notificationId = null, ulong? outagesId = null, bool? isOnline = null)
+    public async Task<GuildPreferencesEntity?> GetGuildPreferencesAsync(ulong guildId)
+    {
+        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
+
+        return await context.Guilds
+            .AsNoTracking()
+            .Where(g => g.UniqueId == guildId)
+            .OrderBy(g => g.Id)
+            .Select(g => g.Preferences)
+            .FirstOrDefaultAsync();
+    }
+
+    public Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl = null, string? apiKey = null, bool? isOnline = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -515,15 +610,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             if (!string.IsNullOrWhiteSpace(apiKey))
                 azuraCast.AdminApiKey = Crypto.Encrypt(apiKey);
-
-            if (instanceAdminGroup.HasValue)
-                azuraCast.InstanceAdminRoleId = instanceAdminGroup.Value;
-
-            if (notificationId.HasValue)
-                azuraCast.NotificationChannelId = notificationId.Value;
-
-            if (outagesId.HasValue)
-                azuraCast.OutagesChannelId = outagesId.Value;
 
             if (isOnline.HasValue)
                 azuraCast.IsOnline = isOnline.Value;
@@ -572,7 +658,41 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? name = null, string? apiKey = null, ulong? stationAdminGroup = null, ulong? stationDjGroup = null, ulong? fileUploadId = null, ulong? requestId = null, string? fileUploadPath = null, bool? hls = null, bool? playlist = null, DateTime? lastSkipTime = null)
+    public Task<bool> UpdateAzuraCastPreferencesAsync(ulong guildId, ulong? instanceAdminGroup = null, ulong? notificationId = null, ulong? outagesId = null)
+    {
+        return ExecuteDbActionAsync(async context =>
+        {
+            AzuraCastEntity? azuraCast = await context.Guilds
+                .Where(g => g.UniqueId == guildId)
+                .OrderBy(g => g.Id)
+                .Select(g => g.AzuraCast)
+                .FirstOrDefaultAsync();
+
+            if (azuraCast is null)
+                return;
+
+            await context.Entry(azuraCast)
+                .Reference(a => a.Preferences)
+                .LoadAsync();
+
+            AzuraCastPreferencesEntity? preferences = azuraCast.Preferences;
+            if (preferences is null)
+                return;
+
+            if (instanceAdminGroup.HasValue)
+                preferences.InstanceAdminRoleId = instanceAdminGroup.Value;
+
+            if (notificationId.HasValue)
+                preferences.NotificationChannelId = notificationId.Value;
+
+            if (outagesId.HasValue)
+                preferences.OutagesChannelId = outagesId.Value;
+
+            context.AzuraCastPreferences.Update(preferences);
+        });
+    }
+
+    public Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? name = null, string? apiKey = null, DateTime? lastSkipTime = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -601,27 +721,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             if (!string.IsNullOrWhiteSpace(apiKey))
                 azuraStation.ApiKey = Crypto.Encrypt(apiKey);
-
-            if (stationAdminGroup.HasValue)
-                azuraStation.StationAdminRoleId = stationAdminGroup.Value;
-
-            if (stationDjGroup.HasValue)
-                azuraStation.StationDjRoleId = stationDjGroup.Value;
-
-            if (fileUploadId.HasValue)
-                azuraStation.FileUploadChannelId = fileUploadId.Value;
-
-            if (requestId.HasValue)
-                azuraStation.RequestsChannelId = requestId.Value;
-
-            if (!string.IsNullOrWhiteSpace(fileUploadPath))
-                azuraStation.FileUploadPath = fileUploadPath;
-
-            if (hls.HasValue)
-                azuraStation.PreferHls = hls.Value;
-
-            if (playlist.HasValue)
-                azuraStation.ShowPlaylistInNowPlaying = playlist.Value;
 
             if (lastSkipTime.HasValue)
                 azuraStation.LastSkipTime = lastSkipTime.Value;
@@ -666,7 +765,57 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> UpdateGuildAsync(ulong guildId, ulong? adminRoleId = null, ulong? adminNotifiyChannelId = null, ulong? errorChannelId = null)
+    public Task<bool> UpdateAzuraCastStationPreferencesAsync(ulong guildId, int stationId, ulong? stationAdminGroup = null, ulong? stationDjGroup = null, ulong? fileUploadId = null, ulong? requestId = null, string? fileUploadPath = null, bool? hls = null, bool? playlist = null)
+    {
+        return ExecuteDbActionAsync(async context =>
+        {
+            AzuraCastEntity? azuraCast = await context.Guilds
+                .Where(g => g.UniqueId == guildId)
+                .OrderBy(g => g.Id)
+                .Select(g => g.AzuraCast)
+                .FirstOrDefaultAsync();
+
+            if (azuraCast is null)
+                return;
+
+            await context.Entry(azuraCast)
+                .Collection(a => a.Stations)
+                .LoadAsync();
+
+            AzuraCastStationEntity? station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId);
+            if (station is null)
+                return;
+
+            AzuraCastStationPreferencesEntity? preferences = station.Preferences;
+            if (preferences is null)
+                return;
+
+            if (stationAdminGroup.HasValue)
+                preferences.StationAdminRoleId = stationAdminGroup.Value;
+
+            if (stationDjGroup.HasValue)
+                preferences.StationDjRoleId = stationDjGroup.Value;
+
+            if (fileUploadId.HasValue)
+                preferences.FileUploadChannelId = fileUploadId.Value;
+
+            if (requestId.HasValue)
+                preferences.RequestsChannelId = requestId.Value;
+
+            if (!string.IsNullOrWhiteSpace(fileUploadPath))
+                preferences.FileUploadPath = fileUploadPath;
+
+            if (hls.HasValue)
+                preferences.PreferHls = hls.Value;
+
+            if (playlist.HasValue)
+                preferences.ShowPlaylistInNowPlaying = playlist.Value;
+
+            context.AzuraCastStationPreferences.Update(preferences);
+        });
+    }
+
+    public Task<bool> UpdateGuildPreferencesAsync(ulong guildId, ulong? adminRoleId = null, ulong? adminNotifiyChannelId = null, ulong? errorChannelId = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -677,18 +826,27 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             if (guild is null)
                 return;
 
-            if (!guild.ConfigSet)
-                guild.ConfigSet = true;
+            await context.Entry(guild)
+                .Reference(g => g.Preferences)
+                .LoadAsync();
+
+            GuildPreferencesEntity? preferences = guild.Preferences;
+            if (preferences is null)
+                return;
 
             if (adminRoleId.HasValue)
-                guild.AdminRoleId = adminRoleId.Value;
+                preferences.AdminRoleId = adminRoleId.Value;
 
             if (adminNotifiyChannelId.HasValue)
-                guild.AdminNotifyChannelId = adminNotifiyChannelId.Value;
+                preferences.AdminNotifyChannelId = adminNotifiyChannelId.Value;
 
             if (errorChannelId.HasValue)
-                guild.ErrorChannelId = errorChannelId.Value;
+                preferences.ErrorChannelId = errorChannelId.Value;
 
+            if (preferences.AdminRoleId is not 0 && preferences.AdminNotifyChannelId is not 0 && preferences.ErrorChannelId is not 0)
+                guild.ConfigSet = true;
+
+            context.GuildPreferences.Update(preferences);
             context.Guilds.Update(guild);
         });
     }
