@@ -22,7 +22,6 @@ namespace AzzyBot.Data.Migrations
                     AdminRoleId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
                     AdminNotifyChannelId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
                     ErrorChannelId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
-                    IsDebugAllowed = table.Column<bool>(type: "boolean", nullable: false),
                     ConfigSet = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>

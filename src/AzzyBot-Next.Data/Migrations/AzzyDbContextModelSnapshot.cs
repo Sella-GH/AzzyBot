@@ -217,9 +217,6 @@ namespace AzzyBot.Data.Migrations
                     b.Property<decimal>("ErrorChannelId")
                         .HasColumnType("numeric(20,0)");
 
-                    b.Property<bool>("IsDebugAllowed")
-                        .HasColumnType("boolean");
-
                     b.Property<decimal>("UniqueId")
                         .HasColumnType("numeric(20,0)");
 

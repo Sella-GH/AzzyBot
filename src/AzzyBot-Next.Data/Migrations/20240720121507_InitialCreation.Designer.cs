@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AzzyBot.Data.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20240720110722_InitialCreation")]
+    [Migration("20240720121507_InitialCreation")]
     partial class InitialCreation
     {
         /// <inheritdoc />
@@ -219,9 +219,6 @@ namespace AzzyBot.Data.Migrations
 
                     b.Property<decimal>("ErrorChannelId")
                         .HasColumnType("numeric(20,0)");
-
-                    b.Property<bool>("IsDebugAllowed")
-                        .HasColumnType("boolean");
 
                     b.Property<decimal>("UniqueId")
                         .HasColumnType("numeric(20,0)");
