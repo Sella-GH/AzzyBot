@@ -2,7 +2,7 @@
 
 namespace AzzyBot.Data.Entities;
 
-public sealed class GuildsEntity
+public sealed class GuildEntity
 {
     /// <summary>
     /// The database id.

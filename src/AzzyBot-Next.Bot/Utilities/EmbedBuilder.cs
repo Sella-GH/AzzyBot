@@ -499,7 +499,7 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.White);
     }
 
-    public static DiscordEmbed BuildGetSettingsGuildEmbed(string serverName, GuildsEntity guild, string adminRole)
+    public static DiscordEmbed BuildGetSettingsGuildEmbed(string serverName, GuildEntity guild, string adminRole)
     {
         ArgumentNullException.ThrowIfNull(guild, nameof(guild));
         ArgumentException.ThrowIfNullOrWhiteSpace(serverName, nameof(serverName));

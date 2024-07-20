@@ -13,7 +13,7 @@ public sealed class AzzyDbContext : DbContext
     { }
 #pragma warning restore CS8618
 
-    public DbSet<GuildsEntity> Guilds { get; set; }
+    public DbSet<GuildEntity> Guilds { get; set; }
     public DbSet<AzuraCastEntity> AzuraCast { get; set; }
     public DbSet<AzuraCastChecksEntity> AzuraCastChecks { get; set; }
     public DbSet<AzuraCastStationEntity> AzuraCastStations { get; set; }

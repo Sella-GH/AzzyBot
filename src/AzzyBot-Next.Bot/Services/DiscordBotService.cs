@@ -119,7 +119,7 @@ public sealed class DiscordBotService
         }
         else if (guildId is not 0)
         {
-            GuildsEntity? guild = await _db.GetGuildAsync(guildId);
+            GuildEntity? guild = await _db.GetGuildAsync(guildId);
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);
@@ -209,7 +209,7 @@ public sealed class DiscordBotService
         }
         else if (guildId is not 0)
         {
-            GuildsEntity? guild = await _db.GetGuildAsync(guildId);
+            GuildEntity? guild = await _db.GetGuildAsync(guildId);
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);

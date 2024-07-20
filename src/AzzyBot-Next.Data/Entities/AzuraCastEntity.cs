@@ -53,12 +53,12 @@ public sealed class AzuraCastEntity
     public ICollection<AzuraCastStationEntity> Stations { get; } = [];
 
     /// <summary>
-    /// The database id of the parenting <see cref="GuildsEntity"/> database item.
+    /// The database id of the parenting <see cref="GuildEntity"/> database item.
     /// </summary>
     public int GuildId { get; set; }
 
     /// <summary>
-    /// The parenting <see cref="GuildsEntity"/> database item.
+    /// The parenting <see cref="GuildEntity"/> database item.
     /// </summary>
-    public GuildsEntity Guild { get; set; } = null!;
+    public GuildEntity Guild { get; set; } = null!;
 }

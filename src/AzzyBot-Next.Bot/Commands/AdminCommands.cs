@@ -155,10 +155,10 @@ public sealed class AdminCommands
                 return;
             }
 
-            IReadOnlyList<GuildsEntity> guildsEntities = await _dbActions.GetGuildsAsync();
+            IReadOnlyList<GuildEntity> guildsEntities = await _dbActions.GetGuildsAsync();
             foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds.Where(g => guildsEntities.Any(g => g.ConfigSet)))
             {
-                GuildsEntity? dbGuild = guildsEntities.FirstOrDefault(g => g.UniqueId == guild.Key);
+                GuildEntity? dbGuild = guildsEntities.FirstOrDefault(g => g.UniqueId == guild.Key);
                 if (dbGuild is null)
                 {
                     await context.EditResponseAsync("Server not found in database.");
