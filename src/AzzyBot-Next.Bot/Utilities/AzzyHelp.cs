@@ -40,7 +40,8 @@ public static class AzzyHelp
         ArgumentOutOfRangeException.ThrowIfZero(commands.Count, nameof(commands));
         ArgumentException.ThrowIfNullOrWhiteSpace(commandName, nameof(commandName));
 
-        foreach (KeyValuePair<string, List<AzzyHelpRecord>> kvp in GetCommandGroups(commands, adminServer, approvedDebug, member, true))
+        string[] parts = commandName.Split(' ');
+        foreach (KeyValuePair<string, List<AzzyHelpRecord>> kvp in GetCommandGroups(commands, adminServer, approvedDebug, member, true).Where(c => c.Key == parts[0]))
         {
             Console.Out.WriteLine(kvp.Key);
             foreach (AzzyHelpRecord record in kvp.Value)

@@ -67,7 +67,6 @@ public sealed class CoreCommands
             }
             else
             {
-                _logger.LogWarning("Command: {Command}", command);
                 AzzyHelpRecord helpCommand = AzzyHelp.GetSingleCommand(context.Extension.Commands, command, adminServer, approvedDebug, member);
                 DiscordEmbed embed = EmbedBuilder.BuildAzzyHelpEmbed(helpCommand);
                 embeds.Add(embed);
