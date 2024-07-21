@@ -164,11 +164,7 @@ public sealed class DiscordBotService
 
             return true;
         }
-        catch (IOException e)
-        {
-            _logger.UnableToLogException(e.ToString());
-        }
-        catch (SecurityException e)
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or SecurityException)
         {
             _logger.UnableToLogException(e.ToString());
         }
@@ -258,11 +254,7 @@ public sealed class DiscordBotService
 
             return true;
         }
-        catch (IOException e)
-        {
-            _logger.UnableToLogException(e.ToString());
-        }
-        catch (SecurityException e)
+        catch (Exception e) when (ex is IOException or SecurityException)
         {
             _logger.UnableToLogException(e.ToString());
         }
@@ -481,10 +473,8 @@ public sealed class DiscordBotService
             string name = pair.Key.Name;
             string value = pair.Value?.ToString() ?? "undefined";
 
-            if (!string.IsNullOrWhiteSpace(name) && value is not "undefined")
-            {
+            if (!string.IsNullOrWhiteSpace(name) && value is not "0" or "undefined")
                 commandParameters.Add(name, value);
-            }
         }
     }
 
