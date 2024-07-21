@@ -11,6 +11,7 @@ services:
       - TZ=Europe/Berlin
     depends_on:
       - AzzyBot-Db
+      - AzzyBot-Ms
     networks:
       - AzzyBot-Db-Nw
       - AzzyBot-Nw
@@ -35,6 +36,17 @@ services:
     hostname: AzzyBot-Db
     volumes:
       - azzybot_data:/var/lib/postgresql/data
+
+  AzzyBot-Ms:
+    container_name: AzzyBot-Ms
+    image: ghcr.io/lavalink-devs/lavalink:4-alpine
+    pull_policy: always
+    restart: unless-stopped
+    networks:
+      - AzzyBot-Nw
+    hostname: AzzyBot-Ms
+    volumes:
+      - ./AzzyBot/Modules/MusicStreaming/Files/application.yml:/opt/Lavalink/application.yml
 
 networks:
   AzzyBot-Db-Nw:
