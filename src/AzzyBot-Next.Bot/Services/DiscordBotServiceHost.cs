@@ -117,7 +117,7 @@ public sealed class DiscordBotServiceHost : IHostedService
 
         return new()
         {
-            Intents = DiscordIntents.Guilds,
+            Intents = DiscordIntents.Guilds | DiscordIntents.GuildVoiceStates,
             LoggerFactory = _loggerFactory,
             // Otherwise it stops reconnecting after 4 attempts
             // TODO Remove this when adapating to the newest release of DSP
