@@ -25,60 +25,22 @@
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <AssemblyName>AzzyBot-Dev.Core</AssemblyName>
     <Product>AzzyBot-Next-Dev.Core</Product>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <AssemblyName>AzzyBot-Dev.Core</AssemblyName>
-    <Product>AzzyBot-Next-Dev.Core</Product>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <AssemblyName>AzzyBot-Dev.Core</AssemblyName>
-    <Product>AzzyBot-Next-Dev.Core</Product>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)'=='Docker'">
     <AssemblyName>AzzyBot-Docker.Core</AssemblyName>
     <Product>AzzyBot-Next-Docker.Core</Product>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|ARM64'">
-    <AssemblyName>AzzyBot-Docker.Core</AssemblyName>
-    <Product>AzzyBot-Next-Docker.Core</Product>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|x64'">
-    <AssemblyName>AzzyBot-Docker.Core</AssemblyName>
-    <Product>AzzyBot-Next-Docker.Core</Product>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker-debug|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)'=='Docker-debug'">
     <AssemblyName>AzzyBot-Docker-Dev.Core</AssemblyName>
     <Product>AzzyBot-Next-Docker-Dev.Core</Product>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker-debug|ARM64'">
-    <AssemblyName>AzzyBot-Docker-Dev.Core</AssemblyName>
-    <Product>AzzyBot-Next-Docker-Dev.Core</Product>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker-debug|x64'">
-    <AssemblyName>AzzyBot-Docker-Dev.Core</AssemblyName>
-    <Product>AzzyBot-Next-Docker-Dev.Core</Product>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <AssemblyName>AzzyBot.Core</AssemblyName>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <AssemblyName>AzzyBot.Core</AssemblyName>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <AssemblyName>AzzyBot.Core</AssemblyName>
   </PropertyGroup>
 

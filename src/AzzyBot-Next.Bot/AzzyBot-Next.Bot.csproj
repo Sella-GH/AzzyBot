@@ -26,60 +26,22 @@
     <StartupObject>AzzyBot.Bot.Startup</StartupObject>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <AssemblyName>AzzyBot-Dev</AssemblyName>
     <Product>AzzyBot-Next-Dev</Product>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <AssemblyName>AzzyBot-Dev</AssemblyName>
-    <Product>AzzyBot-Next-Dev</Product>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <AssemblyName>AzzyBot-Dev</AssemblyName>
-    <Product>AzzyBot-Next-Dev</Product>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)'=='Docker'">
     <AssemblyName>AzzyBot-Docker</AssemblyName>
     <Product>AzzyBot-Next-Docker</Product>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|ARM64'">
-    <AssemblyName>AzzyBot-Docker</AssemblyName>
-    <Product>AzzyBot-Next-Docker</Product>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|x64'">
-    <AssemblyName>AzzyBot-Docker</AssemblyName>
-    <Product>AzzyBot-Next-Docker</Product>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker-debug|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)'=='Docker-debug'">
     <AssemblyName>AzzyBot-Docker-Dev</AssemblyName>
     <Product>AzzyBot-Next-Docker-Dev</Product>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker-debug|ARM64'">
-    <AssemblyName>AzzyBot-Docker-Dev</AssemblyName>
-    <Product>AzzyBot-Next-Docker-Dev</Product>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker-debug|x64'">
-    <AssemblyName>AzzyBot-Docker-Dev</AssemblyName>
-    <Product>AzzyBot-Next-Docker-Dev</Product>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <AssemblyName>AzzyBot</AssemblyName>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <AssemblyName>AzzyBot</AssemblyName>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <AssemblyName>AzzyBot</AssemblyName>
   </PropertyGroup>
 
