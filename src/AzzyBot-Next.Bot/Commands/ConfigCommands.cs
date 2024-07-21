@@ -268,8 +268,11 @@ public sealed class ConfigCommands
                 return;
             }
 
-            await _db.UpdateAzuraCastAsync(context.Guild.Id, url, apiKey);
-            await _db.UpdateAzuraCastPreferencesAsync(context.Guild.Id, instanceAdminGroup?.Id, notificationsChannel?.Id, outagesChannel?.Id);
+            if (url is not null && !string.IsNullOrWhiteSpace(apiKey))
+                await _db.UpdateAzuraCastAsync(context.Guild.Id, url, apiKey);
+
+            if (instanceAdminGroup is not null && notificationsChannel is not null && outagesChannel is not null)
+                await _db.UpdateAzuraCastPreferencesAsync(context.Guild.Id, instanceAdminGroup.Id, notificationsChannel.Id, outagesChannel.Id);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your AzuraCast settings were saved successfully and private data has been encrypted.");
@@ -383,8 +386,11 @@ public sealed class ConfigCommands
                 showPlaylistInEmbed = false;
             }
 
-            await _db.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, stationName, apiKey);
-            await _db.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, adminGroup?.Id, djGroup?.Id, uploadChannel?.Id, requestsChannel?.Id, uploadPath, preferHls, showPlaylistInEmbed);
+            if (stationId.HasValue && !string.IsNullOrWhiteSpace(stationName) && !string.IsNullOrWhiteSpace(apiKey))
+                await _db.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, stationName, apiKey);
+
+            if (adminGroup is not null && djGroup is not null && uploadChannel is not null && requestsChannel is not null && !string.IsNullOrWhiteSpace(uploadPath) && preferHls is not null && showPlaylistInEmbed is not null)
+                await _db.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, adminGroup.Id, djGroup.Id, uploadChannel.Id, requestsChannel.Id, uploadPath, preferHls, showPlaylistInEmbed);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your settings were saved successfully and private data has been encrypted.");
