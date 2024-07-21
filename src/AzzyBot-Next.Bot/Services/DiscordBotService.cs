@@ -101,7 +101,7 @@ public sealed class DiscordBotService
         string exMessage = ex.Message;
         string stackTrace = ex.StackTrace ?? string.Empty;
         string exInfo = (string.IsNullOrWhiteSpace(stackTrace)) ? exMessage : $"{exMessage}\n{stackTrace}";
-        string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
+        string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss-fffffff", CultureInfo.InvariantCulture);
         ulong errorChannelId = _settings.ErrorChannelId;
         bool errorChannelConfigured = true;
 
@@ -184,7 +184,7 @@ public sealed class DiscordBotService
         string exMessage = ex.Message;
         string stackTrace = ex.StackTrace ?? string.Empty;
         string exInfo = (string.IsNullOrWhiteSpace(stackTrace)) ? exMessage : $"{exMessage}\n{stackTrace}";
-        string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss", CultureInfo.InvariantCulture);
+        string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss-fffffff", CultureInfo.InvariantCulture);
         string commandName = ctx.Command.FullName;
         ulong errorChannelId = ctx.Channel.Id;
         bool errorChannelConfigured = true;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
@@ -214,7 +215,15 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(DeleteAzuraCastStationAsync), context.User.GlobalName);
 
-            AzuraCastStationEntity? acStation = await _db.GetAzuraCastStationAsync(context.Guild.Id, station);
+            AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id, false, false, true);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
+
+            AzuraCastStationEntity? acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station);
             if (acStation is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, station);
@@ -222,7 +231,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            FileOperations.DeleteFile(Path.Combine(_azuraCast.FilePath, $"{acStation.AzuraCastId}-{acStation.Id}-{acStation.StationId}-files.json"));
+            FileOperations.DeleteFile(Path.Combine(_azuraCast.FilePath, $"{acStation.AzuraCast.GuildId}-{acStation.AzuraCastId}-{acStation.Id}-{acStation.StationId}-files.json"));
             await _db.DeleteAzuraCastStationAsync(station);
 
             await context.EditResponseAsync("Your station was deleted successfully.");

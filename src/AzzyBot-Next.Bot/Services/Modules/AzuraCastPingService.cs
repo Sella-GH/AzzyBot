@@ -22,7 +22,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = discordBotService;
 
-    public async ValueTask QueueInstancePingAsync()
+    public async Task QueueInstancePingAsync()
     {
         IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(true);
         foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.Checks.ServerStatus == true).Select(g => g.AzuraCast!))
@@ -31,7 +31,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
         }
     }
 
-    public async ValueTask QueueInstancePingAsync(ulong guildId)
+    public async Task QueueInstancePingAsync(ulong guildId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId, nameof(guildId));
 
@@ -48,7 +48,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
             _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await PingInstanceAsync(guild.AzuraCast, ct)));
     }
 
-    private async ValueTask PingInstanceAsync(AzuraCastEntity azuraCast, CancellationToken cancellationToken)
+    private async Task PingInstanceAsync(AzuraCastEntity azuraCast, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
         cancellationToken.ThrowIfCancellationRequested();

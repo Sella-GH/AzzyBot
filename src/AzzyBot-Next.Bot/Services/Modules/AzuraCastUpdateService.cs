@@ -23,7 +23,7 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
 
-    public async ValueTask QueueAzuraCastUpdatesAsync()
+    public async Task QueueAzuraCastUpdatesAsync()
     {
         _logger.BackgroundServiceWorkItem(nameof(QueueAzuraCastUpdatesAsync));
 
@@ -34,7 +34,7 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
         }
     }
 
-    public async ValueTask QueueAzuraCastUpdatesAsync(ulong guildId)
+    public async Task QueueAzuraCastUpdatesAsync(ulong guildId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId, nameof(guildId));
 
@@ -51,7 +51,7 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
             _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForAzuraCastUpdatesAsync(guild.AzuraCast, ct)));
     }
 
-    private async ValueTask CheckForAzuraCastUpdatesAsync(AzuraCastEntity azuraCast, CancellationToken cancellationToken)
+    private async Task CheckForAzuraCastUpdatesAsync(AzuraCastEntity azuraCast, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
