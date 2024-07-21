@@ -1,5 +1,42 @@
 <Project>
+  <!-- Artifacts stuff -->
   <PropertyGroup>
 	  <UseArtifactsOutput>true</UseArtifactsOutput>
+  </PropertyGroup>
+
+  <!-- Build stuff -->
+  <PropertyGroup>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <DebugType>embedded</DebugType>
+    <Optimize Condition="'$(Configuration)'=='Debug' OR '$(Configuration)'=='Docker-debug'">False</Optimize>
+    <Optimize Condition="'$(Configuration)'=='Release' OR '$(Configuration)'=='Docker'">True</Optimize>
+  </PropertyGroup>
+
+  <!-- Development stuff -->
+  <PropertyGroup>
+    <AnalysisLevel>latest-all</AnalysisLevel>
+    <Configurations>Debug;Release;Docker;Docker-debug</Configurations>
+    <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <IsPublishable>True</IsPublishable>
+    <NoWarn>$(NoWarn);CA1812;CA2007</NoWarn>
+    <Nullable>enable</Nullable>
+    <PathMap>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)=.</PathMap>
+    <Platforms>x64;ARM64;AnyCPU</Platforms>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <TargetFramework>net8.0</TargetFramework>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- File Properties -->
+  <PropertyGroup>
+    <Authors>Sella-GH, AzzyBot Contributors</Authors>
+    <Copyright>© 2024 - $(Authors)</Copyright>
+    <Description>Kind of music bot for discord, written in C# and with DSharpPlus. This bot is dedicated for the use with AzuraCast and does not work at it's fully glory without it.</Description>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <RepositoryType>Git</RepositoryType>
+    <RepositoryUrl>https://github.com/Sella-GH/AzzyBot</RepositoryUrl>
+    <Version>2.0.0-preview3.1</Version>
   </PropertyGroup>
 </Project>
