@@ -53,7 +53,7 @@ dotnet_style_qualification_for_event = false:suggestion
 
 # Types: use keywords instead of BCL types, and permit var only when the type is clear
 csharp_style_var_for_built_in_types = false:suggestion
-csharp_style_var_when_type_is_apparent = false:none
+csharp_style_var_when_type_is_apparent = false:suggestion
 csharp_style_var_elsewhere = false:suggestion
 dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
 dotnet_style_predefined_type_for_member_access = true:suggestion
@@ -88,10 +88,10 @@ dotnet_naming_style.camel_case_underscore_style.capitalization = camel_case
 csharp_using_directive_placement = outside_namespace:suggestion
 dotnet_sort_system_directives_first = true
 csharp_prefer_braces = when_multiline:suggestion
-csharp_preserve_single_line_blocks = true:none
-csharp_preserve_single_line_statements = false:none
+csharp_preserve_single_line_blocks = true:suggestion
+csharp_preserve_single_line_statements = false:suggestion
 csharp_prefer_static_local_function = true:suggestion
-csharp_prefer_simple_using_statement = false:none
+csharp_prefer_simple_using_statement = false:suggestion
 csharp_style_prefer_switch_expression = true:suggestion
 dotnet_style_readonly_field = true:suggestion
 
@@ -130,9 +130,9 @@ csharp_style_throw_expression = true:suggestion
 csharp_style_conditional_delegate_call = true:suggestion
 
 # Other features
-csharp_style_prefer_index_operator = false:none
-csharp_style_prefer_range_operator = false:none
-csharp_style_pattern_local_over_anonymous_function = false:none
+csharp_style_prefer_index_operator = false:suggestion
+csharp_style_prefer_range_operator = false:suggestion
+csharp_style_pattern_local_over_anonymous_function = false:suggestion
 
 # Space preferences
 csharp_space_after_cast = false
@@ -167,6 +167,7 @@ dotnet_style_parentheses_in_other_operators = always_for_clarity
 # Analyzers
 dotnet_diagnostic.CA1812.severity = none
 dotnet_diagnostic.CA2007.severity = none
+dotnet_diagnostic.IDE0047.severity = none
 #dotnet_remove_unnecessary_suppression_exclusions = IDE0060,IDE1006
 
 # Roslynator

@@ -162,10 +162,9 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
         string body = await _webService.GetWebAsync(uri, headers, true, noLogging);
-        if (string.IsNullOrWhiteSpace(body))
-            throw new InvalidOperationException($"API response is empty, url: {uri}");
-
-        return JsonSerializer.Deserialize<T>(body) ?? throw new InvalidOperationException($"Could not deserialize body: {body}");
+        return (string.IsNullOrWhiteSpace(body))
+            ? throw new InvalidOperationException($"API response is empty, url: {uri}")
+            : JsonSerializer.Deserialize<T>(body) ?? throw new InvalidOperationException($"Could not deserialize body: {body}");
     }
 
     private async Task<IReadOnlyList<T>> GetFromApiListAsync<T>(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
@@ -315,10 +314,9 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
             return records;
 
         string content = await FileOperations.GetFileContentAsync(file);
-        if (string.IsNullOrWhiteSpace(content))
-            return records;
-
-        return JsonSerializer.Deserialize<List<AzuraFilesRecord>>(content) ?? throw new InvalidOperationException($"Could not deserialize content: {content}");
+        return (string.IsNullOrWhiteSpace(content))
+            ? records
+            : (IReadOnlyList<AzuraFilesRecord>)(JsonSerializer.Deserialize<List<AzuraFilesRecord>>(content) ?? throw new InvalidOperationException($"Could not deserialize content: {content}"));
     }
 
     public Task<IReadOnlyList<AzuraFilesRecord>> GetFilesOnlineAsync(Uri baseUrl, string apiKey, int stationId)

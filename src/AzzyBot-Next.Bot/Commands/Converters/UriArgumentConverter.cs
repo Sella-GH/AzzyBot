@@ -20,9 +20,8 @@ public sealed class UriArgumentConverter : ISlashArgumentConverter<Uri>
         if (!value.Contains("https://", StringComparison.OrdinalIgnoreCase) && !value.Contains("http://", StringComparison.OrdinalIgnoreCase))
             value = $"http://{value}";
 
-        if (Uri.TryCreate(value, UriKind.RelativeOrAbsolute, out Uri? uri) && uri is not null)
-            return Task.FromResult(Optional.FromValue(uri));
-
-        return Task.FromResult(Optional.FromNoValue<Uri>());
+        return (Uri.TryCreate(value, UriKind.RelativeOrAbsolute, out Uri? uri) && uri is not null)
+            ? Task.FromResult(Optional.FromValue(uri))
+            : Task.FromResult(Optional.FromNoValue<Uri>());
     }
 }
