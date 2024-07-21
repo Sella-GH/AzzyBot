@@ -652,6 +652,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         if (loadGuildPrefs)
         {
             await context.Guilds
+                .AsNoTracking()
                 .Include(g => g.Preferences)
                 .LoadAsync();
         }
