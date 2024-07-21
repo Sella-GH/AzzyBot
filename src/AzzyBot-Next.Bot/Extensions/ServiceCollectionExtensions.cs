@@ -12,6 +12,7 @@ using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data;
 using EntityFramework.Exceptions.PostgreSQL;
+using Lavalink4NET.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +21,7 @@ namespace AzzyBot.Bot.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static void AzzyBotServices(this IServiceCollection services)
+    public static void AzzyBotServices(this IServiceCollection services, bool isDocker)
     {
         IServiceProvider serviceProvider = services.BuildServiceProvider();
         AzzyBotSettingsRecord settings = serviceProvider.GetRequiredService<AzzyBotSettingsRecord>();
@@ -55,6 +56,15 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<TimerServiceHost>();
         services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());
+
+        services.AddLavalink();
+        services.ConfigureLavalink(config =>
+        {
+            config.BaseAddress = (isDocker) ? new("http://AzzyBot-Ms:2333") : new("http://localhost:2333");
+            config.Label = "AzzyBot";
+            config.ReadyTimeout = TimeSpan.FromSeconds(15);
+            config.ResumptionOptions = new(TimeSpan.Zero);
+        });
     }
 
     public static void AzzyBotSettings(this IServiceCollection services, bool isDev = false, bool isDocker = false)

@@ -8,6 +8,7 @@
     <PackageVersion Include="DSharpPlus.Commands" Version="5.0.0-nightly-02271" />
     <PackageVersion Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02271" />
     <PackageVersion Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="8.1.2" />
+    <PackageVersion Include="Lavalink4NET.DSharpPlus" Version="4.0.19-beta.6" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
