@@ -473,7 +473,7 @@ public sealed class DiscordBotService
             string name = pair.Key.Name;
             string value = pair.Value?.ToString() ?? "undefined";
 
-            if (!string.IsNullOrWhiteSpace(name) && value is not "0" or "undefined")
+            if (!string.IsNullOrWhiteSpace(name) && value is not "0" && value is not "undefined")
                 commandParameters.Add(name, value);
         }
     }
