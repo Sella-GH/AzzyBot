@@ -45,11 +45,11 @@ public static partial class LoggerActions
     [LoggerMessage(23, LogLevel.Debug, "Creating work items for: {item}")]
     public static partial void BackgroundServiceWorkItem(this ILogger logger, string item);
 
-    [LoggerMessage(30, LogLevel.Debug, "Station {iId}-{dId}-{sId} has different files")]
-    public static partial void BackgroundServiceStationFilesChanged(this ILogger logger, int iId, int dId, int sId);
+    [LoggerMessage(30, LogLevel.Debug, "Station {gId}-{iId}-{dId}-{sId} has different files")]
+    public static partial void BackgroundServiceStationFilesChanged(this ILogger logger, int gId, int iId, int dId, int sId);
 
-    [LoggerMessage(31, LogLevel.Debug, "Instance {id} is {status}")]
-    public static partial void BackgroundServiceInstanceStatus(this ILogger logger, int id, string status);
+    [LoggerMessage(31, LogLevel.Debug, "Instance {gId}-{iId} is {status}")]
+    public static partial void BackgroundServiceInstanceStatus(this ILogger logger, int gId, int iId, string status);
 
     [LoggerMessage(40, LogLevel.Debug, "AzuraCastDiscordPermission is {perm}")]
     public static partial void AzuraCastDiscordPermission(this ILogger logger, string perm);
@@ -111,20 +111,29 @@ public static partial class LoggerActions
     [LoggerMessage(210, LogLevel.Warning, "Could not find Guild item for guild {guild}")]
     public static partial void DatabaseGuildNotFound(this ILogger logger, ulong guild);
 
-    [LoggerMessage(211, LogLevel.Warning, "Could not find AzuraCast item for guild {guild}")]
+    [LoggerMessage(211, LogLevel.Warning, "Could not find Guild preferences for guild {guild}")]
+    public static partial void DatabaseGuildPreferencesNotFound(this ILogger logger, ulong guild);
+
+    [LoggerMessage(212, LogLevel.Warning, "Could not find AzuraCast item for guild {guild}")]
     public static partial void DatabaseAzuraCastNotFound(this ILogger logger, ulong guild);
 
-    [LoggerMessage(212, LogLevel.Warning, "Could not find AzuraCast checks for guild {guild} in instance {instance}")]
+    [LoggerMessage(213, LogLevel.Warning, "Could not find AzuraCast checks for guild {guild} in instance {instance}")]
     public static partial void DatabaseAzuraCastChecksNotFound(this ILogger logger, ulong guild, int instance);
 
-    [LoggerMessage(213, LogLevel.Warning, "Could not find AzuraCast station {station} for guild {guild} in instance {instance}")]
+    [LoggerMessage(214, LogLevel.Warning, "Could not find AzuraCast preferences for guild {guildId} in instance {instance}")]
+    public static partial void DatabaseAzuraCastPreferencesNotFound(this ILogger logger, ulong guildId, int instance);
+
+    [LoggerMessage(215, LogLevel.Warning, "Could not find AzuraCast station {station} for guild {guild} in instance {instance}")]
     public static partial void DatabaseAzuraCastStationNotFound(this ILogger logger, ulong guild, int instance, int station);
 
-    [LoggerMessage(214, LogLevel.Warning, "Could not find AzuraCast station checks for guild {guild} in instance {instance} at station {station}")]
+    [LoggerMessage(216, LogLevel.Warning, "Could not find AzuraCast station checks for guild {guild} in instance {instance} at station {station}")]
     public static partial void DatabaseAzuraCastStationChecksNotFound(this ILogger logger, ulong guild, int instance, int station);
 
-    [LoggerMessage(215, LogLevel.Warning, "Could not find AzuraCast station mount for guild {guild} in instance {instance} at station {station}")]
+    [LoggerMessage(217, LogLevel.Warning, "Could not find AzuraCast station mount for guild {guild} in instance {instance} at station {station}")]
     public static partial void DatabaseAzuraCastStationMountNotFound(this ILogger logger, ulong guild, int instance, int station);
+
+    [LoggerMessage(218, LogLevel.Warning, "Could not find AzuraCast station preferences for guild {guild} in instance {instance} at station {station}")]
+    public static partial void DatabaseAzuraCastStationPreferencesNotFound(this ILogger logger, ulong guild, int instance, int station);
 
     [LoggerMessage(220, LogLevel.Warning, "Could not find discord item {item} for guild {guild}")]
     public static partial void DiscordItemNotFound(this ILogger logger, string item, ulong guild);

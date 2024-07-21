@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands;
@@ -11,7 +10,6 @@ using AzzyBot.Bot.Utilities;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Data;
-using AzzyBot.Data.Entities;
 using DSharpPlus;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.EventArgs;
@@ -153,15 +151,9 @@ public sealed class DiscordBotServiceHost : IHostedService
 
         // Only add debug commands if it's a dev build
         if (AzzyStatsSoftware.GetBotEnvironment == Environments.Development)
-        {
-            IReadOnlyList<GuildsEntity> guilds = await _dbActions.GetGuildsWithDebugAsync();
-            List<ulong> debugGuilds = guilds.Select(g => g.UniqueId).ToList();
-            if (!debugGuilds.Contains(_settings.ServerId))
-                debugGuilds.Add(_settings.ServerId);
+            commandsExtension.AddCommands(typeof(DebugCommands.DebugGroup), _settings.ServerId);
 
-            commandsExtension.AddCommands(typeof(DebugCommands.DebugGroup), [.. debugGuilds]);
-        }
-
+        commandsExtension.AddCheck<AzuraCastDiscordChannelCheck>();
         commandsExtension.AddCheck<AzuraCastDiscordPermCheck>();
         commandsExtension.AddCheck<AzuraCastOnlineCheck>();
         commandsExtension.AddCheck<ModuleActivatedCheck>();

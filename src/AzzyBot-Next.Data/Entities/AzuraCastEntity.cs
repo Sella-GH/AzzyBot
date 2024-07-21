@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using DSharpPlus.Entities;
 
 namespace AzzyBot.Data.Entities;
 
@@ -23,21 +22,6 @@ public sealed class AzuraCastEntity
     public string AdminApiKey { get; set; } = string.Empty;
 
     /// <summary>
-    /// The <see cref="DiscordRole"/> id of the administrative <see cref="DiscordRole"/> of the AzuraCast instance.
-    /// </summary>
-    public ulong InstanceAdminRoleId { get; set; }
-
-    /// <summary>
-    /// The <see cref="DiscordChannel"/> id of the <see cref="DiscordChannel"/> to which notifications should be posted.
-    /// </summary>
-    public ulong NotificationChannelId { get; set; }
-
-    /// <summary>
-    /// The <see cref="DiscordChannel"/> id of the <see cref="DiscordChannel"/> to which instance outages should be posted.
-    /// </summary>
-    public ulong OutagesChannelId { get; set; }
-
-    /// <summary>
     /// The state if the station is online or offline.
     /// </summary>
     public bool IsOnline { get; set; }
@@ -48,17 +32,22 @@ public sealed class AzuraCastEntity
     public AzuraCastChecksEntity Checks { get; set; } = new();
 
     /// <summary>
+    /// The user-defined preferences of the <see cref="AzuraCastEntity"/> object.
+    /// </summary>
+    public AzuraCastPreferencesEntity Preferences { get; set; } = new();
+
+    /// <summary>
     /// A <see cref="ICollection<>"/> of the associated <see cref="AzuraCastStationEntity"/> database items.
     /// </summary>
     public ICollection<AzuraCastStationEntity> Stations { get; } = [];
 
     /// <summary>
-    /// The database id of the parenting <see cref="GuildsEntity"/> database item.
+    /// The database id of the parenting <see cref="GuildEntity"/> database item.
     /// </summary>
     public int GuildId { get; set; }
 
     /// <summary>
-    /// The parenting <see cref="GuildsEntity"/> database item.
+    /// The parenting <see cref="GuildEntity"/> database item.
     /// </summary>
-    public GuildsEntity Guild { get; set; } = null!;
+    public GuildEntity Guild { get; set; } = null!;
 }

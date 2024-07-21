@@ -9,8 +9,10 @@ using System.Net.Mime;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using Microsoft.Extensions.Logging;
@@ -252,6 +254,38 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         catch (HttpRequestException ex)
         {
             _logger.WebRequestFailed(HttpMethod.Put, ex.Message, url);
+            throw;
+        }
+    }
+
+    public async Task<string> UploadAsync(Uri url, string file, string fileName, string filePath, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    {
+        AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
+        AddHeaders(addressFamily, headers, acceptJson, noCache);
+        HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
+
+        try
+        {
+            byte[] fileBytes = await FileOperations.GetBase64BytesFromFileAsync(file);
+            string base64String = Convert.ToBase64String(fileBytes);
+
+            using HttpContent jsonPayload = new StringContent(JsonSerializer.Serialize<AzuraFileUploadRecord>(new($"{filePath}/{fileName}", base64String)), Encoding.UTF8, MediaType);
+            using HttpResponseMessage response = await client.PostAsync(url, jsonPayload);
+            if (response.IsSuccessStatusCode)
+                return await response.Content.ReadAsStringAsync();
+
+            _logger.WebRequestFailed(HttpMethod.Post, response.ReasonPhrase ?? string.Empty, url);
+
+            return string.Empty;
+        }
+        catch (InvalidOperationException)
+        {
+            _logger.WebInvalidUri(url);
+            throw;
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.WebRequestFailed(HttpMethod.Post, ex.Message, url);
             throw;
         }
     }

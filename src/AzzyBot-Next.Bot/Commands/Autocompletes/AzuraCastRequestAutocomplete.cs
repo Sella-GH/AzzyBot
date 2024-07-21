@@ -32,13 +32,20 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
         if (stationId == 0)
             return results;
 
+        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, false, false, true);
+        if (azuraCast is null)
+        {
+            _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+            return results;
+        }
+
         AzuraCastStationEntity? station;
         try
         {
-            station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId);
+            station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId);
             if (station is null)
             {
-                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, stationId);
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, stationId);
                 return results;
             }
         }
@@ -48,8 +55,8 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
         }
 
         string search = context.UserInput;
-        string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(station.AzuraCast.AdminApiKey);
-        string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
+        string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
+        string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
         StringBuilder songResult = new();
 
         void AddResultsFromSong<T>(IReadOnlyList<T> songs)
@@ -113,7 +120,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
         }
         else
         {
-            IReadOnlyList<AzuraFilesRecord> files = await _azuraCast.GetFilesLocalAsync(station.AzuraCastId, station.Id, station.StationId);
+            IReadOnlyList<AzuraFilesRecord> files = await _azuraCast.GetFilesLocalAsync(azuraCast.GuildId, azuraCast.Id, station.Id, station.StationId);
             AddResultsFromSong(files);
         }
 

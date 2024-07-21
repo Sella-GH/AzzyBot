@@ -264,6 +264,37 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, body.ToString(), DiscordColor.White);
     }
 
+    public static DiscordEmbed BuildAzuraCastUploadFileEmbed(AzuraFilesDetailedRecord file, int fileSize, string stationName)
+    {
+        ArgumentNullException.ThrowIfNull(file, nameof(file));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(fileSize, nameof(fileSize));
+
+        const string title = "File Uploaded";
+        const string description = "Your song was uploaded successfully.";
+
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
+        {
+            ["Station"] = new(stationName),
+            ["Title"] = new(file.Title),
+            ["Artist"] = new(file.Artist)
+        };
+
+        if (!string.IsNullOrWhiteSpace(file.Album))
+            fields.Add("Album", new(file.Album));
+
+        fields.Add("Duration", new(file.Length));
+
+        if (!string.IsNullOrWhiteSpace(file.Genre))
+            fields.Add("Genre", new(file.Genre));
+
+        if (!string.IsNullOrWhiteSpace(file.Isrc))
+            fields.Add("ISRC", new(file.Isrc));
+
+        fields.Add("File Size", new($"{Math.Round(fileSize / (1024.0 * 1024.0), 2)} MB"));
+
+        return CreateBasicEmbed(title, description, DiscordColor.SpringGreen, new(file.Art), null, null, fields);
+    }
+
     public static async Task<DiscordEmbed> BuildAzzyHardwareStatsEmbedAsync(Uri avaUrl)
     {
         const string title = "AzzyBot Hardware Stats";
@@ -468,7 +499,7 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.White);
     }
 
-    public static DiscordEmbed BuildGetSettingsGuildEmbed(string serverName, GuildsEntity guild, string adminRole)
+    public static DiscordEmbed BuildGetSettingsGuildEmbed(string serverName, GuildEntity guild, string adminRole)
     {
         ArgumentNullException.ThrowIfNull(guild, nameof(guild));
         ArgumentException.ThrowIfNullOrWhiteSpace(serverName, nameof(serverName));
@@ -480,8 +511,8 @@ public static class EmbedBuilder
         {
             ["Server ID"] = new(guild.UniqueId.ToString(CultureInfo.InvariantCulture)),
             ["Admin Role"] = new((!string.IsNullOrWhiteSpace(adminRole?.Trim()) && adminRole.Trim() is not "()") ? adminRole.Trim() : "Not set"),
-            ["Admin Notify Channel"] = new((guild.AdminNotifyChannelId > 0) ? $"<#{guild.AdminNotifyChannelId}>" : "Not set"),
-            ["Error Channel"] = new((guild.ErrorChannelId > 0) ? $"<#{guild.ErrorChannelId}>" : "Not set"),
+            ["Admin Notify Channel"] = new((guild.Preferences.AdminNotifyChannelId > 0) ? $"<#{guild.Preferences.AdminNotifyChannelId}>" : "Not set"),
+            ["Error Channel"] = new((guild.Preferences.ErrorChannelId > 0) ? $"<#{guild.Preferences.ErrorChannelId}>" : "Not set"),
             ["Configuration Complete"] = new(Misc.ReadableBool(guild.ConfigSet, ReadbleBool.YesNo))
         };
 
@@ -499,8 +530,8 @@ public static class EmbedBuilder
             ["Base Url"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.BaseUrl)) ? Crypto.Decrypt(azuraCast.BaseUrl) : "Not set")}||"),
             ["Admin Api Key"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.AdminApiKey)) ? Crypto.Decrypt(azuraCast.AdminApiKey) : "Not set")}||"),
             ["Instance Admin Role"] = new((!string.IsNullOrWhiteSpace(instanceRole?.Trim()) && instanceRole.Trim() is not "()") ? instanceRole.Trim() : "Not set"),
-            ["Notification Channel"] = new((azuraCast.NotificationChannelId > 0) ? $"<#{azuraCast.NotificationChannelId}>" : "Not set"),
-            ["Outages Channel"] = new((azuraCast.OutagesChannelId > 0) ? $"<#{azuraCast.OutagesChannelId}>" : "Not set"),
+            ["Notification Channel"] = new((azuraCast.Preferences.NotificationChannelId > 0) ? $"<#{azuraCast.Preferences.NotificationChannelId}>" : "Not set"),
+            ["Outages Channel"] = new((azuraCast.Preferences.OutagesChannelId > 0) ? $"<#{azuraCast.Preferences.OutagesChannelId}>" : "Not set"),
             ["Automatic Checks"] = new($"- Server Status: {Misc.ReadableBool(azuraCast.Checks.ServerStatus, ReadbleBool.EnabledDisabled)}\n- Updates: {Misc.ReadableBool(azuraCast.Checks.Updates, ReadbleBool.EnabledDisabled)}\n- Updates Changelog: {Misc.ReadableBool(azuraCast.Checks.UpdatesShowChangelog, ReadbleBool.EnabledDisabled)}")
         };
 
@@ -513,10 +544,10 @@ public static class EmbedBuilder
             string stationId = station.StationId.ToString(CultureInfo.InvariantCulture);
             string stationApiKey = $"||{((!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : "Not set")}||";
             string stationAdminRole;
-            if (station.StationAdminRoleId > 0)
+            if (station.Preferences.StationAdminRoleId > 0)
             {
-                string role = stationRoles.FirstOrDefault(x => x.Key == station.StationAdminRoleId).Value;
-                ulong roleId = stationRoles.FirstOrDefault(x => x.Key == station.StationAdminRoleId).Key;
+                string role = stationRoles.FirstOrDefault(x => x.Key == station.Preferences.StationAdminRoleId).Value;
+                ulong roleId = stationRoles.FirstOrDefault(x => x.Key == station.Preferences.StationAdminRoleId).Key;
                 stationAdminRole = (role is not null) ? $"{role} ({roleId})" : "Not set";
             }
             else
@@ -525,10 +556,10 @@ public static class EmbedBuilder
             }
 
             string stationDjRole;
-            if (station.StationDjRoleId > 0)
+            if (station.Preferences.StationDjRoleId > 0)
             {
-                string role = stationRoles.FirstOrDefault(x => x.Key == station.StationDjRoleId).Value;
-                ulong roleId = stationRoles.FirstOrDefault(x => x.Key == station.StationDjRoleId).Key;
+                string role = stationRoles.FirstOrDefault(x => x.Key == station.Preferences.StationDjRoleId).Value;
+                ulong roleId = stationRoles.FirstOrDefault(x => x.Key == station.Preferences.StationDjRoleId).Key;
                 stationDjRole = (role is not null) ? $"{role} ({roleId})" : "Not set";
             }
             else
@@ -536,9 +567,11 @@ public static class EmbedBuilder
                 stationDjRole = "Not set";
             }
 
-            string requestsChannel = (station.RequestsChannelId > 0) ? $"<#{station.RequestsChannelId}>" : "Not set";
-            string preferHls = Misc.ReadableBool(station.PreferHls, ReadbleBool.EnabledDisabled);
-            string showPlaylist = Misc.ReadableBool(station.ShowPlaylistInNowPlaying, ReadbleBool.EnabledDisabled);
+            string fileUploadChannel = (station.Preferences.FileUploadChannelId > 0) ? $"<#{station.Preferences.FileUploadChannelId}>" : "Not set";
+            string requestsChannel = (station.Preferences.RequestsChannelId > 0) ? $"<#{station.Preferences.RequestsChannelId}>" : "Not set";
+            string fileUploadPath = (!string.IsNullOrWhiteSpace(station.Preferences.FileUploadPath)) ? station.Preferences.FileUploadPath : "Not set";
+            string preferHls = Misc.ReadableBool(station.Preferences.PreferHls, ReadbleBool.EnabledDisabled);
+            string showPlaylist = Misc.ReadableBool(station.Preferences.ShowPlaylistInNowPlaying, ReadbleBool.EnabledDisabled);
             string fileChanges = Misc.ReadableBool(station.Checks.FileChanges, ReadbleBool.EnabledDisabled);
             string mounts = (station.Mounts.Count > 0) ? string.Join('\n', station.Mounts.Select(x => $"- {Crypto.Decrypt(x.Name)}: {Crypto.Decrypt(x.Mount)}")) : "No Mount Points added";
 
@@ -549,7 +582,9 @@ public static class EmbedBuilder
                 ["Station Api Key"] = new(stationApiKey),
                 ["Station Admin Role"] = new(stationAdminRole),
                 ["Station DJ Role"] = new(stationDjRole),
+                ["File Upload Channel"] = new(fileUploadChannel),
                 ["Music Requests Channel"] = new(requestsChannel),
+                ["File Upload Path"] = new(fileUploadPath),
                 ["Prefer HLS Streaming"] = new(preferHls),
                 ["Show Playlist In Now Playing"] = new(showPlaylist),
                 ["Automatic Checks"] = new($"- File Changes: {fileChanges}"),

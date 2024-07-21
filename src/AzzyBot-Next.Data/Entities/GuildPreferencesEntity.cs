@@ -2,17 +2,12 @@
 
 namespace AzzyBot.Data.Entities;
 
-public sealed class GuildsEntity
+public sealed class GuildPreferencesEntity
 {
     /// <summary>
     /// The database id.
     /// </summary>
     public int Id { get; set; }
-
-    /// <summary>
-    /// The <see cref="DiscordGuild"/> id.
-    /// </summary>
-    public ulong UniqueId { get; set; }
 
     /// <summary>
     /// The <see cref="DiscordRole"/> id of the administrative <see cref="DiscordRole"/> of the <see cref="DiscordGuild"/>.
@@ -30,20 +25,12 @@ public sealed class GuildsEntity
     public ulong ErrorChannelId { get; set; }
 
     /// <summary>
-    /// The state if this <see cref="DiscordGuild"/> has debug commands enabled.
+    /// The database id of the parenting <see cref="GuildEntity"/> database item.
     /// </summary>
-    public bool IsDebugAllowed { get; set; }
+    public int GuildId { get; set; }
 
     /// <summary>
-    /// The state if the core config was set.
+    /// The parenting <see cref="GuildEntity"/> database item.
     /// </summary>
-    public bool ConfigSet { get; set; }
-
-    /// <summary>
-    /// The possible <see cref="AzuraCastEntity"/> database item.
-    /// </summary>
-    /// <remarks>
-    /// This can be null if this <see cref="DiscordGuild"/> does not utilitize AzuraCast.
-    /// </remarks>
-    public AzuraCastEntity? AzuraCast { get; set; }
+    public GuildEntity Guild { get; set; } = null!;
 }

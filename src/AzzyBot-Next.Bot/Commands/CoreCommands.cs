@@ -9,8 +9,6 @@ using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Core.Logging;
-using AzzyBot.Data;
-using AzzyBot.Data.Entities;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
@@ -23,10 +21,9 @@ namespace AzzyBot.Bot.Commands;
 public sealed class CoreCommands
 {
     [Command("core"), RequireGuild]
-    public sealed class CoreGroup(AzzyBotSettingsRecord settings, DbActions dbActions, ILogger<CoreGroup> logger)
+    public sealed class CoreGroup(AzzyBotSettingsRecord settings, ILogger<CoreGroup> logger)
     {
         private readonly AzzyBotSettingsRecord _settings = settings;
-        private readonly DbActions _dbActions = dbActions;
         private readonly ILogger<CoreGroup> _logger = logger;
 
         [Command("help"), Description("Gives you an overview about all the available commands.")]
@@ -48,14 +45,6 @@ public sealed class CoreCommands
             IEnumerable<DiscordUser> botOwners = context.Client.CurrentApplication.Owners;
             ulong guildId = context.Guild.Id;
             DiscordMember member = context.Member;
-            GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId);
-            if (guild is null)
-            {
-                _logger.DatabaseGuildNotFound(guildId);
-                await context.EditResponseAsync("Server not found in database.");
-                return;
-            }
-
             bool adminServer = false;
             foreach (DiscordUser _ in botOwners.Where(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId))
             {
@@ -63,7 +52,7 @@ public sealed class CoreCommands
                 break;
             }
 
-            bool approvedDebug = guild.IsDebugAllowed || guildId == _settings.ServerId;
+            bool approvedDebug = guildId == _settings.ServerId;
             List<DiscordEmbed> embeds = [];
             if (string.IsNullOrWhiteSpace(command))
             {

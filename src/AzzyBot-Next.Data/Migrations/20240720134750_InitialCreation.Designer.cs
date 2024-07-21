@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AzzyBot.Data.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20240715112456_InitialCreation")]
+    [Migration("20240720134750_InitialCreation")]
     partial class InitialCreation
     {
         /// <inheritdoc />
@@ -78,11 +78,30 @@ namespace AzzyBot.Data.Migrations
                     b.Property<int>("GuildId")
                         .HasColumnType("integer");
 
-                    b.Property<decimal>("InstanceAdminRoleId")
-                        .HasColumnType("numeric(20,0)");
-
                     b.Property<bool>("IsOnline")
                         .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId")
+                        .IsUnique();
+
+                    b.ToTable("AzuraCast");
+                });
+
+            modelBuilder.Entity("AzzyBot.Data.Entities.AzuraCastPreferencesEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AzuraCastId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("InstanceAdminRoleId")
+                        .HasColumnType("numeric(20,0)");
 
                     b.Property<decimal>("NotificationChannelId")
                         .HasColumnType("numeric(20,0)");
@@ -92,10 +111,10 @@ namespace AzzyBot.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("GuildId")
+                    b.HasIndex("AzuraCastId")
                         .IsUnique();
 
-                    b.ToTable("AzuraCast");
+                    b.ToTable("AzuraCastPreferences");
                 });
 
             modelBuilder.Entity("AzzyBot.Data.Entities.AzuraCastStationChecksEntity", b =>
@@ -142,21 +161,6 @@ namespace AzzyBot.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool>("PreferHls")
-                        .HasColumnType("boolean");
-
-                    b.Property<decimal>("RequestsChannelId")
-                        .HasColumnType("numeric(20,0)");
-
-                    b.Property<bool>("ShowPlaylistInNowPlaying")
-                        .HasColumnType("boolean");
-
-                    b.Property<decimal>("StationAdminRoleId")
-                        .HasColumnType("numeric(20,0)");
-
-                    b.Property<decimal>("StationDjRoleId")
-                        .HasColumnType("numeric(20,0)");
-
                     b.Property<int>("StationId")
                         .HasColumnType("integer");
 
@@ -193,7 +197,67 @@ namespace AzzyBot.Data.Migrations
                     b.ToTable("AzuraCastStationMounts");
                 });
 
-            modelBuilder.Entity("AzzyBot.Data.Entities.GuildsEntity", b =>
+            modelBuilder.Entity("AzzyBot.Data.Entities.AzuraCastStationPreferencesEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("FileUploadChannelId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<string>("FileUploadPath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("PreferHls")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("RequestsChannelId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<bool>("ShowPlaylistInNowPlaying")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("StationAdminRoleId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<decimal>("StationDjRoleId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<int>("StationId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StationId")
+                        .IsUnique();
+
+                    b.ToTable("AzuraCastStationPreferences");
+                });
+
+            modelBuilder.Entity("AzzyBot.Data.Entities.GuildEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("ConfigSet")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("UniqueId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Guilds");
+                });
+
+            modelBuilder.Entity("AzzyBot.Data.Entities.GuildPreferencesEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -207,21 +271,18 @@ namespace AzzyBot.Data.Migrations
                     b.Property<decimal>("AdminRoleId")
                         .HasColumnType("numeric(20,0)");
 
-                    b.Property<bool>("ConfigSet")
-                        .HasColumnType("boolean");
-
                     b.Property<decimal>("ErrorChannelId")
                         .HasColumnType("numeric(20,0)");
 
-                    b.Property<bool>("IsDebugAllowed")
-                        .HasColumnType("boolean");
-
-                    b.Property<decimal>("UniqueId")
-                        .HasColumnType("numeric(20,0)");
+                    b.Property<int>("GuildId")
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Guilds");
+                    b.HasIndex("GuildId")
+                        .IsUnique();
+
+                    b.ToTable("GuildPreferences");
                 });
 
             modelBuilder.Entity("AzzyBot.Data.Entities.AzuraCastChecksEntity", b =>
@@ -237,13 +298,24 @@ namespace AzzyBot.Data.Migrations
 
             modelBuilder.Entity("AzzyBot.Data.Entities.AzuraCastEntity", b =>
                 {
-                    b.HasOne("AzzyBot.Data.Entities.GuildsEntity", "Guild")
+                    b.HasOne("AzzyBot.Data.Entities.GuildEntity", "Guild")
                         .WithOne("AzuraCast")
                         .HasForeignKey("AzzyBot.Data.Entities.AzuraCastEntity", "GuildId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Guild");
+                });
+
+            modelBuilder.Entity("AzzyBot.Data.Entities.AzuraCastPreferencesEntity", b =>
+                {
+                    b.HasOne("AzzyBot.Data.Entities.AzuraCastEntity", "AzuraCast")
+                        .WithOne("Preferences")
+                        .HasForeignKey("AzzyBot.Data.Entities.AzuraCastPreferencesEntity", "AzuraCastId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AzuraCast");
                 });
 
             modelBuilder.Entity("AzzyBot.Data.Entities.AzuraCastStationChecksEntity", b =>
@@ -279,9 +351,34 @@ namespace AzzyBot.Data.Migrations
                     b.Navigation("Station");
                 });
 
+            modelBuilder.Entity("AzzyBot.Data.Entities.AzuraCastStationPreferencesEntity", b =>
+                {
+                    b.HasOne("AzzyBot.Data.Entities.AzuraCastStationEntity", "Station")
+                        .WithOne("Preferences")
+                        .HasForeignKey("AzzyBot.Data.Entities.AzuraCastStationPreferencesEntity", "StationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Station");
+                });
+
+            modelBuilder.Entity("AzzyBot.Data.Entities.GuildPreferencesEntity", b =>
+                {
+                    b.HasOne("AzzyBot.Data.Entities.GuildEntity", "Guild")
+                        .WithOne("Preferences")
+                        .HasForeignKey("AzzyBot.Data.Entities.GuildPreferencesEntity", "GuildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Guild");
+                });
+
             modelBuilder.Entity("AzzyBot.Data.Entities.AzuraCastEntity", b =>
                 {
                     b.Navigation("Checks")
+                        .IsRequired();
+
+                    b.Navigation("Preferences")
                         .IsRequired();
 
                     b.Navigation("Stations");
@@ -293,11 +390,17 @@ namespace AzzyBot.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Mounts");
+
+                    b.Navigation("Preferences")
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("AzzyBot.Data.Entities.GuildsEntity", b =>
+            modelBuilder.Entity("AzzyBot.Data.Entities.GuildEntity", b =>
                 {
                     b.Navigation("AzuraCast");
+
+                    b.Navigation("Preferences")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

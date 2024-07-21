@@ -95,6 +95,13 @@ public static class FileOperations
         }
     }
 
+    public static Task<byte[]> GetBase64BytesFromFileAsync(string path)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(path, nameof(path));
+
+        return File.ReadAllBytesAsync(path);
+    }
+
     public static Task<string> GetFileContentAsync(string path)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path, nameof(path));

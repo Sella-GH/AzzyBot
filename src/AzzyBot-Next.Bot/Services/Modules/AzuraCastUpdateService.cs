@@ -23,24 +23,24 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
 
-    public async ValueTask QueueAzuraCastUpdatesAsync()
+    public async Task QueueAzuraCastUpdatesAsync()
     {
         _logger.BackgroundServiceWorkItem(nameof(QueueAzuraCastUpdatesAsync));
 
-        IReadOnlyList<GuildsEntity> guilds = await _dbActions.GetGuildsAsync(true);
+        IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(true, true);
         foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.IsOnline == true && g.AzuraCast.Checks.Updates).Select(g => g.AzuraCast!))
         {
             _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForAzuraCastUpdatesAsync(azuraCast, ct)));
         }
     }
 
-    public async ValueTask QueueAzuraCastUpdatesAsync(ulong guildId)
+    public async Task QueueAzuraCastUpdatesAsync(ulong guildId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId, nameof(guildId));
 
         _logger.BackgroundServiceWorkItem(nameof(QueueAzuraCastUpdatesAsync));
 
-        GuildsEntity? guild = await _dbActions.GetGuildAsync(guildId, true);
+        GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, true, true);
         if (guild is null || guild.AzuraCast is null)
         {
             _logger.DatabaseGuildNotFound(guildId);
@@ -51,7 +51,7 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
             _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForAzuraCastUpdatesAsync(guild.AzuraCast, ct)));
     }
 
-    private async ValueTask CheckForAzuraCastUpdatesAsync(AzuraCastEntity azuraCast, CancellationToken cancellationToken)
+    private async Task CheckForAzuraCastUpdatesAsync(AzuraCastEntity azuraCast, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -77,7 +77,7 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
             if (azuraCast.Checks.UpdatesShowChangelog)
                 embeds.Add(EmbedBuilder.BuildAzuraCastUpdatesChangelogEmbed(update.RollingUpdatesList, update.NeedsRollingUpdate));
 
-            await _botService.SendMessageAsync(azuraCast.NotificationChannelId, null, embeds);
+            await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, null, embeds);
         }
         catch (OperationCanceledException)
         {
