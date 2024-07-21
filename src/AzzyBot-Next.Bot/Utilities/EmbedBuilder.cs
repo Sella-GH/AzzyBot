@@ -482,12 +482,17 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildAzzyUpdatesInstructionsEmbed()
     {
+        bool isDocker = AzzyStatsHardware.CheckIfDocker;
         bool isLinux = AzzyStatsHardware.CheckIfLinuxOs;
         bool isWindows = AzzyStatsHardware.CheckIfWindowsOs;
         const string title = "Update Instructions";
         string description = "Please follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wiki/Docker-Update-Instructions).";
 
-        if (isLinux)
+        if (isDocker)
+        {
+            return CreateBasicEmbed(title, description, DiscordColor.White);
+        }
+        else if (isLinux)
         {
             description = description.Replace("Docker", "Linux", StringComparison.OrdinalIgnoreCase);
         }
