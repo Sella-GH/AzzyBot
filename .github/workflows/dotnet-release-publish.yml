@@ -61,6 +61,7 @@ jobs:
         with:
           exclude_dir: "AzzyBot"
           include_lang: "C#,MSBuild script"
+          skip_check_run: true
           
       - name: Get Date and Time
         id: dateTime
