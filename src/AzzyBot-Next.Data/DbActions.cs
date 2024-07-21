@@ -644,18 +644,16 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        List<GuildEntity> guilds = await context.Guilds
-            .AsNoTracking()
-            .OrderBy(g => g.Id)
-            .ToListAsync();
-
-        if (loadGuildPrefs)
-        {
-            await context.Guilds
+        List<GuildEntity> guilds = (loadGuildPrefs)
+            ? await context.Guilds
                 .AsNoTracking()
+                .OrderBy(g => g.Id)
                 .Include(g => g.Preferences)
-                .LoadAsync();
-        }
+                .ToListAsync()
+            : await context.Guilds
+                .AsNoTracking()
+                .OrderBy(g => g.Id)
+                .ToListAsync();
 
         if (loadEverything)
         {
