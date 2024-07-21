@@ -48,6 +48,7 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
             return results;
         }
 
+        bool needState = context.Command.Name is "switch-playlist";
         string search = context.UserInput;
         string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(station.AzuraCast.AdminApiKey);
         string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
@@ -60,7 +61,14 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
             if (!string.IsNullOrWhiteSpace(search) && !playlist.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            results.Add($"{playlist.Name} ({Misc.ReadableBool(playlist.IsEnabled, ReadbleBool.EnabledDisabled, true)})", playlist.Id);
+            if (needState)
+            {
+                results.Add($"{playlist.Name} ({Misc.ReadableBool(playlist.IsEnabled, ReadbleBool.EnabledDisabled, true)})", playlist.Id);
+            }
+            else
+            {
+                results.Add(playlist.Name, playlist.Id);
+            }
         }
 
         return results;
