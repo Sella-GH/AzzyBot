@@ -96,7 +96,6 @@ jobs:
         with:
           exclude_dir: "AzzyBot"
           include_lang: "C#,MSBuild script"
-          skip_check_run: true
 
       - name: Docker meta
         id: meta
@@ -206,7 +205,6 @@ jobs:
         with:
           exclude_dir: "AzzyBot"
           include_lang: "C#,MSBuild script"
-          skip_check_run: true
 
       - name: Docker meta
         id: meta
