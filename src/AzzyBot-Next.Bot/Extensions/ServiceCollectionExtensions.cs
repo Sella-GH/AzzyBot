@@ -58,6 +58,7 @@ public static class ServiceCollectionExtensions
         services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());
 
         services.AddLavalink();
+        services.AddSingleton(s => s.GetRequiredService<DiscordBotServiceHost>().Client);
         services.ConfigureLavalink(config =>
         {
             config.BaseAddress = (isDocker) ? new("http://AzzyBot-Ms:2333") : new("http://localhost:2333");

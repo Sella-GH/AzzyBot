@@ -22,7 +22,7 @@ public static class Startup
         if (isDocker && !skipDbWaiting)
         {
             // Give the database time to start up
-            await Task.Delay(TimeSpan.FromSeconds(30));
+            await Task.Delay(TimeSpan.FromSeconds(15));
         }
 
         // https://stackoverflow.com/a/71786309
