@@ -41,16 +41,13 @@ public static class AzzyHelp
         ArgumentException.ThrowIfNullOrWhiteSpace(commandName, nameof(commandName));
 
         string[] parts = commandName.Split(' ');
-        foreach (KeyValuePair<string, List<AzzyHelpRecord>> kvp in GetCommandGroups(commands, adminServer, approvedDebug, member, true).Where(c => c.Key == parts[0]))
-        {
-            Console.Out.WriteLine(kvp.Key);
-            foreach (AzzyHelpRecord record in kvp.Value)
-            {
-                Console.Out.WriteLine(record.Name);
-            }
-        }
+        //foreach (AzzyHelpRecord record in GetCommandGroups(commands, adminServer, approvedDebug, member, true).Where(c => c.Key == parts[0]).SelectMany(r => r.Value))
+        //{
+        //    if (record.Name == commandName)
+        //        return record;
+        //}
 
-        return GetCommandGroups(commands, adminServer, approvedDebug, member, true).FirstOrDefault(r => r.Value.Any(c => c.Name == commandName)).Value.FirstOrDefault() ?? throw new InvalidOperationException("Command not found");
+        return GetCommandGroups(commands, adminServer, approvedDebug, member, true).Where(c => c.Key == parts[0]).SelectMany(r => r.Value).FirstOrDefault(c => c.Name == commandName) ?? throw new InvalidOperationException($"Command not found: {commandName}");
     }
 
     private static Dictionary<string, List<AzzyHelpRecord>> GetCommandGroups(IReadOnlyDictionary<string, Command> commands, bool adminServer, bool approvedDebug, DiscordMember member, bool singleCommand = false)
