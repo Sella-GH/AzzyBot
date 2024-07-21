@@ -41,11 +41,6 @@ public static class AzzyHelp
         ArgumentException.ThrowIfNullOrWhiteSpace(commandName, nameof(commandName));
 
         string[] parts = commandName.Split(' ');
-        //foreach (AzzyHelpRecord record in GetCommandGroups(commands, adminServer, approvedDebug, member, true).Where(c => c.Key == parts[0]).SelectMany(r => r.Value))
-        //{
-        //    if (record.Name == commandName)
-        //        return record;
-        //}
 
         return GetCommandGroups(commands, adminServer, approvedDebug, member, true).Where(c => c.Key == parts[0]).SelectMany(r => r.Value).FirstOrDefault(c => c.Name == commandName) ?? throw new InvalidOperationException($"Command not found: {commandName}");
     }
