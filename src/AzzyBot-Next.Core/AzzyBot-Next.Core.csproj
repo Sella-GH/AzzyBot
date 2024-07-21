@@ -26,90 +26,60 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Dev.Core</AssemblyName>
     <Product>AzzyBot-Next-Dev.Core</Product>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Dev.Core</AssemblyName>
     <Product>AzzyBot-Next-Dev.Core</Product>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Dev.Core</AssemblyName>
     <Product>AzzyBot-Next-Dev.Core</Product>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|AnyCPU'">
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Docker.Core</AssemblyName>
     <Product>AzzyBot-Next-Docker.Core</Product>
-    <Optimize>True</Optimize>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|ARM64'">
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Docker.Core</AssemblyName>
     <Product>AzzyBot-Next-Docker.Core</Product>
-    <Optimize>True</Optimize>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker|x64'">
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Docker.Core</AssemblyName>
     <Product>AzzyBot-Next-Docker.Core</Product>
-    <Optimize>True</Optimize>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker-debug|AnyCPU'">
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Docker-Dev.Core</AssemblyName>
     <Product>AzzyBot-Next-Docker-Dev.Core</Product>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker-debug|ARM64'">
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Docker-Dev.Core</AssemblyName>
     <Product>AzzyBot-Next-Docker-Dev.Core</Product>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Docker-debug|x64'">
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot-Docker-Dev.Core</AssemblyName>
     <Product>AzzyBot-Next-Docker-Dev.Core</Product>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot.Core</AssemblyName>
-    <Optimize>True</Optimize>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot.Core</AssemblyName>
-    <Optimize>True</Optimize>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <AssemblyName>AzzyBot.Core</AssemblyName>
-    <Optimize>True</Optimize>
-    <DebugType>embedded</DebugType>
   </PropertyGroup>
 
   <ItemGroup>

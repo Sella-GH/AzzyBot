@@ -1,5 +1,14 @@
 <Project>
+  <!-- Artifacts stuff -->
   <PropertyGroup>
 	  <UseArtifactsOutput>true</UseArtifactsOutput>
+  </PropertyGroup>
+
+  <!-- Build stuff -->
+  <PropertyGroup>
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <DebugType>embedded</DebugType>
+    <Optimize Condition="'$(Configuration)'=='Debug' OR '$(Configuration)'=='Docker-debug'">False</Optimize>
+    <Optimize Condition="'$(Configuration)'=='Release' OR '$(Configuration)'=='Docker'">True</Optimize>
   </PropertyGroup>
 </Project>
