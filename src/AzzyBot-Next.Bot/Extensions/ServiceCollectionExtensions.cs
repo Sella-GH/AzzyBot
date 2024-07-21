@@ -66,6 +66,7 @@ public static class ServiceCollectionExtensions
             config.ReadyTimeout = TimeSpan.FromSeconds(15);
             config.ResumptionOptions = new(TimeSpan.Zero);
         });
+        services.AddSingleton<MusicStreamingService>();
     }
 
     public static void AzzyBotSettings(this IServiceCollection services, bool isDev = false, bool isDocker = false)

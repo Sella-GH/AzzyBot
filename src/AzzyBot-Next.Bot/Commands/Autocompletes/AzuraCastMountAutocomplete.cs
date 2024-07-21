@@ -48,14 +48,14 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
 
             if (!hlsAdded && record.HlsUrl is not null)
             {
-                results.Add("HTTP Live Streaming", record.HlsUrl);
+                results.Add("HTTP Live Streaming", record.HlsUrl.ToString());
                 hlsAdded = true;
             }
 
             if (!string.IsNullOrWhiteSpace(search) && !mount.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            results.Add(mount.Name, mount.Url);
+            results.Add(mount.Name, mount.Url.ToString());
         }
 
         return results;
