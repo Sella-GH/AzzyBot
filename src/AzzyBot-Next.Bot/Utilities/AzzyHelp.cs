@@ -40,6 +40,15 @@ public static class AzzyHelp
         ArgumentOutOfRangeException.ThrowIfZero(commands.Count, nameof(commands));
         ArgumentException.ThrowIfNullOrWhiteSpace(commandName, nameof(commandName));
 
+        foreach (KeyValuePair<string, List<AzzyHelpRecord>> kvp in GetCommandGroups(commands, adminServer, approvedDebug, member, true))
+        {
+            Console.Out.WriteLine(kvp.Key);
+            foreach (AzzyHelpRecord record in kvp.Value)
+            {
+                Console.Out.WriteLine(record.Name);
+            }
+        }
+
         return GetCommandGroups(commands, adminServer, approvedDebug, member, true).FirstOrDefault(r => r.Value.Any(c => c.Name == commandName)).Value.FirstOrDefault() ?? throw new InvalidOperationException("Command not found");
     }
 
