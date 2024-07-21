@@ -30,7 +30,7 @@ jobs:
       - name: Get version from Directory.Build.props
         id: get-version
         run: |
-          VERSION=$(xmllint --xpath "string(//Project/PropertyGroup/Version)" Directory.Build.props)
+          VERSION=$(grep -oP '(?<=<Version>).*?(?=</Version>)' Directory.Build.props)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set version
