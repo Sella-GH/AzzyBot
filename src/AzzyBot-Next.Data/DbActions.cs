@@ -118,7 +118,8 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 RequestsChannelId = requestsId,
                 ShowPlaylistInNowPlaying = showPlaylist,
                 StationAdminRoleId = stationAdminGroup,
-                StationDjRoleId = stationDjGroup ?? 0
+                StationDjRoleId = stationDjGroup ?? 0,
+                StationId = station.Id
             };
 
             await context.AzuraCastStations.AddAsync(station);
