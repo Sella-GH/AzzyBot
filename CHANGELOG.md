@@ -25,6 +25,7 @@
 
 ### Fixes
 - Permission checks are now really working correctly
+- The `admin send-bot-wide-message` command was corrected so it's finally future proof
 
 ## 2.0.0-preview3.1 - 2024-07-14
 ### General

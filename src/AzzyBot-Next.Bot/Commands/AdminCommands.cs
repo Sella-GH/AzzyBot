@@ -149,28 +149,25 @@ public sealed class AdminCommands
             await context.DeferResponseAsync();
 
             IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
-            if (guilds.Count == 0)
-            {
-                await context.EditResponseAsync("I am not in any server.");
-                return;
-            }
-
             IReadOnlyList<GuildEntity> guildsEntities = await _dbActions.GetGuildsAsync(true);
-            foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds.Where(g => guildsEntities.Any(g => g.ConfigSet)))
+
+            foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds)
             {
-                GuildPreferencesEntity? guildPreferences = guildsEntities.FirstOrDefault(g => g.UniqueId == guild.Key)?.Preferences;
-                if (guildPreferences is null)
+                GuildEntity? guildEntity = guildsEntities.FirstOrDefault(g => g.UniqueId == guild.Key);
+                if (guildEntity is null)
                 {
-                    await context.EditResponseAsync("Server not found in database.");
-                    return;
+                    _logger.DatabaseGuildNotFound(guild.Key);
+                    continue;
                 }
 
-                await _botService.SendMessageAsync(guildPreferences.AdminNotifyChannelId, message);
-            }
-
-            foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds.Where(g => guildsEntities.Any(g => !g.ConfigSet)))
-            {
-                await guild.Value.Owner.SendMessageAsync(message);
+                if (guildEntity.ConfigSet && guildEntity.Preferences.AdminNotifyChannelId is not 0)
+                {
+                    await _botService.SendMessageAsync(guildEntity.Preferences.AdminNotifyChannelId, message);
+                }
+                else
+                {
+                    await guild.Value.Owner.SendMessageAsync(message);
+                }
             }
 
             await context.EditResponseAsync("Message sent to all servers.");
