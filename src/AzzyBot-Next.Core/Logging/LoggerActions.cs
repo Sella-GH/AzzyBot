@@ -45,11 +45,11 @@ public static partial class LoggerActions
     [LoggerMessage(23, LogLevel.Debug, "Creating work items for: {item}")]
     public static partial void BackgroundServiceWorkItem(this ILogger logger, string item);
 
-    [LoggerMessage(30, LogLevel.Debug, "Station {iId}-{dId}-{sId} has different files")]
-    public static partial void BackgroundServiceStationFilesChanged(this ILogger logger, int iId, int dId, int sId);
+    [LoggerMessage(30, LogLevel.Debug, "Station {gId}-{iId}-{dId}-{sId} has different files")]
+    public static partial void BackgroundServiceStationFilesChanged(this ILogger logger, int gId, int iId, int dId, int sId);
 
-    [LoggerMessage(31, LogLevel.Debug, "Instance {id} is {status}")]
-    public static partial void BackgroundServiceInstanceStatus(this ILogger logger, int id, string status);
+    [LoggerMessage(31, LogLevel.Debug, "Instance {gId}-{iId} is {status}")]
+    public static partial void BackgroundServiceInstanceStatus(this ILogger logger, int gId, int iId, string status);
 
     [LoggerMessage(40, LogLevel.Debug, "AzuraCastDiscordPermission is {perm}")]
     public static partial void AzuraCastDiscordPermission(this ILogger logger, string perm);

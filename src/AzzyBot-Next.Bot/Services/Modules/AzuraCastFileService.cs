@@ -111,7 +111,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
         if (addedFiles.Count == 0 && removedFiles.Count == 0)
             return;
 
-        _logger.BackgroundServiceStationFilesChanged(station.AzuraCastId, station.Id, station.StationId);
+        _logger.BackgroundServiceStationFilesChanged(station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
 
         string addedFileName = Path.Combine(_azuraCast.FilePath, $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}-{station.AzuraCast.GuildId}-{station.AzuraCastId}-{station.Id}-{station.StationId}-added.txt");
         string removedFileName = Path.Combine(_azuraCast.FilePath, $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}-{station.AzuraCast.GuildId}-{station.AzuraCastId}-{station.Id}-{station.StationId}-removed.txt");

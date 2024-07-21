@@ -63,7 +63,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
             }
             catch (HttpRequestException)
             {
-                _logger.BackgroundServiceInstanceStatus(azuraCast.Id, "offline");
+                _logger.BackgroundServiceInstanceStatus(azuraCast.GuildId, azuraCast.Id, "offline");
 
                 await _dbActions.UpdateAzuraCastAsync(azuraCast.Guild.UniqueId, null, null, false);
                 await _botService.SendMessageAsync(azuraCast.Preferences.OutagesChannelId, $"AzuraCast instance **{uri}** is **down**!");
@@ -71,7 +71,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
 
             if (status is not null)
             {
-                _logger.BackgroundServiceInstanceStatus(azuraCast.Id, "online");
+                _logger.BackgroundServiceInstanceStatus(azuraCast.GuildId, azuraCast.Id, "online");
 
                 if (!azuraCast.IsOnline)
                 {
@@ -81,7 +81,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
             }
             else
             {
-                _logger.BackgroundServiceInstanceStatus(azuraCast.Id, "unkown or offline");
+                _logger.BackgroundServiceInstanceStatus(azuraCast.GuildId, azuraCast.Id, "unkown or offline");
             }
         }
         catch (OperationCanceledException)
