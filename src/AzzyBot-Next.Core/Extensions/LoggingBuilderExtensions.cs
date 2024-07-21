@@ -46,6 +46,7 @@ public static class LoggingBuilderExtensions
         logging.AddFilter("Microsoft.EntityFrameworkCore.Infrastructure", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
         logging.AddFilter("Microsoft.EntityFrameworkCore.Migrations", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Information);
         logging.AddFilter("Microsoft.Extensions.Hosting", LogLevel.Warning);
+        logging.AddFilter("Microsoft.Extensions.Http.DefaultHttpClientFactory", LogLevel.Warning);
         logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Warning);
         logging.AddSimpleConsole(config =>
         {

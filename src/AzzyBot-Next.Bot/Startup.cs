@@ -17,12 +17,11 @@ public static class Startup
         bool isDev = environment == Environments.Development;
         bool isDocker = AzzyStatsHardware.CheckIfDocker;
         bool forceDebug = (isDocker) ? (Environment.GetEnvironmentVariable("FORCE_DEBUG") == "true") : (args?.Length > 0 && args.Contains("-forceDebug"));
-        bool skipDbWaiting = Environment.GetEnvironmentVariable("SKIP_DB_WAITING") == "true";
 
-        if (isDocker && !skipDbWaiting)
+        if (isDocker)
         {
             // Give the database time to start up
-            await Task.Delay(TimeSpan.FromSeconds(15));
+            await Task.Delay(TimeSpan.FromSeconds(30));
         }
 
         // https://stackoverflow.com/a/71786309

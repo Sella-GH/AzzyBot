@@ -1,13 +1,12 @@
 services:
   AzzyBot:
     container_name: AzzyBot
-    image: sellagh/azzybot:rel-2.0.0-preview3.1
+    image: sellagh/azzybot:rel-2.0.0-preview4.1
     pull_policy: always
     restart: unless-stopped
     user: ${CURRENT_UID}
     environment:
       - FORCE_DEBUG=false
-      - SKIP_DB_WAITING=false
       - TZ=Europe/Berlin
     depends_on:
       - AzzyBot-Db
