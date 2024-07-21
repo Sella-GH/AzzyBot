@@ -27,11 +27,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get version from csproj
-        uses: kzrnm/get-net-sdk-project-versions-action@v2
+      - name: Get version from Directory.Build.props
         id: get-version
-        with:
-          proj-path: src/AzzyBot-Next.Bot/AzzyBot-Next.Bot.csproj
+        run: |
+          VERSION=$(xmllint --xpath "string(//Project/PropertyGroup/Version)" Directory.Build.props)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Set version
         id: set-version
