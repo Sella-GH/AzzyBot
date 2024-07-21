@@ -22,6 +22,7 @@
 - If you have activated "Always Write Playlists to Liquidsoap", the bot will wait for it before the station is completely started
 - A timeout of 30s after each song skip has been added to prevent the bot from skipping songs too fast
 - Removed useless code
+- API permission checks ignore disabled features of the station
 
 ### Fixes
 - Permission checks are now really working correctly

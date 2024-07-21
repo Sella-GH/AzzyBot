@@ -76,18 +76,24 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
 
     private async Task CheckForStationApiPermissionsAsync(AzuraCastStationEntity station)
     {
-        string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
+        string baseUrl = $"{Crypto.Decrypt(station.AzuraCast.BaseUrl)}/api";
         int stationId = station.StationId;
-        List<Uri> apis = [];
-        apis.Add(new($"{baseUrl}/api/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}"));
-        apis.Add(new($"{baseUrl}/api/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlists}"));
-        apis.Add(new($"{baseUrl}/api/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}"));
-        apis.Add(new($"{baseUrl}/api/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}"));
-        apis.Add(new($"{baseUrl}/api/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Requests}"));
-        apis.Add(new($"{baseUrl}/api/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Status}"));
+        AzuraAdminStationConfigRecord config = await GetStationAdminConfigAsync(new(baseUrl), Crypto.Decrypt(station.AzuraCast.AdminApiKey), stationId);
+
+        List <Uri> apis = [];
+        apis.Add(new($"{baseUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}"));
+        apis.Add(new($"{baseUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlists}"));
+        apis.Add(new($"{baseUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}"));
+        apis.Add(new($"{baseUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Status}"));
+
+        if (config.EnableRequests)
+        {
+            apis.Add(new($"{baseUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Requests}"));
+            apis.Add(new($"{baseUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}"));
+        }
 
         if (station.Checks.FileChanges)
-            apis.Add(new($"{baseUrl}/api/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}"));
+            apis.Add(new($"{baseUrl}{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}"));
 
         string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? station.AzuraCast.AdminApiKey : station.ApiKey;
         IReadOnlyList<string> missing = await ExecuteApiPermissionCheckAsync(apis, Crypto.Decrypt(apiKey));
