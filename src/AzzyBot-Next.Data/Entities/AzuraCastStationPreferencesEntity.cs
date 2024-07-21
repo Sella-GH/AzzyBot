@@ -20,11 +20,6 @@ public sealed class AzuraCastStationPreferencesEntity
     public string FileUploadPath { get; set; } = string.Empty;
 
     /// <summary>
-    /// The state if HLS streams should be prefered when listening to this station.
-    /// </summary>
-    public bool PreferHls { get; set; }
-
-    /// <summary>
     /// The <see cref="DiscordChannel"/> id of the <see cref="DiscordChannel"/> to which not-available music-requests should be sent.
     /// </summary>
     public ulong RequestsChannelId { get; set; }

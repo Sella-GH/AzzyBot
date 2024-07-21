@@ -82,7 +82,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, string name, ulong stationAdminGroup, ulong requestsId, bool hls, bool showPlaylist, bool fileChanges, ulong? fileUploadId = null, string? fileUploadPath = null, string? apiKey = null, ulong? stationDjGroup = null)
+    public Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, string name, ulong stationAdminGroup, ulong requestsId, bool showPlaylist, bool fileChanges, ulong? fileUploadId = null, string? fileUploadPath = null, string? apiKey = null, ulong? stationDjGroup = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -114,7 +114,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             {
                 FileUploadChannelId = fileUploadId ?? 0,
                 FileUploadPath = fileUploadPath ?? string.Empty,
-                PreferHls = hls,
                 RequestsChannelId = requestsId,
                 ShowPlaylistInNowPlaying = showPlaylist,
                 StationAdminRoleId = stationAdminGroup,
@@ -123,28 +122,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             };
 
             await context.AzuraCastStations.AddAsync(station);
-        });
-    }
-
-    public Task<bool> AddAzuraCastStationMountPointAsync(int stationId, string mountName, string mount)
-    {
-        return ExecuteDbActionAsync(async context =>
-        {
-            AzuraCastStationEntity? station = await context.AzuraCastStations
-                .OrderBy(g => g.Id)
-                .FirstOrDefaultAsync(s => s.StationId == stationId);
-
-            if (station is null)
-                return;
-
-            AzuraCastStationMountEntity mountPoint = new()
-            {
-                Name = Crypto.Encrypt(mountName),
-                Mount = Crypto.Encrypt(mount),
-                StationId = station.Id
-            };
-
-            await context.AzuraCastStationMounts.AddAsync(mountPoint);
         });
     }
 
@@ -180,7 +157,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     }
 
     public Task<bool> DeleteAzuraCastAsync(ulong guildId) => ExecuteDbActionAsync(async context => await context.AzuraCast.Where(a => a.Guild.UniqueId == guildId).ExecuteDeleteAsync());
-    public Task<bool> DeleteAzuraCastMountAsync(int mountId) => ExecuteDbActionAsync(async context => await context.AzuraCastStationMounts.Where(m => m.Id == mountId).ExecuteDeleteAsync());
     public Task<bool> DeleteAzuraCastStationAsync(int stationId) => ExecuteDbActionAsync(async context => await context.AzuraCastStations.Where(s => s.StationId == stationId).ExecuteDeleteAsync());
 
     public Task<bool> DeleteGuildAsync(ulong guildId)
@@ -223,7 +199,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         return (success) ? deletedGuilds : [];
     }
 
-    public async Task<AzuraCastEntity?> GetAzuraCastAsync(ulong guildId, bool loadChecks = false, bool loadPrefs = false, bool loadStations = false, bool loadStationChecks = false, bool loadStationMounts = false, bool loadStationPrefs = false)
+    public async Task<AzuraCastEntity?> GetAzuraCastAsync(ulong guildId, bool loadChecks = false, bool loadPrefs = false, bool loadStations = false, bool loadStationChecks = false, bool loadStationPrefs = false)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
@@ -258,7 +234,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 .LoadAsync();
         }
 
-        if (loadStations && (loadStationChecks || loadStationMounts || loadStationPrefs))
+        if (loadStations && (loadStationChecks || loadStationPrefs))
         {
             foreach (AzuraCastStationEntity station in azuraCast.Stations)
             {
@@ -266,13 +242,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 {
                     await context.Entry(station)
                         .Reference(s => s.Checks)
-                        .LoadAsync();
-                }
-
-                if (loadStationMounts)
-                {
-                    await context.Entry(station)
-                        .Collection(s => s.Mounts)
                         .LoadAsync();
                 }
 
@@ -309,7 +278,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         return azuraCast.Preferences;
     }
 
-    public async Task<AzuraCastStationEntity?> GetAzuraCastStationAsync(ulong guildId, int stationId, bool loadChecks = false, bool loadMounts = false, bool loadPrefs = false)
+    public async Task<AzuraCastStationEntity?> GetAzuraCastStationAsync(ulong guildId, int stationId, bool loadChecks = false, bool loadPrefs = false)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
@@ -338,13 +307,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 .LoadAsync();
         }
 
-        if (loadMounts)
-        {
-            await context.Entry(station)
-                .Collection(s => s.Mounts)
-                .LoadAsync();
-        }
-
         if (loadPrefs)
         {
             await context.Entry(station)
@@ -355,7 +317,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         return station;
     }
 
-    public async Task<IReadOnlyList<AzuraCastStationEntity>> GetAzuraCastStationsAsync(ulong guildId, bool loadChecks = false, bool loadMounts = false, bool loadPrefs = false)
+    public async Task<IReadOnlyList<AzuraCastStationEntity>> GetAzuraCastStationsAsync(ulong guildId, bool loadChecks = false, bool loadPrefs = false)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
@@ -373,7 +335,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             .Collection(a => a.Stations)
             .LoadAsync();
 
-        if (loadChecks || loadMounts || loadPrefs)
+        if (loadChecks || loadPrefs)
         {
             foreach (AzuraCastStationEntity station in azuraCast.Stations)
             {
@@ -381,13 +343,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 {
                     await context.Entry(station)
                         .Reference(s => s.Checks)
-                        .LoadAsync();
-                }
-
-                if (loadMounts)
-                {
-                    await context.Entry(station)
-                        .Collection(s => s.Mounts)
                         .LoadAsync();
                 }
 
@@ -422,64 +377,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             .LoadAsync();
 
         return azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId)?.Checks;
-    }
-
-    public async Task<AzuraCastStationMountEntity?> GetAzuraCastStationMountAsync(ulong guildId, int stationId, int mountId)
-    {
-        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
-
-        AzuraCastEntity? azuraCast = await context.Guilds
-            .AsNoTracking()
-            .Where(g => g.UniqueId == guildId)
-            .OrderBy(g => g.Id)
-            .Select(g => g.AzuraCast)
-            .FirstOrDefaultAsync();
-
-        if (azuraCast is null)
-            return null;
-
-        await context.Entry(azuraCast)
-            .Collection(a => a.Stations)
-            .LoadAsync();
-
-        AzuraCastStationEntity? station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId);
-        if (station is null)
-            return null;
-
-        await context.Entry(station)
-            .Collection(s => s.Mounts)
-            .LoadAsync();
-
-        return station.Mounts.FirstOrDefault(m => m.Id == mountId);
-    }
-
-    public async Task<IReadOnlyList<AzuraCastStationMountEntity>> GetAzuraCastStationMountsAsync(ulong guildId, int stationId)
-    {
-        await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
-
-        AzuraCastEntity? azuraCast = await context.Guilds
-            .AsNoTracking()
-            .Where(g => g.UniqueId == guildId)
-            .OrderBy(g => g.Id)
-            .Select(g => g.AzuraCast)
-            .FirstOrDefaultAsync();
-
-        if (azuraCast is null)
-            return [];
-
-        await context.Entry(azuraCast)
-            .Collection(a => a.Stations)
-            .LoadAsync();
-
-        AzuraCastStationEntity? station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId);
-        if (station is null)
-            return [];
-
-        await context.Entry(station)
-            .Collection(s => s.Mounts)
-            .LoadAsync();
-
-        return [.. station.Mounts];
     }
 
     public async Task<AzuraCastStationPreferencesEntity?> GetAzuraCastStationPreferencesAsync(ulong guildId, int stationId)
@@ -564,10 +461,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                         .LoadAsync();
 
                     await context.Entry(station)
-                        .Collection(s => s.Mounts)
-                        .LoadAsync();
-
-                    await context.Entry(station)
                         .Reference(s => s.Preferences)
                         .LoadAsync();
                 }
@@ -625,10 +518,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                     {
                         await context.Entry(station)
                             .Reference(s => s.Checks)
-                            .LoadAsync();
-
-                        await context.Entry(station)
-                            .Collection(s => s.Mounts)
                             .LoadAsync();
 
                         await context.Entry(station)
@@ -827,7 +716,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> UpdateAzuraCastStationPreferencesAsync(ulong guildId, int stationId, ulong? stationAdminGroup = null, ulong? stationDjGroup = null, ulong? fileUploadId = null, ulong? requestId = null, string? fileUploadPath = null, bool? hls = null, bool? playlist = null)
+    public Task<bool> UpdateAzuraCastStationPreferencesAsync(ulong guildId, int stationId, ulong? stationAdminGroup = null, ulong? stationDjGroup = null, ulong? fileUploadId = null, ulong? requestId = null, string? fileUploadPath = null, bool? playlist = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -866,9 +755,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             if (!string.IsNullOrWhiteSpace(fileUploadPath))
                 preferences.FileUploadPath = fileUploadPath;
-
-            if (hls.HasValue)
-                preferences.PreferHls = hls.Value;
 
             if (playlist.HasValue)
                 preferences.ShowPlaylistInNowPlaying = playlist.Value;

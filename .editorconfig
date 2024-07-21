@@ -487,7 +487,8 @@ dotnet_diagnostic.rcs1070.severity = suggestion
 dotnet_diagnostic.rcs1071.severity = suggestion
 
 # Convert 'if' to 'return' statement
-dotnet_diagnostic.rcs1073.severity = suggestion
+# This one is doubled
+dotnet_diagnostic.rcs1073.severity = none
 
 # Remove redundant constructor
 dotnet_diagnostic.rcs1074.severity = suggestion

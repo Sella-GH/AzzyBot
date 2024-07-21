@@ -129,10 +129,7 @@ public static partial class LoggerActions
     [LoggerMessage(216, LogLevel.Warning, "Could not find AzuraCast station checks for guild {guild} in instance {instance} at station {station}")]
     public static partial void DatabaseAzuraCastStationChecksNotFound(this ILogger logger, ulong guild, int instance, int station);
 
-    [LoggerMessage(217, LogLevel.Warning, "Could not find AzuraCast station mount for guild {guild} in instance {instance} at station {station}")]
-    public static partial void DatabaseAzuraCastStationMountNotFound(this ILogger logger, ulong guild, int instance, int station);
-
-    [LoggerMessage(218, LogLevel.Warning, "Could not find AzuraCast station preferences for guild {guild} in instance {instance} at station {station}")]
+    [LoggerMessage(217, LogLevel.Warning, "Could not find AzuraCast station preferences for guild {guild} in instance {instance} at station {station}")]
     public static partial void DatabaseAzuraCastStationPreferencesNotFound(this ILogger logger, ulong guild, int instance, int station);
 
     [LoggerMessage(220, LogLevel.Warning, "Could not find discord item {item} for guild {guild}")]

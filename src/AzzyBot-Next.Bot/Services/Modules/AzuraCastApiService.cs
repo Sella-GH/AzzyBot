@@ -448,6 +448,15 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         };
     }
 
+    public Task<AzuraStationRecord> GetStationAsync(Uri baseUrl, int stationId)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}";
+
+        return GetFromApiAsync<AzuraStationRecord>(baseUrl, endpoint);
+    }
+
     public Task<AzuraAdminStationConfigRecord> GetStationAdminConfigAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));

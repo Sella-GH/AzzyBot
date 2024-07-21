@@ -20,6 +20,5 @@ public sealed class AzzyDbContext : DbContext
     public DbSet<AzuraCastPreferencesEntity> AzuraCastPreferences { get; set; }
     public DbSet<AzuraCastStationEntity> AzuraCastStations { get; set; }
     public DbSet<AzuraCastStationChecksEntity> AzuraCastStationChecks { get; set; }
-    public DbSet<AzuraCastStationMountEntity> AzuraCastStationMounts { get; set; }
     public DbSet<AzuraCastStationPreferencesEntity> AzuraCastStationPreferences { get; set; }
 }

@@ -575,10 +575,8 @@ public static class EmbedBuilder
             string fileUploadChannel = (station.Preferences.FileUploadChannelId > 0) ? $"<#{station.Preferences.FileUploadChannelId}>" : "Not set";
             string requestsChannel = (station.Preferences.RequestsChannelId > 0) ? $"<#{station.Preferences.RequestsChannelId}>" : "Not set";
             string fileUploadPath = (!string.IsNullOrWhiteSpace(station.Preferences.FileUploadPath)) ? station.Preferences.FileUploadPath : "Not set";
-            string preferHls = Misc.ReadableBool(station.Preferences.PreferHls, ReadbleBool.EnabledDisabled);
             string showPlaylist = Misc.ReadableBool(station.Preferences.ShowPlaylistInNowPlaying, ReadbleBool.EnabledDisabled);
             string fileChanges = Misc.ReadableBool(station.Checks.FileChanges, ReadbleBool.EnabledDisabled);
-            string mounts = (station.Mounts.Count > 0) ? string.Join('\n', station.Mounts.Select(x => $"- {Crypto.Decrypt(x.Name)}: {Crypto.Decrypt(x.Mount)}")) : "No Mount Points added";
 
             fields = new()
             {
@@ -590,10 +588,8 @@ public static class EmbedBuilder
                 ["File Upload Channel"] = new(fileUploadChannel),
                 ["Music Requests Channel"] = new(requestsChannel),
                 ["File Upload Path"] = new(fileUploadPath),
-                ["Prefer HLS Streaming"] = new(preferHls),
                 ["Show Playlist In Now Playing"] = new(showPlaylist),
-                ["Automatic Checks"] = new($"- File Changes: {fileChanges}"),
-                ["Mount Points"] = new(mounts)
+                ["Automatic Checks"] = new($"- File Changes: {fileChanges}")
             };
 
             embeds.Add(CreateBasicEmbed(stationTitle, string.Empty, DiscordColor.White, null, null, null, fields));
