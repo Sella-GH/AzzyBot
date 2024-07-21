@@ -1,4 +1,9 @@
-## 2.0.0-preview4
+## 2.0.0-preview4.1
+### Fixes
+- The update instructions for docker are now correct
+- The `core help` single command is now working correctly again
+
+## 2.0.0-preview4 - 2024-07-21
 ### Breaking Changes
 - Your Database needs a complete reset, please DROP it and start from scratch
   - You'll likely experience this a few more times until the final release
