@@ -153,20 +153,12 @@ public sealed class AdminCommands
 
             foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds)
             {
-                _logger.LogInformation(guild.Key.ToString());
-                _logger.LogInformation(guild.Value.Id.ToString());
-
                 GuildEntity? guildEntity = guildsEntities.FirstOrDefault(g => g.UniqueId == guild.Key);
                 if (guildEntity is null)
                 {
                     _logger.DatabaseGuildNotFound(guild.Key);
                     continue;
                 }
-
-                _logger.LogInformation(guildEntity.Id.ToString());
-                _logger.LogInformation(guildEntity.UniqueId.ToString());
-                _logger.LogInformation(guildEntity.ConfigSet.ToString());
-                _logger.LogInformation(guildEntity.Preferences.AdminNotifyChannelId.ToString());
 
                 if (guildEntity.ConfigSet && guildEntity.Preferences.AdminNotifyChannelId is not 0)
                 {
