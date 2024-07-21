@@ -177,10 +177,8 @@ public static class AzzyStatsHardware
             ArgumentException.ThrowIfNullOrWhiteSpace(line, nameof(line));
 
             string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if (!long.TryParse(parts[1], out long value))
-                throw new InvalidOperationException("Could not parse value");
 
-            return value;
+            return (!long.TryParse(parts[1], out long value)) ? throw new InvalidOperationException("Could not parse value") : value;
         }
 
         foreach (string line in memoryInfoLines)

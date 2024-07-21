@@ -179,73 +179,16 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         return (success) ? addedGuilds : [];
     }
 
-    public Task<bool> DeleteAzuraCastAsync(ulong guildId)
-    {
-        return ExecuteDbActionAsync(async context =>
-        {
-            GuildEntity? guild = await context.Guilds
-                .Include(g => g.AzuraCast)
-                .OrderBy(g => g.Id)
-                .FirstOrDefaultAsync(g => g.UniqueId == guildId);
-
-            if (guild is null)
-                return;
-
-            AzuraCastEntity? azuraCast = guild.AzuraCast;
-            if (azuraCast is null)
-                return;
-
-            context.AzuraCast.Remove(azuraCast);
-        });
-    }
-
-    public Task<bool> DeleteAzuraCastMountAsync(int mountId)
-    {
-        return ExecuteDbActionAsync(async context =>
-        {
-            AzuraCastStationMountEntity? mount = await context.AzuraCastStationMounts
-                .OrderBy(m => m.Id)
-                .FirstOrDefaultAsync(m => m.Id == mountId);
-
-            if (mount is null)
-                return;
-
-            context.AzuraCastStationMounts.Remove(mount);
-        });
-    }
-
-    public Task<bool> DeleteAzuraCastStationAsync(int stationId)
-    {
-        return ExecuteDbActionAsync(async context =>
-        {
-            AzuraCastStationEntity? station = await context.AzuraCastStations
-                .OrderBy(s => s.Id)
-                .FirstOrDefaultAsync(s => s.StationId == stationId);
-
-            if (station is null)
-                return;
-
-            context.AzuraCastStations.Remove(station);
-        });
-    }
+    public Task<bool> DeleteAzuraCastAsync(ulong guildId) => ExecuteDbActionAsync(async context => await context.AzuraCast.Where(a => a.Guild.UniqueId == guildId).ExecuteDeleteAsync());
+    public Task<bool> DeleteAzuraCastMountAsync(int mountId) => ExecuteDbActionAsync(async context => await context.AzuraCastStationMounts.Where(m => m.Id == mountId).ExecuteDeleteAsync());
+    public Task<bool> DeleteAzuraCastStationAsync(int stationId) => ExecuteDbActionAsync(async context => await context.AzuraCastStations.Where(s => s.StationId == stationId).ExecuteDeleteAsync());
 
     public Task<bool> DeleteGuildAsync(ulong guildId)
     {
         return ExecuteDbActionAsync(async context =>
         {
-            GuildEntity? guild = await context.Guilds
-                .Include(g => g.AzuraCast)
-                .OrderBy(g => g.Id)
-                .FirstOrDefaultAsync(g => g.UniqueId == guildId);
-
-            if (guild is null)
-                return;
-
-            AzuraCastEntity? azuraCast = guild.AzuraCast;
-            if (azuraCast is not null)
-                context.AzuraCast.Remove(azuraCast);
-
-            context.Guilds.Remove(guild);
+            await context.AzuraCast.Where(a => a.Guild.UniqueId == guildId).ExecuteDeleteAsync();
+            await context.Guilds.Where(g => g.UniqueId == guildId).ExecuteDeleteAsync();
         });
     }
 
@@ -266,16 +209,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         if (guildsToDelete.Count is 0)
             return [];
 
-        bool success = await ExecuteDbActionAsync(context =>
+        bool success = await ExecuteDbActionAsync(async context =>
         {
-            foreach (GuildEntity guild in guildsToDelete.Where(guild => guild.AzuraCast is not null))
-            {
-                context.AzuraCast.Remove(guild.AzuraCast ?? throw new InvalidOperationException("AzuraCast is null when it should not be."));
-            }
-
-            context.Guilds.RemoveRange(guildsToDelete);
-
-            return Task.CompletedTask;
+            await context.AzuraCast.Where(a => guildsToDelete.Select(g => g.UniqueId).Contains(a.Guild.UniqueId)).ExecuteDeleteAsync();
+            await context.Guilds.Where(g => guildsToDelete.Select(g => g.UniqueId).Contains(g.UniqueId)).ExecuteDeleteAsync();
         });
 
         List<ulong> deletedGuilds = guildsToDelete

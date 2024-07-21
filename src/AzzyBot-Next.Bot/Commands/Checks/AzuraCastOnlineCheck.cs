@@ -30,9 +30,6 @@ public sealed class AzuraCastOnlineCheck(ILogger<AzuraCastOnlineCheck> logger, D
             return "AzuraCast is null!";
         }
 
-        if (azuraCast.IsOnline)
-            return null;
-
-        return "Offline";
+        return (azuraCast.IsOnline) ? null : "Offline";
     }
 }

@@ -47,9 +47,6 @@ public sealed class AzuraCastDiscordChannelCheck(ILogger<AzuraCastDiscordChannel
                 return null;
         }
 
-        if (context.Channel.Id != channelId)
-            return channelId.ToString(CultureInfo.InvariantCulture);
-
-        return null;
+        return (context.Channel.Id != channelId) ? channelId.ToString(CultureInfo.InvariantCulture) : null;
     }
 }
