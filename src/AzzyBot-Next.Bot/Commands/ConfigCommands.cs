@@ -480,7 +480,7 @@ public sealed class ConfigCommands
             ulong guildId = context.Guild.Id;
             string guildName = context.Guild.Name;
             DiscordMember member = context.Member;
-            GuildEntity? guild = await _db.GetGuildAsync(guildId, true);
+            GuildEntity? guild = await _db.GetGuildAsync(guildId, true, true);
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);

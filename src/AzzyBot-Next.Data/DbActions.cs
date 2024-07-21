@@ -574,7 +574,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         return station.Preferences;
     }
 
-    public async Task<GuildEntity?> GetGuildAsync(ulong guildId, bool loadEverything = false)
+    public async Task<GuildEntity?> GetGuildAsync(ulong guildId, bool loadGuildPrefs = false, bool loadEverything = false)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
@@ -586,11 +586,21 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         if (guild is null)
             return null;
 
-        if (loadEverything)
+        if (loadGuildPrefs)
         {
             await context.Entry(guild)
                 .Reference(g => g.Preferences)
                 .LoadAsync();
+        }
+
+        if (loadEverything)
+        {
+            if (!loadGuildPrefs)
+            {
+                await context.Entry(guild)
+                    .Reference(g => g.Preferences)
+                    .LoadAsync();
+            }
 
             await context.Entry(guild)
                 .Reference(g => g.AzuraCast)
@@ -630,7 +640,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         return guild;
     }
 
-    public async Task<IReadOnlyList<GuildEntity>> GetGuildsAsync(bool loadEverything = false)
+    public async Task<IReadOnlyList<GuildEntity>> GetGuildsAsync(bool loadGuildPrefs = false, bool loadEverything = false)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
@@ -639,13 +649,23 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             .OrderBy(g => g.Id)
             .ToListAsync();
 
+        if (loadGuildPrefs)
+        {
+            await context.Guilds
+                .Include(g => g.Preferences)
+                .LoadAsync();
+        }
+
         if (loadEverything)
         {
             foreach (GuildEntity guild in guilds)
             {
-                await context.Entry(guild)
-                    .Reference(g => g.Preferences)
-                    .LoadAsync();
+                if (!loadGuildPrefs)
+                {
+                    await context.Entry(guild)
+                        .Reference(g => g.Preferences)
+                        .LoadAsync();
+                }
 
                 await context.Entry(guild)
                     .Reference(g => g.AzuraCast)

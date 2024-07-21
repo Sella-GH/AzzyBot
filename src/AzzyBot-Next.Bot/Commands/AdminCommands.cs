@@ -155,7 +155,7 @@ public sealed class AdminCommands
                 return;
             }
 
-            IReadOnlyList<GuildEntity> guildsEntities = await _dbActions.GetGuildsAsync();
+            IReadOnlyList<GuildEntity> guildsEntities = await _dbActions.GetGuildsAsync(true);
             foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds.Where(g => guildsEntities.Any(g => g.ConfigSet)))
             {
                 GuildPreferencesEntity? guildPreferences = guildsEntities.FirstOrDefault(g => g.UniqueId == guild.Key)?.Preferences;

@@ -24,7 +24,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
 
     public async Task QueueInstancePingAsync()
     {
-        IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(true);
+        IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(true, true);
         foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.Checks.ServerStatus == true).Select(g => g.AzuraCast!))
         {
             _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await PingInstanceAsync(azuraCast, ct)));
@@ -37,7 +37,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
 
         _logger.BackgroundServiceWorkItem(nameof(QueueInstancePingAsync));
 
-        GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, true);
+        GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, true, true);
         if (guild is null || guild.AzuraCast is null)
         {
             _logger.DatabaseGuildNotFound(guildId);
