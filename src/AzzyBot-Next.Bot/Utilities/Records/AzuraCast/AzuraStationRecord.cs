@@ -28,4 +28,10 @@ public sealed record AzuraStationMountRecord
 
     [JsonPropertyName("url")]
     public required string Url { get; init; }
+
+    [JsonPropertyName("bitrate")]
+    public required int Bitrate { get; init; }
+
+    [JsonPropertyName("format")]
+    public required string Format { get; init; }
 }

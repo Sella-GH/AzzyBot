@@ -40,6 +40,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
 
         string search = context.UserInput;
         bool hlsAdded = false;
+        string name = string.Empty;
         AzuraStationRecord record = await _azuraCast.GetStationAsync(new(Crypto.Decrypt(azuraCastEntity.BaseUrl)), stationId);
         foreach (AzuraStationMountRecord mount in record.Mounts)
         {
@@ -55,7 +56,11 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
             if (!string.IsNullOrWhiteSpace(search) && !mount.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            results.Add(mount.Name, mount.Url);
+            name = (!mount.Name.Contains("kbps", StringComparison.OrdinalIgnoreCase))
+                ? $"{mount.Name} ({mount.Bitrate} kbps - {mount.Format})"
+                : mount.Name;
+
+            results.Add(name, mount.Url);
         }
 
         return results;
