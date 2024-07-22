@@ -22,8 +22,9 @@ public sealed class MusicStreamingService(IAudioService audioService)
 
         LavalinkPlayerOptions playerOptions = new() { SelfDeaf = true };
         PlayerRetrieveOptions retrieveOptions = new((connectToVoice) ? PlayerChannelBehavior.Join : PlayerChannelBehavior.None, MemberVoiceStateBehavior.RequireSame);
+        ulong channelId = context.Member?.VoiceState.Channel?.Id ?? 0;
 
-        PlayerResult<LavalinkPlayer> player = await _audioService.Players.RetrieveAsync(context.Guild.Id, context.Member?.VoiceState.Channel?.Id ?? 0, PlayerFactory.Default, Options.Create(playerOptions), retrieveOptions);
+        PlayerResult<LavalinkPlayer> player = await _audioService.Players.RetrieveAsync(context.Guild.Id, channelId, PlayerFactory.Default, Options.Create(playerOptions), retrieveOptions);
         if (player.IsSuccess)
             return player.Player;
 
