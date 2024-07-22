@@ -9,9 +9,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build-next",
-            "program": "${workspaceFolder}/artifacts/bin/AzzyBot-Next/Debug/AzzyBot-Dev.dll",
+            "program": "${workspaceFolder}/artifacts/bin/AzzyBot-Next.Bot/Debug/AzzyBot-Dev.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/artifacts/bin/AzzyBot-Next/Debug",
+            "cwd": "${workspaceFolder}/artifacts/bin/AzzyBot-Next.Bot/Debug",
             "env": {
                 "DYLD_LIBRARY_PATH": "/opt/homebrew/opt/openssl@3/lib"
             },
