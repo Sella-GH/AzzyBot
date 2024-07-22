@@ -31,7 +31,11 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(JoinAsync), context.User.GlobalName);
 
+            await context.DeferResponseAsync();
+
             await _musicStreaming.JoinChannelAsync(context);
+
+            await context.EditResponseAsync("I here now.");
         }
 
         [Command("leave"), Description("Leave the voice channel.")]
@@ -41,7 +45,11 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(LeaveAsync), context.User.GlobalName);
 
+            await context.DeferResponseAsync();
+
             await _musicStreaming.LeaveChannelAsync(context);
+
+            await context.EditResponseAsync("I'm gone now.");
         }
 
         [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Needed for the AutoComplete.")]
@@ -58,6 +66,8 @@ public sealed class MusicStreamingCommands
             _logger.CommandRequested(nameof(PlayAsync), context.User.GlobalName);
 
             await _musicStreaming.PlayMusicAsync(context, mountPoint);
+
+            await context.EditResponseAsync("I'm starting to play now!");
         }
     }
 }
