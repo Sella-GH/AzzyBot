@@ -11,7 +11,8 @@ public static class SettingsCheck
 {
     public static int CheckSettings<T>(T? settings, IReadOnlyList<string>? excluded = null, bool isClass = false)
     {
-        ArgumentNullException.ThrowIfNull(settings, nameof(settings));
+        if (settings is null)
+            throw new InvalidOperationException("Settings is null");
 
         PropertyInfo[] properties = settings.GetType().GetProperties();
         int missingSettings = 0;
