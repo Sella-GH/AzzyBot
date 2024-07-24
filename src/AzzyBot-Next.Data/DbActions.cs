@@ -53,7 +53,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 .FirstOrDefaultAsync(g => g.UniqueId == guildId);
 
             if (guild is null)
+            {
+                _logger.DatabaseGuildNotFound(guildId);
                 return;
+            }
 
             AzuraCastEntity azuraCast = new()
             {
@@ -93,7 +96,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 .FirstOrDefaultAsync();
 
             if (azura is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(guildId);
                 return;
+            }
 
             AzuraCastStationEntity station = new()
             {
@@ -210,7 +216,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             .FirstOrDefaultAsync();
 
         if (azuraCast is null)
+        {
+            _logger.DatabaseAzuraCastNotFound(guildId);
             return null;
+        }
 
         if (loadChecks)
         {
@@ -268,7 +277,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             .FirstOrDefaultAsync();
 
         if (azuraCast is null)
+        {
+            _logger.DatabaseAzuraCastNotFound(guildId);
             return null;
+        }
 
         await context.Entry(azuraCast)
             .Reference(a => a.Preferences)
@@ -289,7 +301,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             .FirstOrDefaultAsync();
 
         if (azuraCast is null)
+        {
+            _logger.DatabaseAzuraCastNotFound(guildId);
             return null;
+        }
 
         await context.Entry(azuraCast)
             .Collection(a => a.Stations)
@@ -297,7 +312,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
         AzuraCastStationEntity? station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId);
         if (station is null)
+        {
+            _logger.DatabaseAzuraCastStationNotFound(guildId, azuraCast.Id, stationId);
             return null;
+        }
 
         if (loadChecks)
         {
@@ -328,7 +346,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             .FirstOrDefaultAsync();
 
         if (azuraCast is null)
+        {
+            _logger.DatabaseAzuraCastNotFound(guildId);
             return [];
+        }
 
         await context.Entry(azuraCast)
             .Collection(a => a.Stations)
@@ -369,7 +390,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             .FirstOrDefaultAsync();
 
         if (azuraCast is null)
+        {
+            _logger.DatabaseAzuraCastNotFound(guildId);
             return null;
+        }
 
         await context.Entry(azuraCast)
             .Collection(a => a.Stations)
@@ -390,7 +414,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             .FirstOrDefaultAsync();
 
         if (azuraCast is null)
+        {
+            _logger.DatabaseAzuraCastNotFound(guildId);
             return null;
+        }
 
         await context.Entry(azuraCast)
             .Collection(a => a.Stations)
@@ -398,7 +425,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
         AzuraCastStationEntity? station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId);
         if (station is null)
+        {
+            _logger.DatabaseAzuraCastStationNotFound(guildId, azuraCast.Id, stationId);
             return null;
+        }
 
         await context.Entry(station)
             .Reference(s => s.Preferences)
@@ -553,7 +583,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 .FirstOrDefaultAsync();
 
             if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(guildId);
                 return;
+            }
 
             if (baseUrl is not null)
                 azuraCast.BaseUrl = Crypto.Encrypt(baseUrl.OriginalString);
@@ -579,7 +612,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 .FirstOrDefaultAsync();
 
             if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(guildId);
                 return;
+            }
 
             await context.Entry(azuraCast)
                 .Reference(a => a.Checks)
@@ -587,7 +623,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             AzuraCastChecksEntity? checks = azuraCast.Checks;
             if (checks is null)
+            {
+                _logger.DatabaseAzuraCastChecksNotFound(guildId, azuraCast.Id);
                 return;
+            }
 
             if (serverStatus.HasValue)
                 checks.ServerStatus = serverStatus.Value;
@@ -619,7 +658,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 .FirstOrDefaultAsync();
 
             if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(guildId);
                 return;
+            }    
 
             await context.Entry(azuraCast)
                 .Reference(a => a.Preferences)
@@ -627,7 +669,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             AzuraCastPreferencesEntity? preferences = azuraCast.Preferences;
             if (preferences is null)
+            {
+                _logger.DatabaseAzuraCastPreferencesNotFound(guildId, azuraCast.Id);
                 return;
+            }
 
             if (instanceAdminGroup.HasValue)
                 preferences.InstanceAdminRoleId = instanceAdminGroup.Value;
@@ -653,7 +698,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 .FirstOrDefaultAsync();
 
             if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(guildId);
                 return;
+            }
 
             await context.Entry(azuraCast)
                 .Collection(a => a.Stations)
@@ -661,7 +709,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             AzuraCastStationEntity? azuraStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station);
             if (azuraStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(guildId, azuraCast.Id, station);
                 return;
+            }
 
             if (stationId.HasValue)
                 azuraStation.StationId = stationId.Value;
@@ -687,7 +738,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 .FirstOrDefaultAsync();
 
             if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(guildId);
                 return;
+            }
 
             await context.Entry(azuraCast)
                 .Collection(a => a.Stations)
@@ -695,7 +749,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             AzuraCastStationEntity? station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId);
             if (station is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(guildId, azuraCast.Id, stationId);
                 return;
+            }
 
             await context.Entry(station)
                 .Reference(s => s.Checks)
@@ -703,7 +760,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             AzuraCastStationChecksEntity? checks = station.Checks;
             if (checks is null)
+            {
+                _logger.DatabaseAzuraCastStationChecksNotFound(guildId, azuraCast.Id, stationId);
                 return;
+            }
 
             if (fileChanges.HasValue)
                 checks.FileChanges = fileChanges.Value;
@@ -723,7 +783,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 .FirstOrDefaultAsync();
 
             if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(guildId);
                 return;
+            }
 
             await context.Entry(azuraCast)
                 .Collection(a => a.Stations)
@@ -736,21 +799,16 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 return;
             }
 
+            await context.Entry(station)
+                .Reference(s => s.Preferences)
+                .LoadAsync();
+
             AzuraCastStationPreferencesEntity? preferences = station.Preferences;
             if (preferences is null)
             {
                 _logger.DatabaseAzuraCastStationPreferencesNotFound(guildId, azuraCast.Id, stationId);
                 return;
             }
-
-            _logger.LogWarning(preferences.StationId.ToString());
-            _logger.LogWarning(preferences.FileUploadChannelId.ToString());
-            _logger.LogWarning(preferences.FileUploadPath);
-            _logger.LogWarning(preferences.Id.ToString());
-            _logger.LogWarning(preferences.RequestsChannelId.ToString());
-            _logger.LogWarning(preferences.ShowPlaylistInNowPlaying.ToString());
-            _logger.LogWarning(preferences.StationAdminRoleId.ToString());
-            _logger.LogWarning(preferences.StationDjRoleId.ToString());
 
             if (stationAdminGroup.HasValue)
                 preferences.StationAdminRoleId = stationAdminGroup.Value;
@@ -783,7 +841,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 .FirstOrDefaultAsync(g => g.UniqueId == guildId);
 
             if (guild is null)
+            {
+                _logger.DatabaseGuildNotFound(guildId);
                 return;
+            }
 
             await context.Entry(guild)
                 .Reference(g => g.Preferences)
@@ -791,7 +852,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             GuildPreferencesEntity? preferences = guild.Preferences;
             if (preferences is null)
+            {
+                _logger.DatabaseGuildPreferencesNotFound(guildId);
                 return;
+            }
 
             if (adminRoleId.HasValue)
                 preferences.AdminRoleId = adminRoleId.Value;
