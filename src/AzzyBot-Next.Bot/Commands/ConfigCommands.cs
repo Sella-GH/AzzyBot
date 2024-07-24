@@ -347,23 +347,11 @@ public sealed class ConfigCommands
                 showPlaylistInEmbed = false;
             }
 
-            _logger.LogWarning(station.ToString());
-            _logger.LogWarning(stationId.ToString());
-            _logger.LogWarning(apiKey?.ToString());
-
             if (stationId.HasValue || !string.IsNullOrWhiteSpace(apiKey))
                 await _db.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, apiKey);
 
             if (adminGroup is not null || djGroup is not null || uploadChannel is not null || requestsChannel is not null || !string.IsNullOrWhiteSpace(uploadPath) || showPlaylistInEmbed is not null)
-            {
-                _logger.LogWarning(adminGroup?.ToString());
-                _logger.LogWarning(djGroup?.ToString());
-                _logger.LogWarning(uploadChannel?.ToString());
-                _logger.LogWarning(requestsChannel?.ToString());
-                _logger.LogWarning(uploadPath?.ToString());
-                _logger.LogWarning(showPlaylistInEmbed?.ToString());
                 await _db.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, adminGroup?.Id, djGroup?.Id, uploadChannel?.Id, requestsChannel?.Id, uploadPath, showPlaylistInEmbed);
-            }
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your settings were saved successfully and private data has been encrypted.");

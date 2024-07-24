@@ -661,7 +661,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             {
                 _logger.DatabaseAzuraCastNotFound(guildId);
                 return;
-            }    
+            }
 
             await context.Entry(azuraCast)
                 .Reference(a => a.Preferences)
