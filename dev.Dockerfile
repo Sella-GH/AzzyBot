@@ -5,21 +5,21 @@ RUN apk update && apk upgrade
 RUN apk cache sync
 WORKDIR /build
 COPY ./ ./
-RUN dotnet restore ./src/AzzyBot-Next.Bot/AzzyBot-Next.Bot.csproj
 ARG ARCH
 ARG CONFIG
 ARG OS
+RUN dotnet restore ./src/AzzyBot-Next.Bot/AzzyBot-Next.Bot.csproj
 RUN dotnet publish ./src/AzzyBot-Next.Bot/AzzyBot-Next.Bot.csproj -a $ARCH -c $CONFIG --os $OS -o out
 
 # RUNNER IMAGE
 FROM mcr.microsoft.com/dotnet/runtime:8.0-alpine
+USER root
 
 # Add environment variables
 ENV LC_ALL=en.US.UTF-8
 ENV LANG=en.US.UTF-8
 
 # Upgrade internal tools and packages first
-USER root
 RUN apk update && apk upgrade
 RUN apk add --no-cache icu-data-full icu-libs iputils-ping sed tzdata
 RUN apk cache sync
