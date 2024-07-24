@@ -1,4 +1,21 @@
-## 2.0.0-preview4.1
+## 2.0.0-preview5
+### Breaking Changes
+- Your Database needs a complete reset, please DROP it and start from scratch
+  - You'll likely experience this a few more times until the final release
+  - No, I won't provide migration scripts for preview versions unless I'm fully confident that the database structure is somewhat final
+
+### Additions
+- The `MusicStreaming` module is back
+  - You can stream your stations mount points again
+
+### Removements
+- Removed the `MountPoint` entity of the database
+- Removed the `Name` property in the station config
+
+### Improvements
+- `music now-playing` shows the station name now
+
+## 2.0.0-preview4.1 - 2024-07-21
 ### Fixes
 - The update instructions for docker are now correct
 - The `core help` single command is now working correctly again
