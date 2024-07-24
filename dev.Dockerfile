@@ -36,7 +36,7 @@ RUN sed -i "s\Lines of source code not found\\$LOC_CS\g" /app/Modules/Core/Files
 
 # Add new user
 RUN addgroup azzy
-RUN adduser -G azzy azzy
+RUN adduser -D -G azzy azzy
 RUN chown -R azzy:azzy /app
 RUN chmod 0755 -R /app
 USER azzy
