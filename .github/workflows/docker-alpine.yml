@@ -81,9 +81,9 @@ jobs:
         id: runtime
         run: |
           if [[ "${{ steps.config.outputs.config }}" == "Docker" ]]; then
-            echo "runtime=release.Dockerfile" >> "$GITHUB_OUTPUT"
+            echo "runtime=release.alpine.Dockerfile" >> "$GITHUB_OUTPUT"
           else
-            echo "runtime=dev.Dockerfile" >> "$GITHUB_OUTPUT"
+            echo "runtime=dev.alpine.Dockerfile" >> "$GITHUB_OUTPUT"
           fi
           
       - name: Get Date and Time
