@@ -79,7 +79,7 @@ jobs:
         id: runtime
         run: |
           if [[ "${{ steps.config.outputs.config }}" == "Docker" ]]; then
-            echo "runtime=Dockerfile" >> "$GITHUB_OUTPUT"
+            echo "runtime=release.Dockerfile" >> "$GITHUB_OUTPUT"
           else
             echo "runtime=dev.Dockerfile" >> "$GITHUB_OUTPUT"
           fi
@@ -188,7 +188,7 @@ jobs:
         id: runtime
         run: |
           if [[ "${{ steps.config.outputs.config }}" == "Docker" ]]; then
-            echo "runtime=Dockerfile" >> "$GITHUB_OUTPUT"
+            echo "runtime=release.Dockerfile" >> "$GITHUB_OUTPUT"
           else
             echo "runtime=dev.Dockerfile" >> "$GITHUB_OUTPUT"
           fi
