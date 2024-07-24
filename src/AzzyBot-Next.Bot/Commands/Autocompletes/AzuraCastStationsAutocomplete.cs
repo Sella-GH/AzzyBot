@@ -65,7 +65,7 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
             {
                 case "play":
                     if (config.IsEnabled)
-                        results.Add($"{azuraStation.Name} ({Misc.ReadableBool(config.IsEnabled, ReadbleBool.StartedStopped, true)})", station.StationId);
+                        results.Add(azuraStation.Name, station.StationId);
 
                     break;
 
@@ -83,7 +83,7 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
                     break;
 
                 default:
-                    results.Add($"{azuraStation.Name}", station.StationId);
+                    results.Add(azuraStation.Name, station.StationId);
                     break;
             }
         }
