@@ -156,6 +156,7 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
+            ["Station"] = new(data.Station.Name),
             ["Title"] = new(data.NowPlaying.Song.Title),
             ["By"] = new(data.NowPlaying.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase))
         };

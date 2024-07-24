@@ -4,6 +4,9 @@ namespace AzzyBot.Bot.Utilities.Records.AzuraCast;
 
 public sealed record AzuraNowPlayingDataRecord
 {
+    [JsonPropertyName("station")]
+    public required AzuraStationRecord Station { get; init; }
+
     [JsonPropertyName("now_playing")]
     public required AzuraNowPlayingRecord NowPlaying { get; init; }
 
