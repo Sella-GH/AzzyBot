@@ -103,6 +103,8 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 AzuraCastId = azura.Id
             };
 
+            _logger.LogWarning($"CREATING NEW STATION: {station.Id.ToString()}");
+
             station.Checks = new()
             {
                 FileChanges = fileChanges,
