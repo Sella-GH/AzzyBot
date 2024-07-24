@@ -95,34 +95,28 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             if (azura is null)
                 return;
 
-            AzuraCastStationEntity station = new()
+            azura.Stations.Add(new AzuraCastStationEntity()
             {
                 StationId = stationId,
                 ApiKey = (string.IsNullOrWhiteSpace(apiKey)) ? string.Empty : Crypto.Encrypt(apiKey),
                 LastSkipTime = DateTime.MinValue,
-                AzuraCastId = azura.Id
-            };
+                AzuraCastId = azura.Id,
+                Checks = new AzuraCastStationChecksEntity()
+                {
+                    FileChanges = fileChanges
+                },
+                Preferences = new AzuraCastStationPreferencesEntity()
+                {
+                    FileUploadChannelId = fileUploadId ?? 0,
+                    FileUploadPath = fileUploadPath ?? string.Empty,
+                    RequestsChannelId = requestsId,
+                    ShowPlaylistInNowPlaying = showPlaylist,
+                    StationAdminRoleId = stationAdminGroup,
+                    StationDjRoleId = stationDjGroup ?? 0
+                }
+            });
 
-            _logger.LogWarning($"CREATING NEW STATION: {station.Id.ToString()}");
-
-            station.Checks = new()
-            {
-                FileChanges = fileChanges,
-                StationId = station.Id
-            };
-
-            station.Preferences = new()
-            {
-                FileUploadChannelId = fileUploadId ?? 0,
-                FileUploadPath = fileUploadPath ?? string.Empty,
-                RequestsChannelId = requestsId,
-                ShowPlaylistInNowPlaying = showPlaylist,
-                StationAdminRoleId = stationAdminGroup,
-                StationDjRoleId = stationDjGroup ?? 0,
-                StationId = station.Id
-            };
-
-            await context.AzuraCastStations.AddAsync(station);
+            context.AzuraCast.Update(azura);
         });
     }
 
