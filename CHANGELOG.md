@@ -17,6 +17,7 @@
 
 ### Fixes
 - `modify azuracast-station` works again
+- Logging of 404 errors in the AzuraCast API is gone when starting the station and Liquidsoap is not ready yet
 
 ## 2.0.0-preview4.1 - 2024-07-21
 ### Fixes

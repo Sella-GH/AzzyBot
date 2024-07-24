@@ -169,7 +169,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
-        string body = await _webService.GetWebAsync(uri, headers, true, noLogging);
+        string body = await _webService.GetWebAsync(uri, headers, true, true, noLogging);
         return (string.IsNullOrWhiteSpace(body))
             ? throw new InvalidOperationException($"API response is empty, url: {uri}")
             : JsonSerializer.Deserialize<T>(body) ?? throw new InvalidOperationException($"Could not deserialize body: {body}");
