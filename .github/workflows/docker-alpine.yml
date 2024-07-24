@@ -9,9 +9,12 @@ on:
       - "**.props"
       - "**.sln"
       - "**/docker.yml"
+      - "**/docker-alpine.yml"
       - "CHANGELOG.md"
-      - "Dockerfile"
+      - "dev.alpine.Dockerfile"
       - "dev.Dockerfile"
+      - "release.alpine.Dockerfile"
+      - "release.Dockerfile"
   workflow_dispatch:
 
 jobs:
