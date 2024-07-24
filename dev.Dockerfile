@@ -1,7 +1,8 @@
 # BUILD IMAGE
 FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 USER root
-#RUN apk update && apk upgrade
+RUN apk update && apk upgrade
+RUN apk cache sync
 WORKDIR /build
 COPY ./ ./
 RUN dotnet restore ./src/AzzyBot-Next.Bot/AzzyBot-Next.Bot.csproj
@@ -21,6 +22,7 @@ ENV LANG=en.US.UTF-8
 USER root
 RUN apk update && apk upgrade
 RUN apk add --no-cache icu-data-full icu-libs iputils-ping sed tzdata
+RUN apk cache sync
 
 # Copy the built app
 WORKDIR /app
