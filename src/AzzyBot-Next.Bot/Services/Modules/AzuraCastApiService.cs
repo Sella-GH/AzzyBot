@@ -82,7 +82,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         int stationId = station.StationId;
         AzuraAdminStationConfigRecord config = await GetStationAdminConfigAsync(new(baseUrl), Crypto.Decrypt(station.AzuraCast.AdminApiKey), stationId);
 
-        List <Uri> apis = [];
+        List<Uri> apis = [];
         apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}"));
         apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlists}"));
         apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}"));
