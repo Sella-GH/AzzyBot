@@ -103,7 +103,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
             return;
 
         StringBuilder builder = new();
-        builder.AppendLine(CultureInfo.InvariantCulture, $"I can't access the following endpoints for station **{Crypto.Decrypt(station.Name)}**:");
+        builder.AppendLine(CultureInfo.InvariantCulture, $"I can't access the following endpoints for station **{config.Name}**:");
         foreach (string api in missing)
         {
             builder.AppendLine(api);

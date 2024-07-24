@@ -15,11 +15,6 @@ public sealed class AzuraCastStationEntity
     public int StationId { get; set; }
 
     /// <summary>
-    /// The name of the AzuraCast station.
-    /// </summary>
-    public string Name { get; set; } = string.Empty;
-
-    /// <summary>
     /// The api key of the station.
     /// </summary>
     /// <remarks>

@@ -154,10 +154,6 @@ namespace AzzyBot.Data.Migrations
                     b.Property<DateTime>("LastSkipTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<int>("StationId")
                         .HasColumnType("integer");
 

@@ -10,6 +10,9 @@ public sealed record AzuraStationRecord
     [JsonPropertyName("id")]
     public required int Id { get; init; }
 
+    [JsonPropertyName("name")]
+    public required string Name { get; init; }
+
     [JsonPropertyName("shortcode")]
     public required string Shortcode { get; init; }
 

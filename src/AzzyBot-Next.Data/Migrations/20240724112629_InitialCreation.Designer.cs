@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AzzyBot.Data.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20240721212308_InitialCreation")]
+    [Migration("20240724112629_InitialCreation")]
     partial class InitialCreation
     {
         /// <inheritdoc />
@@ -156,10 +156,6 @@ namespace AzzyBot.Data.Migrations
 
                     b.Property<DateTime>("LastSkipTime")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<int>("StationId")
                         .HasColumnType("integer");

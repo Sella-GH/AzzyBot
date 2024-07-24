@@ -123,7 +123,6 @@ namespace AzzyBot.Data.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     StationId = table.Column<int>(type: "integer", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
                     ApiKey = table.Column<string>(type: "text", nullable: false),
                     LastSkipTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     AzuraCastId = table.Column<int>(type: "integer", nullable: false)

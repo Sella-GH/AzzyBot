@@ -82,7 +82,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, string name, ulong stationAdminGroup, ulong requestsId, bool showPlaylist, bool fileChanges, ulong? fileUploadId = null, string? fileUploadPath = null, string? apiKey = null, ulong? stationDjGroup = null)
+    public Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, ulong stationAdminGroup, ulong requestsId, bool showPlaylist, bool fileChanges, ulong? fileUploadId = null, string? fileUploadPath = null, string? apiKey = null, ulong? stationDjGroup = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -98,7 +98,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             AzuraCastStationEntity station = new()
             {
                 StationId = stationId,
-                Name = Crypto.Encrypt(name),
                 ApiKey = (string.IsNullOrWhiteSpace(apiKey)) ? string.Empty : Crypto.Encrypt(apiKey),
                 LastSkipTime = DateTime.MinValue,
                 AzuraCastId = azura.Id
@@ -643,7 +642,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? name = null, string? apiKey = null, DateTime? lastSkipTime = null)
+    public Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? apiKey = null, DateTime? lastSkipTime = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -666,9 +665,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             if (stationId.HasValue)
                 azuraStation.StationId = stationId.Value;
-
-            if (!string.IsNullOrWhiteSpace(name))
-                azuraStation.Name = Crypto.Encrypt(name);
 
             if (!string.IsNullOrWhiteSpace(apiKey))
                 azuraStation.ApiKey = Crypto.Encrypt(apiKey);

@@ -91,16 +91,10 @@ public sealed class CoreServiceHost(IDbContextFactory<AzzyDbContext> dbContextFa
                 entity.AdminApiKey = Crypto.Encrypt(entity.AdminApiKey, newEncryptionKey);
             }
 
-            foreach (AzuraCastStationEntity entity in azuraCastStations)
+            foreach (AzuraCastStationEntity entity in azuraCastStations.Where(e => !string.IsNullOrWhiteSpace(e.ApiKey)))
             {
-                entity.Name = Crypto.Decrypt(entity.Name);
-                entity.Name = Crypto.Encrypt(entity.Name, newEncryptionKey);
-
-                if (!string.IsNullOrWhiteSpace(entity.ApiKey))
-                {
-                    entity.ApiKey = Crypto.Decrypt(entity.ApiKey);
-                    entity.ApiKey = Crypto.Encrypt(entity.ApiKey, newEncryptionKey);
-                }
+                entity.ApiKey = Crypto.Decrypt(entity.ApiKey);
+                entity.ApiKey = Crypto.Encrypt(entity.ApiKey, newEncryptionKey);
             }
 
             await dbContext.SaveChangesAsync();
