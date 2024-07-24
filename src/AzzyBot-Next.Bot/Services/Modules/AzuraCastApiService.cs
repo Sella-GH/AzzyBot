@@ -612,7 +612,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
                     firstTime = false;
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(10));
+                await Task.Delay(TimeSpan.FromSeconds(30));
             }
         }
 
