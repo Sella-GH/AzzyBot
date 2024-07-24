@@ -21,7 +21,7 @@ namespace AzzyBot.Bot.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static void AzzyBotServices(this IServiceCollection services, bool isDocker)
+    public static void AzzyBotServices(this IServiceCollection services, bool isDev, bool isDocker)
     {
         IServiceProvider serviceProvider = services.BuildServiceProvider();
         AzzyBotSettingsRecord settings = serviceProvider.GetRequiredService<AzzyBotSettingsRecord>();
@@ -35,7 +35,7 @@ public static class ServiceCollectionExtensions
         services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
 
         string connectionString = GetConnectionString(settings.Database?.Host, settings.Database?.Port, settings.Database?.User, settings.Database?.Password, settings.Database?.DatabaseName);
-        services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor());
+        services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor().EnableSensitiveDataLogging(isDev));
         services.AddSingleton<DbActions>();
 
         services.AddSingleton<DiscordBotService>();
