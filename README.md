@@ -9,9 +9,12 @@
     <a href="https://github.com/Sella-GH/AzzyBot/wiki"><strong>Explore the docs »</strong></a>
     <br/>
     <br/>
-    <a href="https://github.com/Sella-GH/AzzyBot/issues">Report Bug</a>
-    .
-    <a href="https://github.com/Sella-GH/AzzyBot/issues">Request Feature</a>
+    <a href="https://github.com/Sella-GH/AzzyBot/issues">Report a bug</a>
+    -
+    <a href="https://github.com/Sella-GH/AzzyBot/issues">Request a feature</a>
+    <br/>
+    <br/>
+    <a href="https://discord.gg/8j6kRAJ5AY">Join the discord community</a>
   </p>
 </p>
 
@@ -22,38 +25,30 @@
 [![Issues](https://img.shields.io/github/issues/Sella-GH/AzzyBot)](https://github.com/Sella-GH/AzzyBot/issues)
 [![PullRequests](https://img.shields.io/github/issues-pr/Sella-GH/AzzyBot)](https://github.com/Sella-GH/AzzyBot/pulls)
 
-## Table Of Contents
+## About AzzyBot
 
-* [About the Project](#about-the-project)
-* [Built With](#built-with)
-* [Getting Started](#getting-started)
-  * [Prerequisites](#prerequisites)
-  * [Installation](#installation)
-* [Roadmap](#roadmap)
-* [Contributing](#contributing)
-* [License](#license)
-* [Authors](#authors)
-* [Acknowledgements](#acknowledgements)
+### Features
+* Modify and work with your AzuraCast station directly from discord
+* Check if new files were added to your station
+* Check if the instance needs some updates
+* Check if it's still online or down
+* Export your playlists
+* Get the played song history
+* Get some technical hardware stats of your server
+* Get the songs inside your playlists
+* See what's currently played
+* Switch the current playlist
+* Search and request a specific song on your station
+* Remove songs from your song request queue
+* Skip songs if you don't want to hear them
+* Start and stop your station
+* Update your whole instance with a single command
+* Users are able to upload files to a specific channel
+* View your AzuraCast system logs
 
-## About The Project
+### Installation
 
-Since my previous project "needed" a discord bot solution to comfort the opening and closing of a so called "club" - I built a discord bot to ensure the best comfort while using it.
-
-The bot contains of the following features:
-- A modular approach on the activating/disabling of features
-- Help command to see all features
-- Integrated updater (more or less functional)
-- Resource usage of AzuraCast and AzzyBot displayed in embeds
-- Checks if files were changed, AzuraCast is offline or automatic "closing" if no listeners are reported on the station
-- Playlist export
-- Local cache of music metadata
-- Switching playlists
-- Get song history of the last 14 days
-- Get songs in playlist
-- Currently played song
-- Song requests
-- Favorite songs (manually)
-- Opening and closing a "club" (a station) also includes statistics for the "opening"
+Follow the instructions inside the [Wiki](https://github.com/Sella-GH/AzzyBot/wiki).
 
 ## Built With
 ### Software
@@ -67,29 +62,8 @@ The bot contains of the following features:
 * [CsvHelper](https://github.com/JoshClose/CsvHelper)
 * [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus)
 * [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
-* [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
 * [Roslynator](https://github.com/dotnet/roslynator)
-
-## Getting Started
-
-To get a local copy up and running follow these simple example steps.
-
-### Prerequisites
-
-- Operating systems
-  - Debian or Ubuntu
-  - Windows (not all features available)
-  - ARM64 or x64 (no ARM32 or x86 support!)
-- The latest release from [here](https://github.com/Sella-GH/AzzyBot/releases)
-- Docker, if you want to use the image (optional)
-
-### Installation
-
-Follow the instructions inside the [Wiki](https://github.com/Sella-GH/AzzyBot/wiki).
-
-## Roadmap
-
-See the [open issues](https://github.com/Sella-GH/AzzyBot/issues) for a list of proposed features (and known issues).
+* Some Microsoft.Extensions.xxx Libraries
 
 ## Contributing
 
@@ -102,9 +76,9 @@ Contributions are what make the open source community such an amazing place to b
 ### Creating A Pull Request
 
 1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+2. Create your Feature Branch (`git checkout -b feat/AmazingFeature`)
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
+4. Push to the Branch (`git push origin feat/AmazingFeature`)
 5. Open a Pull Request
 
 ## License
@@ -117,4 +91,4 @@ Distributed under the AGPL-3.0 License. See [LICENSE](https://github.com/Sella-G
 
 ## Acknowledgements
 
-* CurtWoodman
+* [CurtWoodman](https://github.com/CurtWoodman)
