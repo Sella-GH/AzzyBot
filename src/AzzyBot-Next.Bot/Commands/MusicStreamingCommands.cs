@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
@@ -28,14 +29,23 @@ public sealed class MusicStreamingCommands
         public async Task JoinAsync(CommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Member, nameof(context.Member));
+            ArgumentNullException.ThrowIfNull(context.Member.VoiceState, nameof(context.Member.VoiceState));
+            ArgumentNullException.ThrowIfNull(context.Member.VoiceState.Channel, nameof(context.Member.VoiceState.Channel));
 
             _logger.CommandRequested(nameof(JoinAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
 
+            if (context.Member.VoiceState.Channel.Users.Contains((DiscordMember)context.Client.CurrentUser))
+            {
+                await context.EditResponseAsync("I'm already in the voice channel.");
+                return;
+            }
+
             await _musicStreaming.JoinChannelAsync(context);
 
-            await context.EditResponseAsync("I here now.");
+            await context.EditResponseAsync("I'm here now.");
         }
 
         [Command("leave"), Description("Leave the voice channel.")]
