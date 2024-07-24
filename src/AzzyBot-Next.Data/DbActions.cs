@@ -82,11 +82,9 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public async Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, ulong stationAdminGroup, ulong requestsId, bool showPlaylist, bool fileChanges, ulong? fileUploadId = null, string? fileUploadPath = null, string? apiKey = null, ulong? stationDjGroup = null)
+    public Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, ulong stationAdminGroup, ulong requestsId, bool showPlaylist, bool fileChanges, ulong? fileUploadId = null, string? fileUploadPath = null, string? apiKey = null, ulong? stationDjGroup = null)
     {
-        bool success = false;
-
-        success = await ExecuteDbActionAsync(async context =>
+        return ExecuteDbActionAsync(async context =>
         {
             AzuraCastEntity? azura = await context.Guilds
                 .Where(g => g.UniqueId == guildId)
@@ -105,39 +103,15 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 AzuraCastId = azura.Id
             };
 
-            await context.AzuraCastStations.AddAsync(station);
-        });
+            _logger.LogWarning($"CREATING NEW STATION: {station.Id.ToString()}");
 
-        success = await ExecuteDbActionAsync(async context =>
-        {
-            AzuraCastStationEntity? station = await context.AzuraCastStations
-                .Where(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == stationId)
-                .OrderBy(s => s.Id)
-                .FirstOrDefaultAsync();
-
-            if (station is null)
-                return;
-
-            AzuraCastStationChecksEntity checks = new()
+            station.Checks = new()
             {
                 FileChanges = fileChanges,
                 StationId = station.Id
             };
 
-            await context.AzuraCastStationChecks.AddAsync(checks);
-        });
-
-        success = await ExecuteDbActionAsync(async context =>
-        {
-            AzuraCastStationEntity? station = await context.AzuraCastStations
-                .Where(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == stationId)
-                .OrderBy(s => s.Id)
-                .FirstOrDefaultAsync();
-
-            if (station is null)
-                return;
-
-            AzuraCastStationPreferencesEntity preferences = new()
+            station.Preferences = new()
             {
                 FileUploadChannelId = fileUploadId ?? 0,
                 FileUploadPath = fileUploadPath ?? string.Empty,
@@ -148,10 +122,8 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 StationId = station.Id
             };
 
-            await context.AzuraCastStationPreferences.AddAsync(preferences);
+            await context.AzuraCastStations.AddAsync(station);
         });
-
-        return success;
     }
 
     public Task<bool> AddGuildAsync(ulong guildId)
