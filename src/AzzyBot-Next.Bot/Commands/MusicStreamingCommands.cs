@@ -84,7 +84,7 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(PlayAsync), context.User.GlobalName);
 
-            AzuraCastEntity azura = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is not set up for this server.");
+            AzuraCastEntity azura = await _dbActions.GetAzuraCastAsync(context.Guild.Id, false, false, true) ?? throw new InvalidOperationException("AzuraCast is not set up for this server.");
             AzuraCastStationEntity stationEntity = azura.Stations.FirstOrDefault(x => x.StationId == station) ?? throw new InvalidOperationException("Station not found.");
             try
             {
