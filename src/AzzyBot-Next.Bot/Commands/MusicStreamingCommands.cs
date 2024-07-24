@@ -29,6 +29,7 @@ public sealed class MusicStreamingCommands
         public async Task JoinAsync(CommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
             ArgumentNullException.ThrowIfNull(context.Member, nameof(context.Member));
             ArgumentNullException.ThrowIfNull(context.Member.VoiceState, nameof(context.Member.VoiceState));
             ArgumentNullException.ThrowIfNull(context.Member.VoiceState.Channel, nameof(context.Member.VoiceState.Channel));
@@ -37,7 +38,7 @@ public sealed class MusicStreamingCommands
 
             await context.DeferResponseAsync();
 
-            if (context.Member.VoiceState.Channel.Users.Contains((DiscordMember)context.Client.CurrentUser))
+            if (context.Member.VoiceState.Channel.Users.Contains(await context.Guild.GetMemberAsync(context.Client.CurrentUser.Id)))
             {
                 await context.EditResponseAsync("I'm already in the voice channel.");
                 return;
