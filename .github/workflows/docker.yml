@@ -40,7 +40,7 @@ jobs:
           echo "clean_version=${{ steps.get-version.outputs.version }}" >> "$GITHUB_OUTPUT"
 
   docker-build-amd:
-    name: Build Docker image for ${{ matrix.os }} - ${{ matrix.arch }}
+    name: Build Docker Image For ${{ matrix.os }} - ${{ matrix.arch }}
     needs: [extract_version]
     runs-on: ubuntu-latest
     strategy:
@@ -149,7 +149,7 @@ jobs:
           retention-days: 1
 
   docker-build-arm:
-    name: Build Docker image for ${{ matrix.os }} - ${{ matrix.arch }}
+    name: Build Docker Image For ${{ matrix.os }} - ${{ matrix.arch }}
     needs: [extract_version]
     runs-on: self-hosted
     strategy:

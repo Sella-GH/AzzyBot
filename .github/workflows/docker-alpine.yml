@@ -67,7 +67,6 @@ jobs:
           else
             echo "environment=${{ github.ref_name }}-alpine" >> "$GITHUB_OUTPUT"
           fi
-  
 
       - name: Get config environment
         id: config
