@@ -15,6 +15,9 @@
 ### Improvements
 - `music now-playing` shows the station name now
 
+### Fixes
+- `modify azuracast-station` works again
+
 ## 2.0.0-preview4.1 - 2024-07-21
 ### Fixes
 - The update instructions for docker are now correct

@@ -36,10 +36,10 @@ public sealed class MusicStreamingService(IAudioService audioService)
             PlayerRetrieveStatus.UserNotInVoiceChannel => "You need to be in a voice channel to use this command.",
             PlayerRetrieveStatus.VoiceChannelMismatch => "You need to be in the same voice channel as me to use this command.",
 
-            PlayerRetrieveStatus.PreconditionFailed when player.Precondition == PlayerPrecondition.NotPaused => "I'm not paused.",
-            PlayerRetrieveStatus.PreconditionFailed when player.Precondition == PlayerPrecondition.NotPlaying => "I'm not playing music.",
-            PlayerRetrieveStatus.PreconditionFailed when player.Precondition == PlayerPrecondition.Paused => "I'm already paused.",
-            PlayerRetrieveStatus.PreconditionFailed when player.Precondition == PlayerPrecondition.Playing => "I'm already playing music.",
+            PlayerRetrieveStatus.PreconditionFailed when player.Precondition?.Equals(PlayerPrecondition.NotPaused) == true => "I'm not paused.",
+            PlayerRetrieveStatus.PreconditionFailed when player.Precondition?.Equals(PlayerPrecondition.NotPlaying) == true => "I'm not playing music.",
+            PlayerRetrieveStatus.PreconditionFailed when player.Precondition?.Equals(PlayerPrecondition.Paused) == true => "I'm already paused.",
+            PlayerRetrieveStatus.PreconditionFailed when player.Precondition?.Equals(PlayerPrecondition.Playing) == true => "I'm already playing music.",
 
             _ => "An unknown error occurred while trying to retrieve the player."
         };
