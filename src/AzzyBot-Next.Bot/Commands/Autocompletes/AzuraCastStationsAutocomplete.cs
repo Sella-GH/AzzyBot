@@ -63,6 +63,12 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
 
             switch (context.Command.Name)
             {
+                case "play":
+                    if (config.IsEnabled)
+                        results.Add($"{azuraStation.Name} ({Misc.ReadableBool(config.IsEnabled, ReadbleBool.StartedStopped, true)})", station.StationId);
+
+                    break;
+
                 case "start-station" when config.IsEnabled:
                 case "stop-station" when !config.IsEnabled:
                     continue;
