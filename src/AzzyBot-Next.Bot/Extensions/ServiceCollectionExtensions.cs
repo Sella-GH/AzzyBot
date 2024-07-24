@@ -102,7 +102,6 @@ public static class ServiceCollectionExtensions
         }
 
         string path = Path.Combine("Settings", settingsFile);
-        Console.Out.WriteLine(path);
 
         AzzyBotSettingsRecord? settings = GetConfiguration(path).Get<AzzyBotSettingsRecord>();
         if (settings is null)
@@ -113,28 +112,6 @@ public static class ServiceCollectionExtensions
 
             Environment.Exit(1);
         }
-
-        Console.WriteLine(settings.BotToken);
-        Console.WriteLine(settings.ErrorChannelId);
-        Console.WriteLine(settings.LogRetentionDays);
-        Console.WriteLine(settings.NotificationChannelId);
-        Console.WriteLine(settings.ServerId);
-        Console.WriteLine(settings.SettingsFile);
-        Console.WriteLine(settings.Database?.DatabaseName);
-        Console.WriteLine(settings.Database?.EncryptionKey);
-        Console.WriteLine(settings.Database?.Host);
-        Console.WriteLine(settings.Database?.Password);
-        Console.WriteLine(settings.Database?.Port);
-        Console.WriteLine(settings.Database?.User);
-        Console.WriteLine(settings.DiscordStatus?.Activity);
-        Console.WriteLine(settings.DiscordStatus?.Doing);
-        Console.WriteLine(settings.DiscordStatus?.Status);
-        Console.WriteLine(settings.DiscordStatus?.StreamUrl);
-        Console.WriteLine(settings.MusicStreaming?.LavalinkHost);
-        Console.WriteLine(settings.MusicStreaming?.LavalinkPassword);
-        Console.WriteLine(settings.MusicStreaming?.LavalinkPort);
-        Console.WriteLine(settings.Updater.DisplayChangelog);
-        Console.WriteLine(settings.Updater.DisplayInstructions);
 
         settings.SettingsFile = path;
 
