@@ -57,7 +57,8 @@ public sealed class MusicStreamingCommands
 
             await context.DeferResponseAsync();
 
-            await _musicStreaming.LeaveChannelAsync(context);
+            if (!await _musicStreaming.LeaveChannelAsync(context))
+                return;
 
             await context.EditResponseAsync("I'm gone now.");
         }
