@@ -103,8 +103,6 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 AzuraCastId = azura.Id
             };
 
-            _logger.LogWarning($"CREATING NEW STATION: {station.Id.ToString()}");
-
             station.Checks = new()
             {
                 FileChanges = fileChanges,
@@ -733,11 +731,26 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
             AzuraCastStationEntity? station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId);
             if (station is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(guildId, azuraCast.Id, stationId);
                 return;
+            }
 
             AzuraCastStationPreferencesEntity? preferences = station.Preferences;
             if (preferences is null)
+            {
+                _logger.DatabaseAzuraCastStationPreferencesNotFound(guildId, azuraCast.Id, stationId);
                 return;
+            }
+
+            _logger.LogWarning(preferences.StationId.ToString());
+            _logger.LogWarning(preferences.FileUploadChannelId.ToString());
+            _logger.LogWarning(preferences.FileUploadPath);
+            _logger.LogWarning(preferences.Id.ToString());
+            _logger.LogWarning(preferences.RequestsChannelId.ToString());
+            _logger.LogWarning(preferences.ShowPlaylistInNowPlaying.ToString());
+            _logger.LogWarning(preferences.StationAdminRoleId.ToString());
+            _logger.LogWarning(preferences.StationDjRoleId.ToString());
 
             if (stationAdminGroup.HasValue)
                 preferences.StationAdminRoleId = stationAdminGroup.Value;
