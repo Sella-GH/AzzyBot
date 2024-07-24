@@ -9,9 +9,12 @@ on:
       - "**.props"
       - "**.sln"
       - "**/docker.yml"
+      - "**/docker-alpine.yml"
       - "CHANGELOG.md"
-      - "Dockerfile"
+      - "dev.alpine.Dockerfile"
       - "dev.Dockerfile"
+      - "release.alpine.Dockerfile"
+      - "release.Dockerfile"
   workflow_dispatch:
 
 jobs:
@@ -40,7 +43,7 @@ jobs:
           echo "clean_version=${{ steps.get-version.outputs.version }}" >> "$GITHUB_OUTPUT"
 
   docker-build-amd:
-    name: Build Docker image for ${{ matrix.os }} - ${{ matrix.arch }}
+    name: Build Docker Image For ${{ matrix.os }} - ${{ matrix.arch }}
     needs: [extract_version]
     runs-on: ubuntu-latest
     strategy:
@@ -79,7 +82,7 @@ jobs:
         id: runtime
         run: |
           if [[ "${{ steps.config.outputs.config }}" == "Docker" ]]; then
-            echo "runtime=Dockerfile" >> "$GITHUB_OUTPUT"
+            echo "runtime=release.Dockerfile" >> "$GITHUB_OUTPUT"
           else
             echo "runtime=dev.Dockerfile" >> "$GITHUB_OUTPUT"
           fi
@@ -149,7 +152,7 @@ jobs:
           retention-days: 1
 
   docker-build-arm:
-    name: Build Docker image for ${{ matrix.os }} - ${{ matrix.arch }}
+    name: Build Docker Image For ${{ matrix.os }} - ${{ matrix.arch }}
     needs: [extract_version]
     runs-on: self-hosted
     strategy:
@@ -188,7 +191,7 @@ jobs:
         id: runtime
         run: |
           if [[ "${{ steps.config.outputs.config }}" == "Docker" ]]; then
-            echo "runtime=Dockerfile" >> "$GITHUB_OUTPUT"
+            echo "runtime=release.Dockerfile" >> "$GITHUB_OUTPUT"
           else
             echo "runtime=dev.Dockerfile" >> "$GITHUB_OUTPUT"
           fi
