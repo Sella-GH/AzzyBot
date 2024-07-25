@@ -13,8 +13,30 @@ on:
   workflow_dispatch:
 
 jobs:
+  extract_meta:
+    name: Extract metadata for use
+    runs-on: ubuntu-latest
+    outputs:
+      loc_cs: ${{ steps.loc_cs.outputs.total_lines }}
+      datetime: ${{ steps.dateTime.outputs.time }}
+
+    steps:
+     - name: Calculate Lines of Source Code
+       id: loc_cs
+       uses: PavanMudigonda/lines-of-code-reporter@v1.6
+       with:
+         exclude_dir: "AzzyBot"
+         include_lang: "C#,MSBuild script"
+          
+     - name: Get Date and Time
+       id: dateTime
+       uses: Kaven-Universe/github-action-current-date-time@v1
+       with:
+         format: "YYYY-MM-DDTHH:mm:ss"
+
   build-amd:
     name: Build DEBUG for ${{ matrix.os }} - ${{ matrix.arch }}
+    needs: extract_meta
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -54,24 +76,11 @@ jobs:
      #  env:
      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-     - name: Calculate Lines of Source Code
-       id: loc_cs
-       uses: PavanMudigonda/lines-of-code-reporter@v1.6
-       with:
-         exclude_dir: "AzzyBot"
-         include_lang: "C#,MSBuild script"
-          
-     - name: Get Date and Time
-       id: dateTime
-       uses: Kaven-Universe/github-action-current-date-time@v1
-       with:
-         format: "YYYY-MM-DDTHH:mm:ss"
-
      - name: Add some basic information
        run: |
          sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot-Next.Bot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
-         sed -i 's\Compilation date not found\${{ steps.dateTime.outputs.time }}\g' ./artifacts/publish/AzzyBot-Next.Bot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
-         sed -i 's\Lines of source code not found\${{ steps.loc_cs.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot-Next.Bot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
+         sed -i 's\Compilation date not found\${{ needs.extract_meta.outputs.datetime }}\g' ./artifacts/publish/AzzyBot-Next.Bot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
+         sed -i 's\Lines of source code not found\${{ needs.extract_meta.outputs.loc_cs }}\g' ./artifacts/publish/AzzyBot-Next.Bot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
        env:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
@@ -80,36 +89,3 @@ jobs:
        with:
          name: debug-${{ matrix.os }}-${{ matrix.arch }}
          path: ./artifacts/publish/AzzyBot-Next.Bot/debug_${{ matrix.os }}-${{ matrix.arch }}
-
-  build-docker:
-    name: Build docker .zip file
-    runs-on: ubuntu-latest
-    steps:
-     - name: Checkout
-       uses: actions/checkout@v4
-       with:
-         fetch-depth: 0
-
-     - name: Getting all files together
-       run: |
-         mkdir docker-zip
-         mv ./CHANGELOG.md ./docker-zip/CHANGELOG.md
-         mv ./CHANGELOG_HISTORY.md ./docker-zip/CHANGELOG_HISTORY.md
-         mv ./docker-compose.dev.yml ./docker-zip/docker-compose.yml
-         mv ./LICENSE ./docker-zip/LICENSE
-         mkdir -p ./docker-zip/AzzyBot/Logs
-         mv ./README.md ./docker-zip/README.md
-         mv ./SECURITY.md ./docker-zip/SECURITY.md
-         mkdir -p ./docker-zip/AzzyBot/Modules/AzuraCast/Files
-         #mkdir -p ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins
-         #mv ./src/AzzyBot/Modules/MusicStreaming/Files/application.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/application.yml
-         #mv ./src/AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
-         #wget -qO ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
-         mkdir -p ./docker-zip/AzzyBot/Settings
-         mv ./src/AzzyBot-Next.Bot/Settings/AzzyBotSettings-Docker.json ./docker-zip/AzzyBot/Settings/AzzyBotSettings-Docker.json
-
-     - name: Archive docker-zip artifact
-       uses: actions/upload-artifact@v4
-       with:
-         name: debug-docker
-         path: ./docker-zip

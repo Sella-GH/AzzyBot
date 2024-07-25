@@ -15,9 +15,39 @@ jobs:
     if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
     uses: ./.github/workflows/tag-creation.yml
 
+  extract_meta:
+    name: Extract metadata for use
+    runs-on: ubuntu-latest
+    outputs:
+      loc_cs: ${{ steps.loc_cs.outputs.total_lines }}
+      datetime: ${{ steps.dateTime.outputs.time }}
+      clean_version: ${{ steps.get-version.outputs.clean_version }}
+      version: ${{ steps.get-version.outputs.version }}
+
+    steps:
+     - name: Calculate Lines of Source Code
+       id: loc_cs
+       uses: PavanMudigonda/lines-of-code-reporter@v1.6
+       with:
+         exclude_dir: "AzzyBot"
+         include_lang: "C#,MSBuild script"
+          
+     - name: Get Date and Time
+       id: dateTime
+       uses: Kaven-Universe/github-action-current-date-time@v1
+       with:
+         format: "YYYY-MM-DDTHH:mm:ss"
+
+     - name: Get version from Directory.Build.props
+       id: get-version
+       run: |
+         VERSION=$(grep -oP '(?<=<Version>).*?(?=</Version>)' Directory.Build.props)
+         echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+         echo "clean_version=v$VERSION" >> "$GITHUB_OUTPUT"
+
   build:
     name: Build RELEASE for ${{ matrix.os }} - ${{ matrix.arch }}
-    needs: check_for_tag
+    needs: [check_for_tag, extract_meta]
     if: ${{ needs.check_for_tag.outputs.tag_created == 'true' && contains(github.event.head_commit.message, '[release]') }}
     runs-on: ubuntu-latest
     strategy:
@@ -55,24 +85,11 @@ jobs:
       #  env:
       #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Calculate Lines of Source Code
-        id: loc_cs
-        uses: PavanMudigonda/lines-of-code-reporter@v1.6
-        with:
-          exclude_dir: "AzzyBot"
-          include_lang: "C#,MSBuild script"
-          
-      - name: Get Date and Time
-        id: dateTime
-        uses: Kaven-Universe/github-action-current-date-time@v1
-        with:
-          format: "YYYY-MM-DDTHH:mm:ss"
-
       - name: Add some basic information
         run: |
           sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot-Next.Bot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
-          sed -i 's\Compilation date not found\${{ steps.dateTime.outputs.time }}\g' ./artifacts/publish/AzzyBot-Next.Bot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
-          sed -i 's\Lines of source code not found\${{ steps.loc_cs.outputs.total_lines }}\g' ./artifacts/publish/AzzyBot-Next.Bot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
+          sed -i 's\Compilation date not found\${{ needs.extract_meta.outputs.datetime }}\g' ./artifacts/publish/AzzyBot-Next.Bot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
+          sed -i 's\Lines of source code not found\${{ needs.extract_meta.outputs.loc_cs }}\g' ./artifacts/publish/AzzyBot-Next.Bot/release_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBot.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
@@ -116,34 +133,9 @@ jobs:
           name: release-docker
           path: ./docker-zip
 
-  extract_version:
-    name: Get Release Version
-    needs: check_for_tag
-    runs-on: ubuntu-latest
-    outputs:
-      clean_version: ${{ steps.set-version.outputs.clean_version }}
-      version: ${{ steps.set-version.outputs.version }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Get version from Directory.Build.props
-        id: get-version
-        run: |
-          VERSION=$(grep -oP '(?<=<Version>).*?(?=</Version>)' Directory.Build.props)
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-
-      - name: Set version
-        id: set-version
-        run: |
-          echo "version=v${{ steps.get-version.outputs.version }}" >> "$GITHUB_OUTPUT"
-          echo "clean_version=${{ steps.get-version.outputs.version }}" >> "$GITHUB_OUTPUT"
-
   create_release:
     name: Create GitHub Release
-    needs: [build-docker, extract_version]
+    needs: [extract_meta, build-docker]
     runs-on: ubuntu-latest
     outputs:
       release_version: ${{ steps.set_output.outputs.release_version }}
@@ -173,15 +165,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ needs.extract_version.outputs.version }}
-          name: ${{ needs.extract_version.outputs.clean_version }}
+          tag_name: ${{ needs.extract_meta.outputs.version }}
+          name: ${{ needs.extract_meta.outputs.clean_version }}
           body_path: latest_changelog.md
           prerelease: ${{ contains(github.event.head_commit.message, '[pre-release]') }}
           
       - name: Set Release Version Output
         id: set_output
         run: |
-          echo "release_version=${{ needs.extract_version.outputs.version }}" >> "$GITHUB_OUTPUT"
+          echo "release_version=${{ needs.extract_meta.outputs.version }}" >> "$GITHUB_OUTPUT"
           
   upload_assets:
     name: Upload GitHub Release Assets
