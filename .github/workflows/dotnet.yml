@@ -21,6 +21,11 @@ jobs:
       datetime: ${{ steps.dateTime.outputs.time }}
 
     steps:
+     - name: Checkout
+       uses: actions/checkout@v4
+       with:
+         fetch-depth: 0
+
      - name: Calculate Lines of Source Code
        id: loc_cs
        uses: PavanMudigonda/lines-of-code-reporter@v1.6
