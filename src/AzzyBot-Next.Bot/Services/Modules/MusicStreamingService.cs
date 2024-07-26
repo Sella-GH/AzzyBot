@@ -59,15 +59,31 @@ public sealed class MusicStreamingService(IAudioService audioService)
 
         // Guild has no player
         if (player is null)
+        {
+            Console.Error.WriteLine("Guild has no player.");
             return false;
+        }
 
         // Player doesn't plays anything
         Uri? playedUri = player.CurrentTrack?.Uri;
         if (playedUri is null)
+        {
+            Console.Error.WriteLine("Player doesn't plays anything.");
             return false;
+        }
+
+        Console.WriteLine($"Played URI: {playedUri}");
 
         bool playingHls = playedUri.AbsolutePath.EndsWith(".m3u8", StringComparison.OrdinalIgnoreCase);
+        Console.WriteLine($"Playing HLS: {playingHls}");
+
         Uri stationUri = new((playingHls) ? station.Replace("listen", "live", StringComparison.OrdinalIgnoreCase) : station);
+        Console.WriteLine($"Station URI: {stationUri}");
+
+        int compareResult = Uri.Compare(playedUri, stationUri, UriComponents.Host, UriFormat.UriEscaped, StringComparison.OrdinalIgnoreCase);
+        Console.WriteLine($"Compare result: {compareResult}");
+
+        Console.WriteLine((compareResult is -1 or 1) && playedUri.AbsolutePath == stationUri.AbsolutePath);
 
         return (Uri.Compare(playedUri, stationUri, UriComponents.Host, UriFormat.UriEscaped, StringComparison.OrdinalIgnoreCase) is -1 or 1) && playedUri.AbsolutePath == stationUri.AbsolutePath;
     }

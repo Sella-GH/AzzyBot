@@ -264,8 +264,13 @@ public sealed class AzuraCastCommands
 
             await context.EditResponseAsync($"I stopped the station **{azuraStation.Name}**.");
 
+            _logger.LogWarning($"{Crypto.Decrypt(azuraCast.BaseUrl)}/listen/{azuraStation.Shortcode}");
+
             if (await _musicStreaming.CheckIfPlayedMusicIsStation(context, $"{Crypto.Decrypt(azuraCast.BaseUrl)}/listen/{azuraStation.Shortcode}"))
+            {
+                _logger.LogWarning("The bot was playing music from the station that was stopped. Leaving the channel now.");
                 await _musicStreaming.LeaveChannelAsync(context);
+            }
         }
 
         [Command("toggle-song-requests"), Description("Enable or disable song requests for the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
