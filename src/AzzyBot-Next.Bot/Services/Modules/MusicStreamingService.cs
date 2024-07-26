@@ -50,10 +50,10 @@ public sealed class MusicStreamingService(IAudioService audioService)
         return null;
     }
 
-    public async Task<bool> CheckIfPlayedMusicIsStation(CommandContext context, Uri stationUri)
+    public async Task<bool> CheckIfPlayedMusicIsStation(CommandContext context, string station)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
-        ArgumentNullException.ThrowIfNull(stationUri, nameof(stationUri));
+        ArgumentException.ThrowIfNullOrWhiteSpace(station, nameof(station));
 
         LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, false);
 
@@ -65,6 +65,9 @@ public sealed class MusicStreamingService(IAudioService audioService)
         Uri? playedUri = player.CurrentTrack?.Uri;
         if (playedUri is null)
             return false;
+
+        bool playingHls = playedUri.AbsolutePath.EndsWith(".m3u8", StringComparison.OrdinalIgnoreCase);
+        Uri stationUri = new((playingHls) ? station.Replace("listen", "live", StringComparison.OrdinalIgnoreCase) : station);
 
         return (Uri.Compare(playedUri, stationUri, UriComponents.Host, UriFormat.UriEscaped, StringComparison.OrdinalIgnoreCase) is -1 or 1) && playedUri.AbsolutePath == stationUri.AbsolutePath;
     }

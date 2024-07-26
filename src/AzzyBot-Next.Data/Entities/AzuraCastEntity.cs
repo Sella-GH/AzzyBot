@@ -14,11 +14,17 @@ public sealed class AzuraCastEntity
     /// <summary>
     /// The base url of the AzuraCast instance.
     /// </summary>
+    /// <remarks>
+    /// This property is encrypted.
+    /// </remarks>
     public string BaseUrl { get; set; } = string.Empty;
 
     /// <summary>
     /// The administrative api key of the AzuraCast instance.
     /// </summary>
+    /// <remarks>
+    /// This property is encrypted.
+    /// </remarks>
     public string AdminApiKey { get; set; } = string.Empty;
 
     /// <summary>

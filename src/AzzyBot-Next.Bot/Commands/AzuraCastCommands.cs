@@ -264,7 +264,7 @@ public sealed class AzuraCastCommands
 
             await context.EditResponseAsync($"I stopped the station **{azuraStation.Name}**.");
 
-            if (await _musicStreaming.CheckIfPlayedMusicIsStation(context, new(azuraCast.BaseUrl)))
+            if (await _musicStreaming.CheckIfPlayedMusicIsStation(context, $"{Crypto.Decrypt(azuraCast.BaseUrl)}/listen/{azuraStation.Shortcode}"))
                 await _musicStreaming.LeaveChannelAsync(context);
         }
 

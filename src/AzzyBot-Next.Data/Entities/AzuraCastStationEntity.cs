@@ -19,6 +19,7 @@ public sealed class AzuraCastStationEntity
     /// </summary>
     /// <remarks>
     /// Can be empty if no key was provided. Then the administrative key of the parenting <see cref="AzuraCastEntity"/> database item is used.
+    /// This property is encrypted.
     /// </remarks>
     public string ApiKey { get; set; } = string.Empty;
 
