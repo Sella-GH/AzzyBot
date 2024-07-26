@@ -37,12 +37,13 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AzuraCastCommands
 {
     [Command("azuracast"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator), ModuleActivatedCheck(AzzyModules.AzuraCast)]
-    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCast, AzzyBackgroundService backgroundService, DbActions dbActions, WebRequestService webRequest)
+    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCast, AzzyBackgroundService backgroundService, DbActions dbActions, MusicStreamingService musicStreaming, WebRequestService webRequest)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCast = azuraCast;
         private readonly AzzyBackgroundService _backgroundService = backgroundService;
         private readonly DbActions _dbActions = dbActions;
+        private readonly MusicStreamingService _musicStreaming = musicStreaming;
         private readonly WebRequestService _webRequest = webRequest;
 
         [Command("export-playlists"), Description("Export all playlists from the selected AzuraCast station into a zip file."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -262,6 +263,9 @@ public sealed class AzuraCastCommands
             AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
 
             await context.EditResponseAsync($"I stopped the station **{azuraStation.Name}**.");
+
+            if (await _musicStreaming.CheckIfPlayedMusicIsStation(context, new(azuraCast.BaseUrl)))
+                await _musicStreaming.LeaveChannelAsync(context);
         }
 
         [Command("toggle-song-requests"), Description("Enable or disable song requests for the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]

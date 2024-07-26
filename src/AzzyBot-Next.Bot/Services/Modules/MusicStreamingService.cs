@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Threading.Tasks;
 using DSharpPlus.Commands;
 using Lavalink4NET;
@@ -47,6 +48,25 @@ public sealed class MusicStreamingService(IAudioService audioService)
         await context.EditResponseAsync(errorMessage);
 
         return null;
+    }
+
+    public async Task<bool> CheckIfPlayedMusicIsStation(CommandContext context, Uri stationUri)
+    {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(stationUri, nameof(stationUri));
+
+        LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, false);
+
+        // Guild has no player
+        if (player is null)
+            return false;
+
+        // Player doesn't plays anything
+        Uri? playedUri = player.CurrentTrack?.Uri;
+        if (playedUri is null)
+            return false;
+
+        return (Uri.Compare(playedUri, stationUri, UriComponents.Host, UriFormat.UriEscaped, StringComparison.OrdinalIgnoreCase) is -1 or 1) && playedUri.AbsolutePath == stationUri.AbsolutePath;
     }
 
     public async Task<bool> JoinChannelAsync(CommandContext context)
