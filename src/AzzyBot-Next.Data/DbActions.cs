@@ -295,7 +295,8 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             .OrderBy(g => g.Id)
             .IncludeIf(loadGuildPrefs, q => q.Include(g => g.Preferences))
             .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast).Include(g => g.AzuraCast!.Checks).Include(g => g.AzuraCast!.Preferences))
-            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Checks).ThenInclude(c => c).Include(s => s.Preferences).ThenInclude(p => p))
+            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Checks))
+            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Preferences))
             .ToListAsync();
     }
 
