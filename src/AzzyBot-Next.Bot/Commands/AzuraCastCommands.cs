@@ -259,11 +259,10 @@ public sealed class AzuraCastCommands
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
             AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
 
-            string playResult = await _musicStreaming.CheckIfPlayedMusicIsStationAsync(context, $"{Crypto.Decrypt(azuraCast.BaseUrl)}/listen/{azuraStation.Shortcode}");
-            if (playResult is not "NotPlaying")
+            if (await _musicStreaming.CheckIfPlayedMusicIsStationAsync(context, $"{Crypto.Decrypt(azuraCast.BaseUrl)}/listen/{azuraStation.Shortcode}"))
             {
                 await _musicStreaming.StopMusicAsync(context, false);
-                await Task.Delay(TimeSpan.FromSeconds((playResult is "PlayingHls") ? 15 : 5));
+                await Task.Delay(TimeSpan.FromSeconds(5));
             }
 
             await _azuraCast.StopStationAsync(new(baseUrl), apiKey, station);

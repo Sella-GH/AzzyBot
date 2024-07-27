@@ -50,32 +50,26 @@ public sealed class MusicStreamingService(IAudioService audioService)
         return null;
     }
 
-    public async Task<string> CheckIfPlayedMusicIsStationAsync(CommandContext context, string station)
+    public async Task<bool> CheckIfPlayedMusicIsStationAsync(CommandContext context, string station)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentException.ThrowIfNullOrWhiteSpace(station, nameof(station));
 
         LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, false);
-        const string NotPlaying = "NotPlaying";
-        const string PlayingHls = "PlayingHls";
-        const string PlayingRegular = "PlayingRegular";
 
         // Guild has no player
         if (player is null)
-            return NotPlaying;
+            return false;
 
         // Player doesn't plays anything
         Uri? playedUri = player.CurrentTrack?.Uri;
         if (playedUri is null)
-            return NotPlaying;
+            return false;
 
         bool playingHls = playedUri.AbsolutePath.EndsWith(".m3u8", StringComparison.OrdinalIgnoreCase);
         Uri stationUri = new((playingHls) ? station.Replace("/listen/", "/hls/", StringComparison.OrdinalIgnoreCase) : station);
 
-        if (!(Uri.Compare(playedUri, stationUri, UriComponents.Host, UriFormat.UriEscaped, StringComparison.OrdinalIgnoreCase) is 0 && playedUri.AbsolutePath.StartsWith(stationUri.AbsolutePath, StringComparison.OrdinalIgnoreCase)))
-            return NotPlaying;
-
-        return (playingHls) ? PlayingHls : PlayingRegular;
+        return (Uri.Compare(playedUri, stationUri, UriComponents.Host, UriFormat.UriEscaped, StringComparison.OrdinalIgnoreCase) is 0) && playedUri.AbsolutePath.StartsWith(stationUri.AbsolutePath, StringComparison.OrdinalIgnoreCase);
     }
 
     public async Task<bool> JoinChannelAsync(CommandContext context)
