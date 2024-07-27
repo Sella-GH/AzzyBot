@@ -157,12 +157,12 @@ public static class EmbedBuilder
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
             ["Station"] = new(data.Station.Name),
-            ["Title"] = new(data.NowPlaying.Song.Title),
-            ["By"] = new(data.NowPlaying.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase))
+            ["Title"] = new(data.NowPlaying.Song.Title, true),
+            ["By"] = new(data.NowPlaying.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true)
         };
 
         if (!string.IsNullOrWhiteSpace(data.NowPlaying.Song.Album))
-            fields.Add("On", new(data.NowPlaying.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase)));
+            fields.Add("On", new(data.NowPlaying.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true));
 
         if (!string.IsNullOrWhiteSpace(data.NowPlaying.Song.Genre))
             fields.Add("Genre", new(data.NowPlaying.Song.Genre));
@@ -174,6 +174,9 @@ public static class EmbedBuilder
         }
         else
         {
+            if (!string.IsNullOrWhiteSpace(playlistName))
+                fields.Add("Playlist", new(playlistName));
+
             TimeSpan duration = TimeSpan.FromSeconds(data.NowPlaying.Duration);
             TimeSpan elapsed = TimeSpan.FromSeconds(data.NowPlaying.Elapsed);
 
@@ -182,9 +185,6 @@ public static class EmbedBuilder
             string progressBar = Misc.GetProgressBar(14, elapsed.TotalSeconds, duration.TotalSeconds);
 
             fields.Add("Duration", new($"{progressBar} `[{songElapsed} / {songDuration}]`"));
-
-            if (!string.IsNullOrWhiteSpace(playlistName))
-                fields.Add("Playlist", new(playlistName));
         }
 
         return CreateBasicEmbed(title, message, DiscordColor.Aquamarine, new(thumbnailUrl), null, null, fields);
@@ -200,12 +200,12 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
-            ["Title"] = new(song.Song.Title),
-            ["By"] = new(song.Song.Artist)
+            ["Title"] = new(song.Song.Title, true),
+            ["By"] = new(song.Song.Artist, true)
         };
 
         if (!string.IsNullOrWhiteSpace(song.Song.Album))
-            fields.Add("On", new(song.Song.Album));
+            fields.Add("On", new(song.Song.Album, true));
 
         if (!string.IsNullOrWhiteSpace(song.Song.Genre))
             fields.Add("Genre", new(song.Song.Genre));
@@ -276,17 +276,17 @@ public static class EmbedBuilder
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
             ["Station"] = new(stationName),
-            ["Title"] = new(file.Title),
-            ["Artist"] = new(file.Artist)
+            ["Title"] = new(file.Title, true),
+            ["Artist"] = new(file.Artist, true)
         };
 
         if (!string.IsNullOrWhiteSpace(file.Album))
-            fields.Add("Album", new(file.Album));
-
-        fields.Add("Duration", new(file.Length));
+            fields.Add("Album", new(file.Album, true));
 
         if (!string.IsNullOrWhiteSpace(file.Genre))
             fields.Add("Genre", new(file.Genre));
+
+        fields.Add("Duration", new(file.Length));
 
         if (!string.IsNullOrWhiteSpace(file.Isrc))
             fields.Add("ISRC", new(file.Isrc));
@@ -331,7 +331,7 @@ public static class EmbedBuilder
                 cpuTempBuilder.AppendLine(CultureInfo.InvariantCulture, $"{kvp.Key}: **{kvp.Value} °C**");
             }
 
-            fields.Add("Temperatures", new(cpuTempBuilder.ToString(), false));
+            fields.Add("Temperatures", new(cpuTempBuilder.ToString()));
         }
 
         if (cpuUsage.Count > 0)
@@ -350,7 +350,7 @@ public static class EmbedBuilder
                 cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Core {counter}: **{kvp.Value}%**");
             }
 
-            fields.Add("CPU Usage", new(cpuUsageBuilder.ToString(), false));
+            fields.Add("CPU Usage", new(cpuUsageBuilder.ToString()));
         }
 
         if (cpuLoads is not null)
@@ -373,13 +373,13 @@ public static class EmbedBuilder
 
         if (networkUsage.Count > 0)
         {
-            StringBuilder networkUsageBuilder = new();
             foreach (KeyValuePair<string, AzzyNetworkSpeedRecord> kvp in networkUsage)
             {
-                networkUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Interface: **{kvp.Key}**\nReceived: **{kvp.Value.Received} KB**\nTransmitted: **{kvp.Value.Transmitted} KB**\n");
-            }
+                if (fields.Count is 20)
+                    break;
 
-            fields.Add("Network Usage", new(networkUsageBuilder.ToString()));
+                fields.Add($"Interface: {kvp.Key}", new($"Received: **{kvp.Value.Received} KB**\nTransmitted: **{kvp.Value.Transmitted} KB**", true));
+            }
         }
 
         return CreateBasicEmbed(title, null, DiscordColor.Orange, avaUrl, null, null, fields);
@@ -414,7 +414,7 @@ public static class EmbedBuilder
         Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
         foreach (AzzyHelpRecord command in commands)
         {
-            fields.Add(command.Name, new(command.Description));
+            fields.Add(command.Name, new(command.Description, true));
         }
 
         return CreateBasicEmbed(title, null, DiscordColor.Blurple, null, null, null, fields);

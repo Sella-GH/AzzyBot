@@ -6,6 +6,7 @@
 
 ### Additions
 - The `MusicStreaming` module is back
+  - If the station is stopped while someone is listening they get disconnected first
   - You can stream your stations mount points again
 
 ### Removements
@@ -14,6 +15,7 @@
 
 ### Improvements
 - `music now-playing` shows the station name now
+- Improved some embed structuring
 
 ### Fixes
 - `modify azuracast-station` works again
