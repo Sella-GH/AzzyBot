@@ -58,7 +58,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
             results.Add(name, mount.Id);
         }
 
-        if (hlsAvailable)
+        if ((string.IsNullOrWhiteSpace(search) || search.Contains("hls", StringComparison.OrdinalIgnoreCase)) && hlsAvailable)
             results.Add("HTTP Live Streaming", 0);
 
         return results;
