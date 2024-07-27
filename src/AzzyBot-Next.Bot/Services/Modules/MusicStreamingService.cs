@@ -17,7 +17,7 @@ public sealed class MusicStreamingService(IAudioService audioService)
 {
     private readonly IAudioService _audioService = audioService;
 
-    public async Task<LavalinkPlayer?> GetLavalinkPlayerAsync(CommandContext context, bool connectToVoice = false, ImmutableArray<IPlayerPrecondition> preconditions = default)
+    public async Task<LavalinkPlayer?> GetLavalinkPlayerAsync(CommandContext context, bool connectToVoice = false, bool suppressResponse = false, ImmutableArray<IPlayerPrecondition> preconditions = default)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
@@ -44,7 +44,8 @@ public sealed class MusicStreamingService(IAudioService audioService)
             _ => "An unknown error occurred while trying to retrieve the player."
         };
 
-        await context.EditResponseAsync(errorMessage);
+        if (!suppressResponse)
+            await context.EditResponseAsync(errorMessage);
 
         return null;
     }
@@ -54,7 +55,7 @@ public sealed class MusicStreamingService(IAudioService audioService)
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentException.ThrowIfNullOrWhiteSpace(station, nameof(station));
 
-        LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, false);
+        LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, false, true);
 
         // Guild has no player
         if (player is null)
