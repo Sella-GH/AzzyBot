@@ -157,6 +157,7 @@ public sealed class DiscordBotServiceHost : IHostedService
         commandsExtension.AddCheck<AzuraCastDiscordChannelCheck>();
         commandsExtension.AddCheck<AzuraCastDiscordPermCheck>();
         commandsExtension.AddCheck<AzuraCastOnlineCheck>();
+        commandsExtension.AddCheck<FeatureAvailableCheck>();
         commandsExtension.AddCheck<ModuleActivatedCheck>();
 
         SlashCommandProcessor slashCommandProcessor = new();
