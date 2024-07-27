@@ -66,7 +66,7 @@ public sealed class MusicStreamingService(IAudioService audioService)
             return false;
 
         bool playingHls = playedUri.AbsolutePath.EndsWith(".m3u8", StringComparison.OrdinalIgnoreCase);
-        Uri stationUri = new((playingHls) ? station.Replace("listen", "live", StringComparison.OrdinalIgnoreCase) : station);
+        Uri stationUri = new((playingHls) ? station.Replace("/listen/", "/hls/", StringComparison.OrdinalIgnoreCase) : station);
 
         return (Uri.Compare(playedUri, stationUri, UriComponents.Host, UriFormat.UriEscaped, StringComparison.OrdinalIgnoreCase) is 0) && playedUri.AbsolutePath.StartsWith(stationUri.AbsolutePath, StringComparison.OrdinalIgnoreCase);
     }
