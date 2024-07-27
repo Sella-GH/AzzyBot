@@ -35,7 +35,7 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
             await context.DeferResponseAsync();
 
         int stationId = Convert.ToInt32(context.Arguments.SingleOrDefault(o => o.Key.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
-        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, false, true, true, false, false, true);
+        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, false, true, true, false, true);
         if (azuraCast is null)
         {
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
@@ -50,11 +50,9 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
             case "azuracast start-station":
             case "azuracast stop-station":
             case "azuracast toggle-song-requests":
-            case "config add-azuracast-station-mount":
             case "config modify-azuracast-station":
             case "config modify-azuracast-station-checks":
             case "config delete-azuracast-station":
-            case "config delete-azuracast-station-mount":
             case "dj delete-song-request":
             case "dj skip-song":
             case "dj switch-playlist":
@@ -102,11 +100,9 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
             case "azuracast start-station":
             case "azuracast stop-station":
             case "azuracast toggle-song-requests":
-            case "config add-azuracast-station-mount":
             case "config modify-azuracast-station":
             case "config modify-azuracast-station-checks":
             case "config delete-azuracast-station":
-            case "config delete-azuracast-station-mount":
                 isStationAdmin = userRoles.Contains(_botService.GetDiscordRole(guildId, station.Preferences.StationAdminRoleId));
                 break;
 

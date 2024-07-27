@@ -4,6 +4,9 @@ namespace AzzyBot.Bot.Utilities.Records.AzuraCast;
 
 public sealed record AzuraAdminStationConfigRecord
 {
+    [JsonPropertyName("name")]
+    public required string Name { get; set; }
+
     [JsonPropertyName("is_enabled")]
     public required bool IsEnabled { get; set; }
 

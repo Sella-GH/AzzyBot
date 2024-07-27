@@ -1,4 +1,27 @@
-## 2.0.0-preview4.1
+## 2.0.0-preview5
+### Breaking Changes
+- Your Database needs a complete reset, please DROP it and start from scratch
+  - You'll likely experience this a few more times until the final release
+  - No, I won't provide migration scripts for preview versions unless I'm fully confident that the database structure is somewhat final
+
+### Additions
+- The `MusicStreaming` module is back
+  - If the station is stopped while someone is listening they get disconnected first
+  - You can stream your stations mount points again
+
+### Removements
+- Removed the `MountPoint` entity of the database
+- Removed the `Name` property in the station config
+
+### Improvements
+- `music now-playing` shows the station name now
+- Improved some embed structuring
+
+### Fixes
+- `modify azuracast-station` works again
+- Logging of 404 errors in the AzuraCast API is gone when starting the station and Liquidsoap is not ready yet
+
+## 2.0.0-preview4.1 - 2024-07-21
 ### Fixes
 - The update instructions for docker are now correct
 - The `core help` single command is now working correctly again

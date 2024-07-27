@@ -55,28 +55,35 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
             if (results.Count == 25)
                 break;
 
-            if (!string.IsNullOrWhiteSpace(search) && !Crypto.Decrypt(station.Name).Contains(search, StringComparison.OrdinalIgnoreCase))
+            AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(baseUrl, station.StationId);
+            if (!string.IsNullOrWhiteSpace(search) && azuraStation.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
                 continue;
 
             AzuraAdminStationConfigRecord config = await _azuraCast.GetStationAdminConfigAsync(baseUrl, apiKey, station.StationId);
 
             switch (context.Command.Name)
             {
+                case "play":
+                    if (config.IsEnabled)
+                        results.Add(azuraStation.Name, station.StationId);
+
+                    break;
+
                 case "start-station" when config.IsEnabled:
                 case "stop-station" when !config.IsEnabled:
                     continue;
 
                 case "start-station" when !config.IsEnabled:
                 case "stop-station" when config.IsEnabled:
-                    results.Add($"{Crypto.Decrypt(station.Name)} ({Misc.ReadableBool(config.IsEnabled, ReadbleBool.StartedStopped, true)})", station.StationId);
+                    results.Add($"{azuraStation.Name} ({Misc.ReadableBool(config.IsEnabled, ReadbleBool.StartedStopped, true)})", station.StationId);
                     break;
 
                 case "toggle-song-requests":
-                    results.Add($"{Crypto.Decrypt(station.Name)} ({Misc.ReadableBool(config.EnableRequests, ReadbleBool.EnabledDisabled, true)})", station.StationId);
+                    results.Add($"{azuraStation.Name} ({Misc.ReadableBool(config.EnableRequests, ReadbleBool.EnabledDisabled, true)})", station.StationId);
                     break;
 
                 default:
-                    results.Add($"{Crypto.Decrypt(station.Name)}", station.StationId);
+                    results.Add(azuraStation.Name, station.StationId);
                     break;
             }
         }

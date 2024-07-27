@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AzzyBot.Data.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20240720134750_InitialCreation")]
+    [Migration("20240724112629_InitialCreation")]
     partial class InitialCreation
     {
         /// <inheritdoc />
@@ -157,10 +157,6 @@ namespace AzzyBot.Data.Migrations
                     b.Property<DateTime>("LastSkipTime")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<int>("StationId")
                         .HasColumnType("integer");
 
@@ -169,32 +165,6 @@ namespace AzzyBot.Data.Migrations
                     b.HasIndex("AzuraCastId");
 
                     b.ToTable("AzuraCastStations");
-                });
-
-            modelBuilder.Entity("AzzyBot.Data.Entities.AzuraCastStationMountEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Mount")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("StationId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StationId");
-
-                    b.ToTable("AzuraCastStationMounts");
                 });
 
             modelBuilder.Entity("AzzyBot.Data.Entities.AzuraCastStationPreferencesEntity", b =>
@@ -211,9 +181,6 @@ namespace AzzyBot.Data.Migrations
                     b.Property<string>("FileUploadPath")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<bool>("PreferHls")
-                        .HasColumnType("boolean");
 
                     b.Property<decimal>("RequestsChannelId")
                         .HasColumnType("numeric(20,0)");
@@ -340,17 +307,6 @@ namespace AzzyBot.Data.Migrations
                     b.Navigation("AzuraCast");
                 });
 
-            modelBuilder.Entity("AzzyBot.Data.Entities.AzuraCastStationMountEntity", b =>
-                {
-                    b.HasOne("AzzyBot.Data.Entities.AzuraCastStationEntity", "Station")
-                        .WithMany("Mounts")
-                        .HasForeignKey("StationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Station");
-                });
-
             modelBuilder.Entity("AzzyBot.Data.Entities.AzuraCastStationPreferencesEntity", b =>
                 {
                     b.HasOne("AzzyBot.Data.Entities.AzuraCastStationEntity", "Station")
@@ -388,8 +344,6 @@ namespace AzzyBot.Data.Migrations
                 {
                     b.Navigation("Checks")
                         .IsRequired();
-
-                    b.Navigation("Mounts");
 
                     b.Navigation("Preferences")
                         .IsRequired();

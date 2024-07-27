@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace AzzyBot.Data.Entities;
 
@@ -16,15 +15,11 @@ public sealed class AzuraCastStationEntity
     public int StationId { get; set; }
 
     /// <summary>
-    /// The name of the AzuraCast station.
-    /// </summary>
-    public string Name { get; set; } = string.Empty;
-
-    /// <summary>
     /// The api key of the station.
     /// </summary>
     /// <remarks>
     /// Can be empty if no key was provided. Then the administrative key of the parenting <see cref="AzuraCastEntity"/> database item is used.
+    /// This property is encrypted.
     /// </remarks>
     public string ApiKey { get; set; } = string.Empty;
 
@@ -32,11 +27,6 @@ public sealed class AzuraCastStationEntity
     /// The associated <see cref="AzuraCastStationChecksEntity"/> database item of the station.
     /// </summary>
     public AzuraCastStationChecksEntity Checks { get; set; } = new();
-
-    /// <summary>
-    /// A <see cref="ICollection<>"/> of associated <see cref="AzuraCastStationMountEntity"/> database items.
-    /// </summary>
-    public ICollection<AzuraCastStationMountEntity> Mounts { get; } = [];
 
     /// <summary>
     /// The user-defined preferences of the <see cref="AzuraCastStationEntity"/> object.

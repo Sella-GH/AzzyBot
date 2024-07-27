@@ -1,7 +1,7 @@
 # BUILD IMAGE
-FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
 USER root
-RUN apt update && apt upgrade -y && apt autoremove -y && apt clean -y
+RUN apk update && apk upgrade && apk cache sync
 WORKDIR /build
 COPY ./ ./
 ARG ARCH
@@ -11,7 +11,7 @@ RUN dotnet restore ./src/AzzyBot-Next.Bot/AzzyBot-Next.Bot.csproj
 RUN dotnet publish ./src/AzzyBot-Next.Bot/AzzyBot-Next.Bot.csproj -a $ARCH -c $CONFIG --os $OS -o out
 
 # RUNNER IMAGE
-FROM mcr.microsoft.com/dotnet/runtime:8.0-bookworm-slim
+FROM mcr.microsoft.com/dotnet/runtime:8.0-alpine
 USER root
 
 # Add environment variables
@@ -19,8 +19,8 @@ ENV LC_ALL=en.US.UTF-8
 ENV LANG=en.US.UTF-8
 
 # Upgrade internal tools and packages first
-RUN apt update && apt upgrade -y && apt autoremove -y && apt clean -y
-RUN apt install -y --no-install-recommends iputils-ping
+RUN apk update && apk upgrade && apk cache sync
+RUN apk add --no-cache icu-data-full icu-libs iputils-ping sed tzdata
 
 # Copy the built app
 WORKDIR /app
@@ -35,8 +35,8 @@ RUN sed -i "s\Compilation date not found\\$TIMESTAMP\g" /app/Modules/Core/Files/
 RUN sed -i "s\Lines of source code not found\\$LOC_CS\g" /app/Modules/Core/Files/AzzyBotStats.json
 
 # Add new user
-RUN groupadd azzy
-RUN useradd -m -s /bin/bash -g azzy azzy
+RUN addgroup azzy
+RUN adduser -D -G azzy azzy
 RUN chown -R azzy:azzy /app
 RUN chmod 0755 -R /app
 USER azzy

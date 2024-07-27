@@ -10,17 +10,26 @@ on:
       - "**.sln"
       - "**/docker.yml"
       - "CHANGELOG.md"
-      - "Dockerfile"
+      - "dev.alpine.Dockerfile"
       - "dev.Dockerfile"
+      - "release.alpine.Dockerfile"
+      - "release.Dockerfile"
   workflow_dispatch:
 
 jobs:
-  extract_version:
-    name: Get Release Version
+  extract_meta:
+    name: Extract metadata for use
     runs-on: ubuntu-latest
     outputs:
-      clean_version: ${{ steps.set-version.outputs.clean_version }}
-      version: ${{ steps.set-version.outputs.version }}
+      clean_version: ${{ steps.get-version.outputs.clean_version }}
+      version: ${{ steps.get-version.outputs.version }}
+      environment: ${{ steps.get-environment.outputs.environment }}
+      environment_alpine: ${{ steps.get-environment.outputs.environment_alpine }}
+      config: ${{ steps.get-config.outputs.config }}
+      dockerfile: ${{ steps.get-dockerfile.outputs.dockerfile }}
+      dockerfile_alpine: ${{ steps.get-dockerfile.outputs.dockerfile_alpine }}
+      datetime: ${{ steps.get-datetime.outputs.time }}
+      loc_cs: ${{ steps.get-loc_cs.outputs.total_lines }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -32,16 +41,58 @@ jobs:
         run: |
           VERSION=$(grep -oP '(?<=<Version>).*?(?=</Version>)' Directory.Build.props)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "clean_version=v$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Set version
-        id: set-version
+      - name:
+        id: get-environment
         run: |
-          echo "version=v${{ steps.get-version.outputs.version }}" >> "$GITHUB_OUTPUT"
-          echo "clean_version=${{ steps.get-version.outputs.version }}" >> "$GITHUB_OUTPUT"
+          if ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
+            echo "environment=dev" >> "$GITHUB_OUTPUT"
+            echo "environment_alpine=dev-alpine" >> "$GITHUB_OUTPUT"
+          elif ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
+            echo "environment=rel-${{ steps.get-version.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
+            echo "environment_alpine=rel-${{ steps.get-version.outputs.clean_version }}-alpine" >> "$GITHUB_OUTPUT"
+          else
+            echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            echo "environment_alpine=${{ github.ref_name }}-alpine" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name:
+        id: get-config
+        run: |
+          if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
+            echo "config=Docker" >> "$GITHUB_OUTPUT"
+          else
+            echo "config=Docker-debug" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name:
+        id: get-dockerfile
+        run: |
+          if [[ "${{ steps.get-config.outputs.config }}" == "Docker" ]]; then
+            echo "dockerfile=release.Dockerfile" >> "$GITHUB_OUTPUT"
+            echo "dockerfile_alpine=release.alpine.Dockerfile" >> "$GITHUB_OUTPUT"
+          else
+            echo "dockerfile=dev.Dockerfile" >> "$GITHUB_OUTPUT"
+            echo "dockerfile_alpine=dev.alpine.Dockerfile" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name:
+        id: get-datetime
+        uses: Kaven-Universe/github-action-current-date-time@v1
+        with:
+          format: "YYYY-MM-DDTHH:mm:ss"
+
+      - name: Calculate Lines of Source Code
+        id: get-loc_cs
+        uses: PavanMudigonda/lines-of-code-reporter@v1.6
+        with:
+          exclude_dir: "AzzyBot"
+          include_lang: "C#,MSBuild script"
 
   docker-build-amd:
-    name: Build Docker image for ${{ matrix.os }} - ${{ matrix.arch }}
-    needs: [extract_version]
+    name: Build Docker Image For ${{ matrix.os }} - ${{ matrix.arch }}
+    needs: [extract_meta]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -55,55 +106,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get build environment
-        id: environment
-        run: |
-          if ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
-            echo "environment=dev" >> "$GITHUB_OUTPUT"
-          elif ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
-            echo "environment=rel-${{ needs.extract_version.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Get config environment
-        id: config
-        run: |
-          if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
-            echo "config=Docker" >> "$GITHUB_OUTPUT"
-          else
-            echo "config=Docker-debug" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Get correct dockerfile
-        id: runtime
-        run: |
-          if [[ "${{ steps.config.outputs.config }}" == "Docker" ]]; then
-            echo "runtime=Dockerfile" >> "$GITHUB_OUTPUT"
-          else
-            echo "runtime=dev.Dockerfile" >> "$GITHUB_OUTPUT"
-          fi
-          
-      - name: Get Date and Time
-        id: dateTime
-        uses: Kaven-Universe/github-action-current-date-time@v1
-        with:
-          format: "YYYY-MM-DDTHH:mm:ss"
-
-      - name: Calculate Lines of Source Code
-        id: loc_cs
-        uses: PavanMudigonda/lines-of-code-reporter@v1.6
-        with:
-          exclude_dir: "AzzyBot"
-          include_lang: "C#,MSBuild script"
-
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:
           flavor: latest=${{ contains(github.event.head_commit.message, '[release]') }}
           images: sellagh/azzybot
-          tags: type=raw,value=${{ steps.environment.outputs.environment }}
+          tags: type=raw,value=${{ needs.extract_meta.outputs.environment }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -124,12 +133,12 @@ jobs:
           build-args: |
             ARCH=${{ matrix.arch }}
             OS=${{ matrix.os }}
-            CONFIG=${{ steps.config.outputs.config }}
+            CONFIG=${{ needs.extract_meta.outputs.config }}
             COMMIT=${{ github.sha }}
-            TIMESTAMP=${{ steps.dateTime.outputs.time }}
-            LOC_CS=${{ steps.loc_cs.outputs.total_lines }}
+            TIMESTAMP=${{ needs.extract_meta.outputs.datetime }}
+            LOC_CS=${{ needs.extract_meta.outputs.loc_cs }}
           context: .
-          file: ${{ steps.runtime.outputs.runtime }}
+          file: ${{ needs.extract_meta.outputs.dockerfile }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ matrix.os }}/${{ matrix.arch }}
           outputs: type=image,name=sellagh/azzybot,push-by-digest=true,name-canonical=true,push=true
@@ -143,14 +152,81 @@ jobs:
       - name: Upload digest
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ matrix.os }}-${{ matrix.arch }}
+          name: debian-${{ matrix.os }}-${{ matrix.arch }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  docker-build-alpine-amd:
+    name: Build Docker Alpine Image For ${{ matrix.os }} - ${{ matrix.arch }}
+    needs: [extract_meta]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - os: linux
+            arch: amd64
+            
+    steps:    
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          flavor: latest=false
+          images: sellagh/azzybot
+          tags: type=raw,value=${{ needs.extract_meta.outputs.environment_alpine }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log into Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
+            ARCH=${{ matrix.arch }}
+            OS=${{ matrix.os }}
+            CONFIG=${{ needs.extract_meta.outputs.config }}
+            COMMIT=${{ github.sha }}
+            TIMESTAMP=${{ needs.extract_meta.outputs.datetime }}
+            LOC_CS=${{ needs.extract_meta.outputs.loc_cs }}
+          context: .
+          file: ${{ needs.extract_meta.outputs.dockerfile_alpine }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: ${{ matrix.os }}/${{ matrix.arch }}
+          outputs: type=image,name=sellagh/azzybot,push-by-digest=true,name-canonical=true,push=true
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: alpine-${{ matrix.os }}-${{ matrix.arch }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
 
   docker-build-arm:
-    name: Build Docker image for ${{ matrix.os }} - ${{ matrix.arch }}
-    needs: [extract_version]
+    name: Build Docker Image For ${{ matrix.os }} - ${{ matrix.arch }}
+    needs: [extract_meta]
     runs-on: self-hosted
     strategy:
       matrix:
@@ -164,55 +240,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get build environment
-        id: environment
-        run: |
-          if ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
-            echo "environment=dev" >> "$GITHUB_OUTPUT"
-          elif ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
-            echo "environment=rel-${{ needs.extract_version.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
-          else
-            echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Get config environment
-        id: config
-        run: |
-          if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
-            echo "config=Docker" >> "$GITHUB_OUTPUT"
-          else
-            echo "config=Docker-debug" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Get correct dockerfile
-        id: runtime
-        run: |
-          if [[ "${{ steps.config.outputs.config }}" == "Docker" ]]; then
-            echo "runtime=Dockerfile" >> "$GITHUB_OUTPUT"
-          else
-            echo "runtime=dev.Dockerfile" >> "$GITHUB_OUTPUT"
-          fi
-          
-      - name: Get Date and Time
-        id: dateTime
-        uses: Kaven-Universe/github-action-current-date-time@v1
-        with:
-          format: "YYYY-MM-DDTHH:mm:ss"
-
-      - name: Calculate Lines of Source Code
-        id: loc_cs
-        uses: PavanMudigonda/lines-of-code-reporter@v1.6
-        with:
-          exclude_dir: "AzzyBot"
-          include_lang: "C#,MSBuild script"
-
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:
           flavor: latest=${{ contains(github.event.head_commit.message, '[release]') }}
           images: sellagh/azzybot
-          tags: type=raw,value=${{ steps.environment.outputs.environment }}
+          tags: type=raw,value=${{ needs.extract_meta.outputs.environment }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -233,12 +267,12 @@ jobs:
           build-args: |
             ARCH=${{ matrix.arch }}
             OS=${{ matrix.os }}
-            CONFIG=${{ steps.config.outputs.config }}
+            CONFIG=${{ needs.extract_meta.outputs.config }}
             COMMIT=${{ github.sha }}
-            TIMESTAMP=${{ steps.dateTime.outputs.time }}
-            LOC_CS=${{ steps.loc_cs.outputs.total_lines }}
+            TIMESTAMP=${{ needs.extract_meta.outputs.datetime }}
+            LOC_CS=${{ needs.extract_meta.outputs.loc_cs }}
           context: .
-          file: ${{ steps.runtime.outputs.runtime }}
+          file: ${{ needs.extract_meta.outputs.dockerfile }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ matrix.os }}/${{ matrix.arch }}
           outputs: type=image,name=sellagh/azzybot,push-by-digest=true,name-canonical=true,push=true
@@ -252,7 +286,83 @@ jobs:
       - name: Upload digest
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ matrix.os }}-${{ matrix.arch }}
+          name: debian-${{ matrix.os }}-${{ matrix.arch }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Cleanup Runner
+        if: always()
+        run: |
+          cd /home/runner/actions-runner/_work
+          rm -rf /tmp/digests
+          docker stop $(docker ps -a -q)
+          docker system prune -a -f --volumes
+          docker volume prune -a -f
+
+  docker-build-alpine-arm:
+    name: Build Docker Alpine Image For ${{ matrix.os }} - ${{ matrix.arch }}
+    needs: [extract_meta]
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        include:
+          - os: linux
+            arch: arm64
+            
+    steps:       
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          flavor: latest=false
+          images: sellagh/azzybot
+          tags: type=raw,value=${{ needs.extract_meta.outputs.environment_alpine }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log into Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
+            ARCH=${{ matrix.arch }}
+            OS=${{ matrix.os }}
+            CONFIG=${{ needs.extract_meta.outputs.config }}
+            COMMIT=${{ github.sha }}
+            TIMESTAMP=${{ needs.extract_meta.outputs.datetime }}
+            LOC_CS=${{ needs.extract_meta.outputs.loc_cs }}
+          context: .
+          file: ${{ needs.extract_meta.outputs.dockerfile_alpine }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: ${{ matrix.os }}/${{ matrix.arch }}
+          outputs: type=image,name=sellagh/azzybot,push-by-digest=true,name-canonical=true,push=true
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v4
+        with:
+          name: alpine-${{ matrix.os }}-${{ matrix.arch }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
@@ -269,13 +379,13 @@ jobs:
   merge:
     name: Creating Docker Release
     runs-on: ubuntu-latest
-    needs: [extract_version, docker-build-amd, docker-build-arm]
+    needs: [extract_meta, docker-build-amd, docker-build-alpine-amd, docker-build-arm, docker-build-alpine-arm]
     steps:
       - name: Download digests
         uses: actions/download-artifact@v4
         with:
           path: /tmp/digests
-          pattern: digests-*
+          pattern: debian-*
           merge-multiple: true
           
       - name: Set up Docker Buildx
@@ -287,7 +397,7 @@ jobs:
           if ${{ contains(github.event.head_commit.message, '[release]') || (contains(github.event.ref, 'rel/') && !contains(github.event.head_commit.message, '[pre-release]')) }}; then
             echo "environment=latest" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.event.head_commit.message, '[pre-release]') }}; then
-            echo "environment=rel-${{ needs.extract_version.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
+            echo "environment=rel-${{ needs.extract_meta.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
             echo "environment=dev" >> "$GITHUB_OUTPUT"
           else
@@ -299,6 +409,54 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           flavor: latest=${{ contains(github.event.head_commit.message, '[release]') }}
+          images: sellagh/azzybot
+          tags: type=raw,value=${{ steps.environment.outputs.environment }}
+          
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          
+      - name: Create manifest list and push
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf 'sellagh/azzybot@sha256:%s ' *)
+
+  merge-alpine:
+    name: Creating Docker Alpine Release
+    runs-on: ubuntu-latest
+    needs: [extract_meta, docker-build-amd, docker-build-alpine-amd, docker-build-arm, docker-build-alpine-arm]
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v4
+        with:
+          path: /tmp/digests
+          pattern: alpine-*
+          merge-multiple: true
+          
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Get docker environment
+        id: environment
+        run: |
+          if ${{ contains(github.event.head_commit.message, '[release]') || (contains(github.event.ref, 'rel/') && !contains(github.event.head_commit.message, '[pre-release]')) }}; then
+            echo "environment=latest-alpine" >> "$GITHUB_OUTPUT"
+          elif ${{ contains(github.event.head_commit.message, '[pre-release]') }}; then
+            echo "environment=rel-${{ needs.extract_meta.outputs.clean_version }}-alpine" >> "$GITHUB_OUTPUT"
+          elif ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
+            echo "environment=dev-alpine" >> "$GITHUB_OUTPUT"
+          else
+            echo "environment=${{ github.ref_name }}-alpine" >> "$GITHUB_OUTPUT"
+          fi
+        
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          flavor: latest=false
           images: sellagh/azzybot
           tags: type=raw,value=${{ steps.environment.outputs.environment }}
           

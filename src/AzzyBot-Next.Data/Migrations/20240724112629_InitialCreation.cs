@@ -123,7 +123,6 @@ namespace AzzyBot.Data.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     StationId = table.Column<int>(type: "integer", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
                     ApiKey = table.Column<string>(type: "text", nullable: false),
                     LastSkipTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     AzuraCastId = table.Column<int>(type: "integer", nullable: false)
@@ -160,27 +159,6 @@ namespace AzzyBot.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AzuraCastStationMounts",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Mount = table.Column<string>(type: "text", nullable: false),
-                    StationId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AzuraCastStationMounts", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AzuraCastStationMounts_AzuraCastStations_StationId",
-                        column: x => x.StationId,
-                        principalTable: "AzuraCastStations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AzuraCastStationPreferences",
                 columns: table => new
                 {
@@ -188,7 +166,6 @@ namespace AzzyBot.Data.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FileUploadChannelId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
                     FileUploadPath = table.Column<string>(type: "text", nullable: false),
-                    PreferHls = table.Column<bool>(type: "boolean", nullable: false),
                     RequestsChannelId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
                     ShowPlaylistInNowPlaying = table.Column<bool>(type: "boolean", nullable: false),
                     StationAdminRoleId = table.Column<decimal>(type: "numeric(20,0)", nullable: false),
@@ -231,11 +208,6 @@ namespace AzzyBot.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_AzuraCastStationMounts_StationId",
-                table: "AzuraCastStationMounts",
-                column: "StationId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_AzuraCastStationPreferences_StationId",
                 table: "AzuraCastStationPreferences",
                 column: "StationId",
@@ -264,9 +236,6 @@ namespace AzzyBot.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AzuraCastStationChecks");
-
-            migrationBuilder.DropTable(
-                name: "AzuraCastStationMounts");
 
             migrationBuilder.DropTable(
                 name: "AzuraCastStationPreferences");

@@ -117,7 +117,7 @@ public sealed class DiscordBotServiceHost : IHostedService
 
         return new()
         {
-            Intents = DiscordIntents.Guilds,
+            Intents = DiscordIntents.Guilds | DiscordIntents.GuildVoiceStates,
             LoggerFactory = _loggerFactory,
             // Otherwise it stops reconnecting after 4 attempts
             // TODO Remove this when adapating to the newest release of DSP
@@ -148,6 +148,7 @@ public sealed class DiscordBotServiceHost : IHostedService
         commandsExtension.AddCommands(typeof(AzuraCastCommands.MusicGroup));
         commandsExtension.AddCommands(typeof(ConfigCommands.ConfigGroup));
         commandsExtension.AddCommands(typeof(CoreCommands.CoreGroup));
+        commandsExtension.AddCommands(typeof(MusicStreamingCommands.PlayerGroup));
 
         // Only add debug commands if it's a dev build
         if (AzzyStatsSoftware.GetBotEnvironment == Environments.Development)

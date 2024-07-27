@@ -12,8 +12,10 @@ using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Enums;
+using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
+using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
 using DSharpPlus.Commands;
@@ -116,10 +118,8 @@ public sealed class ConfigCommands
         (
             CommandContext context,
             [Description("Enter the station id of your azuracast station.")] int station,
-            [Description("Enter the name of the new station.")] string stationName,
             [Description("Select the group that has the admin permissions on this station.")] DiscordRole adminGroup,
             [Description("Select a channel to get music requests when a request is not found on the server."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel requestsChannel,
-            [Description("Enable or disable the preference of HLS streams if you add an able mount point."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int hls,
             [Description("Enable or disable the showing of the playlist in the nowplaying embed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int showPlaylist,
             [Description("Enable or disable the automatic check if files have been changed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int fileChanges,
             [Description("Select a channel where users are able to upload their own songs to your station."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? uploadChannel = null,
@@ -147,7 +147,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            await _db.AddAzuraCastStationAsync(context.Guild.Id, station, stationName, adminGroup.Id, requestsChannel.Id, hls is 1, showPlaylist is 1, fileChanges is 1, uploadChannel?.Id, uploadPath, apiKey, djGroup?.Id);
+            await _db.AddAzuraCastStationAsync(context.Guild.Id, station, adminGroup.Id, requestsChannel.Id, showPlaylist is 1, fileChanges is 1, uploadChannel?.Id, uploadPath, apiKey, djGroup?.Id);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your station was added successfully and private data has been encrypted.");
@@ -161,24 +161,6 @@ public sealed class ConfigCommands
 
             if (azuraCast.IsOnline)
                 await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, context.Guild.Id, station);
-        }
-
-        [Command("add-azuracast-station-mount"), Description("Add an AzuraCast mount point to the selected station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
-        public async ValueTask AddAzuraCastStationMountAsync
-        (
-            CommandContext context,
-            [Description("Choose the station you want to add the mount."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
-            [Description("Enter the mount point name.")] string mountName,
-            [Description("Enter the mount point stub.")] string mount
-        )
-        {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-
-            _logger.CommandRequested(nameof(AddAzuraCastStationMountAsync), context.User.GlobalName);
-
-            await _db.AddAzuraCastStationMountPointAsync(station, mountName, mount);
-
-            await context.EditResponseAsync("Your mount point was added successfully.");
         }
 
         [Command("delete-azuracast"), Description("Delete the existing AzuraCast setup."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -235,24 +217,6 @@ public sealed class ConfigCommands
             await _db.DeleteAzuraCastStationAsync(station);
 
             await context.EditResponseAsync("Your station was deleted successfully.");
-        }
-
-        [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Needed in the mount autocomplete provider")]
-        [Command("delete-azuracast-station-mount"), Description("Delete an existing AzuraCast mount point from a station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
-        public async ValueTask DeleteAzuraCastStationMountAsync
-        (
-            CommandContext context,
-            [Description("Select the station of the mount point."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
-            [Description("Select the mount point you want to delete."), SlashAutoCompleteProvider<AzuraCastMountAutocomplete>] int mountId
-        )
-        {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-
-            _logger.CommandRequested(nameof(DeleteAzuraCastStationMountAsync), context.User.GlobalName);
-
-            await _db.DeleteAzuraCastMountAsync(mountId);
-
-            await context.EditResponseAsync("Your mount point was deleted successfully.");
         }
 
         [Command("modify-azuracast"), Description("Modify the general AzuraCast settings."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -352,14 +316,12 @@ public sealed class ConfigCommands
             CommandContext context,
             [Description("Choose the station you want to modify."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
             [Description("Modify the station id.")] int? stationId = null,
-            [Description("Modify the name.")] string? stationName = null,
             [Description("Modify the api key.")] string? apiKey = null,
             [Description("Modify the group that has the admin permissions on this station.")] DiscordRole? adminGroup = null,
             [Description("Modify the group that has the dj permissions on this station.")] DiscordRole? djGroup = null,
             [Description("Modify the channel where users are able to upload their own songs to your station."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? uploadChannel = null,
             [Description("Modify the channel to get music requests when a request is not found in the station."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? requestsChannel = null,
             [Description("Modify the custom path where the user uploaded songs are stored. Like /Requests")] string? uploadPath = null,
-            [Description("Enable or disable the preference of HLS streams if you add an able mount point."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int hls = 0,
             [Description("Enable or disable the showing of the playlist in the nowplaying embed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int showPlaylist = 0
         )
         {
@@ -368,23 +330,13 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(UpdateAzuraCastStationAsync), context.User.GlobalName);
 
-            if (stationId is null && stationName is null && apiKey is null && adminGroup is null && djGroup is null && uploadChannel is null && string.IsNullOrWhiteSpace(uploadPath) && requestsChannel is null && hls is 0 && showPlaylist is 0)
+            if (stationId is null && apiKey is null && adminGroup is null && djGroup is null && uploadChannel is null && string.IsNullOrWhiteSpace(uploadPath) && requestsChannel is null && showPlaylist is 0)
             {
                 await context.RespondAsync("You have to provide at least one parameter to update.");
                 return;
             }
 
-            bool? preferHls = null;
             bool? showPlaylistInEmbed = null;
-
-            if (hls is 1)
-            {
-                preferHls = true;
-            }
-            else if (hls is 2)
-            {
-                preferHls = false;
-            }
 
             if (showPlaylist is 1)
             {
@@ -395,11 +347,11 @@ public sealed class ConfigCommands
                 showPlaylistInEmbed = false;
             }
 
-            if (stationId.HasValue || !string.IsNullOrWhiteSpace(stationName) || !string.IsNullOrWhiteSpace(apiKey))
-                await _db.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, stationName, apiKey);
+            if (stationId.HasValue || !string.IsNullOrWhiteSpace(apiKey))
+                await _db.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, apiKey);
 
-            if (adminGroup is not null || djGroup is not null || uploadChannel is not null || requestsChannel is not null || !string.IsNullOrWhiteSpace(uploadPath) || preferHls is not null || showPlaylistInEmbed is not null)
-                await _db.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, adminGroup?.Id, djGroup?.Id, uploadChannel?.Id, requestsChannel?.Id, uploadPath, preferHls, showPlaylistInEmbed);
+            if (adminGroup is not null || djGroup is not null || uploadChannel is not null || requestsChannel is not null || !string.IsNullOrWhiteSpace(uploadPath) || showPlaylistInEmbed is not null)
+                await _db.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, adminGroup?.Id, djGroup?.Id, uploadChannel?.Id, requestsChannel?.Id, uploadPath, showPlaylistInEmbed);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your settings were saved successfully and private data has been encrypted.");
@@ -497,17 +449,22 @@ public sealed class ConfigCommands
             if (guild.AzuraCast is not null)
             {
                 AzuraCastEntity azuraCast = guild.AzuraCast;
+                AzuraStationRecord stationRecord;
                 Dictionary<ulong, string> stationRoles = [];
+                Dictionary<int, string> stationNames = [];
                 foreach (AzuraCastStationEntity station in azuraCast.Stations)
                 {
                     DiscordRole? stationAdminRole = context.Guild.GetRole(station.Preferences.StationAdminRoleId);
                     DiscordRole? stationDjRole = context.Guild.GetRole(station.Preferences.StationDjRoleId);
                     stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? string.Empty);
                     stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? string.Empty);
+
+                    stationRecord = await _azuraCast.GetStationAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), station.StationId);
+                    stationNames.Add(station.Id, stationRecord.Name);
                 }
 
                 DiscordRole? instanceAdminRole = context.Guild.GetRole(azuraCast.Preferences.InstanceAdminRoleId);
-                IReadOnlyList<DiscordEmbed> azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(azuraCast, $"{instanceAdminRole?.Name} ({instanceAdminRole?.Id})", stationRoles);
+                IReadOnlyList<DiscordEmbed> azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(azuraCast, $"{instanceAdminRole?.Name} ({instanceAdminRole?.Id})", stationRoles, stationNames);
 
                 messageBuilder.AddEmbeds(azuraEmbed);
             }

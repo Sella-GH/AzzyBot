@@ -180,23 +180,46 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
         HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
+        HttpResponseMessage? response = null;
 
         try
         {
-            using (HttpResponseMessage response = await client.GetAsync(url))
+            int retryCount = 0;
+            string result = string.Empty;
+            response = await client.GetAsync(url);
+            while (response.StatusCode is HttpStatusCode.TooManyRequests)
             {
-                response.EnsureSuccessStatusCode();
+                _logger.BotRatelimited(url, retryCount);
 
-                return await response.Content.ReadAsStringAsync();
+                await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2, retryCount)));
+                if (retryCount is not 7)
+                    retryCount++;
+
+                response = await client.GetAsync(url);
             }
+
+            result = await response.Content.ReadAsStringAsync();
+            response.Dispose();
+
+            return result;
         }
         catch (InvalidOperationException)
         {
+            response?.Dispose();
             _logger.WebInvalidUri(url);
             throw;
         }
         catch (HttpRequestException ex)
         {
+            response?.Dispose();
+            if (!noLogging)
+                _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
+
+            throw;
+        }
+        catch (Exception ex)
+        {
+            response?.Dispose();
             if (!noLogging)
                 _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
 

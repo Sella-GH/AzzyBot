@@ -37,12 +37,13 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AzuraCastCommands
 {
     [Command("azuracast"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator), ModuleActivatedCheck(AzzyModules.AzuraCast)]
-    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCast, AzzyBackgroundService backgroundService, DbActions dbActions, WebRequestService webRequest)
+    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCast, AzzyBackgroundService backgroundService, DbActions dbActions, MusicStreamingService musicStreaming, WebRequestService webRequest)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCast = azuraCast;
         private readonly AzzyBackgroundService _backgroundService = backgroundService;
         private readonly DbActions _dbActions = dbActions;
+        private readonly MusicStreamingService _musicStreaming = musicStreaming;
         private readonly WebRequestService _webRequest = webRequest;
 
         [Command("export-playlists"), Description("Export all playlists from the selected AzuraCast station into a zip file."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -95,7 +96,8 @@ public sealed class AzuraCastCommands
 
             await using FileStream fileStream = new(Path.Combine(_azuraCast.FilePath, zFileName), FileMode.Open, FileAccess.Read);
             await using DiscordMessageBuilder builder = new();
-            string message = ((filePaths.Count > 1) ? "Here are the playlists " : "Here is your desired playlist ") + $"from station **{Crypto.Decrypt(acStation.Name)}**";
+            AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
+            string message = ((filePaths.Count > 1) ? "Here are the playlists " : "Here is your desired playlist ") + $"from station **{azuraStation.Name}**";
             builder.WithContent(message).AddFile(zFileName, fileStream, AddFileOptions.CloseStream);
             await context.EditResponseAsync(builder);
 
@@ -234,7 +236,9 @@ public sealed class AzuraCastCommands
 
             await _azuraCast.StartStationAsync(new(baseUrl), apiKey, station, context);
 
-            await context.FollowupAsync($"I started the station **{Crypto.Decrypt(acStation.Name)}**.");
+            AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
+
+            await context.FollowupAsync($"I started the station **{azuraStation.Name}**.");
         }
 
         [Command("stop-station"), Description("Stop the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -253,10 +257,28 @@ public sealed class AzuraCastCommands
             AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
+            AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
+            const string disconnectingMessage = "I disconnected any listeners on this server from the station to prevent issues.";
+            string stoppingMessage = $"I stopped the station **{azuraStation.Name}**.";
+
+            if (await _musicStreaming.CheckIfPlayedMusicIsStationAsync(context, $"{Crypto.Decrypt(azuraCast.BaseUrl)}/listen/{azuraStation.Shortcode}"))
+            {
+                await _musicStreaming.StopMusicAsync(context, false);
+                await context.EditResponseAsync(disconnectingMessage);
+                await Task.Delay(TimeSpan.FromSeconds(30));
+            }
 
             await _azuraCast.StopStationAsync(new(baseUrl), apiKey, station);
 
-            await context.EditResponseAsync($"I stopped the station **{Crypto.Decrypt(acStation.Name)}**.");
+            DiscordMessage? message = await context.GetResponseAsync();
+            if (message is not null)
+            {
+                await context.FollowupAsync(stoppingMessage);
+            }
+            else
+            {
+                await context.EditResponseAsync(stoppingMessage);
+            }
         }
 
         [Command("toggle-song-requests"), Description("Enable or disable song requests for the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -280,7 +302,7 @@ public sealed class AzuraCastCommands
             stationConfig.EnableRequests = !stationConfig.EnableRequests;
             await _azuraCast.ModifyStationAdminConfigAsync(new(baseUrl), apiKey, station, stationConfig);
 
-            await context.EditResponseAsync($"I {Misc.ReadableBool(stationConfig.EnableRequests, ReadbleBool.EnabledDisabled, true)} song requests for station **{Crypto.Decrypt(acStation.Name)}**.");
+            await context.EditResponseAsync($"I {Misc.ReadableBool(stationConfig.EnableRequests, ReadbleBool.EnabledDisabled, true)} song requests for station **{stationConfig.Name}**.");
         }
 
         [Command("update-instance"), Description("Update the AzuraCast instance to the latest version."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -339,7 +361,7 @@ public sealed class AzuraCastCommands
             _logger.CommandRequested(nameof(UploadFilesAsync), context.User.GlobalName);
 
             AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station, false, false, true) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station, false, true) ?? throw new InvalidOperationException("Station is null");
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
@@ -348,8 +370,9 @@ public sealed class AzuraCastCommands
             string uploadPath = (string.IsNullOrWhiteSpace(acStation.Preferences.FileUploadPath)) ? "/" : acStation.Preferences.FileUploadPath;
 
             AzuraFilesDetailedRecord? uploadedFile = await _azuraCast.UploadFileAsync<AzuraFilesDetailedRecord>(new(baseUrl), apiKey, station, filePath, file.FileName, uploadPath);
+            AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
 
-            DiscordEmbed embed = EmbedBuilder.BuildAzuraCastUploadFileEmbed(uploadedFile, file.FileSize, Crypto.Decrypt(acStation.Name));
+            DiscordEmbed embed = EmbedBuilder.BuildAzuraCastUploadFileEmbed(uploadedFile, file.FileSize, azuraStation.Name);
 
             await context.EditResponseAsync(embed);
 
@@ -425,7 +448,7 @@ public sealed class AzuraCastCommands
 
             await _azuraCast.SkipSongAsync(new(baseUrl), apiKey, station);
 
-            await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, null, null, null, DateTime.UtcNow);
+            await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, null, null, DateTime.UtcNow);
 
             await context.EditResponseAsync($"I skipped **{nowPlaying.NowPlaying.Song.Title}** by **{nowPlaying.NowPlaying.Song.Artist}**.");
         }
@@ -448,11 +471,11 @@ public sealed class AzuraCastCommands
             AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
-            string stationName = Crypto.Decrypt(acStation.Name);
+            AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
 
             List<AzuraPlaylistStateRecord> states = await _azuraCast.SwitchPlaylistsAsync(new(baseUrl), apiKey, station, playlistId, removeOld is 1);
             StringBuilder message = new();
-            message.AppendLine(CultureInfo.InvariantCulture, $"I switched the {((states.Count is 1) ? "playlist" : "playlists")} for **{stationName}**.");
+            message.AppendLine(CultureInfo.InvariantCulture, $"I switched the {((states.Count is 1) ? "playlist" : "playlists")} for **{azuraStation.Name}**.");
             foreach (AzuraPlaylistStateRecord state in states)
             {
                 message.AppendLine(CultureInfo.InvariantCulture, $"**{state.PlaylistName}** is now **{Misc.ReadableBool(state.PlaylistState, ReadbleBool.EnabledDisabled, true)}**.");
@@ -503,12 +526,13 @@ public sealed class AzuraCastCommands
                 return;
             }
 
+            AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
             IReadOnlyList<AzuraStationHistoryExportRecord> exportHistory = history.Select(h => new AzuraStationHistoryExportRecord() { Date = dateString, PlayedAt = Converter.ConvertFromUnixTime(h.PlayedAt), Song = h.Song, SongRequest = h.IsRequest, Streamer = h.Streamer, Playlist = h.Playlist }).Reverse().ToList();
             string fileName = $"{azuraCast.GuildId}-{azuraCast.Id}-{acStation.Id}-{acStation.StationId}_SongHistory_{dateStringFile}.csv";
             string filePath = await FileOperations.CreateCsvFileAsync(exportHistory, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
             await using DiscordMessageBuilder builder = new();
-            builder.WithContent($"Here is the song history for station **{Crypto.Decrypt(acStation.Name)}** on **{dateString}**.");
+            builder.WithContent($"Here is the song history for station **{Crypto.Decrypt(azuraStation.Name)}** on **{dateString}**.");
             builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
             await context.EditResponseAsync(builder);
 
@@ -575,7 +599,7 @@ public sealed class AzuraCastCommands
             _logger.CommandRequested(nameof(GetNowPlayingAsync), context.User.GlobalName);
 
             AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station, false, false, true) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station, false, true) ?? throw new InvalidOperationException("Station is null");
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
             AzuraNowPlayingDataRecord? nowPlaying = null;

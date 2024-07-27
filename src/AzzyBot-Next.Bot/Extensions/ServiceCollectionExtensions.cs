@@ -12,6 +12,7 @@ using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data;
 using EntityFramework.Exceptions.PostgreSQL;
+using Lavalink4NET.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,7 +21,7 @@ namespace AzzyBot.Bot.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static void AzzyBotServices(this IServiceCollection services)
+    public static void AzzyBotServices(this IServiceCollection services, bool isDev, bool isDocker)
     {
         IServiceProvider serviceProvider = services.BuildServiceProvider();
         AzzyBotSettingsRecord settings = serviceProvider.GetRequiredService<AzzyBotSettingsRecord>();
@@ -34,7 +35,7 @@ public static class ServiceCollectionExtensions
         services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
 
         string connectionString = GetConnectionString(settings.Database?.Host, settings.Database?.Port, settings.Database?.User, settings.Database?.Password, settings.Database?.DatabaseName);
-        services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor());
+        services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor().EnableSensitiveDataLogging(isDev));
         services.AddSingleton<DbActions>();
 
         services.AddSingleton<DiscordBotService>();
@@ -55,6 +56,37 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<TimerServiceHost>();
         services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());
+
+        services.AddLavalink();
+        services.AddSingleton(s => s.GetRequiredService<DiscordBotServiceHost>().Client);
+        services.ConfigureLavalink(config =>
+        {
+            Uri baseAddress = (isDocker) ? new("http://AzzyBot-Ms:2333") : new("http://localhost:2333");
+            if (settings.MusicStreaming is not null)
+            {
+                if (!string.IsNullOrWhiteSpace(settings.MusicStreaming.LavalinkHost) && settings.MusicStreaming.LavalinkPort is not 0)
+                {
+                    baseAddress = new($"http://{settings.MusicStreaming.LavalinkHost}:{settings.MusicStreaming.LavalinkPort}");
+                }
+                else if (!string.IsNullOrWhiteSpace(settings.MusicStreaming.LavalinkHost) && settings.MusicStreaming.LavalinkPort is 0)
+                {
+                    baseAddress = new($"http://{settings.MusicStreaming.LavalinkHost}:2333");
+                }
+                else if (string.IsNullOrWhiteSpace(settings.MusicStreaming.LavalinkHost) && settings.MusicStreaming.LavalinkPort is not 0)
+                {
+                    baseAddress = (isDocker) ? new($"http://AzzyBot-Ms:{settings.MusicStreaming.LavalinkPort}") : new($"http://localhost:{settings.MusicStreaming.LavalinkPort}");
+                }
+
+                if (!string.IsNullOrWhiteSpace(settings.MusicStreaming.LavalinkPassword))
+                    config.Passphrase = settings.MusicStreaming.LavalinkPassword;
+            }
+
+            config.BaseAddress = baseAddress;
+            config.Label = "AzzyBot";
+            config.ReadyTimeout = TimeSpan.FromSeconds(15);
+            config.ResumptionOptions = new(TimeSpan.Zero);
+        });
+        services.AddSingleton<MusicStreamingService>();
     }
 
     public static void AzzyBotSettings(this IServiceCollection services, bool isDev = false, bool isDocker = false)
@@ -84,7 +116,7 @@ public static class ServiceCollectionExtensions
         settings.SettingsFile = path;
 
         // Check settings if something is missing
-        List<string> exclusions = [nameof(settings.Database.NewEncryptionKey), nameof(settings.DiscordStatus.StreamUrl)];
+        List<string> exclusions = [nameof(settings.Database.NewEncryptionKey), nameof(settings.DiscordStatus.StreamUrl), nameof(settings.MusicStreaming), nameof(settings.MusicStreaming.LavalinkHost), nameof(settings.MusicStreaming.LavalinkPort), nameof(settings.MusicStreaming.LavalinkPassword)];
         if (isDocker)
         {
             exclusions.Add(nameof(settings.Database.Host));

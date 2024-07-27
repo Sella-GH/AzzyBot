@@ -79,7 +79,6 @@ public sealed class CoreServiceHost(IDbContextFactory<AzzyDbContext> dbContextFa
 
         List<AzuraCastEntity> azuraCast = await dbContext.AzuraCast.ToListAsync();
         List<AzuraCastStationEntity> azuraCastStations = await dbContext.AzuraCastStations.ToListAsync();
-        List<AzuraCastStationMountEntity> AzuraCastStationMounts = await dbContext.AzuraCastStationMounts.ToListAsync();
 
         try
         {
@@ -92,25 +91,10 @@ public sealed class CoreServiceHost(IDbContextFactory<AzzyDbContext> dbContextFa
                 entity.AdminApiKey = Crypto.Encrypt(entity.AdminApiKey, newEncryptionKey);
             }
 
-            foreach (AzuraCastStationEntity entity in azuraCastStations)
+            foreach (AzuraCastStationEntity entity in azuraCastStations.Where(e => !string.IsNullOrWhiteSpace(e.ApiKey)))
             {
-                entity.Name = Crypto.Decrypt(entity.Name);
-                entity.Name = Crypto.Encrypt(entity.Name, newEncryptionKey);
-
-                if (!string.IsNullOrWhiteSpace(entity.ApiKey))
-                {
-                    entity.ApiKey = Crypto.Decrypt(entity.ApiKey);
-                    entity.ApiKey = Crypto.Encrypt(entity.ApiKey, newEncryptionKey);
-                }
-            }
-
-            foreach (AzuraCastStationMountEntity entity in AzuraCastStationMounts)
-            {
-                entity.Mount = Crypto.Decrypt(entity.Mount);
-                entity.Mount = Crypto.Encrypt(entity.Mount, newEncryptionKey);
-
-                entity.Name = Crypto.Decrypt(entity.Name);
-                entity.Name = Crypto.Encrypt(entity.Name, newEncryptionKey);
+                entity.ApiKey = Crypto.Decrypt(entity.ApiKey);
+                entity.ApiKey = Crypto.Encrypt(entity.ApiKey, newEncryptionKey);
             }
 
             await dbContext.SaveChangesAsync();

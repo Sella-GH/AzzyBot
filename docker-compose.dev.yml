@@ -1,16 +1,17 @@
 services:
   AzzyBot:
     container_name: AzzyBot
-    image: sellagh/azzybot:rel-2.0.0-preview3.1
+    image: sellagh/azzybot:rel-2.0.0-preview4.1
     pull_policy: always
     restart: unless-stopped
     user: ${CURRENT_UID}
     environment:
       - FORCE_DEBUG=false
-      - SKIP_DB_WAITING=false
+      - SKIP_WAITING=false
       - TZ=Europe/Berlin
     depends_on:
       - AzzyBot-Db
+      - AzzyBot-Ms
     networks:
       - AzzyBot-Db-Nw
       - AzzyBot-Nw
@@ -35,6 +36,17 @@ services:
     hostname: AzzyBot-Db
     volumes:
       - azzybot_data:/var/lib/postgresql/data
+
+  AzzyBot-Ms:
+    container_name: AzzyBot-Ms
+    image: ghcr.io/lavalink-devs/lavalink:4-alpine
+    pull_policy: always
+    restart: unless-stopped
+    networks:
+      - AzzyBot-Nw
+    hostname: AzzyBot-Ms
+    volumes:
+      - ./AzzyBot/Modules/MusicStreaming/Files/application.yml:/opt/Lavalink/application.yml
 
 networks:
   AzzyBot-Db-Nw:

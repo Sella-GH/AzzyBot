@@ -84,12 +84,14 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
 
         try
         {
+            string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
             string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? station.AzuraCast.AdminApiKey : station.ApiKey;
 
             IReadOnlyList<AzuraFilesRecord> onlineFiles = await _azuraCast.GetFilesOnlineAsync(new(Crypto.Decrypt(station.AzuraCast.BaseUrl)), Crypto.Decrypt(apiKey), station.StationId);
             IReadOnlyList<AzuraFilesRecord> localFiles = await _azuraCast.GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
+            AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station.StationId);
 
-            await CheckIfFilesWereModifiedAsync(onlineFiles, localFiles, station, Crypto.Decrypt(station.Name), station.Preferences.RequestsChannelId);
+            await CheckIfFilesWereModifiedAsync(onlineFiles, localFiles, station, azuraStation.Name, station.Preferences.RequestsChannelId);
         }
         catch (OperationCanceledException)
         {

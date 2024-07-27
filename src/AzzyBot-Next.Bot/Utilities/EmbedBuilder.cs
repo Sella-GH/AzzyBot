@@ -101,7 +101,6 @@ public static class EmbedBuilder
         StringBuilder cpuLoads = new();
         StringBuilder memoryUsage = new();
         StringBuilder diskUsage = new();
-        StringBuilder networkUsage = new();
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
         fields.Add("Ping", new($"{stats.Ping} ms"));
@@ -135,13 +134,11 @@ public static class EmbedBuilder
 
         foreach (AzuraNetworkData network in stats.Network)
         {
-            networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Interface: **{network.InterfaceName}**");
-            networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Received: **{network.Received.Speed.Readable}**");
-            networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Transmitted: **{network.Transmitted.Speed.Readable}**");
-            networkUsage.AppendLine();
-        }
+            if (fields.Count is 25)
+                break;
 
-        fields.Add("Network Usage", new(networkUsage.ToString()));
+            fields.Add($"Interface: {network.InterfaceName}", new($"Received: **{network.Received.Speed.Readable}**\nTransmitted: **{network.Transmitted.Speed.Readable}**", true));
+        }
 
         return CreateBasicEmbed(title, null, DiscordColor.Orange, AzuraCastPic, null, null, fields);
     }
@@ -156,15 +153,16 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
-            ["Title"] = new(data.NowPlaying.Song.Title),
-            ["By"] = new(data.NowPlaying.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase))
+            ["Station"] = new(data.Station.Name),
+            ["Title"] = new(data.NowPlaying.Song.Title, true),
+            ["By"] = new(data.NowPlaying.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true)
         };
 
         if (!string.IsNullOrWhiteSpace(data.NowPlaying.Song.Album))
-            fields.Add("On", new(data.NowPlaying.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase)));
+            fields.Add("On", new(data.NowPlaying.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true));
 
         if (!string.IsNullOrWhiteSpace(data.NowPlaying.Song.Genre))
-            fields.Add("Genre", new(data.NowPlaying.Song.Genre));
+            fields.Add("Genre", new(data.NowPlaying.Song.Genre, true));
 
         if (data.Live.IsLive)
         {
@@ -173,6 +171,9 @@ public static class EmbedBuilder
         }
         else
         {
+            if (!string.IsNullOrWhiteSpace(playlistName))
+                fields.Add("Playlist", new(playlistName, true));
+
             TimeSpan duration = TimeSpan.FromSeconds(data.NowPlaying.Duration);
             TimeSpan elapsed = TimeSpan.FromSeconds(data.NowPlaying.Elapsed);
 
@@ -181,9 +182,6 @@ public static class EmbedBuilder
             string progressBar = Misc.GetProgressBar(14, elapsed.TotalSeconds, duration.TotalSeconds);
 
             fields.Add("Duration", new($"{progressBar} `[{songElapsed} / {songDuration}]`"));
-
-            if (!string.IsNullOrWhiteSpace(playlistName))
-                fields.Add("Playlist", new(playlistName));
         }
 
         return CreateBasicEmbed(title, message, DiscordColor.Aquamarine, new(thumbnailUrl), null, null, fields);
@@ -199,12 +197,12 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
-            ["Title"] = new(song.Song.Title),
-            ["By"] = new(song.Song.Artist)
+            ["Title"] = new(song.Song.Title, true),
+            ["By"] = new(song.Song.Artist, true)
         };
 
         if (!string.IsNullOrWhiteSpace(song.Song.Album))
-            fields.Add("On", new(song.Song.Album));
+            fields.Add("On", new(song.Song.Album, true));
 
         if (!string.IsNullOrWhiteSpace(song.Song.Genre))
             fields.Add("Genre", new(song.Song.Genre));
@@ -275,17 +273,17 @@ public static class EmbedBuilder
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
             ["Station"] = new(stationName),
-            ["Title"] = new(file.Title),
-            ["Artist"] = new(file.Artist)
+            ["Title"] = new(file.Title, true),
+            ["Artist"] = new(file.Artist, true)
         };
 
         if (!string.IsNullOrWhiteSpace(file.Album))
-            fields.Add("Album", new(file.Album));
-
-        fields.Add("Duration", new(file.Length));
+            fields.Add("Album", new(file.Album, true));
 
         if (!string.IsNullOrWhiteSpace(file.Genre))
-            fields.Add("Genre", new(file.Genre));
+            fields.Add("Genre", new(file.Genre, true));
+
+        fields.Add("Duration", new(file.Length, true));
 
         if (!string.IsNullOrWhiteSpace(file.Isrc))
             fields.Add("ISRC", new(file.Isrc));
@@ -330,7 +328,7 @@ public static class EmbedBuilder
                 cpuTempBuilder.AppendLine(CultureInfo.InvariantCulture, $"{kvp.Key}: **{kvp.Value} °C**");
             }
 
-            fields.Add("Temperatures", new(cpuTempBuilder.ToString(), false));
+            fields.Add("Temperatures", new(cpuTempBuilder.ToString()));
         }
 
         if (cpuUsage.Count > 0)
@@ -349,7 +347,7 @@ public static class EmbedBuilder
                 cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Core {counter}: **{kvp.Value}%**");
             }
 
-            fields.Add("CPU Usage", new(cpuUsageBuilder.ToString(), false));
+            fields.Add("CPU Usage", new(cpuUsageBuilder.ToString()));
         }
 
         if (cpuLoads is not null)
@@ -372,13 +370,13 @@ public static class EmbedBuilder
 
         if (networkUsage.Count > 0)
         {
-            StringBuilder networkUsageBuilder = new();
             foreach (KeyValuePair<string, AzzyNetworkSpeedRecord> kvp in networkUsage)
             {
-                networkUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Interface: **{kvp.Key}**\nReceived: **{kvp.Value.Received} KB**\nTransmitted: **{kvp.Value.Transmitted} KB**\n");
-            }
+                if (fields.Count is 25)
+                    break;
 
-            fields.Add("Network Usage", new(networkUsageBuilder.ToString()));
+                fields.Add($"Interface: {kvp.Key}", new($"Received: **{kvp.Value.Received} KB**\nTransmitted: **{kvp.Value.Transmitted} KB**", true));
+            }
         }
 
         return CreateBasicEmbed(title, null, DiscordColor.Orange, avaUrl, null, null, fields);
@@ -413,7 +411,7 @@ public static class EmbedBuilder
         Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
         foreach (AzzyHelpRecord command in commands)
         {
-            fields.Add(command.Name, new(command.Description));
+            fields.Add(command.Name, new(command.Description, true));
         }
 
         return CreateBasicEmbed(title, null, DiscordColor.Blurple, null, null, null, fields);
@@ -524,7 +522,7 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.White, null, null, null, fields);
     }
 
-    public static IReadOnlyList<DiscordEmbed> BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast, string instanceRole, IReadOnlyDictionary<ulong, string> stationRoles)
+    public static IReadOnlyList<DiscordEmbed> BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast, string instanceRole, IReadOnlyDictionary<ulong, string> stationRoles, IReadOnlyDictionary<int, string> stationNames)
     {
         ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
 
@@ -545,7 +543,7 @@ public static class EmbedBuilder
         const string stationTitle = "AzuraCast Stations";
         foreach (AzuraCastStationEntity station in azuraCast.Stations)
         {
-            string stationName = Crypto.Decrypt(station.Name);
+            string stationName = stationNames.FirstOrDefault(x => x.Key == station.Id).Value;
             string stationId = station.StationId.ToString(CultureInfo.InvariantCulture);
             string stationApiKey = $"||{((!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : "Not set")}||";
             string stationAdminRole;
@@ -575,10 +573,8 @@ public static class EmbedBuilder
             string fileUploadChannel = (station.Preferences.FileUploadChannelId > 0) ? $"<#{station.Preferences.FileUploadChannelId}>" : "Not set";
             string requestsChannel = (station.Preferences.RequestsChannelId > 0) ? $"<#{station.Preferences.RequestsChannelId}>" : "Not set";
             string fileUploadPath = (!string.IsNullOrWhiteSpace(station.Preferences.FileUploadPath)) ? station.Preferences.FileUploadPath : "Not set";
-            string preferHls = Misc.ReadableBool(station.Preferences.PreferHls, ReadbleBool.EnabledDisabled);
             string showPlaylist = Misc.ReadableBool(station.Preferences.ShowPlaylistInNowPlaying, ReadbleBool.EnabledDisabled);
             string fileChanges = Misc.ReadableBool(station.Checks.FileChanges, ReadbleBool.EnabledDisabled);
-            string mounts = (station.Mounts.Count > 0) ? string.Join('\n', station.Mounts.Select(x => $"- {Crypto.Decrypt(x.Name)}: {Crypto.Decrypt(x.Mount)}")) : "No Mount Points added";
 
             fields = new()
             {
@@ -590,10 +586,8 @@ public static class EmbedBuilder
                 ["File Upload Channel"] = new(fileUploadChannel),
                 ["Music Requests Channel"] = new(requestsChannel),
                 ["File Upload Path"] = new(fileUploadPath),
-                ["Prefer HLS Streaming"] = new(preferHls),
                 ["Show Playlist In Now Playing"] = new(showPlaylist),
-                ["Automatic Checks"] = new($"- File Changes: {fileChanges}"),
-                ["Mount Points"] = new(mounts)
+                ["Automatic Checks"] = new($"- File Changes: {fileChanges}")
             };
 
             embeds.Add(CreateBasicEmbed(stationTitle, string.Empty, DiscordColor.White, null, null, null, fields));

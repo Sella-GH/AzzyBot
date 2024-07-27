@@ -17,9 +17,9 @@ public static class Startup
         bool isDev = environment == Environments.Development;
         bool isDocker = AzzyStatsHardware.CheckIfDocker;
         bool forceDebug = (isDocker) ? (Environment.GetEnvironmentVariable("FORCE_DEBUG") == "true") : (args?.Length > 0 && args.Contains("-forceDebug"));
-        bool skipDbWaiting = Environment.GetEnvironmentVariable("SKIP_DB_WAITING") == "true";
+        bool SkipWaiting = (isDocker) ? (Environment.GetEnvironmentVariable("SKIP_WAITING") == "true") : (args?.Length > 0 && args.Contains("-skipWaiting"));
 
-        if (isDocker && !skipDbWaiting)
+        if (isDocker && !SkipWaiting)
         {
             // Give the database time to start up
             await Task.Delay(TimeSpan.FromSeconds(30));
@@ -54,7 +54,7 @@ public static class Startup
 
         appBuilder.Services.AzzyBotSettings(isDev, isDocker);
         appBuilder.Services.AzzyBotStats(isDev && !isDocker);
-        appBuilder.Services.AzzyBotServices();
+        appBuilder.Services.AzzyBotServices(isDev, isDocker);
 
         #endregion Add services
 

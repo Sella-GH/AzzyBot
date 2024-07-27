@@ -54,6 +54,12 @@ public static partial class LoggerActions
     [LoggerMessage(40, LogLevel.Debug, "AzuraCastDiscordPermission is {perm}")]
     public static partial void AzuraCastDiscordPermission(this ILogger logger, string perm);
 
+    [LoggerMessage(41, LogLevel.Debug, "User {user} is not connected to a voice channel")]
+    public static partial void UserNotConnected(this ILogger logger, string user);
+
+    [LoggerMessage(42, LogLevel.Debug, "Setting channelId to 0 because user is not connected to a voice channel")]
+    public static partial void UserNotConnectedSetChannelId(this ILogger logger);
+
     [LoggerMessage(90, LogLevel.Debug, "Stopping global timer")]
     public static partial void GlobalTimerStop(this ILogger logger);
 
@@ -129,14 +135,14 @@ public static partial class LoggerActions
     [LoggerMessage(216, LogLevel.Warning, "Could not find AzuraCast station checks for guild {guild} in instance {instance} at station {station}")]
     public static partial void DatabaseAzuraCastStationChecksNotFound(this ILogger logger, ulong guild, int instance, int station);
 
-    [LoggerMessage(217, LogLevel.Warning, "Could not find AzuraCast station mount for guild {guild} in instance {instance} at station {station}")]
-    public static partial void DatabaseAzuraCastStationMountNotFound(this ILogger logger, ulong guild, int instance, int station);
-
-    [LoggerMessage(218, LogLevel.Warning, "Could not find AzuraCast station preferences for guild {guild} in instance {instance} at station {station}")]
+    [LoggerMessage(217, LogLevel.Warning, "Could not find AzuraCast station preferences for guild {guild} in instance {instance} at station {station}")]
     public static partial void DatabaseAzuraCastStationPreferencesNotFound(this ILogger logger, ulong guild, int instance, int station);
 
     [LoggerMessage(220, LogLevel.Warning, "Could not find discord item {item} for guild {guild}")]
     public static partial void DiscordItemNotFound(this ILogger logger, string item, ulong guild);
+
+    [LoggerMessage(230, LogLevel.Warning, "Bot is ratelimited on uri: {uri} retrying in {time} seconds")]
+    public static partial void BotRatelimited(this ILogger logger, Uri uri, int time);
 
     [LoggerMessage(290, LogLevel.Warning, "Latest online version of the bot is empty")]
     public static partial void OnlineVersionEmpty(this ILogger logger);
