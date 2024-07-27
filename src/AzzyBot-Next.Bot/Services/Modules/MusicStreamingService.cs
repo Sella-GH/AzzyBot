@@ -71,7 +71,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentException.ThrowIfNullOrWhiteSpace(station, nameof(station));
 
-        LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, false, true);
+        LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, false, true, true);
 
         // Guild has no player
         if (player is null)
