@@ -97,19 +97,6 @@ public sealed class MusicStreamingService(IAudioService audioService)
         return player is not null;
     }
 
-    public async Task<bool> LeaveChannelAsync(CommandContext context)
-    {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
-
-        LavalinkPlayer? player = await GetLavalinkPlayerAsync(context);
-        if (player is null)
-            return false;
-
-        await player.DisconnectAsync();
-
-        return true;
-    }
-
     public async Task<bool> PlayMusicAsync(CommandContext context, string mountPoint)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));

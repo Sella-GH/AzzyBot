@@ -64,7 +64,7 @@ public sealed class MusicStreamingCommands
 
             await context.DeferResponseAsync();
 
-            if (!await _musicStreaming.LeaveChannelAsync(context))
+            if (!await _musicStreaming.StopMusicAsync(context, true))
                 return;
 
             await context.EditResponseAsync("I'm gone now.");
@@ -97,6 +97,20 @@ public sealed class MusicStreamingCommands
             await _musicStreaming.PlayMusicAsync(context, mountPoint);
 
             await context.EditResponseAsync("I'm starting to play now!");
+        }
+
+        [Command("stop"), Description("Stop the music.")]
+        public async Task StopAsync(CommandContext context)
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+            _logger.CommandRequested(nameof(StopAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            await _musicStreaming.StopMusicAsync(context, false);
+
+            await context.EditResponseAsync("I stopped the music.");
         }
     }
 }
