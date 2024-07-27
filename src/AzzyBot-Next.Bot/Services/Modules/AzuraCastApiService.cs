@@ -628,7 +628,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
             {
                 nowPlaying = await GetNowPlayingAsync(baseUrl, stationId, true);
             }
-            catch (HttpRequestException)
+            catch (Exception e) when (e is HttpRequestException || e is InvalidOperationException || e is JsonException)
             {
                 if (!firstTime.HasValue)
                     firstTime = true;
