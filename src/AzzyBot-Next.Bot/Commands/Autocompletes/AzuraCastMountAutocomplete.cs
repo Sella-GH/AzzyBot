@@ -28,7 +28,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
 
         Dictionary<string, object> results = [];
         int stationId = Convert.ToInt32(context.Options.Single(o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
-        if (stationId == 0)
+        if (stationId is 0)
             return results;
 
         AzuraCastEntity? azuraCastEntity = await _dbActions.GetAzuraCastAsync(context.Guild.Id, false, false, true);
@@ -39,19 +39,14 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
         }
 
         string search = context.UserInput;
-        bool hlsAdded = false;
         string name = string.Empty;
         AzuraStationRecord record = await _azuraCast.GetStationAsync(new(Crypto.Decrypt(azuraCastEntity.BaseUrl)), stationId);
+        bool hlsAvailable = record.HlsUrl is not null;
+        int maxMounts = (hlsAvailable) ? 24 : 25;
         foreach (AzuraStationMountRecord mount in record.Mounts)
         {
-            if (results.Count == 25)
+            if (results.Count == maxMounts)
                 break;
-
-            if (!hlsAdded && record.HlsUrl is not null)
-            {
-                results.Add("HTTP Live Streaming", 0);
-                hlsAdded = true;
-            }
 
             if (!string.IsNullOrWhiteSpace(search) && !mount.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
                 continue;
@@ -62,6 +57,9 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
 
             results.Add(name, mount.Id);
         }
+
+        if (hlsAvailable)
+            results.Add("HTTP Live Streaming", 0);
 
         return results;
     }
