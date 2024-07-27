@@ -180,12 +180,13 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
         HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
+        HttpResponseMessage? response = null;
 
         try
         {
             int retryCount = 0;
             string result = string.Empty;
-            HttpResponseMessage response = await client.GetAsync(url);
+            response = await client.GetAsync(url);
             while (response.StatusCode is HttpStatusCode.TooManyRequests)
             {
                 _logger.BotRatelimited(url, retryCount);
@@ -204,11 +205,21 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
         catch (InvalidOperationException)
         {
+            response?.Dispose();
             _logger.WebInvalidUri(url);
             throw;
         }
         catch (HttpRequestException ex)
         {
+            response?.Dispose();
+            if (!noLogging)
+                _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
+
+            throw;
+        }
+        catch (Exception ex)
+        {
+            response?.Dispose();
             if (!noLogging)
                 _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
 
