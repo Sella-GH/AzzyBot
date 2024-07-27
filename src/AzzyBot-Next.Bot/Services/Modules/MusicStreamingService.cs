@@ -27,7 +27,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         ArgumentNullException.ThrowIfNull(context.Member, nameof(context.Member));
 
         LavalinkPlayerOptions playerOptions = new() { SelfDeaf = true };
-        PlayerRetrieveOptions retrieveOptions = new((connectToVoice) ? PlayerChannelBehavior.Join : PlayerChannelBehavior.None, MemberVoiceStateBehavior.RequireSame, preconditions);
+        PlayerRetrieveOptions retrieveOptions = new((connectToVoice) ? PlayerChannelBehavior.Join : PlayerChannelBehavior.None, (ignoreVoice) ? MemberVoiceStateBehavior.Ignore : MemberVoiceStateBehavior.RequireSame, preconditions);
 
         if (context.Member.VoiceState is null)
         {
