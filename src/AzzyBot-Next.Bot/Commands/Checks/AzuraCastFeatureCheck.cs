@@ -45,7 +45,7 @@ public sealed class FeatureAvailableCheck(ILogger<FeatureAvailableCheck> logger,
                 if (azuraCastStation.FileUploadChannelId is not 0)
                     return null;
 
-                return "File uploading is not available for this station!";
+                return azuraCastStation.StationAdminRoleId.ToString(CultureInfo.InvariantCulture);
 
             default:
                 return "Feature not found!";
