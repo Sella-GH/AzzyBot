@@ -257,12 +257,7 @@ public sealed class AzuraCastCommands
             AzuraCastStationEntity acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station) ?? throw new InvalidOperationException("Station is null");
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
-
-            await _azuraCast.StopStationAsync(new(baseUrl), apiKey, station);
-
             AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
-
-            await context.EditResponseAsync($"I stopped the station **{azuraStation.Name}**.");
 
             _logger.LogWarning($"{Crypto.Decrypt(azuraCast.BaseUrl)}/listen/{azuraStation.Shortcode}");
 
@@ -271,6 +266,10 @@ public sealed class AzuraCastCommands
                 _logger.LogWarning("The bot was playing music from the station that was stopped. Leaving the channel now.");
                 await _musicStreaming.LeaveChannelAsync(context);
             }
+
+            await _azuraCast.StopStationAsync(new(baseUrl), apiKey, station);
+
+            await context.EditResponseAsync($"I stopped the station **{azuraStation.Name}**.");
         }
 
         [Command("toggle-song-requests"), Description("Enable or disable song requests for the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
