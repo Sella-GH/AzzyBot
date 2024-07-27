@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
+using AzzyBot.Bot.Commands.Choices;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
@@ -37,7 +38,7 @@ public sealed class MusicStreamingCommands
         (
             CommandContext context,
             [Description("The volume you want to set.")] int volume
-)
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -130,7 +131,11 @@ public sealed class MusicStreamingCommands
         }
 
         [Command("stop"), Description("Stop the music.")]
-        public async Task StopAsync(CommandContext context)
+        public async Task StopAsync
+        (
+            CommandContext context,
+            [Description("Leave the voice channel."), SlashChoiceProvider<BooleanYesNoStateProvider>] int leave = 0
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -138,9 +143,11 @@ public sealed class MusicStreamingCommands
 
             await context.DeferResponseAsync();
 
-            await _musicStreaming.StopMusicAsync(context, false);
+            bool leaving = leave is 1;
+            await _musicStreaming.StopMusicAsync(context, leaving);
+            string response = (leaving) ? "I stopped the music and left the voice channel." : "I stopped the music.";
 
-            await context.EditResponseAsync("I stopped the music.");
+            await context.EditResponseAsync(response);
         }
     }
 }
