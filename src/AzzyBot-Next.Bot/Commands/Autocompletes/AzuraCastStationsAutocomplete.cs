@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
@@ -28,24 +29,16 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
 
         // TODO Solve this more clean and nicer when it's possible
         Dictionary<string, object> results = [];
-        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
+        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, false, false, true);
         if (azuraCast is null)
         {
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
             return results;
         }
 
-        IReadOnlyList<AzuraCastStationEntity> stationsInDb;
-        try
-        {
-            stationsInDb = await _dbActions.GetAzuraCastStationsAsync(context.Guild.Id);
-            if (stationsInDb.Count is 0)
-                return results;
-        }
-        catch (InvalidOperationException)
-        {
+        IReadOnlyList<AzuraCastStationEntity> stationsInDb = azuraCast.Stations.ToList();
+        if (stationsInDb.Count is 0)
             return results;
-        }
 
         string search = context.UserInput;
         Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));

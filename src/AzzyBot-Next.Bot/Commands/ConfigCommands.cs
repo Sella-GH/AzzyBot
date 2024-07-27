@@ -81,7 +81,7 @@ public sealed class ConfigCommands
             }
 
             ulong guildId = context.Guild.Id;
-            GuildEntity? guild = await _db.GetGuildAsync(guildId);
+            GuildEntity? guild = await _db.GetGuildAsync(guildId, false, true);
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);
@@ -96,7 +96,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(guildId);
+            AzuraCastEntity? azuraCast = guild.AzuraCast;
             if (azuraCast is not null)
             {
                 _logger.DatabaseAzuraCastNotFound(guildId);
