@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Immutable;
 using System.Threading.Tasks;
 using AzzyBot.Core.Logging;
 using DSharpPlus.Commands;
@@ -20,14 +19,14 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     private readonly IAudioService _audioService = audioService;
     private readonly ILogger<MusicStreamingService> _logger = logger;
 
-    public async Task<LavalinkPlayer?> GetLavalinkPlayerAsync(CommandContext context, bool connectToVoice = false, bool suppressResponse = false, bool ignoreVoice = false, ImmutableArray<IPlayerPrecondition> preconditions = default)
+    public async Task<LavalinkPlayer?> GetLavalinkPlayerAsync(CommandContext context, bool connectToVoice = false, bool suppressResponse = false, bool ignoreVoice = false)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
         ArgumentNullException.ThrowIfNull(context.Member, nameof(context.Member));
 
         LavalinkPlayerOptions playerOptions = new() { SelfDeaf = true };
-        PlayerRetrieveOptions retrieveOptions = new((connectToVoice) ? PlayerChannelBehavior.Join : PlayerChannelBehavior.None, (ignoreVoice) ? MemberVoiceStateBehavior.Ignore : MemberVoiceStateBehavior.RequireSame, preconditions);
+        PlayerRetrieveOptions retrieveOptions = new((connectToVoice) ? PlayerChannelBehavior.Join : PlayerChannelBehavior.None, (ignoreVoice) ? MemberVoiceStateBehavior.Ignore : MemberVoiceStateBehavior.RequireSame);
 
         if (context.Member.VoiceState is null)
         {
