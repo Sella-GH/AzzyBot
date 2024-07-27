@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
-using AzzyBot.Bot.Utilities.Enums;
 using DSharpPlus.Commands;
 using Lavalink4NET;
 using Lavalink4NET.Clients;

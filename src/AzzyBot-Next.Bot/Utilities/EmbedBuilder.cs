@@ -101,7 +101,6 @@ public static class EmbedBuilder
         StringBuilder cpuLoads = new();
         StringBuilder memoryUsage = new();
         StringBuilder diskUsage = new();
-        StringBuilder networkUsage = new();
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
         fields.Add("Ping", new($"{stats.Ping} ms"));
@@ -135,13 +134,11 @@ public static class EmbedBuilder
 
         foreach (AzuraNetworkData network in stats.Network)
         {
-            networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Interface: **{network.InterfaceName}**");
-            networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Received: **{network.Received.Speed.Readable}**");
-            networkUsage.AppendLine(CultureInfo.InvariantCulture, $"Transmitted: **{network.Transmitted.Speed.Readable}**");
-            networkUsage.AppendLine();
-        }
+            if (fields.Count is 25)
+                break;
 
-        fields.Add("Network Usage", new(networkUsage.ToString()));
+            fields.Add($"Interface: {network.InterfaceName}", new($"Received: **{network.Received.Speed.Readable}**\nTransmitted: **{network.Transmitted.Speed.Readable}**", true));
+        }
 
         return CreateBasicEmbed(title, null, DiscordColor.Orange, AzuraCastPic, null, null, fields);
     }
@@ -165,7 +162,7 @@ public static class EmbedBuilder
             fields.Add("On", new(data.NowPlaying.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true));
 
         if (!string.IsNullOrWhiteSpace(data.NowPlaying.Song.Genre))
-            fields.Add("Genre", new(data.NowPlaying.Song.Genre));
+            fields.Add("Genre", new(data.NowPlaying.Song.Genre, true));
 
         if (data.Live.IsLive)
         {
@@ -175,7 +172,7 @@ public static class EmbedBuilder
         else
         {
             if (!string.IsNullOrWhiteSpace(playlistName))
-                fields.Add("Playlist", new(playlistName));
+                fields.Add("Playlist", new(playlistName, true));
 
             TimeSpan duration = TimeSpan.FromSeconds(data.NowPlaying.Duration);
             TimeSpan elapsed = TimeSpan.FromSeconds(data.NowPlaying.Elapsed);
@@ -284,9 +281,9 @@ public static class EmbedBuilder
             fields.Add("Album", new(file.Album, true));
 
         if (!string.IsNullOrWhiteSpace(file.Genre))
-            fields.Add("Genre", new(file.Genre));
+            fields.Add("Genre", new(file.Genre, true));
 
-        fields.Add("Duration", new(file.Length));
+        fields.Add("Duration", new(file.Length, true));
 
         if (!string.IsNullOrWhiteSpace(file.Isrc))
             fields.Add("ISRC", new(file.Isrc));
@@ -375,7 +372,7 @@ public static class EmbedBuilder
         {
             foreach (KeyValuePair<string, AzzyNetworkSpeedRecord> kvp in networkUsage)
             {
-                if (fields.Count is 20)
+                if (fields.Count is 25)
                     break;
 
                 fields.Add($"Interface: {kvp.Key}", new($"Received: **{kvp.Value.Received} KB**\nTransmitted: **{kvp.Value.Transmitted} KB**", true));
