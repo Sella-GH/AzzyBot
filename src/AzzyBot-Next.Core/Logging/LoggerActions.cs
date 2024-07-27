@@ -135,6 +135,9 @@ public static partial class LoggerActions
     [LoggerMessage(220, LogLevel.Warning, "Could not find discord item {item} for guild {guild}")]
     public static partial void DiscordItemNotFound(this ILogger logger, string item, ulong guild);
 
+    [LoggerMessage(230, LogLevel.Warning, "Bot is ratelimited on uri: {uri} retrying in {time} seconds")]
+    public static partial void BotRatelimited(this ILogger logger, Uri uri, int time);
+
     [LoggerMessage(290, LogLevel.Warning, "Latest online version of the bot is empty")]
     public static partial void OnlineVersionEmpty(this ILogger logger);
 

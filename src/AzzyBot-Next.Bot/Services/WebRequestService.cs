@@ -183,12 +183,24 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
         try
         {
-            using (HttpResponseMessage response = await client.GetAsync(url))
+            int retryCount = 0;
+            string result = string.Empty;
+            HttpResponseMessage response = await client.GetAsync(url);
+            while (response.StatusCode is HttpStatusCode.TooManyRequests)
             {
-                response.EnsureSuccessStatusCode();
+                _logger.BotRatelimited(url, retryCount);
 
-                return await response.Content.ReadAsStringAsync();
+                await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2, retryCount)));
+                if (retryCount is not 7)
+                    retryCount++;
+
+                response = await client.GetAsync(url);
             }
+
+            result = await response.Content.ReadAsStringAsync();
+            response.Dispose();
+
+            return result;
         }
         catch (InvalidOperationException)
         {
