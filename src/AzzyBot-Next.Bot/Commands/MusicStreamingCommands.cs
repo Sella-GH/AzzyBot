@@ -32,6 +32,30 @@ public sealed class MusicStreamingCommands
         private readonly DbActions _dbActions = dbActions;
         private readonly MusicStreamingService _musicStreaming = musicStreaming;
 
+        [Command("change-volume"), Description("Change the volume of the played music.")]
+        public async Task ChangeVolumeAsync
+        (
+            CommandContext context,
+            [Description("The volume you want to set.")] int volume
+)
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+            _logger.CommandRequested(nameof(ChangeVolumeAsync), context.User.GlobalName);
+
+            if (volume is < 0 or > 100)
+            {
+                await context.EditResponseAsync("The volume must be between 0 and 100.");
+                return;
+            }
+
+            await context.DeferResponseAsync();
+
+            await _musicStreaming.SetVolumeAsync(context, volume);
+
+            await context.EditResponseAsync($"I set the volume to {volume}%.");
+        }
+
         [Command("join"), Description("Join the voice channel.")]
         public async Task JoinAsync(CommandContext context)
         {
