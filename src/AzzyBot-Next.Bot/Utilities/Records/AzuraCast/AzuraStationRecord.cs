@@ -26,6 +26,9 @@ public sealed record AzuraStationRecord
 [SuppressMessage("Design", "CA1056:URI-like properties should not be strings", Justification = "It is a string and not an uri.")]
 public sealed record AzuraStationMountRecord
 {
+    [JsonPropertyName("id")]
+    public required int Id { get; init; }
+
     [JsonPropertyName("name")]
     public required string Name { get; init; }
 

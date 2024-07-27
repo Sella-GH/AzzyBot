@@ -8,6 +8,7 @@ using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities.Enums;
+using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data;
@@ -75,7 +76,7 @@ public sealed class MusicStreamingCommands
         (
             CommandContext context,
             [Description("The station you want play."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
-            [Description("The mount point of the station."), SlashAutoCompleteProvider<AzuraCastMountAutocomplete>] string mountPoint
+            [Description("The mount point of the station."), SlashAutoCompleteProvider<AzuraCastMountAutocomplete>] int mountPoint
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -84,9 +85,10 @@ public sealed class MusicStreamingCommands
             _logger.CommandRequested(nameof(PlayAsync), context.User.GlobalName);
 
             AzuraCastEntity azura = await _dbActions.GetAzuraCastAsync(context.Guild.Id, false, false, true) ?? throw new InvalidOperationException("AzuraCast is not set up for this server.");
+            AzuraNowPlayingDataRecord nowPlaying;
             try
             {
-                await _azuraCast.GetNowPlayingAsync(new(Crypto.Decrypt(azura.BaseUrl)), station);
+                nowPlaying = await _azuraCast.GetNowPlayingAsync(new(Crypto.Decrypt(azura.BaseUrl)), station);
             }
             catch (HttpRequestException)
             {
@@ -94,7 +96,11 @@ public sealed class MusicStreamingCommands
                 return;
             }
 
-            await _musicStreaming.PlayMusicAsync(context, mountPoint);
+            string mount = (mountPoint is 0)
+                ? nowPlaying.Station.HlsUrl ?? throw new InvalidOperationException("HTTP Live Streaming is not available for this station.")
+                : nowPlaying.Station.Mounts.FirstOrDefault(m => m.Id == mountPoint)?.Url ?? throw new InvalidOperationException("Mount point not found.");
+
+            await _musicStreaming.PlayMusicAsync(context, mount);
 
             await context.EditResponseAsync("I'm starting to play now!");
         }

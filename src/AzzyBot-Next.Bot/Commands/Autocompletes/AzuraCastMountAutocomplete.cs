@@ -49,7 +49,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
 
             if (!hlsAdded && record.HlsUrl is not null)
             {
-                results.Add("HTTP Live Streaming", record.HlsUrl);
+                results.Add("HTTP Live Streaming", 0);
                 hlsAdded = true;
             }
 
@@ -60,7 +60,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
                 ? $"{mount.Name} ({mount.Bitrate} kbps - {mount.Format})"
                 : mount.Name;
 
-            results.Add(name, mount.Url);
+            results.Add(name, mount.Id);
         }
 
         return results;
