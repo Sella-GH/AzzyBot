@@ -258,16 +258,27 @@ public sealed class AzuraCastCommands
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
             AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
+            const string disconnectingMessage = "I disconnected any listeners on this server from the station to prevent issues.";
+            string stoppingMessage = $"I stopped the station **{azuraStation.Name}**.";
 
             if (await _musicStreaming.CheckIfPlayedMusicIsStationAsync(context, $"{Crypto.Decrypt(azuraCast.BaseUrl)}/listen/{azuraStation.Shortcode}"))
             {
                 await _musicStreaming.StopMusicAsync(context, false);
-                await Task.Delay(TimeSpan.FromSeconds(5));
+                await context.EditResponseAsync(disconnectingMessage);
+                await Task.Delay(TimeSpan.FromSeconds(30));
             }
 
             await _azuraCast.StopStationAsync(new(baseUrl), apiKey, station);
 
-            await context.EditResponseAsync($"I stopped the station **{azuraStation.Name}**.");
+            DiscordMessage? message = await context.GetResponseAsync();
+            if (message is not null)
+            {
+                await context.FollowupAsync(stoppingMessage);
+            }
+            else
+            {
+                await context.EditResponseAsync(stoppingMessage);
+            }
         }
 
         [Command("toggle-song-requests"), Description("Enable or disable song requests for the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
