@@ -339,7 +339,7 @@ public sealed class DiscordBotService
         ContextCheckFailedData? azuraCastFeatureCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is FeatureAvailableCheckAttribute);
         if (azuraCastFeatureCheck is not null)
         {
-            builder.WithContent($"This feature is not activated on this station! Please inform <@&{azuraCastFeatureCheck.ErrorMessage}>");
+            builder.WithContent($"This feature is not activated on this station! Please inform <@&{azuraCastFeatureCheck.ErrorMessage}>.");
             await context.EditResponseAsync(builder);
             return;
         }

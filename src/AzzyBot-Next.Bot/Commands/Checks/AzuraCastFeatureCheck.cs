@@ -25,12 +25,13 @@ public sealed class FeatureAvailableCheck(ILogger<FeatureAvailableCheck> logger,
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
-        if (context is SlashCommandContext ctx && ctx.Interaction.ResponseState is DiscordInteractionResponseState.Unacknowledged)
+        SlashCommandContext? ctx = context as SlashCommandContext;
+        if (ctx?.Interaction.ResponseState is DiscordInteractionResponseState.Unacknowledged)
             await context.DeferResponseAsync();
 
         int stationId = 0;
-        if (context is SlashCommandContext slash)
-            stationId = Convert.ToInt32(slash.Interaction.Data.Options.Single(o => o.Name is "station").Value, CultureInfo.InvariantCulture);
+        if (ctx is not null)
+            stationId = Convert.ToInt32(ctx.Interaction.Data.Options.Single(o => o.Name is "upload-files").Options.Single(o => o.Name is "station").Value, CultureInfo.InvariantCulture);
 
         switch (attribute.Feature)
         {
