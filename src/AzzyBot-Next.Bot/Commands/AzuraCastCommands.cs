@@ -263,7 +263,7 @@ public sealed class AzuraCastCommands
             if (playResult is not "NotPlaying")
             {
                 await _musicStreaming.StopMusicAsync(context, false);
-                await Task.Delay(TimeSpan.FromSeconds((playResult is "PlayingHls") ? 10 : 5));
+                await Task.Delay(TimeSpan.FromSeconds((playResult is "PlayingHls") ? 15 : 5));
             }
 
             await _azuraCast.StopStationAsync(new(baseUrl), apiKey, station);
