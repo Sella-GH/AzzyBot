@@ -54,6 +54,12 @@ public static partial class LoggerActions
     [LoggerMessage(40, LogLevel.Debug, "AzuraCastDiscordPermission is {perm}")]
     public static partial void AzuraCastDiscordPermission(this ILogger logger, string perm);
 
+    [LoggerMessage(41, LogLevel.Debug, "User {user} is not connected to a voice channel")]
+    public static partial void UserNotConnected(this ILogger logger, string user);
+
+    [LoggerMessage(42, LogLevel.Debug, "Setting channelId to 0 because user is not connected to a voice channel")]
+    public static partial void UserNotConnectedSetChannelId(this ILogger logger);
+
     [LoggerMessage(90, LogLevel.Debug, "Stopping global timer")]
     public static partial void GlobalTimerStop(this ILogger logger);
 

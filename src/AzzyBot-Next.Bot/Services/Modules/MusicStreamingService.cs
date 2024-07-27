@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
+using AzzyBot.Core.Logging;
 using DSharpPlus.Commands;
 using Lavalink4NET;
 using Lavalink4NET.Clients;
@@ -9,22 +10,39 @@ using Lavalink4NET.Players.Preconditions;
 using Lavalink4NET.Rest.Entities;
 using Lavalink4NET.Rest.Entities.Tracks;
 using Lavalink4NET.Tracks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class MusicStreamingService(IAudioService audioService)
+public sealed class MusicStreamingService(IAudioService audioService, ILogger<MusicStreamingService> logger)
 {
     private readonly IAudioService _audioService = audioService;
+    private readonly ILogger<MusicStreamingService> _logger = logger;
 
-    public async Task<LavalinkPlayer?> GetLavalinkPlayerAsync(CommandContext context, bool connectToVoice = false, bool suppressResponse = false, ImmutableArray<IPlayerPrecondition> preconditions = default)
+    public async Task<LavalinkPlayer?> GetLavalinkPlayerAsync(CommandContext context, bool connectToVoice = false, bool suppressResponse = false, bool ignoreVoice = false, ImmutableArray<IPlayerPrecondition> preconditions = default)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+        ArgumentNullException.ThrowIfNull(context.Member, nameof(context.Member));
 
         LavalinkPlayerOptions playerOptions = new() { SelfDeaf = true };
         PlayerRetrieveOptions retrieveOptions = new((connectToVoice) ? PlayerChannelBehavior.Join : PlayerChannelBehavior.None, MemberVoiceStateBehavior.RequireSame, preconditions);
-        ulong channelId = context.Member?.VoiceState.Channel?.Id ?? 0;
+
+        if (context.Member.VoiceState is null)
+        {
+            _logger.UserNotConnected(context.User.GlobalName);
+
+            if (!suppressResponse)
+                await context.EditResponseAsync("You must be in a voice channel.");
+
+            if (!ignoreVoice)
+                return null;
+        }
+
+        ulong channelId = (context.Member.VoiceState?.Channel is null) ? 0 : context.Member.VoiceState.Channel.Id;
+        if (channelId is 0)
+            _logger.UserNotConnectedSetChannelId();
 
         PlayerResult<LavalinkPlayer> player = await _audioService.Players.RetrieveAsync(context.Guild.Id, channelId, PlayerFactory.Default, Options.Create(playerOptions), retrieveOptions);
         if (player.IsSuccess)
@@ -33,8 +51,6 @@ public sealed class MusicStreamingService(IAudioService audioService)
         string errorMessage = player.Status switch
         {
             PlayerRetrieveStatus.BotNotConnected => "I'm not connected to a voice channel.",
-            PlayerRetrieveStatus.UserNotInVoiceChannel => "You need to be in a voice channel to use this command.",
-            PlayerRetrieveStatus.VoiceChannelMismatch => "You need to be in the same voice channel as me to use this command.",
 
             PlayerRetrieveStatus.PreconditionFailed when player.Precondition?.Equals(PlayerPrecondition.NotPaused) == true => "I'm not paused.",
             PlayerRetrieveStatus.PreconditionFailed when player.Precondition?.Equals(PlayerPrecondition.NotPlaying) == true => "I'm not playing music.",
