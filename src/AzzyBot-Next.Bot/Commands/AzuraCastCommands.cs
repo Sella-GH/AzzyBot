@@ -259,13 +259,8 @@ public sealed class AzuraCastCommands
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
             AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
 
-            _logger.LogWarning($"{Crypto.Decrypt(azuraCast.BaseUrl)}/listen/{azuraStation.Shortcode}");
-
-            if (await _musicStreaming.CheckIfPlayedMusicIsStation(context, $"{Crypto.Decrypt(azuraCast.BaseUrl)}/listen/{azuraStation.Shortcode}"))
-            {
-                _logger.LogWarning("The bot was playing music from the station that was stopped. Leaving the channel now.");
+            if (await _musicStreaming.CheckIfPlayedMusicIsStationAsync(context, $"{Crypto.Decrypt(azuraCast.BaseUrl)}/listen/{azuraStation.Shortcode}"))
                 await _musicStreaming.StopMusicAsync(context, true);
-            }
 
             await _azuraCast.StopStationAsync(new(baseUrl), apiKey, station);
 

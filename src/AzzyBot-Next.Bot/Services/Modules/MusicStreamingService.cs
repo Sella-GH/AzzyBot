@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
@@ -50,7 +50,7 @@ public sealed class MusicStreamingService(IAudioService audioService)
         return null;
     }
 
-    public async Task<bool> CheckIfPlayedMusicIsStation(CommandContext context, string station)
+    public async Task<bool> CheckIfPlayedMusicIsStationAsync(CommandContext context, string station)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentException.ThrowIfNullOrWhiteSpace(station, nameof(station));
@@ -148,7 +148,7 @@ public sealed class MusicStreamingService(IAudioService audioService)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
-        LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, false, [PlayerPrecondition.Playing, PlayerPrecondition.Paused]);
+        LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, false, [PlayerPrecondition.Playing, PlayerPrecondition.NotPaused]);
         if (player is null)
             return false;
 
