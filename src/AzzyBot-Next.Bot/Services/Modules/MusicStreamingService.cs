@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
@@ -83,9 +83,9 @@ public sealed class MusicStreamingService(IAudioService audioService)
         int compareResult = Uri.Compare(playedUri, stationUri, UriComponents.Host, UriFormat.UriEscaped, StringComparison.OrdinalIgnoreCase);
         Console.WriteLine($"Compare result: {compareResult}");
 
-        Console.WriteLine((compareResult is 0) && playedUri.AbsolutePath == stationUri.AbsolutePath);
+        Console.WriteLine((compareResult is 0) && playedUri.AbsolutePath.StartsWith(stationUri.AbsolutePath, StringComparison.OrdinalIgnoreCase));
 
-        return (Uri.Compare(playedUri, stationUri, UriComponents.Host, UriFormat.UriEscaped, StringComparison.OrdinalIgnoreCase) is 0) && playedUri.AbsolutePath == stationUri.AbsolutePath;
+        return (Uri.Compare(playedUri, stationUri, UriComponents.Host, UriFormat.UriEscaped, StringComparison.OrdinalIgnoreCase) is 0) && playedUri.AbsolutePath.StartsWith(stationUri.AbsolutePath, StringComparison.OrdinalIgnoreCase);
     }
 
     public async Task<bool> JoinChannelAsync(CommandContext context)
