@@ -159,7 +159,7 @@ public sealed class ConfigCommands
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your station was added successfully and private data has been encrypted.");
 
-            GuildEntity? guild = await _db.GetGuildAsync(context.Guild.Id);
+            GuildEntity? guild = await _db.GetGuildAsync(context.Guild.Id, false, true);
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
@@ -263,7 +263,7 @@ public sealed class ConfigCommands
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your AzuraCast settings were saved successfully and private data has been encrypted.");
 
-            GuildEntity? guild = await _db.GetGuildAsync(context.Guild.Id, true, true);
+            GuildEntity? guild = await _db.GetGuildAsync(context.Guild.Id, false, true);
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
@@ -452,7 +452,7 @@ public sealed class ConfigCommands
             ulong guildId = context.Guild.Id;
             string guildName = context.Guild.Name;
             DiscordMember member = context.Member;
-            GuildEntity? guild = await _db.GetGuildAsync(guildId, true, true);
+            GuildEntity? guild = await _db.GetGuildAsync(guildId, false, true);
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);
