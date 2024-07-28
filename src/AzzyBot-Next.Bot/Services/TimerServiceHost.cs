@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Utilities.Enums;
@@ -66,7 +67,8 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBackg
                 await _updaterService.CheckForAzzyUpdatesAsync();
             }
 
-            IReadOnlyList<GuildEntity> guilds = (IReadOnlyList<GuildEntity>)await _dbActions.GetGuildsAsync(true, true);
+            IEnumerable<GuildEntity> enumeratedGuilds = await _dbActions.GetGuildsAsync(true, true);
+            IReadOnlyList<GuildEntity> guilds = enumeratedGuilds.ToList();
 
             _logger.GlobalTimerCheckForAzuraCastStatus();
             _azuraCastBackgroundService.StartAzuraCastBackgroundService(AzuraCastChecks.CheckForOnlineStatus, guilds);
