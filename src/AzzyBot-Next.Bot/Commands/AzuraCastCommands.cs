@@ -115,8 +115,8 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceApiPermissionCheckAsync), context.User.GlobalName);
 
-            GuildEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id, true, true) ?? throw new InvalidOperationException("Guild is null");
-            _backgroundService.StartAzuraCastBackgroundService(AzuraCastChecks.CheckForApiPermissions, [guild], station);
+            IAsyncEnumerable<GuildEntity> guild = _dbActions.GetGuildAsync(context.Guild.Id, true, true);
+            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForApiPermissions, guild, station);
 
             await context.EditResponseAsync("I initiated the permission check, please wait a little for the result.");
         }
@@ -133,8 +133,8 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceCacheRefreshAsync), context.User.GlobalName);
 
-            GuildEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id, true, true) ?? throw new InvalidOperationException("Guild is null");
-            _backgroundService.StartAzuraCastBackgroundService(AzuraCastChecks.CheckForFileChanges, [guild], station);
+            IAsyncEnumerable<GuildEntity> guild = _dbActions.GetGuildAsync(context.Guild.Id, true, true);
+            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, guild, station);
 
             await context.EditResponseAsync("I initiated the cache refresh, please wait a little for it to occur.");
         }
@@ -147,8 +147,25 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceOnlineCheckAsync), context.User.GlobalName);
 
-            GuildEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id, true, true) ?? throw new InvalidOperationException("Guild is null");
-            _backgroundService.StartAzuraCastBackgroundService(AzuraCastChecks.CheckForOnlineStatus, [guild]);
+            ulong guildId = context.Guild.Id;
+            GuildEntity? guild = null;
+            IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(guildId, true, true);
+            await foreach (GuildEntity itGuild in guilds)
+            {
+                if (itGuild.UniqueId == guildId)
+                {
+                    guild = itGuild;
+                    break;
+                }
+            }
+
+            if (guild is null)
+            {
+                _logger.DatabaseGuildNotFound(guildId);
+                return;
+            }
+
+            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guilds);
 
             await context.EditResponseAsync("I initiated the online check for the AzuraCast instance, please wait a little for the result.");
         }
@@ -161,8 +178,25 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceUpdateCheckAsync), context.User.GlobalName);
 
-            GuildEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id, true, true) ?? throw new InvalidOperationException("Guild is null");
-            _backgroundService.StartAzuraCastBackgroundService(AzuraCastChecks.CheckForUpdates, [guild]);
+            ulong guildId = context.Guild.Id;
+            GuildEntity? guild = null;
+            IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(guildId, true, true);
+            await foreach (GuildEntity itGuild in guilds)
+            {
+                if (itGuild.UniqueId == guildId)
+                {
+                    guild = itGuild;
+                    break;
+                }
+            }
+
+            if (guild is null)
+            {
+                _logger.DatabaseGuildNotFound(guildId);
+                return;
+            }
+
+            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, guilds);
 
             await context.EditResponseAsync("I initiated the check for AzuraCast Updates, please wait a little.\nThere won't be an answer if there are no updates available.");
         }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
@@ -161,10 +160,19 @@ public sealed class AdminCommands
             await context.DeferResponseAsync();
 
             IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
-            IEnumerable<GuildEntity> guildsEntities = await _dbActions.GetGuildsAsync(true);
+            IAsyncEnumerable<GuildEntity> guildsEntities = _dbActions.GetGuildsAsync(true);
             foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds)
             {
-                GuildEntity? guildEntity = guildsEntities.FirstOrDefault(g => g.UniqueId == guild.Key);
+                GuildEntity? guildEntity = null;
+                await foreach (GuildEntity entity in guildsEntities)
+                {
+                    if (entity.UniqueId == guild.Key)
+                    {
+                        guildEntity = entity;
+                        break;
+                    }
+                }
+
                 if (guildEntity is null)
                 {
                     _logger.DatabaseGuildNotFound(guild.Key);

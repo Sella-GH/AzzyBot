@@ -262,13 +262,16 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         }
     }
 
-    public void QueueApiPermissionChecks(IEnumerable<GuildEntity> guilds)
+    public async Task QueueApiPermissionChecksAsync(IAsyncEnumerable<GuildEntity> guilds)
     {
+        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
+
         _logger.BackgroundServiceWorkItem(nameof(QueueApiPermissionChecks));
 
-        foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.IsOnline == true).Select(g => g.AzuraCast!))
+        await foreach (GuildEntity guild in guilds)
         {
-            _ = Task.Run(async () => await CheckForApiPermissionsAsync(azuraCast));
+            if (guild.AzuraCast?.IsOnline is true)
+                _ = Task.Run(async () => await CheckForApiPermissionsAsync(guild.AzuraCast));
         }
     }
 

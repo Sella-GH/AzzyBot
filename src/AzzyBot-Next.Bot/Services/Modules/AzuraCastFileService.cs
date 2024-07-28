@@ -25,15 +25,20 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
     private readonly AzuraCastApiService _azuraCast = azuraCast;
     private readonly DiscordBotService _botService = discordBotService;
 
-    public void QueueFileChangesChecks(IEnumerable<GuildEntity> guilds)
+    public async Task QueueFileChangesChecksAsync(IAsyncEnumerable<GuildEntity> guilds)
     {
+        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
+
         _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecks));
 
-        foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.IsOnline == true).Select(g => g.AzuraCast!))
+        await foreach (GuildEntity guild in guilds)
         {
-            foreach (AzuraCastStationEntity station in azuraCast.Stations.Where(s => s.Checks.FileChanges))
+            if (guild.AzuraCast?.IsOnline is true)
             {
-                _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForFileChangesAsync(station, ct)));
+                foreach (AzuraCastStationEntity station in guild.AzuraCast!.Stations.Where(s => s.Checks.FileChanges))
+                {
+                    _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForFileChangesAsync(station, ct)));
+                }
             }
         }
     }

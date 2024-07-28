@@ -13,6 +13,7 @@ using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
+using AzzyBot.Core.Extensions;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
@@ -81,11 +82,20 @@ public sealed class ConfigCommands
             }
 
             ulong guildId = context.Guild.Id;
-            GuildEntity? guild = await _db.GetGuildAsync(guildId, false, true);
+            GuildEntity? guild = null;
+            IAsyncEnumerable<GuildEntity> guilds = _db.GetGuildAsync(guildId, true, true);
+            await foreach (GuildEntity itGuild in guilds)
+            {
+                if (itGuild.UniqueId == guildId)
+                {
+                    guild = itGuild;
+                    break;
+                }
+            }
+
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);
-                await context.EditResponseAsync("Server not found in database.");
                 return;
             }
 
@@ -110,14 +120,14 @@ public sealed class ConfigCommands
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your AzuraCast installation was added successfully and private data has been encrypted.");
 
-            guild = await _db.GetGuildAsync(guildId, true, true);
-            if (guild is null)
+            guilds = _db.GetGuildAsync(guildId, true, true);
+            if (!await guilds.ContainsOneItemAsync())
             {
                 _logger.DatabaseGuildNotFound(guildId);
                 return;
             }
 
-            _backgroundService.StartAzuraCastBackgroundService(AzuraCastChecks.CheckForOnlineStatus, [guild]);
+            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guilds);
         }
 
         [Command("add-azuracast-station"), Description("Add an AzuraCast station to your instance."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -159,10 +169,21 @@ public sealed class ConfigCommands
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your station was added successfully and private data has been encrypted.");
 
-            GuildEntity? guild = await _db.GetGuildAsync(context.Guild.Id, false, true);
+            ulong guildId = context.Guild.Id;
+            GuildEntity? guild = null;
+            IAsyncEnumerable<GuildEntity> guilds = _db.GetGuildAsync(guildId, true, true);
+            await foreach (GuildEntity itGuild in guilds)
+            {
+                if (itGuild.UniqueId == guildId)
+                {
+                    guild = itGuild;
+                    break;
+                }
+            }
+
             if (guild is null)
             {
-                _logger.DatabaseGuildNotFound(context.Guild.Id);
+                _logger.DatabaseGuildNotFound(guildId);
                 return;
             }
 
@@ -172,8 +193,15 @@ public sealed class ConfigCommands
                 return;
             }
 
+            guilds = _db.GetGuildAsync(guildId, true, true);
+            if (!await guilds.ContainsOneItemAsync())
+            {
+                _logger.DatabaseGuildNotFound(guildId);
+                return;
+            }
+
             if (guild.AzuraCast!.IsOnline)
-                _backgroundService.StartAzuraCastBackgroundService(AzuraCastChecks.CheckForFileChanges, [guild], station);
+                await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, guilds, station);
         }
 
         [Command("delete-azuracast"), Description("Delete the existing AzuraCast setup."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -263,15 +291,33 @@ public sealed class ConfigCommands
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your AzuraCast settings were saved successfully and private data has been encrypted.");
 
-            GuildEntity? guild = await _db.GetGuildAsync(context.Guild.Id, false, true);
+            ulong guildId = context.Guild.Id;
+            GuildEntity? guild = null;
+            IAsyncEnumerable<GuildEntity> guilds = _db.GetGuildAsync(guildId, true, true);
+            await foreach (GuildEntity itGuild in guilds)
+            {
+                if (itGuild.UniqueId == guildId)
+                {
+                    guild = itGuild;
+                    break;
+                }
+            }
+
             if (guild is null)
             {
-                _logger.DatabaseGuildNotFound(context.Guild.Id);
+                _logger.DatabaseGuildNotFound(guildId);
+                return;
+            }
+
+            guilds = _db.GetGuildAsync(guildId, true, true);
+            if (!await guilds.ContainsOneItemAsync())
+            {
+                _logger.DatabaseGuildNotFound(guildId);
                 return;
             }
 
             if (url is not null)
-                _backgroundService.StartAzuraCastBackgroundService(AzuraCastChecks.CheckForOnlineStatus, [guild]);
+                await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guilds);
         }
 
         [Command("modify-azuracast-checks"), Description("Modify the automatic checks for your AzuraCast instance."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -452,11 +498,19 @@ public sealed class ConfigCommands
             ulong guildId = context.Guild.Id;
             string guildName = context.Guild.Name;
             DiscordMember member = context.Member;
-            GuildEntity? guild = await _db.GetGuildAsync(guildId, false, true);
+            GuildEntity? guild = null;
+            await foreach (GuildEntity itGuild in _db.GetGuildAsync(guildId, true, true))
+            {
+                if (itGuild.UniqueId == guildId)
+                {
+                    guild = itGuild;
+                    break;
+                }
+            }
+
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);
-                await context.EditResponseAsync("Server not found in database.");
                 return;
             }
 
