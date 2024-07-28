@@ -34,7 +34,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<CoreServiceHost>();
         services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
 
-        string connectionString = GetConnectionString(settings.Database?.Host, settings.Database?.Port, settings.Database?.User, settings.Database?.Password, settings.Database?.DatabaseName);
+        string connectionString = GetConnectionString(isDev, settings.Database?.Host, settings.Database?.Port, settings.Database?.User, settings.Database?.Password, settings.Database?.DatabaseName);
         services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor().EnableSensitiveDataLogging(isDev));
         services.AddSingleton<DbActions>();
 
@@ -165,7 +165,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton(stats);
     }
 
-    private static string GetConnectionString(string? host, int? port, string? user, string? password, string? database)
+    private static string GetConnectionString(bool isDev, string? host, int? port, string? user, string? password, string? database)
     {
         if (string.IsNullOrWhiteSpace(host))
             host = "AzzyBot-Db";
@@ -181,7 +181,7 @@ public static class ServiceCollectionExtensions
             password = "thisIsAzzyB0!P@ssw0rd";
 
         if (string.IsNullOrWhiteSpace(database))
-            database = "azzybot";
+            database = (isDev) ? "azzybot-dev" : "azzybot";
 
         return $"Host={host};Port={port};Database={database};Username={user};Password={password};";
     }

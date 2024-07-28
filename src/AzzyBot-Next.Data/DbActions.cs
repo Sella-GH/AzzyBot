@@ -160,8 +160,11 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         return (success) ? addedGuilds : [];
     }
 
-    public Task<bool> DeleteAzuraCastAsync(ulong guildId) => ExecuteDbActionAsync(async context => await context.AzuraCast.Where(a => a.Guild.UniqueId == guildId).ExecuteDeleteAsync());
-    public Task<bool> DeleteAzuraCastStationAsync(int stationId) => ExecuteDbActionAsync(async context => await context.AzuraCastStations.Where(s => s.StationId == stationId).ExecuteDeleteAsync());
+    public Task<bool> DeleteAzuraCastAsync(ulong guildId)
+        => ExecuteDbActionAsync(async context => await context.AzuraCast.Where(a => a.Guild.UniqueId == guildId).ExecuteDeleteAsync());
+
+    public Task<bool> DeleteAzuraCastStationAsync(int stationId)
+        => ExecuteDbActionAsync(async context => await context.AzuraCastStations.Where(s => s.StationId == stationId).ExecuteDeleteAsync());
 
     public Task<bool> DeleteGuildAsync(ulong guildId)
     {
