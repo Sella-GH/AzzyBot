@@ -32,12 +32,12 @@ namespace AzzyBot.Bot.Commands;
 public sealed class ConfigCommands
 {
     [Command("config"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
-    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCast, AzzyBackgroundService backgroundService, DbActions db)
+    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCast, AzzyBackgroundService backgroundService, DbActions dbActions)
     {
         private readonly ILogger<ConfigGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCast = azuraCast;
         private readonly AzzyBackgroundService _backgroundService = backgroundService;
-        private readonly DbActions _db = db;
+        private readonly DbActions _dbActions = dbActions;
 
         [Command("add-azuracast"), Description("Add an AzuraCast instance to your server. This is a requirement to use the features.")]
         public async ValueTask AddAzuraCastAsync
@@ -83,7 +83,7 @@ public sealed class ConfigCommands
 
             ulong guildId = context.Guild.Id;
             GuildEntity? guild = null;
-            IAsyncEnumerable<GuildEntity> guilds = _db.GetGuildAsync(guildId, true, true);
+            IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(guildId, true, true);
             await foreach (GuildEntity itGuild in guilds)
             {
                 if (itGuild.UniqueId == guildId)
@@ -115,12 +115,12 @@ public sealed class ConfigCommands
                 return;
             }
 
-            await _db.AddAzuraCastAsync(guildId, url, apiKey, instanceAdminGroup.Id, notificationChannel.Id, outagesChannel.Id, serverStatus is 1, updates is 1, updatesChangelog is 1);
+            await _dbActions.AddAzuraCastAsync(guildId, url, apiKey, instanceAdminGroup.Id, notificationChannel.Id, outagesChannel.Id, serverStatus is 1, updates is 1, updatesChangelog is 1);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your AzuraCast installation was added successfully and private data has been encrypted.");
 
-            guilds = _db.GetGuildAsync(guildId, true, true);
+            guilds = _dbActions.GetGuildAsync(guildId, true, true);
             if (!await guilds.ContainsOneItemAsync())
             {
                 _logger.DatabaseGuildNotFound(guildId);
@@ -164,14 +164,14 @@ public sealed class ConfigCommands
                 return;
             }
 
-            await _db.AddAzuraCastStationAsync(context.Guild.Id, station, adminGroup.Id, requestsChannel.Id, showPlaylist is 1, fileChanges is 1, uploadChannel?.Id, uploadPath, apiKey, djGroup?.Id);
+            await _dbActions.AddAzuraCastStationAsync(context.Guild.Id, station, adminGroup.Id, requestsChannel.Id, showPlaylist is 1, fileChanges is 1, uploadChannel?.Id, uploadPath, apiKey, djGroup?.Id);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your station was added successfully and private data has been encrypted.");
 
             ulong guildId = context.Guild.Id;
             GuildEntity? guild = null;
-            IAsyncEnumerable<GuildEntity> guilds = _db.GetGuildAsync(guildId, true, true);
+            IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(guildId, true, true);
             await foreach (GuildEntity itGuild in guilds)
             {
                 if (itGuild.UniqueId == guildId)
@@ -193,7 +193,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            guilds = _db.GetGuildAsync(guildId, true, true);
+            guilds = _dbActions.GetGuildAsync(guildId, true, true);
             if (!await guilds.ContainsOneItemAsync())
             {
                 _logger.DatabaseGuildNotFound(guildId);
@@ -212,7 +212,7 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(DeleteAzuraCastAsync), context.User.GlobalName);
 
-            AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id);
+            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
@@ -221,7 +221,7 @@ public sealed class ConfigCommands
             }
 
             FileOperations.DeleteFiles(_azuraCast.FilePath, $"{azuraCast.Id}-");
-            await _db.DeleteAzuraCastAsync(context.Guild.Id);
+            await _dbActions.DeleteAzuraCastAsync(context.Guild.Id);
 
             await context.EditResponseAsync("Your AzuraCast setup was deleted successfully.");
         }
@@ -238,7 +238,7 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(DeleteAzuraCastStationAsync), context.User.GlobalName);
 
-            AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id, false, false, true);
+            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, false, false, true);
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
@@ -255,7 +255,7 @@ public sealed class ConfigCommands
             }
 
             FileOperations.DeleteFile(Path.Combine(_azuraCast.FilePath, $"{acStation.AzuraCast.GuildId}-{acStation.AzuraCastId}-{acStation.Id}-{acStation.StationId}-files.json"));
-            await _db.DeleteAzuraCastStationAsync(station);
+            await _dbActions.DeleteAzuraCastStationAsync(station);
 
             await context.EditResponseAsync("Your station was deleted successfully.");
         }
@@ -283,17 +283,17 @@ public sealed class ConfigCommands
             }
 
             if (url is not null || !string.IsNullOrWhiteSpace(apiKey))
-                await _db.UpdateAzuraCastAsync(context.Guild.Id, url, apiKey);
+                await _dbActions.UpdateAzuraCastAsync(context.Guild.Id, url, apiKey);
 
             if (instanceAdminGroup is not null || notificationsChannel is not null || outagesChannel is not null)
-                await _db.UpdateAzuraCastPreferencesAsync(context.Guild.Id, instanceAdminGroup?.Id, notificationsChannel?.Id, outagesChannel?.Id);
+                await _dbActions.UpdateAzuraCastPreferencesAsync(context.Guild.Id, instanceAdminGroup?.Id, notificationsChannel?.Id, outagesChannel?.Id);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your AzuraCast settings were saved successfully and private data has been encrypted.");
 
             ulong guildId = context.Guild.Id;
             GuildEntity? guild = null;
-            IAsyncEnumerable<GuildEntity> guilds = _db.GetGuildAsync(guildId, true, true);
+            IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(guildId, true, true);
             await foreach (GuildEntity itGuild in guilds)
             {
                 if (itGuild.UniqueId == guildId)
@@ -309,7 +309,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            guilds = _db.GetGuildAsync(guildId, true, true);
+            guilds = _dbActions.GetGuildAsync(guildId, true, true);
             if (!await guilds.ContainsOneItemAsync())
             {
                 _logger.DatabaseGuildNotFound(guildId);
@@ -371,7 +371,7 @@ public sealed class ConfigCommands
                 enableUpdatesChangelog = false;
             }
 
-            await _db.UpdateAzuraCastChecksAsync(context.Guild.Id, enableServerStatus, enableUpdates, enableUpdatesChangelog);
+            await _dbActions.UpdateAzuraCastChecksAsync(context.Guild.Id, enableServerStatus, enableUpdates, enableUpdatesChangelog);
 
             await context.EditResponseAsync("Your settings were saved successfully.");
         }
@@ -414,10 +414,10 @@ public sealed class ConfigCommands
             }
 
             if (stationId.HasValue || !string.IsNullOrWhiteSpace(apiKey))
-                await _db.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, apiKey);
+                await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, apiKey);
 
             if (adminGroup is not null || djGroup is not null || uploadChannel is not null || requestsChannel is not null || !string.IsNullOrWhiteSpace(uploadPath) || showPlaylistInEmbed is not null)
-                await _db.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, adminGroup?.Id, djGroup?.Id, uploadChannel?.Id, requestsChannel?.Id, uploadPath, showPlaylistInEmbed);
+                await _dbActions.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, adminGroup?.Id, djGroup?.Id, uploadChannel?.Id, requestsChannel?.Id, uploadPath, showPlaylistInEmbed);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your settings were saved successfully and private data has been encrypted.");
@@ -452,7 +452,7 @@ public sealed class ConfigCommands
                 enableFileChanges = false;
             }
 
-            await _db.UpdateAzuraCastStationChecksAsync(context.Guild.Id, station, enableFileChanges);
+            await _dbActions.UpdateAzuraCastStationChecksAsync(context.Guild.Id, station, enableFileChanges);
 
             await context.EditResponseAsync("Your settings were saved successfully.");
         }
@@ -479,7 +479,7 @@ public sealed class ConfigCommands
 
             await context.DeferResponseAsync();
 
-            await _db.UpdateGuildPreferencesAsync(context.Guild.Id, adminRole?.Id, adminChannel?.Id, errorChannel?.Id);
+            await _dbActions.UpdateGuildPreferencesAsync(context.Guild.Id, adminRole?.Id, adminChannel?.Id, errorChannel?.Id);
 
             await context.EditResponseAsync("Your settings were saved successfully.");
         }
@@ -499,7 +499,7 @@ public sealed class ConfigCommands
             string guildName = context.Guild.Name;
             DiscordMember member = context.Member;
             GuildEntity? guild = null;
-            await foreach (GuildEntity itGuild in _db.GetGuildAsync(guildId, true, true))
+            await foreach (GuildEntity itGuild in _dbActions.GetGuildAsync(guildId, true, true))
             {
                 if (itGuild.UniqueId == guildId)
                 {
@@ -558,8 +558,8 @@ public sealed class ConfigCommands
 
             await context.DeferResponseAsync();
 
-            await _db.DeleteGuildAsync(context.Guild.Id);
-            await _db.AddGuildAsync(context.Guild.Id);
+            await _dbActions.DeleteGuildAsync(context.Guild.Id);
+            await _dbActions.AddGuildAsync(context.Guild.Id);
 
             await context.EditResponseAsync("Your settings were reset successfully.\nRemember that you have to set all the configurations again.");
         }
