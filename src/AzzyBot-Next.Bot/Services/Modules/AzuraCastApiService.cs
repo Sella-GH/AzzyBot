@@ -19,10 +19,9 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbActions dbActions, DiscordBotService botService, WebRequestService webService)
+public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DiscordBotService botService, WebRequestService webService)
 {
     private readonly ILogger<AzuraCastApiService> _logger = logger;
-    private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
     private readonly WebRequestService _webService = webService;
 
@@ -264,27 +263,22 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
         }
     }
 
-    public async Task QueueApiPermissionChecksAsync()
+    public void QueueApiPermissionChecks(IReadOnlyList<GuildEntity> guilds)
     {
-        _logger.BackgroundServiceWorkItem(nameof(QueueApiPermissionChecksAsync));
+        _logger.BackgroundServiceWorkItem(nameof(QueueApiPermissionChecks));
 
-        IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(true, true);
         foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.IsOnline == true).Select(g => g.AzuraCast!))
         {
             _ = Task.Run(async () => await CheckForApiPermissionsAsync(azuraCast));
         }
     }
 
-    public async Task QueueApiPermissionChecksAsync(ulong guildId, int stationId = 0)
+    public void QueueApiPermissionChecks(GuildEntity guild, int stationId = 0)
     {
-        _logger.BackgroundServiceWorkItem(nameof(QueueApiPermissionChecksAsync));
+        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
+        ArgumentNullException.ThrowIfNull(guild.AzuraCast, nameof(guild.AzuraCast));
 
-        GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, true, true);
-        if (guild is null || guild.AzuraCast is null)
-        {
-            _logger.DatabaseGuildNotFound(guildId);
-            return;
-        }
+        _logger.BackgroundServiceWorkItem(nameof(QueueApiPermissionChecks));
 
         IEnumerable<AzuraCastStationEntity> stations = guild.AzuraCast.Stations;
         if (stationId is not 0)
@@ -292,7 +286,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
             AzuraCastStationEntity? station = stations.FirstOrDefault(s => s.StationId == stationId);
             if (station is null)
             {
-                _logger.DatabaseAzuraCastStationNotFound(guildId, guild.AzuraCast.Id, stationId);
+                _logger.DatabaseAzuraCastStationNotFound(guild.UniqueId, guild.AzuraCast.Id, stationId);
                 return;
             }
 
@@ -701,7 +695,11 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DbA
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Updates}";
 
-        await PutToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey), true);
+        try
+        {
+            await PutToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
+        }
+        catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException) { }
 
         bool online = false;
         AzuraStatusRecord status;

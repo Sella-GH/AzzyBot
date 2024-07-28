@@ -336,10 +336,18 @@ public sealed class DiscordBotService
             return;
         }
 
+        ContextCheckFailedData? azuraCastFeatureCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is FeatureAvailableCheckAttribute);
+        if (azuraCastFeatureCheck is not null)
+        {
+            builder.WithContent($"This feature is not activated on this station! Please inform <@&{azuraCastFeatureCheck.ErrorMessage}>.");
+            await context.EditResponseAsync(builder);
+            return;
+        }
+
         ContextCheckFailedData? azuraCastDiscordChannelCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is AzuraCastDiscordChannelCheckAttribute);
         if (azuraCastDiscordChannelCheck is not null)
         {
-            if (ulong.TryParse(azuraCastDiscordChannelCheck.ErrorMessage, out ulong channelId))
+            if (ulong.TryParse(azuraCastDiscordChannelCheck.ErrorMessage, out ulong channelId) && channelId is not 0)
             {
                 builder.WithContent($"This command is only usable in: <#{channelId}>");
                 await context.EditResponseAsync(builder);

@@ -23,5 +23,6 @@ public sealed class AesGcmCipher(byte[] nonce, byte[] tag, byte[] cipher)
         );
     }
 
-    public override string ToString() => Convert.ToBase64String(Nonce.Concat(Cipher).Concat(Tag).ToArray());
+    public override string ToString()
+        => Convert.ToBase64String(Nonce.Concat(Cipher).Concat(Tag).ToArray());
 }

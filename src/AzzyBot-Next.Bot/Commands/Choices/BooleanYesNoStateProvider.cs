@@ -13,5 +13,6 @@ public sealed class BooleanYesNoStateProvider : IChoiceProvider
         ["No"] = 2
     };
 
-    public ValueTask<IReadOnlyDictionary<string, object>> ProvideAsync(CommandParameter parameter) => ValueTask.FromResult(_booleanStates);
+    public ValueTask<IReadOnlyDictionary<string, object>> ProvideAsync(CommandParameter parameter)
+        => ValueTask.FromResult(_booleanStates);
 }

@@ -16,5 +16,6 @@ public sealed class BotActivityProvider : IChoiceProvider
         ["Competing"] = 5
     };
 
-    public ValueTask<IReadOnlyDictionary<string, object>> ProvideAsync(CommandParameter parameter) => ValueTask.FromResult(_botActivity);
+    public ValueTask<IReadOnlyDictionary<string, object>> ProvideAsync(CommandParameter parameter)
+        => ValueTask.FromResult(_botActivity);
 }

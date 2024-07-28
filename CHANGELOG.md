@@ -4,6 +4,10 @@
   - You'll likely experience this a few more times until the final release
   - No, I won't provide migration scripts for preview versions unless I'm fully confident that the database structure is somewhat final
 
+### General
+- Reworked the database interactions again so it should be better, faster and smarter now
+- Renamed `azuracast upload-files` to `music upload-files`
+
 ### Additions
 - The `MusicStreaming` module is back
   - If the station is stopped while someone is listening they get disconnected first
@@ -18,8 +22,9 @@
 - Improved some embed structuring
 
 ### Fixes
-- `modify azuracast-station` works again
+- `config modify-azuracast-station` works again
 - Logging of 404 errors in the AzuraCast API is gone when starting the station and Liquidsoap is not ready yet
+- `azuracast update-instance` works again
 
 ## 2.0.0-preview4.1 - 2024-07-21
 ### Fixes

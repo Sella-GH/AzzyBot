@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Extensions;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -89,11 +90,9 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     {
         return ExecuteDbActionAsync(async context =>
         {
-            AzuraCastEntity? azura = await context.Guilds
-                .Where(g => g.UniqueId == guildId)
-                .OrderBy(g => g.Id)
-                .Select(g => g.AzuraCast)
-                .FirstOrDefaultAsync();
+            AzuraCastEntity? azura = await context.AzuraCast
+                .OrderBy(a => a.Id)
+                .FirstOrDefaultAsync(a => a.Guild.UniqueId == guildId);
 
             if (azura is null)
             {
@@ -161,8 +160,11 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         return (success) ? addedGuilds : [];
     }
 
-    public Task<bool> DeleteAzuraCastAsync(ulong guildId) => ExecuteDbActionAsync(async context => await context.AzuraCast.Where(a => a.Guild.UniqueId == guildId).ExecuteDeleteAsync());
-    public Task<bool> DeleteAzuraCastStationAsync(int stationId) => ExecuteDbActionAsync(async context => await context.AzuraCastStations.Where(s => s.StationId == stationId).ExecuteDeleteAsync());
+    public Task<bool> DeleteAzuraCastAsync(ulong guildId)
+        => ExecuteDbActionAsync(async context => await context.AzuraCast.Where(a => a.Guild.UniqueId == guildId).ExecuteDeleteAsync());
+
+    public Task<bool> DeleteAzuraCastStationAsync(int stationId)
+        => ExecuteDbActionAsync(async context => await context.AzuraCastStations.Where(s => s.StationId == stationId).ExecuteDeleteAsync());
 
     public Task<bool> DeleteGuildAsync(ulong guildId)
     {
@@ -208,356 +210,104 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        AzuraCastEntity? azuraCast = await context.Guilds
+        return context.AzuraCast
             .AsNoTracking()
-            .Where(g => g.UniqueId == guildId)
-            .OrderBy(g => g.Id)
-            .Select(g => g.AzuraCast)
-            .FirstOrDefaultAsync();
-
-        if (azuraCast is null)
-        {
-            _logger.DatabaseAzuraCastNotFound(guildId);
-            return null;
-        }
-
-        if (loadChecks)
-        {
-            await context.Entry(azuraCast)
-                .Reference(a => a.Checks)
-                .LoadAsync();
-        }
-
-        if (loadPrefs)
-        {
-            await context.Entry(azuraCast)
-                .Reference(a => a.Preferences)
-                .LoadAsync();
-        }
-
-        if (loadStations)
-        {
-            await context.Entry(azuraCast)
-                .Collection(a => a.Stations)
-                .LoadAsync();
-        }
-
-        if (loadStations && (loadStationChecks || loadStationPrefs))
-        {
-            foreach (AzuraCastStationEntity station in azuraCast.Stations)
-            {
-                if (loadStationChecks)
-                {
-                    await context.Entry(station)
-                        .Reference(s => s.Checks)
-                        .LoadAsync();
-                }
-
-                if (loadStationPrefs)
-                {
-                    await context.Entry(station)
-                        .Reference(s => s.Preferences)
-                        .LoadAsync();
-                }
-            }
-        }
-
-        return azuraCast;
+            .Where(a => a.Guild.UniqueId == guildId)
+            .OrderBy(a => a.Id)
+            .IncludeIf(loadChecks, q => q.Include(a => a.Checks))
+            .IncludeIf(loadPrefs, q => q.Include(a => a.Preferences))
+            .IncludeIf(loadStations, q => q.Include(a => a.Stations))
+            .IncludeIf(loadStationChecks, q => q.Include(a => a.Stations).ThenInclude(s => s.Checks))
+            .IncludeIf(loadStationPrefs, q => q.Include(a => a.Stations).ThenInclude(s => s.Preferences))
+            .FirstOrDefault();
     }
 
     public async Task<AzuraCastPreferencesEntity?> GetAzuraCastPreferencesAsync(ulong guildId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        AzuraCastEntity? azuraCast = await context.Guilds
+        return await context.AzuraCastPreferences
             .AsNoTracking()
-            .Where(g => g.UniqueId == guildId)
-            .OrderBy(g => g.Id)
-            .Select(g => g.AzuraCast)
+            .Where(p => p.AzuraCast.Guild.UniqueId == guildId)
+            .OrderBy(p => p.Id)
             .FirstOrDefaultAsync();
-
-        if (azuraCast is null)
-        {
-            _logger.DatabaseAzuraCastNotFound(guildId);
-            return null;
-        }
-
-        await context.Entry(azuraCast)
-            .Reference(a => a.Preferences)
-            .LoadAsync();
-
-        return azuraCast.Preferences;
     }
 
     public async Task<AzuraCastStationEntity?> GetAzuraCastStationAsync(ulong guildId, int stationId, bool loadChecks = false, bool loadPrefs = false)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        AzuraCastEntity? azuraCast = await context.Guilds
+        return context.AzuraCastStations
             .AsNoTracking()
-            .Where(g => g.UniqueId == guildId)
-            .OrderBy(g => g.Id)
-            .Select(g => g.AzuraCast)
-            .FirstOrDefaultAsync();
-
-        if (azuraCast is null)
-        {
-            _logger.DatabaseAzuraCastNotFound(guildId);
-            return null;
-        }
-
-        await context.Entry(azuraCast)
-            .Collection(a => a.Stations)
-            .LoadAsync();
-
-        AzuraCastStationEntity? station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId);
-        if (station is null)
-        {
-            _logger.DatabaseAzuraCastStationNotFound(guildId, azuraCast.Id, stationId);
-            return null;
-        }
-
-        if (loadChecks)
-        {
-            await context.Entry(station)
-                .Reference(s => s.Checks)
-                .LoadAsync();
-        }
-
-        if (loadPrefs)
-        {
-            await context.Entry(station)
-                .Reference(s => s.Preferences)
-                .LoadAsync();
-        }
-
-        return station;
+            .Where(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == stationId)
+            .OrderBy(s => s.Id)
+            .IncludeIf(loadChecks, q => q.Include(s => s.Checks))
+            .IncludeIf(loadPrefs, q => q.Include(s => s.Preferences))
+            .FirstOrDefault();
     }
 
     public async Task<IReadOnlyList<AzuraCastStationEntity>> GetAzuraCastStationsAsync(ulong guildId, bool loadChecks = false, bool loadPrefs = false)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        AzuraCastEntity? azuraCast = await context.Guilds
+        return await context.AzuraCastStations
             .AsNoTracking()
-            .Where(g => g.UniqueId == guildId)
-            .OrderBy(g => g.Id)
-            .Select(g => g.AzuraCast)
-            .FirstOrDefaultAsync();
-
-        if (azuraCast is null)
-        {
-            _logger.DatabaseAzuraCastNotFound(guildId);
-            return [];
-        }
-
-        await context.Entry(azuraCast)
-            .Collection(a => a.Stations)
-            .LoadAsync();
-
-        if (loadChecks || loadPrefs)
-        {
-            foreach (AzuraCastStationEntity station in azuraCast.Stations)
-            {
-                if (loadChecks)
-                {
-                    await context.Entry(station)
-                        .Reference(s => s.Checks)
-                        .LoadAsync();
-                }
-
-                if (loadPrefs)
-                {
-                    await context.Entry(station)
-                        .Reference(s => s.Preferences)
-                        .LoadAsync();
-                }
-            }
-        }
-
-        return [.. azuraCast.Stations];
+            .Where(s => s.AzuraCast.Guild.UniqueId == guildId)
+            .OrderBy(s => s.Id)
+            .IncludeIf(loadChecks, q => q.Include(s => s.Checks))
+            .IncludeIf(loadPrefs, q => q.Include(s => s.Preferences))
+            .ToListAsync();
     }
 
     public async Task<AzuraCastStationChecksEntity?> GetAzuraCastStationChecksAsync(ulong guildId, int stationId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        AzuraCastEntity? azuraCast = await context.Guilds
+        return await context.AzuraCastStationChecks
             .AsNoTracking()
-            .Where(g => g.UniqueId == guildId)
-            .OrderBy(g => g.Id)
-            .Select(g => g.AzuraCast)
+            .Where(c => c.Station.AzuraCast.Guild.UniqueId == guildId && c.Station.StationId == stationId)
+            .OrderBy(c => c.Id)
             .FirstOrDefaultAsync();
-
-        if (azuraCast is null)
-        {
-            _logger.DatabaseAzuraCastNotFound(guildId);
-            return null;
-        }
-
-        await context.Entry(azuraCast)
-            .Collection(a => a.Stations)
-            .LoadAsync();
-
-        return azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId)?.Checks;
     }
 
     public async Task<AzuraCastStationPreferencesEntity?> GetAzuraCastStationPreferencesAsync(ulong guildId, int stationId)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        AzuraCastEntity? azuraCast = await context.Guilds
+        return await context.AzuraCastStationPreferences
             .AsNoTracking()
-            .Where(g => g.UniqueId == guildId)
-            .OrderBy(g => g.Id)
-            .Select(g => g.AzuraCast)
+            .Where(p => p.Station.AzuraCast.Guild.UniqueId == guildId && p.Station.StationId == stationId)
+            .OrderBy(p => p.Id)
             .FirstOrDefaultAsync();
-
-        if (azuraCast is null)
-        {
-            _logger.DatabaseAzuraCastNotFound(guildId);
-            return null;
-        }
-
-        await context.Entry(azuraCast)
-            .Collection(a => a.Stations)
-            .LoadAsync();
-
-        AzuraCastStationEntity? station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId);
-        if (station is null)
-        {
-            _logger.DatabaseAzuraCastStationNotFound(guildId, azuraCast.Id, stationId);
-            return null;
-        }
-
-        await context.Entry(station)
-            .Reference(s => s.Preferences)
-            .LoadAsync();
-
-        return station.Preferences;
     }
 
     public async Task<GuildEntity?> GetGuildAsync(ulong guildId, bool loadGuildPrefs = false, bool loadEverything = false)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        GuildEntity? guild = await context.Guilds
+        return context.Guilds
             .AsNoTracking()
+            .Where(g => g.UniqueId == guildId)
             .OrderBy(g => g.Id)
-            .FirstOrDefaultAsync(g => g.UniqueId == guildId);
-
-        if (guild is null)
-            return null;
-
-        if (loadGuildPrefs)
-        {
-            await context.Entry(guild)
-                .Reference(g => g.Preferences)
-                .LoadAsync();
-        }
-
-        if (loadEverything)
-        {
-            if (!loadGuildPrefs)
-            {
-                await context.Entry(guild)
-                    .Reference(g => g.Preferences)
-                    .LoadAsync();
-            }
-
-            await context.Entry(guild)
-                .Reference(g => g.AzuraCast)
-                .LoadAsync();
-
-            if (guild.AzuraCast is not null)
-            {
-                await context.Entry(guild.AzuraCast)
-                    .Reference(a => a.Checks)
-                    .LoadAsync();
-
-                await context.Entry(guild.AzuraCast)
-                    .Reference(a => a.Preferences)
-                    .LoadAsync();
-
-                await context.Entry(guild.AzuraCast)
-                    .Collection(a => a.Stations)
-                    .LoadAsync();
-
-                foreach (AzuraCastStationEntity station in guild.AzuraCast.Stations)
-                {
-                    await context.Entry(station)
-                        .Reference(s => s.Checks)
-                        .LoadAsync();
-
-                    await context.Entry(station)
-                        .Reference(s => s.Preferences)
-                        .LoadAsync();
-                }
-            }
-        }
-
-        return guild;
+            .IncludeIf(loadGuildPrefs, q => q.Include(g => g.Preferences))
+            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast).Include(g => g.AzuraCast!.Checks).Include(g => g.AzuraCast!.Preferences))
+            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Checks))
+            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Preferences))
+            .FirstOrDefault();
     }
 
     public async Task<IReadOnlyList<GuildEntity>> GetGuildsAsync(bool loadGuildPrefs = false, bool loadEverything = false)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        List<GuildEntity> guilds = (loadGuildPrefs)
-            ? await context.Guilds
-                .AsNoTracking()
-                .OrderBy(g => g.Id)
-                .Include(g => g.Preferences)
-                .ToListAsync()
-            : await context.Guilds
-                .AsNoTracking()
-                .OrderBy(g => g.Id)
-                .ToListAsync();
-
-        if (loadEverything)
-        {
-            foreach (GuildEntity guild in guilds)
-            {
-                if (!loadGuildPrefs)
-                {
-                    await context.Entry(guild)
-                        .Reference(g => g.Preferences)
-                        .LoadAsync();
-                }
-
-                await context.Entry(guild)
-                    .Reference(g => g.AzuraCast)
-                    .LoadAsync();
-
-                if (guild.AzuraCast is not null)
-                {
-                    await context.Entry(guild.AzuraCast)
-                        .Reference(a => a.Checks)
-                        .LoadAsync();
-
-                    await context.Entry(guild.AzuraCast)
-                        .Reference(a => a.Preferences)
-                        .LoadAsync();
-
-                    await context.Entry(guild.AzuraCast)
-                        .Collection(a => a.Stations)
-                        .LoadAsync();
-
-                    foreach (AzuraCastStationEntity station in guild.AzuraCast.Stations)
-                    {
-                        await context.Entry(station)
-                            .Reference(s => s.Checks)
-                            .LoadAsync();
-
-                        await context.Entry(station)
-                            .Reference(s => s.Preferences)
-                            .LoadAsync();
-                    }
-                }
-            }
-        }
-
-        return guilds;
+        return await context.Guilds
+            .AsNoTracking()
+            .OrderBy(g => g.Id)
+            .IncludeIf(loadGuildPrefs, q => q.Include(g => g.Preferences))
+            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast).Include(g => g.AzuraCast!.Checks).Include(g => g.AzuraCast!.Preferences))
+            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Checks))
+            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Preferences))
+            .ToListAsync();
     }
 
     public async Task<GuildPreferencesEntity?> GetGuildPreferencesAsync(ulong guildId)
@@ -576,10 +326,9 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     {
         return ExecuteDbActionAsync(async context =>
         {
-            AzuraCastEntity? azuraCast = await context.Guilds
-                .Where(g => g.UniqueId == guildId)
-                .OrderBy(g => g.Id)
-                .Select(g => g.AzuraCast)
+            AzuraCastEntity? azuraCast = await context.AzuraCast
+                .Where(a => a.Guild.UniqueId == guildId)
+                .OrderBy(a => a.Id)
                 .FirstOrDefaultAsync();
 
             if (azuraCast is null)
@@ -605,26 +354,14 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     {
         return ExecuteDbActionAsync(async context =>
         {
-            AzuraCastEntity? azuraCast = await context.Guilds
-                .Where(g => g.UniqueId == guildId)
-                .OrderBy(g => g.Id)
-                .Select(g => g.AzuraCast)
+            AzuraCastChecksEntity? checks = await context.AzuraCastChecks
+                .Where(c => c.AzuraCast.Guild.UniqueId == guildId)
+                .OrderBy(c => c.Id)
                 .FirstOrDefaultAsync();
 
-            if (azuraCast is null)
-            {
-                _logger.DatabaseAzuraCastNotFound(guildId);
-                return;
-            }
-
-            await context.Entry(azuraCast)
-                .Reference(a => a.Checks)
-                .LoadAsync();
-
-            AzuraCastChecksEntity? checks = azuraCast.Checks;
             if (checks is null)
             {
-                _logger.DatabaseAzuraCastChecksNotFound(guildId, azuraCast.Id);
+                _logger.DatabaseAzuraCastChecksNotFound(guildId, 0);
                 return;
             }
 
@@ -651,26 +388,14 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     {
         return ExecuteDbActionAsync(async context =>
         {
-            AzuraCastEntity? azuraCast = await context.Guilds
-                .Where(g => g.UniqueId == guildId)
-                .OrderBy(g => g.Id)
-                .Select(g => g.AzuraCast)
+            AzuraCastPreferencesEntity? preferences = await context.AzuraCastPreferences
+                .Where(p => p.AzuraCast.Guild.UniqueId == guildId)
+                .OrderBy(p => p.Id)
                 .FirstOrDefaultAsync();
 
-            if (azuraCast is null)
-            {
-                _logger.DatabaseAzuraCastNotFound(guildId);
-                return;
-            }
-
-            await context.Entry(azuraCast)
-                .Reference(a => a.Preferences)
-                .LoadAsync();
-
-            AzuraCastPreferencesEntity? preferences = azuraCast.Preferences;
             if (preferences is null)
             {
-                _logger.DatabaseAzuraCastPreferencesNotFound(guildId, azuraCast.Id);
+                _logger.DatabaseAzuraCastPreferencesNotFound(guildId, 0);
                 return;
             }
 
@@ -691,26 +416,14 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     {
         return ExecuteDbActionAsync(async context =>
         {
-            AzuraCastEntity? azuraCast = await context.Guilds
-                .Where(g => g.UniqueId == guildId)
-                .OrderBy(g => g.Id)
-                .Select(g => g.AzuraCast)
+            AzuraCastStationEntity? azuraStation = await context.AzuraCastStations
+                .Where(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == station)
+                .OrderBy(s => s.Id)
                 .FirstOrDefaultAsync();
 
-            if (azuraCast is null)
-            {
-                _logger.DatabaseAzuraCastNotFound(guildId);
-                return;
-            }
-
-            await context.Entry(azuraCast)
-                .Collection(a => a.Stations)
-                .LoadAsync();
-
-            AzuraCastStationEntity? azuraStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station);
             if (azuraStation is null)
             {
-                _logger.DatabaseAzuraCastStationNotFound(guildId, azuraCast.Id, station);
+                _logger.DatabaseAzuraCastStationNotFound(guildId, 0, station);
                 return;
             }
 
@@ -731,37 +444,14 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     {
         return ExecuteDbActionAsync(async context =>
         {
-            AzuraCastEntity? azuraCast = await context.Guilds
-                .Where(g => g.UniqueId == guildId)
-                .OrderBy(g => g.Id)
-                .Select(g => g.AzuraCast)
+            AzuraCastStationChecksEntity? checks = await context.AzuraCastStationChecks
+                .Where(c => c.Station.AzuraCast.Guild.UniqueId == guildId && c.Station.StationId == stationId)
+                .OrderBy(c => c.Id)
                 .FirstOrDefaultAsync();
 
-            if (azuraCast is null)
-            {
-                _logger.DatabaseAzuraCastNotFound(guildId);
-                return;
-            }
-
-            await context.Entry(azuraCast)
-                .Collection(a => a.Stations)
-                .LoadAsync();
-
-            AzuraCastStationEntity? station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId);
-            if (station is null)
-            {
-                _logger.DatabaseAzuraCastStationNotFound(guildId, azuraCast.Id, stationId);
-                return;
-            }
-
-            await context.Entry(station)
-                .Reference(s => s.Checks)
-                .LoadAsync();
-
-            AzuraCastStationChecksEntity? checks = station.Checks;
             if (checks is null)
             {
-                _logger.DatabaseAzuraCastStationChecksNotFound(guildId, azuraCast.Id, stationId);
+                _logger.DatabaseAzuraCastStationChecksNotFound(guildId, 0, stationId);
                 return;
             }
 
@@ -776,37 +466,14 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     {
         return ExecuteDbActionAsync(async context =>
         {
-            AzuraCastEntity? azuraCast = await context.Guilds
-                .Where(g => g.UniqueId == guildId)
-                .OrderBy(g => g.Id)
-                .Select(g => g.AzuraCast)
+            AzuraCastStationPreferencesEntity? preferences = await context.AzuraCastStationPreferences
+                .Where(p => p.Station.AzuraCast.Guild.UniqueId == guildId && p.Station.StationId == stationId)
+                .OrderBy(p => p.Id)
                 .FirstOrDefaultAsync();
 
-            if (azuraCast is null)
-            {
-                _logger.DatabaseAzuraCastNotFound(guildId);
-                return;
-            }
-
-            await context.Entry(azuraCast)
-                .Collection(a => a.Stations)
-                .LoadAsync();
-
-            AzuraCastStationEntity? station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId);
-            if (station is null)
-            {
-                _logger.DatabaseAzuraCastStationNotFound(guildId, azuraCast.Id, stationId);
-                return;
-            }
-
-            await context.Entry(station)
-                .Reference(s => s.Preferences)
-                .LoadAsync();
-
-            AzuraCastStationPreferencesEntity? preferences = station.Preferences;
             if (preferences is null)
             {
-                _logger.DatabaseAzuraCastStationPreferencesNotFound(guildId, azuraCast.Id, stationId);
+                _logger.DatabaseAzuraCastStationPreferencesNotFound(guildId, 0, stationId);
                 return;
             }
 
@@ -836,21 +503,12 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     {
         return ExecuteDbActionAsync(async context =>
         {
-            GuildEntity? guild = await context.Guilds
-                .OrderBy(g => g.Id)
-                .FirstOrDefaultAsync(g => g.UniqueId == guildId);
+            GuildPreferencesEntity? preferences = await context.GuildPreferences
+                .Where(p => p.Guild.UniqueId == guildId)
+                .Include(p => p.Guild)
+                .OrderBy(p => p.Id)
+                .FirstOrDefaultAsync();
 
-            if (guild is null)
-            {
-                _logger.DatabaseGuildNotFound(guildId);
-                return;
-            }
-
-            await context.Entry(guild)
-                .Reference(g => g.Preferences)
-                .LoadAsync();
-
-            GuildPreferencesEntity? preferences = guild.Preferences;
             if (preferences is null)
             {
                 _logger.DatabaseGuildPreferencesNotFound(guildId);
@@ -867,10 +525,10 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
                 preferences.ErrorChannelId = errorChannelId.Value;
 
             if (preferences.AdminRoleId is not 0 && preferences.AdminNotifyChannelId is not 0 && preferences.ErrorChannelId is not 0)
-                guild.ConfigSet = true;
+                preferences.Guild.ConfigSet = true;
 
             context.GuildPreferences.Update(preferences);
-            context.Guilds.Update(guild);
+            context.Guilds.Update(preferences.Guild);
         });
     }
 }

@@ -13,5 +13,6 @@ public sealed class AzuraExportPlaylistProvider : IChoiceProvider
         ["PLS"] = "pls"
     };
 
-    public ValueTask<IReadOnlyDictionary<string, object>> ProvideAsync(CommandParameter parameter) => ValueTask.FromResult(_exportProvider);
+    public ValueTask<IReadOnlyDictionary<string, object>> ProvideAsync(CommandParameter parameter)
+        => ValueTask.FromResult(_exportProvider);
 }

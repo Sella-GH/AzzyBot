@@ -1,18 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Core.Logging;
+using AzzyBot.Data;
+using AzzyBot.Data.Entities;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBackgroundService azuraCastBackgroundService, DiscordBotService discordBotService, UpdaterService updaterService) : IAsyncDisposable, IHostedService
+public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBackgroundService azuraCastBackgroundService, DbActions dbActions, DiscordBotService discordBotService, UpdaterService updaterService) : IAsyncDisposable, IHostedService
 {
     private readonly ILogger<TimerServiceHost> _logger = logger;
     private readonly AzzyBackgroundService _azuraCastBackgroundService = azuraCastBackgroundService;
+    private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _discordBotService = discordBotService;
     private readonly UpdaterService _updaterService = updaterService;
     private readonly Task _completedTask = Task.CompletedTask;
@@ -62,14 +66,16 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBackg
                 await _updaterService.CheckForAzzyUpdatesAsync();
             }
 
+            IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(true, true);
+
             _logger.GlobalTimerCheckForAzuraCastStatus();
-            await _azuraCastBackgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus);
+            _azuraCastBackgroundService.StartAzuraCastBackgroundService(AzuraCastChecks.CheckForOnlineStatus, guilds);
 
             // Properly wait if there's an exception or not
             await Task.Delay(TimeSpan.FromSeconds(5));
 
             _logger.GlobalTimerCheckForAzuraCastApi();
-            await _azuraCastBackgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForApiPermissions);
+            _azuraCastBackgroundService.StartAzuraCastBackgroundService(AzuraCastChecks.CheckForApiPermissions, guilds);
 
             // Wait again
             await Task.Delay(TimeSpan.FromSeconds(5));
@@ -79,7 +85,7 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBackg
                 _logger.GlobalTimerCheckForAzuraCastFiles();
                 _lastAzuraCastFileCheck = now;
 
-                await _azuraCastBackgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges);
+                _azuraCastBackgroundService.StartAzuraCastBackgroundService(AzuraCastChecks.CheckForFileChanges, guilds);
             }
 
             if (now - _lastAzuraCastUpdateCheck >= TimeSpan.FromHours(11.98))
@@ -87,7 +93,7 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBackg
                 _logger.GlobalTimerCheckForAzuraCastUpdates();
                 _lastAzuraCastUpdateCheck = now;
 
-                await _azuraCastBackgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates);
+                _azuraCastBackgroundService.StartAzuraCastBackgroundService(AzuraCastChecks.CheckForUpdates, guilds);
             }
         }
         catch (Exception ex)

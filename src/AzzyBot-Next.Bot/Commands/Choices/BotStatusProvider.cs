@@ -15,5 +15,6 @@ public sealed class BotStatusProvider : IChoiceProvider
         ["Do Not Disturb"] = 4
     };
 
-    public ValueTask<IReadOnlyDictionary<string, object>> ProvideAsync(CommandParameter parameter) => ValueTask.FromResult(_botStatus);
+    public ValueTask<IReadOnlyDictionary<string, object>> ProvideAsync(CommandParameter parameter)
+        => ValueTask.FromResult(_botStatus);
 }

@@ -34,7 +34,7 @@ public sealed class MusicStreamingCommands
         private readonly MusicStreamingService _musicStreaming = musicStreaming;
 
         [Command("change-volume"), Description("Change the volume of the played music.")]
-        public async Task ChangeVolumeAsync
+        public async ValueTask ChangeVolumeAsync
         (
             CommandContext context,
             [Description("The volume you want to set.")] int volume
@@ -58,7 +58,7 @@ public sealed class MusicStreamingCommands
         }
 
         [Command("join"), Description("Join the voice channel.")]
-        public async Task JoinAsync(CommandContext context)
+        public async ValueTask JoinAsync(CommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
             ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
@@ -82,7 +82,7 @@ public sealed class MusicStreamingCommands
         }
 
         [Command("leave"), Description("Leave the voice channel.")]
-        public async Task LeaveAsync(CommandContext context)
+        public async ValueTask LeaveAsync(CommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -97,7 +97,7 @@ public sealed class MusicStreamingCommands
         }
 
         [Command("play"), Description("Choose a mount point of the station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
-        public async Task PlayAsync
+        public async ValueTask PlayAsync
         (
             CommandContext context,
             [Description("The station you want play."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
@@ -109,7 +109,7 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(PlayAsync), context.User.GlobalName);
 
-            AzuraCastEntity azura = await _dbActions.GetAzuraCastAsync(context.Guild.Id, false, false, true) ?? throw new InvalidOperationException("AzuraCast is not set up for this server.");
+            AzuraCastEntity azura = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is not set up for this server.");
             AzuraNowPlayingDataRecord nowPlaying;
             try
             {
@@ -131,7 +131,7 @@ public sealed class MusicStreamingCommands
         }
 
         [Command("stop"), Description("Stop the music.")]
-        public async Task StopAsync
+        public async ValueTask StopAsync
         (
             CommandContext context,
             [Description("Leave the voice channel."), SlashChoiceProvider<BooleanYesNoStateProvider>] int leave = 0
