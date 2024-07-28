@@ -695,7 +695,11 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Updates}";
 
-        await PutToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey), true);
+        try
+        {
+            await PutToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
+        }
+        catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException) { }
 
         bool online = false;
         AzuraStatusRecord status;
