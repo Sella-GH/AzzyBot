@@ -36,8 +36,8 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
             return results;
         }
 
-        IReadOnlyList<AzuraCastStationEntity> stationsInDb = azuraCast.Stations.ToList();
-        if (stationsInDb.Count is 0)
+        IEnumerable<AzuraCastStationEntity> stationsInDb = azuraCast.Stations.ToList();
+        if (!stationsInDb.Any())
             return results;
 
         string search = context.UserInput;
@@ -45,7 +45,7 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
         string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
         foreach (AzuraCastStationEntity station in stationsInDb)
         {
-            if (results.Count == 25)
+            if (results.Count is 25)
                 break;
 
             AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(baseUrl, station.StationId);
