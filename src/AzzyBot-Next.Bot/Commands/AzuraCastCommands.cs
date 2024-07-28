@@ -115,9 +115,10 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceApiPermissionCheckAsync), context.User.GlobalName);
 
-            await context.EditResponseAsync("I initiated the permission check, please wait a little for the result.");
+            GuildEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id, true, true) ?? throw new InvalidOperationException("Guild is null");
+            _backgroundService.StartAzuraCastBackgroundService(AzuraCastChecks.CheckForApiPermissions, [guild], station);
 
-            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForApiPermissions, context.Guild.Id, station);
+            await context.EditResponseAsync("I initiated the permission check, please wait a little for the result.");
         }
 
         [Command("force-cache-refresh"), Description("Force the bot to refresh it's local song cache for a specific station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -132,9 +133,10 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceCacheRefreshAsync), context.User.GlobalName);
 
-            await context.EditResponseAsync("I initiated the cache refresh, please wait a little for it to occur.");
+            GuildEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id, true, true) ?? throw new InvalidOperationException("Guild is null");
+            _backgroundService.StartAzuraCastBackgroundService(AzuraCastChecks.CheckForFileChanges, [guild], station);
 
-            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, context.Guild.Id, station);
+            await context.EditResponseAsync("I initiated the cache refresh, please wait a little for it to occur.");
         }
 
         [Command("force-online-check"), Description("Force the bot to check if the AzuraCast instance is online."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -145,9 +147,10 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceOnlineCheckAsync), context.User.GlobalName);
 
-            await context.EditResponseAsync("I initiated the online check for the AzuraCast instance, please wait a little for the result.");
+            GuildEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id, true, true) ?? throw new InvalidOperationException("Guild is null");
+            _backgroundService.StartAzuraCastBackgroundService(AzuraCastChecks.CheckForOnlineStatus, [guild]);
 
-            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, context.Guild.Id);
+            await context.EditResponseAsync("I initiated the online check for the AzuraCast instance, please wait a little for the result.");
         }
 
         [Command("force-update-check"), Description("Force the bot to search for AzuraCast Updates."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -158,9 +161,10 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceUpdateCheckAsync), context.User.GlobalName);
 
-            await context.EditResponseAsync("I initiated the check for AzuraCast Updates, please wait a little.\nThere won't be an answer if there are no updates available.");
+            GuildEntity guild = await _dbActions.GetGuildAsync(context.Guild.Id, true, true) ?? throw new InvalidOperationException("Guild is null");
+            _backgroundService.StartAzuraCastBackgroundService(AzuraCastChecks.CheckForUpdates, [guild]);
 
-            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, context.Guild.Id);
+            await context.EditResponseAsync("I initiated the check for AzuraCast Updates, please wait a little.\nThere won't be an answer if there are no updates available.");
         }
 
         [Command("get-system-logs"), Description("Get the system logs of the AzuraCast instance."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]

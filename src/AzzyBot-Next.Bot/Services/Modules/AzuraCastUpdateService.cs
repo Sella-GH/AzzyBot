@@ -23,29 +23,22 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
 
-    public async Task QueueAzuraCastUpdatesAsync()
+    public void QueueAzuraCastUpdates(IReadOnlyList<GuildEntity> guilds)
     {
-        _logger.BackgroundServiceWorkItem(nameof(QueueAzuraCastUpdatesAsync));
+        _logger.BackgroundServiceWorkItem(nameof(QueueAzuraCastUpdates));
 
-        IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(true, true);
         foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.IsOnline == true && g.AzuraCast.Checks.Updates).Select(g => g.AzuraCast!))
         {
             _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForAzuraCastUpdatesAsync(azuraCast, ct)));
         }
     }
 
-    public async Task QueueAzuraCastUpdatesAsync(ulong guildId)
+    public void QueueAzuraCastUpdates(GuildEntity guild)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId, nameof(guildId));
+        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
+        ArgumentNullException.ThrowIfNull(guild.AzuraCast, nameof(guild.AzuraCast));
 
-        _logger.BackgroundServiceWorkItem(nameof(QueueAzuraCastUpdatesAsync));
-
-        GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, true, true);
-        if (guild is null || guild.AzuraCast is null)
-        {
-            _logger.DatabaseGuildNotFound(guildId);
-            return;
-        }
+        _logger.BackgroundServiceWorkItem(nameof(QueueAzuraCastUpdates));
 
         if (guild.AzuraCast.Checks.Updates)
             _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForAzuraCastUpdatesAsync(guild.AzuraCast, ct)));

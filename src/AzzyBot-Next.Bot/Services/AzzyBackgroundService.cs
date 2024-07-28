@@ -1,8 +1,10 @@
+using System;
+using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Core.Logging;
+using AzzyBot.Data.Entities;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -17,59 +19,65 @@ public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLi
     private readonly AzuraCastUpdateService _updaterService = updaterService;
     private readonly CancellationToken _cancellationToken = applicationLifetime.ApplicationStopping;
 
-    public async Task StartAzuraCastBackgroundServiceAsync(AzuraCastChecks checks, ulong guildId = 0, int stationId = 0)
+    public void StartAzuraCastBackgroundService(AzuraCastChecks checks, IReadOnlyList<GuildEntity> guilds, int stationId = 0)
     {
+        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
+
         _logger.BackgroundServiceStart();
 
         if (_cancellationToken.IsCancellationRequested)
             return;
 
+        GuildEntity? guild = null;
+        if (guilds.Count is 1)
+            guild = guilds[0];
+
         switch (checks)
         {
             case AzuraCastChecks.CheckForApiPermissions:
-                if (guildId == 0)
+                if (guild is null)
                 {
-                    await _apiService.QueueApiPermissionChecksAsync();
+                    _apiService.QueueApiPermissionChecks(guilds);
                 }
                 else
                 {
-                    await _apiService.QueueApiPermissionChecksAsync(guildId, stationId);
+                    _apiService.QueueApiPermissionChecks(guild, stationId);
                 }
 
                 break;
 
             case AzuraCastChecks.CheckForFileChanges:
-                if (guildId == 0)
+                if (guild is null)
                 {
-                    await _fileService.QueueFileChangesChecksAsync();
+                    _fileService.QueueFileChangesChecks(guilds);
                 }
                 else
                 {
-                    await _fileService.QueueFileChangesChecksAsync(guildId, stationId);
+                    _fileService.QueueFileChangesChecks(guild, stationId);
                 }
 
                 break;
 
             case AzuraCastChecks.CheckForOnlineStatus:
-                if (guildId == 0)
+                if (guild is null)
                 {
-                    await _pingService.QueueInstancePingAsync();
+                    _pingService.QueueInstancePing(guilds);
                 }
                 else
                 {
-                    await _pingService.QueueInstancePingAsync(guildId);
+                    _pingService.QueueInstancePing(guild);
                 }
 
                 break;
 
             case AzuraCastChecks.CheckForUpdates:
-                if (guildId == 0)
+                if (guild is null)
                 {
-                    await _updaterService.QueueAzuraCastUpdatesAsync();
+                    _updaterService.QueueAzuraCastUpdates(guilds);
                 }
                 else
                 {
-                    await _updaterService.QueueAzuraCastUpdatesAsync(guildId);
+                    _updaterService.QueueAzuraCastUpdates(guild);
                 }
 
                 break;

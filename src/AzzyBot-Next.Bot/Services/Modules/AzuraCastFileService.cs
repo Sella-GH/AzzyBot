@@ -12,26 +12,23 @@ using AzzyBot.Core.Logging;
 using AzzyBot.Core.Services.Interfaces;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
-using AzzyBot.Data;
 using AzzyBot.Data.Entities;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, IQueuedBackgroundTask taskQueue, AzuraCastApiService azuraCast, DbActions dbActions, DiscordBotService discordBotService)
+public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, IQueuedBackgroundTask taskQueue, AzuraCastApiService azuraCast, DiscordBotService discordBotService)
 {
     private readonly ILogger<AzuraCastFileService> _logger = logger;
     private readonly IQueuedBackgroundTask _taskQueue = taskQueue;
     private readonly AzuraCastApiService _azuraCast = azuraCast;
-    private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = discordBotService;
 
-    public async Task QueueFileChangesChecksAsync()
+    public void QueueFileChangesChecks(IReadOnlyList<GuildEntity> guilds)
     {
-        _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecksAsync));
+        _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecks));
 
-        IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(true, true);
         foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.IsOnline == true).Select(g => g.AzuraCast!))
         {
             foreach (AzuraCastStationEntity station in azuraCast.Stations.Where(s => s.Checks.FileChanges))
@@ -41,18 +38,12 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
         }
     }
 
-    public async Task QueueFileChangesChecksAsync(ulong guildId, int stationId = 0)
+    public void QueueFileChangesChecks(GuildEntity guild, int stationId = 0)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId, nameof(guildId));
+        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
+        ArgumentNullException.ThrowIfNull(guild.AzuraCast, nameof(guild.AzuraCast));
 
-        _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecksAsync));
-
-        GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, true, true);
-        if (guild is null || guild.AzuraCast is null)
-        {
-            _logger.DatabaseGuildNotFound(guildId);
-            return;
-        }
+        _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecks));
 
         IEnumerable<AzuraCastStationEntity> stations = guild.AzuraCast.Stations.Where(s => s.Checks.FileChanges);
         if (stationId is not 0)
@@ -60,7 +51,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
             AzuraCastStationEntity? station = stations.FirstOrDefault(s => s.StationId == stationId);
             if (station is null)
             {
-                _logger.DatabaseAzuraCastStationNotFound(guildId, guild.AzuraCast.Id, stationId);
+                _logger.DatabaseAzuraCastStationNotFound(guild.UniqueId, guild.AzuraCast.Id, stationId);
                 return;
             }
 
