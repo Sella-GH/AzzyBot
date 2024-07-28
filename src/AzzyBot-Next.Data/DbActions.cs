@@ -143,7 +143,8 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
 
         IEnumerable<GuildEntity> newGuilds = guilds.Keys
             .Where(guild => !existingGuilds.Select(g => g.UniqueId).Contains(guild))
-            .Select(guild => new GuildEntity() { UniqueId = guild });
+            .Select(guild => new GuildEntity() { UniqueId = guild })
+            .ToList();
 
         if (!newGuilds.Any())
             return [];
@@ -182,7 +183,8 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             .OrderBy(g => g.Id);
 
         IEnumerable<GuildEntity> guildsToDelete = existingGuilds
-            .Where(guild => !guilds.Keys.Contains(guild.UniqueId));
+            .Where(guild => !guilds.Keys.Contains(guild.UniqueId))
+            .ToList();
 
         if (!guildsToDelete.Any())
             return [];
@@ -249,8 +251,7 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             .Where(s => s.AzuraCast.Guild.UniqueId == guildId)
             .OrderBy(s => s.Id)
             .IncludeIf(loadChecks, q => q.Include(s => s.Checks))
-            .IncludeIf(loadPrefs, q => q.Include(s => s.Preferences))
-            .AsEnumerable();
+            .IncludeIf(loadPrefs, q => q.Include(s => s.Preferences));
     }
 
     public async Task<AzuraCastStationChecksEntity?> GetAzuraCastStationChecksAsync(ulong guildId, int stationId)
