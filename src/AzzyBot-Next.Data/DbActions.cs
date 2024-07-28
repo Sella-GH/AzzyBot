@@ -301,7 +301,8 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             .IncludeIf(loadGuildPrefs, q => q.Include(g => g.Preferences))
             .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast).Include(g => g.AzuraCast!.Checks).Include(g => g.AzuraCast!.Preferences))
             .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Checks))
-            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Preferences));
+            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Preferences))
+            .AsEnumerable();
     }
 
     public async Task<GuildPreferencesEntity?> GetGuildPreferencesAsync(ulong guildId)

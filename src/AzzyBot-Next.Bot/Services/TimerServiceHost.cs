@@ -67,8 +67,7 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBackg
                 await _updaterService.CheckForAzzyUpdatesAsync();
             }
 
-            IEnumerable<GuildEntity> enumeratedGuilds = await _dbActions.GetGuildsAsync(true, true);
-            IReadOnlyList<GuildEntity> guilds = enumeratedGuilds.ToList();
+            IEnumerable<GuildEntity> guilds = await _dbActions.GetGuildsAsync(true, true);
 
             _logger.GlobalTimerCheckForAzuraCastStatus();
             _azuraCastBackgroundService.StartAzuraCastBackgroundService(AzuraCastChecks.CheckForOnlineStatus, guilds);
