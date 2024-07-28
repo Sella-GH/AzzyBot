@@ -9,7 +9,7 @@ namespace AzzyBot.Core.Settings;
 
 public static class SettingsCheck
 {
-    public static int CheckSettings<T>(T? settings, IReadOnlyList<string>? excluded = null, bool isClass = false)
+    public static int CheckSettings<T>(T? settings, IEnumerable<string>? excluded = null, bool isClass = false)
     {
         if (settings is null)
             throw new InvalidOperationException("Settings is null");

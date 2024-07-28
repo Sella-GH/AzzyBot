@@ -242,10 +242,9 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.White, AzuraCastPic, null, null, fields);
     }
 
-    public static DiscordEmbed BuildAzuraCastUpdatesChangelogEmbed(IReadOnlyList<string> changelog, bool isRolling)
+    public static DiscordEmbed BuildAzuraCastUpdatesChangelogEmbed(IEnumerable<string> changelog, bool isRolling)
     {
         ArgumentNullException.ThrowIfNull(changelog, nameof(changelog));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(changelog.Count, nameof(changelog));
 
         const string title = "AzuraCast Updates Changelog";
 
@@ -403,10 +402,8 @@ public static class EmbedBuilder
         ArgumentNullException.ThrowIfNull(commands, nameof(commands));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(commands.Count, nameof(commands));
 
-        const string preTitle = "Command List For";
-
         // Make the first letter an uppercase one and append the rest
-        string title = $"{preTitle} {string.Concat(commands[0].SubCommand[0].ToString().ToUpperInvariant(), commands[0].SubCommand.AsSpan(1))} Group";
+        string title = $"Command List For {string.Concat(commands[0].SubCommand[0].ToString().ToUpperInvariant(), commands[0].SubCommand.AsSpan(1))} Group";
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
         foreach (AzzyHelpRecord command in commands)
@@ -522,7 +519,7 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.White, null, null, null, fields);
     }
 
-    public static IReadOnlyList<DiscordEmbed> BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast, string instanceRole, IReadOnlyDictionary<ulong, string> stationRoles, IReadOnlyDictionary<int, string> stationNames)
+    public static IEnumerable<DiscordEmbed> BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast, string instanceRole, IReadOnlyDictionary<ulong, string> stationRoles, IReadOnlyDictionary<int, string> stationNames)
     {
         ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
 

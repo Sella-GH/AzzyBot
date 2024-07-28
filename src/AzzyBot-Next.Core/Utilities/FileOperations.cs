@@ -18,10 +18,9 @@ public static class FileOperations
         WriteIndented = true
     };
 
-    public static async Task<string> CreateCsvFileAsync<T>(IReadOnlyList<T> content, string? path = null)
+    public static async Task<string> CreateCsvFileAsync<T>(IEnumerable<T> content, string? path = null)
     {
         ArgumentNullException.ThrowIfNull(content, nameof(content));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(content.Count, nameof(content));
 
         string filePath = (!string.IsNullOrWhiteSpace(path)) ? Path.Combine(Path.GetTempPath(), path) : Path.GetTempFileName();
 
@@ -73,10 +72,9 @@ public static class FileOperations
         File.Delete(path);
     }
 
-    public static void DeleteFiles(IReadOnlyList<string> paths)
+    public static void DeleteFiles(IEnumerable<string> paths)
     {
         ArgumentNullException.ThrowIfNull(paths, nameof(paths));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(paths.Count, nameof(paths));
 
         foreach (string path in paths)
         {
@@ -109,7 +107,7 @@ public static class FileOperations
         return File.ReadAllTextAsync(path);
     }
 
-    public static IReadOnlyList<string> GetFilesInDirectory(string path)
+    public static IEnumerable<string> GetFilesInDirectory(string path)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path, nameof(path));
 

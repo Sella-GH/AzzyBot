@@ -78,8 +78,8 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
             string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
             string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? station.AzuraCast.AdminApiKey : station.ApiKey;
 
-            IReadOnlyList<AzuraFilesRecord> onlineFiles = await _azuraCast.GetFilesOnlineAsync(new(Crypto.Decrypt(station.AzuraCast.BaseUrl)), Crypto.Decrypt(apiKey), station.StationId);
-            IReadOnlyList<AzuraFilesRecord> localFiles = await _azuraCast.GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
+            IEnumerable<AzuraFilesRecord> onlineFiles = await _azuraCast.GetFilesOnlineAsync(new(Crypto.Decrypt(station.AzuraCast.BaseUrl)), Crypto.Decrypt(apiKey), station.StationId);
+            IEnumerable<AzuraFilesRecord> localFiles = await _azuraCast.GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
             AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station.StationId);
 
             await CheckIfFilesWereModifiedAsync(onlineFiles, localFiles, station, azuraStation.Name, station.Preferences.RequestsChannelId);
@@ -90,7 +90,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
         }
     }
 
-    private async Task CheckIfFilesWereModifiedAsync(IReadOnlyList<AzuraFilesRecord> onlineFiles, IReadOnlyList<AzuraFilesRecord> localFiles, AzuraCastStationEntity station, string stationName, ulong channelId)
+    private async Task CheckIfFilesWereModifiedAsync(IEnumerable<AzuraFilesRecord> onlineFiles, IEnumerable<AzuraFilesRecord> localFiles, AzuraCastStationEntity station, string stationName, ulong channelId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
         ArgumentException.ThrowIfNullOrWhiteSpace(stationName, nameof(stationName));
@@ -98,10 +98,9 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
         HashSet<AzuraFilesRecord> onlineHashSet = new(onlineFiles, new AzuraFileComparer());
         HashSet<AzuraFilesRecord> localHashSet = new(localFiles, new AzuraFileComparer());
 
-        List<AzuraFilesRecord> addedFiles = onlineHashSet.Except(localHashSet).ToList();
-        List<AzuraFilesRecord> removedFiles = localHashSet.Except(onlineHashSet).ToList();
-
-        if (addedFiles.Count == 0 && removedFiles.Count == 0)
+        IReadOnlyList<AzuraFilesRecord> addedFiles = onlineHashSet.Except(localHashSet).ToList();
+        IReadOnlyList<AzuraFilesRecord> removedFiles = localHashSet.Except(onlineHashSet).ToList();
+        if (addedFiles.Count is 0 && removedFiles.Count is 0)
             return;
 
         _logger.BackgroundServiceStationFilesChanged(station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
@@ -112,7 +111,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
         StringBuilder removed = new();
         List<string> paths = [];
 
-        if (addedFiles.Count > 0)
+        if (addedFiles.Count is not 0)
         {
             foreach (AzuraFilesRecord record in addedFiles)
                 added.AppendLine(record.Path);
@@ -121,7 +120,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
             paths.Add(addedFileName);
         }
 
-        if (removedFiles.Count > 0)
+        if (removedFiles.Count is not 0)
         {
             foreach (AzuraFilesRecord record in removedFiles)
                 removed.AppendLine(record.Path);

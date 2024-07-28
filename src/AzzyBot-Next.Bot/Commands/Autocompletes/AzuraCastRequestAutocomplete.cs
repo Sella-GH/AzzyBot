@@ -59,7 +59,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
         string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
         StringBuilder songResult = new();
 
-        void AddResultsFromSong<T>(IReadOnlyList<T> songs)
+        void AddResultsFromSong<T>(IEnumerable<T> songs)
         {
             foreach (T song in songs)
             {
@@ -106,7 +106,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
 
         if (context.Command.Name is "delete-song-request")
         {
-            IReadOnlyList<AzuraRequestQueueItemRecord> requests = await _azuraCast.GetStationRequestItemsAsync(new(baseUrl), apiKey, stationId, false);
+            IEnumerable<AzuraRequestQueueItemRecord> requests = await _azuraCast.GetStationRequestItemsAsync(new(baseUrl), apiKey, stationId, false);
             AddResultsFromSong(requests);
 
             return results;
@@ -115,12 +115,12 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
         AzuraAdminStationConfigRecord config = await _azuraCast.GetStationAdminConfigAsync(new(baseUrl), apiKey, stationId);
         if (config.EnableRequests)
         {
-            IReadOnlyList<AzuraRequestRecord> requests = await _azuraCast.GetRequestableSongsAsync(new(baseUrl), apiKey, stationId);
+            IEnumerable<AzuraRequestRecord> requests = await _azuraCast.GetRequestableSongsAsync(new(baseUrl), apiKey, stationId);
             AddResultsFromSong(requests);
         }
         else
         {
-            IReadOnlyList<AzuraFilesRecord> files = await _azuraCast.GetFilesLocalAsync(azuraCast.GuildId, azuraCast.Id, station.Id, station.StationId);
+            IEnumerable<AzuraFilesRecord> files = await _azuraCast.GetFilesLocalAsync(azuraCast.GuildId, azuraCast.Id, station.Id, station.StationId);
             AddResultsFromSong(files);
         }
 
