@@ -25,7 +25,11 @@ public sealed class DebugCommands
         private readonly WebRequestService _webRequestService = webRequestService;
 
         [Command("encrypt-decrypt"), Description("Test the encryption and decryption features of the bot.")]
-        public async ValueTask DebugEncryptDecryptAsync(CommandContext context, [Description("Enter the text which should be encrypted and decrypted again."), MinMaxLength(0, 1000)] string text)
+        public async ValueTask DebugEncryptDecryptAsync
+        (
+            CommandContext context,
+            [Description("Enter the text which should be encrypted and decrypted again."), MinMaxLength(0, 1000)] string text
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -41,11 +45,11 @@ public sealed class DebugCommands
 
         [Command("trigger-exception"), Description("Triggers an InvalidOperationException to test if the error reporting system works.")]
         public async ValueTask DebugTriggerExceptionAsync
-            (
+        (
             CommandContext context,
             [Description("Enable to defer the message before throwing the exception."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int throwAfterDefering = 0,
             [Description("Enable to throw the exception after a reply was already made."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int afterReply = 0
-            )
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -64,7 +68,11 @@ public sealed class DebugCommands
         }
 
         [Command("webservice-tests"), Description("Test if the bot is able to resolve connections to external websites.")]
-        public async ValueTask DebugWebServiceTestsAsync(CommandContext context, [Description("Enter a valid url like the following: https://google.com")] Uri url)
+        public async ValueTask DebugWebServiceTestsAsync
+        (
+            CommandContext context,
+            [Description("Enter a valid url like the following: https://google.com")] Uri url
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 

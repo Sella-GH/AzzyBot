@@ -63,7 +63,11 @@ public sealed class AdminCommands
         }
 
         [Command("get-joined-server"), Description("Displays all servers the bot is in.")]
-        public async ValueTask GetJoinedGuildsAsync(CommandContext context, [Description("Select the server you want to get more information about."), SlashAutoCompleteProvider<GuildsAutocomplete>] string? serverId = null)
+        public async ValueTask GetJoinedGuildsAsync
+        (
+            CommandContext context,
+            [Description("Select the server you want to get more information about."), SlashAutoCompleteProvider<GuildsAutocomplete>] string? serverId = null
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -112,7 +116,11 @@ public sealed class AdminCommands
         }
 
         [Command("remove-joined-server"), Description("Removes the bot from a server.")]
-        public async ValueTask RemoveJoinedGuildAsync(CommandContext context, [Description("Select the server you want to remove."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId)
+        public async ValueTask RemoveJoinedGuildAsync
+        (
+            CommandContext context,
+            [Description("Select the server you want to remove."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -140,7 +148,11 @@ public sealed class AdminCommands
         }
 
         [Command("send-bot-wide-message"), Description("Sends a message to all servers the bot is in.")]
-        public async ValueTask SendBotWideMessageAsync(CommandContext context, [Description("The message you want to send."), MinMaxLength(1, 2000)] string message)
+        public async ValueTask SendBotWideMessageAsync
+        (
+            CommandContext context,
+            [Description("The message you want to send."), MinMaxLength(1, 2000)] string message
+        )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
