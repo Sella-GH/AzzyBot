@@ -23,7 +23,7 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
 
-    public void QueueAzuraCastUpdates(IReadOnlyList<GuildEntity> guilds)
+    public void QueueAzuraCastUpdates(IEnumerable<GuildEntity> guilds)
     {
         _logger.BackgroundServiceWorkItem(nameof(QueueAzuraCastUpdates));
 

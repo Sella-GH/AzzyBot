@@ -22,7 +22,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = discordBotService;
 
-    public void QueueInstancePing(IReadOnlyList<GuildEntity> guilds)
+    public void QueueInstancePing(IEnumerable<GuildEntity> guilds)
     {
         _logger.BackgroundServiceWorkItem(nameof(QueueInstancePing));
 

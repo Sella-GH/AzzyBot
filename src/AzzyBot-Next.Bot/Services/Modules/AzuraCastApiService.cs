@@ -263,7 +263,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         }
     }
 
-    public void QueueApiPermissionChecks(IReadOnlyList<GuildEntity> guilds)
+    public void QueueApiPermissionChecks(IEnumerable<GuildEntity> guilds)
     {
         _logger.BackgroundServiceWorkItem(nameof(QueueApiPermissionChecks));
 

@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities.Enums;
+using AzzyBot.Core.Extensions;
 using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
 using Microsoft.Extensions.Hosting;
@@ -19,7 +21,7 @@ public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLi
     private readonly AzuraCastUpdateService _updaterService = updaterService;
     private readonly CancellationToken _cancellationToken = applicationLifetime.ApplicationStopping;
 
-    public void StartAzuraCastBackgroundService(AzuraCastChecks checks, IReadOnlyList<GuildEntity> guilds, int stationId = 0)
+    public void StartAzuraCastBackgroundService(AzuraCastChecks checks, IEnumerable<GuildEntity> guilds, int stationId = 0)
     {
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
 
@@ -29,8 +31,8 @@ public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLi
             return;
 
         GuildEntity? guild = null;
-        if (guilds.Count is 1)
-            guild = guilds[0];
+        if (guilds.ContainsOneItem())
+            guild = guilds.First();
 
         switch (checks)
         {

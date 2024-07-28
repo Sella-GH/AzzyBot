@@ -25,7 +25,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
     private readonly AzuraCastApiService _azuraCast = azuraCast;
     private readonly DiscordBotService _botService = discordBotService;
 
-    public void QueueFileChangesChecks(IReadOnlyList<GuildEntity> guilds)
+    public void QueueFileChangesChecks(IEnumerable<GuildEntity> guilds)
     {
         _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecks));
 

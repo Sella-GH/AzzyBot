@@ -161,7 +161,7 @@ public sealed class AdminCommands
             await context.DeferResponseAsync();
 
             IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
-            IReadOnlyList<GuildEntity> guildsEntities = await _dbActions.GetGuildsAsync(true);
+            IEnumerable<GuildEntity> guildsEntities = await _dbActions.GetGuildsAsync(true);
             foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds)
             {
                 GuildEntity? guildEntity = guildsEntities.FirstOrDefault(g => g.UniqueId == guild.Key);

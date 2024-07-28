@@ -132,30 +132,27 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
     public Task<bool> AddGuildAsync(ulong guildId)
         => ExecuteDbActionAsync(async context => await context.Guilds.AddAsync(new() { UniqueId = guildId }));
 
-    public async Task<IReadOnlyList<DiscordGuild>> AddGuildsAsync(IReadOnlyDictionary<ulong, DiscordGuild> guilds)
+    public async Task<IEnumerable<DiscordGuild>> AddGuildsAsync(IReadOnlyDictionary<ulong, DiscordGuild> guilds)
     {
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
 
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        List<GuildEntity> existingGuilds = await context.Guilds
-            .OrderBy(g => g.Id)
-            .ToListAsync();
+        IEnumerable<GuildEntity> existingGuilds = context.Guilds
+            .OrderBy(g => g.Id);
 
-        List<GuildEntity> newGuilds = guilds.Keys
+        IEnumerable<GuildEntity> newGuilds = guilds.Keys
             .Where(guild => !existingGuilds.Select(g => g.UniqueId).Contains(guild))
-            .Select(guild => new GuildEntity() { UniqueId = guild })
-            .ToList();
+            .Select(guild => new GuildEntity() { UniqueId = guild });
 
-        if (newGuilds.Count is 0)
+        if (!newGuilds.Any())
             return [];
 
         bool success = await ExecuteDbActionAsync(async context => await context.Guilds.AddRangeAsync(newGuilds));
 
-        List<DiscordGuild> addedGuilds = newGuilds
+        IEnumerable<DiscordGuild> addedGuilds = newGuilds
             .Where(guild => guilds.ContainsKey(guild.UniqueId))
-            .Select(guild => guilds[guild.UniqueId])
-            .ToList();
+            .Select(guild => guilds[guild.UniqueId]);
 
         return (success) ? addedGuilds : [];
     }
@@ -175,21 +172,19 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
         });
     }
 
-    public async Task<IReadOnlyList<ulong>> DeleteGuildsAsync(IReadOnlyDictionary<ulong, DiscordGuild> guilds)
+    public async Task<IEnumerable<ulong>> DeleteGuildsAsync(IReadOnlyDictionary<ulong, DiscordGuild> guilds)
     {
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
 
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        List<GuildEntity> existingGuilds = await context.Guilds
-            .OrderBy(g => g.Id)
-            .ToListAsync();
+        IEnumerable<GuildEntity> existingGuilds = context.Guilds
+            .OrderBy(g => g.Id);
 
-        List<GuildEntity> guildsToDelete = existingGuilds
-            .Where(guild => !guilds.Keys.Contains(guild.UniqueId))
-            .ToList();
+        IEnumerable<GuildEntity> guildsToDelete = existingGuilds
+            .Where(guild => !guilds.Keys.Contains(guild.UniqueId));
 
-        if (guildsToDelete.Count is 0)
+        if (!guildsToDelete.Any())
             return [];
 
         bool success = await ExecuteDbActionAsync(async context =>
@@ -198,10 +193,9 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             await context.Guilds.Where(g => guildsToDelete.Select(g => g.UniqueId).Contains(g.UniqueId)).ExecuteDeleteAsync();
         });
 
-        List<ulong> deletedGuilds = guildsToDelete
+        IEnumerable<ulong> deletedGuilds = guildsToDelete
             .Where(guild => !guilds.ContainsKey(guild.UniqueId))
-            .Select(guld => guld.UniqueId)
-            .ToList();
+            .Select(guld => guld.UniqueId);
 
         return (success) ? deletedGuilds : [];
     }
@@ -246,17 +240,17 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             .FirstOrDefault();
     }
 
-    public async Task<IReadOnlyList<AzuraCastStationEntity>> GetAzuraCastStationsAsync(ulong guildId, bool loadChecks = false, bool loadPrefs = false)
+    public async Task<IEnumerable<AzuraCastStationEntity>> GetAzuraCastStationsAsync(ulong guildId, bool loadChecks = false, bool loadPrefs = false)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        return await context.AzuraCastStations
+        return context.AzuraCastStations
             .AsNoTracking()
             .Where(s => s.AzuraCast.Guild.UniqueId == guildId)
             .OrderBy(s => s.Id)
             .IncludeIf(loadChecks, q => q.Include(s => s.Checks))
             .IncludeIf(loadPrefs, q => q.Include(s => s.Preferences))
-            .ToListAsync();
+            .AsEnumerable();
     }
 
     public async Task<AzuraCastStationChecksEntity?> GetAzuraCastStationChecksAsync(ulong guildId, int stationId)
@@ -296,18 +290,17 @@ public sealed class DbActions(IDbContextFactory<AzzyDbContext> dbContextFactory,
             .FirstOrDefault();
     }
 
-    public async Task<IReadOnlyList<GuildEntity>> GetGuildsAsync(bool loadGuildPrefs = false, bool loadEverything = false)
+    public async Task<IEnumerable<GuildEntity>> GetGuildsAsync(bool loadGuildPrefs = false, bool loadEverything = false)
     {
         await using AzzyDbContext context = await _dbContextFactory.CreateDbContextAsync();
 
-        return await context.Guilds
+        return context.Guilds
             .AsNoTracking()
             .OrderBy(g => g.Id)
             .IncludeIf(loadGuildPrefs, q => q.Include(g => g.Preferences))
             .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast).Include(g => g.AzuraCast!.Checks).Include(g => g.AzuraCast!.Preferences))
             .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Checks))
-            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Preferences))
-            .ToListAsync();
+            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Preferences));
     }
 
     public async Task<GuildPreferencesEntity?> GetGuildPreferencesAsync(ulong guildId)
