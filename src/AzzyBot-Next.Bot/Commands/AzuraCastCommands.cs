@@ -16,6 +16,7 @@ using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
+using AzzyBot.Core.Extensions;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
@@ -116,6 +117,13 @@ public sealed class AzuraCastCommands
             _logger.CommandRequested(nameof(ForceApiPermissionCheckAsync), context.User.GlobalName);
 
             IAsyncEnumerable<GuildEntity> guild = _dbActions.GetGuildAsync(context.Guild.Id, true, true);
+            if (!await guild.ContainsOneItemAsync())
+            {
+                _logger.DatabaseGuildNotFound(context.Guild.Id);
+                await context.EditResponseAsync("This server does not exist in the database.");
+                return;
+            }
+
             await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForApiPermissions, guild, station);
 
             await context.EditResponseAsync("I initiated the permission check, please wait a little for the result.");
@@ -134,6 +142,13 @@ public sealed class AzuraCastCommands
             _logger.CommandRequested(nameof(ForceCacheRefreshAsync), context.User.GlobalName);
 
             IAsyncEnumerable<GuildEntity> guild = _dbActions.GetGuildAsync(context.Guild.Id, true, true);
+            if (!await guild.ContainsOneItemAsync())
+            {
+                _logger.DatabaseGuildNotFound(context.Guild.Id);
+                await context.EditResponseAsync("This server does not exist in the database.");
+                return;
+            }
+
             await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, guild, station);
 
             await context.EditResponseAsync("I initiated the cache refresh, please wait a little for it to occur.");
@@ -147,25 +162,15 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceOnlineCheckAsync), context.User.GlobalName);
 
-            ulong guildId = context.Guild.Id;
-            GuildEntity? guild = null;
-            IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(guildId, true, true);
-            await foreach (GuildEntity itGuild in guilds)
+            IAsyncEnumerable<GuildEntity> guild = _dbActions.GetGuildAsync(context.Guild.Id, true, true);
+            if (!await guild.ContainsOneItemAsync())
             {
-                if (itGuild.UniqueId == guildId)
-                {
-                    guild = itGuild;
-                    break;
-                }
-            }
-
-            if (guild is null)
-            {
-                _logger.DatabaseGuildNotFound(guildId);
+                _logger.DatabaseGuildNotFound(context.Guild.Id);
+                await context.EditResponseAsync("This server does not exist in the database.");
                 return;
             }
 
-            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guilds);
+            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guild);
 
             await context.EditResponseAsync("I initiated the online check for the AzuraCast instance, please wait a little for the result.");
         }
@@ -178,25 +183,15 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceUpdateCheckAsync), context.User.GlobalName);
 
-            ulong guildId = context.Guild.Id;
-            GuildEntity? guild = null;
-            IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(guildId, true, true);
-            await foreach (GuildEntity itGuild in guilds)
+            IAsyncEnumerable<GuildEntity> guild = _dbActions.GetGuildAsync(context.Guild.Id, true, true);
+            if (!await guild.ContainsOneItemAsync())
             {
-                if (itGuild.UniqueId == guildId)
-                {
-                    guild = itGuild;
-                    break;
-                }
-            }
-
-            if (guild is null)
-            {
-                _logger.DatabaseGuildNotFound(guildId);
+                _logger.DatabaseGuildNotFound(context.Guild.Id);
+                await context.EditResponseAsync("This server does not exist in the database.");
                 return;
             }
 
-            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, guilds);
+            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, guild);
 
             await context.EditResponseAsync("I initiated the check for AzuraCast Updates, please wait a little.\nThere won't be an answer if there are no updates available.");
         }
