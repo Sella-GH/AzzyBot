@@ -296,9 +296,9 @@ jobs:
         run: |
           cd /home/runner/actions-runner/_work
           rm -rf /tmp/digests
-          docker stop $(docker ps -a -q)
-          docker system prune -a -f --volumes
-          docker volume prune -a -f
+      #    docker stop $(docker ps -a -q)
+      #    docker system prune -a -f --volumes
+      #    docker volume prune -a -f
 
   docker-build-alpine-arm:
     name: Build Docker Alpine Image For ${{ matrix.os }} - ${{ matrix.arch }}
@@ -372,9 +372,9 @@ jobs:
         run: |
           cd /home/runner/actions-runner/_work
           rm -rf /tmp/digests
-          docker stop $(docker ps -a -q)
-          docker system prune -a -f --volumes
-          docker volume prune -a -f
+      #    docker stop $(docker ps -a -q)
+      #    docker system prune -a -f --volumes
+      #    docker volume prune -a -f
 
   merge:
     name: Creating Docker Release
