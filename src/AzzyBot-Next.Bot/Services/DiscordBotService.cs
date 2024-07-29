@@ -285,7 +285,7 @@ public sealed class DiscordBotService
             return;
         }
 
-        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, false, true, true, false, true);
+        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true, loadStationPrefs: true);
         if (azuraCast is null)
         {
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);

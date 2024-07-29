@@ -29,14 +29,14 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
 
         // TODO Solve this more clean and nicer when it's possible
         Dictionary<string, object> results = [];
-        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, false, false, true);
+        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true);
         if (azuraCast is null)
         {
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
             return results;
         }
 
-        IEnumerable<AzuraCastStationEntity> stationsInDb = azuraCast.Stations.ToList();
+        IEnumerable<AzuraCastStationEntity> stationsInDb = azuraCast.Stations;
         if (!stationsInDb.Any())
             return results;
 

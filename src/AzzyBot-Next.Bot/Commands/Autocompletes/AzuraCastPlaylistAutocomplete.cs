@@ -30,7 +30,7 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
 
         Dictionary<string, object> results = [];
         int stationId = Convert.ToInt32(context.Options.Single(o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
-        if (stationId == 0)
+        if (stationId is 0)
             return results;
 
         AzuraCastStationEntity? station;
@@ -55,7 +55,7 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
         IEnumerable<AzuraPlaylistRecord> playlists = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, stationId);
         foreach (AzuraPlaylistRecord playlist in playlists)
         {
-            if (results.Count == 25)
+            if (results.Count is 25)
                 break;
 
             if (!string.IsNullOrWhiteSpace(search) && !playlist.Name.Contains(search, StringComparison.OrdinalIgnoreCase))

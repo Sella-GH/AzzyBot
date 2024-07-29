@@ -23,7 +23,7 @@ public sealed class GuildsAutocomplete(DiscordBotService botService) : IAutoComp
         Dictionary<string, object> results = [];
         foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds)
         {
-            if (results.Count == 25)
+            if (results.Count is 25)
                 break;
 
             if (!string.IsNullOrWhiteSpace(search) && !guild.Value.Name.Contains(search, StringComparison.OrdinalIgnoreCase))

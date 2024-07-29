@@ -83,7 +83,7 @@ public sealed class ConfigCommands
 
             ulong guildId = context.Guild.Id;
             GuildEntity? guild = null;
-            IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(guildId, true, true);
+            IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
             await foreach (GuildEntity itGuild in guilds)
             {
                 if (itGuild.UniqueId == guildId)
@@ -120,7 +120,7 @@ public sealed class ConfigCommands
             await context.DeleteResponseAsync();
             await context.FollowupAsync("Your AzuraCast installation was added successfully and private data has been encrypted.");
 
-            guilds = _dbActions.GetGuildAsync(guildId, true, true);
+            guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
             if (!await guilds.ContainsOneItemAsync())
             {
                 _logger.DatabaseGuildNotFound(guildId);
@@ -171,7 +171,7 @@ public sealed class ConfigCommands
 
             ulong guildId = context.Guild.Id;
             GuildEntity? guild = null;
-            IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(guildId, true, true);
+            IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
             await foreach (GuildEntity itGuild in guilds)
             {
                 if (itGuild.UniqueId == guildId)
@@ -193,7 +193,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            guilds = _dbActions.GetGuildAsync(guildId, true, true);
+            guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
             if (!await guilds.ContainsOneItemAsync())
             {
                 _logger.DatabaseGuildNotFound(guildId);
@@ -238,15 +238,7 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(DeleteAzuraCastStationAsync), context.User.GlobalName);
 
-            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, false, false, true);
-            if (azuraCast is null)
-            {
-                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast not found in database.");
-                return;
-            }
-
-            AzuraCastStationEntity? acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+            AzuraCastStationEntity? acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station, loadAzuraCast: true);
             if (acStation is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, station);
@@ -293,7 +285,7 @@ public sealed class ConfigCommands
 
             ulong guildId = context.Guild.Id;
             GuildEntity? guild = null;
-            IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(guildId, true, true);
+            IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
             await foreach (GuildEntity itGuild in guilds)
             {
                 if (itGuild.UniqueId == guildId)
@@ -309,7 +301,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            guilds = _dbActions.GetGuildAsync(guildId, true, true);
+            guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
             if (!await guilds.ContainsOneItemAsync())
             {
                 _logger.DatabaseGuildNotFound(guildId);
@@ -499,7 +491,7 @@ public sealed class ConfigCommands
             string guildName = context.Guild.Name;
             DiscordMember member = context.Member;
             GuildEntity? guild = null;
-            await foreach (GuildEntity itGuild in _dbActions.GetGuildAsync(guildId, true, true))
+            await foreach (GuildEntity itGuild in _dbActions.GetGuildAsync(guildId, loadEverything: true))
             {
                 if (itGuild.UniqueId == guildId)
                 {

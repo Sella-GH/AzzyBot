@@ -29,23 +29,16 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
 
         Dictionary<string, object> results = [];
         int stationId = Convert.ToInt32(context.Options.Single(o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
-        if (stationId == 0)
+        if (stationId is 0)
             return results;
-
-        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, false, false, true);
-        if (azuraCast is null)
-        {
-            _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-            return results;
-        }
 
         AzuraCastStationEntity? station;
         try
         {
-            station = azuraCast.Stations.FirstOrDefault(s => s.StationId == stationId);
+            station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId, loadAzuraCast: true);
             if (station is null)
             {
-                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, stationId);
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, stationId);
                 return results;
             }
         }
@@ -55,15 +48,15 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
         }
 
         string search = context.UserInput;
-        string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
-        string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
+        string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(station.AzuraCast.AdminApiKey);
+        string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
         StringBuilder songResult = new();
 
         void AddResultsFromSong<T>(IEnumerable<T> songs)
         {
             foreach (T song in songs)
             {
-                if (results.Count == 25)
+                if (results.Count is 25)
                     break;
 
                 if (song is null)
@@ -120,7 +113,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
         }
         else
         {
-            IEnumerable<AzuraFilesRecord> files = await _azuraCast.GetFilesLocalAsync(azuraCast.GuildId, azuraCast.Id, station.Id, station.StationId);
+            IEnumerable<AzuraFilesRecord> files = await _azuraCast.GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCast.Id, station.Id, station.StationId);
             AddResultsFromSong(files);
         }
 

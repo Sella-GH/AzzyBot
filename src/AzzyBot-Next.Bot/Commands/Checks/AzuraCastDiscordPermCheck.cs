@@ -35,7 +35,7 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
             await context.DeferResponseAsync();
 
         int stationId = Convert.ToInt32(context.Arguments.SingleOrDefault(o => o.Key.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
-        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, false, true, true, false, true);
+        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true, loadStationPrefs: true);
         if (azuraCast is null)
         {
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
@@ -113,26 +113,26 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
                 break;
         }
 
-        if (perm == AzuraCastDiscordPerm.InstanceAdminGroup && isInstanceAdmin)
+        if (perm is AzuraCastDiscordPerm.InstanceAdminGroup && isInstanceAdmin)
             return null;
 
-        if (perm == AzuraCastDiscordPerm.StationAdminGroup && (isInstanceAdmin || isStationAdmin))
+        if (perm is AzuraCastDiscordPerm.StationAdminGroup && (isInstanceAdmin || isStationAdmin))
             return null;
 
-        if (perm == AzuraCastDiscordPerm.StationDJGroup && (isInstanceAdmin || isStationAdmin || isStationDj))
+        if (perm is AzuraCastDiscordPerm.StationDJGroup && (isInstanceAdmin || isStationAdmin || isStationDj))
             return null;
 
-        if (perm == AzuraCastDiscordPerm.InstanceAdminGroup)
+        if (perm is AzuraCastDiscordPerm.InstanceAdminGroup)
         {
             _logger.AzuraCastDiscordPermission(nameof(AzuraCastDiscordPerm.InstanceAdminGroup));
             return "Instance";
         }
-        else if (perm == AzuraCastDiscordPerm.StationAdminGroup)
+        else if (perm is AzuraCastDiscordPerm.StationAdminGroup)
         {
             _logger.AzuraCastDiscordPermission(nameof(AzuraCastDiscordPerm.StationAdminGroup));
             return $"Station:{station.StationId}";
         }
-        else if (perm == AzuraCastDiscordPerm.StationDJGroup)
+        else if (perm is AzuraCastDiscordPerm.StationDJGroup)
         {
             _logger.AzuraCastDiscordPermission(nameof(AzuraCastDiscordPerm.StationDJGroup));
             return $"DJ:{station.StationId}";

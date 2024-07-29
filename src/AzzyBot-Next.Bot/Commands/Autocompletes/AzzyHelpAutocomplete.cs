@@ -39,7 +39,7 @@ public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings) : IAuto
         bool approvedDebug = guildId == _settings.ServerId;
         foreach (KeyValuePair<string, List<AzzyHelpRecord>> kvp in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member))
         {
-            if (results.Count == 25)
+            if (results.Count is 25)
                 break;
 
             if (!string.IsNullOrWhiteSpace(search) && kvp.Value.All(r => !r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)))
@@ -47,7 +47,7 @@ public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings) : IAuto
 
             foreach (AzzyHelpRecord record in kvp.Value.Where(r => r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)))
             {
-                if (results.Count == 25)
+                if (results.Count is 25)
                     break;
 
                 results.Add(record.Name, record.Name);
