@@ -8,6 +8,7 @@
 - Reworked the database interactions again so it should be better, faster and smarter now
 - Reworked the internals to make it better maintainable and smoother
 - Renamed `azuracast upload-files` to `music upload-files`
+- Prepared the bot metadata for the final release
 
 ### Additions
 - The `MusicStreaming` module is back

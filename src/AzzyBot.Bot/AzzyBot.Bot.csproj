@@ -1,34 +1,42 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>AzzyBot.Core</RootNamespace>
-    <OutputType>Library</OutputType>
-    <Product>AzzyBot-Next.Core</Product>
+    <RootNamespace>AzzyBot.Bot</RootNamespace>
+    <OutputType>Exe</OutputType>
+    <Product>AzzyBot</Product>
+    <StartupObject>AzzyBot.Bot.Startup</StartupObject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <AssemblyName>AzzyBot-Dev.Core</AssemblyName>
-    <Product>AzzyBot-Next-Dev.Core</Product>
+    <AssemblyName>AzzyBot-Dev</AssemblyName>
+    <Product>AzzyBot-Dev</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Docker'">
-    <AssemblyName>AzzyBot-Docker.Core</AssemblyName>
-    <Product>AzzyBot-Next-Docker.Core</Product>
+    <AssemblyName>AzzyBot-Docker</AssemblyName>
+    <Product>AzzyBot-Docker</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Docker-debug'">
-    <AssemblyName>AzzyBot-Docker-Dev.Core</AssemblyName>
-    <Product>AzzyBot-Next-Docker-Dev.Core</Product>
+    <AssemblyName>AzzyBot-Docker-Dev</AssemblyName>
+    <Product>AzzyBot-Docker-Dev</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <AssemblyName>AzzyBot.Core</AssemblyName>
+    <AssemblyName>AzzyBot</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="CsvHelper" />
     <PackageReference Include="DSharpPlus" />
     <PackageReference Include="DSharpPlus.Commands" />
+    <PackageReference Include="DSharpPlus.Interactivity" />
+    <PackageReference Include="EntityFrameworkCore.Exceptions.PostgreSQL" />
+    <PackageReference Include="Lavalink4NET.DSharpPlus" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="Roslynator.Analyzers">
       <PrivateAssets>all</PrivateAssets>
@@ -53,16 +61,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Modules\Core\Files\AzzyBotStats.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Modules\MusicStreaming\Files\application.yml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\AzzyBot.Core\AzzyBot.Core.csproj" />
+    <ProjectReference Include="..\AzzyBot.Data\AzzyBot.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Modules\MusicStreaming\Files\" />
+    <None Update="Settings\AzzyBotSettings-Docker.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Settings\AzzyBotSettings-Dev.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Settings\AzzyBotSettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

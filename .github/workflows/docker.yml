@@ -43,7 +43,7 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "clean_version=v$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name:
+      - name: Get build environment
         id: get-environment
         run: |
           if ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
@@ -57,7 +57,7 @@ jobs:
             echo "environment_alpine=${{ github.ref_name }}-alpine" >> "$GITHUB_OUTPUT"
           fi
 
-      - name:
+      - name: Get build config
         id: get-config
         run: |
           if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
@@ -66,7 +66,7 @@ jobs:
             echo "config=Docker-debug" >> "$GITHUB_OUTPUT"
           fi
 
-      - name:
+      - name: Get correct Dockerfile
         id: get-dockerfile
         run: |
           if [[ "${{ steps.get-config.outputs.config }}" == "Docker" ]]; then
@@ -77,7 +77,7 @@ jobs:
             echo "dockerfile_alpine=dev.alpine.Dockerfile" >> "$GITHUB_OUTPUT"
           fi
 
-      - name:
+      - name: Get Date and Time
         id: get-datetime
         uses: Kaven-Universe/github-action-current-date-time@v1
         with:
@@ -87,7 +87,6 @@ jobs:
         id: get-loc_cs
         uses: PavanMudigonda/lines-of-code-reporter@v1.6
         with:
-          exclude_dir: "AzzyBot"
           include_lang: "C#,MSBuild script"
 
   docker-build-amd:

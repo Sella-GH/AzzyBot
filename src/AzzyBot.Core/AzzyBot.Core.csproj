@@ -1,34 +1,35 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>AzzyBot.Data</RootNamespace>
+    <RootNamespace>AzzyBot.Core</RootNamespace>
     <OutputType>Library</OutputType>
-    <Product>AzzyBot-Next.Data</Product>
+    <Product>AzzyBot.Core</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <AssemblyName>AzzyBot-Dev.Data</AssemblyName>
-    <Product>AzzyBot-Next-Dev.Data</Product>
+    <AssemblyName>AzzyBot-Dev.Core</AssemblyName>
+    <Product>AzzyBot-Dev.Core</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Docker'">
-    <AssemblyName>AzzyBot-Docker.Data</AssemblyName>
-    <Product>AzzyBot-Next-Docker.Data</Product>
+    <AssemblyName>AzzyBot-Docker.Core</AssemblyName>
+    <Product>AzzyBot-Docker.Core</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Docker-debug'">
-    <AssemblyName>AzzyBot-Docker-Dev.Data</AssemblyName>
-    <Product>AzzyBot-Next-Docker-Dev.Data</Product>
+    <AssemblyName>AzzyBot-Docker-Dev.Core</AssemblyName>
+    <Product>AzzyBot-Docker-Dev.Core</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <AssemblyName>AzzyBot.Data</AssemblyName>
+    <AssemblyName>AzzyBot.Core</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CsvHelper" />
     <PackageReference Include="DSharpPlus" />
-    <PackageReference Include="EntityFrameworkCore.Exceptions.PostgreSQL" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="DSharpPlus.Commands" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="Roslynator.Analyzers">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -52,7 +53,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AzzyBot-Next.Core\AzzyBot-Next.Core.csproj" />
+    <None Update="Modules\Core\Files\AzzyBotStats.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Modules\MusicStreaming\Files\application.yml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Modules\MusicStreaming\Files\" />
   </ItemGroup>
 
 </Project>

@@ -398,5 +398,4 @@ FodyWeavers.xsd
 *.sln.iml
 
 # Config files
-appsettings.development.json
 AzzyBotSettings-Dev.json
