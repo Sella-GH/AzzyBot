@@ -12,7 +12,6 @@ using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
-using AzzyBot.Data;
 using AzzyBot.Data.Entities;
 using DSharpPlus.Commands;
 using Microsoft.Extensions.Logging;
@@ -58,8 +57,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         if (azuraCast.Checks.Updates)
             apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Updates}"));
 
-        IReadOnlyList<string> missing = await ExecuteApiPermissionCheckAsync(apis, Crypto.Decrypt(azuraCast.AdminApiKey));
-        if (missing.Count is 0)
+        IEnumerable<string> missing = await ExecuteApiPermissionCheckAsync(apis, Crypto.Decrypt(azuraCast.AdminApiKey));
+        if (!missing.Any())
             return;
 
         StringBuilder builder = new();
@@ -97,8 +96,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
             apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}"));
 
         string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? station.AzuraCast.AdminApiKey : station.ApiKey;
-        IReadOnlyList<string> missing = await ExecuteApiPermissionCheckAsync(apis, Crypto.Decrypt(apiKey));
-        if (missing.Count == 0)
+        IEnumerable<string> missing = await ExecuteApiPermissionCheckAsync(apis, Crypto.Decrypt(apiKey));
+        if (!missing.Any())
             return;
 
         StringBuilder builder = new();
@@ -183,7 +182,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         }
     }
 
-    private async Task<IReadOnlyList<T>> GetFromApiListAsync<T>(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
+    private async Task<IEnumerable<T>> GetFromApiListAsync<T>(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
@@ -194,7 +193,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            return JsonSerializer.Deserialize<List<T>>(body) ?? throw new InvalidOperationException($"Could not deserialize body: {body}");
+            return JsonSerializer.Deserialize<IEnumerable<T>>(body) ?? throw new InvalidOperationException($"Could not deserialize body: {body}");
         }
         catch (JsonException ex)
         {
@@ -207,7 +206,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(databaseId, nameof(databaseId));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        IReadOnlyList<string> files = FileOperations.GetFilesInDirectory(FilePath);
+        IEnumerable<string> files = FileOperations.GetFilesInDirectory(FilePath);
         string fileName = $"{guildId}-{azuraCastId}-{databaseId}-{stationId}-files.json";
 
         return files.FirstOrDefault(f => f.Contains(fileName, StringComparison.OrdinalIgnoreCase)) ?? string.Empty;
@@ -263,13 +262,16 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         }
     }
 
-    public void QueueApiPermissionChecks(IReadOnlyList<GuildEntity> guilds)
+    public async Task QueueApiPermissionChecksAsync(IAsyncEnumerable<GuildEntity> guilds)
     {
+        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
+
         _logger.BackgroundServiceWorkItem(nameof(QueueApiPermissionChecks));
 
-        foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.IsOnline == true).Select(g => g.AzuraCast!))
+        await foreach (GuildEntity guild in guilds)
         {
-            _ = Task.Run(async () => await CheckForApiPermissionsAsync(azuraCast));
+            if (guild.AzuraCast?.IsOnline is true)
+                _ = Task.Run(async () => await CheckForApiPermissionsAsync(guild.AzuraCast));
         }
     }
 
@@ -323,24 +325,23 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         await _webService.DownloadAsync(url, downloadPath, CreateHeader(apiKey), true);
     }
 
-    public async Task<IReadOnlyList<AzuraFilesRecord>> GetFilesLocalAsync(int guildId, int azuraCastId, int databaseId, int stationId)
+    public async Task<IEnumerable<AzuraFilesRecord>> GetFilesLocalAsync(int guildId, int azuraCastId, int databaseId, int stationId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(azuraCastId, nameof(azuraCastId));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(databaseId, nameof(databaseId));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        List<AzuraFilesRecord> records = [];
         string file = GetLocalFile(guildId, azuraCastId, databaseId, stationId);
         if (string.IsNullOrWhiteSpace(file))
-            return records;
+            return [];
 
         string content = await FileOperations.GetFileContentAsync(file);
         if (string.IsNullOrWhiteSpace(content))
-            return records;
+            return [];
 
         try
         {
-            return JsonSerializer.Deserialize<List<AzuraFilesRecord>>(content) ?? throw new InvalidOperationException($"Could not deserialize content: {content}");
+            return JsonSerializer.Deserialize<IEnumerable<AzuraFilesRecord>>(content) ?? throw new InvalidOperationException($"Could not deserialize content: {content}");
         }
         catch (JsonException ex)
         {
@@ -348,7 +349,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         }
     }
 
-    public Task<IReadOnlyList<AzuraFilesRecord>> GetFilesOnlineAsync(Uri baseUrl, string apiKey, int stationId)
+    public Task<IEnumerable<AzuraFilesRecord>> GetFilesOnlineAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
@@ -395,7 +396,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         return GetFromApiAsync<AzuraPlaylistRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
-    public Task<IReadOnlyList<AzuraPlaylistRecord>> GetPlaylistsAsync(Uri baseUrl, string apiKey, int stationId)
+    public Task<IEnumerable<AzuraPlaylistRecord>> GetPlaylistsAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
@@ -410,7 +411,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        IReadOnlyList<AzuraRequestRecord> songs = await GetRequestableSongsAsync(baseUrl, apiKey, stationId);
+        IEnumerable<AzuraRequestRecord> songs = await GetRequestableSongsAsync(baseUrl, apiKey, stationId);
         AzuraRequestRecord? song = songs.FirstOrDefault(s =>
             (songId is null || s.Song.SongId == songId) &&
             (name is null || s.Song.Title == name) &&
@@ -421,7 +422,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         return song ?? throw new InvalidOperationException($"Song {name} not found.");
     }
 
-    public Task<IReadOnlyList<AzuraRequestRecord>> GetRequestableSongsAsync(Uri baseUrl, string apiKey, int stationId)
+    public Task<IEnumerable<AzuraRequestRecord>> GetRequestableSongsAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
@@ -431,7 +432,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         return GetFromApiListAsync<AzuraRequestRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
-    public Task<IReadOnlyList<AzuraMediaItemRecord>> GetSongsInPlaylistAsync(Uri baseUrl, string apiKey, int stationId, AzuraPlaylistRecord playlist)
+    public Task<IEnumerable<AzuraMediaItemRecord>> GetSongsInPlaylistAsync(Uri baseUrl, string apiKey, int stationId, AzuraPlaylistRecord playlist)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
@@ -447,7 +448,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentNullException.ThrowIfNull(station, nameof(station));
 
-        IReadOnlyList<AzuraFilesRecord> songs = (online) ? await GetFilesOnlineAsync(baseUrl, apiKey, station.StationId) : await GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
+        IEnumerable<AzuraFilesRecord> songs = (online) ? await GetFilesOnlineAsync(baseUrl, apiKey, station.StationId) : await GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
         AzuraFilesRecord? song = songs.FirstOrDefault(s =>
             (uniqueId is null || s.UniqueId == uniqueId) &&
             (songId is null || s.SongId == songId) &&
@@ -488,7 +489,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         return GetFromApiAsync<AzuraAdminStationConfigRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
-    public Task<IReadOnlyList<AzuraStationHistoryItemRecord>> GetStationHistoryAsync(Uri baseUrl, string apiKey, int stationId, in DateTime start, in DateTime end)
+    public Task<IEnumerable<AzuraStationHistoryItemRecord>> GetStationHistoryAsync(Uri baseUrl, string apiKey, int stationId, in DateTime start, in DateTime end)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
@@ -498,7 +499,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         return GetFromApiListAsync<AzuraStationHistoryItemRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
-    public Task<IReadOnlyList<AzuraStationQueueItemDetailedRecord>> GetStationQueueAsync(Uri baseUrl, string apiKey, int stationId)
+    public Task<IEnumerable<AzuraStationQueueItemDetailedRecord>> GetStationQueueAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
@@ -508,7 +509,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         return GetFromApiListAsync<AzuraStationQueueItemDetailedRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
-    public Task<IReadOnlyList<AzuraRequestQueueItemRecord>> GetStationRequestItemsAsync(Uri baseUrl, string apiKey, int stationId, bool history)
+    public Task<IEnumerable<AzuraRequestQueueItemRecord>> GetStationRequestItemsAsync(Uri baseUrl, string apiKey, int stationId, bool history)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
@@ -622,7 +623,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
             {
                 nowPlaying = await GetNowPlayingAsync(baseUrl, stationId, true);
             }
-            catch (Exception e) when (e is HttpRequestException || e is InvalidOperationException || e is JsonException)
+            catch (Exception e) when (e is HttpRequestException or InvalidOperationException or JsonException)
             {
                 if (!firstTime.HasValue)
                     firstTime = true;
@@ -659,7 +660,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playlistId, nameof(playlistId));
 
-        IReadOnlyList<AzuraPlaylistRecord> playlists = await GetPlaylistsAsync(baseUrl, apiKey, stationId);
+        IEnumerable<AzuraPlaylistRecord> playlists = await GetPlaylistsAsync(baseUrl, apiKey, stationId);
         List<AzuraPlaylistStateRecord> states = [];
 
         if (removeOld)

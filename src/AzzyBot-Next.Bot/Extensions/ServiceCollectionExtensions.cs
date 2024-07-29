@@ -35,7 +35,7 @@ public static class ServiceCollectionExtensions
         services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
 
         string connectionString = GetConnectionString(isDev, settings.Database?.Host, settings.Database?.Port, settings.Database?.User, settings.Database?.Password, settings.Database?.DatabaseName);
-        services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor().EnableSensitiveDataLogging(isDev));
+        services.AddDbContextPool<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor().EnableSensitiveDataLogging(isDev));
         services.AddSingleton<DbActions>();
 
         services.AddSingleton<DiscordBotService>();

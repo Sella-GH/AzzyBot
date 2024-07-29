@@ -29,15 +29,15 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
 
         // TODO Solve this more clean and nicer when it's possible
         Dictionary<string, object> results = [];
-        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, false, false, true);
+        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true);
         if (azuraCast is null)
         {
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
             return results;
         }
 
-        IReadOnlyList<AzuraCastStationEntity> stationsInDb = azuraCast.Stations.ToList();
-        if (stationsInDb.Count is 0)
+        IEnumerable<AzuraCastStationEntity> stationsInDb = azuraCast.Stations;
+        if (!stationsInDb.Any())
             return results;
 
         string search = context.UserInput;
@@ -45,7 +45,7 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
         string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
         foreach (AzuraCastStationEntity station in stationsInDb)
         {
-            if (results.Count == 25)
+            if (results.Count is 25)
                 break;
 
             AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(baseUrl, station.StationId);

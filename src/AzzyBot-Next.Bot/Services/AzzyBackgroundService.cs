@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities.Enums;
+using AzzyBot.Core.Extensions;
 using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
 using Microsoft.Extensions.Hosting;
@@ -19,7 +21,7 @@ public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLi
     private readonly AzuraCastUpdateService _updaterService = updaterService;
     private readonly CancellationToken _cancellationToken = applicationLifetime.ApplicationStopping;
 
-    public void StartAzuraCastBackgroundService(AzuraCastChecks checks, IReadOnlyList<GuildEntity> guilds, int stationId = 0)
+    public async Task StartAzuraCastBackgroundServiceAsync(AzuraCastChecks checks, IAsyncEnumerable<GuildEntity> guilds, int stationId = 0)
     {
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
 
@@ -29,15 +31,18 @@ public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLi
             return;
 
         GuildEntity? guild = null;
-        if (guilds.Count is 1)
-            guild = guilds[0];
+        if (await guilds.ContainsOneItemAsync())
+        {
+            await using IAsyncEnumerator<GuildEntity> enumerator = guilds.GetAsyncEnumerator();
+            guild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
+        }
 
         switch (checks)
         {
             case AzuraCastChecks.CheckForApiPermissions:
                 if (guild is null)
                 {
-                    _apiService.QueueApiPermissionChecks(guilds);
+                    await _apiService.QueueApiPermissionChecksAsync(guilds);
                 }
                 else
                 {
@@ -49,7 +54,7 @@ public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLi
             case AzuraCastChecks.CheckForFileChanges:
                 if (guild is null)
                 {
-                    _fileService.QueueFileChangesChecks(guilds);
+                    await _fileService.QueueFileChangesChecksAsync(guilds);
                 }
                 else
                 {
@@ -61,7 +66,7 @@ public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLi
             case AzuraCastChecks.CheckForOnlineStatus:
                 if (guild is null)
                 {
-                    _pingService.QueueInstancePing(guilds);
+                    await _pingService.QueueInstancePingAsync(guilds);
                 }
                 else
                 {
@@ -73,7 +78,7 @@ public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLi
             case AzuraCastChecks.CheckForUpdates:
                 if (guild is null)
                 {
-                    _updaterService.QueueAzuraCastUpdates(guilds);
+                    await _updaterService.QueueAzuraCastUpdatesAsync(guilds);
                 }
                 else
                 {

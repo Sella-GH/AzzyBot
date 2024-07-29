@@ -65,7 +65,7 @@ public static class AzzyHelp
         return records;
     }
 
-    private static List<AzzyHelpRecord> GetCommands(IReadOnlyList<Command> commands, string subCommand = "", bool singleCommand = false)
+    private static List<AzzyHelpRecord> GetCommands(IEnumerable<Command> commands, string subCommand = "", bool singleCommand = false)
     {
         List<AzzyHelpRecord> records = [];
         foreach (Command command in commands)

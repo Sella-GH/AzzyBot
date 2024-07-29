@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,13 +21,18 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = discordBotService;
 
-    public void QueueInstancePing(IReadOnlyList<GuildEntity> guilds)
+    public async Task QueueInstancePingAsync(IAsyncEnumerable<GuildEntity> guilds)
     {
+        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
+
         _logger.BackgroundServiceWorkItem(nameof(QueueInstancePing));
 
-        foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.Checks.ServerStatus == true).Select(g => g.AzuraCast!))
+        await foreach (GuildEntity guild in guilds)
         {
-            _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await PingInstanceAsync(azuraCast, ct)));
+            if (guild.AzuraCast?.Checks.ServerStatus is true)
+            {
+                _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await PingInstanceAsync(guild.AzuraCast, ct)));
+            }
         }
     }
 

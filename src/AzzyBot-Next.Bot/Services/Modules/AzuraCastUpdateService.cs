@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Utilities;
@@ -23,13 +22,16 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
 
-    public void QueueAzuraCastUpdates(IReadOnlyList<GuildEntity> guilds)
+    public async Task QueueAzuraCastUpdatesAsync(IAsyncEnumerable<GuildEntity> guilds)
     {
+        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
+
         _logger.BackgroundServiceWorkItem(nameof(QueueAzuraCastUpdates));
 
-        foreach (AzuraCastEntity azuraCast in guilds.Where(g => g.AzuraCast?.IsOnline == true && g.AzuraCast.Checks.Updates).Select(g => g.AzuraCast!))
+        await foreach (GuildEntity guild in guilds)
         {
-            _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForAzuraCastUpdatesAsync(azuraCast, ct)));
+            if (guild.AzuraCast?.IsOnline is true && guild.AzuraCast.Checks.Updates)
+                _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForAzuraCastUpdatesAsync(guild.AzuraCast!, ct)));
         }
     }
 

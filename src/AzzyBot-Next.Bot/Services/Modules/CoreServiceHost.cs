@@ -18,11 +18,11 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class CoreServiceHost(IDbContextFactory<AzzyDbContext> dbContextFactory, ILogger<CoreServiceHost> logger, AzzyBotSettingsRecord settings) : IHostedService
+public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSettingsRecord settings, AzzyDbContext dbContext) : IHostedService
 {
-    private readonly IDbContextFactory<AzzyDbContext> _dbContextFactory = dbContextFactory;
     private readonly ILogger<CoreServiceHost> _logger = logger;
     private readonly AzzyBotSettingsRecord _settings = settings;
+    private readonly AzzyDbContext _dbContext = dbContext;
     private readonly Task _completed = Task.CompletedTask;
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -74,11 +74,10 @@ public sealed class CoreServiceHost(IDbContextFactory<AzzyDbContext> dbContextFa
 
         byte[] newEncryptionKey = Encoding.UTF8.GetBytes(_settings.Database.NewEncryptionKey);
 
-        await using AzzyDbContext dbContext = await _dbContextFactory.CreateDbContextAsync();
-        await using IDbContextTransaction transaction = await dbContext.Database.BeginTransactionAsync();
+        await using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync();
 
-        List<AzuraCastEntity> azuraCast = await dbContext.AzuraCast.ToListAsync();
-        List<AzuraCastStationEntity> azuraCastStations = await dbContext.AzuraCastStations.ToListAsync();
+        List<AzuraCastEntity> azuraCast = await _dbContext.AzuraCast.ToListAsync();
+        List<AzuraCastStationEntity> azuraCastStations = await _dbContext.AzuraCastStations.ToListAsync();
 
         try
         {
@@ -97,7 +96,7 @@ public sealed class CoreServiceHost(IDbContextFactory<AzzyDbContext> dbContextFa
                 entity.ApiKey = Crypto.Encrypt(entity.ApiKey, newEncryptionKey);
             }
 
-            await dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
         }
         catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)

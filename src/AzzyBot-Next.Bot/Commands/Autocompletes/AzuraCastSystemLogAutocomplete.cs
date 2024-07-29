@@ -38,7 +38,7 @@ public sealed class AzuraCastSystemLogAutocomplete(ILogger<AzuraCastSystemLogAut
         AzuraSystemLogsRecord systemLogs = await _azuraCastApi.GetSystemLogsAsync(baseUrl, apiKey);
         foreach (AzuraSystemLogEntryRecord log in systemLogs.Logs)
         {
-            if (results.Count == 25)
+            if (results.Count is 25)
                 break;
 
             if (!string.IsNullOrWhiteSpace(search) && !log.Name.Contains(search, StringComparison.OrdinalIgnoreCase))

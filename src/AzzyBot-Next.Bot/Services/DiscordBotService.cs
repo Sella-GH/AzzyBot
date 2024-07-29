@@ -27,7 +27,7 @@ public sealed class DiscordBotService
 {
     private readonly ILogger<DiscordBotService> _logger;
     private readonly AzzyBotSettingsRecord _settings;
-    private readonly DbActions _db;
+    private readonly DbActions _dbActions;
     private readonly DiscordClient _client;
     private const string BugReportUrl = "https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D";
     private const string BugReportMessage = $"Send a [bug report]({BugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
@@ -39,7 +39,7 @@ public sealed class DiscordBotService
 
         _logger = logger;
         _settings = settings;
-        _db = dbActions;
+        _dbActions = dbActions;
         _client = botServiceHost.Client;
     }
 
@@ -119,7 +119,7 @@ public sealed class DiscordBotService
         }
         else if (guildId is not 0)
         {
-            GuildPreferencesEntity? guildPrefs = await _db.GetGuildPreferencesAsync(guildId);
+            GuildPreferencesEntity? guildPrefs = await _dbActions.GetGuildPreferencesAsync(guildId);
             if (guildPrefs is null)
             {
                 _logger.DatabaseGuildPreferencesNotFound(guildId);
@@ -205,7 +205,7 @@ public sealed class DiscordBotService
         }
         else if (guildId is not 0)
         {
-            GuildPreferencesEntity? guildPrefs = await _db.GetGuildPreferencesAsync(guildId);
+            GuildPreferencesEntity? guildPrefs = await _dbActions.GetGuildPreferencesAsync(guildId);
             if (guildPrefs is null)
             {
                 _logger.DatabaseGuildPreferencesNotFound(guildId);
@@ -285,7 +285,7 @@ public sealed class DiscordBotService
             return;
         }
 
-        AzuraCastEntity? azuraCast = await _db.GetAzuraCastAsync(context.Guild.Id, false, true, true, false, true);
+        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true, loadStationPrefs: true);
         if (azuraCast is null)
         {
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);

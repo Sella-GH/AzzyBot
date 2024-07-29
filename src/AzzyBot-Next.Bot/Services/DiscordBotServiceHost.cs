@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands;
@@ -301,8 +302,8 @@ public sealed class DiscordBotServiceHost : IHostedService
         ArgumentNullException.ThrowIfNull(_botService, nameof(_botService));
 
         DiscordEmbed embed;
-        IReadOnlyList<DiscordGuild> addedGuilds = await _dbActions.AddGuildsAsync(e.Guilds);
-        if (addedGuilds.Count is not 0)
+        IEnumerable<DiscordGuild> addedGuilds = await _dbActions.AddGuildsAsync(e.Guilds);
+        if (addedGuilds.Any())
         {
             foreach (DiscordGuild guild in addedGuilds)
             {
@@ -312,8 +313,8 @@ public sealed class DiscordBotServiceHost : IHostedService
             }
         }
 
-        IReadOnlyList<ulong> removedGuilds = await _dbActions.DeleteGuildsAsync(e.Guilds);
-        if (removedGuilds.Count is not 0)
+        IEnumerable<ulong> removedGuilds = await _dbActions.DeleteGuildsAsync(e.Guilds);
+        if (removedGuilds.Any())
         {
             foreach (ulong guild in removedGuilds)
             {
