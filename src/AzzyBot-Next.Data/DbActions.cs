@@ -8,7 +8,6 @@ using AzzyBot.Data.Entities;
 using AzzyBot.Data.Extensions;
 using DSharpPlus.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
@@ -207,8 +206,8 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .IncludeIf(loadChecks, q => q.Include(a => a.Checks))
             .IncludeIf(loadPrefs, q => q.Include(a => a.Preferences))
             .IncludeIf(loadStations, q => q.Include(a => a.Stations))
-            .IncludeIf(loadStationChecks, q => q.Include(a => a.Stations).ThenInclude(s => s.Checks))
-            .IncludeIf(loadStationPrefs, q => q.Include(a => a.Stations).ThenInclude(s => s.Preferences))
+            .IncludeIf(loadStations && loadStationChecks, q => q.Include(a => a.Stations).ThenInclude(s => s.Checks))
+            .IncludeIf(loadStations && loadStationPrefs, q => q.Include(a => a.Stations).ThenInclude(s => s.Preferences))
             .IncludeIf(loadGuild, q => q.Include(a => a.Guild))
             .FirstOrDefaultAsync();
     }
@@ -273,7 +272,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .AsNoTracking()
             .Where(g => g.UniqueId == guildId)
             .OrderBy(g => g.Id)
-            .IncludeIf(loadGuildPrefs, q => q.Include(g => g.Preferences))
+            .IncludeIf(loadGuildPrefs || loadEverything, q => q.Include(g => g.Preferences))
             .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast).Include(g => g.AzuraCast!.Checks).Include(g => g.AzuraCast!.Preferences))
             .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Checks))
             .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Preferences))
@@ -285,7 +284,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return _dbContext.Guilds
             .AsNoTracking()
             .OrderBy(g => g.Id)
-            .IncludeIf(loadGuildPrefs, q => q.Include(g => g.Preferences))
+            .IncludeIf(loadGuildPrefs || loadEverything, q => q.Include(g => g.Preferences))
             .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast).Include(g => g.AzuraCast!.Checks).Include(g => g.AzuraCast!.Preferences))
             .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Checks))
             .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Preferences))
