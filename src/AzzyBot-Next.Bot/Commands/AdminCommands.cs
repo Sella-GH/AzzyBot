@@ -199,7 +199,7 @@ public sealed class AdminCommands
         public async ValueTask ViewLogsAsync
         (
             CommandContext context,
-            [Description("The log file you want to read.")] string? logfile = null
+            [Description("The log file you want to read."), SlashAutoCompleteProvider<AzzyViewLogsAutocomplete>] string? logfile = null
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -221,7 +221,7 @@ public sealed class AdminCommands
 
             await using FileStream fileStream = new(logfile, FileMode.Open, FileAccess.Read);
             await using DiscordMessageBuilder builder = new();
-            builder.WithContent($"Here are the logs from {dateTime}.");
+            builder.WithContent($"Here are the logs from **{dateTime}**.");
             builder.AddFile($"{dateTime}.log", fileStream);
             await context.EditResponseAsync(builder);
         }
