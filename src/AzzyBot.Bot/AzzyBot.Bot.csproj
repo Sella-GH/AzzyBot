@@ -3,23 +3,23 @@
   <PropertyGroup>
     <RootNamespace>AzzyBot.Bot</RootNamespace>
     <OutputType>Exe</OutputType>
-    <Product>AzzyBot-Next</Product>
+    <Product>AzzyBot</Product>
     <StartupObject>AzzyBot.Bot.Startup</StartupObject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <AssemblyName>AzzyBot-Dev</AssemblyName>
-    <Product>AzzyBot-Next-Dev</Product>
+    <Product>AzzyBot-Dev</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Docker'">
     <AssemblyName>AzzyBot-Docker</AssemblyName>
-    <Product>AzzyBot-Next-Docker</Product>
+    <Product>AzzyBot-Docker</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Docker-debug'">
     <AssemblyName>AzzyBot-Docker-Dev</AssemblyName>
-    <Product>AzzyBot-Next-Docker-Dev</Product>
+    <Product>AzzyBot-Docker-Dev</Product>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">

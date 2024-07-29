@@ -7,8 +7,8 @@ COPY ./ ./
 ARG ARCH
 ARG CONFIG
 ARG OS
-RUN dotnet restore ./src/AzzyBot-Next.Bot/AzzyBot-Next.Bot.csproj
-RUN dotnet publish ./src/AzzyBot-Next.Bot/AzzyBot-Next.Bot.csproj -a $ARCH -c $CONFIG --os $OS -o out
+RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj
+RUN dotnet publish ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -a $ARCH -c $CONFIG --os $OS -o out
 
 # RUNNER IMAGE
 FROM mcr.microsoft.com/dotnet/runtime:8.0-alpine
