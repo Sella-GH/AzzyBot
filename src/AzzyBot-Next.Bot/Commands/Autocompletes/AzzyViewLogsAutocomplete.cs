@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Core.Utilities;
 using DSharpPlus.Commands.Processors.SlashCommands;
@@ -17,7 +18,7 @@ public sealed class AzzyViewLogsAutocomplete : IAutoCompleteProvider
         Dictionary<string, object> results = [];
         string search = context.UserInput;
 
-        foreach (string file in FileOperations.GetFilesInDirectory("Logs"))
+        foreach (string file in FileOperations.GetFilesInDirectory("Logs").OrderByDescending(f => f))
         {
             if (results.Count is 25)
                 break;
