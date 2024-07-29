@@ -331,14 +331,13 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(databaseId, nameof(databaseId));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
-        List<AzuraFilesRecord> records = [];
         string file = GetLocalFile(guildId, azuraCastId, databaseId, stationId);
         if (string.IsNullOrWhiteSpace(file))
-            return records;
+            return [];
 
         string content = await FileOperations.GetFileContentAsync(file);
         if (string.IsNullOrWhiteSpace(content))
-            return records;
+            return [];
 
         try
         {

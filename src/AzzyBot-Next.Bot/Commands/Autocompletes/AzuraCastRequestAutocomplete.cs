@@ -105,17 +105,20 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
             return results;
         }
 
-        AzuraAdminStationConfigRecord config = await _azuraCast.GetStationAdminConfigAsync(new(baseUrl), apiKey, stationId);
-        if (config.EnableRequests)
+        if (station.AzuraCast.IsOnline)
         {
-            IEnumerable<AzuraRequestRecord> requests = await _azuraCast.GetRequestableSongsAsync(new(baseUrl), apiKey, stationId);
-            AddResultsFromSong(requests);
+            AzuraAdminStationConfigRecord config = await _azuraCast.GetStationAdminConfigAsync(new(baseUrl), apiKey, stationId);
+            if (config.EnableRequests)
+            {
+                IEnumerable<AzuraRequestRecord> requests = await _azuraCast.GetRequestableSongsAsync(new(baseUrl), apiKey, stationId);
+                AddResultsFromSong(requests);
+
+                return results;
+            }
         }
-        else
-        {
-            IEnumerable<AzuraFilesRecord> files = await _azuraCast.GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCast.Id, station.Id, station.StationId);
-            AddResultsFromSong(files);
-        }
+
+        IEnumerable<AzuraFilesRecord> files = await _azuraCast.GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCast.Id, station.Id, station.StationId);
+        AddResultsFromSong(files);
 
         return results;
     }
