@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # 17
 VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot", "src\AzzyBot\AzzyBot.csproj", "{91AAAF0E-4931-4247-BE86-74C595C7D5FC}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot-Next.Bot", "src\AzzyBot-Next.Bot\AzzyBot-Next.Bot.csproj", "{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot-Next.Data", "src\AzzyBot-Next.Data\AzzyBot-Next.Data.csproj", "{AEE73B92-94B6-4F6A-B29B-19C363B3D305}"
@@ -27,18 +25,6 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Debug|ARM64.ActiveCfg = Debug|ARM64
-		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Debug|x64.ActiveCfg = Debug|x64
-		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Docker|Any CPU.ActiveCfg = Docker|Any CPU
-		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Docker|ARM64.ActiveCfg = Docker|ARM64
-		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Docker|x64.ActiveCfg = Docker|x64
-		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Docker-debug|Any CPU.ActiveCfg = Docker-debug|Any CPU
-		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Docker-debug|ARM64.ActiveCfg = Docker-debug|ARM64
-		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Docker-debug|x64.ActiveCfg = Docker-debug|x64
-		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Release|ARM64.ActiveCfg = Release|ARM64
-		{91AAAF0E-4931-4247-BE86-74C595C7D5FC}.Release|x64.ActiveCfg = Release|x64
 		{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}.Debug|ARM64.ActiveCfg = Debug|Any CPU
