@@ -592,7 +592,7 @@ public sealed class AzuraCastCommands
             {
                 nowPlaying = await _azuraCast.GetNowPlayingAsync(new(baseUrl), station);
             }
-            catch (HttpRequestException)
+            catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException)
             {
                 await context.EditResponseAsync("This station is currently offline.");
                 return;
