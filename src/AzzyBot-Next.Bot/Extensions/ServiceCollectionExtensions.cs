@@ -77,7 +77,8 @@ public static class ServiceCollectionExtensions
                     baseAddress = (isDocker) ? new($"http://AzzyBot-Ms:{settings.MusicStreaming.LavalinkPort}") : new($"http://localhost:{settings.MusicStreaming.LavalinkPort}");
                 }
 
-                config.Passphrase = (!string.IsNullOrWhiteSpace(settings.MusicStreaming.LavalinkPassword)) ? settings.MusicStreaming.LavalinkPassword : "AzzyB0TMus1cStr3am!ng";
+                if (!string.IsNullOrWhiteSpace(settings.MusicStreaming.LavalinkPassword))
+                    config.Passphrase = settings.MusicStreaming.LavalinkPassword;
             }
 
             config.BaseAddress = baseAddress;
