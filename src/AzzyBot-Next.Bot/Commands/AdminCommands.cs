@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Choices;
 using AzzyBot.Bot.Services;
+using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Core.Logging;
+using AzzyBot.Core.Utilities;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
 using DSharpPlus.Commands;
@@ -25,7 +28,7 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AdminCommands
 {
     [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
-    public sealed class AdminGroup(DbActions dbActions, DiscordBotService botService, DiscordBotServiceHost botServiceHost, ILogger<AdminGroup> logger)
+    public sealed class AdminGroup(ILogger<AdminGroup> logger, DbActions dbActions, DiscordBotService botService, DiscordBotServiceHost botServiceHost)
     {
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
@@ -190,6 +193,37 @@ public sealed class AdminCommands
             }
 
             await context.EditResponseAsync("Message sent to all servers.");
+        }
+
+        [Command("view-logs"), Description("View the logs of the bot.")]
+        public async ValueTask ViewLogsAsync
+        (
+            CommandContext context,
+            [Description("The log file you want to read.")] string? logfile = null
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+            _logger.CommandRequested(nameof(ViewLogsAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            string dateTime;
+            if (string.IsNullOrWhiteSpace(logfile))
+            {
+                dateTime = DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                logfile = $"{dateTime}.log";
+            }
+            else
+            {
+                dateTime = logfile.Split('.')[0];
+            }
+
+            await using FileStream fileStream = new(logfile, FileMode.Open, FileAccess.Read);
+            await using DiscordMessageBuilder builder = new();
+            builder.WithContent($"Here are the logs from {dateTime}.");
+            builder.AddFile($"{dateTime}.log", fileStream);
+            await context.EditResponseAsync(builder);
         }
     }
 }
