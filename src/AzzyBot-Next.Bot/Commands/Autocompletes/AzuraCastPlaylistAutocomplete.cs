@@ -36,7 +36,7 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
         AzuraCastStationEntity? station;
         try
         {
-            station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId);
+            station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId, loadAzuraCast: true);
             if (station is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, stationId);
