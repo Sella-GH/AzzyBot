@@ -52,7 +52,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AzzyBot-Next.Core\AzzyBot-Next.Core.csproj" />
+    <ProjectReference Include="..\AzzyBot.Core\AzzyBot.Core.csproj" />
   </ItemGroup>
 
 </Project>

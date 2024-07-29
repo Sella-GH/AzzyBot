@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # 17
 VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot-Next.Bot", "src\AzzyBot-Next.Bot\AzzyBot-Next.Bot.csproj", "{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot.Bot", "src\AzzyBot.Bot\AzzyBot.Bot.csproj", "{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot-Next.Data", "src\AzzyBot-Next.Data\AzzyBot-Next.Data.csproj", "{AEE73B92-94B6-4F6A-B29B-19C363B3D305}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot.Data", "src\AzzyBot.Data\AzzyBot.Data.csproj", "{AEE73B92-94B6-4F6A-B29B-19C363B3D305}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot-Next.Core", "src\AzzyBot-Next.Core\AzzyBot-Next.Core.csproj", "{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot.Core", "src\AzzyBot.Core\AzzyBot.Core.csproj", "{F2B56EF4-FC0A-4DC8-8C71-D8245EC562BF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

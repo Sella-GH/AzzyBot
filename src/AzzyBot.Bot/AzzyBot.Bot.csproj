@@ -61,8 +61,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AzzyBot-Next.Core\AzzyBot-Next.Core.csproj" />
-    <ProjectReference Include="..\AzzyBot-Next.Data\AzzyBot-Next.Data.csproj" />
+    <ProjectReference Include="..\AzzyBot.Core\AzzyBot.Core.csproj" />
+    <ProjectReference Include="..\AzzyBot.Data\AzzyBot.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>
