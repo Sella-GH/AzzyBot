@@ -488,8 +488,12 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context, nameof(context));
             ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
-            DateTime dateTime = DateTime.Today.Date;
-            if (date is not null && !DateTime.TryParse(date, out dateTime))
+            DateTime dateTime;
+            if (date is null)
+            {
+                dateTime = DateTime.Today;
+            }
+            else if (!DateTime.TryParse(date, out dateTime))
             {
                 await context.EditResponseAsync("The date format is invalid. Please use the format YYYY-MM-DD.");
                 return;
@@ -587,7 +591,7 @@ public sealed class AzuraCastCommands
             AzuraCastStationEntity acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station) ?? throw new InvalidOperationException("Station is null");
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
-            AzuraNowPlayingDataRecord? nowPlaying = null;
+            AzuraNowPlayingDataRecord nowPlaying;
             try
             {
                 nowPlaying = await _azuraCast.GetNowPlayingAsync(new(baseUrl), station);

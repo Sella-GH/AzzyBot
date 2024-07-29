@@ -6,12 +6,14 @@
 
 ### General
 - Reworked the database interactions again so it should be better, faster and smarter now
+- Reworked the internals to make it better maintainable and smoother
 - Renamed `azuracast upload-files` to `music upload-files`
 
 ### Additions
 - The `MusicStreaming` module is back
   - If the station is stopped while someone is listening they get disconnected first
   - You can stream your stations mount points again
+- New command `admin view-logs` to view the system logs of AzzyBot
 
 ### Removements
 - Removed the `MountPoint` entity of the database
@@ -25,6 +27,7 @@
 - `config modify-azuracast-station` works again
 - Logging of 404 errors in the AzuraCast API is gone when starting the station and Liquidsoap is not ready yet
 - `azuracast update-instance` works again
+- `music now-playing` works again when the station is offline
 
 ## 2.0.0-preview4.1 - 2024-07-21
 ### Fixes
