@@ -216,7 +216,7 @@ public sealed class AdminCommands
             }
             else
             {
-                dateTime = Path.GetFileName(logfile).Split('.')[0];
+                dateTime = Path.GetFileNameWithoutExtension(logfile);
             }
 
             await using FileStream fileStream = new(logfile, FileMode.Open, FileAccess.Read);
