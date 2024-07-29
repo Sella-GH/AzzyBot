@@ -212,11 +212,11 @@ public sealed class AdminCommands
             if (string.IsNullOrWhiteSpace(logfile))
             {
                 dateTime = DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                logfile = $"{dateTime}.log";
+                logfile = Path.Combine("Logs", $"{dateTime}.log");
             }
             else
             {
-                dateTime = logfile.Split('.')[0];
+                dateTime = Path.GetFileName(logfile).Split('.')[0];
             }
 
             await using FileStream fileStream = new(logfile, FileMode.Open, FileAccess.Read);
