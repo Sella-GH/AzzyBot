@@ -20,6 +20,7 @@ updates:
         patterns:
         - "actions*"
         update-types:
+        - "major"
         - "minor"
         - "patch"
       Non-GitHub:
@@ -27,64 +28,7 @@ updates:
         exclude-patterns:
         - "actions*"
         update-types:
-        - "minor"
-        - "patch"
-    open-pull-requests-limit: 25
-
-  - package-ecosystem: "nuget" # See documentation for possible values
-    directory: "/src/AzzyBot" # Location of package manifests
-    schedule:
-      interval: "daily"
-    assignees:
-      - "Sella-GH"
-    commit-message:
-      prefix: "[NuGet]"
-      include: "scope"
-    groups:
-      DSharpPlus:
-        applies-to: version-updates
-        patterns:
-        - "DSharpPlus.*"
-        update-types:
-        - "minor"
-        - "patch"
-      Lavalink4NET:
-        applies-to: version-updates
-        patterns:
-        - "Lavalink4NET.*"
-        update-types:
-        - "minor"
-        - "patch"
-      Microsoft:
-        applies-to: version-updates
-        patterns:
-        - "Microsoft.*"
-        update-types:
-        - "minor"
-        - "patch"
-      Roslynator:
-        applies-to: version-updates
-        patterns:
-        - "Roslynator.*"
-        update-types:
-        - "minor"
-        - "patch"
-      System:
-        applies-to: version-updates
-        patterns:
-        - "System.*"
-        update-types:
-        - "minor"
-        - "patch"
-      Others:
-        applies-to: version-updates
-        exclude-patterns:
-        - "DSharpPlus.*"
-        - "Lavalink4NET.*"
-        - "Microsoft.*"
-        - "Roslynator.*"
-        - "System.*"
-        update-types:
+        - "major"
         - "minor"
         - "patch"
     open-pull-requests-limit: 25
@@ -103,34 +47,43 @@ updates:
       - "dependencies"
       - ".NET"
     groups:
-      #DSharpPlus:
-      #  applies-to: version-updates
-      #  patterns:
-      #  - "DSharpPlus"
-      #  - "DSharpPlus.Commands"
-      #  - "DSharpPlus.Interactivity"
-      #  update-types:
-      #  - "minor"
-      #  - "patch"
+      DSharpPlus:
+        applies-to: version-updates
+        patterns:
+        - "DSharpPlus*"
+        - "DSharpPlus.*"
+        update-types:
+        - "major"
+        - "minor"
+        - "patch"
       Microsoft:
         applies-to: version-updates
         patterns:
         - "Microsoft.*"
         - "Npgsql.*"
+        update-types:
+        - "major"
+        - "minor"
+        - "patch"
       Roslynator:
         applies-to: version-updates
         patterns:
         - "Roslynator.*"
+        update-types:
+        - "major"
+        - "minor"
+        - "patch"
       Others:
         applies-to: version-updates
         exclude-patterns:
-        - "DSharpPlus"
         - "DSharpPlus*"
         - "DSharpPlus.*"
-        - "DSharpPlus.Commands"
-        - "DSharpPlus.Interactivity"
         - "Microsoft.*"
         - "Pomelo.*"
         - "Roslynator.*"
+        update-types:
+        - "major"
+        - "minor"
+        - "patch"
     open-pull-requests-limit: 25
     milestone: 6
