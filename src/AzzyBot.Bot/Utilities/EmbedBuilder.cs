@@ -421,22 +421,22 @@ public static class EmbedBuilder
         const string botUrl = $"{githubUrl}/AzzyBot";
         const string commitUrl = $"{botUrl}/commit";
         const string contribUrl = $"{botUrl}/graphs/contributors";
-        string[] authors = AzzyStatsSoftware.GetBotAuthors.Split(',');
+        string[] authors = SoftwareStats.GetBotAuthors.Split(',');
         string sourceCode = $"{loc} lines";
         string formattedAuthors = $"- [{authors[0].Trim()}]({githubUrl})\n- [{authors[1].Trim()}]({contribUrl})";
         string formattedCommit = $"[{commit}]({commitUrl}/{commit})";
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
-            ["Uptime"] = new($"<t:{Converter.ConvertToUnixTime(AzzyStatsSoftware.GetBotUptime().ToLocalTime())}>", true),
-            ["Bot Version"] = new(AzzyStatsSoftware.GetBotVersion, true),
-            [".NET Version"] = new(AzzyStatsSoftware.GetBotDotNetVersion, true),
+            ["Uptime"] = new($"<t:{Converter.ConvertToUnixTime(SoftwareStats.GetBotUptime().ToLocalTime())}>", true),
+            ["Bot Version"] = new(SoftwareStats.GetBotVersion, true),
+            [".NET Version"] = new(SoftwareStats.GetBotDotNetVersion, true),
             ["D#+ Version"] = new(dspVersion, true),
             ["Authors"] = new(formattedAuthors, true),
             ["Repository"] = new($"[GitHub]({botUrl})", true),
-            ["Environment"] = new(AzzyStatsSoftware.GetBotEnvironment, true),
+            ["Environment"] = new(SoftwareStats.GetBotEnvironment, true),
             ["Source Code"] = new(sourceCode, true),
-            ["Memory Usage"] = new($"{AzzyStatsSoftware.GetBotMemoryUsage()} GB", true),
+            ["Memory Usage"] = new($"{SoftwareStats.GetBotMemoryUsage()} GB", true),
             ["Compilation Date"] = new($"<t:{Converter.ConvertToUnixTime(compileDate.ToLocalTime())}>", true),
             ["AzzyBot GitHub Commit"] = new(formattedCommit)
         };
@@ -450,7 +450,7 @@ public static class EmbedBuilder
 
         const string title = "Azzy Updates Available";
         const string description = "Update now to get the latest bug fixes, features and improvements!";
-        string yourVersion = AzzyStatsSoftware.GetBotVersion;
+        string yourVersion = SoftwareStats.GetBotVersion;
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {

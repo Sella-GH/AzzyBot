@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace AzzyBot.Core.Utilities;
 
-public static class AzzyStatsSoftware
+public static class SoftwareStats
 {
     public static string GetBotAuthors
         => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).CompanyName ?? "Bot authors not found";

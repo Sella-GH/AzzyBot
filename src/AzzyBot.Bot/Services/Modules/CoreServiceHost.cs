@@ -27,8 +27,8 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        string name = AzzyStatsSoftware.GetBotName;
-        string version = AzzyStatsSoftware.GetBotVersion;
+        string name = SoftwareStats.GetBotName;
+        string version = SoftwareStats.GetBotVersion;
         string arch = HardwareStats.GetSystemOsArch;
         string os = HardwareStats.GetSystemOs;
 
