@@ -53,7 +53,7 @@ public static class SettingsCheck
             }
         }
 
-        if (missingSettings == 0 || isClass)
+        if (missingSettings is 0 || isClass)
             return missingSettings;
 
         if (!SoftwareStats.GetAppName.Contains("Docker", StringComparison.OrdinalIgnoreCase))
