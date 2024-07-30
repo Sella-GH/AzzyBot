@@ -314,10 +314,10 @@ public static class EmbedBuilder
 
         Dictionary<int, double> cpuUsage = await HardwareStats.GetSystemCpuAsync();
         Dictionary<string, double> cpuTemp = await HardwareStats.GetSystemCpuTempAsync();
-        AzzyCpuLoadRecord cpuLoads = await HardwareStats.GetSystemCpuLoadAsync();
-        AzzyMemoryUsageRecord memory = await HardwareStats.GetSystemMemoryUsageAsync();
-        AzzyDiskUsageRecord disk = HardwareStats.GetSystemDiskUsage();
-        Dictionary<string, AzzyNetworkSpeedRecord> networkUsage = await HardwareStats.GetSystemNetworkUsageAsync();
+        AppCpuLoadRecord cpuLoads = await HardwareStats.GetSystemCpuLoadAsync();
+        AppMemoryUsageRecord memory = await HardwareStats.GetSystemMemoryUsageAsync();
+        AppDiskUsageRecord disk = HardwareStats.GetSystemDiskUsage();
+        Dictionary<string, AppNetworkSpeedRecord> networkUsage = await HardwareStats.GetSystemNetworkUsageAsync();
 
         if (cpuTemp.Count > 0)
         {
@@ -369,7 +369,7 @@ public static class EmbedBuilder
 
         if (networkUsage.Count > 0)
         {
-            foreach (KeyValuePair<string, AzzyNetworkSpeedRecord> kvp in networkUsage)
+            foreach (KeyValuePair<string, AppNetworkSpeedRecord> kvp in networkUsage)
             {
                 if (fields.Count is 25)
                     break;

@@ -1,4 +1,4 @@
-﻿namespace AzzyBot.Core.Utilities.Records;
+﻿namespace AzzyBot.Bot.Utilities.Records;
 
 public sealed record AzzyDiscordEmbedRecord
 {
