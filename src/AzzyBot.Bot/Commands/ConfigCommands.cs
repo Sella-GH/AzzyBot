@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
@@ -96,6 +95,8 @@ public sealed class ConfigCommands
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);
+                await context.DeleteResponseAsync();
+                await context.FollowupAsync("An error occurred while fetching the server data.");
                 return;
             }
 
@@ -503,6 +504,7 @@ public sealed class ConfigCommands
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);
+                await context.EditResponseAsync("An error occurred while fetching the server data.");
                 return;
             }
 
@@ -516,14 +518,14 @@ public sealed class ConfigCommands
             {
                 AzuraCastEntity azuraCast = guild.AzuraCast;
                 AzuraStationRecord stationRecord;
-                Dictionary<ulong, string> stationRoles = [];
-                Dictionary<int, string> stationNames = [];
+                Dictionary<ulong, string> stationRoles = new(azuraCast.Stations.Count);
+                Dictionary<int, string> stationNames = new(azuraCast.Stations.Count);
                 foreach (AzuraCastStationEntity station in azuraCast.Stations)
                 {
                     DiscordRole? stationAdminRole = context.Guild.GetRole(station.Preferences.StationAdminRoleId);
                     DiscordRole? stationDjRole = context.Guild.GetRole(station.Preferences.StationDjRoleId);
-                    stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? string.Empty);
-                    stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? string.Empty);
+                    stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? "Name not found");
+                    stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found");
 
                     stationRecord = await _azuraCast.GetStationAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), station.StationId);
                     stationNames.Add(station.Id, stationRecord.Name);

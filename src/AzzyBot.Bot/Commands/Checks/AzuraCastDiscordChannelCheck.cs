@@ -37,9 +37,9 @@ public sealed class AzuraCastDiscordChannelCheck(ILogger<AzuraCastDiscordChannel
         }
 
         ulong channelId;
-        switch (context.Command.Name)
+        switch (context.Command.FullName)
         {
-            case "upload-files":
+            case "music upload-files":
                 channelId = prefs.FileUploadChannelId;
                 break;
 

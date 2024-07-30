@@ -20,7 +20,7 @@ public sealed class GuildsAutocomplete(DiscordBotService botService) : IAutoComp
         IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
         string search = context.UserInput;
 
-        Dictionary<string, object> results = [];
+        Dictionary<string, object> results = new(25);
         foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds)
         {
             if (results.Count is 25)

@@ -109,7 +109,13 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(PlayAsync), context.User.GlobalName);
 
-            AzuraCastEntity azura = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is not set up for this server.");
+            AzuraCastEntity? azura = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
+            if (azura is null)
+            {
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
+
             AzuraNowPlayingDataRecord nowPlaying;
             try
             {
@@ -121,9 +127,13 @@ public sealed class MusicStreamingCommands
                 return;
             }
 
-            string mount = (mountPoint is 0)
-                ? nowPlaying.Station.HlsUrl ?? throw new InvalidOperationException("HTTP Live Streaming is not available for this station.")
-                : nowPlaying.Station.Mounts.FirstOrDefault(m => m.Id == mountPoint)?.Url ?? throw new InvalidOperationException("Mount point not found.");
+            string? mount = (mountPoint is 0) ? nowPlaying.Station.HlsUrl : nowPlaying.Station.Mounts.FirstOrDefault(m => m.Id == mountPoint)?.Url;
+            if (mount is null)
+            {
+                string response = (mountPoint is 0) ? "HTTP Live Streaming is not available for this station." : "Mount point not found.";
+                await context.EditResponseAsync(response);
+                return;
+            }
 
             await _musicStreaming.PlayMusicAsync(context, mount);
 

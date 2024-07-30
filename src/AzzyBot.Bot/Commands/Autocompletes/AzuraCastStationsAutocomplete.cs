@@ -28,21 +28,21 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
         // TODO Solve this more clean and nicer when it's possible
-        Dictionary<string, object> results = [];
         AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true);
         if (azuraCast is null)
         {
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-            return results;
+            return new Dictionary<string, object>();
         }
 
         IEnumerable<AzuraCastStationEntity> stationsInDb = azuraCast.Stations;
         if (!stationsInDb.Any())
-            return results;
+            return new Dictionary<string, object>();
 
         string search = context.UserInput;
         Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
         string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
+        Dictionary<string, object> results = new(25);
         foreach (AzuraCastStationEntity station in stationsInDb)
         {
             if (results.Count is 25)

@@ -76,7 +76,7 @@ public sealed class AdminCommands
             await context.DeferResponseAsync();
 
             IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
-            if (guilds.Count == 0)
+            if (guilds.Count is 0)
             {
                 await context.EditResponseAsync("I am not in any server.");
                 return;

@@ -26,16 +26,15 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
-        Dictionary<string, object> results = [];
         int stationId = Convert.ToInt32(context.Options.Single(o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
         if (stationId is 0)
-            return results;
+            return new Dictionary<string, object>();
 
         AzuraCastEntity? azuraCastEntity = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
         if (azuraCastEntity is null)
         {
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-            return results;
+            return new Dictionary<string, object>();
         }
 
         string search = context.UserInput;
@@ -43,6 +42,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
         AzuraStationRecord record = await _azuraCast.GetStationAsync(new(Crypto.Decrypt(azuraCastEntity.BaseUrl)), stationId);
         bool hlsAvailable = record.HlsUrl is not null;
         int maxMounts = (hlsAvailable) ? 24 : 25;
+        Dictionary<string, object> results = new(25);
         foreach (AzuraStationMountRecord mount in record.Mounts)
         {
             if (results.Count == maxMounts)

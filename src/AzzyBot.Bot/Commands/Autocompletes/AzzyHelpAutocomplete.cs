@@ -22,7 +22,6 @@ public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings) : IAuto
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
         ArgumentNullException.ThrowIfNull(context.Member, nameof(context.Member));
 
-        Dictionary<string, object> results = [];
         string search = context.UserInput;
 
         IEnumerable<DiscordUser> botOwners = context.Client.CurrentApplication.Owners;
@@ -37,6 +36,7 @@ public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings) : IAuto
         }
 
         bool approvedDebug = guildId == _settings.ServerId;
+        Dictionary<string, object> results = new(25);
         foreach (KeyValuePair<string, List<AzzyHelpRecord>> kvp in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member))
         {
             if (results.Count is 25)

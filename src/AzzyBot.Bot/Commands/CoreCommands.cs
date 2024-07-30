@@ -53,12 +53,12 @@ public sealed class CoreCommands
             }
 
             bool approvedDebug = guildId == _settings.ServerId;
-            List<DiscordEmbed> embeds = [];
+            List<DiscordEmbed> embeds = new(10);
             if (string.IsNullOrWhiteSpace(command))
             {
                 foreach (KeyValuePair<string, List<AzzyHelpRecord>> kvp in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member))
                 {
-                    if (embeds.Count == 10)
+                    if (embeds.Count is 10)
                         break;
 
                     DiscordEmbed embed = EmbedBuilder.BuildAzzyHelpEmbed(kvp.Value);

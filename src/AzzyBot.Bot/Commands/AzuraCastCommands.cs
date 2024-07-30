@@ -60,16 +60,30 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ExportPlaylistsAsync), context.User.GlobalName);
 
-            AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
+
+            AzuraCastStationEntity? acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+            if (acStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
+                await context.EditResponseAsync("Station not found in database.");
+                return;
+            }
+
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
             string tempDir = Path.Combine(_azuraCast.FilePath, "Temp");
             if (!Directory.Exists(tempDir))
                 Directory.CreateDirectory(tempDir);
 
-            List<string> filePaths = [];
             IEnumerable<AzuraPlaylistRecord> playlists = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, station);
+            List<string> filePaths = [];
             if (userPlaylist is null)
             {
                 foreach (AzuraPlaylistRecord playlist in playlists)
@@ -82,7 +96,12 @@ public sealed class AzuraCastCommands
             }
             else
             {
-                AzuraPlaylistRecord playlist = playlists.FirstOrDefault(p => p.Id == userPlaylist) ?? throw new InvalidOperationException("Playlist not found");
+                AzuraPlaylistRecord? playlist = playlists.FirstOrDefault(p => p.Id == userPlaylist);
+                if (playlist is null)
+                {
+                    await context.EditResponseAsync("Playlist not found.");
+                    return;
+                }
 
                 Uri playlistUrl = (format is "m3u") ? playlist.Links.Export.M3U : playlist.Links.Export.PLS;
                 string fileName = Path.Combine(tempDir, $"{azuraCast.Id}-{acStation.Id}-{playlist.ShortName}.{format}");
@@ -208,10 +227,16 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(GetSystemLogsAsync), context.User.GlobalName);
 
-            AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
+            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
+
             string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
-
             AzuraSystemLogRecord? systemLog = await _azuraCast.GetSystemLogAsync(new(baseUrl), apiKey, logName);
             if (systemLog is null)
             {
@@ -238,7 +263,14 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(GetHardwareStatsAsync), context.User.GlobalName);
 
-            AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
+            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
+
             string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
@@ -261,8 +293,22 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(StartStationAsync), context.User.GlobalName);
 
-            AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
+
+            AzuraCastStationEntity? acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+            if (acStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
+                await context.EditResponseAsync("Station not found in database.");
+                return;
+            }
+
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
@@ -285,8 +331,22 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(StopStationAsync), context.User.GlobalName);
 
-            AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
+
+            AzuraCastStationEntity? acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+            if (acStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
+                await context.EditResponseAsync("Station not found in database.");
+                return;
+            }
+
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
             AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
@@ -325,8 +385,22 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ToggleSongRequestsAsync), context.User.GlobalName);
 
-            AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
+
+            AzuraCastStationEntity? acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+            if (acStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
+                await context.EditResponseAsync("Station not found in database.");
+                return;
+            }
+
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
@@ -345,7 +419,14 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(UpdateInstanceAsync), context.User.GlobalName);
 
-            AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id) ?? throw new InvalidOperationException("AzuraCast is null");
+            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
+
             string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
@@ -384,8 +465,22 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(DeleteSongRequestAsync), context.User.GlobalName);
 
-            AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
+
+            AzuraCastStationEntity? acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+            if (acStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
+                await context.EditResponseAsync("Station not found in database.");
+                return;
+            }
+
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
@@ -412,8 +507,22 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(SkipSongAsync), context.User.GlobalName);
 
-            AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
+
+            AzuraCastStationEntity? acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+            if (acStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
+                await context.EditResponseAsync("Station not found in database.");
+                return;
+            }
+
             if (acStation.LastSkipTime.AddSeconds(30) > DateTime.UtcNow)
             {
                 await context.EditResponseAsync("You can only skip a song every 30 seconds.");
@@ -451,8 +560,22 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(SwitchPlaylistAsync), context.User.GlobalName);
 
-            AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
+
+            AzuraCastStationEntity? acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+            if (acStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
+                await context.EditResponseAsync("Station not found in database.");
+                return;
+            }
+
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
             AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
@@ -488,6 +611,8 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context, nameof(context));
             ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
+            _logger.CommandRequested(nameof(GetSongHistoryAsync), context.User.GlobalName);
+
             DateTime dateTime;
             if (date is null)
             {
@@ -499,10 +624,22 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            _logger.CommandRequested(nameof(GetSongHistoryAsync), context.User.GlobalName);
+            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
 
-            AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastStationEntity? acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+            if (acStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
+                await context.EditResponseAsync("Station not found in database.");
+                return;
+            }
+
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string dateString = dateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
@@ -541,8 +678,22 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(GetSongsInPlaylistAsync), context.User.GlobalName);
 
-            AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
+
+            AzuraCastStationEntity? acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+            if (acStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
+                await context.EditResponseAsync("Station not found in database.");
+                return;
+            }
+
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
 
@@ -587,8 +738,22 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(GetNowPlayingAsync), context.User.GlobalName);
 
-            AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true, loadStationPrefs: true) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true, loadStationPrefs: true);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
+
+            AzuraCastStationEntity? acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+            if (acStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
+                await context.EditResponseAsync("Station not found in database.");
+                return;
+            }
+
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
             AzuraNowPlayingDataRecord nowPlaying;
@@ -628,8 +793,22 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(SearchSongAsync), context.User.GlobalName);
 
-            AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
+
+            AzuraCastStationEntity? acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+            if (acStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
+                await context.EditResponseAsync("Station not found in database.");
+                return;
+            }
+
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
 
@@ -710,6 +889,8 @@ public sealed class AzuraCastCommands
             ArgumentException.ThrowIfNullOrWhiteSpace(file.FileName, nameof(file.FileName));
             ArgumentException.ThrowIfNullOrWhiteSpace(file.Url, nameof(file.Url));
 
+            _logger.CommandRequested(nameof(UploadFilesAsync), context.User.GlobalName);
+
             if (file.FileSize > 52428800)
             {
                 await context.EditResponseAsync("The file is too big. Please upload a file that is smaller than 50MB.");
@@ -723,10 +904,22 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            _logger.CommandRequested(nameof(UploadFilesAsync), context.User.GlobalName);
+            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true, loadStationPrefs: true);
+            if (azuraCast is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync("AzuraCast not found in database.");
+                return;
+            }
 
-            AzuraCastEntity azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true, loadStationPrefs: true) ?? throw new InvalidOperationException("AzuraCast is null");
-            AzuraCastStationEntity acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station) ?? throw new InvalidOperationException("Station is null");
+            AzuraCastStationEntity? acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+            if (acStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
+                await context.EditResponseAsync("Station not found in database.");
+                return;
+            }
+
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
@@ -734,7 +927,7 @@ public sealed class AzuraCastCommands
             await _webRequest.DownloadAsync(new(file.Url), filePath);
             string uploadPath = (string.IsNullOrWhiteSpace(acStation.Preferences.FileUploadPath)) ? "/" : acStation.Preferences.FileUploadPath;
 
-            AzuraFilesDetailedRecord? uploadedFile = await _azuraCast.UploadFileAsync<AzuraFilesDetailedRecord>(new(baseUrl), apiKey, station, filePath, file.FileName, uploadPath);
+            AzuraFilesDetailedRecord uploadedFile = await _azuraCast.UploadFileAsync<AzuraFilesDetailedRecord>(new(baseUrl), apiKey, station, filePath, file.FileName, uploadPath);
             AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
 
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastUploadFileEmbed(uploadedFile, file.FileSize, azuraStation.Name);
