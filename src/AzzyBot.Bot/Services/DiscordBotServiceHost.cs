@@ -261,7 +261,7 @@ public sealed class DiscordBotServiceHost : IHostedService
                     break;
                 }
 
-                await _botService.LogExceptionAsync(ex, now, 0, ((DiscordException)e.Exception).JsonMessage);
+                await _botService.LogExceptionAsync(ex, now, info: ((DiscordException)e.Exception).JsonMessage);
                 break;
         }
     }

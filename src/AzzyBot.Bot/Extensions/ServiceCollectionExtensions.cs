@@ -132,7 +132,7 @@ public static class ServiceCollectionExtensions
 
         SettingsCheck.CheckSettings(settings, exclusions);
 
-        if (settings.Database!.EncryptionKey.Length != 32)
+        if (settings.Database!.EncryptionKey.Length is not 32)
         {
             Console.Error.WriteLine($"The {nameof(settings.Database.EncryptionKey)} must contain exactly 32 characters!");
             if (!HardwareStats.CheckIfLinuxOs)
@@ -146,20 +146,22 @@ public static class ServiceCollectionExtensions
 
     public static void AzzyBotStats(this IServiceCollection services, bool isDev)
     {
-        AzzyBotStatsRecord? stats = new("Unkown", DateTime.Now, 0);
-        if (!isDev)
+        if (isDev)
         {
-            string path = Path.Combine("Modules", "Core", "Files", "AzzyBotStats.json");
+            services.AddSingleton(new AzzyBotStatsRecord("Unknown", DateTime.Now, 0));
+            return;
+        }
 
-            stats = GetConfiguration(path).Get<AzzyBotStatsRecord>();
-            if (stats is null)
-            {
-                Console.Error.Write("There is something wrong with your configuration. Did you followed the installation instructions?");
-                if (!HardwareStats.CheckIfLinuxOs)
-                    Console.ReadKey();
+        string path = Path.Combine("Modules", "Core", "Files", "AzzyBotStats.json");
 
-                Environment.Exit(1);
-            }
+        AzzyBotStatsRecord? stats = GetConfiguration(path).Get<AzzyBotStatsRecord>();
+        if (stats is null)
+        {
+            Console.Error.Write("There is something wrong with your configuration. Did you followed the installation instructions?");
+            if (!HardwareStats.CheckIfLinuxOs)
+                Console.ReadKey();
+
+            Environment.Exit(1);
         }
 
         services.AddSingleton(stats);
