@@ -17,6 +17,7 @@ jobs:
 
   extract_meta:
     name: Extract metadata for use
+    if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
     runs-on: ubuntu-latest
     outputs:
       loc_cs: ${{ steps.loc_cs.outputs.total_lines }}
@@ -46,8 +47,8 @@ jobs:
        id: get-version
        run: |
          VERSION=$(grep -oP '(?<=<Version>).*?(?=</Version>)' Directory.Build.props)
-         echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-         echo "clean_version=v$VERSION" >> "$GITHUB_OUTPUT"
+         echo "version=v$VERSION" >> "$GITHUB_OUTPUT"
+         echo "clean_version=$VERSION" >> "$GITHUB_OUTPUT"
 
   build:
     name: Build RELEASE for ${{ matrix.os }} - ${{ matrix.arch }}
@@ -124,8 +125,8 @@ jobs:
           mv ./SECURITY.md ./docker-zip/SECURITY.md
           mkdir -p ./docker-zip/AzzyBot/Logs
           mkdir -p ./docker-zip/AzzyBot/Modules/AzuraCast/Files
-          #mkdir -p ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins
-          #mv ./src/AzzyBot/Modules/MusicStreaming/Files/application.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/application.yml
+          mkdir -p ./docker-zip/AzzyBot/Modules/MusicStreaming/Files
+          mv ./src/AzzyBot.Bot/Modules/MusicStreaming/Files/application.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/application.yml
           #mv ./src/AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
           #wget -qO ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
           mkdir -p ./docker-zip/AzzyBot/Settings

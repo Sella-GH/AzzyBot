@@ -50,8 +50,8 @@ jobs:
             echo "environment=dev" >> "$GITHUB_OUTPUT"
             echo "environment_alpine=dev-alpine" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
-            echo "environment=rel-${{ steps.get-version.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
-            echo "environment_alpine=rel-${{ steps.get-version.outputs.clean_version }}-alpine" >> "$GITHUB_OUTPUT"
+            echo "environment=rel-${{ steps.get-version.outputs.clean_version }},dev" >> "$GITHUB_OUTPUT"
+            echo "environment_alpine=rel-${{ steps.get-version.outputs.clean_version }}-alpine,dev-alpine" >> "$GITHUB_OUTPUT"
           else
             echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
             echo "environment_alpine=${{ github.ref_name }}-alpine" >> "$GITHUB_OUTPUT"
