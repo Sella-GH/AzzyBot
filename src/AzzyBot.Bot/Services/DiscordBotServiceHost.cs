@@ -152,7 +152,7 @@ public sealed class DiscordBotServiceHost : IHostedService
         commandsExtension.AddCommands(typeof(MusicStreamingCommands.PlayerGroup));
 
         // Only add debug commands if it's a dev build
-        if (SoftwareStats.GetBotEnvironment == Environments.Development)
+        if (SoftwareStats.GetAppEnvironment == Environments.Development)
             commandsExtension.AddCommands(typeof(DebugCommands.DebugGroup), _settings.ServerId);
 
         commandsExtension.AddCheck<AzuraCastDiscordChannelCheck>();

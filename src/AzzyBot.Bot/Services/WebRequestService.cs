@@ -315,8 +315,8 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
     private void AddHeaders(AddressFamily addressFamily, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
-        string botName = SoftwareStats.GetBotName.Replace("Bot", string.Empty, StringComparison.OrdinalIgnoreCase);
-        string botVersion = SoftwareStats.GetBotVersion;
+        string botName = SoftwareStats.GetAppName.Replace("Bot", string.Empty, StringComparison.OrdinalIgnoreCase);
+        string botVersion = SoftwareStats.GetAppVersion;
         HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
         client.DefaultRequestHeaders.Clear();
         client.DefaultRequestHeaders.UserAgent.Add(new(botName, botVersion));

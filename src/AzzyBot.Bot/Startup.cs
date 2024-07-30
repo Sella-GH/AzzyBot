@@ -13,7 +13,7 @@ public static class Startup
 {
     public static async Task Main(string[] args)
     {
-        string environment = SoftwareStats.GetBotEnvironment;
+        string environment = SoftwareStats.GetAppEnvironment;
         bool isDev = environment == Environments.Development;
         bool isDocker = HardwareStats.CheckIfDocker;
         bool forceDebug = (isDocker) ? (Environment.GetEnvironmentVariable("FORCE_DEBUG") == "true") : (args?.Length > 0 && args.Contains("-forceDebug"));

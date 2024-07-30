@@ -26,12 +26,12 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
 
     public async Task CheckForAzzyUpdatesAsync()
     {
-        string localVersion = SoftwareStats.GetBotVersion;
+        string localVersion = SoftwareStats.GetAppVersion;
         bool isPreview = localVersion.Contains("-preview", StringComparison.OrdinalIgnoreCase);
 
         Dictionary<string, string> headers = new()
         {
-            ["User-Agent"] = SoftwareStats.GetBotName
+            ["User-Agent"] = SoftwareStats.GetAppName
         };
 
         string body = await _webService.GetWebAsync((isPreview) ? _previewUrl : _latestUrl, headers, true);

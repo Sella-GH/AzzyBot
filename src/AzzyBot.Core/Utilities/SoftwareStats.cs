@@ -7,29 +7,29 @@ namespace AzzyBot.Core.Utilities;
 
 public static class SoftwareStats
 {
-    public static string GetBotAuthors
+    public static string GetAppAuthors
         => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).CompanyName ?? "Bot authors not found";
 
-    public static string GetBotDotNetVersion
+    public static string GetAppDotNetVersion
         => Environment.Version.ToString() ?? ".NET version not found";
 
-    public static string GetBotEnvironment
-        => (GetBotName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase)) ? Environments.Development : Environments.Production;
+    public static string GetAppEnvironment
+        => (GetAppName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase)) ? Environments.Development : Environments.Production;
 
-    public static string GetBotName
+    public static string GetAppName
         => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductName?.Split('.')[0] ?? "Bot name not found";
 
-    public static string GetBotVersion
+    public static string GetAppVersion
         => FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion ?? "Bot version not found";
 
-    public static double GetBotMemoryUsage()
+    public static double GetAppMemoryUsage()
     {
         using Process azzy = Process.GetCurrentProcess();
 
         return Math.Round(azzy.WorkingSet64 / (1024.0 * 1024.0 * 1024.0), 2);
     }
 
-    public static DateTime GetBotUptime()
+    public static DateTime GetAppUptime()
     {
         using Process azzy = Process.GetCurrentProcess();
 

@@ -493,8 +493,8 @@ public sealed class DiscordBotService
 
         string os = HardwareStats.GetSystemOs;
         string arch = HardwareStats.GetSystemOsArch;
-        string botName = SoftwareStats.GetBotName;
-        string botVersion = SoftwareStats.GetBotVersion;
+        string botName = SoftwareStats.GetAppName;
+        string botVersion = SoftwareStats.GetAppVersion;
 
         DiscordEmbedBuilder builder = new()
         {
