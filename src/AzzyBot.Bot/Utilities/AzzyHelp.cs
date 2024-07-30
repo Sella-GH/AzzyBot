@@ -49,7 +49,7 @@ public static class AzzyHelp
     private static Dictionary<string, List<AzzyHelpRecord>> GetCommandGroups(IReadOnlyDictionary<string, Command> commands, bool adminServer, bool approvedDebug, DiscordMember member, bool singleCommand = false)
     {
         List<string> commandGroups = commands.Where(c => c.Value.Subcommands.Count > 0 && CheckIfMemberHasPermission(adminServer, approvedDebug, member, c.Value.Name)).Select(c => c.Value.Name).ToList();
-        Dictionary<string, List<AzzyHelpRecord>> records = [];
+        Dictionary<string, List<AzzyHelpRecord>> records = new(commands.Count);
         foreach (string group in commandGroups)
         {
             Command command = commands[group];
@@ -65,9 +65,9 @@ public static class AzzyHelp
         return records;
     }
 
-    private static List<AzzyHelpRecord> GetCommands(IEnumerable<Command> commands, string subCommand = "", bool singleCommand = false)
+    private static List<AzzyHelpRecord> GetCommands(IReadOnlyList<Command> commands, string subCommand = "", bool singleCommand = false)
     {
-        List<AzzyHelpRecord> records = [];
+        List<AzzyHelpRecord> records = new(commands.Count);
         foreach (Command command in commands)
         {
             string description = command.Description ?? "No description provided.";
@@ -85,7 +85,7 @@ public static class AzzyHelp
     {
         ArgumentNullException.ThrowIfNull(command, nameof(command));
 
-        Dictionary<string, string> parameters = [];
+        Dictionary<string, string> parameters = new(command.Parameters.Count);
         foreach (CommandParameter parameter in command.Parameters)
         {
             string paramName = parameter.Name ?? "No name provided";

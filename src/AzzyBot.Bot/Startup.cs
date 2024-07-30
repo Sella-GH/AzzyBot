@@ -16,8 +16,8 @@ public static class Startup
         string environment = SoftwareStats.GetAppEnvironment;
         bool isDev = environment == Environments.Development;
         bool isDocker = HardwareStats.CheckIfDocker;
-        bool forceDebug = (isDocker) ? (Environment.GetEnvironmentVariable("FORCE_DEBUG") == "true") : (args?.Length > 0 && args.Contains("-forceDebug"));
-        bool SkipWaiting = (isDocker) ? (Environment.GetEnvironmentVariable("SKIP_WAITING") == "true") : (args?.Length > 0 && args.Contains("-skipWaiting"));
+        bool forceDebug = (isDocker) ? (Environment.GetEnvironmentVariable("FORCE_DEBUG") is "true") : (args?.Length > 0 && args.Contains("-forceDebug"));
+        bool SkipWaiting = (isDocker) ? (Environment.GetEnvironmentVariable("SKIP_WAITING") is "true") : (args?.Length > 0 && args.Contains("-skipWaiting"));
 
         if (isDocker && !SkipWaiting)
         {

@@ -64,20 +64,20 @@ public static class EmbedBuilder
         string addedFiles = "**No** files were added.";
         string removedFiles = "**No** files were removed.";
 
-        if (added == 1)
+        if (added is 1)
         {
             addedFiles = "**1** file was added.";
         }
-        else if (added > 1)
+        else if (added is not 0)
         {
             addedFiles = $"**{added}** files were added.";
         }
 
-        if (removed == 1)
+        if (removed is 1)
         {
             removedFiles = "**1** file was removed.";
         }
-        else if (removed > 1)
+        else if (removed is not 0)
         {
             removedFiles = $"**{removed}** files were removed.";
         }
@@ -102,8 +102,12 @@ public static class EmbedBuilder
         StringBuilder memoryUsage = new();
         StringBuilder diskUsage = new();
 
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
-        fields.Add("Ping", new($"{stats.Ping} ms"));
+        // 5 is the initial count of fields which are def added
+        int init = 5 + ((stats.Network.Count > 20) ? 20 : stats.Network.Count);
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(init)
+        {
+            { "Ping", new($"{stats.Ping} ms") }
+        };
 
         cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"IO-Wait: **{stats.Cpu.Total.IoWait}**%");
         cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"Stolen: **{stats.Cpu.Total.Steal}**%");
@@ -151,7 +155,7 @@ public static class EmbedBuilder
         string? message = null;
         string thumbnailUrl = (!string.IsNullOrWhiteSpace(data.Live.Art)) ? data.Live.Art : data.NowPlaying.Song.Art;
 
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(8)
         {
             ["Station"] = new(data.Station.Name),
             ["Title"] = new(data.NowPlaying.Song.Title, true),
@@ -195,7 +199,7 @@ public static class EmbedBuilder
         const string description = "Here is the song you requested.";
         string? footerText = null;
 
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(5)
         {
             ["Title"] = new(song.Song.Title, true),
             ["By"] = new(song.Song.Artist, true)
@@ -228,7 +232,7 @@ public static class EmbedBuilder
         if (update.RollingUpdatesList.Count == 1)
             description = "Your AzuraCast installation needs **1** update.";
 
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(3)
         {
             ["Current Version"] = new(update.CurrentRelease)
         };
@@ -248,9 +252,8 @@ public static class EmbedBuilder
 
         const string title = "AzuraCast Updates Changelog";
 
-        IEnumerable<string> revChangelog = changelog.Reverse();
         StringBuilder body = new();
-        foreach (string line in revChangelog)
+        foreach (string line in changelog.Reverse())
         {
             body.AppendLine(CultureInfo.InvariantCulture, $"- {line}");
         }
@@ -269,7 +272,7 @@ public static class EmbedBuilder
         const string title = "File Uploaded";
         const string description = "Your song was uploaded successfully.";
 
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(8)
         {
             ["Station"] = new(stationName),
             ["Title"] = new(file.Title, true),
@@ -301,7 +304,7 @@ public static class EmbedBuilder
         bool isDocker = HardwareStats.CheckIfDocker;
         long uptime = Converter.ConvertToUnixTime(HardwareStats.GetSystemUptime);
 
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(25)
         {
             ["Operating System"] = new(os, true),
             ["Architecture"] = new(osArch, true),
@@ -337,7 +340,7 @@ public static class EmbedBuilder
             {
                 int counter = kvp.Key;
 
-                if (counter == 0)
+                if (counter is 0)
                 {
                     cpuUsageBuilder.AppendLine(CultureInfo.InvariantCulture, $"Total: **{kvp.Value}%**");
                     continue;
@@ -388,7 +391,7 @@ public static class EmbedBuilder
         string title = command.Name;
         string description = command.Description;
 
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(command.Parameters.Count);
         foreach (KeyValuePair<string, string> kvp in command.Parameters)
         {
             fields.Add(kvp.Key, new(kvp.Value));
@@ -405,7 +408,7 @@ public static class EmbedBuilder
         // Make the first letter an uppercase one and append the rest
         string title = $"Command List For {string.Concat(commands[0].SubCommand[0].ToString().ToUpperInvariant(), commands[0].SubCommand.AsSpan(1))} Group";
 
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(commands.Count);
         foreach (AzzyHelpRecord command in commands)
         {
             fields.Add(command.Name, new(command.Description, true));
@@ -426,7 +429,7 @@ public static class EmbedBuilder
         string formattedAuthors = $"- [{authors[0].Trim()}]({githubUrl})\n- [{authors[1].Trim()}]({contribUrl})";
         string formattedCommit = $"[{commit}]({commitUrl}/{commit})";
 
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(11)
         {
             ["Uptime"] = new($"<t:{Converter.ConvertToUnixTime(SoftwareStats.GetAppUptime().ToLocalTime())}>", true),
             ["Bot Version"] = new(SoftwareStats.GetAppVersion, true),
@@ -452,7 +455,7 @@ public static class EmbedBuilder
         const string description = "Update now to get the latest bug fixes, features and improvements!";
         string yourVersion = SoftwareStats.GetAppVersion;
 
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(3)
         {
             ["Release Date"] = new($"<t:{Converter.ConvertToUnixTime(updateDate.ToLocalTime())}>"),
             ["Your Version"] = new(yourVersion),
@@ -507,7 +510,7 @@ public static class EmbedBuilder
         const string title = "Settings Overview";
         string description = $"Here are all settings which are currently set for **{serverName}**";
 
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(5)
         {
             ["Server ID"] = new(guild.UniqueId.ToString(CultureInfo.InvariantCulture)),
             ["Admin Role"] = new((!string.IsNullOrWhiteSpace(adminRole?.Trim()) && adminRole.Trim() is not "()") ? adminRole.Trim() : "Not set"),
@@ -525,7 +528,7 @@ public static class EmbedBuilder
 
         const string title = "AzuraCast Settings";
         List<DiscordEmbed> embeds = [];
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(6)
         {
             ["Base Url"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.BaseUrl)) ? Crypto.Decrypt(azuraCast.BaseUrl) : "Not set")}||"),
             ["Admin Api Key"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.AdminApiKey)) ? Crypto.Decrypt(azuraCast.AdminApiKey) : "Not set")}||"),
@@ -573,7 +576,7 @@ public static class EmbedBuilder
             string showPlaylist = Misc.ReadableBool(station.Preferences.ShowPlaylistInNowPlaying, ReadbleBool.EnabledDisabled);
             string fileChanges = Misc.ReadableBool(station.Checks.FileChanges, ReadbleBool.EnabledDisabled);
 
-            fields = new()
+            fields = new(10)
             {
                 ["Station Name"] = new(stationName),
                 ["Station ID"] = new(stationId),
@@ -600,7 +603,7 @@ public static class EmbedBuilder
         string title = (getInfo) ? "Guild Information" : "Guild Added";
         string description = (getInfo) ? $"Here is everything I know about **{guild.Name}**" : $"I was added to **{guild.Name}**.";
 
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(4)
         {
             ["Guild ID"] = new(guild.Id.ToString(CultureInfo.InvariantCulture)),
             ["Creation Date"] = new($"<t:{Converter.ConvertToUnixTime(guild.CreationTimestamp.Date)}>"),
@@ -622,7 +625,7 @@ public static class EmbedBuilder
         const string title = "Guild Removed";
         string description = $"I was removed from **{((!string.IsNullOrWhiteSpace(guild?.Name)) ? guild.Name : guildId)}**.";
 
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = [];
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(3);
         if (guild is not null)
         {
             fields.Add("Guild ID", new(guild.Id.ToString(CultureInfo.InvariantCulture)));
