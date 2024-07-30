@@ -89,7 +89,7 @@ public static class EmbedBuilder
             ["Removed"] = new(removedFiles)
         };
 
-        return CreateBasicEmbed(title, null, DiscordColor.Orange, null, null, null, fields);
+        return CreateBasicEmbed(title, color: DiscordColor.Orange, fields: fields);
     }
 
     public static DiscordEmbed BuildAzuraCastHardwareStatsEmbed(AzuraHardwareStatsRecord stats)
@@ -144,7 +144,7 @@ public static class EmbedBuilder
             fields.Add($"Interface: {network.InterfaceName}", new($"Received: **{network.Received.Speed.Readable}**\nTransmitted: **{network.Transmitted.Speed.Readable}**", true));
         }
 
-        return CreateBasicEmbed(title, null, DiscordColor.Orange, AzuraCastPic, null, null, fields);
+        return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: AzuraCastPic, fields: fields);
     }
 
     public static DiscordEmbed BuildAzuraCastMusicNowPlayingEmbed(AzuraNowPlayingDataRecord data, string? playlistName = null)
@@ -188,7 +188,7 @@ public static class EmbedBuilder
             fields.Add("Duration", new($"{progressBar} `[{songElapsed} / {songDuration}]`"));
         }
 
-        return CreateBasicEmbed(title, message, DiscordColor.Aquamarine, new(thumbnailUrl), null, null, fields);
+        return CreateBasicEmbed(title, message, DiscordColor.Aquamarine, new(thumbnailUrl), fields: fields);
     }
 
     public static DiscordEmbed BuildAzuraCastMusicSearchSongEmbed(AzuraRequestRecord song, bool isQueued, bool isPlayed)
@@ -220,7 +220,7 @@ public static class EmbedBuilder
         if (isPlayed)
             footerText = "This song was played in the last couple of minutes. Give it a break!";
 
-        return CreateBasicEmbed(title, description, DiscordColor.Aquamarine, new(song.Song.Art), footerText, null, fields);
+        return CreateBasicEmbed(title, description, DiscordColor.Aquamarine, new(song.Song.Art), footerText, fields: fields);
     }
 
     public static DiscordEmbed BuildAzuraCastUpdatesAvailableEmbed(AzuraUpdateRecord update)
@@ -243,7 +243,7 @@ public static class EmbedBuilder
         if (update.CanSwitchToStable)
             fields.Add("Stable Switch Available?", new("Yes"));
 
-        return CreateBasicEmbed(title, description, DiscordColor.White, AzuraCastPic, null, null, fields);
+        return CreateBasicEmbed(title, description, DiscordColor.White, AzuraCastPic, fields: fields);
     }
 
     public static DiscordEmbed BuildAzuraCastUpdatesChangelogEmbed(IEnumerable<string> changelog, bool isRolling)
@@ -292,7 +292,7 @@ public static class EmbedBuilder
 
         fields.Add("File Size", new($"{Math.Round(fileSize / (1024.0 * 1024.0), 2)} MB"));
 
-        return CreateBasicEmbed(title, description, DiscordColor.SpringGreen, new(file.Art), null, null, fields);
+        return CreateBasicEmbed(title, description, DiscordColor.SpringGreen, new(file.Art), fields: fields);
     }
 
     public static async Task<DiscordEmbed> BuildAzzyHardwareStatsEmbedAsync(Uri avaUrl)
@@ -313,7 +313,7 @@ public static class EmbedBuilder
         };
 
         if (!HardwareStats.CheckIfLinuxOs)
-            return CreateBasicEmbed(title, null, DiscordColor.Orange, null, notLinux, null, fields);
+            return CreateBasicEmbed(title, color: DiscordColor.Orange, footerText: notLinux, fields: fields);
 
         Dictionary<int, double> cpuUsage = await HardwareStats.GetSystemCpuAsync();
         Dictionary<string, double> cpuTemp = await HardwareStats.GetSystemCpuTempAsync();
@@ -381,7 +381,7 @@ public static class EmbedBuilder
             }
         }
 
-        return CreateBasicEmbed(title, null, DiscordColor.Orange, avaUrl, null, null, fields);
+        return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl, fields: fields);
     }
 
     public static DiscordEmbed BuildAzzyHelpEmbed(AzzyHelpRecord command)
@@ -397,7 +397,7 @@ public static class EmbedBuilder
             fields.Add(kvp.Key, new(kvp.Value));
         }
 
-        return CreateBasicEmbed(title, description, DiscordColor.Blurple, null, null, null, fields);
+        return CreateBasicEmbed(title, description, DiscordColor.Blurple, fields: fields);
     }
 
     public static DiscordEmbed BuildAzzyHelpEmbed(IReadOnlyList<AzzyHelpRecord> commands)
@@ -414,7 +414,7 @@ public static class EmbedBuilder
             fields.Add(command.Name, new(command.Description, true));
         }
 
-        return CreateBasicEmbed(title, null, DiscordColor.Blurple, null, null, null, fields);
+        return CreateBasicEmbed(title, color: DiscordColor.Blurple, fields: fields);
     }
 
     public static DiscordEmbed BuildAzzyInfoStatsEmbed(Uri avaUrl, string dspVersion, string commit, in DateTime compileDate, int loc)
@@ -444,7 +444,7 @@ public static class EmbedBuilder
             ["AzzyBot GitHub Commit"] = new(formattedCommit)
         };
 
-        return CreateBasicEmbed(title, null, DiscordColor.Orange, avaUrl, null, null, fields);
+        return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl, fields: fields);
     }
 
     public static DiscordEmbed BuildAzzyUpdatesAvailableEmbed(string version, in DateTime updateDate, Uri url)
@@ -462,7 +462,7 @@ public static class EmbedBuilder
             ["New Version"] = new(version)
         };
 
-        return CreateBasicEmbed(title, description, DiscordColor.White, null, null, url, fields);
+        return CreateBasicEmbed(title, description, DiscordColor.White, url: url, fields: fields);
     }
 
     public static DiscordEmbed BuildAzzyUpdatesChangelogEmbed(string changelog, Uri url)
@@ -519,7 +519,7 @@ public static class EmbedBuilder
             ["Configuration Complete"] = new(Misc.ReadableBool(guild.ConfigSet, ReadbleBool.YesNo))
         };
 
-        return CreateBasicEmbed(title, description, DiscordColor.White, null, null, null, fields);
+        return CreateBasicEmbed(title, description, DiscordColor.White, fields: fields);
     }
 
     public static IEnumerable<DiscordEmbed> BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast, string instanceRole, IReadOnlyDictionary<ulong, string> stationRoles, IReadOnlyDictionary<int, string> stationNames)
@@ -527,7 +527,7 @@ public static class EmbedBuilder
         ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
 
         const string title = "AzuraCast Settings";
-        List<DiscordEmbed> embeds = [];
+        List<DiscordEmbed> embeds = new(1 + azuraCast.Stations.Count);
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(6)
         {
             ["Base Url"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.BaseUrl)) ? Crypto.Decrypt(azuraCast.BaseUrl) : "Not set")}||"),
@@ -538,7 +538,7 @@ public static class EmbedBuilder
             ["Automatic Checks"] = new($"- Server Status: {Misc.ReadableBool(azuraCast.Checks.ServerStatus, ReadbleBool.EnabledDisabled)}\n- Updates: {Misc.ReadableBool(azuraCast.Checks.Updates, ReadbleBool.EnabledDisabled)}\n- Updates Changelog: {Misc.ReadableBool(azuraCast.Checks.UpdatesShowChangelog, ReadbleBool.EnabledDisabled)}")
         };
 
-        embeds.Add(CreateBasicEmbed(title, string.Empty, DiscordColor.White, null, null, null, fields));
+        embeds.Add(CreateBasicEmbed(title, color: DiscordColor.White, fields: fields));
 
         const string stationTitle = "AzuraCast Stations";
         foreach (AzuraCastStationEntity station in azuraCast.Stations)
@@ -590,7 +590,7 @@ public static class EmbedBuilder
                 ["Automatic Checks"] = new($"- File Changes: {fileChanges}")
             };
 
-            embeds.Add(CreateBasicEmbed(stationTitle, string.Empty, DiscordColor.White, null, null, null, fields));
+            embeds.Add(CreateBasicEmbed(stationTitle, color: DiscordColor.White, fields: fields));
         }
 
         return embeds;
@@ -615,7 +615,7 @@ public static class EmbedBuilder
         if (guild.IconUrl is not null)
             iconUrl = new(guild.IconUrl);
 
-        return CreateBasicEmbed(title, description, DiscordColor.Gold, iconUrl, null, null, fields);
+        return CreateBasicEmbed(title, description, DiscordColor.Gold, iconUrl, fields: fields);
     }
 
     public static DiscordEmbed BuildGuildRemovedEmbed(ulong guildId, DiscordGuild? guild = null)
@@ -633,6 +633,6 @@ public static class EmbedBuilder
             fields.Add("Owner", new($"<@!{guild.OwnerId}>"));
         }
 
-        return CreateBasicEmbed(title, description, DiscordColor.Gold, null, null, null, fields);
+        return CreateBasicEmbed(title, description, DiscordColor.Gold, fields: fields);
     }
 }

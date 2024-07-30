@@ -29,7 +29,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
         string localVersion = SoftwareStats.GetAppVersion;
         bool isPreview = localVersion.Contains("-preview", StringComparison.OrdinalIgnoreCase);
 
-        Dictionary<string, string> headers = new()
+        Dictionary<string, string> headers = new(1)
         {
             ["User-Agent"] = SoftwareStats.GetAppName
         };
@@ -58,48 +58,6 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
         await SendUpdateMessageAsync(onlineVersion, releaseDate, updaterRecord.Body);
     }
 
-    private async Task SendUpdateMessageAsync(string updateVersion, DateTime releaseDate, string changelog)
-    {
-        if (_lastOnlineVersion != updateVersion)
-        {
-            _lastAzzyUpdateNotificationTime = DateTime.MinValue;
-            _azzyNotifyCounter = 0;
-        }
-
-        if (!CheckUpdateNotification(_azzyNotifyCounter, _lastAzzyUpdateNotificationTime))
-            return;
-
-        _lastAzzyUpdateNotificationTime = DateTime.Now;
-        _lastOnlineVersion = updateVersion;
-        _azzyNotifyCounter++;
-
-        _logger.UpdateAvailable(updateVersion);
-
-        List<DiscordEmbed> embeds = [EmbedBuilder.BuildAzzyUpdatesAvailableEmbed(updateVersion, releaseDate, _latestUrl)];
-
-        if (_settings.Updater.DisplayChangelog)
-            embeds.Add(EmbedBuilder.BuildAzzyUpdatesChangelogEmbed(changelog, _latestUrl));
-
-        if (_settings.Updater.DisplayInstructions)
-            embeds.Add(EmbedBuilder.BuildAzzyUpdatesInstructionsEmbed());
-
-        DiscordGuild? discordGuild = _botService.GetDiscordGuild();
-        if (discordGuild is null)
-            return;
-
-        ulong channelId = _settings.NotificationChannelId;
-        if (channelId is 0)
-        {
-            DiscordChannel? discordChannel = await discordGuild.GetSystemChannelAsync();
-            if (discordChannel is null)
-                return;
-
-            channelId = discordChannel.Id;
-        }
-
-        await _botService.SendMessageAsync(channelId, null, embeds);
-    }
-
     public static bool CheckUpdateNotification(int notifyCounter, in DateTime lastNotificationTime)
     {
         DateTime now = DateTime.Now;
@@ -121,5 +79,56 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
         }
 
         return dayNotification || halfDayNotification || quarterDayNotification;
+    }
+
+    private async Task SendUpdateMessageAsync(string updateVersion, DateTime releaseDate, string changelog)
+    {
+        if (_lastOnlineVersion != updateVersion)
+        {
+            _lastAzzyUpdateNotificationTime = DateTime.MinValue;
+            _azzyNotifyCounter = 0;
+        }
+
+        if (!CheckUpdateNotification(_azzyNotifyCounter, _lastAzzyUpdateNotificationTime))
+            return;
+
+        _lastAzzyUpdateNotificationTime = DateTime.Now;
+        _lastOnlineVersion = updateVersion;
+        _azzyNotifyCounter++;
+
+        _logger.UpdateAvailable(updateVersion);
+
+        List<DiscordEmbed> embeds = new(3)
+        {
+            EmbedBuilder.BuildAzzyUpdatesAvailableEmbed(updateVersion, releaseDate, _latestUrl)
+        };
+
+        if (_settings.Updater.DisplayChangelog)
+            embeds.Add(EmbedBuilder.BuildAzzyUpdatesChangelogEmbed(changelog, _latestUrl));
+
+        if (_settings.Updater.DisplayInstructions)
+            embeds.Add(EmbedBuilder.BuildAzzyUpdatesInstructionsEmbed());
+
+        DiscordGuild? discordGuild = _botService.GetDiscordGuild();
+        if (discordGuild is null)
+        {
+            _logger.DiscordItemNotFound(nameof(DiscordGuild), _settings.ServerId);
+            return;
+        }
+
+        ulong channelId = _settings.NotificationChannelId;
+        if (channelId is 0)
+        {
+            DiscordChannel? discordChannel = await discordGuild.GetSystemChannelAsync();
+            if (discordChannel is null)
+            {
+                _logger.DiscordItemNotFound(nameof(DiscordChannel), _settings.ServerId);
+                return;
+            }
+
+            channelId = discordChannel.Id;
+        }
+
+        await _botService.SendMessageAsync(channelId, embeds: embeds);
     }
 }

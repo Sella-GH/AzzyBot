@@ -405,7 +405,7 @@ public sealed class DiscordBotService
             return null;
         }
 
-        return guild.Channels.FirstOrDefault(c => c.Value.Type.Equals(DiscordChannelType.Text) && c.Value.PermissionsFor(member).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages)).Value;
+        return guild.Channels.FirstOrDefault(c => c.Value.Type is DiscordChannelType.Text && c.Value.PermissionsFor(member).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages)).Value;
     }
 
     private static void ProcessOptions(IReadOnlyDictionary<CommandParameter, object?> paramaters, Dictionary<string, string> commandParameters)

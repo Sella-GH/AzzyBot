@@ -159,7 +159,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         try
         {
             using Ping ping = new();
-            PingReply reply = await ping.SendPingAsync(uri.Host, 1000);
+            PingReply reply = await ping.SendPingAsync(uri.Host, TimeSpan.FromMilliseconds(1000));
 
             return reply.RoundtripTime;
         }
@@ -198,20 +198,15 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
                 response = await client.GetAsync(url);
             }
 
-            result = await response.Content.ReadAsStringAsync();
-            response.Dispose();
-
-            return result;
+            return await response.Content.ReadAsStringAsync();
         }
         catch (InvalidOperationException)
         {
-            response?.Dispose();
             _logger.WebInvalidUri(url);
             throw;
         }
         catch (HttpRequestException ex)
         {
-            response?.Dispose();
             if (!noLogging)
                 _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
 
@@ -219,11 +214,14 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
         catch (Exception ex)
         {
-            response?.Dispose();
             if (!noLogging)
                 _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
 
             throw;
+        }
+        finally
+        {
+            response?.Dispose();
         }
     }
 
@@ -350,12 +348,12 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         // If it's an IP address, we can skip the DNS lookup
         IPAddress[] iPAddresses = (isIpAddress) ? [ipAddress ?? IPAddress.Parse(url.Host)] : await Dns.GetHostAddressesAsync(url.Host);
 
-        if (iPAddresses.Length == 1)
+        if (iPAddresses.Length is 1)
             return iPAddresses[0].AddressFamily;
 
         // If we have multiple addresses, we need to determine which one to use
         // Prefer IPv6 over IPv4
-        foreach (IPAddress _ in iPAddresses.Where(ip => ip.AddressFamily == AddressFamily.InterNetworkV6))
+        foreach (IPAddress _ in iPAddresses.Where(ip => ip.AddressFamily is AddressFamily.InterNetworkV6))
         {
             if (await TestIfPreferredMethodIsReachableAsync(url, AddressFamily.InterNetworkV6))
                 return AddressFamily.InterNetworkV6;
@@ -370,19 +368,14 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
         try
         {
-            // Test if the host is reachable
-            using (Socket socket = new(addressFamily, SocketType.Stream, ProtocolType.Tcp))
-            {
-                // Timeout after 5 seconds
-                using (CancellationTokenSource cts = new(TimeSpan.FromSeconds(5)))
-                {
-                    await socket.ConnectAsync(url.Host, 80, cts.Token);
-                }
+            // Test if the host is reachable within 5 seconds
+            using Socket socket = new(addressFamily, SocketType.Stream, ProtocolType.Tcp);
+            using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
+            await socket.ConnectAsync(url.Host, 80, cts.Token);
 
-                return true;
-            }
+            return true;
         }
-        catch (Exception ex) when (ex is SocketException || ex is OperationCanceledException)
+        catch (Exception ex) when (ex is OperationCanceledException || ex is SocketException)
         {
             return false;
         }
