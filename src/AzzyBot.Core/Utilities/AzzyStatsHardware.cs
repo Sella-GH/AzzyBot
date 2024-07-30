@@ -93,7 +93,7 @@ public static class AzzyStatsHardware
         Dictionary<int, long[]> prevCpuTimes = await ReadCpuTimesAsync();
         await Task.Delay(delayInMs);
         Dictionary<int, long[]> currCpuTimes = await ReadCpuTimesAsync();
-        Dictionary<int, double> coreUsages = [];
+        Dictionary<int, double> coreUsages = new(prevCpuTimes.Count);
 
         foreach (KeyValuePair<int, long[]> kvp in prevCpuTimes)
         {
@@ -112,37 +112,32 @@ public static class AzzyStatsHardware
     public static async Task<Dictionary<string, double>> GetSystemCpuTempAsync()
     {
         string typeFolderPath = Path.Combine("/sys", "class", "thermal");
-        string tempInfo;
+        if (!Directory.Exists(typeFolderPath))
+            return [];
+
         Dictionary<string, double> result = [];
-
-        if (Directory.Exists(typeFolderPath))
+        foreach (string folder in Directory.GetDirectories(typeFolderPath))
         {
-            foreach (string folder in Directory.GetDirectories(typeFolderPath))
+            string typeFilePath = Path.Combine(folder, "type");
+            if (!File.Exists(typeFilePath))
+                continue;
+
+            string content = await File.ReadAllTextAsync(typeFilePath);
+
+            // This can be extendend when needed
+            string type = content switch
             {
-                string typeFilePath = Path.Combine(folder, "type");
-                if (File.Exists(typeFilePath))
-                {
-                    bool chipset = false;
-                    string content = await File.ReadAllTextAsync(typeFilePath);
-                    switch (content)
-                    {
-                        case string c when c.StartsWith("pch_", StringComparison.OrdinalIgnoreCase):
-                            chipset = true;
-                            break;
-                    }
+                string c when c.StartsWith("pch_", StringComparison.OrdinalIgnoreCase) => "Chipset",
+                _ => "CPU",
+            };
 
-                    string tempFilePath = Path.Combine(folder, "temp");
-                    if (File.Exists(tempFilePath))
-                    {
-                        tempInfo = await File.ReadAllTextAsync(tempFilePath);
-                        string type = "CPU";
-                        if (chipset)
-                            type = "Chipset";
+            string tempFilePath = Path.Combine(folder, "temp");
+            if (!File.Exists(tempFilePath))
+                continue;
 
-                        result.Add(type, Math.Round(double.Parse(tempInfo, CultureInfo.InvariantCulture) / 1000.0));
-                    }
-                }
-            }
+            string tempInfo = await File.ReadAllTextAsync(tempFilePath);
+
+            result.Add(type, Math.Round(double.Parse(tempInfo, CultureInfo.InvariantCulture) / 1000.0));
         }
 
         return result;
@@ -161,16 +156,12 @@ public static class AzzyStatsHardware
 
     public static AzzyDiskUsageRecord GetSystemDiskUsage()
     {
-        foreach (DriveInfo drive in DriveInfo.GetDrives().Where(d => d.IsReady && d.Name == "/"))
-        {
-            double totalSize = drive.TotalSize / (1024.0 * 1024.0 * 1024.0);
-            double totalFreeSpace = drive.TotalFreeSpace / (1024.0 * 1024.0 * 1024.0);
-            double totalUsedSpace = totalSize - totalFreeSpace;
+        DriveInfo drive = DriveInfo.GetDrives().FirstOrDefault(d => d.IsReady && d.Name == "/") ?? throw new InvalidOperationException("There is more than one root drive");
+        double totalSize = drive.TotalSize / (1024.0 * 1024.0 * 1024.0);
+        double totalFreeSpace = drive.TotalFreeSpace / (1024.0 * 1024.0 * 1024.0);
+        double totalUsedSpace = totalSize - totalFreeSpace;
 
-            return new(Math.Round(totalSize, 2), Math.Round(totalFreeSpace, 2), Math.Round(totalUsedSpace, 2));
-        }
-
-        return new(0, 0, 0);
+        return new(Math.Round(totalSize, 2), Math.Round(totalFreeSpace, 2), Math.Round(totalUsedSpace, 2));
     }
 
     public static async Task<AzzyMemoryUsageRecord> GetSystemMemoryUsageAsync()
@@ -185,7 +176,7 @@ public static class AzzyStatsHardware
 
             string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-            return (!long.TryParse(parts[1], out long value)) ? throw new InvalidOperationException("Could not parse value") : value;
+            return (long.TryParse(parts[1], out long value)) ? value : throw new InvalidOperationException("Could not parse value");
         }
 
         foreach (string line in memoryInfoLines)
@@ -241,7 +232,7 @@ public static class AzzyStatsHardware
         await Task.Delay(delayInMs);
         Dictionary<string, AzzyNetworkStatsRecord> currNetworkStats = await ReadNetworkStatsAsync();
 
-        Dictionary<string, AzzyNetworkSpeedRecord> networkSpeeds = [];
+        Dictionary<string, AzzyNetworkSpeedRecord> networkSpeeds = new(prevNetworkStats.Count);
         foreach (KeyValuePair<string, AzzyNetworkStatsRecord> kvp in prevNetworkStats)
         {
             string networkName = kvp.Key;
