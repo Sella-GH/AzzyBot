@@ -148,10 +148,6 @@ public sealed class DiscordBotService
             string commandName = ctx.Command.FullName;
             Dictionary<string, string> commandOptions = new(ctx.Command.Parameters.Count);
             ProcessOptions(ctx.Arguments, commandOptions);
-            errorChannelId = ctx.Channel.Id;
-
-            if (errorChannelId == ctx.Channel.Id)
-                errorChannelConfigured = false;
 
             embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), info, discordMessage, discordUser, commandName, commandOptions);
         }
