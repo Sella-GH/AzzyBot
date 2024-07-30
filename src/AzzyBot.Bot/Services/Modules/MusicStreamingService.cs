@@ -51,10 +51,10 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         {
             PlayerRetrieveStatus.BotNotConnected => "I'm not connected to a voice channel.",
 
-            PlayerRetrieveStatus.PreconditionFailed when player.Precondition?.Equals(PlayerPrecondition.NotPaused) == true => "I'm not paused.",
-            PlayerRetrieveStatus.PreconditionFailed when player.Precondition?.Equals(PlayerPrecondition.NotPlaying) == true => "I'm not playing music.",
-            PlayerRetrieveStatus.PreconditionFailed when player.Precondition?.Equals(PlayerPrecondition.Paused) == true => "I'm already paused.",
-            PlayerRetrieveStatus.PreconditionFailed when player.Precondition?.Equals(PlayerPrecondition.Playing) == true => "I'm already playing music.",
+            PlayerRetrieveStatus.PreconditionFailed when player.Precondition?.Equals(PlayerPrecondition.NotPaused) is true => "I'm not paused.",
+            PlayerRetrieveStatus.PreconditionFailed when player.Precondition?.Equals(PlayerPrecondition.NotPlaying) is true => "I'm not playing music.",
+            PlayerRetrieveStatus.PreconditionFailed when player.Precondition?.Equals(PlayerPrecondition.Paused) is true => "I'm already paused.",
+            PlayerRetrieveStatus.PreconditionFailed when player.Precondition?.Equals(PlayerPrecondition.Playing) is true => "I'm already playing music.",
 
             _ => "An unknown error occurred while trying to retrieve the player."
         };
@@ -70,7 +70,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentException.ThrowIfNullOrWhiteSpace(station, nameof(station));
 
-        LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, false, true, true);
+        LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, suppressResponse: true, ignoreVoice: true);
 
         // Guild has no player
         if (player is null)
@@ -147,7 +147,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
-        LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, false);
+        LavalinkPlayer? player = await GetLavalinkPlayerAsync(context);
         if (player is null)
             return false;
 

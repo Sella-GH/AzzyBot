@@ -116,7 +116,16 @@ public static class ServiceCollectionExtensions
         settings.SettingsFile = path;
 
         // Check settings if something is missing
-        List<string> exclusions = [nameof(settings.Database.NewEncryptionKey), nameof(settings.DiscordStatus.StreamUrl), nameof(settings.MusicStreaming), nameof(settings.MusicStreaming.LavalinkHost), nameof(settings.MusicStreaming.LavalinkPort), nameof(settings.MusicStreaming.LavalinkPassword)];
+        List<string> exclusions = new(11)
+        {
+            nameof(settings.Database.NewEncryptionKey),
+            nameof(settings.DiscordStatus.StreamUrl),
+            nameof(settings.MusicStreaming),
+            nameof(settings.MusicStreaming.LavalinkHost),
+            nameof(settings.MusicStreaming.LavalinkPort),
+            nameof(settings.MusicStreaming.LavalinkPassword)
+        };
+
         if (isDocker)
         {
             exclusions.Add(nameof(settings.Database.Host));

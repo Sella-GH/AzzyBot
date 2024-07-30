@@ -99,7 +99,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
             await _dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
         }
-        catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
+        catch (Exception ex) when (ex is DbUpdateConcurrencyException or DbUpdateException)
         {
             await transaction.RollbackAsync();
             throw new InvalidOperationException("An error occured while re-encrypting the database", ex);
