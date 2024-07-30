@@ -296,10 +296,10 @@ public static class EmbedBuilder
     {
         const string title = "AzzyBot Hardware Stats";
         const string notLinux = "To display more information you need to have a linux os.";
-        string os = AzzyStatsHardware.GetSystemOs;
-        string osArch = AzzyStatsHardware.GetSystemOsArch;
-        bool isDocker = AzzyStatsHardware.CheckIfDocker;
-        long uptime = Converter.ConvertToUnixTime(AzzyStatsHardware.GetSystemUptime);
+        string os = HardwareStats.GetSystemOs;
+        string osArch = HardwareStats.GetSystemOsArch;
+        bool isDocker = HardwareStats.CheckIfDocker;
+        long uptime = Converter.ConvertToUnixTime(HardwareStats.GetSystemUptime);
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new()
         {
@@ -309,15 +309,15 @@ public static class EmbedBuilder
             ["System Uptime"] = new($"<t:{uptime}>")
         };
 
-        if (!AzzyStatsHardware.CheckIfLinuxOs)
+        if (!HardwareStats.CheckIfLinuxOs)
             return CreateBasicEmbed(title, null, DiscordColor.Orange, null, notLinux, null, fields);
 
-        Dictionary<int, double> cpuUsage = await AzzyStatsHardware.GetSystemCpuAsync();
-        Dictionary<string, double> cpuTemp = await AzzyStatsHardware.GetSystemCpuTempAsync();
-        AzzyCpuLoadRecord cpuLoads = await AzzyStatsHardware.GetSystemCpuLoadAsync();
-        AzzyMemoryUsageRecord memory = await AzzyStatsHardware.GetSystemMemoryUsageAsync();
-        AzzyDiskUsageRecord disk = AzzyStatsHardware.GetSystemDiskUsage();
-        Dictionary<string, AzzyNetworkSpeedRecord> networkUsage = await AzzyStatsHardware.GetSystemNetworkUsageAsync();
+        Dictionary<int, double> cpuUsage = await HardwareStats.GetSystemCpuAsync();
+        Dictionary<string, double> cpuTemp = await HardwareStats.GetSystemCpuTempAsync();
+        AzzyCpuLoadRecord cpuLoads = await HardwareStats.GetSystemCpuLoadAsync();
+        AzzyMemoryUsageRecord memory = await HardwareStats.GetSystemMemoryUsageAsync();
+        AzzyDiskUsageRecord disk = HardwareStats.GetSystemDiskUsage();
+        Dictionary<string, AzzyNetworkSpeedRecord> networkUsage = await HardwareStats.GetSystemNetworkUsageAsync();
 
         if (cpuTemp.Count > 0)
         {
@@ -477,9 +477,9 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildAzzyUpdatesInstructionsEmbed()
     {
-        bool isDocker = AzzyStatsHardware.CheckIfDocker;
-        bool isLinux = AzzyStatsHardware.CheckIfLinuxOs;
-        bool isWindows = AzzyStatsHardware.CheckIfWindowsOs;
+        bool isDocker = HardwareStats.CheckIfDocker;
+        bool isLinux = HardwareStats.CheckIfLinuxOs;
+        bool isWindows = HardwareStats.CheckIfWindowsOs;
         const string title = "Update Instructions";
         string description = "Please follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wiki/Docker-Update-Instructions).";
 

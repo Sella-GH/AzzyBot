@@ -15,7 +15,7 @@ public static class Startup
     {
         string environment = AzzyStatsSoftware.GetBotEnvironment;
         bool isDev = environment == Environments.Development;
-        bool isDocker = AzzyStatsHardware.CheckIfDocker;
+        bool isDocker = HardwareStats.CheckIfDocker;
         bool forceDebug = (isDocker) ? (Environment.GetEnvironmentVariable("FORCE_DEBUG") == "true") : (args?.Length > 0 && args.Contains("-forceDebug"));
         bool SkipWaiting = (isDocker) ? (Environment.GetEnvironmentVariable("SKIP_WAITING") == "true") : (args?.Length > 0 && args.Contains("-skipWaiting"));
 

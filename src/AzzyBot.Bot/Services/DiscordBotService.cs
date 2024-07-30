@@ -491,8 +491,8 @@ public sealed class DiscordBotService
         ArgumentNullException.ThrowIfNull(ex, nameof(ex));
         ArgumentNullException.ThrowIfNull(timestamp, nameof(timestamp));
 
-        string os = AzzyStatsHardware.GetSystemOs;
-        string arch = AzzyStatsHardware.GetSystemOsArch;
+        string os = HardwareStats.GetSystemOs;
+        string arch = HardwareStats.GetSystemOsArch;
         string botName = AzzyStatsSoftware.GetBotName;
         string botVersion = AzzyStatsSoftware.GetBotVersion;
 

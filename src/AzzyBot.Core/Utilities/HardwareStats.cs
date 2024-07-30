@@ -9,7 +9,7 @@ using AzzyBot.Core.Utilities.Records;
 
 namespace AzzyBot.Core.Utilities;
 
-public static class AzzyStatsHardware
+public static class HardwareStats
 {
     public static bool CheckIfDocker
         => Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER", EnvironmentVariableTarget.Process) == "true";

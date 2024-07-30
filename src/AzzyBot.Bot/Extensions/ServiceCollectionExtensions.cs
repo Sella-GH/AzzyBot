@@ -107,7 +107,7 @@ public static class ServiceCollectionExtensions
         if (settings is null)
         {
             Console.Error.Write("No bot configuration found! Please set your settings.");
-            if (!AzzyStatsHardware.CheckIfLinuxOs)
+            if (!HardwareStats.CheckIfLinuxOs)
                 Console.ReadKey();
 
             Environment.Exit(1);
@@ -135,7 +135,7 @@ public static class ServiceCollectionExtensions
         if (settings.Database!.EncryptionKey.Length != 32)
         {
             Console.Error.WriteLine($"The {nameof(settings.Database.EncryptionKey)} must contain exactly 32 characters!");
-            if (!AzzyStatsHardware.CheckIfLinuxOs)
+            if (!HardwareStats.CheckIfLinuxOs)
                 Console.ReadKey();
 
             Environment.Exit(1);
@@ -155,7 +155,7 @@ public static class ServiceCollectionExtensions
             if (stats is null)
             {
                 Console.Error.Write("There is something wrong with your configuration. Did you followed the installation instructions?");
-                if (!AzzyStatsHardware.CheckIfLinuxOs)
+                if (!HardwareStats.CheckIfLinuxOs)
                     Console.ReadKey();
 
                 Environment.Exit(1);
@@ -177,7 +177,7 @@ public static class ServiceCollectionExtensions
             user = "azzybot";
 
         // No password because it can be null when using non-docker
-        if (string.IsNullOrWhiteSpace(password) && AzzyStatsHardware.CheckIfDocker)
+        if (string.IsNullOrWhiteSpace(password) && HardwareStats.CheckIfDocker)
             password = "thisIsAzzyB0!P@ssw0rd";
 
         if (string.IsNullOrWhiteSpace(database))

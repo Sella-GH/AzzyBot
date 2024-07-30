@@ -29,8 +29,8 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
     {
         string name = AzzyStatsSoftware.GetBotName;
         string version = AzzyStatsSoftware.GetBotVersion;
-        string arch = AzzyStatsHardware.GetSystemOsArch;
-        string os = AzzyStatsHardware.GetSystemOs;
+        string arch = HardwareStats.GetSystemOsArch;
+        string os = HardwareStats.GetSystemOs;
 
         _logger.BotStarting(name, version, os, arch);
 
