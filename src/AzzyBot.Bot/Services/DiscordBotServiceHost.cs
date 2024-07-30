@@ -204,7 +204,7 @@ public sealed class DiscordBotServiceHost : IHostedService
 
         if (e.Context is not SlashCommandContext slashContext)
         {
-            await _botService.LogExceptionAsync(ex, now);
+            await _botService.LogExceptionAsync(ex, now, guildId: guildId);
             return;
         }
 
