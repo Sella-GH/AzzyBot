@@ -308,7 +308,7 @@ public static class EmbedBuilder
         {
             ["Operating System"] = new(os, true),
             ["Architecture"] = new(osArch, true),
-            ["Dockerized?"] = new(Misc.ReadableBool(isDocker, ReadbleBool.YesNo), true),
+            ["Dockerized?"] = new(Misc.GetReadableBool(isDocker, ReadableBool.YesNo), true),
             ["System Uptime"] = new($"<t:{uptime}>")
         };
 
@@ -516,7 +516,7 @@ public static class EmbedBuilder
             ["Admin Role"] = new((!string.IsNullOrWhiteSpace(adminRole?.Trim()) && adminRole.Trim() is not "()") ? adminRole.Trim() : "Not set"),
             ["Admin Notify Channel"] = new((guild.Preferences.AdminNotifyChannelId > 0) ? $"<#{guild.Preferences.AdminNotifyChannelId}>" : "Not set"),
             ["Error Channel"] = new((guild.Preferences.ErrorChannelId > 0) ? $"<#{guild.Preferences.ErrorChannelId}>" : "Not set"),
-            ["Configuration Complete"] = new(Misc.ReadableBool(guild.ConfigSet, ReadbleBool.YesNo))
+            ["Configuration Complete"] = new(Misc.GetReadableBool(guild.ConfigSet, ReadableBool.YesNo))
         };
 
         return CreateBasicEmbed(title, description, DiscordColor.White, fields: fields);
@@ -535,7 +535,7 @@ public static class EmbedBuilder
             ["Instance Admin Role"] = new((!string.IsNullOrWhiteSpace(instanceRole?.Trim()) && instanceRole.Trim() is not "()") ? instanceRole.Trim() : "Not set"),
             ["Notification Channel"] = new((azuraCast.Preferences.NotificationChannelId > 0) ? $"<#{azuraCast.Preferences.NotificationChannelId}>" : "Not set"),
             ["Outages Channel"] = new((azuraCast.Preferences.OutagesChannelId > 0) ? $"<#{azuraCast.Preferences.OutagesChannelId}>" : "Not set"),
-            ["Automatic Checks"] = new($"- Server Status: {Misc.ReadableBool(azuraCast.Checks.ServerStatus, ReadbleBool.EnabledDisabled)}\n- Updates: {Misc.ReadableBool(azuraCast.Checks.Updates, ReadbleBool.EnabledDisabled)}\n- Updates Changelog: {Misc.ReadableBool(azuraCast.Checks.UpdatesShowChangelog, ReadbleBool.EnabledDisabled)}")
+            ["Automatic Checks"] = new($"- Server Status: {Misc.GetReadableBool(azuraCast.Checks.ServerStatus, ReadableBool.EnabledDisabled)}\n- Updates: {Misc.GetReadableBool(azuraCast.Checks.Updates, ReadableBool.EnabledDisabled)}\n- Updates Changelog: {Misc.GetReadableBool(azuraCast.Checks.UpdatesShowChangelog, ReadableBool.EnabledDisabled)}")
         };
 
         embeds.Add(CreateBasicEmbed(title, color: DiscordColor.White, fields: fields));
@@ -573,8 +573,8 @@ public static class EmbedBuilder
             string fileUploadChannel = (station.Preferences.FileUploadChannelId > 0) ? $"<#{station.Preferences.FileUploadChannelId}>" : "Not set";
             string requestsChannel = (station.Preferences.RequestsChannelId > 0) ? $"<#{station.Preferences.RequestsChannelId}>" : "Not set";
             string fileUploadPath = (!string.IsNullOrWhiteSpace(station.Preferences.FileUploadPath)) ? station.Preferences.FileUploadPath : "Not set";
-            string showPlaylist = Misc.ReadableBool(station.Preferences.ShowPlaylistInNowPlaying, ReadbleBool.EnabledDisabled);
-            string fileChanges = Misc.ReadableBool(station.Checks.FileChanges, ReadbleBool.EnabledDisabled);
+            string showPlaylist = Misc.GetReadableBool(station.Preferences.ShowPlaylistInNowPlaying, ReadableBool.EnabledDisabled);
+            string fileChanges = Misc.GetReadableBool(station.Checks.FileChanges, ReadableBool.EnabledDisabled);
 
             fields = new(10)
             {
