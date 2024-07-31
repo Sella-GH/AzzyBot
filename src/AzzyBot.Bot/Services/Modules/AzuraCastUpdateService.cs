@@ -58,7 +58,7 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
 
             if (!update.NeedsReleaseUpdate && !update.NeedsRollingUpdate)
             {
-                await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, null, null, null, 0, DateTime.UtcNow);
+                await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: 0, lastUpdateCheck: DateTime.UtcNow);
                 return;
             }
 
@@ -66,13 +66,17 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
             if (!UpdaterService.CheckUpdateNotification(checks.UpdateNotificationCounter, checks.LastUpdateCheck))
                 return;
 
-            await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, null, null, null, checks.UpdateNotificationCounter + 1, DateTime.UtcNow);
+            await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: checks.UpdateNotificationCounter + 1, lastUpdateCheck: DateTime.UtcNow);
 
-            List<DiscordEmbed> embeds = [EmbedBuilder.BuildAzuraCastUpdatesAvailableEmbed(update)];
+            List<DiscordEmbed> embeds = new(2)
+            {
+                EmbedBuilder.BuildAzuraCastUpdatesAvailableEmbed(update)
+            };
+
             if (azuraCast.Checks.UpdatesShowChangelog)
                 embeds.Add(EmbedBuilder.BuildAzuraCastUpdatesChangelogEmbed(update.RollingUpdatesList, update.NeedsRollingUpdate));
 
-            await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, null, embeds);
+            await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, embeds: embeds);
         }
         catch (OperationCanceledException)
         {

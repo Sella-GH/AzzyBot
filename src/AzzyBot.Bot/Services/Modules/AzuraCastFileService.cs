@@ -114,7 +114,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
         string removedFileName = Path.Combine(_azuraCast.FilePath, $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}-{station.AzuraCast.GuildId}-{station.AzuraCastId}-{station.Id}-{station.StationId}-removed.txt");
         StringBuilder added = new();
         StringBuilder removed = new();
-        List<string> paths = [];
+        List<string> paths = new(addedFiles.Count + removedFiles.Count);
 
         if (addedFiles.Count is not 0)
         {

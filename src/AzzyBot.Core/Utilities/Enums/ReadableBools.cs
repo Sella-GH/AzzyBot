@@ -1,6 +1,6 @@
 namespace AzzyBot.Core.Utilities.Enums;
 
-public enum ReadbleBool
+public enum ReadableBool
 {
     EnabledDisabled,
     StartedStopped,

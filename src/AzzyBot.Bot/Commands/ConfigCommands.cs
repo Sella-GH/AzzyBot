@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
@@ -12,6 +11,7 @@ using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Enums;
+using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Extensions;
 using AzzyBot.Core.Logging;
@@ -63,21 +63,21 @@ public sealed class ConfigCommands
             if (instanceAdminGroup is null)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync("You have to select an instance admin group first!");
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceAdminMissing);
                 return;
             }
 
             if (notificationChannel is null)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync("You have to select a notification channel first!");
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceNotificationChannelMissing);
                 return;
             }
 
             if (outagesChannel is null)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync("You have to select an outages channel first!");
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceOutageChannelMissing);
                 return;
             }
 
@@ -96,13 +96,15 @@ public sealed class ConfigCommands
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);
+                await context.DeleteResponseAsync();
+                await context.FollowupAsync(GeneralStrings.GuildNotFound);
                 return;
             }
 
             if (!guild.ConfigSet)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync("You have to set the core settings first!");
+                await context.FollowupAsync(GeneralStrings.CoreSettingsMissing);
                 return;
             }
 
@@ -111,14 +113,14 @@ public sealed class ConfigCommands
             {
                 _logger.DatabaseAzuraCastNotFound(guildId);
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync("AzuraCast is already set up for your server.");
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceAlreadyExists);
                 return;
             }
 
             await _dbActions.AddAzuraCastAsync(guildId, url, apiKey, instanceAdminGroup.Id, notificationChannel.Id, outagesChannel.Id, serverStatus is 1, updates is 1, updatesChangelog is 1);
 
             await context.DeleteResponseAsync();
-            await context.FollowupAsync("Your AzuraCast installation was added successfully and private data has been encrypted.");
+            await context.FollowupAsync(GeneralStrings.ConfigInstanceAdded);
 
             guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
             if (!await guilds.ContainsOneItemAsync())
@@ -153,21 +155,21 @@ public sealed class ConfigCommands
             if (adminGroup is null)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync("You have to select an admin group first!");
+                await context.FollowupAsync(GeneralStrings.ConfigStationAdminMissing);
                 return;
             }
 
             if (requestsChannel is null)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync("You have to select a request channel first!");
+                await context.FollowupAsync(GeneralStrings.ConfigStationRequestChannelMissing);
                 return;
             }
 
             await _dbActions.AddAzuraCastStationAsync(context.Guild.Id, station, adminGroup.Id, requestsChannel.Id, showPlaylist is 1, fileChanges is 1, uploadChannel?.Id, uploadPath, apiKey, djGroup?.Id);
 
             await context.DeleteResponseAsync();
-            await context.FollowupAsync("Your station was added successfully and private data has been encrypted.");
+            await context.FollowupAsync(GeneralStrings.ConfigStationAdded);
 
             ulong guildId = context.Guild.Id;
             GuildEntity? guild = null;
@@ -216,14 +218,14 @@ public sealed class ConfigCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast not found in database.");
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
             FileOperations.DeleteFiles(_azuraCast.FilePath, $"{azuraCast.Id}-");
             await _dbActions.DeleteAzuraCastAsync(context.Guild.Id);
 
-            await context.EditResponseAsync("Your AzuraCast setup was deleted successfully.");
+            await context.EditResponseAsync(GeneralStrings.ConfigInstanceDeleted);
         }
 
         [Command("delete-azuracast-station"), Description("Delete an existing AzuraCast station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -242,14 +244,14 @@ public sealed class ConfigCommands
             if (acStation is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, station);
-                await context.EditResponseAsync("Station not found in database.");
+                await context.EditResponseAsync(GeneralStrings.StationNotFound);
                 return;
             }
 
             FileOperations.DeleteFile(Path.Combine(_azuraCast.FilePath, $"{acStation.AzuraCast.GuildId}-{acStation.AzuraCastId}-{acStation.Id}-{acStation.StationId}-files.json"));
             await _dbActions.DeleteAzuraCastStationAsync(station);
 
-            await context.EditResponseAsync("Your station was deleted successfully.");
+            await context.EditResponseAsync(GeneralStrings.ConfigStationDeleted);
         }
 
         [Command("modify-azuracast"), Description("Modify the general AzuraCast settings."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -270,7 +272,7 @@ public sealed class ConfigCommands
 
             if (url is null && apiKey is null && instanceAdminGroup is null && notificationsChannel is null && outagesChannel is null)
             {
-                await context.RespondAsync("You have to provide at least one parameter to update.");
+                await context.RespondAsync(GeneralStrings.ConfigParameterMissing);
                 return;
             }
 
@@ -281,7 +283,7 @@ public sealed class ConfigCommands
                 await _dbActions.UpdateAzuraCastPreferencesAsync(context.Guild.Id, instanceAdminGroup?.Id, notificationsChannel?.Id, outagesChannel?.Id);
 
             await context.DeleteResponseAsync();
-            await context.FollowupAsync("Your AzuraCast settings were saved successfully and private data has been encrypted.");
+            await context.FollowupAsync(GeneralStrings.ConfigInstanceModified);
 
             ulong guildId = context.Guild.Id;
             GuildEntity? guild = null;
@@ -328,7 +330,7 @@ public sealed class ConfigCommands
 
             if (serverStatus is 0 && updates is 0 && updatesChangelog is 0)
             {
-                await context.RespondAsync("You have to provide at least one parameter to update.");
+                await context.RespondAsync(GeneralStrings.ConfigParameterMissing);
                 return;
             }
 
@@ -365,7 +367,7 @@ public sealed class ConfigCommands
 
             await _dbActions.UpdateAzuraCastChecksAsync(context.Guild.Id, enableServerStatus, enableUpdates, enableUpdatesChangelog);
 
-            await context.EditResponseAsync("Your settings were saved successfully.");
+            await context.EditResponseAsync(GeneralStrings.ConfigInstanceModifiedChecks);
         }
 
         [Command("modify-azuracast-station"), Description("Modify one AzuraCast station you already added."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -390,7 +392,7 @@ public sealed class ConfigCommands
 
             if (stationId is null && apiKey is null && adminGroup is null && djGroup is null && uploadChannel is null && string.IsNullOrWhiteSpace(uploadPath) && requestsChannel is null && showPlaylist is 0)
             {
-                await context.RespondAsync("You have to provide at least one parameter to update.");
+                await context.RespondAsync(GeneralStrings.ConfigParameterMissing);
                 return;
             }
 
@@ -412,7 +414,7 @@ public sealed class ConfigCommands
                 await _dbActions.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, adminGroup?.Id, djGroup?.Id, uploadChannel?.Id, requestsChannel?.Id, uploadPath, showPlaylistInEmbed);
 
             await context.DeleteResponseAsync();
-            await context.FollowupAsync("Your settings were saved successfully and private data has been encrypted.");
+            await context.FollowupAsync(GeneralStrings.ConfigStationModified);
         }
 
         [Command("modify-azuracast-station-checks"), Description("Modify the automatic checks inside an AzuraCast station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -430,7 +432,7 @@ public sealed class ConfigCommands
 
             if (fileChanges is 0)
             {
-                await context.RespondAsync("You have to provide at least one parameter to update.");
+                await context.RespondAsync(GeneralStrings.ConfigParameterMissing);
                 return;
             }
 
@@ -446,7 +448,7 @@ public sealed class ConfigCommands
 
             await _dbActions.UpdateAzuraCastStationChecksAsync(context.Guild.Id, station, enableFileChanges);
 
-            await context.EditResponseAsync("Your settings were saved successfully.");
+            await context.EditResponseAsync(GeneralStrings.ConfigStationModifiedChecks);
         }
 
         [Command("modify-core"), Description("Modify the core settings of the bot.")]
@@ -465,7 +467,7 @@ public sealed class ConfigCommands
 
             if (adminRole is null && adminChannel is null && errorChannel is null)
             {
-                await context.RespondAsync("You have to provide at least one parameter to update.");
+                await context.RespondAsync(GeneralStrings.ConfigParameterMissing);
                 return;
             }
 
@@ -473,7 +475,7 @@ public sealed class ConfigCommands
 
             await _dbActions.UpdateGuildPreferencesAsync(context.Guild.Id, adminRole?.Id, adminChannel?.Id, errorChannel?.Id);
 
-            await context.EditResponseAsync("Your settings were saved successfully.");
+            await context.EditResponseAsync(GeneralStrings.CoreSettingsModified);
         }
 
         [Command("get-settings"), Description("Get all configured settings in a direct message.")]
@@ -503,6 +505,7 @@ public sealed class ConfigCommands
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);
+                await context.EditResponseAsync(GeneralStrings.GuildNotFound);
                 return;
             }
 
@@ -516,14 +519,14 @@ public sealed class ConfigCommands
             {
                 AzuraCastEntity azuraCast = guild.AzuraCast;
                 AzuraStationRecord stationRecord;
-                Dictionary<ulong, string> stationRoles = [];
-                Dictionary<int, string> stationNames = [];
+                Dictionary<ulong, string> stationRoles = new(azuraCast.Stations.Count);
+                Dictionary<int, string> stationNames = new(azuraCast.Stations.Count);
                 foreach (AzuraCastStationEntity station in azuraCast.Stations)
                 {
                     DiscordRole? stationAdminRole = context.Guild.GetRole(station.Preferences.StationAdminRoleId);
                     DiscordRole? stationDjRole = context.Guild.GetRole(station.Preferences.StationDjRoleId);
-                    stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? string.Empty);
-                    stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? string.Empty);
+                    stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? "Name not found");
+                    stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found");
 
                     stationRecord = await _azuraCast.GetStationAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), station.StationId);
                     stationNames.Add(station.Id, stationRecord.Name);
@@ -537,7 +540,7 @@ public sealed class ConfigCommands
 
             await member.SendMessageAsync(messageBuilder);
 
-            await context.EditResponseAsync("I sent you an overview with all the settings in private. Be aware of sensitive data.");
+            await context.EditResponseAsync(GeneralStrings.ConfigGet);
         }
 
         [Command("reset-settings"), Description("Reset all of your settings, you have to reconfigure everything again.")]
@@ -553,7 +556,7 @@ public sealed class ConfigCommands
             await _dbActions.DeleteGuildAsync(context.Guild.Id);
             await _dbActions.AddGuildAsync(context.Guild.Id);
 
-            await context.EditResponseAsync("Your settings were reset successfully.\nRemember that you have to set all the configurations again.");
+            await context.EditResponseAsync(GeneralStrings.ConfigReset);
         }
     }
 }

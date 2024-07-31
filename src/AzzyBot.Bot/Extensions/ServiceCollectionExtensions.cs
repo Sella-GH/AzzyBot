@@ -107,7 +107,7 @@ public static class ServiceCollectionExtensions
         if (settings is null)
         {
             Console.Error.Write("No bot configuration found! Please set your settings.");
-            if (!AzzyStatsHardware.CheckIfLinuxOs)
+            if (!HardwareStats.CheckIfLinuxOs)
                 Console.ReadKey();
 
             Environment.Exit(1);
@@ -116,7 +116,16 @@ public static class ServiceCollectionExtensions
         settings.SettingsFile = path;
 
         // Check settings if something is missing
-        List<string> exclusions = [nameof(settings.Database.NewEncryptionKey), nameof(settings.DiscordStatus.StreamUrl), nameof(settings.MusicStreaming), nameof(settings.MusicStreaming.LavalinkHost), nameof(settings.MusicStreaming.LavalinkPort), nameof(settings.MusicStreaming.LavalinkPassword)];
+        List<string> exclusions = new(11)
+        {
+            nameof(settings.Database.NewEncryptionKey),
+            nameof(settings.DiscordStatus.StreamUrl),
+            nameof(settings.MusicStreaming),
+            nameof(settings.MusicStreaming.LavalinkHost),
+            nameof(settings.MusicStreaming.LavalinkPort),
+            nameof(settings.MusicStreaming.LavalinkPassword)
+        };
+
         if (isDocker)
         {
             exclusions.Add(nameof(settings.Database.Host));
@@ -132,10 +141,10 @@ public static class ServiceCollectionExtensions
 
         SettingsCheck.CheckSettings(settings, exclusions);
 
-        if (settings.Database!.EncryptionKey.Length != 32)
+        if (settings.Database!.EncryptionKey.Length is not 32)
         {
             Console.Error.WriteLine($"The {nameof(settings.Database.EncryptionKey)} must contain exactly 32 characters!");
-            if (!AzzyStatsHardware.CheckIfLinuxOs)
+            if (!HardwareStats.CheckIfLinuxOs)
                 Console.ReadKey();
 
             Environment.Exit(1);
@@ -146,20 +155,22 @@ public static class ServiceCollectionExtensions
 
     public static void AzzyBotStats(this IServiceCollection services, bool isDev)
     {
-        AzzyBotStatsRecord? stats = new("Unkown", DateTime.Now, 0);
-        if (!isDev)
+        if (isDev)
         {
-            string path = Path.Combine("Modules", "Core", "Files", "AzzyBotStats.json");
+            services.AddSingleton(new AzzyBotStatsRecord("Unknown", DateTime.Now, 0));
+            return;
+        }
 
-            stats = GetConfiguration(path).Get<AzzyBotStatsRecord>();
-            if (stats is null)
-            {
-                Console.Error.Write("There is something wrong with your configuration. Did you followed the installation instructions?");
-                if (!AzzyStatsHardware.CheckIfLinuxOs)
-                    Console.ReadKey();
+        string path = Path.Combine("Modules", "Core", "Files", "AzzyBotStats.json");
 
-                Environment.Exit(1);
-            }
+        AzzyBotStatsRecord? stats = GetConfiguration(path).Get<AzzyBotStatsRecord>();
+        if (stats is null)
+        {
+            Console.Error.Write("There is something wrong with your configuration. Did you followed the installation instructions?");
+            if (!HardwareStats.CheckIfLinuxOs)
+                Console.ReadKey();
+
+            Environment.Exit(1);
         }
 
         services.AddSingleton(stats);
@@ -177,7 +188,7 @@ public static class ServiceCollectionExtensions
             user = "azzybot";
 
         // No password because it can be null when using non-docker
-        if (string.IsNullOrWhiteSpace(password) && AzzyStatsHardware.CheckIfDocker)
+        if (string.IsNullOrWhiteSpace(password) && HardwareStats.CheckIfDocker)
             password = "thisIsAzzyB0!P@ssw0rd";
 
         if (string.IsNullOrWhiteSpace(database))

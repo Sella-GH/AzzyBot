@@ -15,7 +15,7 @@ public sealed class AzzyViewLogsAutocomplete : IAutoCompleteProvider
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
-        Dictionary<string, object> results = [];
+        Dictionary<string, object> results = new(25);
         string search = context.UserInput;
 
         foreach (string file in FileOperations.GetFilesInDirectory("Logs").OrderByDescending(f => f))

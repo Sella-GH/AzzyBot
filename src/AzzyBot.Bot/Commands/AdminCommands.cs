@@ -10,6 +10,7 @@ using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Choices;
 using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Utilities;
+using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
@@ -54,11 +55,11 @@ public sealed class AdminCommands
 
             if (reset is 1)
             {
-                await context.EditResponseAsync("Bot status has been reset!");
+                await context.EditResponseAsync(GeneralStrings.BotStatusReset);
             }
             else
             {
-                await context.EditResponseAsync("Bot status has been updated!");
+                await context.EditResponseAsync(GeneralStrings.BotStatusChanged);
             }
         }
 
@@ -76,9 +77,9 @@ public sealed class AdminCommands
             await context.DeferResponseAsync();
 
             IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
-            if (guilds.Count == 0)
+            if (guilds.Count is 0)
             {
-                await context.EditResponseAsync("I am not in any server.");
+                await context.EditResponseAsync(GeneralStrings.NoGuildFound);
                 return;
             }
 
@@ -86,7 +87,7 @@ public sealed class AdminCommands
             {
                 if (!ulong.TryParse(serverId, out ulong guildIdValue))
                 {
-                    await context.EditResponseAsync("Invalid server id.");
+                    await context.EditResponseAsync(GeneralStrings.GuildIdInvalid);
                     return;
                 }
 
@@ -94,7 +95,7 @@ public sealed class AdminCommands
                 if (guild is null)
                 {
                     _logger.DiscordItemNotFound(nameof(DiscordGuild), guildIdValue);
-                    await context.EditResponseAsync("Server not found.");
+                    await context.EditResponseAsync(GeneralStrings.GuildNotFound);
                     return;
                 }
 
@@ -128,7 +129,7 @@ public sealed class AdminCommands
 
             if (!ulong.TryParse(serverId, out ulong guildIdValue))
             {
-                await context.RespondAsync("Invalid server id.");
+                await context.RespondAsync(GeneralStrings.GuildIdInvalid);
                 return;
             }
 
@@ -138,7 +139,7 @@ public sealed class AdminCommands
             if (guild is null)
             {
                 _logger.DiscordItemNotFound(nameof(DiscordGuild), guildIdValue);
-                await context.EditResponseAsync("Server not found.");
+                await context.EditResponseAsync(GeneralStrings.GuildNotFound);
                 return;
             }
 
@@ -190,7 +191,7 @@ public sealed class AdminCommands
                 }
             }
 
-            await context.EditResponseAsync("Message sent to all servers.");
+            await context.EditResponseAsync(GeneralStrings.MessageSentToAll);
         }
 
         [Command("view-logs"), Description("View the logs of the bot.")]

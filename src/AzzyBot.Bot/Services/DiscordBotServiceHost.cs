@@ -36,7 +36,7 @@ public sealed class DiscordBotServiceHost : IHostedService
     private readonly AzzyBotSettingsRecord _settings;
     private readonly DbActions _dbActions;
     private DiscordBotService? _botService;
-    private const string NewGuildText = "Thank you for adding me to your server **%GUULD%**! Before you can make good use of me, you have to set my settings first.\n\nPlease use the command `config modify-core` for this.\nOnly you are able to execute this command right now.";
+    private const string NewGuildText = "Thank you for adding me to your server **%GUILD%**! Before you can make good use of me, you have to set my settings first.\n\nPlease use the command `config modify-core` for this.\nOnly administrators are able to execute this command right now.";
 
     public DiscordClient Client { get; init; }
 
@@ -82,7 +82,6 @@ public sealed class DiscordBotServiceHost : IHostedService
         cancellationToken.ThrowIfCancellationRequested();
 
         await Client.DisconnectAsync();
-        UnregisterEventHandlers();
     }
 
     public async Task SetBotStatusAsync(int status = 1, int type = 2, string doing = "Music", Uri? url = null, bool reset = false)
@@ -93,15 +92,15 @@ public sealed class DiscordBotServiceHost : IHostedService
             return;
         }
 
-        DiscordActivityType activityType = (DiscordActivityType)Enum.ToObject(typeof(DiscordActivityType), type);
-        if (activityType.Equals(DiscordActivityType.Streaming) && url is null)
+        DiscordActivityType activityType = (Enum.IsDefined(typeof(DiscordActivityType), type)) ? (DiscordActivityType)type : DiscordActivityType.ListeningTo;
+        if (activityType is DiscordActivityType.Streaming && url is null)
             activityType = DiscordActivityType.Playing;
 
         DiscordActivity activity = new(doing, activityType);
-        if (activityType.Equals(DiscordActivityType.Streaming) && url is not null && (url.Host.Contains("twitch", StringComparison.OrdinalIgnoreCase) || url.Host.Contains("youtube", StringComparison.OrdinalIgnoreCase)))
+        if (activityType is DiscordActivityType.Streaming && url is not null && (url.Host.Contains("twitch", StringComparison.OrdinalIgnoreCase) || url.Host.Contains("youtube", StringComparison.OrdinalIgnoreCase)))
             activity.StreamUrl = url.OriginalString;
 
-        DiscordUserStatus userStatus = (DiscordUserStatus)Enum.ToObject(typeof(DiscordUserStatus), status);
+        DiscordUserStatus userStatus = (Enum.IsDefined(typeof(DiscordUserStatus), status)) ? (DiscordUserStatus)status : DiscordUserStatus.Online;
 
         await Client.UpdateStatusAsync(activity, userStatus);
     }
@@ -152,7 +151,7 @@ public sealed class DiscordBotServiceHost : IHostedService
         commandsExtension.AddCommands(typeof(MusicStreamingCommands.PlayerGroup));
 
         // Only add debug commands if it's a dev build
-        if (AzzyStatsSoftware.GetBotEnvironment == Environments.Development)
+        if (SoftwareStats.GetAppEnvironment == Environments.Development)
             commandsExtension.AddCommands(typeof(DebugCommands.DebugGroup), _settings.ServerId);
 
         commandsExtension.AddCheck<AzuraCastDiscordChannelCheck>();
@@ -189,14 +188,6 @@ public sealed class DiscordBotServiceHost : IHostedService
         Client.GuildDownloadCompleted += ClientGuildDownloadCompletedAsync;
     }
 
-    private void UnregisterEventHandlers()
-    {
-        Client.ClientErrored -= ClientErroredAsync;
-        Client.GuildCreated -= ClientGuildCreatedAsync;
-        Client.GuildDeleted -= ClientGuildDeletedAsync;
-        Client.GuildDownloadCompleted -= ClientGuildDownloadCompletedAsync;
-    }
-
     private async Task CommandErroredAsync(CommandsExtension c, CommandErroredEventArgs e)
     {
         _logger.CommandsError();
@@ -213,7 +204,7 @@ public sealed class DiscordBotServiceHost : IHostedService
 
         if (e.Context is not SlashCommandContext slashContext)
         {
-            await _botService.LogExceptionAsync(ex, now);
+            await _botService.LogExceptionAsync(ex, now, guildId: guildId);
             return;
         }
 
@@ -261,7 +252,7 @@ public sealed class DiscordBotServiceHost : IHostedService
                     break;
                 }
 
-                await _botService.LogExceptionAsync(ex, now, 0, ((DiscordException)e.Exception).JsonMessage);
+                await _botService.LogExceptionAsync(ex, now, info: ((DiscordException)e.Exception).JsonMessage);
                 break;
         }
     }
@@ -273,21 +264,21 @@ public sealed class DiscordBotServiceHost : IHostedService
         _logger.GuildCreated(e.Guild.Name);
 
         await _dbActions.AddGuildAsync(e.Guild.Id);
-        await e.Guild.Owner.SendMessageAsync(NewGuildText.Replace("%GUULD%", e.Guild.Name, StringComparison.OrdinalIgnoreCase));
+        await e.Guild.Owner.SendMessageAsync(NewGuildText.Replace("%GUILD%", e.Guild.Name, StringComparison.OrdinalIgnoreCase));
 
         DiscordEmbed embed = EmbedBuilder.BuildGuildAddedEmbed(e.Guild);
-        await _botService.SendMessageAsync(_settings.NotificationChannelId, null, [embed]);
+        await _botService.SendMessageAsync(_settings.NotificationChannelId, embeds: [embed]);
     }
 
     private async Task ClientGuildDeletedAsync(DiscordClient c, GuildDeleteEventArgs e)
     {
-        ArgumentNullException.ThrowIfNull(_botService, nameof(_botService));
-
         if (e.Unavailable)
         {
             _logger.GuildUnavailable(e.Guild.Name);
             return;
         }
+
+        ArgumentNullException.ThrowIfNull(_botService, nameof(_botService));
 
         _logger.GuildDeleted(e.Guild.Name);
 
@@ -307,9 +298,9 @@ public sealed class DiscordBotServiceHost : IHostedService
         {
             foreach (DiscordGuild guild in addedGuilds)
             {
-                await guild.Owner.SendMessageAsync(NewGuildText.Replace("%GUULD%", guild.Name, StringComparison.OrdinalIgnoreCase));
+                await guild.Owner.SendMessageAsync(NewGuildText.Replace("%GUILD%", guild.Name, StringComparison.OrdinalIgnoreCase));
                 embed = EmbedBuilder.BuildGuildAddedEmbed(guild);
-                await _botService.SendMessageAsync(_settings.NotificationChannelId, null, [embed]);
+                await _botService.SendMessageAsync(_settings.NotificationChannelId, embeds: [embed]);
             }
         }
 
@@ -319,7 +310,7 @@ public sealed class DiscordBotServiceHost : IHostedService
             foreach (ulong guild in removedGuilds)
             {
                 embed = EmbedBuilder.BuildGuildRemovedEmbed(guild);
-                await _botService.SendMessageAsync(_settings.NotificationChannelId, null, [embed]);
+                await _botService.SendMessageAsync(_settings.NotificationChannelId, embeds: [embed]);
             }
         }
     }

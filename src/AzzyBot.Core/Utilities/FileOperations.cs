@@ -23,13 +23,13 @@ public static class FileOperations
         ArgumentNullException.ThrowIfNull(content, nameof(content));
 
         string filePath = (!string.IsNullOrWhiteSpace(path)) ? Path.Combine(Path.GetTempPath(), path) : Path.GetTempFileName();
-
         await using StreamWriter writer = new(filePath);
         CsvConfiguration config = new(CultureInfo.InvariantCulture)
         {
             Encoding = Encoding.UTF8,
             InjectionOptions = InjectionOptions.Escape
         };
+
         await using CsvWriter csv = new(writer, config);
         await csv.WriteRecordsAsync(content);
 

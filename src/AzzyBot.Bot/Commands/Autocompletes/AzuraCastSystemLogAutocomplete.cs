@@ -24,18 +24,18 @@ public sealed class AzuraCastSystemLogAutocomplete(ILogger<AzuraCastSystemLogAut
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
-        Dictionary<string, object> results = [];
         AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
         if (azuraCast is null)
         {
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-            return results;
+            return new Dictionary<string, object>();
         }
 
         string search = context.UserInput;
         Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
         string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
         AzuraSystemLogsRecord systemLogs = await _azuraCastApi.GetSystemLogsAsync(baseUrl, apiKey);
+        Dictionary<string, object> results = new(25);
         foreach (AzuraSystemLogEntryRecord log in systemLogs.Logs)
         {
             if (results.Count is 25)

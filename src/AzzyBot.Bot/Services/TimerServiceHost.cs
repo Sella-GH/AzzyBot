@@ -54,10 +54,9 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBackg
     {
         _logger.GlobalTimerTick();
 
+        DateTime now = DateTime.Now;
         try
         {
-            DateTime now = DateTime.Now;
-
             if (now - _lastAzzyBotUpdateCheck >= TimeSpan.FromHours(5.98))
             {
                 _logger.GlobalTimerCheckForUpdates();
@@ -98,7 +97,7 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBackg
         }
         catch (Exception ex)
         {
-            await _discordBotService.LogExceptionAsync(ex, DateTime.Now);
+            await _discordBotService.LogExceptionAsync(ex, now);
         }
     }
 }

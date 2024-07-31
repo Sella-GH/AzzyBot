@@ -1,4 +1,10 @@
-## 2.0.0-preview5
+## 2.0.0-preview6
+### General
+- Performance improvements all over the board. The bot should now be faster and more reliable
+- Reworked the way how strings and messages displayed to the user are handled
+
+
+## 2.0.0-preview5 - 2024-07-29
 ### Breaking Changes
 - Your Database needs a complete reset, please DROP it and start from scratch
   - You'll likely experience this a few more times until the final release

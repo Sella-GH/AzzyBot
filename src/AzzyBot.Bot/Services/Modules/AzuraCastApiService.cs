@@ -28,7 +28,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     private static Dictionary<string, string> CreateHeader(string apiKey)
     {
-        return new()
+        return new(1)
         {
             ["X-API-Key"] = apiKey
         };
@@ -50,9 +50,11 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
     {
         string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
         string apiUrl = $"{baseUrl}/api";
-        List<Uri> apis = [];
-        apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Server}/{AzuraApiEndpoints.Stats}"));
-        apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Stations}"));
+        List<Uri> apis = new(3)
+        {
+            new($"{apiUrl}/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Server}/{AzuraApiEndpoints.Stats}"),
+            new($"{apiUrl}/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Stations}")
+        };
 
         if (azuraCast.Checks.Updates)
             apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Updates}"));
@@ -80,11 +82,13 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         int stationId = station.StationId;
         AzuraAdminStationConfigRecord config = await GetStationAdminConfigAsync(new(baseUrl), Crypto.Decrypt(station.AzuraCast.AdminApiKey), stationId);
 
-        List<Uri> apis = [];
-        apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}"));
-        apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlists}"));
-        apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}"));
-        apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Status}"));
+        List<Uri> apis = new(7)
+        {
+            new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}"),
+            new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlists}"),
+            new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}"),
+            new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Status}")
+        };
 
         if (config.EnableRequests)
         {
@@ -119,7 +123,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(apis.Count, nameof(apis));
 
         IReadOnlyList<bool> checks = await _webService.CheckForApiPermissionsAsync(apis, CreateHeader(apiKey));
-        List<string> missing = [];
+        List<string> missing = new(apis.Count);
         for (int i = 0; i < checks.Count; i++)
         {
             if (!checks[i])
@@ -149,17 +153,16 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
         Uri url = new($"{baseUrl}api/{endpoint}");
-        string body;
         try
         {
-            body = await _webService.GetWebAsync(url, headers, true);
+            string body = await _webService.GetWebAsync(url, headers, true);
+
+            return (!string.IsNullOrWhiteSpace(body)) ? body : throw new InvalidOperationException($"API response is empty, url: {url}");
         }
         catch (HttpRequestException ex)
         {
             throw new InvalidOperationException($"Failed {HttpMethod.Get} from API, url: {url}", ex);
         }
-
-        return body;
     }
 
     private async Task<T> GetFromApiAsync<T>(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null, bool noLogging = false)
@@ -167,7 +170,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
-        string body = await _webService.GetWebAsync(uri, headers, true, true, noLogging);
+        string body = await _webService.GetWebAsync(uri, headers, true, noLogging: noLogging);
 
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException($"API response is empty, url: {uri}");
@@ -309,7 +312,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         if (requestId is 0)
         {
-            await PostToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
+            await PostToApiAsync(baseUrl, endpoint, headers: CreateHeader(apiKey));
         }
         else
         {
@@ -374,7 +377,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
     {
         const string endpoint = AzuraApiEndpoints.Status;
 
-        return GetFromApiAsync<AzuraStatusRecord>(baseUrl, endpoint);
+        return GetFromApiAsync<AzuraStatusRecord>(baseUrl, endpoint, noLogging: true);
     }
 
     public Task<AzuraNowPlayingDataRecord> GetNowPlayingAsync(Uri baseUrl, int stationId, bool noLogging = false)
@@ -383,7 +386,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         string endpoint = $"{AzuraApiEndpoints.NowPlaying}/{stationId}";
 
-        return GetFromApiAsync<AzuraNowPlayingDataRecord>(baseUrl, endpoint, null, noLogging);
+        return GetFromApiAsync<AzuraNowPlayingDataRecord>(baseUrl, endpoint, noLogging: noLogging);
     }
 
     public Task<AzuraPlaylistRecord> GetPlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId)
@@ -528,17 +531,14 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Log}/{logName}";
 
-        AzuraSystemLogRecord? log;
         try
         {
-            log = await GetFromApiAsync<AzuraSystemLogRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+            return await GetFromApiAsync<AzuraSystemLogRecord>(baseUrl, endpoint, CreateHeader(apiKey));
         }
         catch (HttpRequestException)
         {
             return null;
         }
-
-        return log;
     }
 
     public Task<AzuraSystemLogsRecord> GetSystemLogsAsync(Uri baseUrl, string apiKey)
@@ -587,7 +587,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Backend}/{AzuraApiEndpoints.Skip}";
 
-        await PostToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
+        await PostToApiAsync(baseUrl, endpoint, headers: CreateHeader(apiKey));
     }
 
     public async Task StartStationAsync(Uri baseUrl, string apiKey, int stationId, CommandContext context)
@@ -661,7 +661,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playlistId, nameof(playlistId));
 
         IEnumerable<AzuraPlaylistRecord> playlists = await GetPlaylistsAsync(baseUrl, apiKey, stationId);
-        List<AzuraPlaylistStateRecord> states = [];
+        List<AzuraPlaylistStateRecord> states = new(1);
 
         if (removeOld)
         {
@@ -687,7 +687,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlist}/{playlistId}/{AzuraApiEndpoints.Toggle}";
 
-        await PutToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
+        await PutToApiAsync(baseUrl, endpoint, headers: CreateHeader(apiKey));
     }
 
     public async Task UpdateInstanceAsync(Uri baseUrl, string apiKey)
@@ -698,9 +698,12 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            await PutToApiAsync(baseUrl, endpoint, null, CreateHeader(apiKey));
+            await PutToApiAsync(baseUrl, endpoint, headers: CreateHeader(apiKey));
         }
-        catch (Exception ex) when (ex is HttpRequestException || ex is TaskCanceledException) { }
+        catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException or TaskCanceledException)
+        {
+            _logger.WebRequestExpectedFailure(HttpMethod.Put, baseUrl, ex.Message);
+        }
 
         bool online = false;
         AzuraStatusRecord status;

@@ -11,6 +11,7 @@ public static class IEnumerableExtensions
         ArgumentNullException.ThrowIfNull(enumerable, nameof(enumerable));
 
         using IEnumerator<T> enumerator = enumerable.GetEnumerator();
+
         return enumerator.MoveNext() && !enumerator.MoveNext();
     }
 
@@ -19,6 +20,7 @@ public static class IEnumerableExtensions
         ArgumentNullException.ThrowIfNull(enumerable, nameof(enumerable));
 
         await using IAsyncEnumerator<T> enumerator = enumerable.GetAsyncEnumerator();
+
         return await enumerator.MoveNextAsync() && !await enumerator.MoveNextAsync();
     }
 }

@@ -27,10 +27,10 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        string name = AzzyStatsSoftware.GetBotName;
-        string version = AzzyStatsSoftware.GetBotVersion;
-        string arch = AzzyStatsHardware.GetSystemOsArch;
-        string os = AzzyStatsHardware.GetSystemOs;
+        string name = SoftwareStats.GetAppName;
+        string version = SoftwareStats.GetAppVersion;
+        string arch = HardwareStats.GetSystemOsArch;
+        string os = HardwareStats.GetSystemOs;
 
         _logger.BotStarting(name, version, os, arch);
 
@@ -99,7 +99,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
             await _dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
         }
-        catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
+        catch (Exception ex) when (ex is DbUpdateConcurrencyException or DbUpdateException)
         {
             await transaction.RollbackAsync();
             throw new InvalidOperationException("An error occured while re-encrypting the database", ex);

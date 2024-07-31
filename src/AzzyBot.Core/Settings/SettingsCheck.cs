@@ -53,10 +53,10 @@ public static class SettingsCheck
             }
         }
 
-        if (missingSettings == 0 || isClass)
+        if (missingSettings is 0 || isClass)
             return missingSettings;
 
-        if (!AzzyStatsSoftware.GetBotName.Contains("Docker", StringComparison.OrdinalIgnoreCase))
+        if (!SoftwareStats.GetAppName.Contains("Docker", StringComparison.OrdinalIgnoreCase))
         {
             Console.Error.WriteLine("Press any key to continue");
             Console.ReadKey();

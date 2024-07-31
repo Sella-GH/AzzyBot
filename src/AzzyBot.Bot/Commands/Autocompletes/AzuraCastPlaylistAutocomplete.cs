@@ -28,10 +28,9 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
-        Dictionary<string, object> results = [];
         int stationId = Convert.ToInt32(context.Options.Single(o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
         if (stationId is 0)
-            return results;
+            return new Dictionary<string, object>();
 
         AzuraCastStationEntity? station;
         try
@@ -40,12 +39,12 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
             if (station is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, stationId);
-                return results;
+                return new Dictionary<string, object>();
             }
         }
         catch (InvalidOperationException)
         {
-            return results;
+            return new Dictionary<string, object>();
         }
 
         bool needState = context.Command.Name is "switch-playlist";
@@ -53,6 +52,7 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
         string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(station.AzuraCast.AdminApiKey);
         string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
         IEnumerable<AzuraPlaylistRecord> playlists = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, stationId);
+        Dictionary<string, object> results = new(25);
         foreach (AzuraPlaylistRecord playlist in playlists)
         {
             if (results.Count is 25)
@@ -63,7 +63,7 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
 
             if (needState)
             {
-                results.Add($"{playlist.Name} ({Misc.ReadableBool(playlist.IsEnabled, ReadbleBool.EnabledDisabled, true)})", playlist.Id);
+                results.Add($"{playlist.Name} ({Misc.GetReadableBool(playlist.IsEnabled, ReadableBool.EnabledDisabled, true)})", playlist.Id);
             }
             else
             {

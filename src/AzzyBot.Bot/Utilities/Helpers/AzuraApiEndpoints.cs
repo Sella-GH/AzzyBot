@@ -10,9 +10,9 @@ public static class AzuraApiEndpoints
     public const string Log = "log";
     public const string Logs = "logs";
     public const string NowPlaying = "nowplaying";
-    public const string Queue = "queue";
     public const string Playlist = "playlist";
     public const string Playlists = "playlists";
+    public const string Queue = "queue";
     public const string Reports = "reports";
     public const string Request = "request";
     public const string Requests = "requests";

@@ -35,11 +35,10 @@ public static class LoggingBuilderExtensions
 
     public static void AzzyBotLogging(this ILoggingBuilder logging, bool isDev = false, bool forceDebug = false)
     {
-        logging.AddConsole();
-
         if (!Directory.Exists("Logs"))
             Directory.CreateDirectory("Logs");
 
+        logging.AddConsole();
         logging.AddFile(config => config.Directory = "Logs");
         logging.AddFilter("Microsoft.EntityFrameworkCore.ChangeTracking", LogLevel.Warning);
         logging.AddFilter("Microsoft.EntityFrameworkCore.Database", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
