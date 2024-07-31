@@ -377,7 +377,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
     {
         const string endpoint = AzuraApiEndpoints.Status;
 
-        return GetFromApiAsync<AzuraStatusRecord>(baseUrl, endpoint);
+        return GetFromApiAsync<AzuraStatusRecord>(baseUrl, endpoint, noLogging: true);
     }
 
     public Task<AzuraNowPlayingDataRecord> GetNowPlayingAsync(Uri baseUrl, int stationId, bool noLogging = false)
@@ -700,9 +700,9 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         {
             await PutToApiAsync(baseUrl, endpoint, headers: CreateHeader(apiKey));
         }
-        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException or TaskCanceledException)
         {
-            _logger.WebRequestFailed(HttpMethod.Put, string.Empty, baseUrl);
+            _logger.WebRequestExpectedFailure(HttpMethod.Put, baseUrl, ex.Message);
         }
 
         bool online = false;

@@ -60,6 +60,9 @@ public static partial class LoggerActions
     [LoggerMessage(42, LogLevel.Debug, "Setting channelId to 0 because user is not connected to a voice channel")]
     public static partial void UserNotConnectedSetChannelId(this ILogger logger);
 
+    [LoggerMessage(50, LogLevel.Debug, "Expected failure of a {type} request to {uri} with exception name {ex}")]
+    public static partial void WebRequestExpectedFailure(this ILogger logger, HttpMethod type, Uri uri, string ex);
+
     [LoggerMessage(90, LogLevel.Debug, "Stopping global timer")]
     public static partial void GlobalTimerStop(this ILogger logger);
 
