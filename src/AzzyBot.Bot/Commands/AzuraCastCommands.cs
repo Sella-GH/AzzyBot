@@ -15,6 +15,7 @@ using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Enums;
+using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Extensions;
 using AzzyBot.Core.Logging;
@@ -64,7 +65,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast is not set up for this server.");
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
@@ -72,7 +73,7 @@ public sealed class AzuraCastCommands
             if (acStation is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
-                await context.EditResponseAsync("Station not found in database.");
+                await context.EditResponseAsync(GeneralStrings.StationNotFound);
                 return;
             }
 
@@ -99,7 +100,7 @@ public sealed class AzuraCastCommands
                 AzuraPlaylistRecord? playlist = playlists.FirstOrDefault(p => p.Id == userPlaylist);
                 if (playlist is null)
                 {
-                    await context.EditResponseAsync("Playlist not found.");
+                    await context.EditResponseAsync(GeneralStrings.PlaylistNotFound);
                     return;
                 }
 
@@ -139,7 +140,7 @@ public sealed class AzuraCastCommands
             if (!await guild.ContainsOneItemAsync())
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
-                await context.EditResponseAsync("This server does not exist in the database.");
+                await context.EditResponseAsync(GeneralStrings.GuildNotFound);
                 return;
             }
 
@@ -164,7 +165,7 @@ public sealed class AzuraCastCommands
             if (!await guild.ContainsOneItemAsync())
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
-                await context.EditResponseAsync("This server does not exist in the database.");
+                await context.EditResponseAsync(GeneralStrings.GuildNotFound);
                 return;
             }
 
@@ -185,7 +186,7 @@ public sealed class AzuraCastCommands
             if (!await guild.ContainsOneItemAsync())
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
-                await context.EditResponseAsync("This server does not exist in the database.");
+                await context.EditResponseAsync(GeneralStrings.GuildNotFound);
                 return;
             }
 
@@ -206,7 +207,7 @@ public sealed class AzuraCastCommands
             if (!await guild.ContainsOneItemAsync())
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
-                await context.EditResponseAsync("This server does not exist in the database.");
+                await context.EditResponseAsync(GeneralStrings.GuildNotFound);
                 return;
             }
 
@@ -231,7 +232,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast is not set up for this server.");
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
@@ -240,7 +241,7 @@ public sealed class AzuraCastCommands
             AzuraSystemLogRecord? systemLog = await _azuraCast.GetSystemLogAsync(new(baseUrl), apiKey, logName);
             if (systemLog is null)
             {
-                await context.EditResponseAsync("This system log is empty and cannot be viewed.");
+                await context.EditResponseAsync(GeneralStrings.SystemLogEmpty);
                 return;
             }
 
@@ -267,7 +268,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast is not set up for this server.");
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
@@ -297,7 +298,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast is not set up for this server.");
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
@@ -305,7 +306,7 @@ public sealed class AzuraCastCommands
             if (acStation is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
-                await context.EditResponseAsync("Station not found in database.");
+                await context.EditResponseAsync(GeneralStrings.StationNotFound);
                 return;
             }
 
@@ -335,7 +336,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast is not set up for this server.");
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
@@ -343,20 +344,19 @@ public sealed class AzuraCastCommands
             if (acStation is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
-                await context.EditResponseAsync("Station not found in database.");
+                await context.EditResponseAsync(GeneralStrings.StationNotFound);
                 return;
             }
 
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
             AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
-            const string disconnectingMessage = "I disconnected any listeners on this server from the station to prevent issues.";
             string stoppingMessage = $"I stopped the station **{azuraStation.Name}**.";
 
             if (await _musicStreaming.CheckIfPlayedMusicIsStationAsync(context, $"{Crypto.Decrypt(azuraCast.BaseUrl)}/listen/{azuraStation.Shortcode}"))
             {
                 await _musicStreaming.StopMusicAsync(context, false);
-                await context.EditResponseAsync(disconnectingMessage);
+                await context.EditResponseAsync(GeneralStrings.StationUsersDisconnected);
                 await Task.Delay(TimeSpan.FromSeconds(30));
             }
 
@@ -389,7 +389,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast is not set up for this server.");
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
@@ -397,7 +397,7 @@ public sealed class AzuraCastCommands
             if (acStation is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
-                await context.EditResponseAsync("Station not found in database.");
+                await context.EditResponseAsync(GeneralStrings.StationNotFound);
                 return;
             }
 
@@ -423,7 +423,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast is not set up for this server.");
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
@@ -433,7 +433,7 @@ public sealed class AzuraCastCommands
             AzuraUpdateRecord update = await _azuraCast.GetUpdatesAsync(new(baseUrl), apiKey);
             if (!update.NeedsReleaseUpdate && !update.NeedsRollingUpdate)
             {
-                await context.EditResponseAsync("The AzuraCast instance is already up to date.");
+                await context.EditResponseAsync(GeneralStrings.InstanceUpToDate);
                 return;
             }
 
@@ -469,7 +469,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast is not set up for this server.");
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
@@ -477,7 +477,7 @@ public sealed class AzuraCastCommands
             if (acStation is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
-                await context.EditResponseAsync("Station not found in database.");
+                await context.EditResponseAsync(GeneralStrings.StationNotFound);
                 return;
             }
 
@@ -511,7 +511,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast is not set up for this server.");
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
@@ -519,13 +519,13 @@ public sealed class AzuraCastCommands
             if (acStation is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
-                await context.EditResponseAsync("Station not found in database.");
+                await context.EditResponseAsync(GeneralStrings.StationNotFound);
                 return;
             }
 
             if (acStation.LastSkipTime.AddSeconds(30) > DateTime.UtcNow)
             {
-                await context.EditResponseAsync("You can only skip a song every 30 seconds.");
+                await context.EditResponseAsync(GeneralStrings.SkipToFast);
                 return;
             }
 
@@ -535,7 +535,7 @@ public sealed class AzuraCastCommands
             AzuraNowPlayingDataRecord nowPlaying = await _azuraCast.GetNowPlayingAsync(new(baseUrl), station);
             if (nowPlaying.NowPlaying.Duration - nowPlaying.NowPlaying.Elapsed <= 15)
             {
-                await context.EditResponseAsync("This song is almost over - please wait!");
+                await context.EditResponseAsync(GeneralStrings.SkipAlmostOver);
                 return;
             }
 
@@ -564,7 +564,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast is not set up for this server.");
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
@@ -572,7 +572,7 @@ public sealed class AzuraCastCommands
             if (acStation is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
-                await context.EditResponseAsync("Station not found in database.");
+                await context.EditResponseAsync(GeneralStrings.StationNotFound);
                 return;
             }
 
@@ -620,7 +620,7 @@ public sealed class AzuraCastCommands
             }
             else if (!DateTime.TryParse(date, out dateTime))
             {
-                await context.EditResponseAsync("The date format is invalid. Please use the format YYYY-MM-DD.");
+                await context.EditResponseAsync(GeneralStrings.DateFormatInvalid);
                 return;
             }
 
@@ -628,7 +628,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast is not set up for this server.");
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
@@ -636,7 +636,7 @@ public sealed class AzuraCastCommands
             if (acStation is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
-                await context.EditResponseAsync("Station not found in database.");
+                await context.EditResponseAsync(GeneralStrings.StationNotFound);
                 return;
             }
 
@@ -682,7 +682,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast is not set up for this server.");
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
@@ -690,7 +690,7 @@ public sealed class AzuraCastCommands
             if (acStation is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
-                await context.EditResponseAsync("Station not found in database.");
+                await context.EditResponseAsync(GeneralStrings.StationNotFound);
                 return;
             }
 
@@ -704,14 +704,14 @@ public sealed class AzuraCastCommands
             }
             catch (HttpRequestException)
             {
-                await context.EditResponseAsync("This playlist does not exist.");
+                await context.EditResponseAsync(GeneralStrings.PlaylistNotFound);
                 return;
             }
 
             IEnumerable<AzuraMediaItemRecord> songs = await _azuraCast.GetSongsInPlaylistAsync(new(baseUrl), apiKey, station, playlist);
             if (!songs.Any())
             {
-                await context.EditResponseAsync("There are no songs in this playlist.");
+                await context.EditResponseAsync(GeneralStrings.PlaylistEmpty);
                 return;
             }
 
@@ -742,7 +742,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast is not set up for this server.");
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
@@ -750,7 +750,7 @@ public sealed class AzuraCastCommands
             if (acStation is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
-                await context.EditResponseAsync("Station not found in database.");
+                await context.EditResponseAsync(GeneralStrings.StationNotFound);
                 return;
             }
 
@@ -763,7 +763,7 @@ public sealed class AzuraCastCommands
             }
             catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException)
             {
-                await context.EditResponseAsync("This station is currently offline.");
+                await context.EditResponseAsync(GeneralStrings.StationOffline);
                 return;
             }
 
@@ -797,7 +797,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast is not set up for this server.");
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
@@ -805,7 +805,7 @@ public sealed class AzuraCastCommands
             if (acStation is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
-                await context.EditResponseAsync("Station not found in database.");
+                await context.EditResponseAsync(GeneralStrings.StationNotFound);
                 return;
             }
 
@@ -864,7 +864,7 @@ public sealed class AzuraCastCommands
 
                 await using DiscordInteractionResponseBuilder interaction = new()
                 {
-                    Content = "I requested the song for you."
+                    Content = GeneralStrings.SongRequested
                 };
                 await result.Result.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource, interaction);
                 await context.EditResponseAsync(embed);
@@ -893,7 +893,7 @@ public sealed class AzuraCastCommands
 
             if (file.FileSize > 52428800)
             {
-                await context.EditResponseAsync("The file is too big. Please upload a file that is smaller than 50MB.");
+                await context.EditResponseAsync(GeneralStrings.FileTooBig);
                 return;
             }
 
@@ -908,7 +908,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast is not set up for this server.");
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
@@ -916,7 +916,7 @@ public sealed class AzuraCastCommands
             if (acStation is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
-                await context.EditResponseAsync("Station not found in database.");
+                await context.EditResponseAsync(GeneralStrings.StationNotFound);
                 return;
             }
 

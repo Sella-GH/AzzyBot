@@ -40,6 +40,7 @@ public static class GeneralStrings
     public const string SongRequested = "I requested the song for you.";
     public const string StationNotFound = "This station does not exist.";
     public const string StationOffline = "This station is currently offline.";
+    public const string StationUsersDisconnected = "All users have been disconnected from the station.";
     public const string SystemLogEmpty = "This system log is empty and cannot be viewed.";
     public const string VoiceAlreadyIn = "I'm already in the voice channel.";
     public const string VoiceJoined = "I'm here now.";
