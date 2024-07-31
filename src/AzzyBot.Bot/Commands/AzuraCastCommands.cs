@@ -430,12 +430,12 @@ public sealed class AzuraCastCommands
             string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
             string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
 
-            //AzuraUpdateRecord update = await _azuraCast.GetUpdatesAsync(new(baseUrl), apiKey);
-            //if (!update.NeedsReleaseUpdate && !update.NeedsRollingUpdate)
-            //{
-            //    await context.EditResponseAsync("The AzuraCast instance is already up to date.");
-            //    return;
-            //}
+            AzuraUpdateRecord update = await _azuraCast.GetUpdatesAsync(new(baseUrl), apiKey);
+            if (!update.NeedsReleaseUpdate && !update.NeedsRollingUpdate)
+            {
+                await context.EditResponseAsync("The AzuraCast instance is already up to date.");
+                return;
+            }
 
             await context.EditResponseAsync("I initiated the update for the AzuraCast instance. Please wait a little until it restarts.");
 
