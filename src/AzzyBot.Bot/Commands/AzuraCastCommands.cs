@@ -64,7 +64,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast not found in database.");
+                await context.EditResponseAsync("AzuraCast is not set up for this server.");
                 return;
             }
 
@@ -231,7 +231,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast not found in database.");
+                await context.EditResponseAsync("AzuraCast is not set up for this server.");
                 return;
             }
 
@@ -267,7 +267,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast not found in database.");
+                await context.EditResponseAsync("AzuraCast is not set up for this server.");
                 return;
             }
 
@@ -297,7 +297,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast not found in database.");
+                await context.EditResponseAsync("AzuraCast is not set up for this server.");
                 return;
             }
 
@@ -335,7 +335,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast not found in database.");
+                await context.EditResponseAsync("AzuraCast is not set up for this server.");
                 return;
             }
 
@@ -389,7 +389,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast not found in database.");
+                await context.EditResponseAsync("AzuraCast is not set up for this server.");
                 return;
             }
 
@@ -423,7 +423,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast not found in database.");
+                await context.EditResponseAsync("AzuraCast is not set up for this server.");
                 return;
             }
 
@@ -469,7 +469,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast not found in database.");
+                await context.EditResponseAsync("AzuraCast is not set up for this server.");
                 return;
             }
 
@@ -511,7 +511,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast not found in database.");
+                await context.EditResponseAsync("AzuraCast is not set up for this server.");
                 return;
             }
 
@@ -564,7 +564,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast not found in database.");
+                await context.EditResponseAsync("AzuraCast is not set up for this server.");
                 return;
             }
 
@@ -628,7 +628,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast not found in database.");
+                await context.EditResponseAsync("AzuraCast is not set up for this server.");
                 return;
             }
 
@@ -682,7 +682,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast not found in database.");
+                await context.EditResponseAsync("AzuraCast is not set up for this server.");
                 return;
             }
 
@@ -742,7 +742,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast not found in database.");
+                await context.EditResponseAsync("AzuraCast is not set up for this server.");
                 return;
             }
 
@@ -797,7 +797,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast not found in database.");
+                await context.EditResponseAsync("AzuraCast is not set up for this server.");
                 return;
             }
 
@@ -908,7 +908,7 @@ public sealed class AzuraCastCommands
             if (azuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync("AzuraCast not found in database.");
+                await context.EditResponseAsync("AzuraCast is not set up for this server.");
                 return;
             }
 

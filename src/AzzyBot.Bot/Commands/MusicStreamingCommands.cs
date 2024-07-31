@@ -9,6 +9,7 @@ using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Choices;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities.Enums;
+using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
@@ -46,7 +47,7 @@ public sealed class MusicStreamingCommands
 
             if (volume is < 0 or > 100)
             {
-                await context.EditResponseAsync("The volume must be between 0 and 100.");
+                await context.EditResponseAsync(GeneralStrings.VolumeInvalid);
                 return;
             }
 
@@ -72,13 +73,13 @@ public sealed class MusicStreamingCommands
 
             if (context.Member.VoiceState.Channel.Users.Contains(await context.Guild.GetMemberAsync(context.Client.CurrentUser.Id)))
             {
-                await context.EditResponseAsync("I'm already in the voice channel.");
+                await context.EditResponseAsync(GeneralStrings.VoiceAlreadyIn);
                 return;
             }
 
             await _musicStreaming.JoinChannelAsync(context);
 
-            await context.EditResponseAsync("I'm here now.");
+            await context.EditResponseAsync(GeneralStrings.VoiceJoined);
         }
 
         [Command("leave"), Description("Leave the voice channel.")]
@@ -93,7 +94,7 @@ public sealed class MusicStreamingCommands
             if (!await _musicStreaming.StopMusicAsync(context, true))
                 return;
 
-            await context.EditResponseAsync("I'm gone now.");
+            await context.EditResponseAsync(GeneralStrings.VoiceLeft);
         }
 
         [Command("play"), Description("Choose a mount point of the station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
@@ -112,7 +113,7 @@ public sealed class MusicStreamingCommands
             AzuraCastEntity? azura = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
             if (azura is null)
             {
-                await context.EditResponseAsync("AzuraCast not found in database.");
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
@@ -123,21 +124,21 @@ public sealed class MusicStreamingCommands
             }
             catch (HttpRequestException)
             {
-                await context.EditResponseAsync("This station is currently offline.");
+                await context.EditResponseAsync(GeneralStrings.StationOffline);
                 return;
             }
 
             string? mount = (mountPoint is 0) ? nowPlaying.Station.HlsUrl : nowPlaying.Station.Mounts.FirstOrDefault(m => m.Id == mountPoint)?.Url;
             if (mount is null)
             {
-                string response = (mountPoint is 0) ? "HTTP Live Streaming is not available for this station." : "Mount point not found.";
+                string response = (mountPoint is 0) ? GeneralStrings.HlsNotAvailable : GeneralStrings.MountPointNotFound;
                 await context.EditResponseAsync(response);
                 return;
             }
 
             await _musicStreaming.PlayMusicAsync(context, mount);
 
-            await context.EditResponseAsync("I'm starting to play now!");
+            await context.EditResponseAsync(GeneralStrings.VoicePlay);
         }
 
         [Command("stop"), Description("Stop the music.")]
@@ -155,7 +156,7 @@ public sealed class MusicStreamingCommands
 
             bool leaving = leave is 1;
             await _musicStreaming.StopMusicAsync(context, leaving);
-            string response = (leaving) ? "I stopped the music and left the voice channel." : "I stopped the music.";
+            string response = (leaving) ? GeneralStrings.VoiceStopLeft : GeneralStrings.VoiceStop;
 
             await context.EditResponseAsync(response);
         }
