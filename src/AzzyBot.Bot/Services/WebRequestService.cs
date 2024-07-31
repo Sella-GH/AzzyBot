@@ -185,7 +185,6 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         try
         {
             int retryCount = 0;
-            string result = string.Empty;
             response = await client.GetAsync(url);
             while (response.StatusCode is HttpStatusCode.TooManyRequests)
             {
