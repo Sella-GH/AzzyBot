@@ -1,4 +1,4 @@
-﻿namespace AzzyBot.Web.Utilities.Records;
+﻿namespace AzzyBot.Web.Settings;
 
 public sealed record AzzyBotWebSettingsRecord
 {
