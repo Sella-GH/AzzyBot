@@ -17,5 +17,6 @@
     <PackageVersion Include="Roslynator.CodeFixes" Version="4.12.4" />
     <PackageVersion Include="Roslynator.Formatting.Analyzers" Version="4.12.4" />
     <PackageVersion Include="Roslynator.Refactorings" Version="4.12.4" />
+    <PackageVersion Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
 </Project>

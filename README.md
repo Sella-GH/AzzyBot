@@ -48,22 +48,26 @@
 
 ### Installation
 
-Follow the instructions inside the [Wiki](https://github.com/Sella-GH/AzzyBot/wiki).
+Follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wiki).
 
 ## Built With
 ### Software
 * [.NET 8](https://github.com/dotnet/runtime)
-* [Visual Studio 2022 Community](https://visualstudio.microsoft.com/de/downloads)
-* [Lavalink](https://github.com/lavalink-devs/Lavalink)
 * [Docker](https://docker.com/)
 * [Docker Compose](https://docker.com/)
+* [Lavalink](https://github.com/lavalink-devs/Lavalink)
+* [PostgreSQL](https://www.postgresql.org/)
+* [Visual Studio 2022 Community](https://visualstudio.microsoft.com/de/downloads)
 
 ### Dependancies
 * [CsvHelper](https://github.com/JoshClose/CsvHelper)
 * [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus)
+* [EntityFrameworkCore](https://github.com/dotnet/efcore)
 * [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
+* [Microsoft.Extensions.X Libs](https://github.com/dotnet/runtime)
+* [Npsql](https://github.com/npgsql/npgsql)
 * [Roslynator](https://github.com/dotnet/roslynator)
-* Some Microsoft.Extensions.xxx Libraries
+* [TagLibSharp](https://github.com/mono/taglib-sharp)
 
 ## Contributing
 
