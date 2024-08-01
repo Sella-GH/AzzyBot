@@ -6,8 +6,11 @@ We expect that all users of the software, if they are interested in taking advan
 
 | Version | Supported          |
 | ------- | ------------------ |
-| Latest Version   | :white_check_mark: |
-| Older Versions   | :x: |
+| 2.0.0-previewX | :white_check_mark: |
+| 1.10.x | :white_check_mark: |
+| 1.9.x | :x: |
+| 1.8.x | :x: |
+| 1.7.x | :x: |
 
 ## Reporting a Vulnerability
 
@@ -24,9 +27,18 @@ You can report any vulnerabilities directly to us if they relate to the core Azz
 ## Out of Scope
 
 AzzyBot is not responsible for the development or maintenance of several pieces of "upstream" software that we incorporate into our own product. This list of software includes, but is not limited to:
-- [.NET](https://github.com/dotnet/runtime/)
-- [CsvHelper](https://github.com/JoshClose/CsvHelper)
-- [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus)
-- [Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json/)
+* [.NET](https://github.com/dotnet/runtime/)
+* [CsvHelper](https://github.com/JoshClose/CsvHelper)
+* [Docker](https://docker.com/)
+* [Docker Compose](https://docker.com/)
+* [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus)
+* [EntityFrameworkCore](https://github.com/dotnet/efcore)
+* [Lavalink](https://github.com/lavalink-devs/lavalink)
+* [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
+* [Microsoft.Extensions.X Libs](https://github.com/dotnet/runtime)
+* [Npsql](https://github.com/npgsql/npgsql)
+* [PostgreSQL](https://www.postgresql.org/)
+* [Roslynator](https://github.com/dotnet/roslynator)
+* [TagLibSharp](https://github.com/mono/taglib-sharp)
 
 If you identify a security issue with any of those pieces of software, we encourage you to report it to them directly. If the issue also affects AzzyBot's implementation of the software, please let us know if and when a resolution is available so that we can update our own software to incorporate the fix.
