@@ -930,12 +930,12 @@ public sealed class AzuraCastCommands
             if (!compliance.IsCompliant)
             {
                 StringBuilder message = new();
-                message.AppendLine("The file is not compliant with the AzuraCast requirements. Please fix the following issues:");
+                message.AppendLine("This file is not compliant with the requirements. Please fix the following issues:");
                 if (!compliance.PerformerCompliance)
-                    message.AppendLine("The performers tag is missing in the file.");
+                    message.AppendLine("- The performers tag is missing.");
 
                 if (!compliance.TitleCompliance)
-                    message.AppendLine("The title tag is missing in the file.");
+                    message.AppendLine("- The title tag is missing.");
 
                 await context.EditResponseAsync(message.ToString());
                 FileOperations.DeleteFile(filePath);
