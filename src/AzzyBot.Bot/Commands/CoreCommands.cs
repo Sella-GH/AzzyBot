@@ -9,6 +9,7 @@ using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Core.Logging;
+using AzzyBot.Core.Utilities.Records;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
@@ -79,9 +80,9 @@ public sealed class CoreCommands
         }
 
         [Command("stats")]
-        public sealed class CoreStats(AzzyBotStatsRecord stats, ILogger<CoreStats> logger)
+        public sealed class CoreStats(AppStatsRecord stats, ILogger<CoreStats> logger)
         {
-            private readonly AzzyBotStatsRecord _stats = stats;
+            private readonly AppStatsRecord _stats = stats;
             private readonly ILogger<CoreStats> _logger = logger;
 
             [Command("hardware"), Description("Shows information about the hardware side of the bot.")]

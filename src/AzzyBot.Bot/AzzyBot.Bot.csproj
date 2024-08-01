@@ -68,6 +68,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Modules\Core\Files\AppStats.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Modules\MusicStreaming\Files\application.yml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Settings\AzzyBotSettings-Docker.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
