@@ -925,6 +925,23 @@ public sealed class AzuraCastCommands
 
             string filePath = Path.Combine(Path.GetTempPath(), $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{azuraCast.GuildId}-{azuraCast.Id}-{acStation.Id}_{file.FileName}");
             await _webRequest.DownloadAsync(new(file.Url), filePath);
+
+            AzuraFileComplianceRecord compliance = AzuraFileChecker.FileIsCompliant(filePath);
+            if (!compliance.IsCompliant)
+            {
+                StringBuilder message = new();
+                message.AppendLine("The file is not compliant with the AzuraCast requirements. Please fix the following issues:");
+                if (!compliance.PerformerCompliance)
+                    message.AppendLine("The performers tag is missing in the file.");
+
+                if (!compliance.TitleCompliance)
+                    message.AppendLine("The title tag is missing in the file.");
+
+                await context.EditResponseAsync(message.ToString());
+                FileOperations.DeleteFile(filePath);
+                return;
+            }
+
             string uploadPath = (string.IsNullOrWhiteSpace(acStation.Preferences.FileUploadPath)) ? "/" : acStation.Preferences.FileUploadPath;
 
             AzuraFilesDetailedRecord uploadedFile = await _azuraCast.UploadFileAsync<AzuraFilesDetailedRecord>(new(baseUrl), apiKey, station, filePath, file.FileName, uploadPath);
