@@ -35,8 +35,19 @@
     <Copyright>© 2024 - $(Authors)</Copyright>
     <Description>Kind of music bot for discord, written in C# and with DSharpPlus. This bot is dedicated for the use with AzuraCast and does not work at it's fully glory without it.</Description>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <NeutralLanguage>en</NeutralLanguage>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageProjectUrl>https://github.com/Sella-GH/AzzyBot</PackageProjectUrl>
     <RepositoryType>Git</RepositoryType>
     <RepositoryUrl>https://github.com/Sella-GH/AzzyBot</RepositoryUrl>
     <Version>2.0.0-preview6</Version>
   </PropertyGroup>
+
+  <!-- Package stuff -->
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 </Project>

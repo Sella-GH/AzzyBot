@@ -5,6 +5,7 @@
     <OutputType>Exe</OutputType>
     <Product>AzzyBot</Product>
     <StartupObject>AzzyBot.Bot.Startup</StartupObject>
+    <Title>AzzyBot</Title>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">

@@ -4,6 +4,7 @@
     <RootNamespace>AzzyBot.Core</RootNamespace>
     <OutputType>Library</OutputType>
     <Product>AzzyBot.Core</Product>
+    <Title>AzzyBot.Core</Title>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
