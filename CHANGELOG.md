@@ -3,6 +3,8 @@
 - Performance improvements all over the board. The bot should now be faster and more reliable
 - Reworked the way how strings and messages displayed to the user are handled
 
+### Improvements
+- The `music upload-files` command checks the uploaded file if it has valid performer and title tag
 
 ## 2.0.0-preview5 - 2024-07-29
 ### Breaking Changes
