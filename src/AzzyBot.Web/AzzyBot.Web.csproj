@@ -4,7 +4,7 @@
     <RootNamespace>AzzyBot.Web</RootNamespace>
     <OutputType>Exe</OutputType>
     <Product>AzzyBot.Web</Product>
-    <StartupObject>AzzyBot.Web.Program</StartupObject>
+    <StartupObject>AzzyBot.Web.Startup</StartupObject>
     <Title>AzzyBot.Web</Title>
     <TypeScriptTarget>ES2021</TypeScriptTarget>
   </PropertyGroup>
@@ -27,5 +27,28 @@
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <AssemblyName>AzzyBot.Web</AssemblyName>
   </PropertyGroup>
+
+  <ItemGroup>
+	<PackageReference Include="Roslynator.Analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Roslynator.CodeAnalysis.Analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Roslynator.CodeFixes">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Roslynator.Formatting.Analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Roslynator.Refactorings">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 
 </Project>

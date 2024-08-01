@@ -4,7 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace AzzyBot.Web;
-public static class Program
+
+public static class Startup
 {
     public static void Main(string[] args)
     {
