@@ -10,6 +10,7 @@ using AzzyBot.Core.Services.Queues;
 using AzzyBot.Core.Settings;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
+using AzzyBot.Core.Utilities.Records;
 using AzzyBot.Data;
 using EntityFramework.Exceptions.PostgreSQL;
 using Lavalink4NET.Extensions;
@@ -19,7 +20,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AzzyBot.Bot.Extensions;
 
-public static class ServiceCollectionExtensions
+public static class IServiceCollectionExtensions
 {
     public static void AzzyBotServices(this IServiceCollection services, bool isDev, bool isDocker)
     {
@@ -157,13 +158,13 @@ public static class ServiceCollectionExtensions
     {
         if (isDev)
         {
-            services.AddSingleton(new AzzyBotStatsRecord("Unknown", DateTime.Now, 0));
+            services.AddSingleton(new AppStatsRecord("Unknown", DateTime.Now, 0));
             return;
         }
 
-        string path = Path.Combine("Modules", "Core", "Files", "AzzyBotStats.json");
+        string path = Path.Combine("Modules", "Core", "Files", "AppStats.json");
 
-        AzzyBotStatsRecord? stats = GetConfiguration(path).Get<AzzyBotStatsRecord>();
+        AppStatsRecord? stats = GetConfiguration(path).Get<AppStatsRecord>();
         if (stats is null)
         {
             Console.Error.Write("There is something wrong with your configuration. Did you followed the installation instructions?");
