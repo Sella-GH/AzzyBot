@@ -118,7 +118,6 @@ jobs:
         run: |
           mkdir docker-zip
           mv ./CHANGELOG.md ./docker-zip/CHANGELOG.md
-          mv ./CHANGELOG_HISTORY.md ./docker-zip/CHANGELOG_HISTORY.md
           mv ./docker-compose.dev.yml ./docker-zip/docker-compose.yml
           mv ./LICENSE ./docker-zip/LICENSE
           mv ./README.md ./docker-zip/README.md
