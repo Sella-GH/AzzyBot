@@ -1,38 +1,57 @@
-using AzzyBot.Web.Components;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using AzzyBot.Core.Extensions;
+using AzzyBot.Core.Utilities;
+using AzzyBot.Web.Extensions;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 namespace AzzyBot.Web;
 
 public static class Startup
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
-        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+        string environment = SoftwareStats.GetAppEnvironment;
+        bool isDev = environment == Environments.Development;
+        bool isDocker = HardwareStats.CheckIfDocker;
+        bool forceDebug = (isDocker) ? (Environment.GetEnvironmentVariable("FORCE_DEBUG") is "true") : (args?.Length > 0 && args.Contains("-forceDebug"));
+        bool SkipWaiting = (isDocker) ? (Environment.GetEnvironmentVariable("SKIP_WAITING") is "true") : (args?.Length > 0 && args.Contains("-skipWaiting"));
 
-        // Add services to the container.
-        builder.Services.AddRazorComponents()
-            .AddInteractiveServerComponents();
-
-        WebApplication app = builder.Build();
-
-        // Configure the HTTP request pipeline.
-        if (!app.Environment.IsDevelopment())
+        if (isDocker && !SkipWaiting)
         {
-            app.UseExceptionHandler("/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            app.UseHsts();
+            // Give the database time to start up
+            await Task.Delay(TimeSpan.FromSeconds(30));
         }
 
-        app.UseHttpsRedirection();
+        WebApplicationOptions webSettings = new()
+        {
+            ContentRootPath = Directory.GetCurrentDirectory(),
+            EnvironmentName = (isDev) ? Environments.Development : Environments.Production,
+            WebRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")
+        };
 
-        app.UseStaticFiles();
-        app.UseAntiforgery();
+        WebApplicationBuilder webBuilder = WebApplication.CreateEmptyBuilder(webSettings);
+        webBuilder.WebHost.AzzyBotWebAppBuilder();
 
-        app.MapRazorComponents<App>()
-            .AddInteractiveServerRenderMode();
+        #region Add logging
 
-        app.Run();
+        webBuilder.Logging.AzzyBotLogging(isDev, forceDebug);
+
+        #endregion Add logging
+
+        #region Add services
+
+        //webBuilder.Services.AzzyBotWebSettings(isDev, isDocker);
+        webBuilder.Services.AzzyBotWebServices(isDev);
+
+        #endregion Add services
+
+        WebApplication webHost = webBuilder.Build();
+        webHost.AzzyBotWebApp(isDev);
+
+        await webHost.RunAsync();
     }
 }

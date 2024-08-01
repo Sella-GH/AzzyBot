@@ -51,4 +51,21 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AzzyBot.Core\AzzyBot.Core.csproj" />
+    <ProjectReference Include="..\AzzyBot.Data\AzzyBot.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Settings\AzzyBotWebSettings-Docker.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Settings\AzzyBotWebSettings-Dev.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Settings\AzzyBotWebSettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
