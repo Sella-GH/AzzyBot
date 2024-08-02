@@ -62,4 +62,6 @@ public static class ILoggingBuilderExtensions
         });
         logging.SetMinimumLevel((isDev || forceDebug) ? LogLevel.Debug : LogLevel.Information);
     }
+
+    public static void AddAzzyBotWebFilters(this ILoggingBuilder logging) => logging.SetMinimumLevel(LogLevel.Information);
 }

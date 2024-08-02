@@ -1,6 +1,10 @@
 ﻿@page "/error"
 
-<PageTitle>Error</PageTitle>
+<HeadContent>
+    <meta property="og:title" content="Error" />
+    <meta property="og:description" content="An error occurred while processing your request." />
+    <title>Error</title>
+</HeadContent>
 
 <h1 class="text-danger">Error.</h1>
 <h2 class="text-danger">An error occurred while processing your request.</h2>
@@ -22,14 +26,3 @@
     For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
     and restarting the app.
 </p>
-
-@code{
-    [CascadingParameter]
-    private HttpContext? HttpContext { get; set; }
-
-    private string? RequestId { get; set; }
-    private bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
-
-    protected override void OnInitialized() =>
-        RequestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;
-}

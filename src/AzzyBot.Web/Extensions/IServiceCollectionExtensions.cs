@@ -22,13 +22,13 @@ public static class IServiceCollectionExtensions
                 s.MaxAge = TimeSpan.FromDays(360);
                 s.Preload = true;
             });
-        }
 
-        services.AddHttpsRedirection(s =>
-        {
-            s.HttpsPort = (!isDev) ? 443 : 5001;
-            s.RedirectStatusCode = (!isDev) ? StatusCodes.Status308PermanentRedirect : StatusCodes.Status307TemporaryRedirect;
-        });
+            services.AddHttpsRedirection(s =>
+            {
+                s.HttpsPort = 443;
+                s.RedirectStatusCode = StatusCodes.Status308PermanentRedirect;
+            });
+        }
 
         services.AddRouting(s =>
         {
@@ -39,7 +39,7 @@ public static class IServiceCollectionExtensions
         });
 
         services.AddAntiforgery(s => s.SuppressXFrameOptionsHeader = true);
-        services.AddRazorComponents(r => r.DetailedErrors = isDev).AddInteractiveServerComponents();
+        services.AddRazorComponents(r => r.DetailedErrors = isDev).AddInteractiveServerComponents(c => c.DetailedErrors = isDev);
 
         // TODO Add Cookie Stuff
         //services.Configure<CookiePolicyOptions>(c =>

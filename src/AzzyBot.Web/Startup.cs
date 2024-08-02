@@ -39,6 +39,7 @@ public static class Startup
         #region Add logging
 
         webBuilder.Logging.AzzyBotLogging(isDev, forceDebug);
+        webBuilder.Logging.AddAzzyBotWebFilters();
 
         #endregion Add logging
 

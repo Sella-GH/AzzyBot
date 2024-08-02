@@ -7,7 +7,7 @@ public static class IWebApplicationExtensions
 {
     public static void AzzyBotWebApp(this WebApplication webApp, bool isDev)
     {
-        webApp.MapRazorComponents<App>();
+        webApp.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
         if (isDev)
         {
