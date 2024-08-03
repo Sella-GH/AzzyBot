@@ -10,18 +10,18 @@ using AzzyBot.Data.Entities;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace AzzyBot.Bot.Services;
+namespace AzzyBot.Bot.Services.BackgroundServices;
 
-public sealed class AzzyBackgroundService(IHostApplicationLifetime applicationLifetime, ILogger<AzzyBackgroundService> logger, AzuraCastApiService azuraCastApiService, AzuraCastFileService azuraCastFileService, AzuraCastPingService azuraCastPingService, AzuraCastUpdateService updaterService)
+public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicationLifetime, ILogger<AzuraChecksBackgroundTask> logger, AzuraCastApiService azuraCastApiService, AzuraCastFileService azuraCastFileService, AzuraCastPingService azuraCastPingService, AzuraCastUpdateService updaterService)
 {
-    private readonly ILogger<AzzyBackgroundService> _logger = logger;
+    private readonly ILogger<AzuraChecksBackgroundTask> _logger = logger;
     private readonly AzuraCastApiService _apiService = azuraCastApiService;
     private readonly AzuraCastFileService _fileService = azuraCastFileService;
     private readonly AzuraCastPingService _pingService = azuraCastPingService;
     private readonly AzuraCastUpdateService _updaterService = updaterService;
     private readonly CancellationToken _cancellationToken = applicationLifetime.ApplicationStopping;
 
-    public async Task StartAzuraCastBackgroundServiceAsync(AzuraCastChecks checks, IAsyncEnumerable<GuildEntity> guilds, int stationId = 0)
+    public async Task StartBackgroundServiceAsync(AzuraCastChecks checks, IAsyncEnumerable<GuildEntity> guilds, int stationId = 0)
     {
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
 

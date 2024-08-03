@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using AzzyBot.Bot.Services;
+using AzzyBot.Bot.Services.BackgroundServices;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Settings;
-using AzzyBot.Core.Services.Interfaces;
-using AzzyBot.Core.Services.Queues;
+using AzzyBot.Core.Services.BackgroundServices;
 using AzzyBot.Core.Settings;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Data.Extensions;
@@ -37,14 +37,15 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<WebRequestService>();
         services.AddSingleton<UpdaterService>();
 
+        services.AddSingleton<QueuedBackgroundTask>();
+
         services.AddSingleton<AzuraCastApiService>();
         services.AddSingleton<AzuraCastFileService>();
         services.AddSingleton<AzuraCastPingService>();
         services.AddSingleton<AzuraCastUpdateService>();
-        services.AddSingleton<AzzyBackgroundService>();
-        services.AddSingleton<AzzyBackgroundServiceHost>();
-        services.AddHostedService(s => s.GetRequiredService<AzzyBackgroundServiceHost>());
-        services.AddSingleton<IQueuedBackgroundTask>(_ => new QueuedBackgroundTask());
+        services.AddSingleton<AzuraChecksBackgroundTask>();
+        services.AddSingleton<QueuedBackgroundTaskHost>();
+        services.AddHostedService(s => s.GetRequiredService<QueuedBackgroundTaskHost>());
 
         services.AddSingleton<TimerServiceHost>();
         services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());

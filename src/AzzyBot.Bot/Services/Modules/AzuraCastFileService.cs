@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
-using AzzyBot.Core.Services.Interfaces;
+using AzzyBot.Core.Services.BackgroundServices;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
@@ -18,10 +18,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, IQueuedBackgroundTask taskQueue, AzuraCastApiService azuraCast, DiscordBotService discordBotService)
+public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, QueuedBackgroundTask taskQueue, AzuraCastApiService azuraCast, DiscordBotService discordBotService)
 {
     private readonly ILogger<AzuraCastFileService> _logger = logger;
-    private readonly IQueuedBackgroundTask _taskQueue = taskQueue;
+    private readonly QueuedBackgroundTask _taskQueue = taskQueue;
     private readonly AzuraCastApiService _azuraCast = azuraCast;
     private readonly DiscordBotService _botService = discordBotService;
 
