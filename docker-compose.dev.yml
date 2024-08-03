@@ -27,8 +27,8 @@ services:
     pull_policy: always
     restart: unless-stopped
     environment:
-      - POSTGRES_DB=azzybot
-      - POSTGRES_USER=azzybot
+      - POSTGRES_DB=azzybot-dev
+      - POSTGRES_USER=azzybot-dev
       - POSTGRES_PASSWORD=thisIsAzzyB0!P@ssw0rd
       - TZ=Europe/Berlin
     networks:
