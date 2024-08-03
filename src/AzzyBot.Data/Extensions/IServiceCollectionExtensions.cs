@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
