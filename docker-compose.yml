@@ -1,20 +1,63 @@
-## Remove the comments from the lines if you want to use the Music Streaming module
-## Do not forget to activate the Music Streaming module in the appsettings.json file then
-
-#include:
-#  - ./AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
 services:
   AzzyBot:
     container_name: AzzyBot
-    image: sellagh/azzybot:latest
+    image: sellagh/azzybot:rel-2.0.0-preview6
     pull_policy: always
     restart: unless-stopped
     user: ${CURRENT_UID}
-#    depends_on:
-#      - lavalink
-#    networks:
-#      - lavalink
+    environment:
+      - FORCE_DEBUG=false
+      - SKIP_WAITING=false
+      - TZ=Europe/Berlin
+    depends_on:
+      - AzzyBot-Db
+      - AzzyBot-Ms
+    networks:
+      - AzzyBot-Db-Nw
+      - AzzyBot-Nw
     volumes:
-      - ./AzzyBot/Customization:/app/Customization
       - ./AzzyBot/Modules/AzuraCast/Files:/app/Modules/AzuraCast/Files
+      - ./AzzyBot/Backups:/app/Backups
+      - ./AzzyBot/Logs:/app/Logs
       - ./AzzyBot/Settings:/app/Settings
+
+  AzzyBot-Db:
+    container_name: AzzyBot-Db
+    image: postgres:16-alpine
+    pull_policy: always
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=azzybot
+      - POSTGRES_USER=azzybot
+      - POSTGRES_PASSWORD=thisIsAzzyB0!P@ssw0rd
+      - TZ=Europe/Berlin
+    networks:
+      - AzzyBot-Db-Nw
+    hostname: AzzyBot-Db
+    volumes:
+      - azzybot_data:/var/lib/postgresql/data
+
+  AzzyBot-Ms:
+    container_name: AzzyBot-Ms
+    image: ghcr.io/lavalink-devs/lavalink:4-alpine
+    pull_policy: always
+    restart: unless-stopped
+    networks:
+      - AzzyBot-Nw
+    hostname: AzzyBot-Ms
+    volumes:
+      - ./AzzyBot/Modules/MusicStreaming/Files/application.yml:/opt/Lavalink/application.yml
+
+networks:
+  AzzyBot-Db-Nw:
+    name: AzzyBot-Db-Nw
+    driver: bridge
+    internal: true
+
+  AzzyBot-Nw:
+    name: AzzyBot-Nw
+    driver: bridge
+
+volumes:
+  azzybot_data:
+    driver: local
