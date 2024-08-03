@@ -3,16 +3,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Core.Logging;
-using AzzyBot.Core.Services.Interfaces;
+using AzzyBot.Core.Services.BackgroundServices;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace AzzyBot.Bot.Services;
+namespace AzzyBot.Bot.Services.BackgroundServices;
 
-public sealed class AzzyBackgroundServiceHost(ILogger<AzzyBackgroundServiceHost> logger, IQueuedBackgroundTask taskQueue, DiscordBotService discordBotService) : BackgroundService
+public sealed class QueuedBackgroundTaskHost(ILogger<QueuedBackgroundTaskHost> logger, QueuedBackgroundTask taskQueue, DiscordBotService discordBotService) : BackgroundService
 {
-    private readonly ILogger<AzzyBackgroundServiceHost> _logger = logger;
-    private readonly IQueuedBackgroundTask _taskQueue = taskQueue;
+    private readonly ILogger<QueuedBackgroundTaskHost> _logger = logger;
+    private readonly QueuedBackgroundTask _taskQueue = taskQueue;
     private readonly DiscordBotService _botService = discordBotService;
 
     public override async Task StartAsync(CancellationToken cancellationToken)

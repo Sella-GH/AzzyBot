@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
+using AzzyBot.Core.Services.BackgroundServices;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
@@ -18,9 +19,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DiscordBotService botService, WebRequestService webService)
+public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, QueuedBackgroundTask taskQueue, DiscordBotService botService, WebRequestService webService)
 {
     private readonly ILogger<AzuraCastApiService> _logger = logger;
+    private readonly QueuedBackgroundTask _taskQueue = taskQueue;
     private readonly DiscordBotService _botService = botService;
     private readonly WebRequestService _webService = webService;
 
@@ -274,7 +276,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         await foreach (GuildEntity guild in guilds)
         {
             if (guild.AzuraCast?.IsOnline is true)
-                _ = Task.Run(async () => await CheckForApiPermissionsAsync(guild.AzuraCast));
+                _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForApiPermissionsAsync(guild.AzuraCast)));
         }
     }
 
@@ -295,11 +297,11 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
                 return;
             }
 
-            _ = Task.Run(async () => await CheckForApiPermissionsAsync(station));
+            _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForApiPermissionsAsync(station)));
         }
         else
         {
-            _ = Task.Run(async () => await CheckForApiPermissionsAsync(guild.AzuraCast));
+            _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForApiPermissionsAsync(guild.AzuraCast)));
         }
     }
 

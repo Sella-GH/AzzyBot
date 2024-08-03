@@ -12,6 +12,7 @@ using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Choices;
 using AzzyBot.Bot.Services;
+using AzzyBot.Bot.Services.BackgroundServices;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Enums;
@@ -39,11 +40,11 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AzuraCastCommands
 {
     [Command("azuracast"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator), ModuleActivatedCheck(AzzyModules.AzuraCast)]
-    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCast, AzzyBackgroundService backgroundService, DbActions dbActions, MusicStreamingService musicStreaming)
+    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCast, AzuraChecksBackgroundTask backgroundService, DbActions dbActions, MusicStreamingService musicStreaming)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCast = azuraCast;
-        private readonly AzzyBackgroundService _backgroundService = backgroundService;
+        private readonly AzuraChecksBackgroundTask _backgroundService = backgroundService;
         private readonly DbActions _dbActions = dbActions;
         private readonly MusicStreamingService _musicStreaming = musicStreaming;
 
@@ -144,7 +145,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForApiPermissions, guild, station);
+            await _backgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForApiPermissions, guild, station);
 
             await context.EditResponseAsync("I initiated the permission check, please wait a little for the result.");
         }
@@ -169,7 +170,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, guild, station);
+            await _backgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, guild, station);
 
             await context.EditResponseAsync("I initiated the cache refresh, please wait a little for it to occur.");
         }
@@ -190,7 +191,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guild);
+            await _backgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guild);
 
             await context.EditResponseAsync("I initiated the online check for the AzuraCast instance, please wait a little for the result.");
         }
@@ -211,7 +212,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            await _backgroundService.StartAzuraCastBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, guild);
+            await _backgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, guild);
 
             await context.EditResponseAsync("I initiated the check for AzuraCast Updates, please wait a little.\nThere won't be an answer if there are no updates available.");
         }
@@ -876,31 +877,27 @@ public sealed class AzuraCastCommands
                     return;
                 }
 
+                string response = string.Empty;
                 if (acStation.LastSkipTime.AddSeconds(16) > DateTime.UtcNow)
                 {
-                    await using DiscordInteractionResponseBuilder interaction = new()
-                    {
-                        Content = GeneralStrings.SongRequestQueued
-                    };
-                    await result.Result.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource, interaction);
-                    await context.EditResponseAsync(embed);
-
-                    return;
+                    response = GeneralStrings.SongRequestQueued;
                 }
                 else
                 {
                     await _azuraCast.RequestSongAsync(baseUrl, station, songRequest.RequestId);
                     await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, acStation.StationId, lastRequestTime: DateTime.UtcNow);
 
-                    await using DiscordInteractionResponseBuilder interaction = new()
-                    {
-                        Content = GeneralStrings.SongRequested
-                    };
-                    await result.Result.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource, interaction);
-                    await context.EditResponseAsync(embed);
-
-                    return;
+                    response = GeneralStrings.SongRequested;
                 }
+
+                await using DiscordInteractionResponseBuilder interaction = new()
+                {
+                    Content = response
+                };
+                await result.Result.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource, interaction);
+                await context.EditResponseAsync(embed);
+
+                return;
             }
 
             await context.EditResponseAsync(embed);
