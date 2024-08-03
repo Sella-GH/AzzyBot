@@ -22,11 +22,28 @@ public sealed class AzzyBackgroundServiceHost(ILogger<AzzyBackgroundServiceHost>
         await base.StartAsync(cancellationToken);
     }
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "We do not know the exception which could be throwing.")]
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.BackgroundServiceHostRun();
 
-        return ProcessQueueAsync(stoppingToken);
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            try
+            {
+                Func<CancellationToken, ValueTask>? workItem = await _taskQueue.DequeueAsync(stoppingToken);
+
+                await workItem(stoppingToken);
+            }
+            catch (OperationCanceledException)
+            {
+                _logger.OperationCanceled(nameof(ExecuteAsync));
+            }
+            catch (Exception ex)
+            {
+                await _botService.LogExceptionAsync(ex, DateTime.Now);
+            }
+        }
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)
@@ -34,27 +51,5 @@ public sealed class AzzyBackgroundServiceHost(ILogger<AzzyBackgroundServiceHost>
         _logger.BackgroundServiceHostStop();
 
         await base.StopAsync(cancellationToken);
-    }
-
-    [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "We do not know the exception which could be throwing.")]
-    private async Task ProcessQueueAsync(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            try
-            {
-                Func<CancellationToken, ValueTask>? workItem = await _taskQueue.DequeueAsync(cancellationToken);
-
-                await workItem(cancellationToken);
-            }
-            catch (OperationCanceledException)
-            {
-                _logger.OperationCanceled(nameof(ProcessQueueAsync));
-            }
-            catch (Exception ex)
-            {
-                await _botService.LogExceptionAsync(ex, DateTime.Now);
-            }
-        }
     }
 }

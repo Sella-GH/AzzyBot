@@ -42,6 +42,14 @@ public sealed class AzuraCastStationEntity
     public DateTime LastSkipTime { get; set; }
 
     /// <summary>
+    /// The last saved <see cref="DateTime"/> timestamp after a song was requested.
+    /// </summary>
+    /// <remarks>
+    /// Always use <see cref="DateTime.UtcNow"/> to set this value.
+    /// </remarks>
+    public DateTime LastRequestTime { get; set; }
+
+    /// <summary>
     /// The database id of the parenting <see cref="AzuraCastEntity"/> database item.
     /// </summary>
     public int AzuraCastId { get; set; }

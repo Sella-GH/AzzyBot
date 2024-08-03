@@ -851,7 +851,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            DiscordButtonComponent button = new(DiscordButtonStyle.Success, "request_song", "Request Song");
+            DiscordButtonComponent button = new(DiscordButtonStyle.Success, $"request_song_{context.User.Id}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Request Song");
             await using DiscordMessageBuilder builder = new();
             builder.AddEmbed(embed);
             builder.AddComponents(button);
@@ -860,16 +860,47 @@ public sealed class AzuraCastCommands
             InteractivityResult<ComponentInteractionCreateEventArgs> result = await message.WaitForButtonAsync(context.User, TimeSpan.FromMinutes(1));
             if (!result.TimedOut)
             {
-                await _azuraCast.RequestSongAsync(baseUrl, station, songRequest.RequestId);
-
-                await using DiscordInteractionResponseBuilder interaction = new()
+                azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true);
+                if (azuraCast is null)
                 {
-                    Content = GeneralStrings.SongRequested
-                };
-                await result.Result.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource, interaction);
-                await context.EditResponseAsync(embed);
+                    _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                    await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
+                    return;
+                }
 
-                return;
+                acStation = azuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+                if (acStation is null)
+                {
+                    _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCast.Id, station);
+                    await context.EditResponseAsync(GeneralStrings.StationNotFound);
+                    return;
+                }
+
+                if (acStation.LastSkipTime.AddSeconds(16) > DateTime.UtcNow)
+                {
+                    await using DiscordInteractionResponseBuilder interaction = new()
+                    {
+                        Content = GeneralStrings.SongRequestQueued
+                    };
+                    await result.Result.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource, interaction);
+                    await context.EditResponseAsync(embed);
+
+                    return;
+                }
+                else
+                {
+                    await _azuraCast.RequestSongAsync(baseUrl, station, songRequest.RequestId);
+                    await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, acStation.StationId, lastRequestTime: DateTime.UtcNow);
+
+                    await using DiscordInteractionResponseBuilder interaction = new()
+                    {
+                        Content = GeneralStrings.SongRequested
+                    };
+                    await result.Result.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource, interaction);
+                    await context.EditResponseAsync(embed);
+
+                    return;
+                }
             }
 
             await context.EditResponseAsync(embed);

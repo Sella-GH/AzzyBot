@@ -104,6 +104,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
                 StationId = stationId,
                 ApiKey = (string.IsNullOrWhiteSpace(apiKey)) ? string.Empty : Crypto.Encrypt(apiKey),
                 LastSkipTime = DateTime.MinValue,
+                LastRequestTime = DateTime.MinValue,
                 AzuraCastId = azura.Id
             };
 
@@ -391,7 +392,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         });
     }
 
-    public Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? apiKey = null, DateTime? lastSkipTime = null)
+    public Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? apiKey = null, DateTime? lastSkipTime = null, DateTime? lastRequestTime = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -414,6 +415,9 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
 
             if (lastSkipTime.HasValue)
                 azuraStation.LastSkipTime = lastSkipTime.Value;
+
+            if (lastRequestTime.HasValue)
+                azuraStation.LastRequestTime = lastRequestTime.Value;
 
             context.AzuraCastStations.Update(azuraStation);
         });
