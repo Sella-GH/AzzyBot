@@ -12,6 +12,7 @@ using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Records;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
+using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
@@ -30,7 +31,7 @@ public sealed class CoreCommands
         [Command("help"), Description("Gives you an overview about all the available commands.")]
         public async ValueTask HelpAsync
         (
-            CommandContext context,
+            SlashCommandContext context,
             [Description("The command you want to get more information about."), SlashAutoCompleteProvider<AzzyHelpAutocomplete>] string? command = null
         )
         {
@@ -86,7 +87,7 @@ public sealed class CoreCommands
             private readonly ILogger<CoreStats> _logger = logger;
 
             [Command("hardware"), Description("Shows information about the hardware side of the bot.")]
-            public async ValueTask HardwareStatsAsync(CommandContext context)
+            public async ValueTask HardwareStatsAsync(SlashCommandContext context)
             {
                 ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -101,7 +102,7 @@ public sealed class CoreCommands
             }
 
             [Command("info"), Description("Shows information about the bot and it's components.")]
-            public async ValueTask InfoStatsAsync(CommandContext context)
+            public async ValueTask InfoStatsAsync(SlashCommandContext context)
             {
                 ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -117,7 +118,7 @@ public sealed class CoreCommands
             }
 
             [Command("ping"), Description("Ping the bot and get the latency to discord.")]
-            public async ValueTask PingAsync(CommandContext context)
+            public async ValueTask PingAsync(SlashCommandContext context)
             {
                 ArgumentNullException.ThrowIfNull(context, nameof(context));
 

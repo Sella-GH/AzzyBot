@@ -17,6 +17,7 @@ using AzzyBot.Data;
 using AzzyBot.Data.Entities;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
+using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
@@ -37,7 +38,7 @@ public sealed class MusicStreamingCommands
         [Command("change-volume"), Description("Change the volume of the played music.")]
         public async ValueTask ChangeVolumeAsync
         (
-            CommandContext context,
+            SlashCommandContext context,
             [Description("The volume you want to set.")] int volume
         )
         {
@@ -47,7 +48,7 @@ public sealed class MusicStreamingCommands
 
             if (volume is < 0 or > 100)
             {
-                await context.EditResponseAsync(GeneralStrings.VolumeInvalid);
+                await context.RespondAsync(GeneralStrings.VolumeInvalid, true);
                 return;
             }
 
@@ -59,7 +60,7 @@ public sealed class MusicStreamingCommands
         }
 
         [Command("join"), Description("Join the voice channel.")]
-        public async ValueTask JoinAsync(CommandContext context)
+        public async ValueTask JoinAsync(SlashCommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
             ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
@@ -83,7 +84,7 @@ public sealed class MusicStreamingCommands
         }
 
         [Command("leave"), Description("Leave the voice channel.")]
-        public async ValueTask LeaveAsync(CommandContext context)
+        public async ValueTask LeaveAsync(SlashCommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -100,7 +101,7 @@ public sealed class MusicStreamingCommands
         [Command("play"), Description("Choose a mount point of the station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
         public async ValueTask PlayAsync
         (
-            CommandContext context,
+            SlashCommandContext context,
             [Description("The station you want play."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
             [Description("The mount point of the station."), SlashAutoCompleteProvider<AzuraCastMountAutocomplete>] int mountPoint
         )
@@ -144,7 +145,7 @@ public sealed class MusicStreamingCommands
         [Command("stop"), Description("Stop the music.")]
         public async ValueTask StopAsync
         (
-            CommandContext context,
+            SlashCommandContext context,
             [Description("Leave the voice channel."), SlashChoiceProvider<BooleanYesNoStateProvider>] int leave = 0
         )
         {

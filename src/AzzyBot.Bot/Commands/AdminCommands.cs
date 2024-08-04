@@ -17,6 +17,7 @@ using AzzyBot.Data.Entities;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ArgumentModifiers;
 using DSharpPlus.Commands.ContextChecks;
+using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
@@ -37,7 +38,7 @@ public sealed class AdminCommands
         [Command("change-bot-status"), Description("Change the global bot status according to your likes.")]
         public async ValueTask ChangeStatusAsync
         (
-            CommandContext context,
+            SlashCommandContext context,
             [Description("Choose the activity type which the bot should have."), SlashChoiceProvider<BotActivityProvider>] int activity = 1,
             [Description("Choose the status type which the bot should have."), SlashChoiceProvider<BotStatusProvider>] int status = 2,
             [Description("Enter a custom doing which is added after the activity type."), MinMaxLength(0, 128)] string doing = "Music",
@@ -51,7 +52,7 @@ public sealed class AdminCommands
 
             await context.DeferResponseAsync();
 
-            await _botServiceHost.SetBotStatusAsync(status, activity, doing, url, reset == 1);
+            await _botServiceHost.SetBotStatusAsync(status, activity, doing, url, reset is 1);
 
             if (reset is 1)
             {
@@ -66,7 +67,7 @@ public sealed class AdminCommands
         [Command("get-joined-server"), Description("Displays all servers the bot is in.")]
         public async ValueTask GetJoinedGuildsAsync
         (
-            CommandContext context,
+            SlashCommandContext context,
             [Description("Select the server you want to get more information about."), SlashAutoCompleteProvider<GuildsAutocomplete>] string? serverId = null
         )
         {
@@ -119,7 +120,7 @@ public sealed class AdminCommands
         [Command("remove-joined-server"), Description("Removes the bot from a server.")]
         public async ValueTask RemoveJoinedGuildAsync
         (
-            CommandContext context,
+            SlashCommandContext context,
             [Description("Select the server you want to remove."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId
         )
         {
@@ -129,7 +130,7 @@ public sealed class AdminCommands
 
             if (!ulong.TryParse(serverId, out ulong guildIdValue))
             {
-                await context.RespondAsync(GeneralStrings.GuildIdInvalid);
+                await context.RespondAsync(GeneralStrings.GuildIdInvalid, true);
                 return;
             }
 
@@ -151,7 +152,7 @@ public sealed class AdminCommands
         [Command("send-bot-wide-message"), Description("Sends a message to all servers the bot is in.")]
         public async ValueTask SendBotWideMessageAsync
         (
-            CommandContext context,
+            SlashCommandContext context,
             [Description("The message you want to send."), MinMaxLength(1, 2000)] string message
         )
         {
@@ -197,7 +198,7 @@ public sealed class AdminCommands
         [Command("view-logs"), Description("View the logs of the bot.")]
         public async ValueTask ViewLogsAsync
         (
-            CommandContext context,
+            SlashCommandContext context,
             [Description("The log file you want to read."), SlashAutoCompleteProvider<AzzyViewLogsAutocomplete>] string? logfile = null
         )
         {

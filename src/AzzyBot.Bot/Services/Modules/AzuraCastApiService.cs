@@ -14,7 +14,7 @@ using AzzyBot.Core.Services.BackgroundServices;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
-using DSharpPlus.Commands;
+using DSharpPlus.Commands.Processors.SlashCommands;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
@@ -592,7 +592,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Que
         await PostToApiAsync(baseUrl, endpoint, headers: CreateHeader(apiKey));
     }
 
-    public async Task StartStationAsync(Uri baseUrl, string apiKey, int stationId, CommandContext context)
+    public async Task StartStationAsync(Uri baseUrl, string apiKey, int stationId, SlashCommandContext context)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
