@@ -33,6 +33,9 @@ namespace AzzyBot.Data.Migrations
                     b.Property<int>("AzuraCastId")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("LastServerStatusCheck")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<DateTime>("LastUpdateCheck")
                         .HasColumnType("timestamp with time zone");
 
@@ -124,6 +127,9 @@ namespace AzzyBot.Data.Migrations
 
                     b.Property<bool>("FileChanges")
                         .HasColumnType("boolean");
+
+                    b.Property<DateTime>("LastFileChangesCheck")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("StationId")
                         .HasColumnType("integer");
