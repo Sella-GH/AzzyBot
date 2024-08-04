@@ -9,6 +9,7 @@ using AzzyBot.Core.Utilities.Encryption;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ArgumentModifiers;
 using DSharpPlus.Commands.ContextChecks;
+using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
@@ -27,7 +28,7 @@ public sealed class DebugCommands
         [Command("encrypt-decrypt"), Description("Test the encryption and decryption features of the bot.")]
         public async ValueTask DebugEncryptDecryptAsync
         (
-            CommandContext context,
+            SlashCommandContext context,
             [Description("Enter the text which should be encrypted and decrypted again."), MinMaxLength(0, 1000)] string text
         )
         {
@@ -46,7 +47,7 @@ public sealed class DebugCommands
         [Command("trigger-exception"), Description("Triggers an InvalidOperationException to test if the error reporting system works.")]
         public async ValueTask DebugTriggerExceptionAsync
         (
-            CommandContext context,
+            SlashCommandContext context,
             [Description("Enable to defer the message before throwing the exception."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int throwAfterDefering = 0,
             [Description("Enable to throw the exception after a reply was already made."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int afterReply = 0
         )
@@ -70,7 +71,7 @@ public sealed class DebugCommands
         [Command("webservice-tests"), Description("Test if the bot is able to resolve connections to external websites.")]
         public async ValueTask DebugWebServiceTestsAsync
         (
-            CommandContext context,
+            SlashCommandContext context,
             [Description("Enter a valid url like the following: https://google.com")] Uri url
         )
         {

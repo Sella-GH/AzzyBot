@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AzzyBot.Core.Logging;
-using DSharpPlus.Commands;
+using DSharpPlus.Commands.Processors.SlashCommands;
 using Lavalink4NET;
 using Lavalink4NET.Clients;
 using Lavalink4NET.Players;
@@ -19,7 +19,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     private readonly IAudioService _audioService = audioService;
     private readonly ILogger<MusicStreamingService> _logger = logger;
 
-    public async Task<LavalinkPlayer?> GetLavalinkPlayerAsync(CommandContext context, bool connectToVoice = false, bool suppressResponse = false, bool ignoreVoice = false)
+    public async Task<LavalinkPlayer?> GetLavalinkPlayerAsync(SlashCommandContext context, bool connectToVoice = false, bool suppressResponse = false, bool ignoreVoice = false)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
@@ -65,7 +65,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         return null;
     }
 
-    public async Task<bool> CheckIfPlayedMusicIsStationAsync(CommandContext context, string station)
+    public async Task<bool> CheckIfPlayedMusicIsStationAsync(SlashCommandContext context, string station)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentException.ThrowIfNullOrWhiteSpace(station, nameof(station));
@@ -87,7 +87,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         return (Uri.Compare(playedUri, stationUri, UriComponents.Host, UriFormat.UriEscaped, StringComparison.OrdinalIgnoreCase) is 0) && playedUri.AbsolutePath.StartsWith(stationUri.AbsolutePath, StringComparison.OrdinalIgnoreCase);
     }
 
-    public async Task<bool> JoinChannelAsync(CommandContext context)
+    public async Task<bool> JoinChannelAsync(SlashCommandContext context)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -96,7 +96,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         return player is not null;
     }
 
-    public async Task<bool> PlayMusicAsync(CommandContext context, string mountPoint)
+    public async Task<bool> PlayMusicAsync(SlashCommandContext context, string mountPoint)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentException.ThrowIfNullOrWhiteSpace(mountPoint, nameof(mountPoint));
@@ -124,7 +124,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         return true;
     }
 
-    public async Task<bool> SetVolumeAsync(CommandContext context, float volume, bool reset = false)
+    public async Task<bool> SetVolumeAsync(SlashCommandContext context, float volume, bool reset = false)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
@@ -143,7 +143,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         return true;
     }
 
-    public async Task<bool> StopMusicAsync(CommandContext context, bool disconnect = false)
+    public async Task<bool> StopMusicAsync(SlashCommandContext context, bool disconnect = false)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
