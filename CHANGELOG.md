@@ -11,6 +11,8 @@
 - Multiple song requests occuring nearly the same time should now be accepted correctly
 - Promoted the last missing timer task to be a background task
 - `player play-mount` now shows the name of the station which is played
+- `music search-song` can now only be used in the music request channel
+- Station file changes are now posted in the AzuraCast Instance notification channel (just like the others)
 
 ## 2.0.0-preview6 2024-08-01
 ### General

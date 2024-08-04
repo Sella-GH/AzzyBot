@@ -785,7 +785,7 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync(embed);
         }
 
-        [Command("search-song"), Description("Search for a song on the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+        [Command("search-song"), Description("Search for a song on the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordChannelCheck]
         public async ValueTask SearchSongAsync
         (
             SlashCommandContext context,

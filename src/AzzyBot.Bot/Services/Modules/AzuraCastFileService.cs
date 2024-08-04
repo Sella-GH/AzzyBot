@@ -87,7 +87,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, Q
             IEnumerable<AzuraFilesRecord> localFiles = await _azuraCast.GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
             AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station.StationId);
 
-            await CheckIfFilesWereModifiedAsync(onlineFiles, localFiles, station, azuraStation.Name, station.Preferences.RequestsChannelId);
+            await CheckIfFilesWereModifiedAsync(onlineFiles, localFiles, station, azuraStation.Name, station.AzuraCast.Preferences.NotificationChannelId);
         }
         catch (OperationCanceledException)
         {
