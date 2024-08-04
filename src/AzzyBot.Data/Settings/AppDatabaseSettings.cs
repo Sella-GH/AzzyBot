@@ -10,17 +10,17 @@ public sealed record AppDatabaseSettings
     public string? NewEncryptionKey { get; set; } // 32 Characters
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public string? Host { get; init; } = "AzzyBot-Db";
+    public string Host { get; init; } = "AzzyBot-Db";
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int Port { get; init; } = 5432;
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public string? User { get; init; } = "azzybot";
+    public string User { get; init; } = "azzybot";
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public string? Password { get; init; } = "thisIsAzzyB0!P@ssw0rd";
+    public string Password { get; init; } = "thisIsAzzyB0!P@ssw0rd";
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public string? DatabaseName { get; init; } = "azzybot";
+    public string DatabaseName { get; init; } = "azzybot";
 }
