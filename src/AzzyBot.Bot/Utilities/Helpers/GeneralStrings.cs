@@ -38,6 +38,7 @@ public static class GeneralStrings
     public const string SkipAlmostOver = "This song is almost over. Please wait!";
     public const string SkipToFast = "You can only skip a song every 30 seconds.";
     public const string SongRequested = "I requested the song for you.";
+    public const string SongRequestQueued = "Your song request has been queued.";
     public const string StationNotFound = "This station does not exist.";
     public const string StationOffline = "This station is currently offline.";
     public const string StationUsersDisconnected = "All users have been disconnected from the station.";
@@ -45,7 +46,7 @@ public static class GeneralStrings
     public const string VoiceAlreadyIn = "I'm already in the voice channel.";
     public const string VoiceJoined = "I'm here now.";
     public const string VoiceLeft = "I'm gone now.";
-    public const string VoicePlay = "I'm starting to play now.";
+    public const string VoicePlay = "I'm starting to play **%station%** now.";
     public const string VoiceStop = "I'm stopping the music now.";
     public const string VoiceStopLeft = "I'm stopping the music and leaving now.";
     public const string VolumeInvalid = "Please use a value between 0 and 100.";

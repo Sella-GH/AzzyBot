@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+using AzzyBot.Data.Settings;
 
 namespace AzzyBot.Bot.Settings;
 
@@ -13,7 +13,7 @@ public sealed record AzzyBotSettingsRecord
     public required int LogRetentionDays { get; init; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public DatabaseSettings? Database { get; init; }
+    public AppDatabaseSettings? Database { get; init; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public DiscordStatus? DiscordStatus { get; init; }
@@ -24,28 +24,6 @@ public sealed record AzzyBotSettingsRecord
 
     [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
     public string? SettingsFile { get; set; }
-}
-
-[SuppressMessage("Roslynator", "RCS1181:Convert comment to documentation comment", Justification = "Informational comment")]
-public sealed record DatabaseSettings
-{
-    public required string EncryptionKey { get; set; } // 32 Characters
-    public string? NewEncryptionKey { get; set; } // 32 Characters
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? Host { get; init; }
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public int Port { get; init; }
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? User { get; init; }
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? Password { get; init; }
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? DatabaseName { get; init; }
 }
 
 public sealed record DiscordStatus

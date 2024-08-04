@@ -24,15 +24,15 @@ public static class SoftwareStats
 
     public static double GetAppMemoryUsage()
     {
-        using Process azzy = Process.GetCurrentProcess();
+        using Process app = Process.GetCurrentProcess();
 
-        return Math.Round(azzy.WorkingSet64 / (1024.0 * 1024.0 * 1024.0), 2);
+        return Math.Round(app.WorkingSet64 / (1024.0 * 1024.0 * 1024.0), 2);
     }
 
     public static DateTime GetAppUptime()
     {
-        using Process azzy = Process.GetCurrentProcess();
+        using Process app = Process.GetCurrentProcess();
 
-        return azzy.StartTime;
+        return app.StartTime;
     }
 }

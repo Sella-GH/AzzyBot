@@ -68,7 +68,7 @@ jobs:
      - name: Install GitHub CLI
        run: sudo apt update && sudo apt install -y gh
       
-     - name: Publish Debug
+     - name: Publish Bot Debug
        run: |
          dotnet publish /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Debug -r ${{ matrix.os }}-${{ matrix.arch }}
 
@@ -82,14 +82,14 @@ jobs:
 
      - name: Add some basic information
        run: |
-         sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot.Bot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
-         sed -i 's\Compilation date not found\${{ needs.extract_meta.outputs.datetime }}\g' ./artifacts/publish/AzzyBot.Bot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
-         sed -i 's\Lines of source code not found\${{ needs.extract_meta.outputs.loc_cs }}\g' ./artifacts/publish/AzzyBot.Bot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AzzyBotStats.json
+         sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot.Bot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AppStats.json
+         sed -i 's\Compilation date not found\${{ needs.extract_meta.outputs.datetime }}\g' ./artifacts/publish/AzzyBot.Bot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AppStats.json
+         sed -i 's\Lines of source code not found\${{ needs.extract_meta.outputs.loc_cs }}\g' ./artifacts/publish/AzzyBot.Bot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/Core/Files/AppStats.json
        env:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
-     - name: Archive Build Artifact
+     - name: Archive Bot Build Artifact
        uses: actions/upload-artifact@v4
        with:
-         name: debug-${{ matrix.os }}-${{ matrix.arch }}
+         name: debug-bot-${{ matrix.os }}-${{ matrix.arch }}
          path: ./artifacts/publish/AzzyBot.Bot/debug_${{ matrix.os }}-${{ matrix.arch }}

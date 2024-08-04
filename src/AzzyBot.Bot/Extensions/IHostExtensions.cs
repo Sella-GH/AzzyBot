@@ -9,7 +9,7 @@ using Npgsql;
 
 namespace AzzyBot.Bot.Extensions;
 
-public static class HostExtensions
+public static class IHostExtensions
 {
     public static void ApplyDbMigrations(this IHost app)
     {

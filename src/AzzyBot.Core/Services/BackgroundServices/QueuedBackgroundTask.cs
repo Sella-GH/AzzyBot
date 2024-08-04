@@ -2,17 +2,16 @@
 using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using AzzyBot.Core.Services.Interfaces;
 
-namespace AzzyBot.Core.Services.Queues;
+namespace AzzyBot.Core.Services.BackgroundServices;
 
-public sealed class QueuedBackgroundTask : IQueuedBackgroundTask
+public sealed class QueuedBackgroundTask
 {
     private readonly Channel<Func<CancellationToken, ValueTask>> _queue;
 
     public QueuedBackgroundTask()
     {
-        BoundedChannelOptions options = new(100)
+        BoundedChannelOptions options = new(1024)
         {
             FullMode = BoundedChannelFullMode.Wait
         };

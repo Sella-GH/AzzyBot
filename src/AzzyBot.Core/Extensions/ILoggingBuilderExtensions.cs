@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging.Console;
 
 namespace AzzyBot.Core.Extensions;
 
-public static class LoggingBuilderExtensions
+public static class ILoggingBuilderExtensions
 {
     public static ILoggingBuilder AddFile(this ILoggingBuilder builder)
     {

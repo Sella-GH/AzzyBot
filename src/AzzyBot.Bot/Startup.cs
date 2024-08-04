@@ -39,10 +39,10 @@ public static class Startup
         HostApplicationBuilderSettings appSettings = new()
         {
             ContentRootPath = Directory.GetCurrentDirectory(),
-            DisableDefaults = true,
             EnvironmentName = (isDev) ? Environments.Development : Environments.Production
         };
-        HostApplicationBuilder appBuilder = Host.CreateApplicationBuilder(appSettings);
+
+        HostApplicationBuilder appBuilder = Host.CreateEmptyApplicationBuilder(appSettings);
 
         #region Add logging
 

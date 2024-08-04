@@ -10,17 +10,19 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
+using AzzyBot.Core.Services.BackgroundServices;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
-using DSharpPlus.Commands;
+using DSharpPlus.Commands.Processors.SlashCommands;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DiscordBotService botService, WebRequestService webService)
+public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, QueuedBackgroundTask taskQueue, DiscordBotService botService, WebRequestService webService)
 {
     private readonly ILogger<AzuraCastApiService> _logger = logger;
+    private readonly QueuedBackgroundTask _taskQueue = taskQueue;
     private readonly DiscordBotService _botService = botService;
     private readonly WebRequestService _webService = webService;
 
@@ -265,17 +267,23 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         }
     }
 
-    public async Task QueueApiPermissionChecksAsync(IAsyncEnumerable<GuildEntity> guilds)
+    public async Task QueueApiPermissionChecksAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
     {
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
 
         _logger.BackgroundServiceWorkItem(nameof(QueueApiPermissionChecks));
 
+        int counter = 0;
         await foreach (GuildEntity guild in guilds)
         {
-            if (guild.AzuraCast?.IsOnline is true)
-                _ = Task.Run(async () => await CheckForApiPermissionsAsync(guild.AzuraCast));
+            if (guild.AzuraCast?.IsOnline is true && now > guild.AzuraCast.Checks.LastServerStatusCheck.AddMinutes(14.98))
+            {
+                _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForApiPermissionsAsync(guild.AzuraCast)));
+                counter++;
+            }
         }
+
+        _logger.GlobalTimerCheckForAzuraCastApi(counter);
     }
 
     public void QueueApiPermissionChecks(GuildEntity guild, int stationId = 0)
@@ -295,11 +303,11 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
                 return;
             }
 
-            _ = Task.Run(async () => await CheckForApiPermissionsAsync(station));
+            _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForApiPermissionsAsync(station)));
         }
         else
         {
-            _ = Task.Run(async () => await CheckForApiPermissionsAsync(guild.AzuraCast));
+            _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForApiPermissionsAsync(guild.AzuraCast)));
         }
     }
 
@@ -590,7 +598,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         await PostToApiAsync(baseUrl, endpoint, headers: CreateHeader(apiKey));
     }
 
-    public async Task StartStationAsync(Uri baseUrl, string apiKey, int stationId, CommandContext context)
+    public async Task StartStationAsync(Uri baseUrl, string apiKey, int stationId, SlashCommandContext context)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));

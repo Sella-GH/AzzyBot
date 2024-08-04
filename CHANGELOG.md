@@ -1,4 +1,23 @@
-## 2.0.0-preview6
+## 2.0.0-preview7
+### Breaking Changes
+- Your Database needs a complete reset, please DROP it and start from scratch
+  - This is probably the last time it needs to be dropped by now
+
+### General
+- Reworked the way how the background tasks are handled and extended the queue up to 1024 items
+- Renamed `player play` to `player play-mount` and adjusted the description
+
+### Improvements
+- Multiple song requests occuring nearly the same time should now be accepted correctly
+- Promoted the last missing timer task to be a background task
+- `player play-mount` now shows the name of the station which is played
+- `music search-song` can now only be used in the music request channel
+- Station file changes are now posted in the AzuraCast Instance notification channel (just like the others)
+
+### Fixes
+- `azuracast force-update-check` works again
+
+## 2.0.0-preview6 2024-08-01
 ### General
 - Performance improvements all over the board. The bot should now be faster and more reliable
 - Reworked the way how strings and messages displayed to the user are handled
