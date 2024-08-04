@@ -80,6 +80,7 @@ namespace AzzyBot.Data.Migrations
                     Updates = table.Column<bool>(type: "boolean", nullable: false),
                     UpdatesShowChangelog = table.Column<bool>(type: "boolean", nullable: false),
                     UpdateNotificationCounter = table.Column<int>(type: "integer", nullable: false),
+                    LastServerStatusCheck = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     LastUpdateCheck = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     AzuraCastId = table.Column<int>(type: "integer", nullable: false)
                 },
@@ -146,6 +147,7 @@ namespace AzzyBot.Data.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     FileChanges = table.Column<bool>(type: "boolean", nullable: false),
+                    LastFileChangesCheck = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     StationId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
