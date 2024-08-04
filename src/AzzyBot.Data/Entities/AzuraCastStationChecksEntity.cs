@@ -1,4 +1,6 @@
-﻿namespace AzzyBot.Data.Entities;
+﻿using System;
+
+namespace AzzyBot.Data.Entities;
 
 public sealed class AzuraCastStationChecksEntity
 {
@@ -11,6 +13,14 @@ public sealed class AzuraCastStationChecksEntity
     /// The state of the check if files have been changed.
     /// </summary>
     public bool FileChanges { get; set; }
+
+    /// <summary>
+    /// The <see cref="DateTime"/> of the last file changes check.
+    /// </summary>
+    /// <remarks>
+    /// Always use <see cref="DateTime.UtcNow"/> to set this value.
+    /// </remarks>
+    public DateTime LastFileChangesCheck { get; set; }
 
     /// <summary>
     /// The database id of the parenting <see cref="AzuraCastStationEntity"/> database item.

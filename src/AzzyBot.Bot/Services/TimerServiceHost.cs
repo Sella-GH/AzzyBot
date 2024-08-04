@@ -22,8 +22,6 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
     private readonly UpdaterService _updaterService = updaterService;
     private readonly Task _completedTask = Task.CompletedTask;
     private Timer? _timer;
-    private DateTime _lastAzuraCastFileCheck = DateTime.MinValue;
-    private DateTime _lastAzuraCastUpdateCheck = DateTime.MinValue;
     private DateTime _lastAzzyBotUpdateCheck = DateTime.MinValue;
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -67,34 +65,20 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
             }
 
             IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildsAsync(loadEverything: true);
+            int delay = 5 + _discordBotService.GetDiscordGuilds.Count;
 
-            _logger.GlobalTimerCheckForAzuraCastStatus();
             await _azuraCastBackgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guilds);
 
             // Properly wait if there's an exception or not
-            await Task.Delay(TimeSpan.FromSeconds(5));
+            await Task.Delay(TimeSpan.FromSeconds(delay));
 
-            _logger.GlobalTimerCheckForAzuraCastApi();
             await _azuraCastBackgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForApiPermissions, guilds);
 
             // Wait again
-            await Task.Delay(TimeSpan.FromSeconds(5));
+            await Task.Delay(TimeSpan.FromSeconds(delay));
 
-            if (now - _lastAzuraCastFileCheck >= TimeSpan.FromHours(0.98))
-            {
-                _logger.GlobalTimerCheckForAzuraCastFiles();
-                _lastAzuraCastFileCheck = now;
-
-                await _azuraCastBackgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, guilds);
-            }
-
-            if (now - _lastAzuraCastUpdateCheck >= TimeSpan.FromHours(11.98))
-            {
-                _logger.GlobalTimerCheckForAzuraCastUpdates();
-                _lastAzuraCastUpdateCheck = now;
-
-                await _azuraCastBackgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, guilds);
-            }
+            await _azuraCastBackgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, guilds);
+            await _azuraCastBackgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, guilds);
         }
         catch (Exception ex)
         {

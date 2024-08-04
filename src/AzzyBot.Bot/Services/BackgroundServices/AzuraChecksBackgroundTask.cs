@@ -37,12 +37,13 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
             guild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
         }
 
+        DateTime now = DateTime.UtcNow;
         switch (checks)
         {
             case AzuraCastChecks.CheckForApiPermissions:
                 if (guild is null)
                 {
-                    await _apiService.QueueApiPermissionChecksAsync(guilds);
+                    await _apiService.QueueApiPermissionChecksAsync(guilds, now);
                 }
                 else
                 {
@@ -54,7 +55,7 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
             case AzuraCastChecks.CheckForFileChanges:
                 if (guild is null)
                 {
-                    await _fileService.QueueFileChangesChecksAsync(guilds);
+                    await _fileService.QueueFileChangesChecksAsync(guilds, now);
                 }
                 else
                 {
@@ -66,7 +67,7 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
             case AzuraCastChecks.CheckForOnlineStatus:
                 if (guild is null)
                 {
-                    await _pingService.QueueInstancePingAsync(guilds);
+                    await _pingService.QueueInstancePingAsync(guilds, now);
                 }
                 else
                 {
@@ -78,7 +79,7 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
             case AzuraCastChecks.CheckForUpdates:
                 if (guild is null)
                 {
-                    await _updaterService.QueueAzuraCastUpdatesAsync(guilds);
+                    await _updaterService.QueueAzuraCastUpdatesAsync(guilds, now);
                 }
                 else
                 {
