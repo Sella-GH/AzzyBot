@@ -1,4 +1,16 @@
-## 2.0.0-preview6
+## 2.0.0-preview7
+### Breaking Changes
+- Your Database needs a complete reset, please DROP it and start from scratch
+  - This is probably one (if not the last) time it needs to be dropped by now
+
+### General
+- Reworked the way how the background tasks are handled and extended the queue up to 1024 items
+
+### Improvements
+- Multiple song requests occuring nearly the same time should now be accepted correctly
+- Promoted the last missing timer task to be a background task
+
+## 2.0.0-preview6 2024-08-01
 ### General
 - Performance improvements all over the board. The bot should now be faster and more reliable
 - Reworked the way how strings and messages displayed to the user are handled

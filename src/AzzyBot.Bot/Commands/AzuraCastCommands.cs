@@ -20,6 +20,7 @@ using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Extensions;
 using AzzyBot.Core.Logging;
+using AzzyBot.Core.Services.BackgroundServices;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Core.Utilities.Enums;
@@ -594,11 +595,13 @@ public sealed class AzuraCastCommands
     }
 
     [Command("music"), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
-    public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastApiService azuraCast, DbActions dbActions, WebRequestService webRequest)
+    public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastApiService azuraCast, AzuraRequestBackgroundTask requestBackgroundTask, QueuedBackgroundTask queue, DbActions dbActions, WebRequestService webRequest)
     {
         private readonly ILogger<MusicGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCast = azuraCast;
+        private readonly AzuraRequestBackgroundTask _requestBackgroundTask = requestBackgroundTask;
         private readonly DbActions _dbActions = dbActions;
+        private readonly QueuedBackgroundTask _queue = queue;
         private readonly WebRequestService _webRequest = webRequest;
 
         [Command("get-song-history"), Description("Get the song history of the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
@@ -878,14 +881,19 @@ public sealed class AzuraCastCommands
                 }
 
                 string response = string.Empty;
-                if (acStation.LastSkipTime.AddSeconds(16) > DateTime.UtcNow)
+                DateTime lastRequest = acStation.LastRequestTime.AddSeconds(16);
+                DateTime now = DateTime.UtcNow;
+                if (lastRequest > now)
                 {
+                    AzuraCustomQueueItemRecord record = new(context.Guild.Id, baseUrl, station, songRequest.RequestId, DateTime.UtcNow);
+                    _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _requestBackgroundTask.CreateRequestAsync(record)));
+
                     response = GeneralStrings.SongRequestQueued;
                 }
                 else
                 {
                     await _azuraCast.RequestSongAsync(baseUrl, station, songRequest.RequestId);
-                    await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, acStation.StationId, lastRequestTime: DateTime.UtcNow);
+                    await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, acStation.StationId, lastRequestTime: DateTime.UtcNow.AddSeconds(16));
 
                     response = GeneralStrings.SongRequested;
                 }

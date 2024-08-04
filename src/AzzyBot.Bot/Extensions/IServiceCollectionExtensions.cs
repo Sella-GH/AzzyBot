@@ -38,14 +38,15 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<UpdaterService>();
 
         services.AddSingleton<QueuedBackgroundTask>();
+        services.AddSingleton<QueuedBackgroundTaskHost>();
+        services.AddHostedService(s => s.GetRequiredService<QueuedBackgroundTaskHost>());
 
         services.AddSingleton<AzuraCastApiService>();
         services.AddSingleton<AzuraCastFileService>();
         services.AddSingleton<AzuraCastPingService>();
         services.AddSingleton<AzuraCastUpdateService>();
         services.AddSingleton<AzuraChecksBackgroundTask>();
-        services.AddSingleton<QueuedBackgroundTaskHost>();
-        services.AddHostedService(s => s.GetRequiredService<QueuedBackgroundTaskHost>());
+        services.AddSingleton<AzuraRequestBackgroundTask>();
 
         services.AddSingleton<TimerServiceHost>();
         services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());

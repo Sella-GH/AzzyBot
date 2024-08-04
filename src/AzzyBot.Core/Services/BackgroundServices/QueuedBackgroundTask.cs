@@ -11,7 +11,7 @@ public sealed class QueuedBackgroundTask
 
     public QueuedBackgroundTask()
     {
-        BoundedChannelOptions options = new(100)
+        BoundedChannelOptions options = new(1024)
         {
             FullMode = BoundedChannelFullMode.Wait
         };
