@@ -22,17 +22,23 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
 
-    public async Task QueueAzuraCastUpdatesAsync(IAsyncEnumerable<GuildEntity> guilds)
+    public async Task QueueAzuraCastUpdatesAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
     {
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
 
         _logger.BackgroundServiceWorkItem(nameof(QueueAzuraCastUpdates));
 
+        int counter = 0;
         await foreach (GuildEntity guild in guilds)
         {
-            if (guild.AzuraCast?.IsOnline is true && guild.AzuraCast.Checks.Updates)
+            if (guild.AzuraCast?.IsOnline is true && guild.AzuraCast.Checks.Updates && now > guild.AzuraCast.Checks.LastUpdateCheck.AddHours(11.98))
+            {
                 _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForAzuraCastUpdatesAsync(guild.AzuraCast!, ct)));
+                counter++;
+            }
         }
+
+        _logger.GlobalTimerCheckForAzuraCastUpdates(counter);
     }
 
     public void QueueAzuraCastUpdates(GuildEntity guild)
@@ -43,10 +49,10 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
         _logger.BackgroundServiceWorkItem(nameof(QueueAzuraCastUpdates));
 
         if (guild.AzuraCast.Checks.Updates)
-            _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForAzuraCastUpdatesAsync(guild.AzuraCast, ct)));
+            _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForAzuraCastUpdatesAsync(guild.AzuraCast, ct, true)));
     }
 
-    private async Task CheckForAzuraCastUpdatesAsync(AzuraCastEntity azuraCast, CancellationToken cancellationToken)
+    private async Task CheckForAzuraCastUpdatesAsync(AzuraCastEntity azuraCast, CancellationToken cancellationToken, bool forced = false)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -63,7 +69,7 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
             }
 
             AzuraCastChecksEntity checks = azuraCast.Checks;
-            if (!UpdaterService.CheckUpdateNotification(checks.UpdateNotificationCounter, checks.LastUpdateCheck))
+            if (!forced && !UpdaterService.CheckUpdateNotification(checks.UpdateNotificationCounter, checks.LastUpdateCheck))
                 return;
 
             await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: checks.UpdateNotificationCounter + 1, lastUpdateCheck: DateTime.UtcNow);

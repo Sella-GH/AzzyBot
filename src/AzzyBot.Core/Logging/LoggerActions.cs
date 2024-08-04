@@ -21,17 +21,17 @@ public static partial class LoggerActions
     [LoggerMessage(12, LogLevel.Debug, "Global timer checking for bot updates")]
     public static partial void GlobalTimerCheckForUpdates(this ILogger logger);
 
-    [LoggerMessage(13, LogLevel.Debug, "Global timer checking for AzuraCast files changes")]
-    public static partial void GlobalTimerCheckForAzuraCastFiles(this ILogger logger);
+    [LoggerMessage(13, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast files changes")]
+    public static partial void GlobalTimerCheckForAzuraCastFiles(this ILogger logger, int counter);
 
-    [LoggerMessage(14, LogLevel.Debug, "Global timer checking for AzuraCast updates")]
-    public static partial void GlobalTimerCheckForAzuraCastUpdates(this ILogger logger);
+    [LoggerMessage(14, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast updates")]
+    public static partial void GlobalTimerCheckForAzuraCastUpdates(this ILogger logger, int counter);
 
-    [LoggerMessage(15, LogLevel.Debug, "Global timer checking for AzuraCast instance status")]
-    public static partial void GlobalTimerCheckForAzuraCastStatus(this ILogger logger);
+    [LoggerMessage(15, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast instance status")]
+    public static partial void GlobalTimerCheckForAzuraCastStatus(this ILogger logger, int counter);
 
-    [LoggerMessage(16, LogLevel.Debug, "Global timer checking for AzuraCast api permissions")]
-    public static partial void GlobalTimerCheckForAzuraCastApi(this ILogger logger);
+    [LoggerMessage(16, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast api permissions")]
+    public static partial void GlobalTimerCheckForAzuraCastApi(this ILogger logger, int counter);
 
     [LoggerMessage(20, LogLevel.Debug, "BackgroundServiceHost started")]
     public static partial void BackgroundServiceHostStart(this ILogger logger);

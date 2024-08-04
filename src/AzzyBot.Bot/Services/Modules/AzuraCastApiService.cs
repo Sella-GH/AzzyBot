@@ -267,17 +267,23 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Que
         }
     }
 
-    public async Task QueueApiPermissionChecksAsync(IAsyncEnumerable<GuildEntity> guilds)
+    public async Task QueueApiPermissionChecksAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
     {
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
 
         _logger.BackgroundServiceWorkItem(nameof(QueueApiPermissionChecks));
 
+        int counter = 0;
         await foreach (GuildEntity guild in guilds)
         {
-            if (guild.AzuraCast?.IsOnline is true)
+            if (guild.AzuraCast?.IsOnline is true && now > guild.AzuraCast.Checks.LastServerStatusCheck.AddMinutes(14.98))
+            {
                 _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForApiPermissionsAsync(guild.AzuraCast)));
+                counter++;
+            }
         }
+
+        _logger.GlobalTimerCheckForAzuraCastApi(counter);
     }
 
     public void QueueApiPermissionChecks(GuildEntity guild, int stationId = 0)

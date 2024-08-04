@@ -12,35 +12,41 @@ using AzzyBot.Core.Logging;
 using AzzyBot.Core.Services.BackgroundServices;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
+using AzzyBot.Data;
 using AzzyBot.Data.Entities;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, QueuedBackgroundTask taskQueue, AzuraCastApiService azuraCast, DiscordBotService discordBotService)
+public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, AzuraCastApiService azuraCast, DbActions dbActions, DiscordBotService discordBotService, QueuedBackgroundTask taskQueue)
 {
     private readonly ILogger<AzuraCastFileService> _logger = logger;
-    private readonly QueuedBackgroundTask _taskQueue = taskQueue;
     private readonly AzuraCastApiService _azuraCast = azuraCast;
+    private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = discordBotService;
+    private readonly QueuedBackgroundTask _taskQueue = taskQueue;
 
-    public async Task QueueFileChangesChecksAsync(IAsyncEnumerable<GuildEntity> guilds)
+    public async Task QueueFileChangesChecksAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
     {
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
 
         _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecks));
 
+        int counter = 0;
         await foreach (GuildEntity guild in guilds)
         {
             if (guild.AzuraCast?.IsOnline is true)
             {
-                foreach (AzuraCastStationEntity station in guild.AzuraCast!.Stations.Where(s => s.Checks.FileChanges))
+                foreach (AzuraCastStationEntity station in guild.AzuraCast!.Stations.Where(s => s.Checks.FileChanges && now > s.Checks.LastFileChangesCheck.AddHours(0.98)))
                 {
                     _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForFileChangesAsync(station, ct)));
+                    counter++;
                 }
             }
         }
+
+        _logger.GlobalTimerCheckForAzuraCastFiles(counter);
     }
 
     public void QueueFileChangesChecks(GuildEntity guild, int stationId = 0)
@@ -134,8 +140,9 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, Q
             paths.Add(removedFileName);
         }
 
+        await FileOperations.WriteToFileAsync(Path.Combine(_azuraCast.FilePath, $"{station.AzuraCast.GuildId}-{station.AzuraCastId}-{station.Id}-{station.StationId}-files.json"), JsonSerializer.Serialize(onlineFiles, FileOperations.JsonOptions));
+        await _dbActions.UpdateAzuraCastStationChecksAsync(station.AzuraCast.Guild.UniqueId, station.StationId, lastFileChangesCheck: DateTime.UtcNow);
         DiscordEmbed embed = EmbedBuilder.BuildAzuraCastFileChangesEmbed(stationName, addedFiles.Count, removedFiles.Count);
         await _botService.SendMessageAsync(channelId, $"Changes in the files of station **{stationName}** detected. Check the details below.", [embed], paths);
-        await FileOperations.WriteToFileAsync(Path.Combine(_azuraCast.FilePath, $"{station.AzuraCast.GuildId}-{station.AzuraCastId}-{station.Id}-{station.StationId}-files.json"), JsonSerializer.Serialize(onlineFiles, FileOperations.JsonOptions));
     }
 }

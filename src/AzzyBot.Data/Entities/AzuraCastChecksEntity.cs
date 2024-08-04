@@ -33,6 +33,14 @@ public sealed class AzuraCastChecksEntity
     public int UpdateNotificationCounter { get; set; }
 
     /// <summary>
+    /// The <see cref="DateTime"/> of the last server status check.
+    /// </summary>
+    /// <remarks>
+    /// Always use <see cref="DateTime.UtcNow"/> to set this value.
+    /// </remarks>
+    public DateTime LastServerStatusCheck { get; set; }
+
+    /// <summary>
     /// The <see cref="DateTime"/> of the last update check.
     /// </summary>
     /// <remarks>
