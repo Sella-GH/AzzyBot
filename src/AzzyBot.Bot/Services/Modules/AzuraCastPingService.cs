@@ -30,7 +30,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, Q
         int counter = 0;
         await foreach (GuildEntity guild in guilds)
         {
-            if (guild.AzuraCast?.Checks.ServerStatus is true && now > guild.AzuraCast.Checks.LastServerStatusCheck.AddMinutes(14.98))
+            if (guild.AzuraCast?.Checks.ServerStatus is true && now > guild.AzuraCast?.Checks.LastServerStatusCheck.AddMinutes(14.98))
             {
                 _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await PingInstanceAsync(guild.AzuraCast, ct)));
                 counter++;
