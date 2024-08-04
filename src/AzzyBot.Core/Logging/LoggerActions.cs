@@ -51,6 +51,15 @@ public static partial class LoggerActions
     [LoggerMessage(31, LogLevel.Debug, "Instance {gId}-{iId} is {status}")]
     public static partial void BackgroundServiceInstanceStatus(this ILogger logger, int gId, int iId, string status);
 
+    [LoggerMessage(32, LogLevel.Debug, "Song request {rId} from {gId}-{iId}-{dId}-{sId} is waiting {time} seconds")]
+    public static partial void BackgroundServiceSongRequestWaiting(this ILogger logger, string rId, int gId, int iId, int dId, int sId, int time);
+
+    [LoggerMessage(33, LogLevel.Debug, "Song request {rId} from {gId}-{iId}-{dId}-{sId} requeued")]
+    public static partial void BackgroundServiceSongRequestRequed(this ILogger logger, string rId, int gId, int iId, int dId, int sId);
+
+    [LoggerMessage(34, LogLevel.Debug, "Song request {rId} from {gId}-{iId}-{dId}-{sId} finished")]
+    public static partial void BackgroundServiceSongRequestFinished(this ILogger logger, string rId, int gId, int iId, int dId, int sId);
+
     [LoggerMessage(40, LogLevel.Debug, "AzuraCastDiscordPermission is {perm}")]
     public static partial void AzuraCastDiscordPermission(this ILogger logger, string perm);
 

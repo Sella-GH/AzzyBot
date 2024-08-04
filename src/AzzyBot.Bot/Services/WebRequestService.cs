@@ -237,7 +237,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             if (response.IsSuccessStatusCode)
                 return;
 
-            _logger.WebRequestFailed(HttpMethod.Post, response.ReasonPhrase ?? string.Empty, url);
+            throw new HttpRequestException(response.ReasonPhrase);
         }
         catch (InvalidOperationException)
         {
