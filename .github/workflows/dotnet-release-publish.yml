@@ -81,10 +81,6 @@ jobs:
       - name: Publish Bot Release
         run: |
           dotnet publish /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Release -r ${{ matrix.os }}-${{ matrix.arch }}
-
-      - name: Publish Web Release
-        run: |
-          dotnet publish /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Web/AzzyBot.Web.csproj -c Release -r ${{ matrix.os }}-${{ matrix.arch }}
           
       #- name: Download and extract Lavalink
       #  run: |
@@ -107,12 +103,6 @@ jobs:
         with:
           name: release-bot-${{ matrix.os }}-${{ matrix.arch }}
           path: ./artifacts/publish/AzzyBot.Bot/release_${{ matrix.os }}-${{ matrix.arch }}
-
-      - name: Archive Web Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-web-${{ matrix.os }}-${{ matrix.arch }}
-          path: ./artifacts/publish/AzzyBot.Web/release_${{ matrix.os }}-${{ matrix.arch }}
 
   build-docker:
     name: Build docker .zip file

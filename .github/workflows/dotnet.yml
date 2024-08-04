@@ -72,10 +72,6 @@ jobs:
        run: |
          dotnet publish /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Debug -r ${{ matrix.os }}-${{ matrix.arch }}
 
-     - name: Publish Web Debug
-       run: |
-         dotnet publish /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Web/AzzyBot.Web.csproj -c Debug -r ${{ matrix.os }}-${{ matrix.arch }}
-
      #- name: Download and extract Lavalink
      #  run: |
      #    mkdir -p ./artifacts/publish/AzzyBot/debug_${{ matrix.os }}-${{ matrix.arch }}/Modules/MusicStreaming/Files/plugins
@@ -97,9 +93,3 @@ jobs:
        with:
          name: debug-bot-${{ matrix.os }}-${{ matrix.arch }}
          path: ./artifacts/publish/AzzyBot.Bot/debug_${{ matrix.os }}-${{ matrix.arch }}
-        
-     - name: Archive Web Build Artifact
-       uses: actions/upload-artifact@v4
-       with:
-         name: debug-web-${{ matrix.os }}-${{ matrix.arch }}
-         path: ./artifacts/publish/AzzyBot.Web/debug_${{ matrix.os }}-${{ matrix.arch }}
