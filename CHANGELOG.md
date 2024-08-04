@@ -5,10 +5,12 @@
 
 ### General
 - Reworked the way how the background tasks are handled and extended the queue up to 1024 items
+- Renamed `player play` to `player play-mount` and adjusted the description
 
 ### Improvements
 - Multiple song requests occuring nearly the same time should now be accepted correctly
 - Promoted the last missing timer task to be a background task
+- `player play-mount` now shows the name of the station which is played
 
 ## 2.0.0-preview6 2024-08-01
 ### General

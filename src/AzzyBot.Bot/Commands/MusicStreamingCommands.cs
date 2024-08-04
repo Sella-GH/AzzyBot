@@ -98,7 +98,7 @@ public sealed class MusicStreamingCommands
             await context.EditResponseAsync(GeneralStrings.VoiceLeft);
         }
 
-        [Command("play"), Description("Choose a mount point of the station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+        [Command("play-mount"), Description("Choose a mount point of the station to play it."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
         public async ValueTask PlayAsync
         (
             SlashCommandContext context,
@@ -139,7 +139,7 @@ public sealed class MusicStreamingCommands
 
             await _musicStreaming.PlayMusicAsync(context, mount);
 
-            await context.EditResponseAsync(GeneralStrings.VoicePlay);
+            await context.EditResponseAsync(GeneralStrings.VoicePlay.Replace("%station%", nowPlaying.Station.Name, StringComparison.OrdinalIgnoreCase));
         }
 
         [Command("stop"), Description("Stop the music.")]
