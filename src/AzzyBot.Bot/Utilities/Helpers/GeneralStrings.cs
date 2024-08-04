@@ -46,7 +46,7 @@ public static class GeneralStrings
     public const string VoiceAlreadyIn = "I'm already in the voice channel.";
     public const string VoiceJoined = "I'm here now.";
     public const string VoiceLeft = "I'm gone now.";
-    public const string VoicePlay = "I'm starting to play now.";
+    public const string VoicePlay = "I'm starting to play **%station%** now.";
     public const string VoiceStop = "I'm stopping the music now.";
     public const string VoiceStopLeft = "I'm stopping the music and leaving now.";
     public const string VolumeInvalid = "Please use a value between 0 and 100.";
