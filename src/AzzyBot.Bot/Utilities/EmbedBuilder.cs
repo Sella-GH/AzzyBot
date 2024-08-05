@@ -12,6 +12,8 @@ using AzzyBot.Core.Utilities.Enums;
 using AzzyBot.Core.Utilities.Records;
 using AzzyBot.Data.Entities;
 using DSharpPlus.Entities;
+using Lavalink4NET.Players;
+using Lavalink4NET.Tracks;
 
 namespace AzzyBot.Bot.Utilities;
 
@@ -634,5 +636,54 @@ public static class EmbedBuilder
         }
 
         return CreateBasicEmbed(title, description, DiscordColor.Gold, fields: fields);
+    }
+
+    public static DiscordEmbed BuildMusicStreamingHistoryEmbed(IEnumerable<ITrackQueueItem> history, bool isQueue = false)
+    {
+        string title = (isQueue) ? "Upcoming Song Queue" : "Song History";
+        StringBuilder builder = new();
+
+        int count = 0;
+        foreach (ITrackQueueItem item in history.Where(i => i.Track is not null))
+        {
+            if (title.Length + builder.Length > 6000)
+                break;
+
+            if (isQueue)
+            {
+                builder.AppendLine(CultureInfo.InvariantCulture, $"- [{count}] **[{item.Track!.Title}]({item.Track!.Uri})** by **{item.Track!.Author}** ({item.Track!.Duration.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture)})");
+            }
+            else
+            {
+                builder.AppendLine(CultureInfo.InvariantCulture, $"- **[{item.Track!.Title}]({item.Track!.Uri})** by **{item.Track!.Author}** ({item.Track!.Duration.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture)})");
+            }
+
+            count++;
+        }
+
+        return CreateBasicEmbed(title, builder.ToString(), DiscordColor.Blurple);
+    }
+
+    public static DiscordEmbed BuildMusicStreamingNowPlayingEmbed(LavalinkTrack track, TimeSpan? elapsed)
+    {
+        ArgumentNullException.ThrowIfNull(track, nameof(track));
+        ArgumentNullException.ThrowIfNull(elapsed, nameof(elapsed));
+
+        const string title = "Now Playing";
+
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(4)
+        {
+            ["Source"] = new(track.SourceName ?? "Not defined"),
+            ["Title"] = new(track.Title, true),
+            ["By"] = new(track.Author, true)
+        };
+
+        string songDuration = track.Duration.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
+        string songElapsed = elapsed.Value.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
+        string progressBar = Misc.GetProgressBar(14, elapsed.Value.TotalSeconds, track.Duration.TotalSeconds);
+
+        fields.Add("Duration", new($"{progressBar} `[{songElapsed} / {songDuration}]`"));
+
+        return CreateBasicEmbed(title, color: DiscordColor.Aquamarine, thumbnailUrl: track.ArtworkUri, url: track.Uri, fields: fields);
     }
 }
