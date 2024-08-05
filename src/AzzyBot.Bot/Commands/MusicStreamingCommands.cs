@@ -99,7 +99,7 @@ public sealed class MusicStreamingCommands
         }
 
         [Command("play-mount"), Description("Choose a mount point of the station to play it."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
-        public async ValueTask PlayAsync
+        public async ValueTask PlayMountAsync
         (
             SlashCommandContext context,
             [Description("The station you want play."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
@@ -109,7 +109,7 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context, nameof(context));
             ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
-            _logger.CommandRequested(nameof(PlayAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(PlayMountAsync), context.User.GlobalName);
 
             AzuraCastEntity? azura = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
             if (azura is null)
@@ -137,7 +137,10 @@ public sealed class MusicStreamingCommands
                 return;
             }
 
-            await _musicStreaming.PlayMusicAsync(context, mount);
+            await _musicStreaming.PlayMountMusicAsync(context, mount);
+
+            await context.EditResponseAsync(GeneralStrings.VoicePlayMount.Replace("%station%", nowPlaying.Station.Name, StringComparison.OrdinalIgnoreCase));
+        }
 
             await context.EditResponseAsync(GeneralStrings.VoicePlay.Replace("%station%", nowPlaying.Station.Name, StringComparison.OrdinalIgnoreCase));
         }
