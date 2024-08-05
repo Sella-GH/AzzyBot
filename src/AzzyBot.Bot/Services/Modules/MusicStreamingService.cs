@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using AzzyBot.Core.Logging;
 using DSharpPlus.Commands.Processors.SlashCommands;
@@ -6,6 +8,7 @@ using Lavalink4NET;
 using Lavalink4NET.Clients;
 using Lavalink4NET.Players;
 using Lavalink4NET.Players.Preconditions;
+using Lavalink4NET.Players.Queued;
 using Lavalink4NET.Rest.Entities;
 using Lavalink4NET.Rest.Entities.Tracks;
 using Lavalink4NET.Tracks;
@@ -19,14 +22,11 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     private readonly IAudioService _audioService = audioService;
     private readonly ILogger<MusicStreamingService> _logger = logger;
 
-    public async Task<LavalinkPlayer?> GetLavalinkPlayerAsync(SlashCommandContext context, bool connectToVoice = false, bool suppressResponse = false, bool ignoreVoice = false)
+    public async Task<LavalinkPlayer?> GetLavalinkPlayerAsync(SlashCommandContext context, bool useDefault = true, bool connectToVoice = false, bool suppressResponse = false, bool ignoreVoice = false)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
         ArgumentNullException.ThrowIfNull(context.Member, nameof(context.Member));
-
-        LavalinkPlayerOptions playerOptions = new() { SelfDeaf = true };
-        PlayerRetrieveOptions retrieveOptions = new((connectToVoice) ? PlayerChannelBehavior.Join : PlayerChannelBehavior.None, (ignoreVoice) ? MemberVoiceStateBehavior.Ignore : MemberVoiceStateBehavior.RequireSame);
 
         if (context.Member.VoiceState is null)
         {
@@ -43,26 +43,81 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         if (channelId is 0)
             _logger.UserNotConnectedSetChannelId();
 
-        PlayerResult<LavalinkPlayer> player = await _audioService.Players.RetrieveAsync(context.Guild.Id, channelId, PlayerFactory.Default, Options.Create(playerOptions), retrieveOptions);
-        if (player.IsSuccess)
-            return player.Player;
+        PlayerResult<LavalinkPlayer> defaultPlayer;
+        PlayerResult<QueuedLavalinkPlayer> queuedPlayer;
+        PlayerRetrieveOptions retrieveOptions = new((connectToVoice) ? PlayerChannelBehavior.Join : PlayerChannelBehavior.None, (ignoreVoice) ? MemberVoiceStateBehavior.Ignore : MemberVoiceStateBehavior.RequireSame);
 
-        string errorMessage = player.Status switch
+        string errorMessage;
+        if (useDefault)
         {
-            PlayerRetrieveStatus.BotNotConnected => "I'm not connected to a voice channel.",
+            LavalinkPlayerOptions defaultPlayerOptions = new()
+            {
+                DisconnectOnDestroy = true,
+                SelfDeaf = true
+            };
 
-            PlayerRetrieveStatus.PreconditionFailed when player.Precondition?.Equals(PlayerPrecondition.NotPaused) is true => "I'm not paused.",
-            PlayerRetrieveStatus.PreconditionFailed when player.Precondition?.Equals(PlayerPrecondition.NotPlaying) is true => "I'm not playing music.",
-            PlayerRetrieveStatus.PreconditionFailed when player.Precondition?.Equals(PlayerPrecondition.Paused) is true => "I'm already paused.",
-            PlayerRetrieveStatus.PreconditionFailed when player.Precondition?.Equals(PlayerPrecondition.Playing) is true => "I'm already playing music.",
+            defaultPlayer = await GetLavalinkDefaultPlayerAsync(context.Guild.Id, channelId, defaultPlayerOptions, retrieveOptions);
+            if (defaultPlayer.IsSuccess)
+                return defaultPlayer.Player;
 
-            _ => "An unknown error occurred while trying to retrieve the player."
-        };
+            errorMessage = PostPlayerRetrieveError(defaultPlayer.Status, defaultPlayer.Precondition?.ToString());
+        }
+        else
+        {
+            QueuedLavalinkPlayerOptions queuedPlayerOptions = new()
+            {
+                ClearHistoryOnStop = false,
+                ClearQueueOnStop = false,
+                DefaultTrackRepeatMode = TrackRepeatMode.None,
+                DisconnectOnDestroy = true,
+                EnableAutoPlay = true,
+                HistoryBehavior = TrackHistoryBehavior.Full,
+                HistoryCapacity = int.MaxValue,
+                ResetTrackRepeatOnStop = true,
+                RespectTrackRepeatOnSkip = false,
+                SelfDeaf = true
+            };
+
+            queuedPlayer = await GetLavalinkQueuedPlayerAsync(context.Guild.Id, channelId, queuedPlayerOptions, retrieveOptions);
+            if (queuedPlayer.IsSuccess)
+                return queuedPlayer.Player;
+
+            errorMessage = PostPlayerRetrieveError(queuedPlayer.Status, queuedPlayer.Precondition?.ToString());
+        }
 
         if (!suppressResponse)
             await context.EditResponseAsync(errorMessage);
 
         return null;
+    }
+
+    private async Task<PlayerResult<LavalinkPlayer>> GetLavalinkDefaultPlayerAsync(ulong guildId, ulong channelId, LavalinkPlayerOptions playerOptions, PlayerRetrieveOptions retrieveOptions)
+    {
+        ArgumentNullException.ThrowIfNull(playerOptions, nameof(playerOptions));
+        ArgumentNullException.ThrowIfNull(retrieveOptions, nameof(retrieveOptions));
+
+        return await _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Default, Options.Create(playerOptions), retrieveOptions);
+    }
+
+    private async Task<PlayerResult<QueuedLavalinkPlayer>> GetLavalinkQueuedPlayerAsync(ulong guildId, ulong channelId, QueuedLavalinkPlayerOptions playerOptions, PlayerRetrieveOptions retrieveOptions)
+    {
+        ArgumentNullException.ThrowIfNull(playerOptions, nameof(playerOptions));
+        ArgumentNullException.ThrowIfNull(retrieveOptions, nameof(retrieveOptions));
+
+        return await _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Queued, Options.Create(playerOptions), retrieveOptions);
+    }
+
+    private static string PostPlayerRetrieveError(PlayerRetrieveStatus status, string? precondition)
+    {
+        return status switch
+        {
+            PlayerRetrieveStatus.BotNotConnected => "I'm not connected to a voice channel.",
+            PlayerRetrieveStatus.PreconditionFailed when precondition == PlayerPrecondition.NotPaused.ToString() => "I'm not paused.",
+            PlayerRetrieveStatus.PreconditionFailed when precondition == PlayerPrecondition.NotPlaying.ToString() => "I'm not playing music.",
+            PlayerRetrieveStatus.PreconditionFailed when precondition == PlayerPrecondition.Paused.ToString() => "I'm already paused.",
+            PlayerRetrieveStatus.PreconditionFailed when precondition == PlayerPrecondition.Playing.ToString() => "I'm already playing music.",
+            _ => "An unknown error occurred while trying to retrieve the player.",
+        };
     }
 
     public async Task<bool> CheckIfPlayedMusicIsStationAsync(SlashCommandContext context, string station)
@@ -87,21 +142,111 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         return (Uri.Compare(playedUri, stationUri, UriComponents.Host, UriFormat.UriEscaped, StringComparison.OrdinalIgnoreCase) is 0) && playedUri.AbsolutePath.StartsWith(stationUri.AbsolutePath, StringComparison.OrdinalIgnoreCase);
     }
 
+    public async Task<bool> ClearQueueAsync(SlashCommandContext context, int position = -1)
+    {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+        if (await GetLavalinkPlayerAsync(context, useDefault: false) is not QueuedLavalinkPlayer player)
+            return false;
+
+        if (position is -1)
+        {
+            await player.Queue.ClearAsync();
+        }
+        else
+        {
+            await player.Queue.RemoveAtAsync(position);
+        }
+
+        return true;
+    }
+
+    public async Task<TimeSpan?> GetCurrentPositionAsync(SlashCommandContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+        return await GetLavalinkPlayerAsync(context, useDefault: false, suppressResponse: true, ignoreVoice: true) is not QueuedLavalinkPlayer player
+            ? null
+            : (player.Position?.Position);
+    }
+
+    [SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "Code style")]
+    public async Task<IEnumerable<ITrackQueueItem>?> HistoryAsync(SlashCommandContext context, bool queue = false)
+    {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+        if (await GetLavalinkPlayerAsync(context, useDefault: false, suppressResponse: true, ignoreVoice: true) is not QueuedLavalinkPlayer player)
+            return [];
+
+        return (queue) ? player.Queue : player.Queue.History;
+    }
+
     public async Task<bool> JoinChannelAsync(SlashCommandContext context)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
-        LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, true);
+        LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, connectToVoice: true);
 
         return player is not null;
     }
 
-    public async Task<bool> PlayMusicAsync(SlashCommandContext context, string mountPoint)
+    public async Task<LavalinkTrack?> NowPlayingAsync(SlashCommandContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+        return (await GetLavalinkPlayerAsync(context, useDefault: false, suppressResponse: true) is not QueuedLavalinkPlayer player)
+            ? null
+            : player.CurrentTrack;
+    }
+
+    public async Task<bool> PauseAsync(SlashCommandContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+        if (await GetLavalinkPlayerAsync(context, useDefault: false) is not QueuedLavalinkPlayer player)
+            return false;
+
+        await player.PauseAsync();
+
+        return true;
+    }
+
+    public async Task<string?> PlayMusicAsync(SlashCommandContext context, string query, TrackSearchMode searchMode)
+    {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentException.ThrowIfNullOrWhiteSpace(query, nameof(query));
+
+        if (await GetLavalinkPlayerAsync(context, useDefault: false, connectToVoice: true) is not QueuedLavalinkPlayer player)
+            return null;
+
+        TrackLoadOptions trackOptions = new()
+        {
+            CacheMode = CacheMode.Dynamic,
+            SearchBehavior = StrictSearchBehavior.Passthrough,
+            SearchMode = searchMode
+        };
+
+        TrackLoadResult tracks = await _audioService.Tracks.LoadTracksAsync(query, trackOptions);
+        if (!tracks.IsSuccess)
+        {
+            await context.EditResponseAsync("An error occurred while trying to load the track.\nPlease check if you used the correct url for your selected provider!");
+            return null;
+        }
+
+        foreach (LavalinkTrack track in tracks.Tracks)
+        {
+            await player.PlayAsync(track, true);
+        }
+
+        return (tracks.Tracks.Length > 2) ? $"I queued the playlist **{tracks.Playlist?.Name}** with **{tracks.Tracks.Length}** tracks." : $"I queued **{tracks.Track.Title}** by **{tracks.Track.Author}**";
+    }
+
+    public async Task<bool> PlayMountMusicAsync(SlashCommandContext context, string mountPoint)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentException.ThrowIfNullOrWhiteSpace(mountPoint, nameof(mountPoint));
 
-        LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, true);
+        LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, connectToVoice: true);
         if (player is null)
             return false;
 
@@ -124,6 +269,18 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         return true;
     }
 
+    public async Task<bool> ResumeAsync(SlashCommandContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+        if (await GetLavalinkPlayerAsync(context, useDefault: false) is not QueuedLavalinkPlayer player)
+            return false;
+
+        await player.ResumeAsync();
+
+        return true;
+    }
+
     public async Task<bool> SetVolumeAsync(SlashCommandContext context, float volume, bool reset = false)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -139,6 +296,18 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         }
 
         await player.SetVolumeAsync(volume / 100f);
+
+        return true;
+    }
+
+    public async Task<bool> SkipSongAsync(SlashCommandContext context, int count = 1)
+    {
+        ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+        if (await GetLavalinkPlayerAsync(context, useDefault: false, suppressResponse: true) is not QueuedLavalinkPlayer player)
+            return false;
+
+        await player.SkipAsync(count);
 
         return true;
     }
