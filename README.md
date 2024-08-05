@@ -28,23 +28,34 @@
 ## About AzzyBot
 
 ### Features
-* Modify and work with your AzuraCast station directly from discord
+#### AzuraCast-specific
+* Create, manage and work with your AzuraCast station directly from discord
 * Check if new files were added to your station
 * Check if the instance needs some updates
-* Check if it's still online or down
+* Check if your instance is still online or down
 * Export your playlists
 * Get the played song history
 * Get some technical hardware stats of your server
-* Get the songs inside your playlists
-* See what's currently played
-* Switch the current playlist
-* Search and request a specific song on your station
+* Get the songs from inside your playlists
+* Listen to your station's mount points inside voice channels
 * Remove songs from your song request queue
+* Search and request a specific song on your station
+* See what's currently played
 * Skip songs if you don't want to hear them
 * Start and stop your station
+* Switch the current playlist
 * Update your whole instance with a single command
 * Users are able to upload files to a specific channel
 * View your AzuraCast system logs
+
+#### MusicStreaming specific
+* Listen to songs from SoundCloud (only provider right now)
+* Clear your upoming song queue (or one song of it)
+* Get the played song history
+* Get the upcoming play queue
+* Pause the music
+* Resume the music
+* Skip a song (or multiple)
 
 ### Installation
 
