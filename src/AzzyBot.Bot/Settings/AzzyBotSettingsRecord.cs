@@ -30,22 +30,22 @@ public sealed record AzzyBotSettingsRecord
 
 public sealed record DiscordStatus
 {
-    public int Activity { get; init; }
-    public string? Doing { get; init; }
-    public int Status { get; init; }
-    public Uri? StreamUrl { get; init; }
+    public int Activity { get; init; } = 2;
+    public string? Doing { get; init; } = "Music";
+    public int Status { get; init; } = 3;
+    public Uri? StreamUrl { get; init; } = string.Empty;
 }
 
 public sealed record MusicStreamingSettings
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? LavalinkHost { get; init; }
+    public string? LavalinkHost { get; init; } = "lavalink";
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
-    public int LavalinkPort { get; init; }
+    public int LavalinkPort { get; init; } = 2333;
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? LavalinkPassword { get; init; }
+    public string? LavalinkPassword { get; init; } = "AzzyB0TMus1cStr3am!ng";
 }
 
 public sealed record CoreUpdater
