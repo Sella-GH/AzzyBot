@@ -20,6 +20,8 @@ public sealed record AzzyBotSettingsRecord
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public MusicStreamingSettings? MusicStreaming { get; init; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public required CoreUpdater Updater { get; init; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
