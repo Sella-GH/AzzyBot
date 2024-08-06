@@ -30,9 +30,16 @@ public sealed record AzzyBotSettingsRecord
 
 public sealed record DiscordStatus
 {
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int Activity { get; init; } = 2;
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public string? Doing { get; init; } = "Music";
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int Status { get; init; } = 1;
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public Uri? StreamUrl { get; init; }
 }
 
