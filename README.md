@@ -74,6 +74,7 @@ Follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wi
 * [CsvHelper](https://github.com/JoshClose/CsvHelper)
 * [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus)
 * [EntityFrameworkCore](https://github.com/dotnet/efcore)
+* [EntityFrameworkCore.Exceptions.PostgreSQL](https://github.com/Giorgi/EntityFramework.Exceptions)
 * [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
 * [Microsoft.Extensions.X Libs](https://github.com/dotnet/runtime)
 * [Npsql](https://github.com/npgsql/npgsql)
