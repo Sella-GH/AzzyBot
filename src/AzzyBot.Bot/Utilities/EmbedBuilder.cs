@@ -486,20 +486,7 @@ public static class EmbedBuilder
         bool isLinux = HardwareStats.CheckIfLinuxOs;
         bool isWindows = HardwareStats.CheckIfWindowsOs;
         const string title = "Update Instructions";
-        string description = "Please follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wiki/Docker-Update-Instructions).";
-
-        if (isDocker)
-        {
-            return CreateBasicEmbed(title, description, DiscordColor.White);
-        }
-        else if (isLinux)
-        {
-            description = description.Replace("Docker", "Linux", StringComparison.OrdinalIgnoreCase);
-        }
-        else if (isWindows)
-        {
-            description = description.Replace("Docker", "Windows", StringComparison.OrdinalIgnoreCase);
-        }
+        string description = "Please follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wiki/Azzy-2.0.0-Updating).";
 
         return CreateBasicEmbed(title, description, DiscordColor.White);
     }
