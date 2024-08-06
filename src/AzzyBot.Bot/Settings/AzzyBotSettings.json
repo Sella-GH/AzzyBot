@@ -20,6 +20,8 @@
     "StreamUrl": null
   },
   "MusicStreaming": {
+    "LavalinkHost": "localhost",
+    "LavalinkPort": 2333,
     "LavalinkPassword": "AzzyB0TMus1cStr3am!ng"
   },
   "Updater": {
