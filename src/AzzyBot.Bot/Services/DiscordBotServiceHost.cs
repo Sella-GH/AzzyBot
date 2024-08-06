@@ -63,7 +63,7 @@ public sealed class DiscordBotServiceHost : IHostedService
         await Client.ConnectAsync();
 
         _logger.BotReady();
-        string invite = Client.CurrentApplication.GenerateOAuthUri(null, DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages, [DiscordOAuthScope.ApplicationsCommands, DiscordOAuthScope.Bot]);
+        string invite = Client.CurrentApplication.GenerateOAuthUri(null, DiscordPermissions.AccessChannels | DiscordPermissions.AttachFiles | DiscordPermissions.SendMessages, [DiscordOAuthScope.ApplicationsCommands, DiscordOAuthScope.Bot]);
         _logger.InviteUrl(invite);
 
         // Wait 3 Seconds to let the client boot up
