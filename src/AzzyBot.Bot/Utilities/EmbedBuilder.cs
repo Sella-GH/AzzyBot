@@ -663,7 +663,7 @@ public static class EmbedBuilder
         };
 
         string songDuration = track.Duration.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
-        string songElapsed = elapsed.Value.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
+        string songElapsed = (elapsed.HasValue) ? elapsed.Value.ToString(@"mm\:ss", CultureInfo.InvariantCulture) : TimeSpan.FromTicks(0).ToString(@"mm\:ss", CultureInfo.InvariantCulture);
         string progressBar = Misc.GetProgressBar(14, elapsed.Value.TotalSeconds, track.Duration.TotalSeconds);
 
         fields.Add("Duration", new($"{progressBar} `[{songElapsed} / {songDuration}]`"));
