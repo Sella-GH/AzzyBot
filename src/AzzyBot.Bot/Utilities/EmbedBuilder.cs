@@ -482,11 +482,8 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildAzzyUpdatesInstructionsEmbed()
     {
-        bool isDocker = HardwareStats.CheckIfDocker;
-        bool isLinux = HardwareStats.CheckIfLinuxOs;
-        bool isWindows = HardwareStats.CheckIfWindowsOs;
         const string title = "Update Instructions";
-        string description = "Please follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wiki/Azzy-2.0.0-Updating).";
+        const string description = "Please follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wiki/Azzy-2.0.0-Updating).";
 
         return CreateBasicEmbed(title, description, DiscordColor.White);
     }
