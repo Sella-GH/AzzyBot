@@ -7,7 +7,7 @@ namespace AzzyBot.Bot.Commands.Choices;
 
 public sealed class AzuraExportPlaylistProvider : IChoiceProvider
 {
-    private readonly IReadOnlyDictionary<string, object> _exportProvider = new Dictionary<string, object>()
+    private readonly IReadOnlyDictionary<string, object> _exportProvider = new Dictionary<string, object>(2)
     {
         ["M3U"] = "m3u",
         ["PLS"] = "pls"

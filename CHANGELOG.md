@@ -6,6 +6,21 @@
 ### General
 - Reworked the way how the background tasks are handled and extended the queue up to 1024 items
 - Renamed `player play` to `player play-mount` and adjusted the description
+- Streaming music from `SoundCloud` is now possible over the integrated music streaming module!
+- More preparations for the final release of the bot
+
+### Dependencies
+- Updated [EntityFrameworkCore.Exceptions.PostgreSQL](https://github.com/Giorgi/EntityFramework.Exceptions) to version 8.1.3
+
+### Additions
+- New Commands
+  - `player play` to select the provider and provide a url
+  - `player pause` to pause the player
+  - `player resume` to resume the player
+  - `player queue-clear` to clear the whole queue or only one song
+  - `player skip` to skip a song
+  - `player history` to view the song history
+  - `player queue` to view the song queue
 
 ### Improvements
 - Multiple song requests occuring nearly the same time should now be accepted correctly
@@ -13,6 +28,9 @@
 - `player play-mount` now shows the name of the station which is played
 - `music search-song` can now only be used in the music request channel
 - Station file changes are now posted in the AzuraCast Instance notification channel (just like the others)
+- Moved some code around the libs to better separate it
+- Cleaned up the workflows
+- Updated the constant link to the updater page
 
 ### Fixes
 - `azuracast force-update-check` works again

@@ -7,7 +7,7 @@ namespace AzzyBot.Bot.Commands.Choices;
 
 public sealed class BooleanYesNoStateProvider : IChoiceProvider
 {
-    private readonly IReadOnlyDictionary<string, object> _booleanStates = new Dictionary<string, object>()
+    private readonly IReadOnlyDictionary<string, object> _booleanStates = new Dictionary<string, object>(2)
     {
         ["Yes"] = 1,
         ["No"] = 2

@@ -7,7 +7,7 @@ namespace AzzyBot.Bot.Commands.Choices;
 
 public sealed class BotActivityProvider : IChoiceProvider
 {
-    private readonly IReadOnlyDictionary<string, object> _botActivity = new Dictionary<string, object>()
+    private readonly IReadOnlyDictionary<string, object> _botActivity = new Dictionary<string, object>(4)
     {
         ["Playing"] = 0,
         ["Streaming"] = 1,

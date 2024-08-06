@@ -7,7 +7,7 @@ namespace AzzyBot.Bot.Commands.Choices;
 
 public sealed class BotStatusProvider : IChoiceProvider
 {
-    private readonly IReadOnlyDictionary<string, object> _botStatus = new Dictionary<string, object>()
+    private readonly IReadOnlyDictionary<string, object> _botStatus = new Dictionary<string, object>(4)
     {
         ["Offline"] = 0,
         ["Online"] = 1,
