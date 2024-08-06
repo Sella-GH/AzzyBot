@@ -636,13 +636,12 @@ public static class EmbedBuilder
             if (isQueue)
             {
                 builder.AppendLine(CultureInfo.InvariantCulture, $"- [{count}] **[{item.Track!.Title}]({item.Track!.Uri})** by **{item.Track!.Author}** ({item.Track!.Duration.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture)})");
+                count++;
             }
             else
             {
                 builder.AppendLine(CultureInfo.InvariantCulture, $"- **[{item.Track!.Title}]({item.Track!.Uri})** by **{item.Track!.Author}** ({item.Track!.Duration.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture)})");
             }
-
-            count++;
         }
 
         return CreateBasicEmbed(title, builder.ToString(), DiscordColor.Blurple);
