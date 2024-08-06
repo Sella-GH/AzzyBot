@@ -32,7 +32,7 @@ public sealed record DiscordStatus
 {
     public int Activity { get; init; } = 2;
     public string? Doing { get; init; } = "Music";
-    public int Status { get; init; } = 3;
+    public int Status { get; init; } = 1;
     public Uri? StreamUrl { get; init; } = string.Empty;
 }
 
