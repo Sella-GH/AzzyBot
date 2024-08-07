@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Choices;
+using AzzyBot.Bot.Localization;
 using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
@@ -19,6 +20,7 @@ using DSharpPlus.Commands.ArgumentModifiers;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
+using DSharpPlus.Commands.Processors.SlashCommands.Localization;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 
@@ -27,7 +29,7 @@ namespace AzzyBot.Bot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class AdminCommands
 {
-    [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
+    [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator), InteractionLocalizer<CommandLocalizer>]
     public sealed class AdminGroup(ILogger<AdminGroup> logger, DbActions dbActions, DiscordBotService botService, DiscordBotServiceHost botServiceHost)
     {
         private readonly DbActions _dbActions = dbActions;
@@ -35,7 +37,7 @@ public sealed class AdminCommands
         private readonly DiscordBotServiceHost _botServiceHost = botServiceHost;
         private readonly ILogger<AdminGroup> _logger = logger;
 
-        [Command("change-bot-status"), Description("Change the global bot status according to your likes.")]
+        [Command("change-bot-status"), Description("Change the global bot status according to your likes."), InteractionLocalizer<CommandLocalizer>]
         public async ValueTask ChangeStatusAsync
         (
             SlashCommandContext context,
@@ -64,7 +66,7 @@ public sealed class AdminCommands
             }
         }
 
-        [Command("get-joined-server"), Description("Displays all servers the bot is in.")]
+        [Command("get-joined-server"), Description("Displays all servers the bot is in."), InteractionLocalizer<CommandLocalizer>]
         public async ValueTask GetJoinedGuildsAsync
         (
             SlashCommandContext context,
@@ -117,7 +119,7 @@ public sealed class AdminCommands
             await context.EditResponseAsync(stringBuilder.ToString());
         }
 
-        [Command("remove-joined-server"), Description("Removes the bot from a server.")]
+        [Command("remove-joined-server"), Description("Removes the bot from a server."), InteractionLocalizer<CommandLocalizer>]
         public async ValueTask RemoveJoinedGuildAsync
         (
             SlashCommandContext context,
@@ -149,7 +151,7 @@ public sealed class AdminCommands
             await context.EditResponseAsync($"I left **{guild.Name}** ({guild.Id}).");
         }
 
-        [Command("send-bot-wide-message"), Description("Sends a message to all servers the bot is in.")]
+        [Command("send-bot-wide-message"), Description("Sends a message to all servers the bot is in."), InteractionLocalizer<CommandLocalizer>]
         public async ValueTask SendBotWideMessageAsync
         (
             SlashCommandContext context,
@@ -195,7 +197,7 @@ public sealed class AdminCommands
             await context.EditResponseAsync(GeneralStrings.MessageSentToAll);
         }
 
-        [Command("view-logs"), Description("View the logs of the bot.")]
+        [Command("view-logs"), Description("View the logs of the bot."), InteractionLocalizer<CommandLocalizer>]
         public async ValueTask ViewLogsAsync
         (
             SlashCommandContext context,
