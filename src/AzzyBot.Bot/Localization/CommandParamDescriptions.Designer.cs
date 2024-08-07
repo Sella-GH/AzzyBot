@@ -59,5 +59,50 @@ namespace AzzyBot.Bot.Localization {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose the activity type which the bot should have..
+        /// </summary>
+        internal static string activity {
+            get {
+                return ResourceManager.GetString("activity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter a custom doing which is added after the activity type..
+        /// </summary>
+        internal static string doing {
+            get {
+                return ResourceManager.GetString("doing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset the bot status to default..
+        /// </summary>
+        internal static string reset {
+            get {
+                return ResourceManager.GetString("reset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Choose the status type which the bot should have.
+        /// </summary>
+        internal static string status {
+            get {
+                return ResourceManager.GetString("status", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter a custom url. Only usable when having activity type streaming or watching.
+        /// </summary>
+        internal static string url {
+            get {
+                return ResourceManager.GetString("url", resourceCulture);
+            }
+        }
     }
 }

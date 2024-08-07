@@ -118,18 +118,18 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="activity" xml:space="preserve">
-    <value>Choose the activity type which the bot should have.</value>
-  </data>
-  <data name="doing" xml:space="preserve">
-    <value>Enter a custom doing which is added after the activity type.</value>
+    <value>aktivität</value>
   </data>
   <data name="status" xml:space="preserve">
-    <value>Choose the status type which the bot should have</value>
+    <value>status</value>
+  </data>
+  <data name="doing" xml:space="preserve">
+    <value>tätigkeit</value>
   </data>
   <data name="url" xml:space="preserve">
-    <value>Enter a custom url. Only usable when having activity type streaming or watching</value>
+    <value>url</value>
   </data>
   <data name="reset" xml:space="preserve">
-    <value>Reset the bot status to default.</value>
+    <value>zurücksetzen</value>
   </data>
 </root>
