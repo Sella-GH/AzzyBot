@@ -153,7 +153,14 @@ public sealed class DiscordBotService
 
             foreach (ulong channelId in channels)
             {
-                if (!await CheckChannelPermissionsAsync(member, channelId, DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages))
+                DiscordChannel? channel = await GetDiscordChannelAsync(channelId);
+                if (channel is null)
+                {
+                    _logger.DiscordItemNotFound(nameof(DiscordChannel), channelId);
+                    continue;
+                }
+
+                if (!channel.PermissionsFor(member).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages))
                     channelNotAccessible.Add(channelId);
             }
 
