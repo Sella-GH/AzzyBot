@@ -46,7 +46,7 @@
 ### Fixes
 - `azuracast force-update-check` works again
 
-## 2.0.0-preview6 2024-08-01
+## 2.0.0-preview6 - 2024-08-01
 ### General
 - Performance improvements all over the board. The bot should now be faster and more reliable
 - Reworked the way how strings and messages displayed to the user are handled
