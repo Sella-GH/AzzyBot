@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
-using AzzyBot.Core.Services.BackgroundServices;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
@@ -14,47 +13,18 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logger, QueuedBackgroundTask taskQueue, AzuraCastApiService azuraCastApiService, DbActions dbActions, DiscordBotService botService)
+public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logger, AzuraCastApiService azuraCastApiService, DbActions dbActions, DiscordBotService botService)
 {
     private readonly ILogger<AzuraCastUpdateService> _logger = logger;
-    private readonly QueuedBackgroundTask _taskQueue = taskQueue;
     private readonly AzuraCastApiService _azuraCastApiService = azuraCastApiService;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
 
-    public async Task QueueAzuraCastUpdatesAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
-    {
-        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
-
-        _logger.BackgroundServiceWorkItem(nameof(QueueAzuraCastUpdates));
-
-        int counter = 0;
-        await foreach (GuildEntity guild in guilds)
-        {
-            if (guild.AzuraCast?.IsOnline is true && guild.AzuraCast.Checks.Updates && now > guild.AzuraCast.Checks.LastUpdateCheck.AddHours(11.98))
-            {
-                _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForAzuraCastUpdatesAsync(guild.AzuraCast!, ct)));
-                counter++;
-            }
-        }
-
-        _logger.GlobalTimerCheckForAzuraCastUpdates(counter);
-    }
-
-    public void QueueAzuraCastUpdates(GuildEntity guild)
-    {
-        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
-        ArgumentNullException.ThrowIfNull(guild.AzuraCast, nameof(guild.AzuraCast));
-
-        _logger.BackgroundServiceWorkItem(nameof(QueueAzuraCastUpdates));
-
-        if (guild.AzuraCast.Checks.Updates)
-            _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForAzuraCastUpdatesAsync(guild.AzuraCast, ct, true)));
-    }
-
-    private async Task CheckForAzuraCastUpdatesAsync(AzuraCastEntity azuraCast, CancellationToken cancellationToken, bool forced = false)
+    public async Task CheckForAzuraCastUpdatesAsync(AzuraCastEntity azuraCast, CancellationToken cancellationToken, bool forced = false)
     {
         cancellationToken.ThrowIfCancellationRequested();
+
+        ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
 
         try
         {
