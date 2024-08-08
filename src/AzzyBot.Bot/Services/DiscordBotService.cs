@@ -43,6 +43,35 @@ public sealed class DiscordBotService
         _client = botServiceHost.Client;
     }
 
+    public async Task<bool> CheckChannelPermissionsAsync(DiscordMember member, ulong channelId, DiscordPermissions permissions)
+    {
+        ArgumentNullException.ThrowIfNull(member, nameof(member));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
+
+        DiscordChannel? channel = await GetDiscordChannelAsync(channelId);
+        if (channel is null)
+        {
+            _logger.DiscordItemNotFound(nameof(DiscordChannel), channelId);
+            return false;
+        }
+
+        return channel.PermissionsFor(member).HasPermission(permissions);
+    }
+
+    public async Task<bool> CheckChannelPermissionsAsync(DiscordMember member, ulong[] channels, DiscordPermissions permissions)
+    {
+        ArgumentNullException.ThrowIfNull(member, nameof(member));
+        ArgumentNullException.ThrowIfNull(channels, nameof(channels));
+
+        foreach (ulong channelId in channels)
+        {
+            if (!await CheckChannelPermissionsAsync(member, channelId, permissions))
+                return false;
+        }
+
+        return true;
+    }
+
     public bool CheckIfClientIsConnected
         => _client.IsConnected;
 
@@ -70,13 +99,13 @@ public sealed class DiscordBotService
     public IReadOnlyDictionary<ulong, DiscordGuild> GetDiscordGuilds
         => _client.Guilds;
 
-    public async Task<DiscordMember?> GetDiscordMemberAsync(ulong guildId, ulong userId)
+    public async Task<DiscordMember?> GetDiscordMemberAsync(ulong guildId, ulong userId = 0)
     {
         DiscordGuild? guild = GetDiscordGuild(guildId);
         DiscordMember? member = null;
 
         if (guild is not null)
-            member = await guild.GetMemberAsync(userId);
+            member = await guild.GetMemberAsync((userId is not 0) ? userId : _client.CurrentUser.Id);
 
         return member;
     }
@@ -127,7 +156,7 @@ public sealed class DiscordBotService
 
             if (errorChannelId == _settings.ErrorChannelId)
             {
-                DiscordChannel? dChannel = await GetFirstDiscordChannelAsync(guildId, _client.CurrentUser.Id);
+                DiscordChannel? dChannel = await GetFirstDiscordChannelAsync(guildId);
                 if (dChannel is null)
                 {
                     _logger.DiscordItemNotFound(nameof(DiscordChannel), guildId);
@@ -322,7 +351,7 @@ public sealed class DiscordBotService
         }
         else
         {
-            DiscordMember? dMember = await GetDiscordMemberAsync(channel.Guild.Id, _client.CurrentUser.Id);
+            DiscordMember? dMember = await GetDiscordMemberAsync(channel.Guild.Id);
             if (dMember is null)
             {
                 _logger.UnableToSendMessage($"Bot is not a member of server: {channel.Guild.Name} ({channel.Guild.Id})");
@@ -405,10 +434,10 @@ public sealed class DiscordBotService
         return null;
     }
 
-    private async Task<DiscordChannel?> GetFirstDiscordChannelAsync(ulong guildId, ulong memberId)
+    private async Task<DiscordChannel?> GetFirstDiscordChannelAsync(ulong guildId)
     {
         DiscordGuild? guild = GetDiscordGuild(guildId);
-        DiscordMember? member = await GetDiscordMemberAsync(guildId, memberId);
+        DiscordMember? member = await GetDiscordMemberAsync(guildId);
 
         if (guild is null)
         {
@@ -418,7 +447,7 @@ public sealed class DiscordBotService
 
         if (member is null)
         {
-            _logger.DiscordItemNotFound(nameof(DiscordMember), memberId);
+            _logger.DiscordItemNotFound(nameof(DiscordMember), _client.CurrentUser.Id);
             return null;
         }
 

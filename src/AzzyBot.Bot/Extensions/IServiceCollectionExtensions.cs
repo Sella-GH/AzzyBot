@@ -41,6 +41,8 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<QueuedBackgroundTaskHost>();
         services.AddHostedService(s => s.GetRequiredService<QueuedBackgroundTaskHost>());
 
+        services.AddSingleton<CoreBackgroundTask>();
+
         services.AddSingleton<AzuraCastApiService>();
         services.AddSingleton<AzuraCastFileService>();
         services.AddSingleton<AzuraCastPingService>();
