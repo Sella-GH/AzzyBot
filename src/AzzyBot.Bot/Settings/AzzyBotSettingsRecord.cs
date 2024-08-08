@@ -46,7 +46,7 @@ public sealed record DiscordStatus
 public sealed record MusicStreamingSettings
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? LavalinkHost { get; init; } = "lavalink";
+    public string? LavalinkHost { get; init; } = "AzzyBot-Ms";
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int LavalinkPort { get; init; } = 2333;
