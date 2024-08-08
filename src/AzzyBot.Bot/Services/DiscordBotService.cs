@@ -81,8 +81,6 @@ public sealed class DiscordBotService
         ArgumentNullException.ThrowIfNull(channelIds, nameof(channelIds));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelIds.Length, nameof(channelIds));
 
-        _logger.BackgroundServiceWorkItem(nameof(CheckPermissionsAsync));
-
         DiscordMember? member = await GetDiscordMemberAsync(guild.Id);
         if (member is null)
         {
@@ -102,14 +100,28 @@ public sealed class DiscordBotService
         if (channelNotAccessible.Count is 0)
             return;
 
-        await guild.Owner.SendMessageAsync($"I don't have the required permissions to send messages in channel(s) {string.Join(", ", channelNotAccessible)} in guild {guild.Name} ({guild.Id}).\nPlease review your permission set.");
+        StringBuilder builder = new();
+        builder.AppendLine(CultureInfo.InvariantCulture, $"I don't have the required permissions in server **{guild.Name}** to send messages in channel(s):");
+        foreach (ulong channelId in channelNotAccessible)
+        {
+            DiscordChannel? dChannel = await GetDiscordChannelAsync(channelId);
+            if (dChannel is null)
+            {
+                _logger.DiscordItemNotFound(nameof(DiscordChannel), channelId);
+                continue;
+            }
+
+            builder.AppendLine(CultureInfo.InvariantCulture, $"- {dChannel.Mention}");
+        }
+
+        builder.AppendLine("Please review your permission set.");
+
+        await guild.Owner.SendMessageAsync(builder.ToString());
     }
 
     public async Task CheckPermissionsAsync(IAsyncEnumerable<GuildEntity> guilds)
     {
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
-
-        _logger.BackgroundServiceWorkItem(nameof(CheckPermissionsAsync));
 
         DiscordMember? member;
         List<ulong> channels = [];
@@ -172,7 +184,23 @@ public sealed class DiscordBotService
                 continue;
             }
 
-            await dGuild.Owner.SendMessageAsync($"I don't have the required permissions to send messages in channel(s) {string.Join(", ", channelNotAccessible)} in guild {dGuild.Name} ({dGuild.Id}).\nPlease review your permission set.");
+            StringBuilder builder = new();
+            builder.AppendLine(CultureInfo.InvariantCulture, $"I don't have the required permissions in server **{dGuild.Name}** to send messages in channel(s):");
+            foreach (ulong channelId in channelNotAccessible)
+            {
+                DiscordChannel? dChannel = await GetDiscordChannelAsync(channelId);
+                if (dChannel is null)
+                {
+                    _logger.DiscordItemNotFound(nameof(DiscordChannel), channelId);
+                    continue;
+                }
+
+                builder.AppendLine(CultureInfo.InvariantCulture, $"- {dChannel.Mention}");
+            }
+
+            builder.AppendLine("Please review your permission set.");
+
+            await dGuild.Owner.SendMessageAsync(builder.ToString());
         }
     }
 

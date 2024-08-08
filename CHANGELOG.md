@@ -2,6 +2,10 @@
 ### General
 - Failsafes added to prevent the bot from crashing
 
+### Additions
+- New command `core force-channel-permissions-check` which checks all discord channels if the bot has the correct permissions
+- Every 15 minutes the bot checks if it has the correct permissions in every ever-set channel
+
 ## 2.0.0-preview7 - 2024-08-06
 ### Breaking Changes
 - Your Database needs a complete reset, please DROP it and start from scratch

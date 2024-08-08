@@ -66,10 +66,14 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
             }
 
             IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildsAsync(loadEverything: true);
-            int delay = 5 + _discordBotService.GetDiscordGuilds.Count;
+            int guildCount = _discordBotService.GetDiscordGuilds.Count;
+            int delay = 5 + guildCount;
 
             if (!_firstRun)
+            {
+                _logger.GlobalTimerCheckForChannelPermissions(guildCount);
                 await _discordBotService.CheckPermissionsAsync(guilds);
+            }
 
             await _azuraChecksBackgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guilds);
 
