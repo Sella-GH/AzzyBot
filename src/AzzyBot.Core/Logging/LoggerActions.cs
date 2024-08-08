@@ -186,6 +186,9 @@ public static partial class LoggerActions
     [LoggerMessage(401, LogLevel.Critical, "I'm not inside the server with the id {id} - please invite me to my hometown or I wont' start!")]
     public static partial void NotInHomeGuild(this ILogger logger, ulong id);
 
+    [LoggerMessage(402, LogLevel.Critical, "You removed me from my hometown server with the id {id}! I'm going to shutdown now.")]
+    public static partial void RemovedFromHomeGuild(this ILogger logger, ulong id);
+
     [LoggerMessage(410, LogLevel.Critical, "The given settings can't be parsed, are they filled out?")]
     public static partial void UnableToParseSettings(this ILogger logger);
 

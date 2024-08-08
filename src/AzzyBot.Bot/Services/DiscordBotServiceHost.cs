@@ -272,6 +272,14 @@ public sealed class DiscordBotServiceHost : IHostedService
 
     private async Task ClientGuildDeletedAsync(DiscordClient c, GuildDeleteEventArgs e)
     {
+        if (e.Guild.Id == _settings.ServerId)
+        {
+            _logger.RemovedFromHomeGuild(_settings.ServerId);
+            Environment.Exit(0);
+
+            return;
+        }
+
         if (e.Unavailable)
         {
             _logger.GuildUnavailable(e.Guild.Name);
