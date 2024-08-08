@@ -23,25 +23,15 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class DiscordBotService
+public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordClient client)
 {
-    private readonly ILogger<DiscordBotService> _logger;
-    private readonly AzzyBotSettingsRecord _settings;
-    private readonly DbActions _dbActions;
-    private readonly DiscordClient _client;
+    private readonly ILogger<DiscordBotService> _logger = logger;
+    private readonly AzzyBotSettingsRecord _settings = settings;
+    private readonly DbActions _dbActions = dbActions;
+    private readonly DiscordClient _client = client;
     private const string BugReportUrl = "https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D";
     private const string BugReportMessage = $"Send a [bug report]({BugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
     private const string ErrorChannelNotConfigured = $"**If you're seeing this message then I am not configured correctly!**\nTell your server admin to run */config modify-core*\n\n{BugReportMessage}";
-
-    public DiscordBotService(AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotServiceHost botServiceHost, ILogger<DiscordBotService> logger)
-    {
-        ArgumentNullException.ThrowIfNull(botServiceHost, nameof(botServiceHost));
-
-        _logger = logger;
-        _settings = settings;
-        _dbActions = dbActions;
-        _client = botServiceHost.Client;
-    }
 
     public bool CheckIfClientIsConnected
     => _client.AllShardsConnected;

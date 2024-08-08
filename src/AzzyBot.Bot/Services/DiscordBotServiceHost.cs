@@ -17,42 +17,27 @@ using DSharpPlus.Exceptions;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class DiscordBotServiceHost : IClientErrorHandler, IHostedService
+public sealed class DiscordBotServiceHost(ILogger<DiscordBotServiceHost> logger, AzzyBotSettingsRecord settings, DiscordBotService botService, DiscordClient client) : IClientErrorHandler, IHostedService
 {
-    private readonly ILogger<DiscordBotServiceHost> _logger;
-    private readonly IServiceProvider _serviceProvider;
-    private readonly AzzyBotSettingsRecord _settings;
-    private DiscordBotService? _botService;
-
-    public DiscordClient Client { get; init; }
-
-    public DiscordBotServiceHost(ILogger<DiscordBotServiceHost> logger, IServiceProvider serviceProvider, AzzyBotSettingsRecord settings, DiscordClient client)
-    {
-        _logger = logger;
-        _serviceProvider = serviceProvider;
-        _settings = settings;
-
-        Client = client;
-    }
+    private readonly ILogger<DiscordBotServiceHost> _logger = logger;
+    private readonly AzzyBotSettingsRecord _settings = settings;
+    private readonly DiscordBotService _botService = botService;
+    private readonly DiscordClient _client = client;
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(_settings, nameof(_settings));
-
         cancellationToken.ThrowIfCancellationRequested();
-        _botService = _serviceProvider.GetRequiredService<DiscordBotService>();
         RegisterCommands();
         RegisterInteractivity();
-        await Client.ConnectAsync();
+        await _client.ConnectAsync();
 
         _logger.BotReady();
-        string invite = Client.CurrentApplication.GenerateOAuthUri(null, DiscordPermissions.AccessChannels | DiscordPermissions.AttachFiles | DiscordPermissions.SendMessages, [DiscordOAuthScope.ApplicationsCommands, DiscordOAuthScope.Bot]);
+        string invite = _client.CurrentApplication.GenerateOAuthUri(null, DiscordPermissions.AccessChannels | DiscordPermissions.AttachFiles | DiscordPermissions.SendMessages, [DiscordOAuthScope.ApplicationsCommands, DiscordOAuthScope.Bot]);
         _logger.InviteUrl(invite);
 
         // Wait 3 Seconds to let the client boot up
@@ -70,7 +55,7 @@ public sealed class DiscordBotServiceHost : IClientErrorHandler, IHostedService
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        await Client.DisconnectAsync();
+        await _client.DisconnectAsync();
     }
 
     public async ValueTask HandleEventHandlerError(string name, Exception exception, Delegate invokedDelegate, object sender, object args)
@@ -108,18 +93,11 @@ public sealed class DiscordBotServiceHost : IClientErrorHandler, IHostedService
     }
 
     public async ValueTask HandleGatewayError(Exception exception)
-    {
-        if (_botService is null)
-            return;
-
-        await _botService.LogExceptionAsync(exception, DateTime.Now);
-    }
+        => await _botService.LogExceptionAsync(exception, DateTime.Now);
 
     private void RegisterCommands()
     {
-        ArgumentNullException.ThrowIfNull(_settings, nameof(_settings));
-
-        CommandsExtension commandsExtension = Client.UseCommands(new()
+        CommandsExtension commandsExtension = _client.UseCommands(new()
         {
             RegisterDefaultCommandProcessors = false,
             UseDefaultCommandErrorHandler = false
@@ -156,8 +134,6 @@ public sealed class DiscordBotServiceHost : IClientErrorHandler, IHostedService
 
     private void RegisterInteractivity()
     {
-        ArgumentNullException.ThrowIfNull(Client, nameof(Client));
-
         InteractivityConfiguration config = new()
         {
             ResponseBehavior = InteractionResponseBehavior.Ignore,
@@ -165,16 +141,13 @@ public sealed class DiscordBotServiceHost : IClientErrorHandler, IHostedService
             Timeout = TimeSpan.FromMinutes(15)
         };
 
-        Client.UseInteractivity(config);
+        _client.UseInteractivity(config);
     }
 
     private async Task CommandErroredAsync(CommandsExtension c, CommandErroredEventArgs e)
     {
         _logger.CommandsError();
         _logger.CommandsErrorType(e.Exception.GetType().Name);
-
-        if (_botService is null)
-            return;
 
         Exception ex = e.Exception;
         DateTime now = DateTime.Now;
