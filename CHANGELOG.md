@@ -20,7 +20,7 @@
   - `player play` to select the provider and provide a url
   - `player pause` to pause the player
   - `player resume` to resume the player
-  - `player queue-clear` to clear the whole queue or only one songow 
+  - `player queue-clear` to clear the whole queue or only one song
   - `player skip` to skip a song
   - `player history` to view the song history
   - `player queue` to view the song queue

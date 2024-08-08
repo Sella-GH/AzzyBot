@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="activity" xml:space="preserve">
-    <value>Wähle den Aktivitäten-Typ welchen der Bot haben soll.</value>
+    <value>Wähle den Aktivitäten-Typ aus welchen der Bot haben soll.</value>
   </data>
   <data name="doing" xml:space="preserve">
     <value>Setze eine eigene Tätigkeit welche nach dem Aktivitäten-Typ gesetzt wird.</value>
@@ -127,9 +127,9 @@
     <value>Wähle den Status Typ welchen der Bot haben soll.</value>
   </data>
   <data name="url" xml:space="preserve">
-    <value>Setze eine eigene Url. Funktioniert nur wenn der Aktivitäten-Typ "Streamt" oder "Schaut" gesetzt ist.</value>
+    <value>Setze eine Url. Funktioniert nur wenn der Aktivitäten-Typ "Streamt" oder "Schaut" gesetzt ist.</value>
   </data>
   <data name="reset" xml:space="preserve">
-    <value>Setze den Bot Status auf den Standard zurück.</value>
+    <value>Setzt den Bot Status auf den Standard zurück.</value>
   </data>
 </root>
