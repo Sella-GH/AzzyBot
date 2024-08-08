@@ -24,6 +24,9 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
 
     public async Task QueueApiPermissionChecksAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
     {
+        if (_cancellationToken.IsCancellationRequested)
+            return;
+
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
 
         _logger.BackgroundServiceWorkItem(nameof(QueueApiPermissionChecks));
@@ -43,6 +46,9 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
 
     public void QueueApiPermissionChecks(GuildEntity guild, int stationId = 0)
     {
+        if (_cancellationToken.IsCancellationRequested)
+            return;
+
         ArgumentNullException.ThrowIfNull(guild, nameof(guild));
         ArgumentNullException.ThrowIfNull(guild.AzuraCast, nameof(guild.AzuraCast));
 
@@ -68,6 +74,9 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
 
     public async Task QueueFileChangesChecksAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
     {
+        if (_cancellationToken.IsCancellationRequested)
+            return;
+
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
 
         _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecksAsync));
@@ -90,6 +99,9 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
 
     public void QueueFileChangesChecks(GuildEntity guild, int stationId = 0)
     {
+        if (_cancellationToken.IsCancellationRequested)
+            return;
+
         ArgumentNullException.ThrowIfNull(guild, nameof(guild));
         ArgumentNullException.ThrowIfNull(guild.AzuraCast, nameof(guild.AzuraCast));
 
@@ -118,6 +130,9 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
 
     public async Task QueueInstancePingAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
     {
+        if (_cancellationToken.IsCancellationRequested)
+            return;
+
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
 
         _logger.BackgroundServiceWorkItem(nameof(QueueInstancePingAsync));
@@ -137,6 +152,9 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
 
     public void QueueInstancePing(GuildEntity guild)
     {
+        if (_cancellationToken.IsCancellationRequested)
+            return;
+
         ArgumentNullException.ThrowIfNull(guild, nameof(guild));
         ArgumentNullException.ThrowIfNull(guild.AzuraCast, nameof(guild.AzuraCast));
 
@@ -148,6 +166,9 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
 
     public async Task QueueUpdatesAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
     {
+        if (_cancellationToken.IsCancellationRequested)
+            return;
+
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
 
         _logger.BackgroundServiceWorkItem(nameof(QueueUpdatesAsync));
@@ -167,6 +188,9 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
 
     public void QueueUpdates(GuildEntity guild)
     {
+        if (_cancellationToken.IsCancellationRequested)
+            return;
+
         ArgumentNullException.ThrowIfNull(guild, nameof(guild));
         ArgumentNullException.ThrowIfNull(guild.AzuraCast, nameof(guild.AzuraCast));
 
