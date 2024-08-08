@@ -139,15 +139,27 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceApiPermissionCheckAsync), context.User.GlobalName);
 
+            GuildEntity? dGuild = null;
             IAsyncEnumerable<GuildEntity> guild = _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
-            if (!await guild.ContainsOneItemAsync())
+            if (await guild.ContainsOneItemAsync())
+            {
+                await using IAsyncEnumerator<GuildEntity> enumerator = guild.GetAsyncEnumerator();
+                dGuild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
+                if (dGuild is null)
+                {
+                    _logger.DatabaseGuildNotFound(context.Guild.Id);
+                    await context.EditResponseAsync(GeneralStrings.GuildNotFound);
+                    return;
+                }
+            }
+            else
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
                 await context.EditResponseAsync(GeneralStrings.GuildNotFound);
                 return;
             }
 
-            await _backgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForApiPermissions, guild, station);
+            _backgroundService.QueueApiPermissionChecks(dGuild, station);
 
             await context.EditResponseAsync("I initiated the permission check, please wait a little for the result.");
         }
@@ -164,15 +176,27 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceCacheRefreshAsync), context.User.GlobalName);
 
+            GuildEntity? dGuild = null;
             IAsyncEnumerable<GuildEntity> guild = _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
-            if (!await guild.ContainsOneItemAsync())
+            if (await guild.ContainsOneItemAsync())
+            {
+                await using IAsyncEnumerator<GuildEntity> enumerator = guild.GetAsyncEnumerator();
+                dGuild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
+                if (dGuild is null)
+                {
+                    _logger.DatabaseGuildNotFound(context.Guild.Id);
+                    await context.EditResponseAsync(GeneralStrings.GuildNotFound);
+                    return;
+                }
+            }
+            else
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
                 await context.EditResponseAsync(GeneralStrings.GuildNotFound);
                 return;
             }
 
-            await _backgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, guild, station);
+            _backgroundService.QueueFileChangesChecks(dGuild, station);
 
             await context.EditResponseAsync("I initiated the cache refresh, please wait a little for it to occur.");
         }
@@ -185,15 +209,27 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceOnlineCheckAsync), context.User.GlobalName);
 
+            GuildEntity? dGuild = null;
             IAsyncEnumerable<GuildEntity> guild = _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
-            if (!await guild.ContainsOneItemAsync())
+            if (await guild.ContainsOneItemAsync())
+            {
+                await using IAsyncEnumerator<GuildEntity> enumerator = guild.GetAsyncEnumerator();
+                dGuild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
+                if (dGuild is null)
+                {
+                    _logger.DatabaseGuildNotFound(context.Guild.Id);
+                    await context.EditResponseAsync(GeneralStrings.GuildNotFound);
+                    return;
+                }
+            }
+            else
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
                 await context.EditResponseAsync(GeneralStrings.GuildNotFound);
                 return;
             }
 
-            await _backgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guild);
+            _backgroundService.QueueInstancePing(dGuild);
 
             await context.EditResponseAsync("I initiated the online check for the AzuraCast instance, please wait a little for the result.");
         }
@@ -206,15 +242,27 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceUpdateCheckAsync), context.User.GlobalName);
 
+            GuildEntity? dGuild = null;
             IAsyncEnumerable<GuildEntity> guild = _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
-            if (!await guild.ContainsOneItemAsync())
+            if (await guild.ContainsOneItemAsync())
+            {
+                await using IAsyncEnumerator<GuildEntity> enumerator = guild.GetAsyncEnumerator();
+                dGuild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
+                if (dGuild is null)
+                {
+                    _logger.DatabaseGuildNotFound(context.Guild.Id);
+                    await context.EditResponseAsync(GeneralStrings.GuildNotFound);
+                    return;
+                }
+            }
+            else
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
                 await context.EditResponseAsync(GeneralStrings.GuildNotFound);
                 return;
             }
 
-            await _backgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, guild);
+            _backgroundService.QueueUpdates(dGuild);
 
             await context.EditResponseAsync("I initiated the check for AzuraCast Updates, please wait a little.\nThere won't be an answer if there are no updates available.");
         }

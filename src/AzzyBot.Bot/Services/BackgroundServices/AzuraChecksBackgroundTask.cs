@@ -4,8 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Services.Modules;
-using AzzyBot.Bot.Utilities.Enums;
-using AzzyBot.Core.Extensions;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Services.BackgroundServices;
 using AzzyBot.Data.Entities;
@@ -23,75 +21,6 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
     private readonly AzuraCastUpdateService _updaterService = updaterService;
     private readonly CancellationToken _cancellationToken = applicationLifetime.ApplicationStopping;
     private readonly QueuedBackgroundTask _queue = queue;
-
-    public async Task StartBackgroundServiceAsync(AzuraCastChecks checks, IAsyncEnumerable<GuildEntity> guilds, int stationId = 0)
-    {
-        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
-
-        _logger.BackgroundServiceStart();
-
-        if (_cancellationToken.IsCancellationRequested)
-            return;
-
-        GuildEntity? guild = null;
-        if (await guilds.ContainsOneItemAsync())
-        {
-            await using IAsyncEnumerator<GuildEntity> enumerator = guilds.GetAsyncEnumerator();
-            guild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
-        }
-
-        DateTime now = DateTime.UtcNow;
-        switch (checks)
-        {
-            case AzuraCastChecks.CheckForApiPermissions:
-                if (guild is null)
-                {
-                    await _apiService.QueueApiPermissionChecksAsync(guilds, now);
-                }
-                else
-                {
-                    _apiService.QueueApiPermissionChecks(guild, stationId);
-                }
-
-                break;
-
-            case AzuraCastChecks.CheckForFileChanges:
-                if (guild is null)
-                {
-                    await _fileService.QueueFileChangesChecksAsync(guilds, now);
-                }
-                else
-                {
-                    _fileService.QueueFileChangesChecks(guild, stationId);
-                }
-
-                break;
-
-            case AzuraCastChecks.CheckForOnlineStatus:
-                if (guild is null)
-                {
-                    await _pingService.QueueInstancePingAsync(guilds, now);
-                }
-                else
-                {
-                    _pingService.QueueInstancePing(guild);
-                }
-
-                break;
-
-            case AzuraCastChecks.CheckForUpdates:
-                if (guild is null)
-                {
-                    await _updaterService.QueueAzuraCastUpdatesAsync(guilds, now);
-                }
-                else
-                {
-                    _updaterService.QueueAzuraCastUpdates(guild);
-                }
-
-                break;
-        }
-    }
 
     public async Task QueueApiPermissionChecksAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
     {

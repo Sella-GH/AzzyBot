@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Services.BackgroundServices;
-using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Core.Logging;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
@@ -75,18 +74,18 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
                 await _discordBotService.CheckPermissionsAsync(guilds);
             }
 
-            await _azuraChecksBackgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guilds);
+            await _azuraChecksBackgroundService.QueueInstancePingAsync(guilds, now);
 
             // Properly wait if there's an exception or not
             await Task.Delay(TimeSpan.FromSeconds(delay));
 
-            await _azuraChecksBackgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForApiPermissions, guilds);
+            await _azuraChecksBackgroundService.QueueApiPermissionChecksAsync(guilds, now);
 
             // Wait again
             await Task.Delay(TimeSpan.FromSeconds(delay));
 
-            await _azuraChecksBackgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, guilds);
-            await _azuraChecksBackgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, guilds);
+            await _azuraChecksBackgroundService.QueueFileChangesChecksAsync(guilds, now);
+            await _azuraChecksBackgroundService.QueueUpdatesAsync(guilds, now);
 
             _firstRun = false;
         }
