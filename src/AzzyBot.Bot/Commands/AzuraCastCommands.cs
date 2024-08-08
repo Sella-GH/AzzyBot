@@ -910,7 +910,7 @@ public sealed class AzuraCastCommands
             builder.AddComponents(button);
 
             DiscordMessage message = await context.EditResponseAsync(builder);
-            InteractivityResult<ComponentInteractionCreateEventArgs> result = await message.WaitForButtonAsync(context.User, TimeSpan.FromMinutes(1));
+            InteractivityResult<ComponentInteractionCreatedEventArgs> result = await message.WaitForButtonAsync(context.User, TimeSpan.FromMinutes(1));
             if (!result.TimedOut)
             {
                 azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true);

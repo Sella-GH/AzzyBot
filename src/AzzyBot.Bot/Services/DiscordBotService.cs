@@ -44,7 +44,7 @@ public sealed class DiscordBotService
     }
 
     public bool CheckIfClientIsConnected
-    => _client.IsConnected;
+    => _client.AllShardsConnected;
 
     public async Task<bool> CheckChannelPermissionsAsync(DiscordMember member, ulong channelId, DiscordPermissions permissions)
     {
@@ -102,7 +102,8 @@ public sealed class DiscordBotService
 
         builder.AppendLine("Please review your permission set.");
 
-        await guild.Owner.SendMessageAsync(builder.ToString());
+        DiscordMember owner = await guild.GetGuildOwnerAsync();
+        await owner.SendMessageAsync(builder.ToString());
     }
 
     public async Task CheckPermissionsAsync(IAsyncEnumerable<GuildEntity> guilds)
@@ -193,7 +194,8 @@ public sealed class DiscordBotService
 
             builder.AppendLine("Please review your permission set.");
 
-            await dGuild.Owner.SendMessageAsync(builder.ToString());
+            DiscordMember owner = await dGuild.GetGuildOwnerAsync();
+            await owner.SendMessageAsync(builder.ToString());
         }
     }
 
@@ -526,12 +528,22 @@ public sealed class DiscordBotService
         await _client.UpdateStatusAsync(activity, userStatus);
     }
 
-    private static async Task<DiscordMessage?> AcknowledgeExceptionAsync(SlashCommandContext ctx)
+    private async Task<DiscordMessage?> AcknowledgeExceptionAsync(SlashCommandContext ctx)
     {
-        DiscordMember? member = ctx.Guild?.Owner;
+        DiscordGuild? guild = ctx.Guild;
+        DiscordMember? owner = null;
+        if (guild is null)
+        {
+            _logger.DiscordItemNotFound(nameof(DiscordGuild), 0);
+        }
+        else
+        {
+            owner = await guild.GetGuildOwnerAsync();
+        }
+
         string errorMessage = "Ooops something went wrong!\n\nPlease inform the owner of this server.";
-        if (member is not null)
-            errorMessage = errorMessage.Replace("the owner of this server", member.Mention, StringComparison.OrdinalIgnoreCase);
+        if (owner is not null)
+            errorMessage = errorMessage.Replace("the owner of this server", owner.Mention, StringComparison.OrdinalIgnoreCase);
 
         await using DiscordMessageBuilder builder = new()
         {

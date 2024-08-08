@@ -34,7 +34,7 @@ public static partial class EventListener
         DiscordMember owner = await e.Guild.GetGuildOwnerAsync();
         await owner.SendMessageAsync(NewGuildText.Replace("%GUILD%", e.Guild.Name, StringComparison.OrdinalIgnoreCase));
 
-        DiscordEmbed embed = EmbedBuilder.BuildGuildAddedEmbed(e.Guild);
+        DiscordEmbed embed = await EmbedBuilder.BuildGuildAddedEmbedAsync(e.Guild);
         await botService.SendMessageAsync(settings.NotificationChannelId, embeds: [embed]);
     }
 }

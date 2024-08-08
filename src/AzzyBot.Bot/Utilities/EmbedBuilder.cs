@@ -582,18 +582,19 @@ public static class EmbedBuilder
         return embeds;
     }
 
-    public static DiscordEmbed BuildGuildAddedEmbed(DiscordGuild guild, bool getInfo = false)
+    public static async Task<DiscordEmbed> BuildGuildAddedEmbedAsync(DiscordGuild guild, bool getInfo = false)
     {
         ArgumentNullException.ThrowIfNull(guild, nameof(guild));
 
         string title = (getInfo) ? "Guild Information" : "Guild Added";
         string description = (getInfo) ? $"Here is everything I know about **{guild.Name}**" : $"I was added to **{guild.Name}**.";
+        DiscordMember owner = await guild.GetGuildOwnerAsync();
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(4)
         {
             ["Guild ID"] = new(guild.Id.ToString(CultureInfo.InvariantCulture)),
             ["Creation Date"] = new($"<t:{Converter.ConvertToUnixTime(guild.CreationTimestamp.Date)}>"),
-            ["Owner"] = new(guild.Owner.Mention),
+            ["Owner"] = new(owner.Mention),
             ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture), true)
         };
 

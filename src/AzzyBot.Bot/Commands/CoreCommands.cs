@@ -149,10 +149,11 @@ public sealed class CoreCommands
             public async ValueTask PingAsync(SlashCommandContext context)
             {
                 ArgumentNullException.ThrowIfNull(context, nameof(context));
+                ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
                 _logger.CommandRequested(nameof(PingAsync), context.User.GlobalName);
 
-                await context.RespondAsync($"Pong! {context.Client.Ping}ms");
+                await context.RespondAsync($"Pong! {context.Client.GetConnectionLatency(context.Guild.Id)}ms");
             }
         }
     }
