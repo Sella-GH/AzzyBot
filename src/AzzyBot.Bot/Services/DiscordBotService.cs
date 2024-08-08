@@ -61,20 +61,6 @@ public sealed class DiscordBotService
         return channel.PermissionsFor(member).HasPermission(permissions);
     }
 
-    public async Task<bool> CheckChannelPermissionsAsync(DiscordMember member, ulong[] channels, DiscordPermissions permissions)
-    {
-        ArgumentNullException.ThrowIfNull(member, nameof(member));
-        ArgumentNullException.ThrowIfNull(channels, nameof(channels));
-
-        foreach (ulong channelId in channels)
-        {
-            if (!await CheckChannelPermissionsAsync(member, channelId, permissions))
-                return false;
-        }
-
-        return true;
-    }
-
     public async Task CheckPermissionsAsync(DiscordGuild guild, ulong[] channelIds)
     {
         ArgumentNullException.ThrowIfNull(guild, nameof(guild));
