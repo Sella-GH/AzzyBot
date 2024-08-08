@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using AzzyBot.Bot.EventListeners;
 using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.BackgroundServices;
 using AzzyBot.Bot.Services.Modules;
@@ -9,6 +10,8 @@ using AzzyBot.Core.Services.BackgroundServices;
 using AzzyBot.Core.Settings;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Data.Extensions;
+using DSharpPlus;
+using DSharpPlus.Extensions;
 using Lavalink4NET.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +32,14 @@ public static class IServiceCollectionExtensions
 
         // Register the database services
         services.AzzyBotDataServices(isDev, settings.Database!.EncryptionKey, settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.DatabaseName);
+
+        services.AddDiscordClient(settings.BotToken, DiscordIntents.Guilds | DiscordIntents.GuildVoiceStates);
+        services.ConfigureEventHandlers(e =>
+        {
+            e.HandleGuildCreated(EventListener.OnGuildCreatedAsync);
+            e.HandleGuildDeleted(EventListener.OnGuildDeletedAsync);
+            e.HandleGuildDownloadCompleted(EventListener.OnGuildDownloadCompletedAsync);
+        });
 
         services.AddSingleton<DiscordBotService>();
         services.AddSingleton<DiscordBotServiceHost>();
