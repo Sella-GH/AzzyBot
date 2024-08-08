@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Choices;
+using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.BackgroundServices;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
@@ -15,7 +16,6 @@ using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Extensions;
 using AzzyBot.Core.Logging;
-using AzzyBot.Core.Services.BackgroundServices;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data;
@@ -34,14 +34,13 @@ namespace AzzyBot.Bot.Commands;
 public sealed class ConfigCommands
 {
     [Command("config"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
-    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCast, AzuraChecksBackgroundTask backgroundService, CoreBackgroundTask coreBackgroundTask, DbActions dbActions, QueuedBackgroundTask queue)
+    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCast, AzuraChecksBackgroundTask backgroundService, DbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<ConfigGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCast = azuraCast;
         private readonly AzuraChecksBackgroundTask _backgroundService = backgroundService;
-        private readonly CoreBackgroundTask _coreBackgroundTask = coreBackgroundTask;
         private readonly DbActions _dbActions = dbActions;
-        private readonly QueuedBackgroundTask _queue = queue;
+        private readonly DiscordBotService _botService = botService;
 
         [Command("add-azuracast"), Description("Add an AzuraCast instance to your server. This is a requirement to use the features.")]
         public async ValueTask AddAzuraCastAsync
@@ -133,7 +132,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            await Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _coreBackgroundTask.CheckPermissionsAsync(context.Guild, [notificationChannel.Id, outagesChannel.Id])));
+            await _botService.CheckPermissionsAsync(context.Guild, [notificationChannel.Id, outagesChannel.Id]);
             await _backgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guilds);
         }
 
@@ -208,7 +207,7 @@ public sealed class ConfigCommands
             }
 
             ulong[] channels = (uploadChannel is null) ? [requestsChannel.Id] : [requestsChannel.Id, uploadChannel.Id];
-            await Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _coreBackgroundTask.CheckPermissionsAsync(context.Guild, channels)));
+            await _botService.CheckPermissionsAsync(context.Guild, channels);
 
             if (guild.AzuraCast!.IsOnline)
                 await _backgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, guilds, station);
@@ -335,7 +334,7 @@ public sealed class ConfigCommands
                 }
 
                 if (channels.Length is not 0)
-                    await Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _coreBackgroundTask.CheckPermissionsAsync(context.Guild, channels)));
+                    await _botService.CheckPermissionsAsync(context.Guild, channels);
             }
 
             if (url is not null)
@@ -454,7 +453,7 @@ public sealed class ConfigCommands
                 }
 
                 if (channels.Length is not 0)
-                    await Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _coreBackgroundTask.CheckPermissionsAsync(context.Guild, channels)));
+                    await _botService.CheckPermissionsAsync(context.Guild, channels);
             }
 
             if (stationId.HasValue || !string.IsNullOrWhiteSpace(apiKey))
@@ -565,7 +564,7 @@ public sealed class ConfigCommands
             }
 
             if (channels.Length is not 0)
-                await Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _coreBackgroundTask.CheckPermissionsAsync(context.Guild, channels)));
+                await _botService.CheckPermissionsAsync(context.Guild, channels);
         }
 
         [Command("get-settings"), Description("Get all configured settings in a direct message.")]

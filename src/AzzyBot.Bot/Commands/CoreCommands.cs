@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
-using AzzyBot.Bot.Services.BackgroundServices;
+using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
@@ -28,12 +28,12 @@ namespace AzzyBot.Bot.Commands;
 public sealed class CoreCommands
 {
     [Command("core"), RequireGuild]
-    public sealed class CoreGroup(ILogger<CoreGroup> logger, AzzyBotSettingsRecord settings, CoreBackgroundTask coreBackgroundTask, DbActions dbActions)
+    public sealed class CoreGroup(ILogger<CoreGroup> logger, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<CoreGroup> _logger = logger;
         private readonly AzzyBotSettingsRecord _settings = settings;
-        private readonly CoreBackgroundTask _coreBackgroundTask = coreBackgroundTask;
         private readonly DbActions _dbActions = dbActions;
+        private readonly DiscordBotService _botService = botService;
 
         [Command("force-channel-permissions-check"), Description("Forces a check of the permissions for the bot in the necessary channel.")]
         public async ValueTask ForceChannelPermissionsCheckAsync(SlashCommandContext context)
@@ -51,9 +51,9 @@ public sealed class CoreCommands
                 return;
             }
 
-            await Task.Run(async () => await _coreBackgroundTask.CheckPermissionsAsync(guild));
-
             await context.EditResponseAsync("I initiated a check of the permissions for the bot, please wait a little for the result.");
+
+            await _botService.CheckPermissionsAsync(guild);
         }
 
         [Command("help"), Description("Gives you an overview about all the available commands.")]

@@ -31,14 +31,12 @@ public static class IServiceCollectionExtensions
         services.AzzyBotDataServices(isDev, settings.Database!.EncryptionKey, settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.DatabaseName);
 
         services.AddSingleton<DiscordBotService>();
+        services.AddSingleton<DiscordBotServiceHost>();
+        services.AddHostedService(s => s.GetRequiredService<DiscordBotServiceHost>());
 
         services.AddSingleton<QueuedBackgroundTask>();
         services.AddSingleton<QueuedBackgroundTaskHost>();
         services.AddHostedService(s => s.GetRequiredService<QueuedBackgroundTaskHost>());
-
-        services.AddSingleton<CoreBackgroundTask>();
-        services.AddSingleton<DiscordBotServiceHost>();
-        services.AddHostedService(s => s.GetRequiredService<DiscordBotServiceHost>());
 
         services.AddSingleton<WebRequestService>();
         services.AddSingleton<UpdaterService>();
