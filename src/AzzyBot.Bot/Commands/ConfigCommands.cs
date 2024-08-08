@@ -126,14 +126,24 @@ public sealed class ConfigCommands
             await context.FollowupAsync(GeneralStrings.ConfigInstanceAdded);
 
             guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
-            if (!await guilds.ContainsOneItemAsync())
+            if (await guilds.ContainsOneItemAsync())
+            {
+                await using IAsyncEnumerator<GuildEntity> enumerator = guilds.GetAsyncEnumerator();
+                guild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
+                if (guild is null)
+                {
+                    _logger.DatabaseGuildNotFound(guildId);
+                    return;
+                }
+            }
+            else
             {
                 _logger.DatabaseGuildNotFound(guildId);
                 return;
             }
 
             await _botService.CheckPermissionsAsync(context.Guild, [notificationChannel.Id, outagesChannel.Id]);
-            await _backgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guilds);
+            _backgroundService.QueueInstancePing(guild);
         }
 
         [Command("add-azuracast-station"), Description("Add an AzuraCast station to your instance."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -200,7 +210,17 @@ public sealed class ConfigCommands
             }
 
             guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
-            if (!await guilds.ContainsOneItemAsync())
+            if (await guilds.ContainsOneItemAsync())
+            {
+                await using IAsyncEnumerator<GuildEntity> enumerator = guilds.GetAsyncEnumerator();
+                guild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
+                if (guild is null)
+                {
+                    _logger.DatabaseGuildNotFound(guildId);
+                    return;
+                }
+            }
+            else
             {
                 _logger.DatabaseGuildNotFound(guildId);
                 return;
@@ -210,7 +230,7 @@ public sealed class ConfigCommands
             await _botService.CheckPermissionsAsync(context.Guild, channels);
 
             if (guild.AzuraCast!.IsOnline)
-                await _backgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, guilds, station);
+                _backgroundService.QueueFileChangesChecks(guild, station);
         }
 
         [Command("delete-azuracast"), Description("Delete the existing AzuraCast setup."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -311,7 +331,17 @@ public sealed class ConfigCommands
             }
 
             guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
-            if (!await guilds.ContainsOneItemAsync())
+            if (await guilds.ContainsOneItemAsync())
+            {
+                await using IAsyncEnumerator<GuildEntity> enumerator = guilds.GetAsyncEnumerator();
+                guild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
+                if (guild is null)
+                {
+                    _logger.DatabaseGuildNotFound(guildId);
+                    return;
+                }
+            }
+            else
             {
                 _logger.DatabaseGuildNotFound(guildId);
                 return;
@@ -338,7 +368,7 @@ public sealed class ConfigCommands
             }
 
             if (url is not null)
-                await _backgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guilds);
+                _backgroundService.QueueInstancePing(guild);
         }
 
         [Command("modify-azuracast-checks"), Description("Modify the automatic checks for your AzuraCast instance."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -474,15 +504,26 @@ public sealed class ConfigCommands
                     return;
                 }
 
+                GuildEntity? guild = null;
                 IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
-                if (!await guilds.ContainsOneItemAsync())
+                if (await guilds.ContainsOneItemAsync())
+                {
+                    await using IAsyncEnumerator<GuildEntity> enumerator = guilds.GetAsyncEnumerator();
+                    guild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
+                    if (guild is null)
+                    {
+                        _logger.DatabaseGuildNotFound(context.Guild.Id);
+                        return;
+                    }
+                }
+                else
                 {
                     _logger.DatabaseGuildNotFound(context.Guild.Id);
                     return;
                 }
 
                 if (acStation.AzuraCast.IsOnline)
-                    await _backgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, guilds, station);
+                    _backgroundService.QueueFileChangesChecks(guild, station);
             }
 
             await context.DeleteResponseAsync();
