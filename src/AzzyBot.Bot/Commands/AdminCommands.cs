@@ -70,7 +70,7 @@ public sealed class AdminCommands
         public async ValueTask GetJoinedGuildsAsync
         (
             SlashCommandContext context,
-            [Description("Select the server you want to get more information about."), SlashAutoCompleteProvider<GuildsAutocomplete>] string? serverId = null
+            [Description("Select the server you want to get more information about."), SlashAutoCompleteProvider<GuildsAutocomplete>, InteractionLocalizer<CommandLocalizer>] string? serverId = null
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -123,7 +123,7 @@ public sealed class AdminCommands
         public async ValueTask RemoveJoinedGuildAsync
         (
             SlashCommandContext context,
-            [Description("Select the server you want to remove."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId
+            [Description("Select the server you want to remove."), SlashAutoCompleteProvider<GuildsAutocomplete>, InteractionLocalizer<CommandLocalizer>] string serverId
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -155,7 +155,7 @@ public sealed class AdminCommands
         public async ValueTask SendBotWideMessageAsync
         (
             SlashCommandContext context,
-            [Description("The message you want to send."), MinMaxLength(1, 2000)] string message
+            [Description("The message you want to send."), MinMaxLength(1, 2000), InteractionLocalizer<CommandLocalizer>] string message
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -201,7 +201,7 @@ public sealed class AdminCommands
         public async ValueTask ViewLogsAsync
         (
             SlashCommandContext context,
-            [Description("The log file you want to read."), SlashAutoCompleteProvider<AzzyViewLogsAutocomplete>] string? logfile = null
+            [Description("The log file you want to read."), SlashAutoCompleteProvider<AzzyViewLogsAutocomplete>, InteractionLocalizer<CommandLocalizer>] string? logfile = null
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));

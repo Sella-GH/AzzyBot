@@ -4,11 +4,14 @@ using System.Globalization;
 using System.Resources;
 using System.Threading.Tasks;
 using DSharpPlus.Commands.Processors.SlashCommands.Localization;
+using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Localization;
 
-public sealed class CommandLocalizer() : IInteractionLocalizer
+public sealed class CommandLocalizer(ILogger<CommandLocalizer> logger) : IInteractionLocalizer
 {
+    private readonly ILogger<CommandLocalizer> _logger = logger;
+
     public ValueTask<IReadOnlyDictionary<DiscordLocale, string>> TranslateAsync(string fullSymbolName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(fullSymbolName, nameof(fullSymbolName));
@@ -52,13 +55,20 @@ public sealed class CommandLocalizer() : IInteractionLocalizer
         {
             ResourceManager resources = (!isParameter) ? new(typeof(CommandNames)) : new(typeof(CommandParamNames));
             locales.Add(DiscordLocale.de, resources.GetString(symbolName, new CultureInfo(1031)) ?? string.Empty);
-            locales.Add(DiscordLocale.en_US, symbolName);
+            locales.Add(DiscordLocale.en_US, resources.GetString(symbolName, new CultureInfo(1033)) ?? string.Empty);
         }
         else if (fullSymbolName.EndsWith(".description", StringComparison.OrdinalIgnoreCase) && !topLevelCommand)
         {
             ResourceManager resources = (!isParameter) ? new(typeof(CommandDescriptions)) : new(typeof(CommandParamDescriptions));
             locales.Add(DiscordLocale.de, resources.GetString(symbolName, new CultureInfo(1031)) ?? string.Empty);
             locales.Add(DiscordLocale.en_US, resources.GetString(symbolName, new CultureInfo(1033)) ?? string.Empty);
+        }
+
+        _logger.LogWarning(fullSymbolName);
+        _logger.LogWarning(symbolName);
+        foreach (KeyValuePair<DiscordLocale, string> locale in locales)
+        {
+            _logger.LogWarning($"{locale.Key}: {locale.Value}");
         }
 
         return new ValueTask<IReadOnlyDictionary<DiscordLocale, string>>(locales);

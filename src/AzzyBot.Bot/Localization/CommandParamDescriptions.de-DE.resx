@@ -132,4 +132,13 @@
   <data name="reset" xml:space="preserve">
     <value>Setzt den Bot Status auf den Standard zurück.</value>
   </data>
+  <data name="serverid" xml:space="preserve">
+    <value>Wähle den richtigen Server aus.</value>
+  </data>
+  <data name="message" xml:space="preserve">
+    <value>Die Nachricht welche du versenden möchtest.</value>
+  </data>
+  <data name="logfile" xml:space="preserve">
+    <value>Die Logfile welche du sehen möchtest.</value>
+  </data>
 </root>

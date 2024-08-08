@@ -132,4 +132,13 @@
   <data name="reset" xml:space="preserve">
     <value>reset</value>
   </data>
+  <data name="serverid" xml:space="preserve">
+    <value>serverid</value>
+  </data>
+  <data name="message" xml:space="preserve">
+    <value>message</value>
+  </data>
+  <data name="logfile" xml:space="preserve">
+    <value>logfile</value>
+  </data>
 </root>
