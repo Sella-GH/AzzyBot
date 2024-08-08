@@ -29,12 +29,11 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AdminCommands
 {
     [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
-    public sealed class AdminGroup(ILogger<AdminGroup> logger, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotService botService, DiscordBotServiceHost botServiceHost)
+    public sealed class AdminGroup(ILogger<AdminGroup> logger, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotService botService)
     {
         private readonly AzzyBotSettingsRecord _settings = settings;
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
-        private readonly DiscordBotServiceHost _botServiceHost = botServiceHost;
         private readonly ILogger<AdminGroup> _logger = logger;
 
         [Command("change-bot-status"), Description("Change the global bot status according to your likes.")]
@@ -54,7 +53,7 @@ public sealed class AdminCommands
 
             await context.DeferResponseAsync();
 
-            await _botServiceHost.SetBotStatusAsync(status, activity, doing, url, reset is 1);
+            await _botService.SetBotStatusAsync(status, activity, doing, url, reset is 1);
 
             if (reset is 1)
             {

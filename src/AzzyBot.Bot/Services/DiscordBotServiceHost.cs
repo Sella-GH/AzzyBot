@@ -74,7 +74,7 @@ public sealed class DiscordBotServiceHost : IHostedService
         int status = _settings.DiscordStatus?.Status ?? 1;
         Uri? url = _settings.DiscordStatus?.StreamUrl;
 
-        await SetBotStatusAsync(status, activity, doing, url);
+        await _botService.SetBotStatusAsync(status, activity, doing, url);
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)
@@ -82,27 +82,6 @@ public sealed class DiscordBotServiceHost : IHostedService
         cancellationToken.ThrowIfCancellationRequested();
 
         await Client.DisconnectAsync();
-    }
-
-    public async Task SetBotStatusAsync(int status = 1, int type = 2, string doing = "Music", Uri? url = null, bool reset = false)
-    {
-        if (reset)
-        {
-            await Client.UpdateStatusAsync(new DiscordActivity("Music", DiscordActivityType.ListeningTo), DiscordUserStatus.Online);
-            return;
-        }
-
-        DiscordActivityType activityType = (Enum.IsDefined(typeof(DiscordActivityType), type)) ? (DiscordActivityType)type : DiscordActivityType.ListeningTo;
-        if (activityType is DiscordActivityType.Streaming && url is null)
-            activityType = DiscordActivityType.Playing;
-
-        DiscordActivity activity = new(doing, activityType);
-        if (activityType is DiscordActivityType.Streaming && url is not null && (url.Host.Contains("twitch", StringComparison.OrdinalIgnoreCase) || url.Host.Contains("youtube", StringComparison.OrdinalIgnoreCase)))
-            activity.StreamUrl = url.OriginalString;
-
-        DiscordUserStatus userStatus = (Enum.IsDefined(typeof(DiscordUserStatus), status)) ? (DiscordUserStatus)status : DiscordUserStatus.Online;
-
-        await Client.UpdateStatusAsync(activity, userStatus);
     }
 
     private DiscordConfiguration GetDiscordConfig()

@@ -354,6 +354,27 @@ public sealed class DiscordBotService
         return true;
     }
 
+    public async Task SetBotStatusAsync(int status = 1, int type = 2, string doing = "Music", Uri? url = null, bool reset = false)
+    {
+        if (reset)
+        {
+            await _client.UpdateStatusAsync(new DiscordActivity("Music", DiscordActivityType.ListeningTo), DiscordUserStatus.Online);
+            return;
+        }
+
+        DiscordActivityType activityType = (Enum.IsDefined(typeof(DiscordActivityType), type)) ? (DiscordActivityType)type : DiscordActivityType.ListeningTo;
+        if (activityType is DiscordActivityType.Streaming && url is null)
+            activityType = DiscordActivityType.Playing;
+
+        DiscordActivity activity = new(doing, activityType);
+        if (activityType is DiscordActivityType.Streaming && url is not null && (url.Host.Contains("twitch", StringComparison.OrdinalIgnoreCase) || url.Host.Contains("youtube", StringComparison.OrdinalIgnoreCase)))
+            activity.StreamUrl = url.OriginalString;
+
+        DiscordUserStatus userStatus = (Enum.IsDefined(typeof(DiscordUserStatus), status)) ? (DiscordUserStatus)status : DiscordUserStatus.Online;
+
+        await _client.UpdateStatusAsync(activity, userStatus);
+    }
+
     private static async Task<DiscordMessage?> AcknowledgeExceptionAsync(SlashCommandContext ctx)
     {
         DiscordMember? member = ctx.Guild?.Owner;
