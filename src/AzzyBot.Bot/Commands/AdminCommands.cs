@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Choices;
 using AzzyBot.Bot.Services;
+using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
@@ -28,8 +29,9 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AdminCommands
 {
     [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
-    public sealed class AdminGroup(ILogger<AdminGroup> logger, DbActions dbActions, DiscordBotService botService, DiscordBotServiceHost botServiceHost)
+    public sealed class AdminGroup(ILogger<AdminGroup> logger, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotService botService, DiscordBotServiceHost botServiceHost)
     {
+        private readonly AzzyBotSettingsRecord _settings = settings;
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
         private readonly DiscordBotServiceHost _botServiceHost = botServiceHost;
@@ -141,6 +143,12 @@ public sealed class AdminCommands
             {
                 _logger.DiscordItemNotFound(nameof(DiscordGuild), guildIdValue);
                 await context.EditResponseAsync(GeneralStrings.GuildNotFound);
+                return;
+            }
+
+            if (guild.Id == _settings.ServerId)
+            {
+                await context.EditResponseAsync(GeneralStrings.CanNotLeaveServer);
                 return;
             }
 

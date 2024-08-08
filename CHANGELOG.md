@@ -1,4 +1,8 @@
-## 2.0.0-preview7
+## 2.0.0-preview8
+### General
+- Failsafes added to prevent the bot from crashing
+
+## 2.0.0-preview7 - 2024-08-06
 ### Breaking Changes
 - Your Database needs a complete reset, please DROP it and start from scratch
   - This is probably the last time it needs to be dropped by now
