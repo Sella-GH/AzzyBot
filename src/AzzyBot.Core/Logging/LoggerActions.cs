@@ -21,16 +21,19 @@ public static partial class LoggerActions
     [LoggerMessage(12, LogLevel.Debug, "Global timer checking for bot updates")]
     public static partial void GlobalTimerCheckForUpdates(this ILogger logger);
 
-    [LoggerMessage(13, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast files changes")]
+    [LoggerMessage(13, LogLevel.Debug, "Global timer checking {counter} guilds for channel permissions")]
+    public static partial void GlobalTimerCheckForChannelPermissions(this ILogger logger, int counter);
+
+    [LoggerMessage(14, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast files changes")]
     public static partial void GlobalTimerCheckForAzuraCastFiles(this ILogger logger, int counter);
 
-    [LoggerMessage(14, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast updates")]
+    [LoggerMessage(15, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast updates")]
     public static partial void GlobalTimerCheckForAzuraCastUpdates(this ILogger logger, int counter);
 
-    [LoggerMessage(15, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast instance status")]
+    [LoggerMessage(16, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast instance status")]
     public static partial void GlobalTimerCheckForAzuraCastStatus(this ILogger logger, int counter);
 
-    [LoggerMessage(16, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast api permissions")]
+    [LoggerMessage(17, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast api permissions")]
     public static partial void GlobalTimerCheckForAzuraCastApi(this ILogger logger, int counter);
 
     [LoggerMessage(20, LogLevel.Debug, "BackgroundServiceHost started")]
@@ -180,12 +183,18 @@ public static partial class LoggerActions
     [LoggerMessage(320, LogLevel.Error, "Database transaction failed with error: ")]
     public static partial void DatabaseTransactionFailed(this ILogger logger, Exception ex);
 
-    [LoggerMessage(400, LogLevel.Critical, "The given settings can't be parsed, are they filled out?")]
+    [LoggerMessage(400, LogLevel.Critical, "An exception occured: ")]
+    public static partial void ExceptionOccured(this ILogger logger, Exception ex);
+
+    [LoggerMessage(401, LogLevel.Critical, "I'm not inside the server with the id {id} - please invite me to my hometown or I won't start!")]
+    public static partial void NotInHomeGuild(this ILogger logger, ulong id);
+
+    [LoggerMessage(402, LogLevel.Critical, "You removed me from my hometown server with the id {id}! I'm going to shutdown now.")]
+    public static partial void RemovedFromHomeGuild(this ILogger logger, ulong id);
+
+    [LoggerMessage(410, LogLevel.Critical, "The given settings can't be parsed, are they filled out?")]
     public static partial void UnableToParseSettings(this ILogger logger);
 
-    [LoggerMessage(401, LogLevel.Critical, "The given BotToken is either missing or invalid")]
+    [LoggerMessage(411, LogLevel.Critical, "The given BotToken is either missing or invalid")]
     public static partial void BotTokenInvalid(this ILogger logger);
-
-    [LoggerMessage(402, LogLevel.Critical, "An exception occured: ")]
-    public static partial void ExceptionOccured(this ILogger logger, Exception ex);
 }

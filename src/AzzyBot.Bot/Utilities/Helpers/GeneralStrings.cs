@@ -4,6 +4,7 @@ public static class GeneralStrings
 {
     public const string BotStatusChanged = "Bot status has been updated!";
     public const string BotStatusReset = "Bot status has been reset!";
+    public const string CanNotLeaveServer = "You can't make me leave my own home server!";
     public const string CoreSettingsMissing = "You have to set the core settings first!";
     public const string CoreSettingsModified = "Core settings have been modified successfully.";
     public const string ConfigGet = "I sent you an overview with all the settings in private. Be aware of sensitive data.";

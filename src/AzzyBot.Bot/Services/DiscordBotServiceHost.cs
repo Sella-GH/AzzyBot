@@ -11,6 +11,7 @@ using AzzyBot.Bot.Utilities;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Data;
+using AzzyBot.Data.Entities;
 using DSharpPlus;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.EventArgs;
@@ -40,7 +41,7 @@ public sealed class DiscordBotServiceHost : IHostedService
 
     public DiscordClient Client { get; init; }
 
-    public DiscordBotServiceHost(AzzyBotSettingsRecord settings, DbActions dbActions, ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
+    public DiscordBotServiceHost(ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider, AzzyBotSettingsRecord settings, DbActions dbActions)
     {
         _logger = logger;
         _loggerFactory = loggerFactory;
@@ -74,7 +75,7 @@ public sealed class DiscordBotServiceHost : IHostedService
         int status = _settings.DiscordStatus?.Status ?? 1;
         Uri? url = _settings.DiscordStatus?.StreamUrl;
 
-        await SetBotStatusAsync(status, activity, doing, url);
+        await _botService.SetBotStatusAsync(status, activity, doing, url);
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)
@@ -82,27 +83,6 @@ public sealed class DiscordBotServiceHost : IHostedService
         cancellationToken.ThrowIfCancellationRequested();
 
         await Client.DisconnectAsync();
-    }
-
-    public async Task SetBotStatusAsync(int status = 1, int type = 2, string doing = "Music", Uri? url = null, bool reset = false)
-    {
-        if (reset)
-        {
-            await Client.UpdateStatusAsync(new DiscordActivity("Music", DiscordActivityType.ListeningTo), DiscordUserStatus.Online);
-            return;
-        }
-
-        DiscordActivityType activityType = (Enum.IsDefined(typeof(DiscordActivityType), type)) ? (DiscordActivityType)type : DiscordActivityType.ListeningTo;
-        if (activityType is DiscordActivityType.Streaming && url is null)
-            activityType = DiscordActivityType.Playing;
-
-        DiscordActivity activity = new(doing, activityType);
-        if (activityType is DiscordActivityType.Streaming && url is not null && (url.Host.Contains("twitch", StringComparison.OrdinalIgnoreCase) || url.Host.Contains("youtube", StringComparison.OrdinalIgnoreCase)))
-            activity.StreamUrl = url.OriginalString;
-
-        DiscordUserStatus userStatus = (Enum.IsDefined(typeof(DiscordUserStatus), status)) ? (DiscordUserStatus)status : DiscordUserStatus.Online;
-
-        await Client.UpdateStatusAsync(activity, userStatus);
     }
 
     private DiscordConfiguration GetDiscordConfig()
@@ -188,42 +168,6 @@ public sealed class DiscordBotServiceHost : IHostedService
         Client.GuildDownloadCompleted += ClientGuildDownloadCompletedAsync;
     }
 
-    private async Task CommandErroredAsync(CommandsExtension c, CommandErroredEventArgs e)
-    {
-        _logger.CommandsError();
-        _logger.CommandsErrorType(e.Exception.GetType().Name);
-
-        if (_botService is null)
-            return;
-
-        Exception ex = e.Exception;
-        DateTime now = DateTime.Now;
-        ulong guildId = 0;
-        if (e.Context.Guild is not null)
-            guildId = e.Context.Guild.Id;
-
-        if (e.Context is not SlashCommandContext slashContext)
-        {
-            await _botService.LogExceptionAsync(ex, now, guildId: guildId);
-            return;
-        }
-
-        switch (ex)
-        {
-            case ChecksFailedException checksFailed:
-                await _botService.RespondToChecksExceptionAsync(checksFailed, slashContext);
-                break;
-
-            case DiscordException:
-                await _botService.LogExceptionAsync(ex, now, slashContext, guildId, ((DiscordException)e.Exception).JsonMessage);
-                break;
-
-            default:
-                await _botService.LogExceptionAsync(ex, now, slashContext, guildId);
-                break;
-        }
-    }
-
     private async Task ClientErroredAsync(DiscordClient c, ClientErrorEventArgs e)
     {
         if (_botService is null)
@@ -272,6 +216,14 @@ public sealed class DiscordBotServiceHost : IHostedService
 
     private async Task ClientGuildDeletedAsync(DiscordClient c, GuildDeleteEventArgs e)
     {
+        if (e.Guild.Id == _settings.ServerId)
+        {
+            _logger.RemovedFromHomeGuild(_settings.ServerId);
+            Environment.Exit(0);
+
+            return;
+        }
+
         if (e.Unavailable)
         {
             _logger.GuildUnavailable(e.Guild.Name);
@@ -291,6 +243,14 @@ public sealed class DiscordBotServiceHost : IHostedService
     private async Task ClientGuildDownloadCompletedAsync(DiscordClient c, GuildDownloadCompletedEventArgs e)
     {
         ArgumentNullException.ThrowIfNull(_botService, nameof(_botService));
+
+        if (!e.Guilds.ContainsKey(_settings.ServerId))
+        {
+            _logger.NotInHomeGuild(_settings.ServerId);
+            Environment.Exit(0);
+
+            return;
+        }
 
         DiscordEmbed embed;
         IEnumerable<DiscordGuild> addedGuilds = await _dbActions.AddGuildsAsync(e.Guilds);
@@ -312,6 +272,45 @@ public sealed class DiscordBotServiceHost : IHostedService
                 embed = EmbedBuilder.BuildGuildRemovedEmbed(guild);
                 await _botService.SendMessageAsync(_settings.NotificationChannelId, embeds: [embed]);
             }
+        }
+
+        IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildsAsync(loadEverything: true);
+        await _botService.CheckPermissionsAsync(guilds);
+    }
+
+    private async Task CommandErroredAsync(CommandsExtension c, CommandErroredEventArgs e)
+    {
+        _logger.CommandsError();
+        _logger.CommandsErrorType(e.Exception.GetType().Name);
+
+        if (_botService is null)
+            return;
+
+        Exception ex = e.Exception;
+        DateTime now = DateTime.Now;
+        ulong guildId = 0;
+        if (e.Context.Guild is not null)
+            guildId = e.Context.Guild.Id;
+
+        if (e.Context is not SlashCommandContext slashContext)
+        {
+            await _botService.LogExceptionAsync(ex, now, guildId: guildId);
+            return;
+        }
+
+        switch (ex)
+        {
+            case ChecksFailedException checksFailed:
+                await _botService.RespondToChecksExceptionAsync(checksFailed, slashContext);
+                break;
+
+            case DiscordException:
+                await _botService.LogExceptionAsync(ex, now, slashContext, guildId, ((DiscordException)e.Exception).JsonMessage);
+                break;
+
+            default:
+                await _botService.LogExceptionAsync(ex, now, slashContext, guildId);
+                break;
         }
     }
 }

@@ -34,12 +34,12 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<DiscordBotServiceHost>();
         services.AddHostedService(s => s.GetRequiredService<DiscordBotServiceHost>());
 
-        services.AddSingleton<WebRequestService>();
-        services.AddSingleton<UpdaterService>();
-
         services.AddSingleton<QueuedBackgroundTask>();
         services.AddSingleton<QueuedBackgroundTaskHost>();
         services.AddHostedService(s => s.GetRequiredService<QueuedBackgroundTaskHost>());
+
+        services.AddSingleton<WebRequestService>();
+        services.AddSingleton<UpdaterService>();
 
         services.AddSingleton<AzuraCastApiService>();
         services.AddSingleton<AzuraCastFileService>();
