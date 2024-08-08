@@ -9,7 +9,6 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.EventListeners;
 
@@ -23,12 +22,11 @@ public static partial class EventListener
         ArgumentNullException.ThrowIfNull(e, nameof(e));
 
         IServiceProvider sp = c.ServiceProvider;
-        ILogger logger = sp.GetRequiredService<ILogger>();
         AzzyBotSettingsRecord settings = sp.GetRequiredService<AzzyBotSettingsRecord>();
         DiscordBotService botService = sp.GetRequiredService<DiscordBotService>();
         DbActions dbActions = sp.GetRequiredService<DbActions>();
 
-        logger.GuildCreated(e.Guild.Name);
+        c.Logger.GuildCreated(e.Guild.Name);
 
         await dbActions.AddGuildAsync(e.Guild.Id);
         DiscordMember owner = await e.Guild.GetGuildOwnerAsync();

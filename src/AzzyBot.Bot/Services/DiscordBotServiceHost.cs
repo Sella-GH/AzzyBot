@@ -129,7 +129,7 @@ public sealed class DiscordBotServiceHost(ILogger<DiscordBotServiceHost> logger,
         SlashCommandProcessor slashCommandProcessor = new();
         slashCommandProcessor.AddConverter<Uri>(new UriArgumentConverter());
 
-        commandsExtension.AddProcessor<SlashCommandProcessor>();
+        commandsExtension.AddProcessor(slashCommandProcessor);
     }
 
     private void RegisterInteractivity()

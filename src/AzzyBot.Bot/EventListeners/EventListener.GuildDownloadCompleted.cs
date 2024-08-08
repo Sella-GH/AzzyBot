@@ -12,7 +12,6 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.EventListeners;
 
@@ -24,12 +23,11 @@ public static partial class EventListener
         ArgumentNullException.ThrowIfNull(e, nameof(e));
 
         IServiceProvider sp = c.ServiceProvider;
-        ILogger logger = sp.GetRequiredService<ILogger>();
         AzzyBotSettingsRecord settings = sp.GetRequiredService<AzzyBotSettingsRecord>();
 
         if (!e.Guilds.ContainsKey(settings.ServerId))
         {
-            logger.NotInHomeGuild(settings.ServerId);
+            c.Logger.NotInHomeGuild(settings.ServerId);
             Environment.Exit(0);
 
             return;
