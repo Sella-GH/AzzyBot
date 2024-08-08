@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Commands;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Converters;
+using AzzyBot.Bot.Services.BackgroundServices;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Core.Logging;
+using AzzyBot.Core.Services.BackgroundServices;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Data;
+using AzzyBot.Data.Entities;
 using DSharpPlus;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.EventArgs;
@@ -34,18 +37,22 @@ public sealed class DiscordBotServiceHost : IHostedService
     private readonly ILoggerFactory _loggerFactory;
     private readonly IServiceProvider _serviceProvider;
     private readonly AzzyBotSettingsRecord _settings;
+    private readonly CoreBackgroundTask _coreBackgroundTask;
     private readonly DbActions _dbActions;
+    private readonly QueuedBackgroundTask _queue;
     private DiscordBotService? _botService;
     private const string NewGuildText = "Thank you for adding me to your server **%GUILD%**! Before you can make good use of me, you have to set my settings first.\n\nPlease use the command `config modify-core` for this.\nOnly administrators are able to execute this command right now.";
 
     public DiscordClient Client { get; init; }
 
-    public DiscordBotServiceHost(AzzyBotSettingsRecord settings, DbActions dbActions, ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider)
+    public DiscordBotServiceHost(ILogger<DiscordBotServiceHost> logger, ILoggerFactory loggerFactory, IServiceProvider serviceProvider, AzzyBotSettingsRecord settings, CoreBackgroundTask coreBackgroundTask, DbActions dbActions, QueuedBackgroundTask queue)
     {
         _logger = logger;
         _loggerFactory = loggerFactory;
         _serviceProvider = serviceProvider;
+        _coreBackgroundTask = coreBackgroundTask;
         _dbActions = dbActions;
+        _queue = queue;
         _settings = settings;
 
         Client = new(GetDiscordConfig());
@@ -308,5 +315,8 @@ public sealed class DiscordBotServiceHost : IHostedService
                 await _botService.SendMessageAsync(_settings.NotificationChannelId, embeds: [embed]);
             }
         }
+
+        IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildsAsync(loadEverything: true);
+        await Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _coreBackgroundTask.CheckPermissionsAsync(guilds)));
     }
 }
