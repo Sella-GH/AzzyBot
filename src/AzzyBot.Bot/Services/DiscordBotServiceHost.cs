@@ -292,6 +292,14 @@ public sealed class DiscordBotServiceHost : IHostedService
     {
         ArgumentNullException.ThrowIfNull(_botService, nameof(_botService));
 
+        if (!e.Guilds.ContainsKey(_settings.ServerId))
+        {
+            _logger.NotInHomeGuild(_settings.ServerId);
+            Environment.Exit(0);
+
+            return;
+        }
+
         DiscordEmbed embed;
         IEnumerable<DiscordGuild> addedGuilds = await _dbActions.AddGuildsAsync(e.Guilds);
         if (addedGuilds.Any())

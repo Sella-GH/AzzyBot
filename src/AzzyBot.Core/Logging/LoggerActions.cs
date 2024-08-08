@@ -180,12 +180,15 @@ public static partial class LoggerActions
     [LoggerMessage(320, LogLevel.Error, "Database transaction failed with error: ")]
     public static partial void DatabaseTransactionFailed(this ILogger logger, Exception ex);
 
-    [LoggerMessage(400, LogLevel.Critical, "The given settings can't be parsed, are they filled out?")]
+    [LoggerMessage(400, LogLevel.Critical, "An exception occured: ")]
+    public static partial void ExceptionOccured(this ILogger logger, Exception ex);
+
+    [LoggerMessage(401, LogLevel.Critical, "I'm not inside the server with the id {id} - please invite me to my hometown or I wont' start!")]
+    public static partial void NotInHomeGuild(this ILogger logger, ulong id);
+
+    [LoggerMessage(410, LogLevel.Critical, "The given settings can't be parsed, are they filled out?")]
     public static partial void UnableToParseSettings(this ILogger logger);
 
-    [LoggerMessage(401, LogLevel.Critical, "The given BotToken is either missing or invalid")]
+    [LoggerMessage(411, LogLevel.Critical, "The given BotToken is either missing or invalid")]
     public static partial void BotTokenInvalid(this ILogger logger);
-
-    [LoggerMessage(402, LogLevel.Critical, "An exception occured: ")]
-    public static partial void ExceptionOccured(this ILogger logger, Exception ex);
 }
