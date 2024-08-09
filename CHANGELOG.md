@@ -1,6 +1,11 @@
 ## 2.0.0-preview8
 ### General
 - Failsafes added to prevent the bot from crashing
+- Refactored the code to comply with the newest dependency versions
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02350
+- Replaced [Lavalink4NET.DSharpPlus](https://github.com/angelobreuer/Lavalink4NET) with [Lavalink4NET.DSharpPlus.Nightly](https://github.com/angelobreuer/Lavalink4NET) version 4.0.20
 
 ### Additions
 - New command `core force-channel-permissions-check` which checks all discord channels if the bot has the correct permissions
@@ -8,6 +13,7 @@
 
 ### Improvements
 - Consolidated some code to make it more readable and maintainable (and hopefully faster)
+- The bot checks now if the voice channel to enter is visible and joinable for it
 
 ## 2.0.0-preview7 - 2024-08-06
 ### Breaking Changes

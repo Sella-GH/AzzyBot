@@ -23,28 +23,18 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class DiscordBotService
+public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordClient client)
 {
-    private readonly ILogger<DiscordBotService> _logger;
-    private readonly AzzyBotSettingsRecord _settings;
-    private readonly DbActions _dbActions;
-    private readonly DiscordClient _client;
+    private readonly ILogger<DiscordBotService> _logger = logger;
+    private readonly AzzyBotSettingsRecord _settings = settings;
+    private readonly DbActions _dbActions = dbActions;
+    private readonly DiscordClient _client = client;
     private const string BugReportUrl = "https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D";
     private const string BugReportMessage = $"Send a [bug report]({BugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
     private const string ErrorChannelNotConfigured = $"**If you're seeing this message then I am not configured correctly!**\nTell your server admin to run */config modify-core*\n\n{BugReportMessage}";
 
-    public DiscordBotService(AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotServiceHost botServiceHost, ILogger<DiscordBotService> logger)
-    {
-        ArgumentNullException.ThrowIfNull(botServiceHost, nameof(botServiceHost));
-
-        _logger = logger;
-        _settings = settings;
-        _dbActions = dbActions;
-        _client = botServiceHost.Client;
-    }
-
     public bool CheckIfClientIsConnected
-    => _client.IsConnected;
+    => _client.AllShardsConnected;
 
     public async Task<bool> CheckChannelPermissionsAsync(DiscordMember member, ulong channelId, DiscordPermissions permissions)
     {
@@ -102,7 +92,8 @@ public sealed class DiscordBotService
 
         builder.AppendLine("Please review your permission set.");
 
-        await guild.Owner.SendMessageAsync(builder.ToString());
+        DiscordMember owner = await guild.GetGuildOwnerAsync();
+        await owner.SendMessageAsync(builder.ToString());
     }
 
     public async Task CheckPermissionsAsync(IAsyncEnumerable<GuildEntity> guilds)
@@ -193,7 +184,8 @@ public sealed class DiscordBotService
 
             builder.AppendLine("Please review your permission set.");
 
-            await dGuild.Owner.SendMessageAsync(builder.ToString());
+            DiscordMember owner = await dGuild.GetGuildOwnerAsync();
+            await owner.SendMessageAsync(builder.ToString());
         }
     }
 
@@ -526,12 +518,22 @@ public sealed class DiscordBotService
         await _client.UpdateStatusAsync(activity, userStatus);
     }
 
-    private static async Task<DiscordMessage?> AcknowledgeExceptionAsync(SlashCommandContext ctx)
+    private async Task<DiscordMessage?> AcknowledgeExceptionAsync(SlashCommandContext ctx)
     {
-        DiscordMember? member = ctx.Guild?.Owner;
+        DiscordGuild? guild = ctx.Guild;
+        DiscordMember? owner = null;
+        if (guild is null)
+        {
+            _logger.DiscordItemNotFound(nameof(DiscordGuild), 0);
+        }
+        else
+        {
+            owner = await guild.GetGuildOwnerAsync();
+        }
+
         string errorMessage = "Ooops something went wrong!\n\nPlease inform the owner of this server.";
-        if (member is not null)
-            errorMessage = errorMessage.Replace("the owner of this server", member.Mention, StringComparison.OrdinalIgnoreCase);
+        if (owner is not null)
+            errorMessage = errorMessage.Replace("the owner of this server", owner.Mention, StringComparison.OrdinalIgnoreCase);
 
         await using DiscordMessageBuilder builder = new()
         {

@@ -101,7 +101,7 @@ public sealed class AdminCommands
                     return;
                 }
 
-                DiscordEmbed embed = EmbedBuilder.BuildGuildAddedEmbed(guild, true);
+                DiscordEmbed embed = await EmbedBuilder.BuildGuildAddedEmbedAsync(guild, true);
                 await context.EditResponseAsync(embed);
 
                 return;
@@ -195,7 +195,8 @@ public sealed class AdminCommands
                 }
                 else
                 {
-                    await guild.Value.Owner.SendMessageAsync(message);
+                    DiscordMember owner = await guild.Value.GetGuildOwnerAsync();
+                    await owner.SendMessageAsync(message);
                 }
             }
 
