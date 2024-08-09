@@ -10,6 +10,7 @@ using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Choices;
 using AzzyBot.Bot.Localization;
 using AzzyBot.Bot.Services;
+using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
@@ -30,11 +31,11 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AdminCommands
 {
     [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator), InteractionLocalizer<CommandLocalizer>]
-    public sealed class AdminGroup(ILogger<AdminGroup> logger, DbActions dbActions, DiscordBotService botService, DiscordBotServiceHost botServiceHost)
+    public sealed class AdminGroup(ILogger<AdminGroup> logger, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotService botService)
     {
+        private readonly AzzyBotSettingsRecord _settings = settings;
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
-        private readonly DiscordBotServiceHost _botServiceHost = botServiceHost;
         private readonly ILogger<AdminGroup> _logger = logger;
 
         [Command("change-bot-status"), Description("Change the global bot status according to your likes."), InteractionLocalizer<CommandLocalizer>]
@@ -54,7 +55,7 @@ public sealed class AdminCommands
 
             await context.DeferResponseAsync();
 
-            await _botServiceHost.SetBotStatusAsync(status, activity, doing, url, reset is 1);
+            await _botService.SetBotStatusAsync(status, activity, doing, url, reset is 1);
 
             if (reset is 1)
             {
@@ -102,7 +103,7 @@ public sealed class AdminCommands
                     return;
                 }
 
-                DiscordEmbed embed = EmbedBuilder.BuildGuildAddedEmbed(guild, true);
+                DiscordEmbed embed = await EmbedBuilder.BuildGuildAddedEmbedAsync(guild, true);
                 await context.EditResponseAsync(embed);
 
                 return;
@@ -143,6 +144,12 @@ public sealed class AdminCommands
             {
                 _logger.DiscordItemNotFound(nameof(DiscordGuild), guildIdValue);
                 await context.EditResponseAsync(GeneralStrings.GuildNotFound);
+                return;
+            }
+
+            if (guild.Id == _settings.ServerId)
+            {
+                await context.EditResponseAsync(GeneralStrings.CanNotLeaveServer);
                 return;
             }
 
@@ -190,7 +197,8 @@ public sealed class AdminCommands
                 }
                 else
                 {
-                    await guild.Value.Owner.SendMessageAsync(message);
+                    DiscordMember owner = await guild.Value.GetGuildOwnerAsync();
+                    await owner.SendMessageAsync(message);
                 }
             }
 

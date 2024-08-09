@@ -5,11 +5,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
+using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
+using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records;
+using AzzyBot.Core.Extensions;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Records;
+using AzzyBot.Data;
+using AzzyBot.Data.Entities;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
@@ -23,10 +28,33 @@ namespace AzzyBot.Bot.Commands;
 public sealed class CoreCommands
 {
     [Command("core"), RequireGuild]
-    public sealed class CoreGroup(AzzyBotSettingsRecord settings, ILogger<CoreGroup> logger)
+    public sealed class CoreGroup(ILogger<CoreGroup> logger, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotService botService)
     {
-        private readonly AzzyBotSettingsRecord _settings = settings;
         private readonly ILogger<CoreGroup> _logger = logger;
+        private readonly AzzyBotSettingsRecord _settings = settings;
+        private readonly DbActions _dbActions = dbActions;
+        private readonly DiscordBotService _botService = botService;
+
+        [Command("force-channel-permissions-check"), Description("Forces a check of the permissions for the bot in the necessary channel."), RequirePermissions(DiscordPermissions.None, DiscordPermissions.ManageChannels)]
+        public async ValueTask ForceChannelPermissionsCheckAsync(SlashCommandContext context)
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+            _logger.CommandRequested(nameof(ForceChannelPermissionsCheckAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            IAsyncEnumerable<GuildEntity> guild = _dbActions.GetGuildAsync(_settings.ServerId, loadEverything: true);
+            if (!await guild.ContainsOneItemAsync())
+            {
+                await context.RespondAsync(GeneralStrings.GuildNotFound);
+                return;
+            }
+
+            await context.EditResponseAsync("I initiated a check of the permissions for the bot, please wait a little for the result.");
+
+            await _botService.CheckPermissionsAsync(guild);
+        }
 
         [Command("help"), Description("Gives you an overview about all the available commands.")]
         public async ValueTask HelpAsync
@@ -121,10 +149,11 @@ public sealed class CoreCommands
             public async ValueTask PingAsync(SlashCommandContext context)
             {
                 ArgumentNullException.ThrowIfNull(context, nameof(context));
+                ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
                 _logger.CommandRequested(nameof(PingAsync), context.User.GlobalName);
 
-                await context.RespondAsync($"Pong! {context.Client.Ping}ms");
+                await context.RespondAsync($"Pong! {context.Client.GetConnectionLatency(context.Guild.Id)}ms");
             }
         }
     }

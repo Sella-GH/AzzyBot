@@ -23,28 +23,171 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class DiscordBotService
+public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordClient client)
 {
-    private readonly ILogger<DiscordBotService> _logger;
-    private readonly AzzyBotSettingsRecord _settings;
-    private readonly DbActions _dbActions;
-    private readonly DiscordClient _client;
+    private readonly ILogger<DiscordBotService> _logger = logger;
+    private readonly AzzyBotSettingsRecord _settings = settings;
+    private readonly DbActions _dbActions = dbActions;
+    private readonly DiscordClient _client = client;
     private const string BugReportUrl = "https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D";
     private const string BugReportMessage = $"Send a [bug report]({BugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
     private const string ErrorChannelNotConfigured = $"**If you're seeing this message then I am not configured correctly!**\nTell your server admin to run */config modify-core*\n\n{BugReportMessage}";
 
-    public DiscordBotService(AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotServiceHost botServiceHost, ILogger<DiscordBotService> logger)
-    {
-        ArgumentNullException.ThrowIfNull(botServiceHost, nameof(botServiceHost));
+    public bool CheckIfClientIsConnected
+    => _client.AllShardsConnected;
 
-        _logger = logger;
-        _settings = settings;
-        _dbActions = dbActions;
-        _client = botServiceHost.Client;
+    public async Task<bool> CheckChannelPermissionsAsync(DiscordMember member, ulong channelId, DiscordPermissions permissions)
+    {
+        ArgumentNullException.ThrowIfNull(member, nameof(member));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
+
+        DiscordChannel? channel = await GetDiscordChannelAsync(channelId);
+        if (channel is null)
+        {
+            _logger.DiscordItemNotFound(nameof(DiscordChannel), channelId);
+            return false;
+        }
+
+        return channel.PermissionsFor(member).HasPermission(permissions);
     }
 
-    public bool CheckIfClientIsConnected
-        => _client.IsConnected;
+    public async Task CheckPermissionsAsync(DiscordGuild guild, ulong[] channelIds)
+    {
+        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
+        ArgumentNullException.ThrowIfNull(channelIds, nameof(channelIds));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelIds.Length, nameof(channelIds));
+
+        DiscordMember? member = await GetDiscordMemberAsync(guild.Id);
+        if (member is null)
+        {
+            _logger.DiscordItemNotFound(nameof(DiscordMember), guild.Id);
+            return;
+        }
+
+        List<ulong> channels = new(channelIds.Length);
+        List<ulong> channelNotAccessible = new(channelIds.Length);
+        foreach (ulong channelId in channelIds)
+        {
+            channels.Add(channelId);
+            if (!await CheckChannelPermissionsAsync(member, channelId, DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages))
+                channelNotAccessible.Add(channelId);
+        }
+
+        if (channelNotAccessible.Count is 0)
+            return;
+
+        StringBuilder builder = new();
+        builder.AppendLine(CultureInfo.InvariantCulture, $"I don't have the required permissions in server **{guild.Name}** to send messages in channel(s):");
+        foreach (ulong channelId in channelNotAccessible)
+        {
+            DiscordChannel? dChannel = await GetDiscordChannelAsync(channelId);
+            if (dChannel is null)
+            {
+                _logger.DiscordItemNotFound(nameof(DiscordChannel), channelId);
+                continue;
+            }
+
+            builder.AppendLine(CultureInfo.InvariantCulture, $"- {dChannel.Mention}");
+        }
+
+        builder.AppendLine("Please review your permission set.");
+
+        DiscordMember owner = await guild.GetGuildOwnerAsync();
+        await owner.SendMessageAsync(builder.ToString());
+    }
+
+    public async Task CheckPermissionsAsync(IAsyncEnumerable<GuildEntity> guilds)
+    {
+        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
+
+        DiscordMember? member;
+        List<ulong> channels = [];
+        List<ulong> channelNotAccessible = [];
+        await foreach (GuildEntity guild in guilds)
+        {
+            if (guild.UniqueId == _settings.ServerId)
+            {
+                channels.Add(_settings.ErrorChannelId);
+                channels.Add(_settings.NotificationChannelId);
+            }
+
+            member = await GetDiscordMemberAsync(guild.UniqueId);
+            if (member is null)
+            {
+                _logger.DiscordItemNotFound(nameof(DiscordMember), guild.UniqueId);
+                continue;
+            }
+
+            if (guild.Preferences.AdminNotifyChannelId is not 0)
+                channels.Add(guild.Preferences.AdminNotifyChannelId);
+
+            if (guild.Preferences.ErrorChannelId is not 0)
+                channels.Add(guild.Preferences.ErrorChannelId);
+
+            if (guild.AzuraCast is not null)
+            {
+                if (guild.AzuraCast.Preferences.NotificationChannelId is not 0)
+                    channels.Add(guild.AzuraCast.Preferences.NotificationChannelId);
+
+                if (guild.AzuraCast.Preferences.OutagesChannelId is not 0)
+                    channels.Add(guild.AzuraCast.Preferences.OutagesChannelId);
+
+                foreach (AzuraCastStationEntity station in guild.AzuraCast.Stations)
+                {
+                    if (station.Preferences.FileUploadChannelId is not 0)
+                        channels.Add(station.Preferences.FileUploadChannelId);
+
+                    if (station.Preferences.RequestsChannelId is not 0)
+                        channels.Add(station.Preferences.RequestsChannelId);
+                }
+            }
+
+            foreach (ulong channelId in channels)
+            {
+                DiscordChannel? channel = await GetDiscordChannelAsync(channelId);
+                if (channel is null)
+                {
+                    _logger.DiscordItemNotFound(nameof(DiscordChannel), channelId);
+                    continue;
+                }
+
+                if (!channel.PermissionsFor(member).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages))
+                    channelNotAccessible.Add(channelId);
+            }
+
+            if (channelNotAccessible.Count is 0)
+            {
+                channels.Clear();
+                continue;
+            }
+
+            DiscordGuild? dGuild = GetDiscordGuild(guild.UniqueId);
+            if (dGuild is null)
+            {
+                _logger.DiscordItemNotFound(nameof(DiscordGuild), guild.UniqueId);
+                continue;
+            }
+
+            StringBuilder builder = new();
+            builder.AppendLine(CultureInfo.InvariantCulture, $"I don't have the required permissions in server **{dGuild.Name}** to send messages in channel(s):");
+            foreach (ulong channelId in channelNotAccessible)
+            {
+                DiscordChannel? dChannel = await GetDiscordChannelAsync(channelId);
+                if (dChannel is null)
+                {
+                    _logger.DiscordItemNotFound(nameof(DiscordChannel), channelId);
+                    continue;
+                }
+
+                builder.AppendLine(CultureInfo.InvariantCulture, $"- {dChannel.Mention}");
+            }
+
+            builder.AppendLine("Please review your permission set.");
+
+            DiscordMember owner = await dGuild.GetGuildOwnerAsync();
+            await owner.SendMessageAsync(builder.ToString());
+        }
+    }
 
     public async Task<DiscordChannel?> GetDiscordChannelAsync(ulong channelId)
     {
@@ -70,13 +213,13 @@ public sealed class DiscordBotService
     public IReadOnlyDictionary<ulong, DiscordGuild> GetDiscordGuilds
         => _client.Guilds;
 
-    public async Task<DiscordMember?> GetDiscordMemberAsync(ulong guildId, ulong userId)
+    public async Task<DiscordMember?> GetDiscordMemberAsync(ulong guildId, ulong userId = 0)
     {
         DiscordGuild? guild = GetDiscordGuild(guildId);
         DiscordMember? member = null;
 
         if (guild is not null)
-            member = await guild.GetMemberAsync(userId);
+            member = await guild.GetMemberAsync((userId is not 0) ? userId : _client.CurrentUser.Id);
 
         return member;
     }
@@ -127,7 +270,7 @@ public sealed class DiscordBotService
 
             if (errorChannelId == _settings.ErrorChannelId)
             {
-                DiscordChannel? dChannel = await GetFirstDiscordChannelAsync(guildId, _client.CurrentUser.Id);
+                DiscordChannel? dChannel = await GetFirstDiscordChannelAsync(guildId);
                 if (dChannel is null)
                 {
                     _logger.DiscordItemNotFound(nameof(DiscordChannel), guildId);
@@ -322,7 +465,7 @@ public sealed class DiscordBotService
         }
         else
         {
-            DiscordMember? dMember = await GetDiscordMemberAsync(channel.Guild.Id, _client.CurrentUser.Id);
+            DiscordMember? dMember = await GetDiscordMemberAsync(channel.Guild.Id);
             if (dMember is null)
             {
                 _logger.UnableToSendMessage($"Bot is not a member of server: {channel.Guild.Name} ({channel.Guild.Id})");
@@ -354,12 +497,43 @@ public sealed class DiscordBotService
         return true;
     }
 
-    private static async Task<DiscordMessage?> AcknowledgeExceptionAsync(SlashCommandContext ctx)
+    public async Task SetBotStatusAsync(int status = 1, int type = 2, string doing = "Music", Uri? url = null, bool reset = false)
     {
-        DiscordMember? member = ctx.Guild?.Owner;
+        if (reset)
+        {
+            await _client.UpdateStatusAsync(new DiscordActivity("Music", DiscordActivityType.ListeningTo), DiscordUserStatus.Online);
+            return;
+        }
+
+        DiscordActivityType activityType = (Enum.IsDefined(typeof(DiscordActivityType), type)) ? (DiscordActivityType)type : DiscordActivityType.ListeningTo;
+        if (activityType is DiscordActivityType.Streaming && url is null)
+            activityType = DiscordActivityType.Playing;
+
+        DiscordActivity activity = new(doing, activityType);
+        if (activityType is DiscordActivityType.Streaming && url is not null && (url.Host.Contains("twitch", StringComparison.OrdinalIgnoreCase) || url.Host.Contains("youtube", StringComparison.OrdinalIgnoreCase)))
+            activity.StreamUrl = url.OriginalString;
+
+        DiscordUserStatus userStatus = (Enum.IsDefined(typeof(DiscordUserStatus), status)) ? (DiscordUserStatus)status : DiscordUserStatus.Online;
+
+        await _client.UpdateStatusAsync(activity, userStatus);
+    }
+
+    private async Task<DiscordMessage?> AcknowledgeExceptionAsync(SlashCommandContext ctx)
+    {
+        DiscordGuild? guild = ctx.Guild;
+        DiscordMember? owner = null;
+        if (guild is null)
+        {
+            _logger.DiscordItemNotFound(nameof(DiscordGuild), 0);
+        }
+        else
+        {
+            owner = await guild.GetGuildOwnerAsync();
+        }
+
         string errorMessage = "Ooops something went wrong!\n\nPlease inform the owner of this server.";
-        if (member is not null)
-            errorMessage = errorMessage.Replace("the owner of this server", member.Mention, StringComparison.OrdinalIgnoreCase);
+        if (owner is not null)
+            errorMessage = errorMessage.Replace("the owner of this server", owner.Mention, StringComparison.OrdinalIgnoreCase);
 
         await using DiscordMessageBuilder builder = new()
         {
@@ -384,10 +558,10 @@ public sealed class DiscordBotService
         return null;
     }
 
-    private async Task<DiscordChannel?> GetFirstDiscordChannelAsync(ulong guildId, ulong memberId)
+    private async Task<DiscordChannel?> GetFirstDiscordChannelAsync(ulong guildId)
     {
         DiscordGuild? guild = GetDiscordGuild(guildId);
-        DiscordMember? member = await GetDiscordMemberAsync(guildId, memberId);
+        DiscordMember? member = await GetDiscordMemberAsync(guildId);
 
         if (guild is null)
         {
@@ -397,7 +571,7 @@ public sealed class DiscordBotService
 
         if (member is null)
         {
-            _logger.DiscordItemNotFound(nameof(DiscordMember), memberId);
+            _logger.DiscordItemNotFound(nameof(DiscordMember), _client.CurrentUser.Id);
             return null;
         }
 

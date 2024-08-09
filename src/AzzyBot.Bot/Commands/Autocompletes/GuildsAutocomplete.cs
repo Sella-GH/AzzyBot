@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Services;
+using AzzyBot.Bot.Settings;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class GuildsAutocomplete(DiscordBotService botService) : IAutoCompleteProvider
+public sealed class GuildsAutocomplete(AzzyBotSettingsRecord settings, DiscordBotService botService) : IAutoCompleteProvider
 {
+    private readonly AzzyBotSettingsRecord _settings = settings;
     private readonly DiscordBotService _botService = botService;
 
     public ValueTask<IReadOnlyDictionary<string, object>> AutoCompleteAsync(AutoCompleteContext context)
@@ -27,6 +29,9 @@ public sealed class GuildsAutocomplete(DiscordBotService botService) : IAutoComp
                 break;
 
             if (!string.IsNullOrWhiteSpace(search) && !guild.Value.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            if (guild.Value.Id == _settings.ServerId)
                 continue;
 
             results.Add(guild.Value.Name, guild.Key.ToString(CultureInfo.InvariantCulture));

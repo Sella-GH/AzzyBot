@@ -44,8 +44,8 @@ jobs:
         id: get-version
         run: |
           VERSION=$(grep -oP '(?<=<Version>).*?(?=</Version>)' Directory.Build.props)
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "clean_version=v$VERSION" >> "$GITHUB_OUTPUT"
+          echo "version=v$VERSION" >> "$GITHUB_OUTPUT"
+          echo "clean_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Get build environment
         id: get-environment

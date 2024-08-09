@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Services.BackgroundServices;
-using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Core.Logging;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
@@ -13,16 +12,17 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChecksBackgroundTask azuraCastBackgroundService, DbActions dbActions, DiscordBotService discordBotService, UpdaterService updaterService) : IAsyncDisposable, IHostedService
+public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChecksBackgroundTask azuraChecksBackgroundService, DbActions dbActions, DiscordBotService discordBotService, UpdaterService updaterService) : IAsyncDisposable, IHostedService
 {
     private readonly ILogger<TimerServiceHost> _logger = logger;
-    private readonly AzuraChecksBackgroundTask _azuraCastBackgroundService = azuraCastBackgroundService;
+    private readonly AzuraChecksBackgroundTask _azuraChecksBackgroundService = azuraChecksBackgroundService;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _discordBotService = discordBotService;
     private readonly UpdaterService _updaterService = updaterService;
     private readonly Task _completedTask = Task.CompletedTask;
     private Timer? _timer;
     private DateTime _lastAzzyBotUpdateCheck = DateTime.MinValue;
+    private bool _firstRun = true;
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
@@ -65,20 +65,29 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
             }
 
             IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildsAsync(loadEverything: true);
-            int delay = 5 + _discordBotService.GetDiscordGuilds.Count;
+            int guildCount = _discordBotService.GetDiscordGuilds.Count;
+            int delay = 5 + guildCount;
 
-            await _azuraCastBackgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guilds);
+            if (!_firstRun)
+            {
+                _logger.GlobalTimerCheckForChannelPermissions(guildCount);
+                await _discordBotService.CheckPermissionsAsync(guilds);
+            }
+
+            await _azuraChecksBackgroundService.QueueInstancePingAsync(guilds, now);
 
             // Properly wait if there's an exception or not
             await Task.Delay(TimeSpan.FromSeconds(delay));
 
-            await _azuraCastBackgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForApiPermissions, guilds);
+            await _azuraChecksBackgroundService.QueueApiPermissionChecksAsync(guilds, now);
 
             // Wait again
             await Task.Delay(TimeSpan.FromSeconds(delay));
 
-            await _azuraCastBackgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, guilds);
-            await _azuraCastBackgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForUpdates, guilds);
+            await _azuraChecksBackgroundService.QueueFileChangesChecksAsync(guilds, now);
+            await _azuraChecksBackgroundService.QueueUpdatesAsync(guilds, now);
+
+            _firstRun = false;
         }
         catch (Exception ex)
         {
