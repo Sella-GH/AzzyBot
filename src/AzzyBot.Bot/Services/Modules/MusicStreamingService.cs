@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using AzzyBot.Core.Logging;
 using DSharpPlus.Commands.Processors.SlashCommands;
+using DSharpPlus.Entities;
 using Lavalink4NET;
 using Lavalink4NET.Clients;
 using Lavalink4NET.Players;
@@ -17,10 +18,11 @@ using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class MusicStreamingService(IAudioService audioService, ILogger<MusicStreamingService> logger)
+public sealed class MusicStreamingService(IAudioService audioService, ILogger<MusicStreamingService> logger, DiscordBotService botService)
 {
     private readonly IAudioService _audioService = audioService;
     private readonly ILogger<MusicStreamingService> _logger = logger;
+    private readonly DiscordBotService _botService = botService;
 
     public async Task<LavalinkPlayer?> GetLavalinkPlayerAsync(SlashCommandContext context, bool useDefault = true, bool connectToVoice = false, bool suppressResponse = false, bool ignoreVoice = false)
     {
@@ -39,9 +41,37 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
                 return null;
         }
 
-        ulong channelId = (context.Member.VoiceState?.Channel is null) ? 0 : context.Member.VoiceState.Channel.Id;
-        if (channelId is 0)
+        DiscordChannel? channel = context.Member.VoiceState?.Channel;
+        ulong channelId = (channel is null) ? 0 : channel.Id;
+        if (channel is null)
             _logger.UserNotConnectedSetChannelId();
+
+        bool notConnecting = false;
+        if (channel is null)
+        {
+            notConnecting = true;
+        }
+        else if (channelId is not 0)
+        {
+            DiscordMember? bot = await _botService.GetDiscordMemberAsync(context.Guild.Id);
+            if (bot is null)
+            {
+                _logger.DiscordItemNotFound(nameof(DiscordMember), context.Guild.Id);
+                notConnecting = true;
+            }
+            else if (!await _botService.CheckChannelPermissionsAsync(bot, channelId, DiscordPermissions.AccessChannels | DiscordPermissions.UseVoice))
+            {
+                notConnecting = true;
+            }
+        }
+
+        if (notConnecting)
+        {
+            if (!suppressResponse)
+                await context.EditResponseAsync("I don't have permission to connect to the voice channel.");
+
+            return null;
+        }
 
         PlayerResult<LavalinkPlayer> defaultPlayer;
         PlayerResult<QueuedLavalinkPlayer> queuedPlayer;

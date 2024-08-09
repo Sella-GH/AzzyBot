@@ -13,6 +13,7 @@
 
 ### Improvements
 - Consolidated some code to make it more readable and maintainable (and hopefully faster)
+- The bot checks now if the voice channel to enter is visible and joinable for it
 
 ## 2.0.0-preview7 - 2024-08-06
 ### Breaking Changes
