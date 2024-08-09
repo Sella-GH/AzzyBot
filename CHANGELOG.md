@@ -1,4 +1,21 @@
-## 2.0.0-preview7
+## 2.0.0-preview8
+### General
+- Failsafes added to prevent the bot from crashing
+- Refactored the code to comply with the newest dependency versions
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02350
+- Replaced [Lavalink4NET.DSharpPlus](https://github.com/angelobreuer/Lavalink4NET) with [Lavalink4NET.DSharpPlus.Nightly](https://github.com/angelobreuer/Lavalink4NET) version 4.0.20
+
+### Additions
+- New command `core force-channel-permissions-check` which checks all discord channels if the bot has the correct permissions
+- Every 15 minutes the bot checks if it has the correct permissions in every ever-set channel
+
+### Improvements
+- Consolidated some code to make it more readable and maintainable (and hopefully faster)
+- The bot checks now if the voice channel to enter is visible and joinable for it
+
+## 2.0.0-preview7 - 2024-08-06
 ### Breaking Changes
 - Your Database needs a complete reset, please DROP it and start from scratch
   - This is probably the last time it needs to be dropped by now
@@ -35,7 +52,7 @@
 ### Fixes
 - `azuracast force-update-check` works again
 
-## 2.0.0-preview6 2024-08-01
+## 2.0.0-preview6 - 2024-08-01
 ### General
 - Performance improvements all over the board. The bot should now be faster and more reliable
 - Reworked the way how strings and messages displayed to the user are handled

@@ -44,8 +44,8 @@ jobs:
         id: get-version
         run: |
           VERSION=$(grep -oP '(?<=<Version>).*?(?=</Version>)' Directory.Build.props)
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "clean_version=v$VERSION" >> "$GITHUB_OUTPUT"
+          echo "version=v$VERSION" >> "$GITHUB_OUTPUT"
+          echo "clean_version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Get build environment
         id: get-environment
@@ -54,8 +54,8 @@ jobs:
             echo "environment=dev" >> "$GITHUB_OUTPUT"
             echo "environment_alpine=dev-alpine" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
-            echo "environment=rel-${{ steps.get-version.outputs.clean_version }},dev" >> "$GITHUB_OUTPUT"
-            echo "environment_alpine=rel-${{ steps.get-version.outputs.clean_version }}-alpine,dev-alpine" >> "$GITHUB_OUTPUT"
+            echo "environment=rel-${{ steps.get-version.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
+            echo "environment_alpine=rel-${{ steps.get-version.outputs.clean_version }}-alpine" >> "$GITHUB_OUTPUT"
           else
             echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
             echo "environment_alpine=${{ github.ref_name }}-alpine" >> "$GITHUB_OUTPUT"
@@ -400,7 +400,7 @@ jobs:
           if ${{ contains(github.event.head_commit.message, '[release]') || (contains(github.event.ref, 'rel/') && !contains(github.event.head_commit.message, '[pre-release]')) }}; then
             echo "environment=latest" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.event.head_commit.message, '[pre-release]') }}; then
-            echo "environment=rel-${{ needs.extract_meta.outputs.clean_version }},dev" >> "$GITHUB_OUTPUT"
+            echo "environment=rel-${{ needs.extract_meta.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
             echo "environment=dev" >> "$GITHUB_OUTPUT"
           else
@@ -448,7 +448,7 @@ jobs:
           if ${{ contains(github.event.head_commit.message, '[release]') || (contains(github.event.ref, 'rel/') && !contains(github.event.head_commit.message, '[pre-release]')) }}; then
             echo "environment=latest-alpine" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.event.head_commit.message, '[pre-release]') }}; then
-            echo "environment=rel-${{ needs.extract_meta.outputs.clean_version }}-alpine,dev-alpine" >> "$GITHUB_OUTPUT"
+            echo "environment=rel-${{ needs.extract_meta.outputs.clean_version }}-alpine" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
             echo "environment=dev-alpine" >> "$GITHUB_OUTPUT"
           else

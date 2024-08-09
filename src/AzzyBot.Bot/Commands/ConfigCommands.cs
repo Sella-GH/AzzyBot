@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Choices;
+using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.BackgroundServices;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
@@ -33,12 +34,13 @@ namespace AzzyBot.Bot.Commands;
 public sealed class ConfigCommands
 {
     [Command("config"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
-    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCast, AzuraChecksBackgroundTask backgroundService, DbActions dbActions)
+    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCast, AzuraChecksBackgroundTask backgroundService, DbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<ConfigGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCast = azuraCast;
         private readonly AzuraChecksBackgroundTask _backgroundService = backgroundService;
         private readonly DbActions _dbActions = dbActions;
+        private readonly DiscordBotService _botService = botService;
 
         [Command("add-azuracast"), Description("Add an AzuraCast instance to your server. This is a requirement to use the features.")]
         public async ValueTask AddAzuraCastAsync
@@ -124,13 +126,24 @@ public sealed class ConfigCommands
             await context.FollowupAsync(GeneralStrings.ConfigInstanceAdded);
 
             guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
-            if (!await guilds.ContainsOneItemAsync())
+            if (await guilds.ContainsOneItemAsync())
+            {
+                await using IAsyncEnumerator<GuildEntity> enumerator = guilds.GetAsyncEnumerator();
+                guild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
+                if (guild is null)
+                {
+                    _logger.DatabaseGuildNotFound(guildId);
+                    return;
+                }
+            }
+            else
             {
                 _logger.DatabaseGuildNotFound(guildId);
                 return;
             }
 
-            await _backgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guilds);
+            await _botService.CheckPermissionsAsync(context.Guild, [notificationChannel.Id, outagesChannel.Id]);
+            _backgroundService.QueueInstancePing(guild);
         }
 
         [Command("add-azuracast-station"), Description("Add an AzuraCast station to your instance."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -197,14 +210,27 @@ public sealed class ConfigCommands
             }
 
             guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
-            if (!await guilds.ContainsOneItemAsync())
+            if (await guilds.ContainsOneItemAsync())
+            {
+                await using IAsyncEnumerator<GuildEntity> enumerator = guilds.GetAsyncEnumerator();
+                guild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
+                if (guild is null)
+                {
+                    _logger.DatabaseGuildNotFound(guildId);
+                    return;
+                }
+            }
+            else
             {
                 _logger.DatabaseGuildNotFound(guildId);
                 return;
             }
 
+            ulong[] channels = (uploadChannel is null) ? [requestsChannel.Id] : [requestsChannel.Id, uploadChannel.Id];
+            await _botService.CheckPermissionsAsync(context.Guild, channels);
+
             if (guild.AzuraCast!.IsOnline)
-                await _backgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForFileChanges, guilds, station);
+                _backgroundService.QueueFileChangesChecks(guild, station);
         }
 
         [Command("delete-azuracast"), Description("Delete the existing AzuraCast setup."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -305,14 +331,44 @@ public sealed class ConfigCommands
             }
 
             guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
-            if (!await guilds.ContainsOneItemAsync())
+            if (await guilds.ContainsOneItemAsync())
+            {
+                await using IAsyncEnumerator<GuildEntity> enumerator = guilds.GetAsyncEnumerator();
+                guild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
+                if (guild is null)
+                {
+                    _logger.DatabaseGuildNotFound(guildId);
+                    return;
+                }
+            }
+            else
             {
                 _logger.DatabaseGuildNotFound(guildId);
                 return;
             }
 
+            if (notificationsChannel is not null || outagesChannel is not null)
+            {
+                ulong[] channels = [];
+                if (notificationsChannel is null && outagesChannel is not null)
+                {
+                    channels = [outagesChannel.Id];
+                }
+                else if (outagesChannel is null && notificationsChannel is not null)
+                {
+                    channels = [notificationsChannel.Id];
+                }
+                else if (notificationsChannel is not null && outagesChannel is not null)
+                {
+                    channels = [notificationsChannel.Id, outagesChannel.Id];
+                }
+
+                if (channels.Length is not 0)
+                    await _botService.CheckPermissionsAsync(context.Guild, channels);
+            }
+
             if (url is not null)
-                await _backgroundService.StartBackgroundServiceAsync(AzuraCastChecks.CheckForOnlineStatus, guilds);
+                _backgroundService.QueueInstancePing(guild);
         }
 
         [Command("modify-azuracast-checks"), Description("Modify the automatic checks for your AzuraCast instance."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -408,11 +464,67 @@ public sealed class ConfigCommands
                 showPlaylistInEmbed = false;
             }
 
+            if (adminGroup is not null || djGroup is not null || uploadChannel is not null || requestsChannel is not null || !string.IsNullOrWhiteSpace(uploadPath) || showPlaylistInEmbed is not null)
+            {
+                await _dbActions.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, adminGroup?.Id, djGroup?.Id, uploadChannel?.Id, requestsChannel?.Id, uploadPath, showPlaylistInEmbed);
+
+                ulong[] channels = [];
+                if (requestsChannel is not null && uploadChannel is null)
+                {
+                    channels = [requestsChannel.Id];
+                }
+                else if (uploadChannel is not null && requestsChannel is null)
+                {
+                    channels = [uploadChannel.Id];
+                }
+                else if (requestsChannel is not null && uploadChannel is not null)
+                {
+                    channels = [requestsChannel.Id, uploadChannel.Id];
+                }
+
+                if (channels.Length is not 0)
+                    await _botService.CheckPermissionsAsync(context.Guild, channels);
+            }
+
             if (stationId.HasValue || !string.IsNullOrWhiteSpace(apiKey))
+            {
                 await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, apiKey);
 
-            if (adminGroup is not null || djGroup is not null || uploadChannel is not null || requestsChannel is not null || !string.IsNullOrWhiteSpace(uploadPath) || showPlaylistInEmbed is not null)
-                await _dbActions.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, adminGroup?.Id, djGroup?.Id, uploadChannel?.Id, requestsChannel?.Id, uploadPath, showPlaylistInEmbed);
+                AzuraCastStationEntity? acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station, loadAzuraCast: true);
+                if (acStation is null)
+                {
+                    _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, station);
+                    await context.EditResponseAsync(GeneralStrings.StationNotFound);
+                    return;
+                }
+
+                if (acStation.AzuraCast is null)
+                {
+                    _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                    return;
+                }
+
+                GuildEntity? guild = null;
+                IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
+                if (await guilds.ContainsOneItemAsync())
+                {
+                    await using IAsyncEnumerator<GuildEntity> enumerator = guilds.GetAsyncEnumerator();
+                    guild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
+                    if (guild is null)
+                    {
+                        _logger.DatabaseGuildNotFound(context.Guild.Id);
+                        return;
+                    }
+                }
+                else
+                {
+                    _logger.DatabaseGuildNotFound(context.Guild.Id);
+                    return;
+                }
+
+                if (acStation.AzuraCast.IsOnline)
+                    _backgroundService.QueueFileChangesChecks(guild, station);
+            }
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync(GeneralStrings.ConfigStationModified);
@@ -477,6 +589,23 @@ public sealed class ConfigCommands
             await _dbActions.UpdateGuildPreferencesAsync(context.Guild.Id, adminRole?.Id, adminChannel?.Id, errorChannel?.Id);
 
             await context.EditResponseAsync(GeneralStrings.CoreSettingsModified);
+
+            ulong[] channels = [];
+            if (adminChannel is not null && errorChannel is null)
+            {
+                channels = [adminChannel.Id];
+            }
+            else if (errorChannel is not null && adminChannel is null)
+            {
+                channels = [errorChannel.Id];
+            }
+            else if (adminChannel is not null && errorChannel is not null)
+            {
+                channels = [adminChannel.Id, errorChannel.Id];
+            }
+
+            if (channels.Length is not 0)
+                await _botService.CheckPermissionsAsync(context.Guild, channels);
         }
 
         [Command("get-settings"), Description("Get all configured settings in a direct message.")]

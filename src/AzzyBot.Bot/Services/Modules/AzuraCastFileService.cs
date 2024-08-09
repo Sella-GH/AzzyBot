@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
-using AzzyBot.Core.Services.BackgroundServices;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data;
@@ -19,67 +18,18 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, AzuraCastApiService azuraCast, DbActions dbActions, DiscordBotService discordBotService, QueuedBackgroundTask taskQueue)
+public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, AzuraCastApiService azuraCast, DbActions dbActions, DiscordBotService discordBotService)
 {
     private readonly ILogger<AzuraCastFileService> _logger = logger;
     private readonly AzuraCastApiService _azuraCast = azuraCast;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = discordBotService;
-    private readonly QueuedBackgroundTask _taskQueue = taskQueue;
 
-    public async Task QueueFileChangesChecksAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
-    {
-        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
-
-        _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecks));
-
-        int counter = 0;
-        await foreach (GuildEntity guild in guilds)
-        {
-            if (guild.AzuraCast?.IsOnline is true)
-            {
-                foreach (AzuraCastStationEntity station in guild.AzuraCast!.Stations.Where(s => s.Checks.FileChanges && now > s.Checks.LastFileChangesCheck.AddHours(0.98)))
-                {
-                    _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForFileChangesAsync(station, ct)));
-                    counter++;
-                }
-            }
-        }
-
-        _logger.GlobalTimerCheckForAzuraCastFiles(counter);
-    }
-
-    public void QueueFileChangesChecks(GuildEntity guild, int stationId = 0)
-    {
-        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
-        ArgumentNullException.ThrowIfNull(guild.AzuraCast, nameof(guild.AzuraCast));
-
-        _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecks));
-
-        IEnumerable<AzuraCastStationEntity> stations = guild.AzuraCast.Stations.Where(s => s.Checks.FileChanges);
-        if (stationId is not 0)
-        {
-            AzuraCastStationEntity? station = stations.FirstOrDefault(s => s.StationId == stationId);
-            if (station is null)
-            {
-                _logger.DatabaseAzuraCastStationNotFound(guild.UniqueId, guild.AzuraCast.Id, stationId);
-                return;
-            }
-
-            _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForFileChangesAsync(station, ct)));
-        }
-        else
-        {
-            foreach (AzuraCastStationEntity station in stations)
-            {
-                _ = Task.Run(async () => await _taskQueue.QueueBackgroundWorkItemAsync(async ct => await CheckForFileChangesAsync(station, ct)));
-            }
-        }
-    }
-
-    private async Task CheckForFileChangesAsync(AzuraCastStationEntity station, CancellationToken cancellationToken)
+    public async Task CheckForFileChangesAsync(AzuraCastStationEntity station, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
+
+        ArgumentNullException.ThrowIfNull(station, nameof(station));
 
         if (!Directory.Exists(_azuraCast.FilePath))
             Directory.CreateDirectory(_azuraCast.FilePath);

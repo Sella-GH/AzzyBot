@@ -9,11 +9,11 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.BackgroundServices;
 
-public sealed class QueuedBackgroundTaskHost(ILogger<QueuedBackgroundTaskHost> logger, QueuedBackgroundTask taskQueue, DiscordBotService discordBotService) : BackgroundService
+public sealed class QueuedBackgroundTaskHost(ILogger<QueuedBackgroundTaskHost> logger, DiscordBotService discordBotService, QueuedBackgroundTask taskQueue) : BackgroundService
 {
     private readonly ILogger<QueuedBackgroundTaskHost> _logger = logger;
-    private readonly QueuedBackgroundTask _taskQueue = taskQueue;
     private readonly DiscordBotService _botService = discordBotService;
+    private readonly QueuedBackgroundTask _taskQueue = taskQueue;
 
     public override async Task StartAsync(CancellationToken cancellationToken)
     {

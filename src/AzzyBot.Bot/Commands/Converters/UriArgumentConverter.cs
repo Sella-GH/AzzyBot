@@ -14,7 +14,7 @@ public sealed class UriArgumentConverter : ISlashArgumentConverter<Uri>
     public string ReadableName
         => "Url";
 
-    public Task<Optional<Uri>> ConvertAsync(InteractionConverterContext context, InteractionCreateEventArgs eventArgs)
+    public Task<Optional<Uri>> ConvertAsync(InteractionConverterContext context, InteractionCreatedEventArgs eventArgs)
         => ConvertAsync(context?.Argument?.RawValue);
 
     public static Task<Optional<Uri>> ConvertAsync(string? value)

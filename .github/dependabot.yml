@@ -14,6 +14,8 @@ updates:
     commit-message:
       prefix: "[Actions]"
       include: "scope"
+    labels:
+      - "ci"
     groups:
       GitHub:
         applies-to: version-updates
@@ -43,7 +45,6 @@ updates:
       prefix: "[NuGet]"
       include: "scope"
     labels:
-      - "dev-next"
       - "dependencies"
       - ".NET"
     groups:

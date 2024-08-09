@@ -582,18 +582,19 @@ public static class EmbedBuilder
         return embeds;
     }
 
-    public static DiscordEmbed BuildGuildAddedEmbed(DiscordGuild guild, bool getInfo = false)
+    public static async Task<DiscordEmbed> BuildGuildAddedEmbedAsync(DiscordGuild guild, bool getInfo = false)
     {
         ArgumentNullException.ThrowIfNull(guild, nameof(guild));
 
         string title = (getInfo) ? "Guild Information" : "Guild Added";
         string description = (getInfo) ? $"Here is everything I know about **{guild.Name}**" : $"I was added to **{guild.Name}**.";
+        DiscordMember owner = await guild.GetGuildOwnerAsync();
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(4)
         {
             ["Guild ID"] = new(guild.Id.ToString(CultureInfo.InvariantCulture)),
             ["Creation Date"] = new($"<t:{Converter.ConvertToUnixTime(guild.CreationTimestamp.Date)}>"),
-            ["Owner"] = new(guild.Owner.Mention),
+            ["Owner"] = new(owner.Mention),
             ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture), true)
         };
 
@@ -636,13 +637,12 @@ public static class EmbedBuilder
             if (isQueue)
             {
                 builder.AppendLine(CultureInfo.InvariantCulture, $"- [{count}] **[{item.Track!.Title}]({item.Track!.Uri})** by **{item.Track!.Author}** ({item.Track!.Duration.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture)})");
+                count++;
             }
             else
             {
                 builder.AppendLine(CultureInfo.InvariantCulture, $"- **[{item.Track!.Title}]({item.Track!.Uri})** by **{item.Track!.Author}** ({item.Track!.Duration.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture)})");
             }
-
-            count++;
         }
 
         return CreateBasicEmbed(title, builder.ToString(), DiscordColor.Blurple);
@@ -663,8 +663,8 @@ public static class EmbedBuilder
         };
 
         string songDuration = track.Duration.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
-        string songElapsed = elapsed.Value.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
-        string progressBar = Misc.GetProgressBar(14, elapsed.Value.TotalSeconds, track.Duration.TotalSeconds);
+        string songElapsed = (elapsed.HasValue) ? elapsed.Value.ToString(@"mm\:ss", CultureInfo.InvariantCulture) : TimeSpan.FromTicks(0).ToString(@"mm\:ss", CultureInfo.InvariantCulture);
+        string progressBar = Misc.GetProgressBar(14, (elapsed.HasValue) ? elapsed.Value.TotalSeconds : 0, track.Duration.TotalSeconds);
 
         fields.Add("Duration", new($"{progressBar} `[{songElapsed} / {songDuration}]`"));
 
