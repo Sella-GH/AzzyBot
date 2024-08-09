@@ -1,7 +1,7 @@
 ## 2.0.0-preview8
 ### General
 - Failsafes added to prevent the bot from crashing
-- Refactored the code to comply with the newest dependencie versions
+- Refactored the code to comply with the newest dependency versions
 
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02350
