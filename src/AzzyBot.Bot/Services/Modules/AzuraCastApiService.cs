@@ -23,6 +23,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
     private readonly ILogger<AzuraCastApiService> _logger = logger;
     private readonly DiscordBotService _botService = botService;
     private readonly WebRequestService _webService = webService;
+    private const string AzuraCastPermissionsWiki = "https://github.com/Sella-GH/AzzyBot/wiki/AzuraCast-API-Key-required-permissions";
 
     public string FilePath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "AzuraCast", "Files");
 
@@ -56,8 +57,9 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
     {
         string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
         string apiUrl = $"{baseUrl}/api";
-        List<Uri> apis = new(3)
+        List<Uri> apis = new(4)
         {
+            new($"{apiUrl}/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Logs}"),
             new($"{apiUrl}/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Server}/{AzuraApiEndpoints.Stats}"),
             new($"{apiUrl}/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Stations}")
         };
@@ -76,7 +78,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
             builder.AppendLine(api);
         }
 
-        builder.AppendLine("Please review your permission set.");
+        builder.AppendLine($"Please review your [permission]({AzuraCastPermissionsWiki}) set.");
 
         await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, builder.ToString());
     }
@@ -97,10 +99,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         };
 
         if (config.EnableRequests)
-        {
-            apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Requests}"));
             apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}"));
-        }
 
         if (station.Checks.FileChanges)
             apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}"));
@@ -117,7 +116,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
             builder.AppendLine(api);
         }
 
-        builder.AppendLine("Please review your permission set.");
+        builder.AppendLine("Please review your [permission]({AzuraCastPermissionsWiki}) set.");
 
         await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, builder.ToString());
     }
