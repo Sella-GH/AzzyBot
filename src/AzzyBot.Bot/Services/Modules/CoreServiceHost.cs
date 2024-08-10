@@ -90,7 +90,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
                 entity.AdminApiKey = Crypto.Encrypt(entity.AdminApiKey, newEncryptionKey);
             }
 
-            foreach (AzuraCastStationEntity entity in azuraCastStations.Where(e => !string.IsNullOrWhiteSpace(e.ApiKey)))
+            foreach (AzuraCastStationEntity entity in azuraCastStations.Where(static e => !string.IsNullOrWhiteSpace(e.ApiKey)))
             {
                 entity.ApiKey = Crypto.Decrypt(entity.ApiKey);
                 entity.ApiKey = Crypto.Encrypt(entity.ApiKey, newEncryptionKey);

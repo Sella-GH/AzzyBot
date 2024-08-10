@@ -43,18 +43,18 @@ public static class AzzyHelp
 
         string[] parts = commandName.Split(' ');
 
-        return GetCommandGroups(commands, adminServer, approvedDebug, member, true).Where(c => c.Key == parts[0]).SelectMany(r => r.Value).FirstOrDefault(c => c.Name == commandName) ?? throw new InvalidOperationException($"Command not found: {commandName}");
+        return GetCommandGroups(commands, adminServer, approvedDebug, member, true).Where(c => c.Key == parts[0]).SelectMany(static r => r.Value).FirstOrDefault(c => c.Name == commandName) ?? throw new InvalidOperationException($"Command not found: {commandName}");
     }
 
     private static Dictionary<string, List<AzzyHelpRecord>> GetCommandGroups(IReadOnlyDictionary<string, Command> commands, bool adminServer, bool approvedDebug, DiscordMember member, bool singleCommand = false)
     {
-        List<string> commandGroups = commands.Where(c => c.Value.Subcommands.Count > 0 && CheckIfMemberHasPermission(adminServer, approvedDebug, member, c.Value.Name)).Select(c => c.Value.Name).ToList();
+        List<string> commandGroups = commands.Where(c => c.Value.Subcommands.Count > 0 && CheckIfMemberHasPermission(adminServer, approvedDebug, member, c.Value.Name)).Select(static c => c.Value.Name).ToList();
         Dictionary<string, List<AzzyHelpRecord>> records = new(commands.Count);
         foreach (string group in commandGroups)
         {
             Command command = commands[group];
-            List<AzzyHelpRecord> subCommands = GetCommands(command.Subcommands.Where(c => c.Description is not "No description provided.").ToList(), command.Name, singleCommand);
-            foreach (Command subCommand in command.Subcommands.Where(c => c.Subcommands.Count > 0))
+            List<AzzyHelpRecord> subCommands = GetCommands(command.Subcommands.Where(static c => c.Description is not "No description provided.").ToList(), command.Name, singleCommand);
+            foreach (Command subCommand in command.Subcommands.Where(static c => c.Subcommands.Count > 0))
             {
                 subCommands.AddRange(GetCommands(subCommand.Subcommands, command.Name, singleCommand));
             }

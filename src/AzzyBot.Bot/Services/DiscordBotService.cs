@@ -207,7 +207,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         if (guildId is 0)
             guildId = _settings.ServerId;
 
-        return GetDiscordGuilds.Select(g => g.Value).FirstOrDefault(g => g.Id == guildId);
+        return GetDiscordGuilds.Select(static g => g.Value).FirstOrDefault(g => g.Id == guildId);
     }
 
     public IReadOnlyDictionary<ulong, DiscordGuild> GetDiscordGuilds
@@ -334,7 +334,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         await using DiscordMessageBuilder builder = new();
         builder.WithAllowedMention(RoleMention.All);
 
-        ContextCheckFailedData? moduleActivatedCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is ModuleActivatedCheckAttribute);
+        ContextCheckFailedData? moduleActivatedCheck = ex.Errors.FirstOrDefault(static e => e.ContextCheckAttribute is ModuleActivatedCheckAttribute);
         if (moduleActivatedCheck is not null)
         {
             builder.WithContent("This module is not activated, you are unable to use commands from it.");
@@ -349,7 +349,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             return;
         }
 
-        ContextCheckFailedData? azuraCastOnlineCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is AzuraCastOnlineCheckAttribute);
+        ContextCheckFailedData? azuraCastOnlineCheck = ex.Errors.FirstOrDefault(static e => e.ContextCheckAttribute is AzuraCastOnlineCheckAttribute);
         if (azuraCastOnlineCheck is not null)
         {
             builder.WithContent($"The AzuraCast instance is currently offline!\nPlease contact <@&{azuraCast.Preferences.InstanceAdminRoleId}>.");
@@ -357,7 +357,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             return;
         }
 
-        ContextCheckFailedData? azuraCastDiscordPermCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is AzuraCastDiscordPermCheckAttribute);
+        ContextCheckFailedData? azuraCastDiscordPermCheck = ex.Errors.FirstOrDefault(static e => e.ContextCheckAttribute is AzuraCastDiscordPermCheckAttribute);
         if (azuraCastDiscordPermCheck is not null)
         {
             string message = "You don't have the required permissions to execute this command!\nPlease contact {0}.";
@@ -391,7 +391,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             return;
         }
 
-        ContextCheckFailedData? azuraCastFeatureCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is FeatureAvailableCheckAttribute);
+        ContextCheckFailedData? azuraCastFeatureCheck = ex.Errors.FirstOrDefault(static e => e.ContextCheckAttribute is FeatureAvailableCheckAttribute);
         if (azuraCastFeatureCheck is not null)
         {
             builder.WithContent($"This feature is not activated on this station! Please inform <@&{azuraCastFeatureCheck.ErrorMessage}>.");
@@ -399,7 +399,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             return;
         }
 
-        ContextCheckFailedData? azuraCastDiscordChannelCheck = ex.Errors.FirstOrDefault(e => e.ContextCheckAttribute is AzuraCastDiscordChannelCheckAttribute);
+        ContextCheckFailedData? azuraCastDiscordChannelCheck = ex.Errors.FirstOrDefault(static e => e.ContextCheckAttribute is AzuraCastDiscordChannelCheckAttribute);
         if (azuraCastDiscordChannelCheck is not null)
         {
             if (ulong.TryParse(azuraCastDiscordChannelCheck.ErrorMessage, out ulong channelId) && channelId is not 0)

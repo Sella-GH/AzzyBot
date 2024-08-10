@@ -629,7 +629,7 @@ public static class EmbedBuilder
         StringBuilder builder = new();
 
         int count = 0;
-        foreach (ITrackQueueItem item in history.Where(i => i.Track is not null))
+        foreach (ITrackQueueItem item in history.Where(static i => i.Track is not null))
         {
             if (title.Length + builder.Length > 6000)
                 break;

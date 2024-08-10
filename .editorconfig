@@ -166,10 +166,18 @@ dotnet_style_parentheses_in_other_binary_operators = always_for_clarity
 dotnet_style_parentheses_in_other_operators = always_for_clarity
 
 # Analyzers
+
+## CA1812: 
 dotnet_diagnostic.CA1812.severity = none
+
+## CA2007: 
 dotnet_diagnostic.CA2007.severity = none
+
+## IDE0047: Remove unnecessary parentheses
 dotnet_diagnostic.IDE0047.severity = none
-#dotnet_remove_unnecessary_suppression_exclusions = IDE0060,IDE1006
+
+## IDE0320: Make anonymous function static
+dotnet_diagnostic.IDE0320.severity = suggestion
 
 # Roslynator
 dotnet_analyzer_diagnostic.category-roslynator.severity = default
@@ -215,783 +223,783 @@ roslynator_use_var = never
 roslynator_use_var_instead_of_implicit_object_creation = false
 
 # Roslynator Analyzers
-# Add blank line after embedded statement
+## Add blank line after embedded statement
 dotnet_diagnostic.rcs0001.severity = suggestion
 
-# Add blank line after #region
+## Add blank line after #region
 dotnet_diagnostic.rcs0002.severity = suggestion
 
-# Add blank line after using directive list
+## Add blank line after using directive list
 dotnet_diagnostic.rcs0003.severity = suggestion
 
-# Add blank line before #endregion
+## Add blank line before #endregion
 dotnet_diagnostic.rcs0005.severity = suggestion
 
-# Add blank line before using directive list
+## Add blank line before using directive list
 dotnet_diagnostic.rcs0006.severity = suggestion
 
-# Add blank line between accessors
+## Add blank line between accessors
 dotnet_diagnostic.rcs0007.severity = suggestion
 
-# Add blank line between closing brace and next statement
+## Add blank line between closing brace and next statement
 dotnet_diagnostic.rcs0008.severity = suggestion
 
-# Add blank line between declaration and documentation comment
+## Add blank line between declaration and documentation comment
 dotnet_diagnostic.rcs0009.severity = suggestion
 
-# Add blank line between declarations
+## Add blank line between declarations
 dotnet_diagnostic.rcs0010.severity = suggestion
 
-# Add/remove blank line between single-line accessors
+## Add/remove blank line between single-line accessors
 dotnet_diagnostic.rcs0011.severity = suggestion
 
-# Add blank line between single-line declarations
+## Add blank line between single-line declarations
 dotnet_diagnostic.rcs0012.severity = none
 
-# Add blank line between single-line declarations of different kind
+## Add blank line between single-line declarations of different kind
 dotnet_diagnostic.rcs0013.severity = none
 
-# Add/remove blank line between using directives
+## Add/remove blank line between using directives
 dotnet_diagnostic.rcs0015.severity = suggestion
 
-# Put attribute list on its own line
+## Put attribute list on its own line
 dotnet_diagnostic.rcs0016.severity = suggestion
 
-# Format accessor's braces on a single line or multiple lines
+## Format accessor's braces on a single line or multiple lines
 dotnet_diagnostic.rcs0020.severity = suggestion
 
-# Format block's braces on a single line or multiple lines
+## Format block's braces on a single line or multiple lines
 dotnet_diagnostic.rcs0021.severity = suggestion
 
-# Format type declaration's braces
+## Format type declaration's braces
 dotnet_diagnostic.rcs0023.severity = suggestion
 
-# Add new line after switch label
+## Add new line after switch label
 dotnet_diagnostic.rcs0024.severity = suggestion
 
-# Put full accessor on its own line
+## Put full accessor on its own line
 dotnet_diagnostic.rcs0025.severity = suggestion
 
-# Place new line after/before binary operator
+## Place new line after/before binary operator
 dotnet_diagnostic.rcs0027.severity = suggestion
 
-# Place new line after/before '?:' operator
+## Place new line after/before '?:' operator
 dotnet_diagnostic.rcs0028.severity = suggestion
 
-# Put constructor initializer on its own line
+## Put constructor initializer on its own line
 dotnet_diagnostic.rcs0029.severity = none
 
-# Put embedded statement on its own line
+## Put embedded statement on its own line
 dotnet_diagnostic.rcs0030.severity = suggestion
 
-# Put enum member on its own line
+## Put enum member on its own line
 dotnet_diagnostic.rcs0031.severity = suggestion
 
-# Place new line after/before arrow token
+## Place new line after/before arrow token
 dotnet_diagnostic.rcs0032.severity = suggestion
 
-# Put statement on its own line
+## Put statement on its own line
 dotnet_diagnostic.rcs0033.severity = suggestion
 
-# Put type parameter constraint on its own line
+## Put type parameter constraint on its own line
 dotnet_diagnostic.rcs0034.severity = suggestion
 
-# Remove blank line between single-line declarations of same kind
+## Remove blank line between single-line declarations of same kind
 dotnet_diagnostic.rcs0036.severity = suggestion
 
-# Remove new line before base list
+## Remove new line before base list
 dotnet_diagnostic.rcs0039.severity = suggestion
 
-# Remove new line between 'if' keyword and 'else' keyword
+## Remove new line between 'if' keyword and 'else' keyword
 dotnet_diagnostic.rcs0041.severity = suggestion
 
-# Put auto-accessors on a single line
+## Put auto-accessors on a single line
 dotnet_diagnostic.rcs0042.severity = suggestion
 
-# Use carriage return + linefeed as new line
+## Use carriage return + linefeed as new line
 dotnet_diagnostic.rcs0044.severity = suggestion
 
-# Use linefeed as new line
+## Use linefeed as new line
 dotnet_diagnostic.rcs0045.severity = none
 
-# Use spaces instead of tab
+## Use spaces instead of tab
 dotnet_diagnostic.rcs0046.severity = suggestion
 
-# Put initializer on a single line
+## Put initializer on a single line
 dotnet_diagnostic.rcs0048.severity = none
 
-# Add blank line after top comment
+## Add blank line after top comment
 dotnet_diagnostic.rcs0049.severity = suggestion
 
-# Add blank line before top declaration
+## Add blank line before top declaration
 dotnet_diagnostic.rcs0050.severity = suggestion
 
-# Add/remove new line before 'while' in 'do' statement
+## Add/remove new line before 'while' in 'do' statement
 dotnet_diagnostic.rcs0051.severity = suggestion
 
-# Place new line after/before equals token
+## Place new line after/before equals token
 dotnet_diagnostic.rcs0052.severity = suggestion
 
-# Fix formatting of a list
+## Fix formatting of a list
 dotnet_diagnostic.rcs0053.severity = none
 
-# Fix formatting of a call chain
+## Fix formatting of a call chain
 dotnet_diagnostic.rcs0054.severity = suggestion
 
-# Fix formatting of a binary expression chain
+## Fix formatting of a binary expression chain
 dotnet_diagnostic.rcs0055.severity = suggestion
 
-# A line is too long
+## A line is too long
 dotnet_diagnostic.rcs0056.severity = none
 
-# Normalize whitespace at the beginning of a file
+## Normalize whitespace at the beginning of a file
 dotnet_diagnostic.rcs0057.severity = suggestion
 
-# Normalize whitespace at the end of a file
+## Normalize whitespace at the end of a file
 dotnet_diagnostic.rcs0058.severity = suggestion
 
-# Place new line after/before null-conditional operator
+## Place new line after/before null-conditional operator
 dotnet_diagnostic.rcs0059.severity = suggestion
 
-# Add/remove line after file scoped namespace declaration
+## Add/remove line after file scoped namespace declaration
 dotnet_diagnostic.rcs0060.severity = suggestion
 
-# Add/remove blank line between switch sections
+## Add/remove blank line between switch sections
 dotnet_diagnostic.rcs0061.severity = suggestion
 
-# Add braces (when expression spans over multiple lines)
+## Add braces (when expression spans over multiple lines)
 dotnet_diagnostic.rcs1001.severity = suggestion
 
-# Remove braces
+## Remove braces
 dotnet_diagnostic.rcs1002.severity = none
 
-# Add braces to if-else (when expression spans over multiple lines)
+## Add braces to if-else (when expression spans over multiple lines)
 dotnet_diagnostic.rcs1003.severity = suggestion
 
-# Remove braces from if-else
+## Remove braces from if-else
 dotnet_diagnostic.rcs1004.severity = none
 
-# Simplify nested using statement
+## Simplify nested using statement
 dotnet_diagnostic.rcs1005.severity = suggestion
 
-# Merge 'else' with nested 'if'
+## Merge 'else' with nested 'if'
 dotnet_diagnostic.rcs1006.severity = suggestion
 
-# Add braces
+## Add braces
 dotnet_diagnostic.rcs1007.severity = none
 
-# Use predefined type
+## Use predefined type
 dotnet_diagnostic.rcs1013.severity = suggestion
 
-# Use explicitly/implicitly typed array
+## Use explicitly/implicitly typed array
 dotnet_diagnostic.rcs1014.severity = suggestion
 
-# Use nameof operator
+## Use nameof operator
 dotnet_diagnostic.rcs1015.severity = suggestion
 
-# Use block body or expression body
-# This one is doubled
+## Use block body or expression body
+## This one is doubled
 dotnet_diagnostic.rcs1016.severity = none
 
-# Add/remove accessibility modifiers
+## Add/remove accessibility modifiers
 dotnet_diagnostic.rcs1018.severity = suggestion
 
-# Order modifiers
+## Order modifiers
 dotnet_diagnostic.rcs1019.severity = none
 
-# Simplify Nullable<T> to T?
+## Simplify Nullable<T> to T?
 dotnet_diagnostic.rcs1020.severity = suggestion
 
-# Convert lambda expression body to expression body
-# This one is doubled
+## Convert lambda expression body to expression body
+## This one is doubled
 dotnet_diagnostic.rcs1021.severity = none
 
-# Remove unnecessary braces in switch section
+## Remove unnecessary braces in switch section
 dotnet_diagnostic.rcs1031.severity = suggestion
 
-# Remove redundant parentheses
+## Remove redundant parentheses
 dotnet_diagnostic.rcs1032.severity = suggestion
 
-# Remove redundant boolean literal
+## Remove redundant boolean literal
 dotnet_diagnostic.rcs1033.severity = suggestion
 
-# Remove redundant 'sealed' modifier
+## Remove redundant 'sealed' modifier
 dotnet_diagnostic.rcs1034.severity = suggestion
 
-# Remove unnecessary blank line
+## Remove unnecessary blank line
 dotnet_diagnostic.rcs1036.severity = suggestion
 
-# Remove trailing white-space
+## Remove trailing white-space
 dotnet_diagnostic.rcs1037.severity = suggestion
 
-# Remove argument list from attribute
+## Remove argument list from attribute
 dotnet_diagnostic.rcs1039.severity = suggestion
 
-# Remove enum default underlying type
+## Remove enum default underlying type
 dotnet_diagnostic.rcs1042.severity = suggestion
 
-# Remove 'partial' modifier from type with a single part
+## Remove 'partial' modifier from type with a single part
 dotnet_diagnostic.rcs1043.severity = suggestion
 
-# Remove original exception from throw statement
+## Remove original exception from throw statement
 dotnet_diagnostic.rcs1044.severity = warning
 
-# Asynchronous method name should end with 'Async'
+## Asynchronous method name should end with 'Async'
 dotnet_diagnostic.rcs1046.severity = suggestion
 
-# Non-asynchronous method name should not end with 'Async'
+## Non-asynchronous method name should not end with 'Async'
 dotnet_diagnostic.rcs1047.severity = suggestion
 
-# Use lambda expression instead of anonymous method
+## Use lambda expression instead of anonymous method
 dotnet_diagnostic.rcs1048.severity = suggestion
 
-# Simplify boolean comparison
+## Simplify boolean comparison
 dotnet_diagnostic.rcs1049.severity = suggestion
 
-# Include/omit parentheses when creating new object
+## Include/omit parentheses when creating new object
 dotnet_diagnostic.rcs1050.severity = suggestion
 
-# Add/remove parentheses from condition in conditional operator
+## Add/remove parentheses from condition in conditional operator
 dotnet_diagnostic.rcs1051.severity = suggestion
 
-# Declare each attribute separately
+## Declare each attribute separately
 dotnet_diagnostic.rcs1052.severity = none
 
-# Unnecessary semicolon at the end of declaration
+## Unnecessary semicolon at the end of declaration
 dotnet_diagnostic.rcs1055.severity = suggestion
 
-# Avoid usage of using alias directive
+## Avoid usage of using alias directive
 dotnet_diagnostic.rcs1056.severity = suggestion
 
-# Use compound assignment
+## Use compound assignment
 dotnet_diagnostic.rcs1058.severity = suggestion
 
-# Avoid locking on publicly accessible instance
+## Avoid locking on publicly accessible instance
 dotnet_diagnostic.rcs1059.severity = warning
 
-# Declare each type in separate file
+## Declare each type in separate file
 dotnet_diagnostic.rcs1060.severity = none
 
-# Merge 'if' with nested 'if'
+## Merge 'if' with nested 'if'
 dotnet_diagnostic.rcs1061.severity = suggestion
 
-# Simplify logical negation
+## Simplify logical negation
 dotnet_diagnostic.rcs1068.severity = suggestion
 
-# Remove unnecessary case label
+## Remove unnecessary case label
 dotnet_diagnostic.rcs1069.severity = suggestion
 
-# Remove redundant default switch section
+## Remove redundant default switch section
 dotnet_diagnostic.rcs1070.severity = suggestion
 
-# Remove redundant base constructor call
+## Remove redundant base constructor call
 dotnet_diagnostic.rcs1071.severity = suggestion
 
-# Convert 'if' to 'return' statement
-# This one is doubled
+## Convert 'if' to 'return' statement
+## This one is doubled
 dotnet_diagnostic.rcs1073.severity = none
 
-# Remove redundant constructor
+## Remove redundant constructor
 dotnet_diagnostic.rcs1074.severity = suggestion
 
-# Avoid empty catch clause that catches System.Exception
+## Avoid empty catch clause that catches System.Exception
 dotnet_diagnostic.rcs1075.severity = warning
 
-# Optimize LINQ method call
+## Optimize LINQ method call
 dotnet_diagnostic.rcs1077.severity = suggestion
 
-# Use "" or 'string.Empty'
+## Use "" or 'string.Empty'
 dotnet_diagnostic.rcs1078.severity = suggestion
 
-# Throwing of new NotImplementedException
+## Throwing of new NotImplementedException
 dotnet_diagnostic.rcs1079.severity = suggestion
 
-# Use 'Count/Length' property instead of 'Any' method
-# This one is doubled
+## Use 'Count/Length' property instead of 'Any' method
+## This one is doubled
 dotnet_diagnostic.rcs1080.severity = none
 
-# Split variable declaration
+## Split variable declaration
 dotnet_diagnostic.rcs1081.severity = suggestion
 
-# Use coalesce expression instead of conditional expression
+## Use coalesce expression instead of conditional expression
 dotnet_diagnostic.rcs1084.severity = suggestion
 
-# Use auto-implemented property
+## Use auto-implemented property
 dotnet_diagnostic.rcs1085.severity = suggestion
 
-# Use --/++ operator instead of assignment
+## Use --/++ operator instead of assignment
 dotnet_diagnostic.rcs1089.severity = suggestion
 
-# Add/remove 'ConfigureAwait(false)' call
+## Add/remove 'ConfigureAwait(false)' call
 dotnet_diagnostic.rcs1090.severity = none
 
-# File contains no code
+## File contains no code
 dotnet_diagnostic.rcs1093.severity = suggestion
 
-# Declare using directive on top level
+## Declare using directive on top level
 dotnet_diagnostic.rcs1094.severity = suggestion
 
-# Use 'HasFlag' method or bitwise operator
+## Use 'HasFlag' method or bitwise operator
 dotnet_diagnostic.rcs1096.severity = suggestion
 
-# Remove redundant 'ToString' call
+## Remove redundant 'ToString' call
 dotnet_diagnostic.rcs1097.severity = suggestion
 
-# Constant values should be placed on right side of comparisons
+## Constant values should be placed on right side of comparisons
 dotnet_diagnostic.rcs1098.severity = suggestion
 
-# Default label should be the last label in a switch section
+## Default label should be the last label in a switch section
 dotnet_diagnostic.rcs1099.severity = suggestion
 
-# Make class static
+## Make class static
 dotnet_diagnostic.rcs1102.severity = warning
 
-# Convert 'if' to assignment
+## Convert 'if' to assignment
 dotnet_diagnostic.rcs1103.severity = suggestion
 
-# Simplify conditional expression
-# This one is doubled
+## Simplify conditional expression
+## This one is doubled
 dotnet_diagnostic.rcs1104.severity = none
 
-# Unnecessary interpolation
+## Unnecessary interpolation
 dotnet_diagnostic.rcs1105.severity = suggestion
 
-# Remove redundant 'ToCharArray' call
+## Remove redundant 'ToCharArray' call
 dotnet_diagnostic.rcs1107.severity = suggestion
 
-# Add 'static' modifier to all partial class declarations
+## Add 'static' modifier to all partial class declarations
 dotnet_diagnostic.rcs1108.severity = suggestion
 
-# Declare type inside namespace
+## Declare type inside namespace
 dotnet_diagnostic.rcs1110.severity = suggestion
 
-# Add braces to switch section with multiple statements
+## Add braces to switch section with multiple statements
 dotnet_diagnostic.rcs1111.severity = none
 
-# Combine 'Enumerable.Where' method chain
+## Combine 'Enumerable.Where' method chain
 dotnet_diagnostic.rcs1112.severity = suggestion
 
-# Use 'string.IsNullOrEmpty' method
+## Use 'string.IsNullOrEmpty' method
 dotnet_diagnostic.rcs1113.severity = suggestion
 
-# Remove redundant delegate creation
+## Remove redundant delegate creation
 dotnet_diagnostic.rcs1114.severity = suggestion
 
-# Mark local variable as const
+## Mark local variable as const
 dotnet_diagnostic.rcs1118.severity = suggestion
 
-# Add parentheses when necessary
+## Add parentheses when necessary
 dotnet_diagnostic.rcs1123.severity = suggestion
 
-# Inline local variable
+## Inline local variable
 dotnet_diagnostic.rcs1124.severity = suggestion
 
-# Add braces to if-else
+## Add braces to if-else
 dotnet_diagnostic.rcs1126.severity = suggestion
 
-# Use coalesce expression
+## Use coalesce expression
 dotnet_diagnostic.rcs1128.severity = suggestion
 
-# Remove redundant field initialization
-# This one is doubled
+## Remove redundant field initialization
+## This one is doubled
 dotnet_diagnostic.rcs1129.severity = none
 
-# Bitwise operation on enum without Flags attribute
+## Bitwise operation on enum without Flags attribute
 dotnet_diagnostic.rcs1130.severity = suggestion
 
-# Remove redundant overriding member
+## Remove redundant overriding member
 dotnet_diagnostic.rcs1132.severity = suggestion
 
-# Remove redundant Dispose/Close call
+## Remove redundant Dispose/Close call
 dotnet_diagnostic.rcs1133.severity = suggestion
 
-# Remove redundant statement
+## Remove redundant statement
 dotnet_diagnostic.rcs1134.severity = suggestion
 
-# Declare enum member with zero value (when enum has FlagsAttribute)
+## Declare enum member with zero value (when enum has FlagsAttribute)
 dotnet_diagnostic.rcs1135.severity = suggestion
 
-# Merge switch sections with equivalent content
+## Merge switch sections with equivalent content
 dotnet_diagnostic.rcs1136.severity = suggestion
 
-# Add summary to documentation comment
+## Add summary to documentation comment
 dotnet_diagnostic.rcs1138.severity = warning
 
-# Add summary element to documentation comment
+## Add summary element to documentation comment
 dotnet_diagnostic.rcs1139.severity = warning
 
-# Add exception to documentation comment
+## Add exception to documentation comment
 dotnet_diagnostic.rcs1140.severity = suggestion
 
-# Add 'param' element to documentation comment
+## Add 'param' element to documentation comment
 dotnet_diagnostic.rcs1141.severity = none
 
-# Add 'typeparam' element to documentation comment
+## Add 'typeparam' element to documentation comment
 dotnet_diagnostic.rcs1142.severity = suggestion
 
-# Simplify coalesce expression
+## Simplify coalesce expression
 dotnet_diagnostic.rcs1143.severity = suggestion
 
-# Remove redundant 'as' operator
+## Remove redundant 'as' operator
 dotnet_diagnostic.rcs1145.severity = suggestion
 
-# Use conditional access
+## Use conditional access
 dotnet_diagnostic.rcs1146.severity = suggestion
 
-# Remove redundant cast
+## Remove redundant cast
 dotnet_diagnostic.rcs1151.severity = suggestion
 
-# Sort enum members
+## Sort enum members
 dotnet_diagnostic.rcs1154.severity = suggestion
 
-# Use StringComparison when comparing strings
+## Use StringComparison when comparing strings
 dotnet_diagnostic.rcs1155.severity = warning
 
-# Use string.Length instead of comparison with empty string
+## Use string.Length instead of comparison with empty string
 dotnet_diagnostic.rcs1156.severity = suggestion
 
-# Composite enum value contains undefined flag
+## Composite enum value contains undefined flag
 dotnet_diagnostic.rcs1157.severity = suggestion
 
-# Static member in generic type should use a type parameter
+## Static member in generic type should use a type parameter
 dotnet_diagnostic.rcs1158.severity = suggestion
 
-# Use EventHandler<T>
+## Use EventHandler<T>
 dotnet_diagnostic.rcs1159.severity = suggestion
 
-# Abstract type should not have public constructors
+## Abstract type should not have public constructors
 dotnet_diagnostic.rcs1160.severity = suggestion
 
-# Enum should declare explicit values
+## Enum should declare explicit values
 dotnet_diagnostic.rcs1161.severity = none
 
-# Avoid chain of assignments
+## Avoid chain of assignments
 dotnet_diagnostic.rcs1162.severity = suggestion
 
-# Unused parameter
-# This one is doubled
+## Unused parameter
+## This one is doubled
 dotnet_diagnostic.rcs1163.severity = none
 
-# Unused type parameter
+## Unused type parameter
 dotnet_diagnostic.rcs1164.severity = suggestion
 
-# Unconstrained type parameter checked for null
+## Unconstrained type parameter checked for null
 dotnet_diagnostic.rcs1165.severity = suggestion
 
-# Value type object is never equal to null
+## Value type object is never equal to null
 dotnet_diagnostic.rcs1166.severity = suggestion
 
-# Parameter name differs from base name
+## Parameter name differs from base name
 dotnet_diagnostic.rcs1168.severity = suggestion
 
-# Make field read-only
-# This one is doubled
+## Make field read-only
+## This one is doubled
 dotnet_diagnostic.rcs1169.severity = none
 
-# Use read-only auto-implemented property
+## Use read-only auto-implemented property
 dotnet_diagnostic.rcs1170.severity = suggestion
 
-# Simplify lazy initialization
+## Simplify lazy initialization
 dotnet_diagnostic.rcs1171.severity = suggestion
 
-# Use 'is' operator instead of 'as' operator
+## Use 'is' operator instead of 'as' operator
 dotnet_diagnostic.rcs1172.severity = warning
 
-# Use coalesce expression instead of 'if'
+## Use coalesce expression instead of 'if'
 dotnet_diagnostic.rcs1173.severity = suggestion
 
-# Remove redundant async/await
+## Remove redundant async/await
 dotnet_diagnostic.rcs1174.severity = suggestion
 
-# Unused 'this' parameter
+## Unused 'this' parameter
 dotnet_diagnostic.rcs1175.severity = suggestion
 
-# Unnecessary assignment
+## Unnecessary assignment
 dotnet_diagnostic.rcs1179.severity = suggestion
 
-# Inline lazy initialization
+## Inline lazy initialization
 dotnet_diagnostic.rcs1180.severity = suggestion
 
-# Convert comment to documentation comment
+## Convert comment to documentation comment
 dotnet_diagnostic.rcs1181.severity = suggestion
 
-# Remove redundant base interface
+## Remove redundant base interface
 dotnet_diagnostic.rcs1182.severity = suggestion
 
-# Use Regex instance instead of static method
+## Use Regex instance instead of static method
 dotnet_diagnostic.rcs1186.severity = suggestion
 
-# Use constant instead of field
+## Use constant instead of field
 dotnet_diagnostic.rcs1187.severity = suggestion
 
-# Remove redundant auto-property initialization
+## Remove redundant auto-property initialization
 dotnet_diagnostic.rcs1188.severity = suggestion
 
-# Add or remove region name
+## Add or remove region name
 dotnet_diagnostic.rcs1189.severity = suggestion
 
-# Join string expressions
+## Join string expressions
 dotnet_diagnostic.rcs1190.severity = suggestion
 
-# Declare enum value as combination of names
+## Declare enum value as combination of names
 dotnet_diagnostic.rcs1191.severity = suggestion
 
-# Unnecessary usage of verbatim string literal
+## Unnecessary usage of verbatim string literal
 dotnet_diagnostic.rcs1192.severity = suggestion
 
-# Overriding member should not change 'params' modifier
+## Overriding member should not change 'params' modifier
 dotnet_diagnostic.rcs1193.severity = warning
 
-# Implement exception constructors
+## Implement exception constructors
 dotnet_diagnostic.rcs1194.severity = warning
 
-# Use ^ operator
+## Use ^ operator
 dotnet_diagnostic.rcs1195.severity = suggestion
 
-# Call extension method as instance method
+## Call extension method as instance method
 dotnet_diagnostic.rcs1196.severity = suggestion
 
-# Optimize StringBuilder.Append/AppendLine call
+## Optimize StringBuilder.Append/AppendLine call
 dotnet_diagnostic.rcs1197.severity = suggestion
 
-# Avoid unnecessary boxing of value type
+## Avoid unnecessary boxing of value type
 dotnet_diagnostic.rcs1198.severity = none
 
-# Unnecessary null check
+## Unnecessary null check
 dotnet_diagnostic.rcs1199.severity = suggestion
 
-# Call 'Enumerable.ThenBy' instead of 'Enumerable.OrderBy'
+## Call 'Enumerable.ThenBy' instead of 'Enumerable.OrderBy'
 dotnet_diagnostic.rcs1200.severity = suggestion
 
-# Use method chaining
+## Use method chaining
 dotnet_diagnostic.rcs1201.severity = none
 
-# Avoid NullReferenceException
+## Avoid NullReferenceException
 dotnet_diagnostic.rcs1202.severity = suggestion
 
-# Use AttributeUsageAttribute
+## Use AttributeUsageAttribute
 dotnet_diagnostic.rcs1203.severity = warning
 
-# Use EventArgs.Empty
+## Use EventArgs.Empty
 dotnet_diagnostic.rcs1204.severity = suggestion
 
-# Order named arguments according to the order of parameters
+## Order named arguments according to the order of parameters
 dotnet_diagnostic.rcs1205.severity = suggestion
 
-# Use conditional access instead of conditional expression
+## Use conditional access instead of conditional expression
 dotnet_diagnostic.rcs1206.severity = suggestion
 
-# Use anonymous function or method group
+## Use anonymous function or method group
 dotnet_diagnostic.rcs1207.severity = suggestion
 
-# Reduce 'if' nesting
+## Reduce 'if' nesting
 dotnet_diagnostic.rcs1208.severity = suggestion
 
-# Order type parameter constraints
+## Order type parameter constraints
 dotnet_diagnostic.rcs1209.severity = suggestion
 
-# Return completed task instead of returning null
+## Return completed task instead of returning null
 dotnet_diagnostic.rcs1210.severity = warning
 
-# Remove unnecessary 'else'
+## Remove unnecessary 'else'
 dotnet_diagnostic.rcs1211.severity = suggestion
 
-# Remove redundant assignment
+## Remove redundant assignment
 dotnet_diagnostic.rcs1212.severity = suggestion
 
-# Remove unused member declaration
-# This one is doubled
+## Remove unused member declaration
+## This one is doubled
 dotnet_diagnostic.rcs1213.severity = none
 
-# Unnecessary interpolated string
+## Unnecessary interpolated string
 dotnet_diagnostic.rcs1214.severity = suggestion
 
-# Expression is always equal to true/false
+## Expression is always equal to true/false
 dotnet_diagnostic.rcs1215.severity = warning
 
-# Unnecessary unsafe context
+## Unnecessary unsafe context
 dotnet_diagnostic.rcs1216.severity = suggestion
 
-# Convert interpolated string to concatenation
+## Convert interpolated string to concatenation
 dotnet_diagnostic.rcs1217.severity = suggestion
 
-# Simplify code branching
+## Simplify code branching
 dotnet_diagnostic.rcs1218.severity = suggestion
 
-# Use pattern matching instead of combination of 'is' operator and cast operator
+## Use pattern matching instead of combination of 'is' operator and cast operator
 dotnet_diagnostic.rcs1220.severity = suggestion
 
-# Use pattern matching instead of combination of 'as' operator and null check
+## Use pattern matching instead of combination of 'as' operator and null check
 dotnet_diagnostic.rcs1221.severity = suggestion
 
-# Merge preprocessor directives
+## Merge preprocessor directives
 dotnet_diagnostic.rcs1222.severity = suggestion
 
-# Mark publicly visible type with DebuggerDisplay attribute
+## Mark publicly visible type with DebuggerDisplay attribute
 dotnet_diagnostic.rcs1223.severity = none
 
-# Make method an extension method
+## Make method an extension method
 dotnet_diagnostic.rcs1224.severity = suggestion
 
-# Make class sealed
+## Make class sealed
 dotnet_diagnostic.rcs1225.severity = suggestion
 
-# Add paragraph to documentation comment
+## Add paragraph to documentation comment
 dotnet_diagnostic.rcs1226.severity = suggestion
 
-# Validate arguments correctly
+## Validate arguments correctly
 dotnet_diagnostic.rcs1227.severity = suggestion
 
-# Unused element in a documentation comment
+## Unused element in a documentation comment
 dotnet_diagnostic.rcs1228.severity = suggestion
 
-# Use async/await when necessary
+## Use async/await when necessary
 dotnet_diagnostic.rcs1229.severity = suggestion
 
-# Unnecessary explicit use of enumerator
+## Unnecessary explicit use of enumerator
 dotnet_diagnostic.rcs1230.severity = suggestion
 
-# Make parameter ref read-only
+## Make parameter ref read-only
 dotnet_diagnostic.rcs1231.severity = suggestion
 
-# Order elements in documentation comment
+## Order elements in documentation comment
 dotnet_diagnostic.rcs1232.severity = suggestion
 
-# Use short-circuiting operator
+## Use short-circuiting operator
 dotnet_diagnostic.rcs1233.severity = suggestion
 
-# Duplicate enum value
+## Duplicate enum value
 dotnet_diagnostic.rcs1234.severity = suggestion
 
-# Optimize method call
+## Optimize method call
 dotnet_diagnostic.rcs1235.severity = suggestion
 
-# Use exception filter
+## Use exception filter
 dotnet_diagnostic.rcs1236.severity = suggestion
 
-# Avoid nested ?: operators
+## Avoid nested ?: operators
 dotnet_diagnostic.rcs1238.severity = suggestion
 
-# Use 'for' statement instead of 'while' statement
+## Use 'for' statement instead of 'while' statement
 dotnet_diagnostic.rcs1239.severity = suggestion
 
-# Operator is unnecessary
+## Operator is unnecessary
 dotnet_diagnostic.rcs1240.severity = suggestion
 
-# Implement non-generic counterpart
+## Implement non-generic counterpart
 dotnet_diagnostic.rcs1241.severity = suggestion
 
-# Do not pass non-read-only struct by read-only reference
+## Do not pass non-read-only struct by read-only reference
 dotnet_diagnostic.rcs1242.severity = warning
 
-# Duplicate word in a comment
+## Duplicate word in a comment
 dotnet_diagnostic.rcs1243.severity = suggestion
 
-# Simplify 'default' expression
+## Simplify 'default' expression
 dotnet_diagnostic.rcs1244.severity = suggestion
 
-# Use element access
+## Use element access
 dotnet_diagnostic.rcs1246.severity = suggestion
 
-# Fix documentation comment tag
+## Fix documentation comment tag
 dotnet_diagnostic.rcs1247.severity = suggestion
 
-# Normalize null check
+## Normalize null check
 dotnet_diagnostic.rcs1248.severity = suggestion
 
-# Unnecessary null-forgiving operator
+## Unnecessary null-forgiving operator
 dotnet_diagnostic.rcs1249.severity = suggestion
 
-# Use implicit/explicit object creation
-# This is doubled
+## Use implicit/explicit object creation
+## This is doubled
 dotnet_diagnostic.rcs1250.severity = none
 
-# Remove unnecessary braces from record declaration
+## Remove unnecessary braces from record declaration
 dotnet_diagnostic.rcs1251.severity = suggestion
 
-# Normalize usage of infinite loop
+## Normalize usage of infinite loop
 dotnet_diagnostic.rcs1252.severity = suggestion
 
-# Format documentation comment summary
+## Format documentation comment summary
 dotnet_diagnostic.rcs1253.severity = suggestion
 
-# Normalize format of enum flag value
+## Normalize format of enum flag value
 dotnet_diagnostic.rcs1254.severity = suggestion
 
-# Simplify argument null check
+## Simplify argument null check
 dotnet_diagnostic.rcs1255.severity = suggestion
 
-# Invalid argument null check
+## Invalid argument null check
 dotnet_diagnostic.rcs1256.severity = suggestion
 
-# Use enum field explicitly
+## Use enum field explicitly
 dotnet_diagnostic.rcs1257.severity = suggestion
 
-# Unnecessary enum flag
+## Unnecessary enum flag
 dotnet_diagnostic.rcs1258.severity = suggestion
 
-# Remove empty syntax
+## Remove empty syntax
 dotnet_diagnostic.rcs1259.severity = suggestion
 
-# Add/remove trailing comma
+## Add/remove trailing comma
 dotnet_diagnostic.rcs1260.severity = suggestion
 
-# Resource can be disposed asynchronously
+## Resource can be disposed asynchronously
 dotnet_diagnostic.rcs1261.severity = suggestion
 
-# Unnecessary raw string literal
+## Unnecessary raw string literal
 dotnet_diagnostic.rcs1262.severity = suggestion
 
-# Invalid reference in a documentation comment
+## Invalid reference in a documentation comment
 dotnet_diagnostic.rcs1263.severity = warning
 
-# Use 'var' or explicit type
-# This one is doubled
+## Use 'var' or explicit type
+## This one is doubled
 dotnet_diagnostic.rcs1264.severity = none
 
-# Remove redundant catch block
+## Remove redundant catch block
 dotnet_diagnostic.rcs1265.severity = suggestion
 
-# Use raw string literal
+## Use raw string literal
 dotnet_diagnostic.rcs1266.severity = suggestion
 
-# Use string interpolation instead of 'string.Concat'
+## Use string interpolation instead of 'string.Concat'
 dotnet_diagnostic.rcs1267.severity = suggestion
 
-# Simplify numeric comparison
+## Simplify numeric comparison
 dotnet_diagnostic.rcs1268.severity = suggestion
 
-# Use pattern matching
+## Use pattern matching
 dotnet_diagnostic.rcs9001.severity = suggestion
 
-# Use property SyntaxNode.SpanStart
+## Use property SyntaxNode.SpanStart
 dotnet_diagnostic.rcs9002.severity = suggestion
 
-# Unnecessary conditional access
+## Unnecessary conditional access
 dotnet_diagnostic.rcs9003.severity = suggestion
 
-# Call 'Any' instead of accessing 'Count'
+## Call 'Any' instead of accessing 'Count'
 dotnet_diagnostic.rcs9004.severity = suggestion
 
-# Unnecessary null check
+## Unnecessary null check
 dotnet_diagnostic.rcs9005.severity = suggestion
 
-# Use element access
+## Use element access
 dotnet_diagnostic.rcs9006.severity = suggestion
 
-# Use return value
+## Use return value
 dotnet_diagnostic.rcs9007.severity = warning
 
-# Call 'Last' instead of using []
+## Call 'Last' instead of using []
 dotnet_diagnostic.rcs9008.severity = suggestion
 
-# Unknown language name
+## Unknown language name
 dotnet_diagnostic.rcs9009.severity = warning
 
-# Specify ExportCodeRefactoringProviderAttribute.Name
+## Specify ExportCodeRefactoringProviderAttribute.Name
 dotnet_diagnostic.rcs9010.severity = suggestion
 
-# Specify ExportCodeFixProviderAttribute.Name
+## Specify ExportCodeFixProviderAttribute.Name
 dotnet_diagnostic.rcs9011.severity = suggestion
 
 # Json files
