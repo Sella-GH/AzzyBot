@@ -320,14 +320,14 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         }
     }
 
-    public Task<IEnumerable<AzuraFilesRecord>> GetFilesOnlineAsync(Uri baseUrl, string apiKey, int stationId)
+    public Task<IEnumerable<AzuraFilesDetailedRecord>> GetFilesOnlineAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}";
 
-        return GetFromApiListAsync<AzuraFilesRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+        return GetFromApiListAsync<AzuraFilesDetailedRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
     public async Task<AzuraHardwareStatsRecord> GetHardwareStatsAsync(Uri baseUrl, string apiKey)
