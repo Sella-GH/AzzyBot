@@ -47,7 +47,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
         }
 
         string search = context.UserInput;
-        string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(station.AzuraCast.AdminApiKey);
+        string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.AzuraCast.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
         string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
         StringBuilder songResult = new();
         Dictionary<string, object> results = new(25);
@@ -111,13 +111,20 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
             {
                 IEnumerable<AzuraRequestRecord> requests = await _azuraCast.GetRequestableSongsAsync(new(baseUrl), apiKey, stationId);
                 AddResultsFromSong(requests);
-
-                return results;
             }
+            else
+            {
+                IEnumerable<AzuraFilesDetailedRecord> filesOnline = await _azuraCast.GetFilesOnlineAsync(new(baseUrl), apiKey, stationId);
+                IEnumerable<AzuraPlaylistRecord> playlists = await _azuraCast.GetPlaylistsWithRequestsAsync(new(baseUrl), apiKey, stationId);
+                IEnumerable<AzuraFilesRecord> fileRequests = filesOnline.Where(f => f.Playlists.Any(p => playlists.Any(pl => pl.Id == p.Id)));
+                AddResultsFromSong(fileRequests);
+            }
+
+            return results;
         }
 
-        IEnumerable<AzuraFilesRecord> files = await _azuraCast.GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCast.Id, station.Id, station.StationId);
-        AddResultsFromSong(files);
+        IEnumerable<AzuraFilesRecord> filesLocal = await _azuraCast.GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCast.Id, station.Id, station.StationId);
+        AddResultsFromSong(filesLocal);
 
         return results;
     }
