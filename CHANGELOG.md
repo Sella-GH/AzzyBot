@@ -4,6 +4,9 @@
 - Permission check messages are now including the new wiki [link](https://github.com/Sella-GH/AzzyBot/wiki/AzuraCast-API-Key-required-permissions)
 - Updated the permission check uris
 
+### Dependencies
+- New dependency on [System.Linq.Async](https://github.com/dotnet/reactive) version 6.0.1
+
 ### Improvements
 - Improvements were made regarding receiving of song requests
 - Consolidated some code to reduce bloat

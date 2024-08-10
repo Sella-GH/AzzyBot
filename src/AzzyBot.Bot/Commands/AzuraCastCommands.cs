@@ -18,7 +18,6 @@ using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
-using AzzyBot.Core.Extensions;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Services.BackgroundServices;
 using AzzyBot.Core.Utilities;
@@ -154,20 +153,8 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceApiPermissionCheckAsync), context.User.GlobalName);
 
-            GuildEntity? dGuild = null;
-            IAsyncEnumerable<GuildEntity> guild = _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
-            if (await guild.ContainsOneItemAsync())
-            {
-                await using IAsyncEnumerator<GuildEntity> enumerator = guild.GetAsyncEnumerator();
-                dGuild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
-                if (dGuild is null)
-                {
-                    _logger.DatabaseGuildNotFound(context.Guild.Id);
-                    await context.EditResponseAsync(GeneralStrings.GuildNotFound);
-                    return;
-                }
-            }
-            else
+            GuildEntity? dGuild = await _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true).FirstOrDefaultAsync();
+            if (dGuild is null)
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
                 await context.EditResponseAsync(GeneralStrings.GuildNotFound);
@@ -198,20 +185,8 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceCacheRefreshAsync), context.User.GlobalName);
 
-            GuildEntity? dGuild = null;
-            IAsyncEnumerable<GuildEntity> guild = _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
-            if (await guild.ContainsOneItemAsync())
-            {
-                await using IAsyncEnumerator<GuildEntity> enumerator = guild.GetAsyncEnumerator();
-                dGuild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
-                if (dGuild is null)
-                {
-                    _logger.DatabaseGuildNotFound(context.Guild.Id);
-                    await context.EditResponseAsync(GeneralStrings.GuildNotFound);
-                    return;
-                }
-            }
-            else
+            GuildEntity? dGuild = await _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true).FirstOrDefaultAsync();
+            if (dGuild is null)
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
                 await context.EditResponseAsync(GeneralStrings.GuildNotFound);
@@ -231,20 +206,8 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceOnlineCheckAsync), context.User.GlobalName);
 
-            GuildEntity? dGuild = null;
-            IAsyncEnumerable<GuildEntity> guild = _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
-            if (await guild.ContainsOneItemAsync())
-            {
-                await using IAsyncEnumerator<GuildEntity> enumerator = guild.GetAsyncEnumerator();
-                dGuild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
-                if (dGuild is null)
-                {
-                    _logger.DatabaseGuildNotFound(context.Guild.Id);
-                    await context.EditResponseAsync(GeneralStrings.GuildNotFound);
-                    return;
-                }
-            }
-            else
+            GuildEntity? dGuild = await _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true).FirstOrDefaultAsync();
+            if (dGuild is null)
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
                 await context.EditResponseAsync(GeneralStrings.GuildNotFound);
@@ -264,20 +227,8 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceUpdateCheckAsync), context.User.GlobalName);
 
-            GuildEntity? dGuild = null;
-            IAsyncEnumerable<GuildEntity> guild = _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
-            if (await guild.ContainsOneItemAsync())
-            {
-                await using IAsyncEnumerator<GuildEntity> enumerator = guild.GetAsyncEnumerator();
-                dGuild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
-                if (dGuild is null)
-                {
-                    _logger.DatabaseGuildNotFound(context.Guild.Id);
-                    await context.EditResponseAsync(GeneralStrings.GuildNotFound);
-                    return;
-                }
-            }
-            else
+            GuildEntity? dGuild = await _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true).FirstOrDefaultAsync();
+            if (dGuild is null)
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
                 await context.EditResponseAsync(GeneralStrings.GuildNotFound);

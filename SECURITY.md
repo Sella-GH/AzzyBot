@@ -39,6 +39,7 @@ AzzyBot is not responsible for the development or maintenance of several pieces 
 * [Npsql](https://github.com/npgsql/npgsql)
 * [PostgreSQL](https://www.postgresql.org/)
 * [Roslynator](https://github.com/dotnet/roslynator)
+* [System.Linq.Async](https://github.com/dotnet/reactive)
 * [TagLibSharp](https://github.com/mono/taglib-sharp)
 
 If you identify a security issue with any of those pieces of software, we encourage you to report it to them directly. If the issue also affects AzzyBot's implementation of the software, please let us know if and when a resolution is available so that we can update our own software to incorporate the fix.
