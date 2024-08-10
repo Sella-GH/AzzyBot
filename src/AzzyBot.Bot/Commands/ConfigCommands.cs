@@ -15,7 +15,6 @@ using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
-using AzzyBot.Core.Extensions;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
@@ -354,6 +353,29 @@ public sealed class ConfigCommands
             await _dbActions.UpdateAzuraCastChecksAsync(context.Guild.Id, enableServerStatus, enableUpdates, enableUpdatesChangelog);
 
             await context.EditResponseAsync(GeneralStrings.ConfigInstanceModifiedChecks);
+
+            if (serverStatus is 1 || updates is 1)
+            {
+                ulong guildId = context.Guild.Id;
+                GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true).FirstOrDefaultAsync();
+                if (guild is null)
+                {
+                    _logger.DatabaseGuildNotFound(guildId);
+                    return;
+                }
+
+                if (guild.AzuraCast is null)
+                {
+                    _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                    return;
+                }
+
+                if (serverStatus is 1)
+                    _backgroundService.QueueInstancePing(guild);
+
+                if (updates is 1)
+                    _backgroundService.QueueUpdates(guild);
+            }
         }
 
         [Command("modify-azuracast-station"), Description("Modify one AzuraCast station you already added."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -482,6 +504,32 @@ public sealed class ConfigCommands
             await _dbActions.UpdateAzuraCastStationChecksAsync(context.Guild.Id, station, enableFileChanges);
 
             await context.EditResponseAsync(GeneralStrings.ConfigStationModifiedChecks);
+
+            if (fileChanges is 1)
+            {
+                ulong guildId = context.Guild.Id;
+                GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true).FirstOrDefaultAsync();
+                if (guild is null)
+                {
+                    _logger.DatabaseGuildNotFound(guildId);
+                    return;
+                }
+
+                if (guild.AzuraCast is null)
+                {
+                    _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                    return;
+                }
+
+                if (guild.AzuraCast.Stations.FirstOrDefault(s => s.Id == station) is not AzuraCastStationEntity acStation)
+                {
+                    _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, guild.AzuraCast.Id, station);
+                    return;
+                }
+
+                if (guild.AzuraCast.IsOnline)
+                    _backgroundService.QueueFileChangesChecks(guild, station);
+            }
         }
 
         [Command("modify-core"), Description("Modify the core settings of the bot.")]

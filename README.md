@@ -79,6 +79,7 @@ Follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wi
 * [Microsoft.Extensions.X Libs](https://github.com/dotnet/runtime)
 * [Npsql](https://github.com/npgsql/npgsql)
 * [Roslynator](https://github.com/dotnet/roslynator)
+* [System.Linq.Async](https://github.com/dotnet/reactive)
 * [TagLibSharp](https://github.com/mono/taglib-sharp)
 
 ## Contributing
