@@ -11,6 +11,9 @@ public sealed record AzuraPlaylistRecord
     [JsonPropertyName("is_enabled")]
     public bool IsEnabled { get; init; }
 
+    [JsonPropertyName("include_in_requests")]
+    public bool IncludeInRequests { get; init; }
+
     [JsonPropertyName("id")]
     public int Id { get; init; }
 
