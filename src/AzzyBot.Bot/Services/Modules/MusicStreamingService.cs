@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Entities;
@@ -35,7 +36,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
             _logger.UserNotConnected(context.User.GlobalName);
 
             if (!suppressResponse)
-                await context.EditResponseAsync("You must be in a voice channel.");
+                await context.EditResponseAsync(GeneralStrings.VoiceNotConnected);
 
             if (!ignoreVoice)
                 return null;
@@ -49,7 +50,10 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         bool notConnecting = false;
         if (channel is null)
         {
-            notConnecting = true;
+            if (!suppressResponse)
+                await context.EditResponseAsync(GeneralStrings.VoiceNoUser);
+
+            return null;
         }
         else if (channelId is not 0)
         {

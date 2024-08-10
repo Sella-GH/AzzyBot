@@ -175,7 +175,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task<string> GetWebAsync(Uri url, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true, bool noLogging = false)
+    public async Task<string?> GetWebAsync(Uri url, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true, bool noLogging = false)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
@@ -197,7 +197,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
                 response = await client.GetAsync(url);
             }
 
-            return await response.Content.ReadAsStringAsync();
+            return (response.StatusCode is not HttpStatusCode.Forbidden) ? await response.Content.ReadAsStringAsync() : null;
         }
         catch (InvalidOperationException)
         {
@@ -278,7 +278,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task<string> UploadAsync(Uri url, string file, string fileName, string filePath, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    public async Task<string?> UploadAsync(Uri url, string file, string fileName, string filePath, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
@@ -296,7 +296,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
             _logger.WebRequestFailed(HttpMethod.Post, response.ReasonPhrase ?? string.Empty, url);
 
-            return string.Empty;
+            return null;
         }
         catch (InvalidOperationException)
         {

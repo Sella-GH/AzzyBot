@@ -223,7 +223,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .FirstOrDefaultAsync();
     }
 
-    public Task<AzuraCastStationEntity?> GetAzuraCastStationAsync(ulong guildId, int stationId, bool loadChecks = false, bool loadPrefs = false, bool loadAzuraCast = false)
+    public Task<AzuraCastStationEntity?> GetAzuraCastStationAsync(ulong guildId, int stationId, bool loadChecks = false, bool loadPrefs = false, bool loadAzuraCast = false, bool loadAzuraCastPrefs = false)
     {
         return _dbContext.AzuraCastStations
             .AsNoTracking()
@@ -232,6 +232,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .IncludeIf(loadChecks, static q => q.Include(static s => s.Checks))
             .IncludeIf(loadPrefs, static q => q.Include(static s => s.Preferences))
             .IncludeIf(loadAzuraCast, static q => q.Include(static s => s.AzuraCast))
+            .IncludeIf(loadAzuraCastPrefs, static q => q.Include(static s => s.AzuraCast.Preferences))
             .FirstOrDefaultAsync();
     }
 

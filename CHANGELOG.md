@@ -1,10 +1,16 @@
 ## 2.0.0-preview9
-### Improvements
-- Updated the permission check uris
+### General
+- Greatly overhauled the missing permission handling
 - Permission check messages are now including the new wiki [link](https://github.com/Sella-GH/AzzyBot/wiki/AzuraCast-API-Key-required-permissions)
+- Updated the permission check uris
+
+### Improvements
 - Improvements were made regarding receiving of song requests
 - Consolidated some code to reduce bloat
 - Code performance improvements
+
+### Fixes
+- `player join`, `player play` and `player play-mount` are working again when the user isn't classified as "in a voice channel" by discord
 
 ## 2.0.0-preview8 - 2024-08-09
 ### General
