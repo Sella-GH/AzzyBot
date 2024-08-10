@@ -114,7 +114,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
             }
             else
             {
-                IEnumerable<AzuraFilesDetailedRecord> filesOnline = await _azuraCast.GetFilesOnlineAsync(new(baseUrl), apiKey, stationId);
+                IEnumerable<AzuraFilesDetailedRecord> filesOnline = await _azuraCast.GetFilesOnlineAsync<AzuraFilesDetailedRecord>(new(baseUrl), apiKey, stationId);
                 IEnumerable<AzuraPlaylistRecord> playlists = await _azuraCast.GetPlaylistsWithRequestsAsync(new(baseUrl), apiKey, stationId);
                 IEnumerable<AzuraFilesRecord> fileRequests = filesOnline.Where(f => f.Playlists.Any(p => playlists.Any(pl => pl.Id == p.Id)));
                 AddResultsFromSong(fileRequests);
