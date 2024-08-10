@@ -648,7 +648,7 @@ public sealed class ConfigCommands
             if (guild.AzuraCast is not null)
             {
                 AzuraCastEntity azuraCast = guild.AzuraCast;
-                AzuraStationRecord stationRecord;
+                AzuraStationRecord? stationRecord;
                 Dictionary<ulong, string> stationRoles = new(azuraCast.Stations.Count);
                 Dictionary<int, string> stationNames = new(azuraCast.Stations.Count);
                 foreach (AzuraCastStationEntity station in azuraCast.Stations)
@@ -659,6 +659,12 @@ public sealed class ConfigCommands
                     stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found");
 
                     stationRecord = await _azuraCast.GetStationAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), station.StationId);
+                    if (stationRecord is null)
+                    {
+                        await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                        continue;
+                    }
+
                     stationNames.Add(station.Id, stationRecord.Name);
                 }
 

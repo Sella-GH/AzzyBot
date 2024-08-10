@@ -205,10 +205,12 @@ public sealed class MusicStreamingCommands
                 return;
             }
 
-            AzuraNowPlayingDataRecord nowPlaying;
+            AzuraNowPlayingDataRecord? nowPlaying;
             try
             {
                 nowPlaying = await _azuraCast.GetNowPlayingAsync(new(Crypto.Decrypt(azura.BaseUrl)), station);
+                if (nowPlaying is null)
+                    throw new HttpRequestException("NowPlaying is null.");
             }
             catch (HttpRequestException)
             {
