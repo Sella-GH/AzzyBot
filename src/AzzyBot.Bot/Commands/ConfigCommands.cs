@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
@@ -85,17 +86,7 @@ public sealed class ConfigCommands
             await context.DeferResponseAsync();
 
             ulong guildId = context.Guild.Id;
-            GuildEntity? guild = null;
-            IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
-            await foreach (GuildEntity itGuild in guilds)
-            {
-                if (itGuild.UniqueId == guildId)
-                {
-                    guild = itGuild;
-                    break;
-                }
-            }
-
+            GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true).FirstOrDefaultAsync();
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);
@@ -125,20 +116,12 @@ public sealed class ConfigCommands
             await context.DeleteResponseAsync();
             await context.FollowupAsync(GeneralStrings.ConfigInstanceAdded);
 
-            guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
-            if (await guilds.ContainsOneItemAsync())
-            {
-                await using IAsyncEnumerator<GuildEntity> enumerator = guilds.GetAsyncEnumerator();
-                guild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
-                if (guild is null)
-                {
-                    _logger.DatabaseGuildNotFound(guildId);
-                    return;
-                }
-            }
-            else
+            guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true).FirstOrDefaultAsync();
+            if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);
+                await context.DeleteResponseAsync();
+                await context.FollowupAsync(GeneralStrings.GuildNotFound);
                 return;
             }
 
@@ -186,17 +169,7 @@ public sealed class ConfigCommands
             await context.FollowupAsync(GeneralStrings.ConfigStationAdded);
 
             ulong guildId = context.Guild.Id;
-            GuildEntity? guild = null;
-            IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
-            await foreach (GuildEntity itGuild in guilds)
-            {
-                if (itGuild.UniqueId == guildId)
-                {
-                    guild = itGuild;
-                    break;
-                }
-            }
-
+            GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true).FirstOrDefaultAsync();
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);
@@ -209,27 +182,10 @@ public sealed class ConfigCommands
                 return;
             }
 
-            guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
-            if (await guilds.ContainsOneItemAsync())
-            {
-                await using IAsyncEnumerator<GuildEntity> enumerator = guilds.GetAsyncEnumerator();
-                guild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
-                if (guild is null)
-                {
-                    _logger.DatabaseGuildNotFound(guildId);
-                    return;
-                }
-            }
-            else
-            {
-                _logger.DatabaseGuildNotFound(guildId);
-                return;
-            }
-
             ulong[] channels = (uploadChannel is null) ? [requestsChannel.Id] : [requestsChannel.Id, uploadChannel.Id];
             await _botService.CheckPermissionsAsync(context.Guild, channels);
 
-            if (guild.AzuraCast!.IsOnline)
+            if (guild.AzuraCast.IsOnline)
                 _backgroundService.QueueFileChangesChecks(guild, station);
         }
 
@@ -313,35 +269,8 @@ public sealed class ConfigCommands
             await context.FollowupAsync(GeneralStrings.ConfigInstanceModified);
 
             ulong guildId = context.Guild.Id;
-            GuildEntity? guild = null;
-            IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
-            await foreach (GuildEntity itGuild in guilds)
-            {
-                if (itGuild.UniqueId == guildId)
-                {
-                    guild = itGuild;
-                    break;
-                }
-            }
-
+            GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true).FirstOrDefaultAsync();
             if (guild is null)
-            {
-                _logger.DatabaseGuildNotFound(guildId);
-                return;
-            }
-
-            guilds = _dbActions.GetGuildAsync(guildId, loadEverything: true);
-            if (await guilds.ContainsOneItemAsync())
-            {
-                await using IAsyncEnumerator<GuildEntity> enumerator = guilds.GetAsyncEnumerator();
-                guild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
-                if (guild is null)
-                {
-                    _logger.DatabaseGuildNotFound(guildId);
-                    return;
-                }
-            }
-            else
             {
                 _logger.DatabaseGuildNotFound(guildId);
                 return;
@@ -490,39 +419,30 @@ public sealed class ConfigCommands
             {
                 await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, apiKey);
 
-                AzuraCastStationEntity? acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station, loadAzuraCast: true);
-                if (acStation is null)
+                ulong guildId = context.Guild.Id;
+                GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true).FirstOrDefaultAsync();
+                if (guild is null)
                 {
-                    _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, station);
+                    _logger.DatabaseGuildNotFound(guildId);
+                    await context.EditResponseAsync(GeneralStrings.GuildNotFound);
+                    return;
+                }
+
+                if (guild.AzuraCast is null)
+                {
+                    _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                    await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
+                    return;
+                }
+
+                if (guild.AzuraCast.Stations.FirstOrDefault(s => s.Id == station) is not AzuraCastStationEntity acStation)
+                {
+                    _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, guild.AzuraCast.Id, station);
                     await context.EditResponseAsync(GeneralStrings.StationNotFound);
                     return;
                 }
 
-                if (acStation.AzuraCast is null)
-                {
-                    _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                    return;
-                }
-
-                GuildEntity? guild = null;
-                IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
-                if (await guilds.ContainsOneItemAsync())
-                {
-                    await using IAsyncEnumerator<GuildEntity> enumerator = guilds.GetAsyncEnumerator();
-                    guild = (await enumerator.MoveNextAsync()) ? enumerator.Current : null;
-                    if (guild is null)
-                    {
-                        _logger.DatabaseGuildNotFound(context.Guild.Id);
-                        return;
-                    }
-                }
-                else
-                {
-                    _logger.DatabaseGuildNotFound(context.Guild.Id);
-                    return;
-                }
-
-                if (acStation.AzuraCast.IsOnline)
+                if (guild.AzuraCast.IsOnline)
                     _backgroundService.QueueFileChangesChecks(guild, station);
             }
 

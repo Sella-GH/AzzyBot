@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
@@ -173,16 +174,7 @@ public sealed class AdminCommands
             IAsyncEnumerable<GuildEntity> guildsEntities = _dbActions.GetGuildsAsync(true);
             foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds)
             {
-                GuildEntity? guildEntity = null;
-                await foreach (GuildEntity entity in guildsEntities)
-                {
-                    if (entity.UniqueId == guild.Key)
-                    {
-                        guildEntity = entity;
-                        break;
-                    }
-                }
-
+                GuildEntity? guildEntity = await guildsEntities.Where(e => e.UniqueId == guild.Key).FirstOrDefaultAsync();
                 if (guildEntity is null)
                 {
                     _logger.DatabaseGuildNotFound(guild.Key);
