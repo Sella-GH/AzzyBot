@@ -23,6 +23,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
     private readonly ILogger<AzuraCastApiService> _logger = logger;
     private readonly DiscordBotService _botService = botService;
     private readonly WebRequestService _webService = webService;
+    private const string AzuraCastPermissionsWiki = "https://github.com/Sella-GH/AzzyBot/wiki/AzuraCast-API-Key-required-permissions";
 
     public string FilePath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "AzuraCast", "Files");
 
@@ -56,8 +57,9 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
     {
         string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
         string apiUrl = $"{baseUrl}/api";
-        List<Uri> apis = new(3)
+        List<Uri> apis = new(4)
         {
+            new($"{apiUrl}/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Logs}"),
             new($"{apiUrl}/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Server}/{AzuraApiEndpoints.Stats}"),
             new($"{apiUrl}/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Stations}")
         };
@@ -76,7 +78,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
             builder.AppendLine(api);
         }
 
-        builder.AppendLine("Please review your permission set.");
+        builder.AppendLine($"Please review your [permission]({AzuraCastPermissionsWiki}) set.");
 
         await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, builder.ToString());
     }
@@ -97,10 +99,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         };
 
         if (config.EnableRequests)
-        {
-            apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Requests}"));
             apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}"));
-        }
 
         if (station.Checks.FileChanges)
             apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}"));
@@ -117,7 +116,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
             builder.AppendLine(api);
         }
 
-        builder.AppendLine("Please review your permission set.");
+        builder.AppendLine("Please review your [permission]({AzuraCastPermissionsWiki}) set.");
 
         await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, builder.ToString());
     }
@@ -320,14 +319,14 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         }
     }
 
-    public Task<IEnumerable<AzuraFilesRecord>> GetFilesOnlineAsync(Uri baseUrl, string apiKey, int stationId)
+    public Task<IEnumerable<T>> GetFilesOnlineAsync<T>(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}";
 
-        return GetFromApiListAsync<AzuraFilesRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+        return GetFromApiListAsync<T>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
     public async Task<AzuraHardwareStatsRecord> GetHardwareStatsAsync(Uri baseUrl, string apiKey)
@@ -377,6 +376,16 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         return GetFromApiListAsync<AzuraPlaylistRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
+    public async Task<IEnumerable<AzuraPlaylistRecord>> GetPlaylistsWithRequestsAsync(Uri baseUrl, string apiKey, int stationId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+
+        IEnumerable<AzuraPlaylistRecord> playlists = await GetPlaylistsAsync(baseUrl, apiKey, stationId);
+
+        return playlists.Where(static p => p.IncludeInRequests);
+    }
+
     public async Task<AzuraRequestRecord> GetRequestableSongAsync(Uri baseUrl, string apiKey, int stationId, string? songId = null, string? name = null, string? artist = null, string? album = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
@@ -419,7 +428,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentNullException.ThrowIfNull(station, nameof(station));
 
-        IEnumerable<AzuraFilesRecord> songs = (online) ? await GetFilesOnlineAsync(baseUrl, apiKey, station.StationId) : await GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
+        IEnumerable<AzuraFilesRecord> songs = (online) ? await GetFilesOnlineAsync<AzuraFilesRecord>(baseUrl, apiKey, station.StationId) : await GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
         AzuraFilesRecord? song = songs.FirstOrDefault(s =>
             (uniqueId is null || s.UniqueId == uniqueId) &&
             (songId is null || s.SongId == songId) &&

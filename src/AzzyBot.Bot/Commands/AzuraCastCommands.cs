@@ -131,7 +131,7 @@ public sealed class AzuraCastCommands
         public async ValueTask ForceApiPermissionCheckAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to check the api key."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station
+            [Description("The station of which you want to check the api key."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int? station = null
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -159,9 +159,16 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            _backgroundService.QueueApiPermissionChecks(dGuild, station);
+            if (station.HasValue)
+            {
+                _backgroundService.QueueApiPermissionChecks(dGuild, station.Value);
+            }
+            else
+            {
+                _backgroundService.QueueApiPermissionChecks(dGuild);
+            }
 
-            await context.EditResponseAsync("I initiated the permission check, please wait a little for the result.");
+            await context.EditResponseAsync("I initiated the permission check.\nThere won't be another message if your permissions are set correctly.");
         }
 
         [Command("force-cache-refresh"), Description("Force the bot to refresh it's local song cache for a specific station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -198,7 +205,7 @@ public sealed class AzuraCastCommands
 
             _backgroundService.QueueFileChangesChecks(dGuild, station);
 
-            await context.EditResponseAsync("I initiated the cache refresh, please wait a little for it to occur.");
+            await context.EditResponseAsync("I initiated the cache refresh.");
         }
 
         [Command("force-online-check"), Description("Force the bot to check if the AzuraCast instance is online."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -231,7 +238,7 @@ public sealed class AzuraCastCommands
 
             _backgroundService.QueueInstancePing(dGuild);
 
-            await context.EditResponseAsync("I initiated the online check for the AzuraCast instance, please wait a little for the result.");
+            await context.EditResponseAsync("I initiated the online check for the AzuraCast instance.");
         }
 
         [Command("force-update-check"), Description("Force the bot to search for AzuraCast Updates."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -264,7 +271,7 @@ public sealed class AzuraCastCommands
 
             _backgroundService.QueueUpdates(dGuild);
 
-            await context.EditResponseAsync("I initiated the check for AzuraCast Updates, please wait a little.\nThere won't be an answer if there are no updates available.");
+            await context.EditResponseAsync("I initiated the check for AzuraCast Updates.\nThere won't be another message if there are no updates available.");
         }
 
         [Command("get-system-logs"), Description("Get the system logs of the AzuraCast instance."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -825,7 +832,7 @@ public sealed class AzuraCastCommands
             {
                 string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(azuraCast.AdminApiKey);
                 IEnumerable<AzuraPlaylistRecord> playlist = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, station);
-                playlistName = playlist.Where(p => p.Name == nowPlaying.NowPlaying.Playlist).Select(p => p.Name).FirstOrDefault();
+                playlistName = playlist.Where(p => p.Name == nowPlaying.NowPlaying.Playlist).Select(static p => p.Name).FirstOrDefault();
             }
 
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicNowPlayingEmbed(nowPlaying, playlistName);

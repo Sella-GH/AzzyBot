@@ -1,4 +1,12 @@
-## 2.0.0-preview8
+## 2.0.0-preview9
+### Improvements
+- Updated the permission check uris
+- Permission check messages are now including the new wiki [link](https://github.com/Sella-GH/AzzyBot/wiki/AzuraCast-API-Key-required-permissions)
+- Improvements were made regarding receiving of song requests
+- Consolidated some code to reduce bloat
+- Code performance improvements
+
+## 2.0.0-preview8 - 2024-08-09
 ### General
 - Failsafes added to prevent the bot from crashing
 - Refactored the code to comply with the newest dependency versions

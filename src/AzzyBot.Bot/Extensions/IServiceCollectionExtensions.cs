@@ -28,13 +28,13 @@ public static class IServiceCollectionExtensions
         // Need to register as Singleton first
         // Otherwise DI doesn't work properly
         services.AddSingleton<CoreServiceHost>();
-        services.AddHostedService(s => s.GetRequiredService<CoreServiceHost>());
+        services.AddHostedService(static s => s.GetRequiredService<CoreServiceHost>());
 
         // Register the database services
         services.AzzyBotDataServices(isDev, settings.Database!.EncryptionKey, settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.DatabaseName);
 
         services.AddDiscordClient(settings.BotToken, DiscordIntents.Guilds | DiscordIntents.GuildVoiceStates);
-        services.ConfigureEventHandlers(e =>
+        services.ConfigureEventHandlers(static e =>
         {
             e.HandleGuildCreated(EventListener.OnGuildCreatedAsync);
             e.HandleGuildDeleted(EventListener.OnGuildDeletedAsync);
@@ -43,11 +43,11 @@ public static class IServiceCollectionExtensions
 
         services.AddSingleton<DiscordBotService>();
         services.AddSingleton<DiscordBotServiceHost>();
-        services.AddHostedService(s => s.GetRequiredService<DiscordBotServiceHost>());
+        services.AddHostedService(static s => s.GetRequiredService<DiscordBotServiceHost>());
 
         services.AddSingleton<QueuedBackgroundTask>();
         services.AddSingleton<QueuedBackgroundTaskHost>();
-        services.AddHostedService(s => s.GetRequiredService<QueuedBackgroundTaskHost>());
+        services.AddHostedService(static s => s.GetRequiredService<QueuedBackgroundTaskHost>());
 
         services.AddSingleton<WebRequestService>();
         services.AddSingleton<UpdaterService>();
@@ -60,7 +60,7 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<AzuraRequestBackgroundTask>();
 
         services.AddSingleton<TimerServiceHost>();
-        services.AddHostedService(s => s.GetRequiredService<TimerServiceHost>());
+        services.AddHostedService(static s => s.GetRequiredService<TimerServiceHost>());
 
         services.AddLavalink();
         services.ConfigureLavalink(config =>
