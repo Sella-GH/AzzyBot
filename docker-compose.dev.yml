@@ -1,7 +1,7 @@
 services:
   AzzyBot:
     container_name: AzzyBot
-    image: sellagh/azzybot:rel-2.0.0-preview7
+    image: sellagh/azzybot:rel-2.0.0-preview9
     pull_policy: always
     restart: unless-stopped
     user: ${CURRENT_UID}

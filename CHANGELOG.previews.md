@@ -1,4 +1,6 @@
 ## 2.0.0-preview9
+This is a release candidate. If no major bugs are found, this will be the final release.
+
 ### General
 - Greatly overhauled the missing permission handling
 - Permission check messages are now including the new wiki [link](https://github.com/Sella-GH/AzzyBot/wiki/AzuraCast-API-Key-required-permissions)

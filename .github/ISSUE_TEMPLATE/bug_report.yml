@@ -29,6 +29,8 @@ body :
         - "2.0.0-preview5"
         - "2.0.0-preview6"
         - "2.0.0-preview7"
+        - "2.0.0-preview8"
+        - "2.0.0-preview9"
     validations :
       required : true
 
