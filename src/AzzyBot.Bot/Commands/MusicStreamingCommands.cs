@@ -90,11 +90,16 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
             ArgumentNullException.ThrowIfNull(context.Member, nameof(context.Member));
             ArgumentNullException.ThrowIfNull(context.Member.VoiceState, nameof(context.Member.VoiceState));
-            ArgumentNullException.ThrowIfNull(context.Member.VoiceState.Channel, nameof(context.Member.VoiceState.Channel));
 
             _logger.CommandRequested(nameof(JoinAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
+
+            if (context.Member.VoiceState.Channel is null)
+            {
+                await context.EditResponseAsync(GeneralStrings.VoiceNoUser);
+                return;
+            }
 
             if (context.Member.VoiceState.Channel.Users.Contains(await context.Guild.GetMemberAsync(context.Client.CurrentUser.Id)))
             {
@@ -201,6 +206,7 @@ public sealed class MusicStreamingCommands
             AzuraCastEntity? azura = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
             if (azura is null)
             {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
                 await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }

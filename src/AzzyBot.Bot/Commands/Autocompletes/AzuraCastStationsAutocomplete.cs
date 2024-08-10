@@ -69,7 +69,7 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
 
             switch (context.Command.Name)
             {
-                case "play":
+                case "play-mount":
                     if (config.IsEnabled)
                         results.Add(azuraStation.Name, station.StationId);
 

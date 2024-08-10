@@ -41,10 +41,18 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
 
         string search = context.UserInput;
         string name = string.Empty;
-        AzuraStationRecord? record = await _azuraCast.GetStationAsync(new(Crypto.Decrypt(azuraCastEntity.BaseUrl)), stationId);
-        if (record is null)
+        AzuraStationRecord? record = null;
+        try
         {
-            await _botService.SendMessageAsync(azuraCastEntity.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({stationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+            record = await _azuraCast.GetStationAsync(new(Crypto.Decrypt(azuraCastEntity.BaseUrl)), stationId);
+            if (record is null)
+            {
+                await _botService.SendMessageAsync(azuraCastEntity.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({stationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                return new Dictionary<string, object>();
+            }
+        }
+        catch (InvalidOperationException)
+        {
             return new Dictionary<string, object>();
         }
 

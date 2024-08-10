@@ -50,6 +50,8 @@ public static class GeneralStrings
     public const string VoiceAlreadyIn = "I'm already in the voice channel.";
     public const string VoiceJoined = "I'm here now.";
     public const string VoiceLeft = "I'm gone now.";
+    public const string VoiceNotConnected = "You are not connected to a voice channel.";
+    public const string VoiceNoUser = "Discord didn't told me you're in a voice channel, please rejoin.";
     public const string VoicePlayMount = "I'm starting to play **%station%** now.";
     public const string VoicePlaySong = "I'm starting to play **%track%** by **%artist%** now.";
     public const string VoiceStop = "I'm stopping the music now.";
