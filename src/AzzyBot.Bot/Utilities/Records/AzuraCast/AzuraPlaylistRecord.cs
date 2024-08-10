@@ -38,3 +38,15 @@ public sealed record AzuraPlaylistLinkExportRecord
     [JsonPropertyName("m3u")]
     public Uri M3U { get; init; } = new Uri("https://github.com");
 }
+
+public sealed record AzuraPlaylistStateRecord
+{
+    public string PlaylistName { get; init; }
+    public bool PlaylistState { get; init; }
+
+    public AzuraPlaylistStateRecord(string playlistName, bool playlistState)
+    {
+        PlaylistName = playlistName;
+        PlaylistState = playlistState;
+    }
+}
