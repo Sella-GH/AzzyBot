@@ -23,7 +23,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
     private readonly ILogger<AzuraCastApiService> _logger = logger;
     private readonly DiscordBotService _botService = botService;
     private readonly WebRequestService _webService = webService;
-    private const string AzuraCastPermissionsWiki = "https://github.com/Sella-GH/AzzyBot/wiki/AzuraCast-API-Key-required-permissions";
+    public const string AzuraCastPermissionsWiki = "Please review your [permission](https://github.com/Sella-GH/AzzyBot/wiki/AzuraCast-API-Key-required-permissions) set.";
 
     public string FilePath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "AzuraCast", "Files");
 
@@ -78,7 +78,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
             builder.AppendLine(api);
         }
 
-        builder.AppendLine($"Please review your [permission]({AzuraCastPermissionsWiki}) set.");
+        builder.AppendLine(AzuraCastPermissionsWiki);
 
         await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, builder.ToString());
     }
@@ -118,7 +118,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
             builder.AppendLine(api);
         }
 
-        builder.AppendLine("Please review your [permission]({AzuraCastPermissionsWiki}) set.");
+        builder.AppendLine(AzuraCastPermissionsWiki);
 
         await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, builder.ToString());
     }
