@@ -6,8 +6,8 @@ We expect that all users of the software, if they are interested in taking advan
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 2.0.0-previewX | :white_check_mark: |
-| 1.10.x | :white_check_mark: |
+| 2.0.x | :white_check_mark: |
+| 1.10.x | :x: |
 | 1.9.x | :x: |
 | 1.8.x | :x: |
 | 1.7.x | :x: |

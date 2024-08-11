@@ -17,20 +17,9 @@ body :
       label : "Version"
       description : "Which version of Azzy are you using?"
       options :
-        - "1.9.x"
+        - "2.0.0"
         - "1.10.x"
-        - "2.0.0-preview1"
-        - "2.0.0-preview1.1"
-        - "2.0.0-preview2"
-        - "2.0.0-preview3"
-        - "2.0.0-preview3.1"
-        - "2.0.0-preview4"
-        - "2.0.0-preview4.1"
-        - "2.0.0-preview5"
-        - "2.0.0-preview6"
-        - "2.0.0-preview7"
-        - "2.0.0-preview8"
-        - "2.0.0-preview9"
+        - "1.9.x"
     validations :
       required : true
 
@@ -41,7 +30,7 @@ body :
       description : "Which deployment version are you using?"
       options :
         - Docker
-        - Native
+        #- Native
     validations :
       required : true
 
