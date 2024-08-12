@@ -22,7 +22,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class DiscordBotServiceHost(ILogger<DiscordBotServiceHost> logger, AzzyBotSettingsRecord settings, DiscordBotService botService, DiscordClient client) : IClientErrorHandler, IHostedService
+public sealed class DiscordBotServiceHost(ILogger<DiscordBotServiceHost> logger, AzzyBotSettingsRecord settings, DiscordBotService botService, DiscordClient client) : IHostedService
 {
     private readonly ILogger<DiscordBotServiceHost> _logger = logger;
     private readonly AzzyBotSettingsRecord _settings = settings;
@@ -57,43 +57,6 @@ public sealed class DiscordBotServiceHost(ILogger<DiscordBotServiceHost> logger,
 
         await _client.DisconnectAsync();
     }
-
-    public async ValueTask HandleEventHandlerError(string name, Exception exception, Delegate invokedDelegate, object sender, object args)
-    {
-        ArgumentNullException.ThrowIfNull(exception, nameof(exception));
-
-        if (_botService is null)
-            return;
-
-        DateTime now = DateTime.Now;
-
-        switch (exception)
-        {
-            case RateLimitException:
-                break;
-
-            case BadRequestException:
-            case NotFoundException:
-            case RequestSizeException:
-            case ServerErrorException:
-            case UnauthorizedException:
-                await _botService.LogExceptionAsync(exception, now);
-                break;
-
-            default:
-                if (exception is not DiscordException)
-                {
-                    await _botService.LogExceptionAsync(exception, now);
-                    break;
-                }
-
-                await _botService.LogExceptionAsync(exception, now, info: ((DiscordException)exception).JsonMessage);
-                break;
-        }
-    }
-
-    public async ValueTask HandleGatewayError(Exception exception)
-        => await _botService.LogExceptionAsync(exception, DateTime.Now);
 
     private void RegisterCommands()
     {
