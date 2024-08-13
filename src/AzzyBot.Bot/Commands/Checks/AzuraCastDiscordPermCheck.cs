@@ -111,6 +111,10 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
             case "dj switch-playlist":
                 isStationDj = userRoles.Contains(_botService.GetDiscordRole(guildId, station.Preferences.StationDjRoleId));
                 break;
+
+            default:
+                _logger.CommandNotFound(commandName);
+                break;
         }
 
         if (perm is AzuraCastDiscordPerm.InstanceAdminGroup && isInstanceAdmin)

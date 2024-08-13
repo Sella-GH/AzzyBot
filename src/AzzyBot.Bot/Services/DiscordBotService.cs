@@ -553,9 +553,10 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
             case DiscordInteractionResponseState.Replied:
                 return await ctx.FollowupAsync(builder);
-        }
 
-        return null;
+            default:
+                throw new InvalidOperationException("Unknown response state");
+        }
     }
 
     private async Task<DiscordChannel?> GetFirstDiscordChannelAsync(ulong guildId)

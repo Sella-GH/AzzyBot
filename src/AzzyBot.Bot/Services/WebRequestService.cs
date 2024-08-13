@@ -374,7 +374,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
             return true;
         }
-        catch (Exception ex) when (ex is OperationCanceledException || ex is SocketException)
+        catch (Exception ex) when (ex is OperationCanceledException or SocketException)
         {
             return false;
         }

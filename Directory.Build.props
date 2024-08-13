@@ -17,6 +17,7 @@
     <AnalysisLevel>latest-all</AnalysisLevel>
     <Configurations>Debug;Release;Docker;Docker-debug</Configurations>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <ImplicitUsings>disable</ImplicitUsings>
     <IsPublishable>True</IsPublishable>
     <NoWarn>$(NoWarn);CA1812;CA2007</NoWarn>
