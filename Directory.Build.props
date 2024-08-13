@@ -20,7 +20,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <ImplicitUsings>disable</ImplicitUsings>
     <IsPublishable>True</IsPublishable>
-    <NoWarn>$(NoWarn);CA1812;CA2007</NoWarn>
+    <NoWarn>$(NoWarn);CA2007</NoWarn>
     <Nullable>enable</Nullable>
     <PathMap>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)=.</PathMap>
     <Platforms>x64;ARM64;AnyCPU</Platforms>
