@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Core.Logging;
@@ -10,31 +9,24 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class DiscordBotServiceHost(ILogger<DiscordBotServiceHost> logger, AzzyBotSettingsRecord settings, DiscordBotService botService, DiscordClient client) : IHostedService
+public sealed class DiscordBotServiceHost(ILogger<DiscordBotServiceHost> logger, AzzyBotSettingsRecord settings, DiscordClient client) : IHostedService
 {
     private readonly ILogger<DiscordBotServiceHost> _logger = logger;
     private readonly AzzyBotSettingsRecord _settings = settings;
-    private readonly DiscordBotService _botService = botService;
     private readonly DiscordClient _client = client;
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        await _client.ConnectAsync();
+
+        DiscordActivity activity = DiscordBotService.SetBotStatusActivity(_settings.DiscordStatus?.Activity ?? 2, _settings.DiscordStatus?.Doing ?? "Music", _settings.DiscordStatus?.StreamUrl);
+        DiscordUserStatus status = DiscordBotService.SetBotStatusUserStatus(_settings.DiscordStatus?.Status ?? 1);
+
+        await _client.ConnectAsync(activity, status);
 
         _logger.BotReady();
         string invite = _client.CurrentApplication.GenerateOAuthUri(null, DiscordPermissions.AccessChannels | DiscordPermissions.AttachFiles | DiscordPermissions.SendMessages, [DiscordOAuthScope.ApplicationsCommands, DiscordOAuthScope.Bot]);
         _logger.InviteUrl(invite);
-
-        // Wait 3 Seconds to let the client boot up
-        await Task.Delay(3000, cancellationToken);
-
-        int activity = _settings.DiscordStatus?.Activity ?? 2;
-        string doing = _settings.DiscordStatus?.Doing ?? "Music";
-        int status = _settings.DiscordStatus?.Status ?? 1;
-        Uri? url = _settings.DiscordStatus?.StreamUrl;
-
-        await _botService.SetBotStatusAsync(status, activity, doing, url);
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)

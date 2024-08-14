@@ -497,7 +497,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         return true;
     }
 
-    public async Task SetBotStatusAsync(int status = 1, int type = 2, string doing = "Music", Uri? url = null, bool reset = false)
+    public async Task SetBotStatusAsync(int status, int type, string doing, Uri? url = null, bool reset = false)
     {
         if (reset)
         {
@@ -505,6 +505,14 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             return;
         }
 
+        DiscordActivity activity = SetBotStatusActivity(type, doing, url);
+        DiscordUserStatus newStatus = SetBotStatusUserStatus(status);
+
+        await _client.UpdateStatusAsync(activity, newStatus);
+    }
+
+    public static DiscordActivity SetBotStatusActivity(int type, string doing, Uri? url)
+    {
         DiscordActivityType activityType = (Enum.IsDefined(typeof(DiscordActivityType), type)) ? (DiscordActivityType)type : DiscordActivityType.ListeningTo;
         if (activityType is DiscordActivityType.Streaming && url is null)
             activityType = DiscordActivityType.Playing;
@@ -513,10 +521,11 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         if (activityType is DiscordActivityType.Streaming && url is not null && (url.Host.Contains("twitch", StringComparison.OrdinalIgnoreCase) || url.Host.Contains("youtube", StringComparison.OrdinalIgnoreCase)))
             activity.StreamUrl = url.OriginalString;
 
-        DiscordUserStatus userStatus = (Enum.IsDefined(typeof(DiscordUserStatus), status)) ? (DiscordUserStatus)status : DiscordUserStatus.Online;
-
-        await _client.UpdateStatusAsync(activity, userStatus);
+        return activity;
     }
+
+    public static DiscordUserStatus SetBotStatusUserStatus(int status)
+        => (Enum.IsDefined(typeof(DiscordUserStatus), status)) ? (DiscordUserStatus)status : DiscordUserStatus.Online;
 
     private async Task<DiscordMessage?> AcknowledgeExceptionAsync(SlashCommandContext ctx)
     {
