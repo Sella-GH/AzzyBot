@@ -47,12 +47,12 @@ jobs:
       - name: Get build environment
         id: get-environment
         run: |
-          if ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') || !contains(github.event.head_commit.message, '[release]') }}; then
-            echo "environment=dev" >> "$GITHUB_OUTPUT"
-            echo "environment_alpine=dev-alpine" >> "$GITHUB_OUTPUT"
-          elif ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') }}; then
+          if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') }}; then
             echo "environment=rel-${{ steps.get-version.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
             echo "environment_alpine=rel-${{ steps.get-version.outputs.clean_version }}-alpine" >> "$GITHUB_OUTPUT"
+          elif ${{ contains(github.ref_name, 'main') && (!contains(github.event.head_commit.message, '[pre-release]') || !contains(github.event.head_commit.message, '[release]')) }}; then
+            echo "environment=dev" >> "$GITHUB_OUTPUT"
+            echo "environment_alpine=dev-alpine" >> "$GITHUB_OUTPUT"
           else
             echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
             echo "environment_alpine=${{ github.ref_name }}-alpine" >> "$GITHUB_OUTPUT"
@@ -61,7 +61,7 @@ jobs:
       - name: Get build config
         id: get-config
         run: |
-          if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
+          if ${{ (contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/')) }}; then
             echo "config=Docker" >> "$GITHUB_OUTPUT"
           else
             echo "config=Docker-debug" >> "$GITHUB_OUTPUT"
