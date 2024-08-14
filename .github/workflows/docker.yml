@@ -171,7 +171,7 @@ jobs:
           fetch-depth: 0
 
       - name: Docker meta
-        if: ${{ !contains(github.event.head_commit.message, '[release]') || !contains(github.event.head_commit.message, '[pre-release]') || !contains(github.event.ref, 'rel/') }}
+        if: ${{ !contains(github.event.head_commit.message, '[release]') && !contains(github.event.head_commit.message, '[pre-release]') && !contains(github.event.ref, 'rel/') }}
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -326,7 +326,7 @@ jobs:
           fetch-depth: 0
 
       - name: Docker meta
-        if: ${{ !contains(github.event.head_commit.message, '[release]') || !contains(github.event.head_commit.message, '[pre-release]') || !contains(github.event.ref, 'rel/') }}
+        if: ${{ !contains(github.event.head_commit.message, '[release]') && !contains(github.event.head_commit.message, '[pre-release]') && !contains(github.event.ref, 'rel/') }}
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -466,7 +466,7 @@ jobs:
           fi
         
       - name: Docker meta
-        if: ${{ !contains(github.event.head_commit.message, '[release]') || !contains(github.event.head_commit.message, '[pre-release]') || !contains(github.event.ref, 'rel/') }}
+        if: ${{ !contains(github.event.head_commit.message, '[release]') && !contains(github.event.head_commit.message, '[pre-release]') && !contains(github.event.ref, 'rel/') }}
         id: meta
         uses: docker/metadata-action@v5
         with:
