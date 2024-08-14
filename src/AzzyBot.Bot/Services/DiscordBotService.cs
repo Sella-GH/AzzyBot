@@ -161,7 +161,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
                 continue;
             }
 
-            DiscordGuild? dGuild = GetDiscordGuild(guild.UniqueId);
+            DiscordGuild? dGuild = await _client.GetGuildsAsync().FirstOrDefaultAsync(g => g.Id == guild.UniqueId);
             if (dGuild is null)
             {
                 _logger.DiscordItemNotFound(nameof(DiscordGuild), guild.UniqueId);
@@ -202,20 +202,20 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         }
     }
 
-    public DiscordGuild? GetDiscordGuild(ulong guildId = 0)
+    public async Task<DiscordGuild?> GetDiscordGuildAsync(ulong guildId = 0)
     {
         if (guildId is 0)
             guildId = _settings.ServerId;
 
-        return GetDiscordGuilds.Select(static g => g.Value).FirstOrDefault(g => g.Id == guildId);
+        return await GetDiscordGuildsAsync.FirstOrDefaultAsync(g => g.Id == guildId);
     }
 
-    public IReadOnlyDictionary<ulong, DiscordGuild> GetDiscordGuilds
-        => _client.Guilds;
+    public IAsyncEnumerable<DiscordGuild> GetDiscordGuildsAsync
+        => _client.GetGuildsAsync();
 
     public async Task<DiscordMember?> GetDiscordMemberAsync(ulong guildId, ulong userId = 0)
     {
-        DiscordGuild? guild = GetDiscordGuild(guildId);
+        DiscordGuild? guild = await _client.GetGuildsAsync().FirstOrDefaultAsync(g => g.Id == guildId);
         DiscordMember? member = null;
 
         if (guild is not null)
@@ -559,7 +559,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
     private async Task<DiscordChannel?> GetFirstDiscordChannelAsync(ulong guildId)
     {
-        DiscordGuild? guild = GetDiscordGuild(guildId);
+        DiscordGuild? guild = await _client.GetGuildsAsync().FirstOrDefaultAsync(g => g.Id == guildId);
         DiscordMember? member = await GetDiscordMemberAsync(guildId);
 
         if (guild is null)

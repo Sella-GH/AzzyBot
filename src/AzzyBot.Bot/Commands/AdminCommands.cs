@@ -79,8 +79,8 @@ public sealed class AdminCommands
 
             await context.DeferResponseAsync();
 
-            IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
-            if (guilds.Count is 0)
+            IAsyncEnumerable<DiscordGuild> guilds = _botService.GetDiscordGuildsAsync;
+            if (await guilds.AnyAsync())
             {
                 await context.EditResponseAsync(GeneralStrings.NoGuildFound);
                 return;
@@ -94,7 +94,7 @@ public sealed class AdminCommands
                     return;
                 }
 
-                DiscordGuild? guild = _botService.GetDiscordGuild(guildIdValue);
+                DiscordGuild? guild = await guilds.FirstOrDefaultAsync(g => g.Id == guildIdValue);
                 if (guild is null)
                 {
                     _logger.DiscordItemNotFound(nameof(DiscordGuild), guildIdValue);
@@ -111,9 +111,9 @@ public sealed class AdminCommands
             // TODO This is not suitable for more than a few houndred servers
             StringBuilder stringBuilder = new();
             stringBuilder.AppendLine("I am in the following servers:");
-            foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds)
+            await foreach (DiscordGuild guild in guilds)
             {
-                stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"- {guild.Value.Name} ({guild.Key})");
+                stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"- {guild.Name} ({guild.Id})");
             }
 
             await context.EditResponseAsync(stringBuilder.ToString());
@@ -138,7 +138,7 @@ public sealed class AdminCommands
 
             await context.DeferResponseAsync();
 
-            DiscordGuild? guild = _botService.GetDiscordGuild(guildIdValue);
+            DiscordGuild? guild = await _botService.GetDiscordGuildAsync(guildIdValue);
             if (guild is null)
             {
                 _logger.DiscordItemNotFound(nameof(DiscordGuild), guildIdValue);
@@ -170,14 +170,14 @@ public sealed class AdminCommands
 
             await context.DeferResponseAsync();
 
-            IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
+            IAsyncEnumerable<DiscordGuild> guilds = _botService.GetDiscordGuildsAsync;
             IAsyncEnumerable<GuildEntity> guildsEntities = _dbActions.GetGuildsAsync(true);
-            foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds)
+            await foreach (DiscordGuild guild in guilds)
             {
-                GuildEntity? guildEntity = await guildsEntities.Where(e => e.UniqueId == guild.Key).FirstOrDefaultAsync();
+                GuildEntity? guildEntity = await guildsEntities.Where(e => e.UniqueId == guild.Id).FirstOrDefaultAsync();
                 if (guildEntity is null)
                 {
-                    _logger.DatabaseGuildNotFound(guild.Key);
+                    _logger.DatabaseGuildNotFound(guild.Id);
                     continue;
                 }
 
@@ -187,7 +187,7 @@ public sealed class AdminCommands
                 }
                 else
                 {
-                    DiscordMember owner = await guild.Value.GetGuildOwnerAsync();
+                    DiscordMember owner = await guild.GetGuildOwnerAsync();
                     await owner.SendMessageAsync(message);
                 }
             }
