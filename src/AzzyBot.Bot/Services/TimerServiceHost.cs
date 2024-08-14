@@ -51,6 +51,9 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "General exception is there to log unkown exceptions")]
     private async void TimerTimeoutAsync(object? o)
     {
+        if (_firstRun)
+            await Task.Delay(TimeSpan.FromSeconds(30));
+
         _logger.GlobalTimerTick();
 
         DateTime now = DateTime.Now;
