@@ -48,14 +48,11 @@ jobs:
         id: get-environment
         run: |
           if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') }}; then
-            echo "environment=rel-${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
-            echo "environment_alpine=rel-${{ github.ref_name }}-alpine" >> "$GITHUB_OUTPUT"
+            echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            echo "environment_alpine=${{ github.ref_name }}-alpine" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.ref_name, 'main') && (!contains(github.event.head_commit.message, '[pre-release]') || !contains(github.event.head_commit.message, '[release]')) }}; then
             echo "environment=dev" >> "$GITHUB_OUTPUT"
             echo "environment_alpine=dev-alpine" >> "$GITHUB_OUTPUT"
-          else
-            echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
-            echo "environment_alpine=${{ github.ref_name }}-alpine" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Get build config
@@ -419,11 +416,9 @@ jobs:
         id: environment
         run: |
           if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') }}; then
-            echo "environment=rel-${{ needs.extract_meta.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
+            echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
             echo "environment=dev" >> "$GITHUB_OUTPUT"
-          else
-            echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
         
       - name: Docker meta
@@ -465,11 +460,9 @@ jobs:
         id: environment
         run: |
           if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') }}; then
-            echo "environment=rel-${{ needs.extract_meta.outputs.clean_version }}-alpine" >> "$GITHUB_OUTPUT"
+            echo "environment=${{ github.ref_name }}-alpine" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
             echo "environment=dev-alpine" >> "$GITHUB_OUTPUT"
-          else
-            echo "environment=${{ github.ref_name }}-alpine" >> "$GITHUB_OUTPUT"
           fi
         
       - name: Docker meta
