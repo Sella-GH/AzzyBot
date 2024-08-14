@@ -33,7 +33,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
 
             return true;
         }
-        catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
+        catch (Exception ex) when (ex is DbUpdateConcurrencyException or DbUpdateException)
         {
             _logger.DatabaseTransactionFailed(ex);
             await transaction.RollbackAsync();

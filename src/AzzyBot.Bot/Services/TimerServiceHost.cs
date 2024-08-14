@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Services.BackgroundServices;
@@ -51,6 +52,9 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "General exception is there to log unkown exceptions")]
     private async void TimerTimeoutAsync(object? o)
     {
+        if (_firstRun)
+            await Task.Delay(TimeSpan.FromSeconds(30));
+
         _logger.GlobalTimerTick();
 
         DateTime now = DateTime.Now;
@@ -65,7 +69,7 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
             }
 
             IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildsAsync(loadEverything: true);
-            int guildCount = _discordBotService.GetDiscordGuilds.Count;
+            int guildCount = await _discordBotService.GetDiscordGuildsAsync.CountAsync();
             int delay = 5 + guildCount;
 
             if (!_firstRun)

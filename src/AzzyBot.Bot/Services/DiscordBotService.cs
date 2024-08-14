@@ -161,7 +161,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
                 continue;
             }
 
-            DiscordGuild? dGuild = GetDiscordGuild(guild.UniqueId);
+            DiscordGuild? dGuild = await _client.GetGuildsAsync().FirstOrDefaultAsync(g => g.Id == guild.UniqueId);
             if (dGuild is null)
             {
                 _logger.DiscordItemNotFound(nameof(DiscordGuild), guild.UniqueId);
@@ -202,37 +202,26 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         }
     }
 
-    public DiscordGuild? GetDiscordGuild(ulong guildId = 0)
+    public async Task<DiscordGuild?> GetDiscordGuildAsync(ulong guildId = 0)
     {
         if (guildId is 0)
             guildId = _settings.ServerId;
 
-        return GetDiscordGuilds.Select(static g => g.Value).FirstOrDefault(g => g.Id == guildId);
+        return await GetDiscordGuildsAsync.FirstOrDefaultAsync(g => g.Id == guildId);
     }
 
-    public IReadOnlyDictionary<ulong, DiscordGuild> GetDiscordGuilds
-        => _client.Guilds;
+    public IAsyncEnumerable<DiscordGuild> GetDiscordGuildsAsync
+        => _client.GetGuildsAsync();
 
     public async Task<DiscordMember?> GetDiscordMemberAsync(ulong guildId, ulong userId = 0)
     {
-        DiscordGuild? guild = GetDiscordGuild(guildId);
+        DiscordGuild? guild = await _client.GetGuildsAsync().FirstOrDefaultAsync(g => g.Id == guildId);
         DiscordMember? member = null;
 
         if (guild is not null)
             member = await guild.GetMemberAsync((userId is not 0) ? userId : _client.CurrentUser.Id);
 
         return member;
-    }
-
-    public DiscordRole? GetDiscordRole(ulong guildId, ulong roleId)
-    {
-        DiscordGuild? guild = GetDiscordGuild(guildId);
-        DiscordRole? role = null;
-
-        if (guild is not null)
-            role = guild.GetRole(roleId);
-
-        return role;
     }
 
     public async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, SlashCommandContext? ctx = null, ulong guildId = 0, string? info = null)
@@ -497,7 +486,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         return true;
     }
 
-    public async Task SetBotStatusAsync(int status = 1, int type = 2, string doing = "Music", Uri? url = null, bool reset = false)
+    public async Task SetBotStatusAsync(int status, int type, string doing, Uri? url = null, bool reset = false)
     {
         if (reset)
         {
@@ -505,6 +494,14 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             return;
         }
 
+        DiscordActivity activity = SetBotStatusActivity(type, doing, url);
+        DiscordUserStatus newStatus = SetBotStatusUserStatus(status);
+
+        await _client.UpdateStatusAsync(activity, newStatus);
+    }
+
+    public static DiscordActivity SetBotStatusActivity(int type, string doing, Uri? url)
+    {
         DiscordActivityType activityType = (Enum.IsDefined(typeof(DiscordActivityType), type)) ? (DiscordActivityType)type : DiscordActivityType.ListeningTo;
         if (activityType is DiscordActivityType.Streaming && url is null)
             activityType = DiscordActivityType.Playing;
@@ -513,10 +510,11 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         if (activityType is DiscordActivityType.Streaming && url is not null && (url.Host.Contains("twitch", StringComparison.OrdinalIgnoreCase) || url.Host.Contains("youtube", StringComparison.OrdinalIgnoreCase)))
             activity.StreamUrl = url.OriginalString;
 
-        DiscordUserStatus userStatus = (Enum.IsDefined(typeof(DiscordUserStatus), status)) ? (DiscordUserStatus)status : DiscordUserStatus.Online;
-
-        await _client.UpdateStatusAsync(activity, userStatus);
+        return activity;
     }
+
+    public static DiscordUserStatus SetBotStatusUserStatus(int status)
+        => (Enum.IsDefined(typeof(DiscordUserStatus), status)) ? (DiscordUserStatus)status : DiscordUserStatus.Online;
 
     private async Task<DiscordMessage?> AcknowledgeExceptionAsync(SlashCommandContext ctx)
     {
@@ -553,14 +551,15 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
             case DiscordInteractionResponseState.Replied:
                 return await ctx.FollowupAsync(builder);
-        }
 
-        return null;
+            default:
+                throw new InvalidOperationException("Unknown response state");
+        }
     }
 
     private async Task<DiscordChannel?> GetFirstDiscordChannelAsync(ulong guildId)
     {
-        DiscordGuild? guild = GetDiscordGuild(guildId);
+        DiscordGuild? guild = await _client.GetGuildsAsync().FirstOrDefaultAsync(g => g.Id == guildId);
         DiscordMember? member = await GetDiscordMemberAsync(guildId);
 
         if (guild is null)

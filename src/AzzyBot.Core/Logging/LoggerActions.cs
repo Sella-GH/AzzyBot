@@ -156,6 +156,9 @@ public static partial class LoggerActions
     [LoggerMessage(220, LogLevel.Warning, "Could not find discord item {item} for guild {guild}")]
     public static partial void DiscordItemNotFound(this ILogger logger, string item, ulong guild);
 
+    [LoggerMessage(221, LogLevel.Warning, "Could not find referenced command {command}")]
+    public static partial void CommandNotFound(this ILogger logger, string command);
+
     [LoggerMessage(230, LogLevel.Warning, "Bot is ratelimited on uri: {uri} retrying in {time} seconds")]
     public static partial void BotRatelimited(this ILogger logger, Uri uri, int time);
 

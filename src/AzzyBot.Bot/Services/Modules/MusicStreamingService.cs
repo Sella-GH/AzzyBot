@@ -128,7 +128,6 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     private async Task<PlayerResult<LavalinkPlayer>> GetLavalinkDefaultPlayerAsync(ulong guildId, ulong channelId, LavalinkPlayerOptions playerOptions, PlayerRetrieveOptions retrieveOptions)
     {
         ArgumentNullException.ThrowIfNull(playerOptions, nameof(playerOptions));
-        ArgumentNullException.ThrowIfNull(retrieveOptions, nameof(retrieveOptions));
 
         return await _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Default, Options.Create(playerOptions), retrieveOptions);
     }
@@ -136,11 +135,11 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     private async Task<PlayerResult<QueuedLavalinkPlayer>> GetLavalinkQueuedPlayerAsync(ulong guildId, ulong channelId, QueuedLavalinkPlayerOptions playerOptions, PlayerRetrieveOptions retrieveOptions)
     {
         ArgumentNullException.ThrowIfNull(playerOptions, nameof(playerOptions));
-        ArgumentNullException.ThrowIfNull(retrieveOptions, nameof(retrieveOptions));
 
         return await _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Queued, Options.Create(playerOptions), retrieveOptions);
     }
 
+    [SuppressMessage("Style", "IDE0072:Add missing cases", Justification = "These are not needed.")]
     private static string PostPlayerRetrieveError(PlayerRetrieveStatus status, string? precondition)
     {
         return status switch

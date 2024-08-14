@@ -1,3 +1,14 @@
+## 2.0.1
+### General
+- `admin change-bot-status` requires activity, status and doing to be set now
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02356
+- Updated [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET) to version 4.0.21
+
+### Improvements
+- Greatly refactored the handling of DSharpPlus related stuff
+
 ## 2.0.0
 ### General
 - Complete rewrite of the bot using newest technologies

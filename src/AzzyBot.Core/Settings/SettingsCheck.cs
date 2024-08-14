@@ -50,6 +50,9 @@ public static class SettingsCheck
                     missingSettings = CheckSettings(value, excluded, true);
 
                     continue;
+
+                default:
+                    continue;
             }
         }
 
