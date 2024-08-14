@@ -14,10 +14,7 @@ on:
       - "**.sln"
       - "**.yml"
       - "CHANGELOG.md"
-      - "dev.alpine.Dockerfile"
-      - "dev.Dockerfile"
-      - "release.alpine.Dockerfile"
-      - "release.Dockerfile"
+      - "**.Dockerfile"
   workflow_dispatch:
 
 jobs:
@@ -50,10 +47,10 @@ jobs:
       - name: Get build environment
         id: get-environment
         run: |
-          if ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
+          if ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') || !contains(github.event.head_commit.message, '[release]') }}; then
             echo "environment=dev" >> "$GITHUB_OUTPUT"
             echo "environment_alpine=dev-alpine" >> "$GITHUB_OUTPUT"
-          elif ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
+          elif ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || (contains(github.event.ref, 'rel/') }}; then
             echo "environment=rel-${{ steps.get-version.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
             echo "environment_alpine=rel-${{ steps.get-version.outputs.clean_version }}-alpine" >> "$GITHUB_OUTPUT"
           else
@@ -113,7 +110,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') }}
+          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') || (contains(github.event.ref, 'rel/') }}
           images: sellagh/azzybot
           tags: type=raw,value=${{ needs.extract_meta.outputs.environment }}
 
@@ -180,7 +177,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          flavor: latest=false
+          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') || (contains(github.event.ref, 'rel/') }}
           images: sellagh/azzybot
           tags: type=raw,value=${{ needs.extract_meta.outputs.environment_alpine }}
 
@@ -247,7 +244,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') }}
+          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') || (contains(github.event.ref, 'rel/') }}
           images: sellagh/azzybot
           tags: type=raw,value=${{ needs.extract_meta.outputs.environment }}
 
@@ -323,7 +320,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          flavor: latest=false
+          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') || (contains(github.event.ref, 'rel/') }}
           images: sellagh/azzybot
           tags: type=raw,value=${{ needs.extract_meta.outputs.environment_alpine }}
 
@@ -397,9 +394,7 @@ jobs:
       - name: Get docker environment
         id: environment
         run: |
-          if ${{ contains(github.event.head_commit.message, '[release]') || (contains(github.event.ref, 'rel/') && !contains(github.event.head_commit.message, '[pre-release]')) }}; then
-            echo "environment=latest" >> "$GITHUB_OUTPUT"
-          elif ${{ contains(github.event.head_commit.message, '[pre-release]') }}; then
+          if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || (contains(github.event.ref, 'rel/') }}; then
             echo "environment=rel-${{ needs.extract_meta.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
             echo "environment=dev" >> "$GITHUB_OUTPUT"
@@ -411,7 +406,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') }}
+          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') || (contains(github.event.ref, 'rel/') }}
           images: sellagh/azzybot
           tags: type=raw,value=${{ steps.environment.outputs.environment }}
           
@@ -445,9 +440,7 @@ jobs:
       - name: Get docker environment
         id: environment
         run: |
-          if ${{ contains(github.event.head_commit.message, '[release]') || (contains(github.event.ref, 'rel/') && !contains(github.event.head_commit.message, '[pre-release]')) }}; then
-            echo "environment=latest-alpine" >> "$GITHUB_OUTPUT"
-          elif ${{ contains(github.event.head_commit.message, '[pre-release]') }}; then
+          if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || (contains(github.event.ref, 'rel/') }}; then
             echo "environment=rel-${{ needs.extract_meta.outputs.clean_version }}-alpine" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
             echo "environment=dev-alpine" >> "$GITHUB_OUTPUT"
@@ -459,7 +452,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          flavor: latest=false
+          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') || (contains(github.event.ref, 'rel/') }}
           images: sellagh/azzybot
           tags: type=raw,value=${{ steps.environment.outputs.environment }}
           
