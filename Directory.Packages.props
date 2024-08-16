@@ -4,13 +4,13 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="CsvHelper" Version="33.0.1" />
-    <PackageVersion Include="DSharpPlus" Version="5.0.0-nightly-02350" />
-    <PackageVersion Include="DSharpPlus.Commands" Version="5.0.0-nightly-02350" />
-    <PackageVersion Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02350" />
+    <PackageVersion Include="DSharpPlus" Version="5.0.0-nightly-02356" />
+    <PackageVersion Include="DSharpPlus.Commands" Version="5.0.0-nightly-02356" />
+    <PackageVersion Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02356" />
     <PackageVersion Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="8.1.3" />
-    <PackageVersion Include="Lavalink4NET.DSharpPlus" Version="4.0.20" />
-    <PackageVersion Include="Lavalink4NET.DSharpPlus.Nightly" Version="4.0.20" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7" />
+    <PackageVersion Include="Lavalink4NET.DSharpPlus" Version="4.0.21" />
+    <PackageVersion Include="Lavalink4NET.DSharpPlus.Nightly" Version="4.0.21" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
     <PackageVersion Include="Roslynator.Analyzers" Version="4.12.4" />
@@ -18,6 +18,8 @@
     <PackageVersion Include="Roslynator.CodeFixes" Version="4.12.4" />
     <PackageVersion Include="Roslynator.Formatting.Analyzers" Version="4.12.4" />
     <PackageVersion Include="Roslynator.Refactorings" Version="4.12.4" />
+    <PackageVersion Include="System.Linq.Async" Version="6.0.1" />
+    <PackageVersion Include="System.Text.Json" Version="8.0.4" />
     <PackageVersion Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
 </Project>

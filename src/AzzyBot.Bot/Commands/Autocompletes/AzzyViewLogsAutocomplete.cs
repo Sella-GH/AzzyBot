@@ -18,7 +18,7 @@ public sealed class AzzyViewLogsAutocomplete : IAutoCompleteProvider
         Dictionary<string, object> results = new(25);
         string search = context.UserInput;
 
-        foreach (string file in FileOperations.GetFilesInDirectory("Logs").OrderByDescending(f => f))
+        foreach (string file in FileOperations.GetFilesInDirectory("Logs").OrderByDescending(static f => f))
         {
             if (results.Count is 25)
                 break;

@@ -34,7 +34,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
             ["User-Agent"] = SoftwareStats.GetAppName
         };
 
-        string body = await _webService.GetWebAsync((isPreview) ? _previewUrl : _latestUrl, headers, true);
+        string? body = await _webService.GetWebAsync((isPreview) ? _previewUrl : _latestUrl, headers, true);
         if (string.IsNullOrWhiteSpace(body))
         {
             _logger.OnlineVersionEmpty();
@@ -109,7 +109,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
         if (_settings.Updater.DisplayInstructions)
             embeds.Add(EmbedBuilder.BuildAzzyUpdatesInstructionsEmbed());
 
-        DiscordGuild? discordGuild = _botService.GetDiscordGuild();
+        DiscordGuild? discordGuild = await _botService.GetDiscordGuildAsync();
         if (discordGuild is null)
         {
             _logger.DiscordItemNotFound(nameof(DiscordGuild), _settings.ServerId);

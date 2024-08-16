@@ -9,9 +9,12 @@
     <a href="https://github.com/Sella-GH/AzzyBot/wiki"><strong>Explore the docs »</strong></a>
     <br/>
     <br/>
-    <a href="https://github.com/Sella-GH/AzzyBot/issues">Report a bug</a>
+    <a href="https://discord.com/oauth2/authorize?client_id=1270502179936931840&scope=applications.commands%20bot&permissions=35840">Invite AzzyBot to your server!</a>
+    <br/>
+    <br/>
+    <a href="https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D">Report a bug</a>
     -
-    <a href="https://github.com/Sella-GH/AzzyBot/issues">Request a feature</a>
+    <a href="https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=enhancement&projects=&template=feature_request.yml&title=%5BFEATURE%5D">Request a feature</a>
     <br/>
     <br/>
     <a href="https://discord.gg/8j6kRAJ5AY">Join the discord community</a>
@@ -79,12 +82,13 @@ Follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wi
 * [Microsoft.Extensions.X Libs](https://github.com/dotnet/runtime)
 * [Npsql](https://github.com/npgsql/npgsql)
 * [Roslynator](https://github.com/dotnet/roslynator)
+* [System.Linq.Async](https://github.com/dotnet/reactive)
 * [TagLibSharp](https://github.com/mono/taglib-sharp)
 
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-* If you have suggestions for adding or removing projects, feel free to [open an issue](https://github.com/Sella-GH/AzzyBot/issues/new) to discuss it, or directly create a pull request after you edit the *README.md* file with necessary changes.
+* If you have suggestions for adding or removing projects, feel free to [open an issue](https://github.com/Sella-GH/AzzyBot/issues/new/choose) to discuss it, or directly create a pull request after you edit the *README.md* file with necessary changes.
 * Please make sure you check your spelling and grammar.
 * Create individual PR for each suggestion.
 * Please also read through the [Code Of Conduct](https://github.com/Sella-GH/AzzyBot/blob/main/CODE_OF_CONDUCT.md) before posting your first idea as well.

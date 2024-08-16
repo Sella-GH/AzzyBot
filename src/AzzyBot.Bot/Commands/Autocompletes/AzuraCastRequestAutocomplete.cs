@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
@@ -16,25 +17,26 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocomplete> logger, AzuraCastApiService azuraCast, DbActions dbActions) : IAutoCompleteProvider
+public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocomplete> logger, AzuraCastApiService azuraCast, DbActions dbActions, DiscordBotService botService) : IAutoCompleteProvider
 {
     private readonly ILogger<AzuraCastRequestAutocomplete> _logger = logger;
     private readonly AzuraCastApiService _azuraCast = azuraCast;
     private readonly DbActions _dbActions = dbActions;
+    private readonly DiscordBotService _botService = botService;
 
     public async ValueTask<IReadOnlyDictionary<string, object>> AutoCompleteAsync(AutoCompleteContext context)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
-        int stationId = Convert.ToInt32(context.Options.Single(o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
+        int stationId = Convert.ToInt32(context.Options.Single(static o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
         if (stationId is 0)
             return new Dictionary<string, object>();
 
         AzuraCastStationEntity? station;
         try
         {
-            station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId, loadAzuraCast: true);
+            station = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId, loadAzuraCast: true, loadAzuraCastPrefs: true);
             if (station is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, stationId);
@@ -47,7 +49,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
         }
 
         string search = context.UserInput;
-        string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(station.AzuraCast.AdminApiKey);
+        string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.AzuraCast.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
         string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
         StringBuilder songResult = new();
         Dictionary<string, object> results = new(25);
@@ -96,9 +98,15 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
             }
         }
 
-        if (context.Command.Name is "delete-song-request")
+        if (station.AzuraCast.IsOnline && context.Command.Name is "delete-song-request")
         {
-            IEnumerable<AzuraRequestQueueItemRecord> requests = await _azuraCast.GetStationRequestItemsAsync(new(baseUrl), apiKey, stationId, false);
+            IEnumerable<AzuraRequestQueueItemRecord>? requests = await _azuraCast.GetStationRequestItemsAsync(new(baseUrl), apiKey, stationId, false);
+            if (requests is null)
+            {
+                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **requests** endpoint on station ({stationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                return new Dictionary<string, object>();
+            }
+
             AddResultsFromSong(requests);
 
             return results;
@@ -106,18 +114,49 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
 
         if (station.AzuraCast.IsOnline)
         {
-            AzuraAdminStationConfigRecord config = await _azuraCast.GetStationAdminConfigAsync(new(baseUrl), apiKey, stationId);
+            AzuraAdminStationConfigRecord? config = await _azuraCast.GetStationAdminConfigAsync(new(baseUrl), apiKey, stationId);
+            if (config is null)
+            {
+                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                return new Dictionary<string, object>();
+            }
+
             if (config.EnableRequests)
             {
-                IEnumerable<AzuraRequestRecord> requests = await _azuraCast.GetRequestableSongsAsync(new(baseUrl), apiKey, stationId);
-                AddResultsFromSong(requests);
+                IEnumerable<AzuraRequestRecord>? requests = await _azuraCast.GetRequestableSongsAsync(new(baseUrl), apiKey, stationId);
+                if (requests is null)
+                {
+                    await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **requests** endpoint on station ({stationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                    return new Dictionary<string, object>();
+                }
 
-                return results;
+                AddResultsFromSong(requests);
             }
+            else
+            {
+                IEnumerable<AzuraFilesDetailedRecord>? filesOnline = await _azuraCast.GetFilesOnlineAsync<AzuraFilesDetailedRecord>(new(baseUrl), apiKey, stationId);
+                if (filesOnline is null)
+                {
+                    await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station ({stationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                    return new Dictionary<string, object>();
+                }
+
+                IEnumerable<AzuraPlaylistRecord>? playlists = await _azuraCast.GetPlaylistsWithRequestsAsync(new(baseUrl), apiKey, stationId);
+                if (playlists is null)
+                {
+                    await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station ({stationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                    return new Dictionary<string, object>();
+                }
+
+                IEnumerable<AzuraFilesRecord> fileRequests = filesOnline.Where(f => f.Playlists.Any(p => playlists.Any(pl => pl.Id == p.Id)));
+                AddResultsFromSong(fileRequests);
+            }
+
+            return results;
         }
 
-        IEnumerable<AzuraFilesRecord> files = await _azuraCast.GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCast.Id, station.Id, station.StationId);
-        AddResultsFromSong(files);
+        IEnumerable<AzuraFilesRecord> filesLocal = await _azuraCast.GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCast.Id, station.Id, station.StationId);
+        AddResultsFromSong(filesLocal);
 
         return results;
     }

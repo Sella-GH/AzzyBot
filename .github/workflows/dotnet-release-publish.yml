@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       loc_cs: ${{ steps.loc_cs.outputs.total_lines }}
+      changelog: ${{ steps.changelog.outputs.changelog }}
       datetime: ${{ steps.dateTime.outputs.time }}
       clean_version: ${{ steps.get-version.outputs.clean_version }}
       version: ${{ steps.get-version.outputs.version }}
@@ -36,6 +37,15 @@ jobs:
        uses: PavanMudigonda/lines-of-code-reporter@v1.6
        with:
          include_lang: "C#,MSBuild script"
+
+     - name: Get correct changelog
+       id: changelog
+       run: |
+        if ${{ contains(github.event.head_commit.message, '[pre-release]') }}; then
+          echo "changelog=CHANGELOG.previews.md" >> "$GITHUB_OUTPUT"
+        else
+          echo "changelog=CHANGELOG.md" >> "$GITHUB_OUTPUT"
+        fi
           
      - name: Get Date and Time
        id: dateTime
@@ -116,6 +126,7 @@ jobs:
 
   build-docker:
     name: Build docker .zip file
+    needs: extract_meta
     if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
     runs-on: ubuntu-latest
     steps:
@@ -127,7 +138,7 @@ jobs:
       - name: Getting all files together
         run: |
           mkdir docker-zip
-          mv ./CHANGELOG.md ./docker-zip/CHANGELOG.md
+          mv ./${{ needs.extract_meta.outputs.changelog }} ./docker-zip/CHANGELOG.md
           mv ./docker-compose.yml ./docker-zip/docker-compose.yml
           mv ./LICENSE ./docker-zip/LICENSE
           mv ./README.md ./docker-zip/README.md
@@ -144,7 +155,7 @@ jobs:
       - name: Archive docker-zip artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-docker
+          name: ${{ needs.extract_meta.outputs.clean_version }}-docker
           path: ./docker-zip
 
   create_release:
@@ -160,8 +171,8 @@ jobs:
       - name: Extract Latest Changelog Entry
         id: extract_changelog
         run: |
-          # Extract the latest changelog entry from CHANGELOG.md
-          latest_entry=$(awk 'BEGIN {found=0} /^## / {if (found) exit; found=1} {if (found) print}' CHANGELOG.md)
+          # Extract the latest changelog entry from the changelog file
+          latest_entry=$(awk 'BEGIN {found=0} /^## / {if (found) exit; found=1} {if (found) print}' ${{ needs.extract_meta.outputs.changelog }})
           echo "$latest_entry" > latest_changelog.md
           
           # Extract title for release

@@ -30,7 +30,12 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
         {
             string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
 
-            AzuraUpdateRecord update = await _azuraCastApiService.GetUpdatesAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), apiKey);
+            AzuraUpdateRecord? update = await _azuraCastApiService.GetUpdatesAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), apiKey);
+            if (update is null)
+            {
+                await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative updates** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                return;
+            }
 
             if (!update.NeedsReleaseUpdate && !update.NeedsRollingUpdate)
             {

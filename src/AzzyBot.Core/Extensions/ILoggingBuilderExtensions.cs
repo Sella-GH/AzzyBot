@@ -39,7 +39,7 @@ public static class ILoggingBuilderExtensions
             Directory.CreateDirectory("Logs");
 
         logging.AddConsole();
-        logging.AddFile(config => config.Directory = "Logs");
+        logging.AddFile(static config => config.Directory = "Logs");
         logging.AddFilter("Microsoft.EntityFrameworkCore.ChangeTracking", LogLevel.Warning);
         logging.AddFilter("Microsoft.EntityFrameworkCore.Database", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
         logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Connection", LogLevel.Warning);
@@ -53,7 +53,7 @@ public static class ILoggingBuilderExtensions
         logging.AddFilter("Microsoft.Hosting.Lifetime", LogLevel.Warning);
         logging.AddFilter("System.Net.Http.HttpClient.Default.ClientHandler", LogLevel.Warning);
         logging.AddFilter("System.Net.Http.HttpClient.Default.LogicalHandler", LogLevel.Warning);
-        logging.AddSimpleConsole(config =>
+        logging.AddSimpleConsole(static config =>
         {
             config.ColorBehavior = LoggerColorBehavior.Enabled;
             config.IncludeScopes = true;

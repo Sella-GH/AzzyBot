@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Entities;
@@ -35,7 +36,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
             _logger.UserNotConnected(context.User.GlobalName);
 
             if (!suppressResponse)
-                await context.EditResponseAsync("You must be in a voice channel.");
+                await context.EditResponseAsync(GeneralStrings.VoiceNotConnected);
 
             if (!ignoreVoice)
                 return null;
@@ -49,7 +50,10 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         bool notConnecting = false;
         if (channel is null)
         {
-            notConnecting = true;
+            if (!suppressResponse)
+                await context.EditResponseAsync(GeneralStrings.VoiceNoUser);
+
+            return null;
         }
         else if (channelId is not 0)
         {
@@ -124,7 +128,6 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     private async Task<PlayerResult<LavalinkPlayer>> GetLavalinkDefaultPlayerAsync(ulong guildId, ulong channelId, LavalinkPlayerOptions playerOptions, PlayerRetrieveOptions retrieveOptions)
     {
         ArgumentNullException.ThrowIfNull(playerOptions, nameof(playerOptions));
-        ArgumentNullException.ThrowIfNull(retrieveOptions, nameof(retrieveOptions));
 
         return await _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Default, Options.Create(playerOptions), retrieveOptions);
     }
@@ -132,11 +135,11 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     private async Task<PlayerResult<QueuedLavalinkPlayer>> GetLavalinkQueuedPlayerAsync(ulong guildId, ulong channelId, QueuedLavalinkPlayerOptions playerOptions, PlayerRetrieveOptions retrieveOptions)
     {
         ArgumentNullException.ThrowIfNull(playerOptions, nameof(playerOptions));
-        ArgumentNullException.ThrowIfNull(retrieveOptions, nameof(retrieveOptions));
 
         return await _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Queued, Options.Create(playerOptions), retrieveOptions);
     }
 
+    [SuppressMessage("Style", "IDE0072:Add missing cases", Justification = "These are not needed.")]
     private static string PostPlayerRetrieveError(PlayerRetrieveStatus status, string? precondition)
     {
         return status switch

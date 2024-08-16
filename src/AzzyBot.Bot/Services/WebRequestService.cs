@@ -29,7 +29,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
     /// </summary>
     private readonly HttpClient _httpClientV4 = new(new SocketsHttpHandler()
     {
-        ConnectCallback = async (context, cancellationToken) =>
+        ConnectCallback = static async (context, cancellationToken) =>
         {
             Socket socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             await socket.ConnectAsync(context.DnsEndPoint, cancellationToken);
@@ -175,7 +175,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task<string> GetWebAsync(Uri url, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true, bool noLogging = false)
+    public async Task<string?> GetWebAsync(Uri url, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true, bool noLogging = false)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
@@ -197,7 +197,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
                 response = await client.GetAsync(url);
             }
 
-            return await response.Content.ReadAsStringAsync();
+            return (response.StatusCode is not HttpStatusCode.Forbidden) ? await response.Content.ReadAsStringAsync() : null;
         }
         catch (InvalidOperationException)
         {
@@ -278,7 +278,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task<string> UploadAsync(Uri url, string file, string fileName, string filePath, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    public async Task<string?> UploadAsync(Uri url, string file, string fileName, string filePath, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
@@ -296,7 +296,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
             _logger.WebRequestFailed(HttpMethod.Post, response.ReasonPhrase ?? string.Empty, url);
 
-            return string.Empty;
+            return null;
         }
         catch (InvalidOperationException)
         {
@@ -352,7 +352,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
         // If we have multiple addresses, we need to determine which one to use
         // Prefer IPv6 over IPv4
-        foreach (IPAddress _ in iPAddresses.Where(ip => ip.AddressFamily is AddressFamily.InterNetworkV6))
+        foreach (IPAddress _ in iPAddresses.Where(static ip => ip.AddressFamily is AddressFamily.InterNetworkV6))
         {
             if (await TestIfPreferredMethodIsReachableAsync(url, AddressFamily.InterNetworkV6))
                 return AddressFamily.InterNetworkV6;
@@ -374,7 +374,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
             return true;
         }
-        catch (Exception ex) when (ex is OperationCanceledException || ex is SocketException)
+        catch (Exception ex) when (ex is OperationCanceledException or SocketException)
         {
             return false;
         }

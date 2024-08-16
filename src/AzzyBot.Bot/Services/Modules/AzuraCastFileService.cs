@@ -39,9 +39,20 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, A
             string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
             string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? station.AzuraCast.AdminApiKey : station.ApiKey;
 
-            IEnumerable<AzuraFilesRecord> onlineFiles = await _azuraCast.GetFilesOnlineAsync(new(Crypto.Decrypt(station.AzuraCast.BaseUrl)), Crypto.Decrypt(apiKey), station.StationId);
+            IEnumerable<AzuraFilesRecord>? onlineFiles = await _azuraCast.GetFilesOnlineAsync<AzuraFilesRecord>(new(Crypto.Decrypt(station.AzuraCast.BaseUrl)), Crypto.Decrypt(apiKey), station.StationId);
+            if (onlineFiles is null)
+            {
+                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station ({station.StationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                return;
+            }
+
             IEnumerable<AzuraFilesRecord> localFiles = await _azuraCast.GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
-            AzuraStationRecord azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station.StationId);
+            AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station.StationId);
+            if (azuraStation is null)
+            {
+                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station ({station.StationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                return;
+            }
 
             await CheckIfFilesWereModifiedAsync(onlineFiles, localFiles, station, azuraStation.Name, station.AzuraCast.Preferences.NotificationChannelId);
         }
@@ -59,8 +70,8 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, A
         HashSet<AzuraFilesRecord> onlineHashSet = new(onlineFiles, new AzuraFileComparer());
         HashSet<AzuraFilesRecord> localHashSet = new(localFiles, new AzuraFileComparer());
 
-        IReadOnlyList<AzuraFilesRecord> addedFiles = onlineHashSet.Except(localHashSet).ToList();
-        IReadOnlyList<AzuraFilesRecord> removedFiles = localHashSet.Except(onlineHashSet).ToList();
+        List<AzuraFilesRecord> addedFiles = onlineHashSet.Except(localHashSet).ToList();
+        List<AzuraFilesRecord> removedFiles = localHashSet.Except(onlineHashSet).ToList();
         if (addedFiles.Count is 0 && removedFiles.Count is 0)
             return;
 

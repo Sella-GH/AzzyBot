@@ -11,6 +11,9 @@ public sealed record AzuraPlaylistRecord
     [JsonPropertyName("is_enabled")]
     public bool IsEnabled { get; init; }
 
+    [JsonPropertyName("include_in_requests")]
+    public bool IncludeInRequests { get; init; }
+
     [JsonPropertyName("id")]
     public int Id { get; init; }
 
@@ -34,4 +37,16 @@ public sealed record AzuraPlaylistLinkExportRecord
 
     [JsonPropertyName("m3u")]
     public Uri M3U { get; init; } = new Uri("https://github.com");
+}
+
+public sealed record AzuraPlaylistStateRecord
+{
+    public string PlaylistName { get; init; }
+    public bool PlaylistState { get; init; }
+
+    public AzuraPlaylistStateRecord(string playlistName, bool playlistState)
+    {
+        PlaylistName = playlistName;
+        PlaylistState = playlistState;
+    }
 }

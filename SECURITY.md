@@ -6,8 +6,8 @@ We expect that all users of the software, if they are interested in taking advan
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 2.0.0-previewX | :white_check_mark: |
-| 1.10.x | :white_check_mark: |
+| 2.0.x | :white_check_mark: |
+| 1.10.x | :x: |
 | 1.9.x | :x: |
 | 1.8.x | :x: |
 | 1.7.x | :x: |
@@ -39,6 +39,7 @@ AzzyBot is not responsible for the development or maintenance of several pieces 
 * [Npsql](https://github.com/npgsql/npgsql)
 * [PostgreSQL](https://www.postgresql.org/)
 * [Roslynator](https://github.com/dotnet/roslynator)
+* [System.Linq.Async](https://github.com/dotnet/reactive)
 * [TagLibSharp](https://github.com/mono/taglib-sharp)
 
 If you identify a security issue with any of those pieces of software, we encourage you to report it to them directly. If the issue also affects AzzyBot's implementation of the software, please let us know if and when a resolution is available so that we can update our own software to incorporate the fix.

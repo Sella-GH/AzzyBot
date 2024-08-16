@@ -16,6 +16,7 @@ updates:
       include: "scope"
     labels:
       - "ci"
+      - "dependencies"
     groups:
       GitHub:
         applies-to: version-updates
@@ -33,7 +34,6 @@ updates:
         - "major"
         - "minor"
         - "patch"
-    open-pull-requests-limit: 25
 
   - package-ecosystem: "nuget" # See documentation for possible values
     directory: "/" # Location of package manifests
@@ -46,7 +46,6 @@ updates:
       include: "scope"
     labels:
       - "dependencies"
-      - ".NET"
     groups:
       DSharpPlus:
         applies-to: version-updates
@@ -60,6 +59,7 @@ updates:
       Microsoft:
         applies-to: version-updates
         patterns:
+        - "EntityFrameworkCore.*"
         - "Microsoft.*"
         - "Npgsql.*"
         update-types:
@@ -79,6 +79,7 @@ updates:
         exclude-patterns:
         - "DSharpPlus*"
         - "DSharpPlus.*"
+        - "EntityFrameworkCore.*"
         - "Microsoft.*"
         - "Pomelo.*"
         - "Roslynator.*"
@@ -86,5 +87,3 @@ updates:
         - "major"
         - "minor"
         - "patch"
-    open-pull-requests-limit: 25
-    milestone: 6
