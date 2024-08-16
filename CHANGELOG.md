@@ -10,10 +10,12 @@
 - Greatly refactored the handling of DSharpPlus related stuff
 - The usual connection error message of updating AzuraCast should not be shown anymore
 - `core stats hardware` now shows the latency to discord
+- More internal restructuring to make the code more functional
 
 ### Fixes
 - MusicStreaming commands exit correctly now when there is an error
 - Command error handling works flawlessly again
+- `admin get-joined-server` works again (and shows the server defined in `AzzyBotSettingsDocker.json` too)
 
 ## 2.0.0
 ### General
