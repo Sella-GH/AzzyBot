@@ -17,3 +17,9 @@ public sealed record AzuraSystemLogEntryRecord
     [JsonPropertyName("key")]
     public required string Key { get; init; }
 }
+
+public sealed record AzuraSystemLogRecord
+{
+    [JsonPropertyName("contents")]
+    public required string Content { get; init; }
+}

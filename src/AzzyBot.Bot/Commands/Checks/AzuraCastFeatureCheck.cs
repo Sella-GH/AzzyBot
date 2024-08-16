@@ -31,7 +31,7 @@ public sealed class FeatureAvailableCheck(ILogger<FeatureAvailableCheck> logger,
 
         int stationId = 0;
         if (ctx is not null)
-            stationId = Convert.ToInt32(ctx.Interaction.Data.Options.Single(o => o.Name is "upload-files").Options.Single(o => o.Name is "station").Value, CultureInfo.InvariantCulture);
+            stationId = Convert.ToInt32(ctx.Interaction.Data.Options.Single(static o => o.Name is "upload-files").Options.Single(static o => o.Name is "station").Value, CultureInfo.InvariantCulture);
 
         switch (attribute.Feature)
         {

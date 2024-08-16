@@ -16,9 +16,7 @@ public static class AzuraApiEndpoints
     public const string Reports = "reports";
     public const string Request = "request";
     public const string Requests = "requests";
-    public const string Restart = "restart";
     public const string Server = "server";
-    public const string Services = "services";
     public const string Skip = "skip";
     public const string Station = "station";
     public const string Stations = "stations";

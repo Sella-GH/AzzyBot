@@ -33,7 +33,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
 
             return true;
         }
-        catch (Exception ex) when (ex is DbUpdateException || ex is DbUpdateConcurrencyException)
+        catch (Exception ex) when (ex is DbUpdateConcurrencyException or DbUpdateException)
         {
             _logger.DatabaseTransactionFailed(ex);
             await transaction.RollbackAsync();
@@ -49,7 +49,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return ExecuteDbActionAsync(async context =>
         {
             GuildEntity? guild = await context.Guilds
-                .OrderBy(g => g.Id)
+                .OrderBy(static g => g.Id)
                 .FirstOrDefaultAsync(g => g.UniqueId == guildId);
 
             if (guild is null)
@@ -90,7 +90,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return ExecuteDbActionAsync(async context =>
         {
             AzuraCastEntity? azura = await context.AzuraCast
-                .OrderBy(a => a.Id)
+                .OrderBy(static a => a.Id)
                 .FirstOrDefaultAsync(a => a.Guild.UniqueId == guildId);
 
             if (azura is null)
@@ -137,11 +137,11 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
 
         IEnumerable<GuildEntity> existingGuilds = _dbContext.Guilds
-            .OrderBy(g => g.Id);
+            .OrderBy(static g => g.Id);
 
         IEnumerable<GuildEntity> newGuilds = guilds.Keys
-            .Where(guild => !existingGuilds.Select(g => g.UniqueId).Contains(guild))
-            .Select(guild => new GuildEntity() { UniqueId = guild })
+            .Where(guild => !existingGuilds.Select(static g => g.UniqueId).Contains(guild))
+            .Select(static guild => new GuildEntity() { UniqueId = guild })
             .ToList();
 
         if (!newGuilds.Any())
@@ -176,7 +176,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
 
         IEnumerable<GuildEntity> existingGuilds = _dbContext.Guilds
-            .OrderBy(g => g.Id);
+            .OrderBy(static g => g.Id);
 
         IEnumerable<GuildEntity> guildsToDelete = existingGuilds
             .Where(guild => !guilds.Keys.Contains(guild.UniqueId))
@@ -187,13 +187,13 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
 
         bool success = await ExecuteDbActionAsync(async context =>
         {
-            await context.AzuraCast.Where(a => guildsToDelete.Select(g => g.UniqueId).Contains(a.Guild.UniqueId)).ExecuteDeleteAsync();
-            await context.Guilds.Where(g => guildsToDelete.Select(g => g.UniqueId).Contains(g.UniqueId)).ExecuteDeleteAsync();
+            await context.AzuraCast.Where(a => guildsToDelete.Select(static g => g.UniqueId).Contains(a.Guild.UniqueId)).ExecuteDeleteAsync();
+            await context.Guilds.Where(g => guildsToDelete.Select(static g => g.UniqueId).Contains(g.UniqueId)).ExecuteDeleteAsync();
         });
 
         IEnumerable<ulong> deletedGuilds = guildsToDelete
             .Where(guild => !guilds.ContainsKey(guild.UniqueId))
-            .Select(guld => guld.UniqueId);
+            .Select(static guld => guld.UniqueId);
 
         return (success) ? deletedGuilds : [];
     }
@@ -203,13 +203,13 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return _dbContext.AzuraCast
             .AsNoTracking()
             .Where(a => a.Guild.UniqueId == guildId)
-            .OrderBy(a => a.Id)
-            .IncludeIf(loadChecks, q => q.Include(a => a.Checks))
-            .IncludeIf(loadPrefs, q => q.Include(a => a.Preferences))
-            .IncludeIf(loadStations, q => q.Include(a => a.Stations))
-            .IncludeIf(loadStations && loadStationChecks, q => q.Include(a => a.Stations).ThenInclude(s => s.Checks))
-            .IncludeIf(loadStations && loadStationPrefs, q => q.Include(a => a.Stations).ThenInclude(s => s.Preferences))
-            .IncludeIf(loadGuild, q => q.Include(a => a.Guild))
+            .OrderBy(static a => a.Id)
+            .IncludeIf(loadChecks, static q => q.Include(static a => a.Checks))
+            .IncludeIf(loadPrefs, static q => q.Include(static a => a.Preferences))
+            .IncludeIf(loadStations, static q => q.Include(static a => a.Stations))
+            .IncludeIf(loadStations && loadStationChecks, static q => q.Include(static a => a.Stations).ThenInclude(static s => s.Checks))
+            .IncludeIf(loadStations && loadStationPrefs, static q => q.Include(static a => a.Stations).ThenInclude(static s => s.Preferences))
+            .IncludeIf(loadGuild, static q => q.Include(static a => a.Guild))
             .FirstOrDefaultAsync();
     }
 
@@ -218,20 +218,21 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return _dbContext.AzuraCastPreferences
             .AsNoTracking()
             .Where(p => p.AzuraCast.Guild.UniqueId == guildId)
-            .OrderBy(p => p.Id)
-            .IncludeIf(loadAzuraCast, q => q.Include(p => p.AzuraCast))
+            .OrderBy(static p => p.Id)
+            .IncludeIf(loadAzuraCast, static q => q.Include(static p => p.AzuraCast))
             .FirstOrDefaultAsync();
     }
 
-    public Task<AzuraCastStationEntity?> GetAzuraCastStationAsync(ulong guildId, int stationId, bool loadChecks = false, bool loadPrefs = false, bool loadAzuraCast = false)
+    public Task<AzuraCastStationEntity?> GetAzuraCastStationAsync(ulong guildId, int stationId, bool loadChecks = false, bool loadPrefs = false, bool loadAzuraCast = false, bool loadAzuraCastPrefs = false)
     {
         return _dbContext.AzuraCastStations
             .AsNoTracking()
             .Where(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == stationId)
-            .OrderBy(s => s.Id)
-            .IncludeIf(loadChecks, q => q.Include(s => s.Checks))
-            .IncludeIf(loadPrefs, q => q.Include(s => s.Preferences))
-            .IncludeIf(loadAzuraCast, q => q.Include(s => s.AzuraCast))
+            .OrderBy(static s => s.Id)
+            .IncludeIf(loadChecks, static q => q.Include(static s => s.Checks))
+            .IncludeIf(loadPrefs, static q => q.Include(static s => s.Preferences))
+            .IncludeIf(loadAzuraCast, static q => q.Include(static s => s.AzuraCast))
+            .IncludeIf(loadAzuraCastPrefs, static q => q.Include(static s => s.AzuraCast.Preferences))
             .FirstOrDefaultAsync();
     }
 
@@ -240,10 +241,10 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return _dbContext.AzuraCastStations
             .AsNoTracking()
             .Where(s => s.AzuraCast.Guild.UniqueId == guildId)
-            .OrderBy(s => s.Id)
-            .IncludeIf(loadChecks, q => q.Include(s => s.Checks))
-            .IncludeIf(loadPrefs, q => q.Include(s => s.Preferences))
-            .IncludeIf(loadAzuraCast, q => q.Include(s => s.AzuraCast))
+            .OrderBy(static s => s.Id)
+            .IncludeIf(loadChecks, static q => q.Include(static s => s.Checks))
+            .IncludeIf(loadPrefs, static q => q.Include(static s => s.Preferences))
+            .IncludeIf(loadAzuraCast, static q => q.Include(static s => s.AzuraCast))
             .AsAsyncEnumerable();
     }
 
@@ -252,8 +253,8 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return _dbContext.AzuraCastStationChecks
             .AsNoTracking()
             .Where(c => c.Station.AzuraCast.Guild.UniqueId == guildId && c.Station.StationId == stationId)
-            .OrderBy(c => c.Id)
-            .IncludeIf(loadStation, q => q.Include(c => c.Station))
+            .OrderBy(static c => c.Id)
+            .IncludeIf(loadStation, static q => q.Include(static c => c.Station))
             .FirstOrDefaultAsync();
     }
 
@@ -262,8 +263,8 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return _dbContext.AzuraCastStationPreferences
             .AsNoTracking()
             .Where(p => p.Station.AzuraCast.Guild.UniqueId == guildId && p.Station.StationId == stationId)
-            .OrderBy(p => p.Id)
-            .IncludeIf(loadStation, q => q.Include(p => p.Station))
+            .OrderBy(static p => p.Id)
+            .IncludeIf(loadStation, static q => q.Include(static p => p.Station))
             .FirstOrDefaultAsync();
     }
 
@@ -272,11 +273,11 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return _dbContext.Guilds
             .AsNoTracking()
             .Where(g => g.UniqueId == guildId)
-            .OrderBy(g => g.Id)
-            .IncludeIf(loadGuildPrefs || loadEverything, q => q.Include(g => g.Preferences))
-            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast).Include(g => g.AzuraCast!.Checks).Include(g => g.AzuraCast!.Preferences))
-            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Checks))
-            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Preferences))
+            .OrderBy(static g => g.Id)
+            .IncludeIf(loadGuildPrefs || loadEverything, static q => q.Include(static g => g.Preferences))
+            .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast).Include(static g => g.AzuraCast!.Checks).Include(static g => g.AzuraCast!.Preferences))
+            .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Checks))
+            .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Preferences))
             .AsAsyncEnumerable();
     }
 
@@ -284,11 +285,11 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
     {
         return _dbContext.Guilds
             .AsNoTracking()
-            .OrderBy(g => g.Id)
-            .IncludeIf(loadGuildPrefs || loadEverything, q => q.Include(g => g.Preferences))
-            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast).Include(g => g.AzuraCast!.Checks).Include(g => g.AzuraCast!.Preferences))
-            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Checks))
-            .IncludeIf(loadEverything, q => q.Include(g => g.AzuraCast!.Stations).ThenInclude(s => s.Preferences))
+            .OrderBy(static g => g.Id)
+            .IncludeIf(loadGuildPrefs || loadEverything, static q => q.Include(static g => g.Preferences))
+            .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast).Include(static g => g.AzuraCast!.Checks).Include(static g => g.AzuraCast!.Preferences))
+            .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Checks))
+            .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Preferences))
             .AsAsyncEnumerable();
     }
 
@@ -297,8 +298,8 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return _dbContext.Guilds
             .AsNoTracking()
             .Where(g => g.UniqueId == guildId)
-            .OrderBy(g => g.Id)
-            .Select(g => g.Preferences)
+            .OrderBy(static g => g.Id)
+            .Select(static g => g.Preferences)
             .FirstOrDefaultAsync();
     }
 
@@ -308,7 +309,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             AzuraCastEntity? azuraCast = await context.AzuraCast
                 .Where(a => a.Guild.UniqueId == guildId)
-                .OrderBy(a => a.Id)
+                .OrderBy(static a => a.Id)
                 .FirstOrDefaultAsync();
 
             if (azuraCast is null)
@@ -336,7 +337,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             AzuraCastChecksEntity? checks = await context.AzuraCastChecks
                 .Where(c => c.AzuraCast.Guild.UniqueId == guildId)
-                .OrderBy(c => c.Id)
+                .OrderBy(static c => c.Id)
                 .FirstOrDefaultAsync();
 
             if (checks is null)
@@ -373,7 +374,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             AzuraCastPreferencesEntity? preferences = await context.AzuraCastPreferences
                 .Where(p => p.AzuraCast.Guild.UniqueId == guildId)
-                .OrderBy(p => p.Id)
+                .OrderBy(static p => p.Id)
                 .FirstOrDefaultAsync();
 
             if (preferences is null)
@@ -401,7 +402,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             AzuraCastStationEntity? azuraStation = await context.AzuraCastStations
                 .Where(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == station)
-                .OrderBy(s => s.Id)
+                .OrderBy(static s => s.Id)
                 .FirstOrDefaultAsync();
 
             if (azuraStation is null)
@@ -432,7 +433,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             AzuraCastStationChecksEntity? checks = await context.AzuraCastStationChecks
                 .Where(c => c.Station.AzuraCast.Guild.UniqueId == guildId && c.Station.StationId == stationId)
-                .OrderBy(c => c.Id)
+                .OrderBy(static c => c.Id)
                 .FirstOrDefaultAsync();
 
             if (checks is null)
@@ -457,7 +458,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             AzuraCastStationPreferencesEntity? preferences = await context.AzuraCastStationPreferences
                 .Where(p => p.Station.AzuraCast.Guild.UniqueId == guildId && p.Station.StationId == stationId)
-                .OrderBy(p => p.Id)
+                .OrderBy(static p => p.Id)
                 .FirstOrDefaultAsync();
 
             if (preferences is null)
@@ -494,8 +495,8 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             GuildPreferencesEntity? preferences = await context.GuildPreferences
                 .Where(p => p.Guild.UniqueId == guildId)
-                .Include(p => p.Guild)
-                .OrderBy(p => p.Id)
+                .Include(static p => p.Guild)
+                .OrderBy(static p => p.Id)
                 .FirstOrDefaultAsync();
 
             if (preferences is null)

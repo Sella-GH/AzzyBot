@@ -12,7 +12,7 @@ namespace AzzyBot.Core.Utilities;
 public static class HardwareStats
 {
     public static bool CheckIfDocker
-        => Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER", EnvironmentVariableTarget.Process) == "true";
+        => Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER", EnvironmentVariableTarget.Process) is "true";
 
     public static bool CheckIfLinuxOs
         => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
@@ -156,7 +156,7 @@ public static class HardwareStats
 
     public static AppDiskUsageRecord GetSystemDiskUsage()
     {
-        DriveInfo drive = DriveInfo.GetDrives().FirstOrDefault(d => d.IsReady && d.Name == "/") ?? throw new InvalidOperationException("There is more than one root drive");
+        DriveInfo drive = DriveInfo.GetDrives().FirstOrDefault(static d => d.IsReady && d.Name == "/") ?? throw new InvalidOperationException("There is more than one root drive");
         double totalSize = drive.TotalSize / (1024.0 * 1024.0 * 1024.0);
         double totalFreeSpace = drive.TotalFreeSpace / (1024.0 * 1024.0 * 1024.0);
         double totalUsedSpace = totalSize - totalFreeSpace;
