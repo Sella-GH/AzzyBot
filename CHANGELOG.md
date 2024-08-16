@@ -13,6 +13,7 @@
 
 ### Fixes
 - MusicStreaming commands exit correctly now when there is an error
+- Command error handling works flawlessly again
 
 ## 2.0.0
 ### General
