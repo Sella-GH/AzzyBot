@@ -9,6 +9,9 @@
 ### Improvements
 - Greatly refactored the handling of DSharpPlus related stuff
 
+### Fixes
+- MusicStreaming commands exit correctly now when there is an error
+
 ## 2.0.0
 ### General
 - Complete rewrite of the bot using newest technologies
