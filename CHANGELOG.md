@@ -8,6 +8,7 @@
 
 ### Improvements
 - Greatly refactored the handling of DSharpPlus related stuff
+- The usual connection error message of updating AzuraCast should not be shown anymore
 
 ### Fixes
 - MusicStreaming commands exit correctly now when there is an error
