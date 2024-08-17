@@ -202,16 +202,16 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         }
     }
 
-    public async Task<DiscordGuild?> GetDiscordGuildAsync(ulong guildId = 0)
+    public DiscordGuild? GetDiscordGuild(ulong guildId = 0)
     {
         if (guildId is 0)
             guildId = _settings.ServerId;
 
-        return await GetDiscordGuildsAsync.FirstOrDefaultAsync(g => g.Id == guildId);
+        return GetDiscordGuilds.Select(static g => g.Value).FirstOrDefault(g => g.Id == guildId);
     }
 
-    public IAsyncEnumerable<DiscordGuild> GetDiscordGuildsAsync
-        => _client.GetGuildsAsync();
+    public IReadOnlyDictionary<ulong, DiscordGuild> GetDiscordGuilds
+        => _client.Guilds;
 
     public async Task<DiscordMember?> GetDiscordMemberAsync(ulong guildId, ulong userId = 0)
     {
