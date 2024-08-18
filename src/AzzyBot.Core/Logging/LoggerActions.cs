@@ -108,6 +108,12 @@ public static partial class LoggerActions
     [LoggerMessage(106, LogLevel.Information, "Database Reencryption completed")]
     public static partial void DatabaseReencryptionComplete(this ILogger logger);
 
+    [LoggerMessage(107, LogLevel.Information, "Starting database cleanup of guilds.")]
+    public static partial void DatabaseCleanupStart(this ILogger logger);
+
+    [LoggerMessage(108, LogLevel.Information, "Database cleanup of guilds completed, {count} guilds were deleted.")]
+    public static partial void DatabaseCleanupComplete(this ILogger logger, int count);
+
     [LoggerMessage(110, LogLevel.Information, "AzzyBot joined the following Guild: {guild}")]
     public static partial void GuildCreated(this ILogger logger, string guild);
 

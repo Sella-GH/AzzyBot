@@ -15,17 +15,18 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBotSettingsRecord settings, AzuraChecksBackgroundTask azuraChecksBackgroundService, DbActions dbActions, DiscordBotService discordBotService, UpdaterService updaterService) : IAsyncDisposable, IHostedService
+public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBotSettingsRecord settings, AzuraChecksBackgroundTask azuraChecksBackgroundService, DbActions dbActions, DbMaintenance dbMaintenance, DiscordBotService discordBotService, UpdaterService updaterService) : IAsyncDisposable, IHostedService
 {
     private readonly ILogger<TimerServiceHost> _logger = logger;
     private readonly AzuraChecksBackgroundTask _azuraChecksBackgroundService = azuraChecksBackgroundService;
     private readonly AzzyBotSettingsRecord _settings = settings;
     private readonly DbActions _dbActions = dbActions;
+    private readonly DbMaintenance _dbMaintenance = dbMaintenance;
     private readonly DiscordBotService _discordBotService = discordBotService;
     private readonly UpdaterService _updaterService = updaterService;
     private readonly Task _completedTask = Task.CompletedTask;
     private DateTime _lastAzzyBotUpdateCheck = DateTime.MinValue;
-    private DateTime _lastLogFileCleaning = DateTime.MinValue;
+    private DateTime _lastCleanup = DateTime.MinValue;
     private Timer? _timer;
     private bool _firstRun = true;
 
@@ -64,10 +65,11 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBotSe
         DateTime now = DateTime.Now;
         try
         {
-            if (now - _lastLogFileCleaning >= TimeSpan.FromDays(1))
+            if (now - _lastCleanup >= TimeSpan.FromDays(1))
             {
                 LogfileCleaning();
-                _lastLogFileCleaning = now;
+                await _dbMaintenance.CleanupLeftoverGuildsAsync(_discordBotService.GetDiscordGuilds);
+                _lastCleanup = now;
             }
 
             if (now - _lastAzzyBotUpdateCheck >= TimeSpan.FromHours(5.98))

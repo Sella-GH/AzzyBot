@@ -132,6 +132,11 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
     public Task<bool> AddGuildAsync(ulong guildId)
         => ExecuteDbActionAsync(async context => await context.Guilds.AddAsync(new() { UniqueId = guildId }));
 
+    /// <summary>
+    /// Checks and adds <see cref="DiscordGuild"/> to the database in which the bot is a member of.
+    /// </summary>
+    /// <param name="guilds">The list of <see cref="DiscordGuild"/> in which the bot is a member of.</param>
+    /// <returns>An <see cref="IEnumerable{T}"/>with the added <see cref="DiscordGuild"/>s.</returns>
     public async Task<IEnumerable<DiscordGuild>> AddGuildsAsync(IReadOnlyDictionary<ulong, DiscordGuild> guilds)
     {
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
@@ -171,6 +176,11 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         });
     }
 
+    /// <summary>
+    /// Checks and deletes <see cref="DiscordGuild"/>s from the database in which the bot is no longer a member of.
+    /// </summary>
+    /// <param name="guilds">The list of <see cref="DiscordGuild"/>s in which the bot is a member of.</param>
+    /// <returns>An <see cref="IEnumerable{T}"/>with the deleted <see cref="DiscordGuild"/> ids as a <see langword="ulong"/>.</returns>
     public async Task<IEnumerable<ulong>> DeleteGuildsAsync(IReadOnlyDictionary<ulong, DiscordGuild> guilds)
     {
         ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
