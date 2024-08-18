@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -34,8 +33,6 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
 
         _logger.BotStarting(name, version, os, arch);
 
-        LogfileCleaning();
-
         if (_settings.Database is not null && !string.IsNullOrWhiteSpace(_settings.Database.NewEncryptionKey) && (_settings.Database.NewEncryptionKey != _settings.Database.EncryptionKey))
             await ReencryptDatabaseAsync();
     }
@@ -45,22 +42,6 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
         _logger.BotStopping();
 
         return _completed;
-    }
-
-    private void LogfileCleaning()
-    {
-        _logger.LogfileCleaning();
-
-        DateTime date = DateTime.Today.AddDays(-_settings.LogRetentionDays);
-        string logPath = Path.Combine(Environment.CurrentDirectory, "Logs");
-        int counter = 0;
-        foreach (string logFile in Directory.GetFiles(logPath, "*.log").Where(f => File.GetLastWriteTime(f) < date))
-        {
-            File.Delete(logFile);
-            counter++;
-        }
-
-        _logger.LogfileDeleted(counter);
     }
 
     private async Task ReencryptDatabaseAsync()
