@@ -1071,7 +1071,7 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(UploadFilesAsync), context.User.GlobalName);
 
-            if (file.FileSize > 52428800)
+            if (file.FileSize > 52428800) // 50 MB
             {
                 await context.EditResponseAsync(GeneralStrings.FileTooBig);
                 return;
