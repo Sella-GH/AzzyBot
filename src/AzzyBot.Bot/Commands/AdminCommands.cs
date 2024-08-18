@@ -218,7 +218,7 @@ public sealed class AdminCommands
             if (string.IsNullOrWhiteSpace(logfile))
             {
                 dateTime = DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                logfile = FileOperations.GetFilesInDirectory("Logs").First();
+                logfile = FileOperations.GetFilesInDirectory("Logs", true).First();
             }
             else
             {
