@@ -25,7 +25,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     private readonly ILogger<MusicStreamingService> _logger = logger;
     private readonly DiscordBotService _botService = botService;
 
-    public async Task<LavalinkPlayer?> GetLavalinkPlayerAsync(SlashCommandContext context, bool useDefault = true, bool connectToVoice = false, bool suppressResponse = false, bool ignoreVoice = false)
+    private async Task<LavalinkPlayer?> GetLavalinkPlayerAsync(SlashCommandContext context, bool useDefault = true, bool connectToVoice = false, bool suppressResponse = false, bool ignoreVoice = false)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
@@ -227,9 +227,9 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
-        return (await GetLavalinkPlayerAsync(context, useDefault: false, suppressResponse: true) is not QueuedLavalinkPlayer player)
-            ? null
-            : player.CurrentTrack;
+        return (await GetLavalinkPlayerAsync(context, useDefault: false, suppressResponse: true) is QueuedLavalinkPlayer player)
+            ? player.CurrentTrack
+            : null;
     }
 
     public async Task<bool> PauseAsync(SlashCommandContext context)
