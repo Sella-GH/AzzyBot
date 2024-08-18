@@ -14,10 +14,7 @@ on:
       - "**.sln"
       - "**.yml"
       - "CHANGELOG.md"
-      - "dev.alpine.Dockerfile"
-      - "dev.Dockerfile"
-      - "release.alpine.Dockerfile"
-      - "release.Dockerfile"
+      - "**.Dockerfile"
   workflow_dispatch:
 
 jobs:
@@ -50,21 +47,18 @@ jobs:
       - name: Get build environment
         id: get-environment
         run: |
-          if ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
-            echo "environment=dev" >> "$GITHUB_OUTPUT"
-            echo "environment_alpine=dev-alpine" >> "$GITHUB_OUTPUT"
-          elif ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
-            echo "environment=rel-${{ steps.get-version.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
-            echo "environment_alpine=rel-${{ steps.get-version.outputs.clean_version }}-alpine" >> "$GITHUB_OUTPUT"
-          else
+          if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') }}; then
             echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
             echo "environment_alpine=${{ github.ref_name }}-alpine" >> "$GITHUB_OUTPUT"
+          elif ${{ contains(github.ref_name, 'main') && (!contains(github.event.head_commit.message, '[pre-release]') || !contains(github.event.head_commit.message, '[release]')) }}; then
+            echo "environment=dev" >> "$GITHUB_OUTPUT"
+            echo "environment_alpine=dev-alpine" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Get build config
         id: get-config
         run: |
-          if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}; then
+          if ${{ (contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/')) }}; then
             echo "config=Docker" >> "$GITHUB_OUTPUT"
           else
             echo "config=Docker-debug" >> "$GITHUB_OUTPUT"
@@ -113,7 +107,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') }}
+          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/') }}
           images: sellagh/azzybot
           tags: type=raw,value=${{ needs.extract_meta.outputs.environment }}
 
@@ -177,12 +171,24 @@ jobs:
           fetch-depth: 0
 
       - name: Docker meta
+        if: ${{ !contains(github.event.head_commit.message, '[release]') && !contains(github.event.head_commit.message, '[pre-release]') && !contains(github.event.ref, 'rel/') }}
         id: meta
         uses: docker/metadata-action@v5
         with:
           flavor: latest=false
           images: sellagh/azzybot
           tags: type=raw,value=${{ needs.extract_meta.outputs.environment_alpine }}
+
+      - name: Docker meta
+        if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') }}
+        id: meta-latest
+        uses: docker/metadata-action@v5
+        with:
+          flavor: latest=false
+          images: sellagh/azzybot
+          tags: |
+            type=raw,value=${{ needs.extract_meta.outputs.environment_alpine }}
+            type=raw,value=latest-alpine
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -247,7 +253,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') }}
+          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/') }}
           images: sellagh/azzybot
           tags: type=raw,value=${{ needs.extract_meta.outputs.environment }}
 
@@ -320,12 +326,24 @@ jobs:
           fetch-depth: 0
 
       - name: Docker meta
+        if: ${{ !contains(github.event.head_commit.message, '[release]') && !contains(github.event.head_commit.message, '[pre-release]') && !contains(github.event.ref, 'rel/') }}
         id: meta
         uses: docker/metadata-action@v5
         with:
           flavor: latest=false
           images: sellagh/azzybot
           tags: type=raw,value=${{ needs.extract_meta.outputs.environment_alpine }}
+
+      - name: Docker meta
+        if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') }}
+        id: meta-latest
+        uses: docker/metadata-action@v5
+        with:
+          flavor: latest=false
+          images: sellagh/azzybot
+          tags: |
+            type=raw,value=${{ needs.extract_meta.outputs.environment_alpine }}
+            type=raw,value=latest-alpine
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -397,21 +415,17 @@ jobs:
       - name: Get docker environment
         id: environment
         run: |
-          if ${{ contains(github.event.head_commit.message, '[release]') || (contains(github.event.ref, 'rel/') && !contains(github.event.head_commit.message, '[pre-release]')) }}; then
-            echo "environment=latest" >> "$GITHUB_OUTPUT"
-          elif ${{ contains(github.event.head_commit.message, '[pre-release]') }}; then
-            echo "environment=rel-${{ needs.extract_meta.outputs.clean_version }}" >> "$GITHUB_OUTPUT"
+          if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') }}; then
+            echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
             echo "environment=dev" >> "$GITHUB_OUTPUT"
-          else
-            echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
         
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
         with:
-          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') }}
+          flavor: latest=${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/') }}
           images: sellagh/azzybot
           tags: type=raw,value=${{ steps.environment.outputs.environment }}
           
@@ -445,23 +459,31 @@ jobs:
       - name: Get docker environment
         id: environment
         run: |
-          if ${{ contains(github.event.head_commit.message, '[release]') || (contains(github.event.ref, 'rel/') && !contains(github.event.head_commit.message, '[pre-release]')) }}; then
-            echo "environment=latest-alpine" >> "$GITHUB_OUTPUT"
-          elif ${{ contains(github.event.head_commit.message, '[pre-release]') }}; then
-            echo "environment=rel-${{ needs.extract_meta.outputs.clean_version }}-alpine" >> "$GITHUB_OUTPUT"
+          if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') }}; then
+            echo "environment=${{ github.ref_name }}-alpine" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.ref_name, 'main') && !contains(github.event.head_commit.message, '[pre-release]') }}; then
             echo "environment=dev-alpine" >> "$GITHUB_OUTPUT"
-          else
-            echo "environment=${{ github.ref_name }}-alpine" >> "$GITHUB_OUTPUT"
           fi
         
       - name: Docker meta
+        if: ${{ !contains(github.event.head_commit.message, '[release]') && !contains(github.event.head_commit.message, '[pre-release]') && !contains(github.event.ref, 'rel/') }}
         id: meta
         uses: docker/metadata-action@v5
         with:
           flavor: latest=false
           images: sellagh/azzybot
           tags: type=raw,value=${{ steps.environment.outputs.environment }}
+
+      - name: Docker meta
+        if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') }}
+        id: meta-latest
+        uses: docker/metadata-action@v5
+        with:
+          flavor: latest=false
+          images: sellagh/azzybot
+          tags: |
+            type=raw,value=${{ needs.extract_meta.outputs.environment_alpine }}
+            type=raw,value=latest-alpine
           
       - name: Login to Docker Hub
         uses: docker/login-action@v3
