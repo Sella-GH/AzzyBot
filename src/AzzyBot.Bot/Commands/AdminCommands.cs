@@ -215,14 +215,14 @@ public sealed class AdminCommands
             await context.DeferResponseAsync();
 
             string dateTime;
-            if (string.IsNullOrWhiteSpace(logfile))
+            if (!string.IsNullOrWhiteSpace(logfile))
             {
-                dateTime = DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                logfile = FileOperations.GetFilesInDirectory("Logs", true).First();
+                dateTime = Path.GetFileNameWithoutExtension(logfile).Split("_")[0];
             }
             else
             {
-                dateTime = Path.GetFileNameWithoutExtension(logfile);
+                dateTime = DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                logfile = FileOperations.GetFilesInDirectory("Logs", true).First();
             }
 
             await using FileStream fileStream = new(logfile, FileMode.Open, FileAccess.Read);
