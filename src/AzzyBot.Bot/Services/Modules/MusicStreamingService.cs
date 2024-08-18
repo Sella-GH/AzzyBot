@@ -198,9 +198,16 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
-        return (await GetLavalinkPlayerAsync(context, useDefault: false, suppressResponse: true, ignoreVoice: true) is not QueuedLavalinkPlayer player)
-            ? null
-            : (player.Position?.Position);
+        try
+        {
+            return (await GetLavalinkPlayerAsync(context, useDefault: false, suppressResponse: true, ignoreVoice: true) is QueuedLavalinkPlayer player)
+               ? player.Position?.Position
+               : null;
+        }
+        catch (InvalidOperationException)
+        {
+            return TimeSpan.MinValue;
+        }
     }
 
     [SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "Code style")]

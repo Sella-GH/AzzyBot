@@ -19,6 +19,7 @@
 - MusicStreaming commands exit correctly now when there is an error
 - Command error handling works flawlessly again
 - `admin get-joined-server` works again (and shows the server defined in `AzzyBotSettingsDocker.json` too)
+- `player now-playing` doesn't throws an error when it's used while playing a mount point
 
 ## 2.0.0
 ### General
