@@ -12,6 +12,9 @@ public static partial class LoggerActions
     [LoggerMessage(1, LogLevel.Debug, "{number} logfiles were deleted")]
     public static partial void LogfileDeleted(this ILogger logger, int number);
 
+    [LoggerMessage(9, LogLevel.Debug, "Cluster logging test intervall {i}")]
+    public static partial void ClusterLoggingTest(this ILogger logger, int i);
+
     [LoggerMessage(10, LogLevel.Debug, "Starting global timer")]
     public static partial void GlobalTimerStart(this ILogger logger);
 
