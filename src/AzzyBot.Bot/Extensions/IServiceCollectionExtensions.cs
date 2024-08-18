@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using AzzyBot.Bot.EventListeners;
+using AzzyBot.Bot.Commands;
+using AzzyBot.Bot.Commands.Checks;
+using AzzyBot.Bot.Commands.Converters;
 using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.BackgroundServices;
+using AzzyBot.Bot.Services.DiscordEvents;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Core.Services.BackgroundServices;
@@ -11,10 +14,16 @@ using AzzyBot.Core.Settings;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Data.Extensions;
 using DSharpPlus;
+using DSharpPlus.Commands;
+using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Extensions;
+using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.Enums;
+using DSharpPlus.Interactivity.Extensions;
 using Lavalink4NET.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace AzzyBot.Bot.Extensions;
 
@@ -33,13 +42,9 @@ public static class IServiceCollectionExtensions
         // Register the database services
         services.AzzyBotDataServices(isDev, settings.Database!.EncryptionKey, settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.DatabaseName);
 
-        services.AddDiscordClient(settings.BotToken, DiscordIntents.Guilds | DiscordIntents.GuildVoiceStates);
-        services.ConfigureEventHandlers(static e =>
-        {
-            e.HandleGuildCreated(EventListener.OnGuildCreatedAsync);
-            e.HandleGuildDeleted(EventListener.OnGuildDeletedAsync);
-            e.HandleGuildDownloadCompleted(EventListener.OnGuildDownloadCompletedAsync);
-        });
+        services.DiscordClient(settings.BotToken);
+        services.DiscordClientCommands(settings);
+        services.DiscordClientInteractivity();
 
         services.AddSingleton<DiscordBotService>();
         services.AddSingleton<DiscordBotServiceHost>();
@@ -155,5 +160,65 @@ public static class IServiceCollectionExtensions
         }
 
         services.AddSingleton(settings);
+    }
+
+    private static void DiscordClient(this IServiceCollection services, string token)
+    {
+        services.AddDiscordClient(token, DiscordIntents.Guilds | DiscordIntents.GuildVoiceStates);
+        services.ConfigureEventHandlers(static e => e.AddEventHandlers<DiscordGuildsHandler>(ServiceLifetime.Singleton));
+    }
+
+    private static void DiscordClientCommands(this IServiceCollection services, AzzyBotSettingsRecord settings)
+    {
+        services.AddSingleton<DiscordCommandsErrorHandler>();
+        services.AddCommandsExtension(c =>
+        {
+            DiscordCommandsErrorHandler handler = c.ServiceProvider.GetRequiredService<DiscordCommandsErrorHandler>();
+
+            c.CommandErrored += handler.CommandErroredAsync;
+
+            // Only add admin commands to the main server
+            c.AddCommand(typeof(AdminCommands.AdminGroup), settings.ServerId);
+
+            // These commands are for every server
+            c.AddCommand(typeof(AzuraCastCommands.AzuraCastGroup));
+            c.AddCommand(typeof(AzuraCastCommands.DjGroup));
+            c.AddCommand(typeof(AzuraCastCommands.MusicGroup));
+            c.AddCommand(typeof(ConfigCommands.ConfigGroup));
+            c.AddCommand(typeof(CoreCommands.CoreGroup));
+            c.AddCommand(typeof(MusicStreamingCommands.PlayerGroup));
+
+            // Only add debug commands if it's a dev build
+            if (SoftwareStats.GetAppEnvironment == Environments.Development)
+                c.AddCommand(typeof(DebugCommands.DebugGroup), settings.ServerId);
+
+            c.AddCheck<AzuraCastDiscordChannelCheck>();
+            c.AddCheck<AzuraCastDiscordPermCheck>();
+            c.AddCheck<AzuraCastOnlineCheck>();
+            c.AddCheck<FeatureAvailableCheck>();
+            c.AddCheck<ModuleActivatedCheck>();
+
+            SlashCommandProcessor slashCommandProcessor = new();
+            slashCommandProcessor.AddConverter<Uri>(new UriArgumentConverter());
+
+            c.AddProcessor(slashCommandProcessor);
+        },
+        new CommandsConfiguration()
+        {
+            RegisterDefaultCommandProcessors = false,
+            UseDefaultCommandErrorHandler = false
+        });
+    }
+
+    private static void DiscordClientInteractivity(this IServiceCollection services)
+    {
+        InteractivityConfiguration config = new()
+        {
+            ResponseBehavior = InteractionResponseBehavior.Ignore,
+            ResponseMessage = "This is not a valid option!",
+            Timeout = TimeSpan.FromMinutes(15)
+        };
+
+        services.AddInteractivityExtension(config);
     }
 }

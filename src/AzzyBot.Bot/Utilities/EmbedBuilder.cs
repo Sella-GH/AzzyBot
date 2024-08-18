@@ -297,7 +297,7 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.SpringGreen, new(file.Art), fields: fields);
     }
 
-    public static async Task<DiscordEmbed> BuildAzzyHardwareStatsEmbedAsync(Uri avaUrl)
+    public static async Task<DiscordEmbed> BuildAzzyHardwareStatsEmbedAsync(Uri avaUrl, int ping)
     {
         const string title = "AzzyBot Hardware Stats";
         const string notLinux = "To display more information you need to have a linux os.";
@@ -311,8 +311,14 @@ public static class EmbedBuilder
             ["Operating System"] = new(os, true),
             ["Architecture"] = new(osArch, true),
             ["Dockerized?"] = new(Misc.GetReadableBool(isDocker, ReadableBool.YesNo), true),
-            ["System Uptime"] = new($"<t:{uptime}>")
+            ["System Uptime"] = new($"<t:{uptime}>", true)
         };
+
+        if (ping is not 0)
+        {
+            fields.Add("Ping", new($"{ping} ms", true));
+            fields.Add("\u200b", new("\u200b", true)); // Empty field to make the embed look better
+        }
 
         if (!HardwareStats.CheckIfLinuxOs)
             return CreateBasicEmbed(title, color: DiscordColor.Orange, footerText: notLinux, fields: fields);
@@ -594,7 +600,7 @@ public static class EmbedBuilder
         {
             ["Guild ID"] = new(guild.Id.ToString(CultureInfo.InvariantCulture)),
             ["Creation Date"] = new($"<t:{Converter.ConvertToUnixTime(guild.CreationTimestamp.Date)}>"),
-            ["Owner"] = new(owner.Mention),
+            ["Owner"] = new(owner.Mention, true),
             ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture), true)
         };
 
@@ -651,7 +657,8 @@ public static class EmbedBuilder
     public static DiscordEmbed BuildMusicStreamingNowPlayingEmbed(LavalinkTrack track, TimeSpan? elapsed)
     {
         ArgumentNullException.ThrowIfNull(track, nameof(track));
-        ArgumentNullException.ThrowIfNull(elapsed, nameof(elapsed));
+        if (elapsed is null)
+            throw new ArgumentNullException(nameof(elapsed), "Elapsed time cannot be null.");
 
         const string title = "Now Playing";
 

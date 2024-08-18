@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace AzzyBot.Data.Entities;
@@ -43,7 +44,7 @@ public sealed class AzuraCastEntity
     public AzuraCastPreferencesEntity Preferences { get; set; } = new();
 
     /// <summary>
-    /// A <see cref="ICollection<>"/> of the associated <see cref="AzuraCastStationEntity"/> database items.
+    /// A <see cref="ICollection"/> of the associated <see cref="AzuraCastStationEntity"/> database items.
     /// </summary>
     public ICollection<AzuraCastStationEntity> Stations { get; } = [];
 

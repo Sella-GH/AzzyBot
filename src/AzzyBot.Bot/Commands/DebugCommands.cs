@@ -25,6 +25,26 @@ public sealed class DebugCommands
         private readonly ILogger<DebugGroup> _logger = logger;
         private readonly WebRequestService _webRequestService = webRequestService;
 
+        [Command("cluster-logging"), Description("Test the logging file rotation feature of the bot.")]
+        public async ValueTask DebugClusterLoggingAsync
+        (
+            SlashCommandContext context,
+            [Description("Set the amount of log entries to be written.")] int logAmount = 1000000
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context, nameof(context));
+
+            _logger.CommandRequested(nameof(DebugClusterLoggingAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+            for (int i = 0; i < logAmount; i++)
+            {
+                _logger.ClusterLoggingTest(i);
+            }
+
+            await context.EditResponseAsync("Cluster logging test was successful!");
+        }
+
         [Command("encrypt-decrypt"), Description("Test the encryption and decryption features of the bot.")]
         public async ValueTask DebugEncryptDecryptAsync
         (

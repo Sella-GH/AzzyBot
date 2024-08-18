@@ -14,6 +14,7 @@ using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
+using AzzyBot.Core.Utilities;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
 using DSharpPlus.Commands;
@@ -32,18 +33,18 @@ public sealed class AdminCommands
     [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
     public sealed class AdminGroup(ILogger<AdminGroup> logger, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotService botService)
     {
+        private readonly ILogger<AdminGroup> _logger = logger;
         private readonly AzzyBotSettingsRecord _settings = settings;
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
-        private readonly ILogger<AdminGroup> _logger = logger;
 
         [Command("change-bot-status"), Description("Change the global bot status according to your likes.")]
         public async ValueTask ChangeStatusAsync
         (
             SlashCommandContext context,
-            [Description("Choose the activity type which the bot should have."), SlashChoiceProvider<BotActivityProvider>] int activity = 1,
-            [Description("Choose the status type which the bot should have."), SlashChoiceProvider<BotStatusProvider>] int status = 2,
-            [Description("Enter a custom doing which is added after the activity type."), MinMaxLength(0, 128)] string doing = "Music",
+            [Description("Choose the activity type which the bot should have."), SlashChoiceProvider<BotActivityProvider>] int activity,
+            [Description("Choose the status type which the bot should have."), SlashChoiceProvider<BotStatusProvider>] int status,
+            [Description("Enter a custom doing which is added after the activity type."), MinMaxLength(0, 128)] string doing,
             [Description("Enter a custom url. Only usable when having activity type streaming or watching!")] Uri? url = null,
             [Description("Reset the bot status to default."), SlashChoiceProvider<BooleanYesNoStateProvider>] int reset = 0
         )
@@ -94,8 +95,7 @@ public sealed class AdminCommands
                     return;
                 }
 
-                DiscordGuild? guild = _botService.GetDiscordGuild(guildIdValue);
-                if (guild is null)
+                if (!guilds.TryGetValue(guildIdValue, out DiscordGuild? guild))
                 {
                     _logger.DiscordItemNotFound(nameof(DiscordGuild), guildIdValue);
                     await context.EditResponseAsync(GeneralStrings.GuildNotFound);
@@ -111,9 +111,9 @@ public sealed class AdminCommands
             // TODO This is not suitable for more than a few houndred servers
             StringBuilder stringBuilder = new();
             stringBuilder.AppendLine("I am in the following servers:");
-            foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds)
+            foreach (DiscordGuild guild in guilds.Values)
             {
-                stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"- {guild.Value.Name} ({guild.Key})");
+                stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"- {guild.Name} ({guild.Id})");
             }
 
             await context.EditResponseAsync(stringBuilder.ToString());
@@ -171,13 +171,19 @@ public sealed class AdminCommands
             await context.DeferResponseAsync();
 
             IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
-            IAsyncEnumerable<GuildEntity> guildsEntities = _dbActions.GetGuildsAsync(true);
-            foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds)
+            if (guilds.Count is 0)
             {
-                GuildEntity? guildEntity = await guildsEntities.Where(e => e.UniqueId == guild.Key).FirstOrDefaultAsync();
+                await context.EditResponseAsync(GeneralStrings.NoGuildFound);
+                return;
+            }
+
+            IAsyncEnumerable<GuildEntity> guildsEntities = _dbActions.GetGuildsAsync(true);
+            foreach (DiscordGuild guild in guilds.Values)
+            {
+                GuildEntity? guildEntity = await guildsEntities.Where(e => e.UniqueId == guild.Id).FirstOrDefaultAsync();
                 if (guildEntity is null)
                 {
-                    _logger.DatabaseGuildNotFound(guild.Key);
+                    _logger.DatabaseGuildNotFound(guild.Id);
                     continue;
                 }
 
@@ -187,7 +193,7 @@ public sealed class AdminCommands
                 }
                 else
                 {
-                    DiscordMember owner = await guild.Value.GetGuildOwnerAsync();
+                    DiscordMember owner = await guild.GetGuildOwnerAsync();
                     await owner.SendMessageAsync(message);
                 }
             }
@@ -209,14 +215,14 @@ public sealed class AdminCommands
             await context.DeferResponseAsync();
 
             string dateTime;
-            if (string.IsNullOrWhiteSpace(logfile))
+            if (!string.IsNullOrWhiteSpace(logfile))
             {
-                dateTime = DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                logfile = Path.Combine("Logs", $"{dateTime}.log");
+                dateTime = Path.GetFileNameWithoutExtension(logfile).Split("_")[0];
             }
             else
             {
-                dateTime = Path.GetFileNameWithoutExtension(logfile);
+                dateTime = DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                logfile = FileOperations.GetFilesInDirectory("Logs", true).First();
             }
 
             await using FileStream fileStream = new(logfile, FileMode.Open, FileAccess.Read);

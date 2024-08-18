@@ -20,21 +20,25 @@ public sealed class GuildsAutocomplete(AzzyBotSettingsRecord settings, DiscordBo
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
         IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
+        if (guilds.Count is 0)
+            return new ValueTask<IReadOnlyDictionary<string, object>>();
+
         string search = context.UserInput;
 
         Dictionary<string, object> results = new(25);
-        foreach (KeyValuePair<ulong, DiscordGuild> guild in guilds)
+        string commandName = context.Command.Name;
+        foreach (DiscordGuild guild in guilds.Values)
         {
             if (results.Count is 25)
                 break;
 
-            if (!string.IsNullOrWhiteSpace(search) && !guild.Value.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(search) && !guild.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            if (guild.Value.Id == _settings.ServerId)
+            if (guild.Id == _settings.ServerId && commandName is not "get-joined-server")
                 continue;
 
-            results.Add(guild.Value.Name, guild.Key.ToString(CultureInfo.InvariantCulture));
+            results.Add(guild.Name, guild.Id.ToString(CultureInfo.InvariantCulture));
         }
 
         return new ValueTask<IReadOnlyDictionary<string, object>>(results);

@@ -25,7 +25,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     private readonly ILogger<MusicStreamingService> _logger = logger;
     private readonly DiscordBotService _botService = botService;
 
-    public async Task<LavalinkPlayer?> GetLavalinkPlayerAsync(SlashCommandContext context, bool useDefault = true, bool connectToVoice = false, bool suppressResponse = false, bool ignoreVoice = false)
+    private async Task<LavalinkPlayer?> GetLavalinkPlayerAsync(SlashCommandContext context, bool useDefault = true, bool connectToVoice = false, bool suppressResponse = false, bool ignoreVoice = false)
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
@@ -128,7 +128,6 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     private async Task<PlayerResult<LavalinkPlayer>> GetLavalinkDefaultPlayerAsync(ulong guildId, ulong channelId, LavalinkPlayerOptions playerOptions, PlayerRetrieveOptions retrieveOptions)
     {
         ArgumentNullException.ThrowIfNull(playerOptions, nameof(playerOptions));
-        ArgumentNullException.ThrowIfNull(retrieveOptions, nameof(retrieveOptions));
 
         return await _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Default, Options.Create(playerOptions), retrieveOptions);
     }
@@ -136,11 +135,11 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     private async Task<PlayerResult<QueuedLavalinkPlayer>> GetLavalinkQueuedPlayerAsync(ulong guildId, ulong channelId, QueuedLavalinkPlayerOptions playerOptions, PlayerRetrieveOptions retrieveOptions)
     {
         ArgumentNullException.ThrowIfNull(playerOptions, nameof(playerOptions));
-        ArgumentNullException.ThrowIfNull(retrieveOptions, nameof(retrieveOptions));
 
         return await _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Queued, Options.Create(playerOptions), retrieveOptions);
     }
 
+    [SuppressMessage("Style", "IDE0072:Add missing cases", Justification = "These are not needed.")]
     private static string PostPlayerRetrieveError(PlayerRetrieveStatus status, string? precondition)
     {
         return status switch
@@ -199,9 +198,16 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
-        return (await GetLavalinkPlayerAsync(context, useDefault: false, suppressResponse: true, ignoreVoice: true) is not QueuedLavalinkPlayer player)
-            ? null
-            : (player.Position?.Position);
+        try
+        {
+            return (await GetLavalinkPlayerAsync(context, useDefault: false, suppressResponse: true, ignoreVoice: true) is QueuedLavalinkPlayer player)
+               ? player.Position?.Position
+               : null;
+        }
+        catch (InvalidOperationException)
+        {
+            return TimeSpan.MinValue;
+        }
     }
 
     [SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "Code style")]
@@ -228,9 +234,16 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
-        return (await GetLavalinkPlayerAsync(context, useDefault: false, suppressResponse: true) is not QueuedLavalinkPlayer player)
-            ? null
-            : player.CurrentTrack;
+        try
+        {
+            return (await GetLavalinkPlayerAsync(context, useDefault: false, suppressResponse: true) is QueuedLavalinkPlayer player)
+                ? player.CurrentTrack
+                : null;
+        }
+        catch (InvalidOperationException)
+        {
+            return new() { Author = "AzzyBot.Bot", Identifier = "AzzyBot.Bot", Title = "AzzyBot.Bot" };
+        }
     }
 
     public async Task<bool> PauseAsync(SlashCommandContext context)

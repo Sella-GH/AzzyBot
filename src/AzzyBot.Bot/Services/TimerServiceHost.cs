@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Services.BackgroundServices;
+using AzzyBot.Bot.Settings;
 using AzzyBot.Core.Logging;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
@@ -12,16 +15,19 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChecksBackgroundTask azuraChecksBackgroundService, DbActions dbActions, DiscordBotService discordBotService, UpdaterService updaterService) : IAsyncDisposable, IHostedService
+public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBotSettingsRecord settings, AzuraChecksBackgroundTask azuraChecksBackgroundService, DbActions dbActions, DbMaintenance dbMaintenance, DiscordBotService discordBotService, UpdaterService updaterService) : IAsyncDisposable, IHostedService
 {
     private readonly ILogger<TimerServiceHost> _logger = logger;
     private readonly AzuraChecksBackgroundTask _azuraChecksBackgroundService = azuraChecksBackgroundService;
+    private readonly AzzyBotSettingsRecord _settings = settings;
     private readonly DbActions _dbActions = dbActions;
+    private readonly DbMaintenance _dbMaintenance = dbMaintenance;
     private readonly DiscordBotService _discordBotService = discordBotService;
     private readonly UpdaterService _updaterService = updaterService;
     private readonly Task _completedTask = Task.CompletedTask;
-    private Timer? _timer;
     private DateTime _lastAzzyBotUpdateCheck = DateTime.MinValue;
+    private DateTime _lastCleanup = DateTime.MinValue;
+    private Timer? _timer;
     private bool _firstRun = true;
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -51,11 +57,21 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "General exception is there to log unkown exceptions")]
     private async void TimerTimeoutAsync(object? o)
     {
+        if (_firstRun)
+            await Task.Delay(TimeSpan.FromSeconds(30));
+
         _logger.GlobalTimerTick();
 
         DateTime now = DateTime.Now;
         try
         {
+            if (now - _lastCleanup >= TimeSpan.FromDays(1))
+            {
+                LogfileCleaning();
+                await _dbMaintenance.CleanupLeftoverGuildsAsync(_discordBotService.GetDiscordGuilds);
+                _lastCleanup = now;
+            }
+
             if (now - _lastAzzyBotUpdateCheck >= TimeSpan.FromHours(5.98))
             {
                 _logger.GlobalTimerCheckForUpdates();
@@ -93,5 +109,21 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
         {
             await _discordBotService.LogExceptionAsync(ex, now);
         }
+    }
+
+    private void LogfileCleaning()
+    {
+        _logger.LogfileCleaning();
+
+        DateTime date = DateTime.Today.AddDays(-_settings.LogRetentionDays);
+        string logPath = Path.Combine(Environment.CurrentDirectory, "Logs");
+        int counter = 0;
+        foreach (string logFile in Directory.GetFiles(logPath, "*.log").Where(f => File.GetLastWriteTime(f) < date))
+        {
+            File.Delete(logFile);
+            counter++;
+        }
+
+        _logger.LogfileDeleted(counter);
     }
 }

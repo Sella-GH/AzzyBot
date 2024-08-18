@@ -12,6 +12,9 @@ public static partial class LoggerActions
     [LoggerMessage(1, LogLevel.Debug, "{number} logfiles were deleted")]
     public static partial void LogfileDeleted(this ILogger logger, int number);
 
+    [LoggerMessage(9, LogLevel.Debug, "Cluster logging test intervall {i}")]
+    public static partial void ClusterLoggingTest(this ILogger logger, int i);
+
     [LoggerMessage(10, LogLevel.Debug, "Starting global timer")]
     public static partial void GlobalTimerStart(this ILogger logger);
 
@@ -105,6 +108,12 @@ public static partial class LoggerActions
     [LoggerMessage(106, LogLevel.Information, "Database Reencryption completed")]
     public static partial void DatabaseReencryptionComplete(this ILogger logger);
 
+    [LoggerMessage(107, LogLevel.Information, "Starting database cleanup of guilds.")]
+    public static partial void DatabaseCleanupStart(this ILogger logger);
+
+    [LoggerMessage(108, LogLevel.Information, "Database cleanup of guilds completed, {count} guilds were deleted.")]
+    public static partial void DatabaseCleanupComplete(this ILogger logger, int count);
+
     [LoggerMessage(110, LogLevel.Information, "AzzyBot joined the following Guild: {guild}")]
     public static partial void GuildCreated(this ILogger logger, string guild);
 
@@ -155,6 +164,9 @@ public static partial class LoggerActions
 
     [LoggerMessage(220, LogLevel.Warning, "Could not find discord item {item} for guild {guild}")]
     public static partial void DiscordItemNotFound(this ILogger logger, string item, ulong guild);
+
+    [LoggerMessage(221, LogLevel.Warning, "Could not find referenced command {command}")]
+    public static partial void CommandNotFound(this ILogger logger, string command);
 
     [LoggerMessage(230, LogLevel.Warning, "Bot is ratelimited on uri: {uri} retrying in {time} seconds")]
     public static partial void BotRatelimited(this ILogger logger, Uri uri, int time);

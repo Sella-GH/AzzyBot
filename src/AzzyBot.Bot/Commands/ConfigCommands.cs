@@ -607,7 +607,8 @@ public sealed class ConfigCommands
                 return;
             }
 
-            DiscordRole? adminRole = context.Guild.GetRole(guild.Preferences.AdminRoleId);
+            IReadOnlyList<DiscordRole> roles = await context.Guild.GetRolesAsync();
+            DiscordRole? adminRole = roles.FirstOrDefault(r => r.Id == guild.Preferences.AdminRoleId);
             DiscordEmbed guildEmbed = EmbedBuilder.BuildGetSettingsGuildEmbed(guildName, guild, $"{adminRole?.Name} ({adminRole?.Id})");
 
             await using DiscordMessageBuilder messageBuilder = new();
@@ -621,8 +622,8 @@ public sealed class ConfigCommands
                 Dictionary<int, string> stationNames = new(azuraCast.Stations.Count);
                 foreach (AzuraCastStationEntity station in azuraCast.Stations)
                 {
-                    DiscordRole? stationAdminRole = context.Guild.GetRole(station.Preferences.StationAdminRoleId);
-                    DiscordRole? stationDjRole = context.Guild.GetRole(station.Preferences.StationDjRoleId);
+                    DiscordRole? stationAdminRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationAdminRoleId);
+                    DiscordRole? stationDjRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationDjRoleId);
                     stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? "Name not found");
                     stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found");
 
@@ -636,7 +637,7 @@ public sealed class ConfigCommands
                     stationNames.Add(station.Id, stationRecord.Name);
                 }
 
-                DiscordRole? instanceAdminRole = context.Guild.GetRole(azuraCast.Preferences.InstanceAdminRoleId);
+                DiscordRole? instanceAdminRole = roles.FirstOrDefault(r => r.Id == azuraCast.Preferences.InstanceAdminRoleId);
                 IEnumerable<DiscordEmbed> azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(azuraCast, $"{instanceAdminRole?.Name} ({instanceAdminRole?.Id})", stationRoles, stationNames);
 
                 messageBuilder.AddEmbeds(azuraEmbed);

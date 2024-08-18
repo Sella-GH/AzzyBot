@@ -123,7 +123,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, builder.ToString());
     }
 
-    private async Task<IReadOnlyList<string>> ExecuteApiPermissionCheckAsync(IReadOnlyList<Uri> apis, string apiKey)
+    private async Task<IReadOnlyList<string>> ExecuteApiPermissionCheckAsync(List<Uri> apis, string apiKey)
     {
         ArgumentNullException.ThrowIfNull(apis, nameof(apis));
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
@@ -694,7 +694,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            await PutToApiAsync(baseUrl, endpoint, headers: CreateHeader(apiKey));
+            await PutToApiAsync(baseUrl, endpoint, headers: CreateHeader(apiKey), ignoreException: true);
         }
         catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException or TaskCanceledException)
         {

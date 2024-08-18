@@ -70,8 +70,8 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, A
         HashSet<AzuraFilesRecord> onlineHashSet = new(onlineFiles, new AzuraFileComparer());
         HashSet<AzuraFilesRecord> localHashSet = new(localFiles, new AzuraFileComparer());
 
-        IReadOnlyList<AzuraFilesRecord> addedFiles = onlineHashSet.Except(localHashSet).ToList();
-        IReadOnlyList<AzuraFilesRecord> removedFiles = localHashSet.Except(onlineHashSet).ToList();
+        List<AzuraFilesRecord> addedFiles = onlineHashSet.Except(localHashSet).ToList();
+        List<AzuraFilesRecord> removedFiles = localHashSet.Except(onlineHashSet).ToList();
         if (addedFiles.Count is 0 && removedFiles.Count is 0)
             return;
 

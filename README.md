@@ -9,6 +9,9 @@
     <a href="https://github.com/Sella-GH/AzzyBot/wiki"><strong>Explore the docs »</strong></a>
     <br/>
     <br/>
+    <a href="https://discord.com/oauth2/authorize?client_id=1270502179936931840&scope=applications.commands%20bot&permissions=35840">Invite AzzyBot to your server!</a>
+    <br/>
+    <br/>
     <a href="https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D">Report a bug</a>
     -
     <a href="https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=enhancement&projects=&template=feature_request.yml&title=%5BFEATURE%5D">Request a feature</a>
