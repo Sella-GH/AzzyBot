@@ -227,9 +227,16 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     {
         ArgumentNullException.ThrowIfNull(context, nameof(context));
 
-        return (await GetLavalinkPlayerAsync(context, useDefault: false, suppressResponse: true) is QueuedLavalinkPlayer player)
-            ? player.CurrentTrack
-            : null;
+        try
+        {
+            return (await GetLavalinkPlayerAsync(context, useDefault: false, suppressResponse: true) is QueuedLavalinkPlayer player)
+                ? player.CurrentTrack
+                : null;
+        }
+        catch (InvalidOperationException)
+        {
+            return new() { Author = "AzzyBot.Bot", Identifier = "AzzyBot.Bot", Title = "AzzyBot.Bot" };
+        }
     }
 
     public async Task<bool> PauseAsync(SlashCommandContext context)
