@@ -142,7 +142,12 @@ public sealed class MusicStreamingCommands
             TimeSpan? pos = await _musicStreaming.GetCurrentPositionAsync(context);
             if (track is null || pos is null)
             {
-                await context.EditResponseAsync("Nothing is playing right now.");
+                await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
+                return;
+            }
+            else if ((track.Author is "AzzyBot.Bot" || track.Title is "AzzyBot.Bot" || track.Identifier is "AzzyBot.Bot") && pos == TimeSpan.MinValue)
+            {
+                await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;
             }
 
@@ -160,9 +165,15 @@ public sealed class MusicStreamingCommands
 
             await context.DeferResponseAsync();
 
-            if (await _musicStreaming.NowPlayingAsync(context) is null)
+            LavalinkTrack? track = await _musicStreaming.NowPlayingAsync(context);
+            if (track is null)
             {
-                await context.EditResponseAsync("Nothing is playing right now.");
+                await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
+                return;
+            }
+            else if (track.Author is "AzzyBot.Bot" && track.Title is "AzzyBot.Bot" && track.Identifier is "AzzyBot.Bot")
+            {
+                await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;
             }
 
@@ -289,9 +300,15 @@ public sealed class MusicStreamingCommands
 
             await context.DeferResponseAsync();
 
-            if (await _musicStreaming.NowPlayingAsync(context) is null)
+            LavalinkTrack? track = await _musicStreaming.NowPlayingAsync(context);
+            if (track is null)
             {
-                await context.EditResponseAsync("Nothing is playing right now.");
+                await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
+                return;
+            }
+            else if (track.Author is "AzzyBot.Bot" && track.Title is "AzzyBot.Bot" && track.Identifier is "AzzyBot.Bot")
+            {
+                await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;
             }
 
@@ -314,9 +331,15 @@ public sealed class MusicStreamingCommands
 
             await context.DeferResponseAsync();
 
-            if (await _musicStreaming.NowPlayingAsync(context) is null)
+            LavalinkTrack? track = await _musicStreaming.NowPlayingAsync(context);
+            if (track is null)
             {
-                await context.EditResponseAsync("Nothing is playing right now.");
+                await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
+                return;
+            }
+            else if (track.Author is "AzzyBot.Bot" && track.Title is "AzzyBot.Bot" && track.Identifier is "AzzyBot.Bot")
+            {
+                await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;
             }
 
