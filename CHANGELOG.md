@@ -13,6 +13,7 @@
 - More internal restructuring to make the code more functional
 - File logging now rotates the logs daily or when exceeding 24.9 MB file size
 - Adjusted maximum upload size of `music upload-files` to 49.9 MB
+- Leftover servers in database are now removed every day
 
 ### Fixes
 - MusicStreaming commands exit correctly now when there is an error
