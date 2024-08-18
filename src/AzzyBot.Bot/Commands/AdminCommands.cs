@@ -14,6 +14,7 @@ using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
+using AzzyBot.Core.Utilities;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
 using DSharpPlus.Commands;
@@ -217,7 +218,7 @@ public sealed class AdminCommands
             if (string.IsNullOrWhiteSpace(logfile))
             {
                 dateTime = DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                logfile = Path.Combine("Logs", $"{dateTime}.log");
+                logfile = FileOperations.GetFilesInDirectory("Logs").First();
             }
             else
             {
