@@ -23,7 +23,7 @@ public sealed class FileLogger : ILogger
         _getConfig = getConfig;
     }
 
-    private static void InitializeLogWriter(Func<FileLoggerConfiguration> getConfig)
+    private void InitializeLogWriter(Func<FileLoggerConfiguration> getConfig)
     {
         FileLoggerConfiguration config = getConfig();
         if (LogStream is not null && !ShouldRotateBecauseOfFileSize(config) && !ShouldRotateBecauseOfTime(config))
@@ -60,8 +60,18 @@ public sealed class FileLogger : ILogger
     public bool IsEnabled(LogLevel logLevel)
         => logLevel is not LogLevel.None && !string.IsNullOrWhiteSpace(_getConfig().Directory);
 
-    private static string GetLogFilePath(string directory)
-        => Path.Combine(directory, $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.log");
+    private string GetLogFilePath(string directory)
+    {
+        DateTime now = DateTime.Now;
+        string[] files = Directory.GetFiles(directory, $"{now:yyyy-MM-dd}_*.log");
+        if (files.Length is 0)
+            return Path.Combine(directory, $"{now:yyyy-MM-dd_HH-mm-ss}.log");
+
+        FileLoggerConfiguration config = _getConfig();
+        FileInfo fileInfo = new(files[^1]);
+
+        return (fileInfo.Length <= config.MaxFileSize) ? fileInfo.FullName : Path.Combine(directory, $"{now:yyyy-MM-dd_HH-mm-ss}.log");
+    }
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {

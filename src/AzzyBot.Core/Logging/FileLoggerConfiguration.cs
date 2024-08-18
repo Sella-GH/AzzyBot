@@ -7,6 +7,6 @@ namespace AzzyBot.Core.Logging;
 public sealed class FileLoggerConfiguration
 {
     public string Directory { get; set; } = string.Empty;
-    public int MaxFileSize { get; set; } = 52428800; // 50 MB
+    public int MaxFileSize { get; set; } = 26109524; // ~24.9 MB
     public TimeSpan MaxTimeSpan { get; set; } = TimeSpan.FromDays(1);
 }

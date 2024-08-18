@@ -29,8 +29,7 @@ public sealed class DebugCommands
         public async ValueTask DebugClusterLoggingAsync
         (
             SlashCommandContext context,
-            [Description("Set the amount of log entries to be written.")] int logAmount = 1000,
-            [Description("Set the amount of time the bot should wait between each log entry.")] int waitTime = 0
+            [Description("Set the amount of log entries to be written.")] int logAmount = 1000000
         )
         {
             ArgumentNullException.ThrowIfNull(context, nameof(context));
@@ -41,7 +40,6 @@ public sealed class DebugCommands
             for (int i = 0; i < logAmount; i++)
             {
                 _logger.ClusterLoggingTest(i);
-                await Task.Delay(waitTime);
             }
 
             await context.EditResponseAsync("Cluster logging test was successful!");
