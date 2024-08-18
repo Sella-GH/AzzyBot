@@ -21,9 +21,11 @@
 - `admin get-joined-server` works again (and shows the server defined in `AzzyBotSettingsDocker.json` too)
 - `player now-playing` doesn't throws an error when it's used while playing a mount point
 
-## 2.0.0
+## 2.0.0 - 2024-08-11
 ### General
 - Complete rewrite of the bot using newest technologies
 - Includes a database to store your settings and other important data
 - New commands to manage your bot and settings
 - Support for multiple servers, multiple stations and multiple users
+
+Read the [docs](https://github.com/Sella-GH/AzzyBot/wiki/) if you need help setting the bot up.
