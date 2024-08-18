@@ -11,7 +11,8 @@
 - The usual connection error message of updating AzuraCast should not be shown anymore
 - `core stats hardware` now shows the latency to discord
 - More internal restructuring to make the code more functional
-- File logging now rotates the logs daily or when exceeding 50 MB file size
+- File logging now rotates the logs daily or when exceeding 24.9 MB file size
+- Adjusted maximum upload size of `music upload-files` to 49.9 MB
 
 ### Fixes
 - MusicStreaming commands exit correctly now when there is an error
