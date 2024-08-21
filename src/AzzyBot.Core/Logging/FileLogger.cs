@@ -55,17 +55,22 @@ public sealed class FileLogger(string name, Func<FileLoggerConfiguration> getCon
 
     private static string GetLogFilePath(string directory, FileLoggerConfiguration config)
     {
-        DateTime now = DateTime.Now;
-        string formattedDate = now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-        string[] files = Directory.GetFiles(directory, $"{formattedDate}_*.log").OrderDescending().ToArray();
+        string formattedDate = DateTime.Now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+        string[] files = [.. Directory.GetFiles(directory, $"{formattedDate}*.log").OrderByDescending(File.GetCreationTime)];
         if (files.Length is 0)
             return Path.Combine(directory, $"{formattedDate}.log");
 
         FileInfo fileInfo = new(files[0]);
-        string[] fileName = fileInfo.Name.Split('_');
-        int count = (fileName.Length is 1) ? 0 : Convert.ToInt32(fileName[1], CultureInfo.InvariantCulture);
+        if (fileInfo.Length >= config.MaxFileSize)
+        {
+            string[] fileName = fileInfo.Name.Split('_');
+            int count = (fileName.Length is 1) ? 0 : Convert.ToInt32(fileName[1].Split('.')[0], CultureInfo.InvariantCulture);
+            count++;
 
-        return (fileInfo.Length <= config.MaxFileSize && count is 0) ? fileInfo.FullName : Path.Combine(directory, $"{formattedDate}_{count}.log");
+            return Path.Combine(directory, $"{formattedDate}_{count}.log");
+        }
+
+        return fileInfo.FullName;
     }
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
