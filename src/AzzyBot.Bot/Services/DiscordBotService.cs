@@ -5,11 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Security;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
+using AzzyBot.Core.Utilities.Records;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
 using DSharpPlus;
@@ -291,7 +293,8 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
         try
         {
-            string tempFilePath = await FileOperations.CreateTempFileAsync(exInfo, $"StackTrace_{timestampString}.log");
+            string jsonDump = JsonSerializer.Serialize<SerializableExceptionsRecord>(new(ex), FileOperations.JsonOptions);
+            string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, $"AzzyBotException_{timestampString}.log");
 
             bool messageSent = await SendMessageAsync(errorChannelId, (errorChannelConfigured) ? BugReportMessage : ErrorChannelNotConfigured, [embed], [tempFilePath]);
             if (!messageSent)
@@ -301,7 +304,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
             return true;
         }
-        catch (Exception e) when (e is IOException or SecurityException or UnauthorizedAccessException)
+        catch (Exception e) when (e is IOException or NotSupportedException or SecurityException or UnauthorizedAccessException)
         {
             _logger.UnableToLogException(e.ToString());
         }
