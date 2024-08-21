@@ -232,7 +232,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
         string exMessage = ex.Message;
         string stackTrace = ex.StackTrace ?? string.Empty;
-        string exInfo = (string.IsNullOrWhiteSpace(stackTrace)) ? exMessage : $"{exMessage}\n{stackTrace}";
+        string exInfo = (!string.IsNullOrWhiteSpace(stackTrace)) ? $"{exMessage}\n{stackTrace}" : exMessage;
         string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss-fffffff", CultureInfo.InvariantCulture);
         ulong errorChannelId = _settings.ErrorChannelId;
         bool errorChannelConfigured = true;
@@ -281,11 +281,11 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             Dictionary<string, string> commandOptions = new(ctx.Command.Parameters.Count);
             ProcessOptions(ctx.Arguments, commandOptions);
 
-            embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), info, discordMessage, discordUser, commandName, commandOptions);
+            embed = CreateExceptionEmbed(ex, timestampString, info, discordMessage, discordUser, commandName, commandOptions);
         }
         else
         {
-            embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), info);
+            embed = CreateExceptionEmbed(ex, timestampString, info);
         }
 
         try
