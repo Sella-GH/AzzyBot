@@ -1,9 +1,4 @@
 <Project>
-  <!-- Artifacts stuff -->
-  <PropertyGroup>
-	  <UseArtifactsOutput>true</UseArtifactsOutput>
-  </PropertyGroup>
-
   <!-- Build stuff -->
   <PropertyGroup>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
@@ -22,11 +17,12 @@
     <IsPublishable>True</IsPublishable>
     <NoWarn>$(NoWarn);CA2007</NoWarn>
     <Nullable>enable</Nullable>
-    <PathMap>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)=.</PathMap>
+    <PathMap>$(MSBuildProjectDirectory)=./$(MSBuildProjectName)</PathMap>
     <Platforms>x64;ARM64;AnyCPU</Platforms>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <TargetFramework>net8.0</TargetFramework>
+	  <UseArtifactsOutput>true</UseArtifactsOutput>
     <WarningsAsErrors>nullable</WarningsAsErrors>
   </PropertyGroup>
 

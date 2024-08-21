@@ -7,17 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/AzzyBot/AzzyBot.csproj"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "build-next",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "build",
-                "${workspaceFolder}/src/AzzyBot-Next.Bot/AzzyBot-Next.Bot.csproj"
+                "${workspaceFolder}/src/AzzyBot.Bot/AzzyBot.Bot.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

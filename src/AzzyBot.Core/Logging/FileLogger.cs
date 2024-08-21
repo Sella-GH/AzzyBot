@@ -1,27 +1,20 @@
 using System;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Core.Logging;
 
-public sealed class FileLogger : ILogger
+public sealed class FileLogger(string name, Func<FileLoggerConfiguration> getConfig) : ILogger
 {
-    private readonly string _name;
-    private readonly Func<FileLoggerConfiguration> _getConfig;
+    private readonly string _name = name;
+    private readonly Func<FileLoggerConfiguration> _getConfig = getConfig;
     private static StreamWriter? LogStream;
     private static readonly object Lock = new();
     private static string? CurrentLogFilePath;
     private static DateTime LastFileCreationTime;
-
-    public FileLogger(string name, Func<FileLoggerConfiguration> getConfig)
-    {
-        ArgumentNullException.ThrowIfNull(name, nameof(name));
-        ArgumentNullException.ThrowIfNull(getConfig, nameof(getConfig));
-
-        _name = name;
-        _getConfig = getConfig;
-    }
 
     private static void InitializeLogWriter(Func<FileLoggerConfiguration> getConfig)
     {
@@ -62,14 +55,22 @@ public sealed class FileLogger : ILogger
 
     private static string GetLogFilePath(string directory, FileLoggerConfiguration config)
     {
-        DateTime now = DateTime.Now;
-        string[] files = Directory.GetFiles(directory, $"{now:yyyy-MM-dd}_*.log");
+        string formattedDate = DateTime.Now.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+        string[] files = [.. Directory.GetFiles(directory, $"{formattedDate}*.log").OrderByDescending(File.GetCreationTime)];
         if (files.Length is 0)
-            return Path.Combine(directory, $"{now:yyyy-MM-dd_HH-mm-ss}.log");
+            return Path.Combine(directory, $"{formattedDate}.log");
 
-        FileInfo fileInfo = new(files[^1]);
+        FileInfo fileInfo = new(files[0]);
+        if (fileInfo.Length >= config.MaxFileSize)
+        {
+            string[] fileName = fileInfo.Name.Split('_');
+            int count = (fileName.Length is 1) ? 0 : Convert.ToInt32(fileName[1].Split('.')[0], CultureInfo.InvariantCulture);
+            count++;
 
-        return (fileInfo.Length <= config.MaxFileSize) ? fileInfo.FullName : Path.Combine(directory, $"{now:yyyy-MM-dd_HH-mm-ss}.log");
+            return Path.Combine(directory, $"{formattedDate}_{count}.log");
+        }
+
+        return fileInfo.FullName;
     }
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)

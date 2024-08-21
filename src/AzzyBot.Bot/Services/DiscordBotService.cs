@@ -5,11 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Security;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
+using AzzyBot.Core.Utilities.Records;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
 using DSharpPlus;
@@ -230,9 +232,6 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
         _logger.ExceptionOccured(ex);
 
-        string exMessage = ex.Message;
-        string stackTrace = ex.StackTrace ?? string.Empty;
-        string exInfo = (string.IsNullOrWhiteSpace(stackTrace)) ? exMessage : $"{exMessage}\n{stackTrace}";
         string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss-fffffff", CultureInfo.InvariantCulture);
         ulong errorChannelId = _settings.ErrorChannelId;
         bool errorChannelConfigured = true;
@@ -281,16 +280,17 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             Dictionary<string, string> commandOptions = new(ctx.Command.Parameters.Count);
             ProcessOptions(ctx.Arguments, commandOptions);
 
-            embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), info, discordMessage, discordUser, commandName, commandOptions);
+            embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture), info, discordMessage, discordUser, commandName, commandOptions);
         }
         else
         {
-            embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture), info);
+            embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture), info);
         }
 
         try
         {
-            string tempFilePath = await FileOperations.CreateTempFileAsync(exInfo, $"StackTrace_{timestampString}.log");
+            string jsonDump = JsonSerializer.Serialize<SerializableExceptionsRecord>(new(ex, info), FileOperations.JsonOptions);
+            string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, $"AzzyBotException_{timestampString}.json");
 
             bool messageSent = await SendMessageAsync(errorChannelId, (errorChannelConfigured) ? BugReportMessage : ErrorChannelNotConfigured, [embed], [tempFilePath]);
             if (!messageSent)
@@ -300,7 +300,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
             return true;
         }
-        catch (Exception e) when (e is IOException or SecurityException or UnauthorizedAccessException)
+        catch (Exception e) when (e is IOException or NotSupportedException or SecurityException or UnauthorizedAccessException)
         {
             _logger.UnableToLogException(e.ToString());
         }
@@ -586,12 +586,12 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             string name = kvp.Key.Name;
             string value = kvp.Value?.ToString() ?? "undefined";
 
-            if (!string.IsNullOrWhiteSpace(name) && value is not "0" && value is not "undefined")
+            if (!string.IsNullOrWhiteSpace(name) && value is not "0" or "undefined")
                 commandParameters.Add(name, value);
         }
     }
 
-    private static DiscordEmbedBuilder CreateExceptionEmbed(Exception ex, string timestamp, string? jsonMessage = null, DiscordMessage? message = null, DiscordUser? user = null, string? commandName = null, Dictionary<string, string>? commandOptions = null)
+    private DiscordEmbedBuilder CreateExceptionEmbed(Exception ex, string timestamp, string? jsonMessage = null, DiscordMessage? message = null, DiscordUser? user = null, string? commandName = null, Dictionary<string, string>? commandOptions = null)
     {
         ArgumentNullException.ThrowIfNull(ex, nameof(ex));
         ArgumentNullException.ThrowIfNull(timestamp, nameof(timestamp));
@@ -600,6 +600,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         string arch = HardwareStats.GetSystemOsArch;
         string botName = SoftwareStats.GetAppName;
         string botVersion = SoftwareStats.GetAppVersion;
+        string botIconUrl = _client.CurrentUser.AvatarUrl;
 
         DiscordEmbedBuilder builder = new()
         {
@@ -613,6 +614,9 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             builder.AddField("Advanced Error", jsonMessage);
 
         builder.AddField("Timestamp", timestamp);
+
+        if (!string.IsNullOrWhiteSpace(ex.Source))
+            builder.AddField("Source", ex.Source);
 
         if (message is not null)
             builder.AddField("Message", message.JumpLink.ToString());
@@ -636,7 +640,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
         builder.AddField("OS", os);
         builder.AddField("Arch", arch);
-        builder.WithAuthor(botName, BugReportUrl);
+        builder.WithAuthor(botName, BugReportUrl, botIconUrl);
         builder.WithFooter($"Version: {botVersion}");
 
         return builder;
