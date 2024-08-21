@@ -232,10 +232,6 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
         _logger.ExceptionOccured(ex);
 
-        string exMessage = ex.Message;
-        string stackTrace = ex.StackTrace ?? string.Empty;
-        string exSource = ex.Source ?? string.Empty;
-        string exInfo = (!string.IsNullOrWhiteSpace(stackTrace)) ? $"{exMessage}\n{stackTrace}" : exMessage;
         string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss-fffffff", CultureInfo.InvariantCulture);
         ulong errorChannelId = _settings.ErrorChannelId;
         bool errorChannelConfigured = true;
@@ -284,11 +280,11 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             Dictionary<string, string> commandOptions = new(ctx.Command.Parameters.Count);
             ProcessOptions(ctx.Arguments, commandOptions);
 
-            embed = CreateExceptionEmbed(ex, timestampString, exSource, info, discordMessage, discordUser, commandName, commandOptions);
+            embed = CreateExceptionEmbed(ex, timestampString, info, discordMessage, discordUser, commandName, commandOptions);
         }
         else
         {
-            embed = CreateExceptionEmbed(ex, timestampString, exSource, info);
+            embed = CreateExceptionEmbed(ex, timestampString, info);
         }
 
         try
@@ -595,7 +591,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         }
     }
 
-    private DiscordEmbedBuilder CreateExceptionEmbed(Exception ex, string timestamp, string? exSource = null, string? jsonMessage = null, DiscordMessage? message = null, DiscordUser? user = null, string? commandName = null, Dictionary<string, string>? commandOptions = null)
+    private DiscordEmbedBuilder CreateExceptionEmbed(Exception ex, string timestamp, string? jsonMessage = null, DiscordMessage? message = null, DiscordUser? user = null, string? commandName = null, Dictionary<string, string>? commandOptions = null)
     {
         ArgumentNullException.ThrowIfNull(ex, nameof(ex));
         ArgumentNullException.ThrowIfNull(timestamp, nameof(timestamp));
@@ -619,8 +615,8 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
         builder.AddField("Timestamp", timestamp);
 
-        if (!string.IsNullOrWhiteSpace(exSource))
-            builder.AddField("Source", exSource);
+        if (!string.IsNullOrWhiteSpace(ex.Source))
+            builder.AddField("Source", ex.Source);
 
         if (message is not null)
             builder.AddField("Message", message.JumpLink.ToString());
