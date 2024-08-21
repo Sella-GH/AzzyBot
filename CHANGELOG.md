@@ -1,4 +1,9 @@
-## 2.0.1
+## 2.1.0
+### Improvements
+- Exception embeds now produce json output instead of a stacktrace.log file
+- Changed file logging naming scheme to be less confusing
+
+## 2.0.1 - 2024-08-18
 ### General
 - `admin change-bot-status` requires activity, status and doing to be set now
 
