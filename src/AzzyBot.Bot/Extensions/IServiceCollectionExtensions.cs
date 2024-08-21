@@ -170,9 +170,12 @@ public static class IServiceCollectionExtensions
 
     private static void DiscordClientCommands(this IServiceCollection services, AzzyBotSettingsRecord settings)
     {
+        services.AddSingleton<DiscordCommandsErrorHandler>();
         services.AddCommandsExtension(c =>
         {
-            c.CommandErrored += DiscordCommandsErrorHandler.CommandErroredAsync;
+            DiscordCommandsErrorHandler handler = c.ServiceProvider.GetRequiredService<DiscordCommandsErrorHandler>();
+
+            c.CommandErrored += handler.CommandErroredAsync;
 
             // Only add admin commands to the main server
             c.AddCommand(typeof(AdminCommands.AdminGroup), settings.ServerId);

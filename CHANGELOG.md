@@ -1,4 +1,9 @@
-## 2.0.1
+## 2.1.0
+### Improvements
+- Exception embeds now produce json output instead of a stacktrace.log file
+- Changed file logging naming scheme to be less confusing
+
+## 2.0.1 - 2024-08-18
 ### General
 - `admin change-bot-status` requires activity, status and doing to be set now
 
@@ -8,10 +13,24 @@
 
 ### Improvements
 - Greatly refactored the handling of DSharpPlus related stuff
+- The usual connection error message of updating AzuraCast should not be shown anymore
+- `core stats hardware` now shows the latency to discord
+- More internal restructuring to make the code more functional
+- File logging now rotates the logs daily or when exceeding 24.9 MB file size
+- Adjusted maximum upload size of `music upload-files` to 49.9 MB
+- Leftover servers in database are now removed every day
 
-## 2.0.0
+### Fixes
+- MusicStreaming commands exit correctly now when there is an error
+- Command error handling works flawlessly again
+- `admin get-joined-server` works again (and shows the server defined in `AzzyBotSettingsDocker.json` too)
+- `player now-playing` doesn't throws an error when it's used while playing a mount point
+
+## 2.0.0 - 2024-08-11
 ### General
 - Complete rewrite of the bot using newest technologies
 - Includes a database to store your settings and other important data
 - New commands to manage your bot and settings
 - Support for multiple servers, multiple stations and multiple users
+
+Read the [docs](https://github.com/Sella-GH/AzzyBot/wiki/) if you need help setting the bot up.

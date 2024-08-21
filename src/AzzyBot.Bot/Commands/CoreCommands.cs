@@ -118,13 +118,14 @@ public sealed class CoreCommands
             public async ValueTask HardwareStatsAsync(SlashCommandContext context)
             {
                 ArgumentNullException.ThrowIfNull(context, nameof(context));
+                ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
                 _logger.CommandRequested(nameof(HardwareStatsAsync), context.User.GlobalName);
 
                 await context.DeferResponseAsync();
 
                 Uri avaUrl = new(context.Client.CurrentUser.AvatarUrl);
-                DiscordEmbed embed = await EmbedBuilder.BuildAzzyHardwareStatsEmbedAsync(avaUrl);
+                DiscordEmbed embed = await EmbedBuilder.BuildAzzyHardwareStatsEmbedAsync(avaUrl, context.Client.GetConnectionLatency(context.Guild.Id).Milliseconds);
 
                 await context.EditResponseAsync(embed);
             }
@@ -153,7 +154,7 @@ public sealed class CoreCommands
 
                 _logger.CommandRequested(nameof(PingAsync), context.User.GlobalName);
 
-                await context.RespondAsync($"Pong! {context.Client.GetConnectionLatency(context.Guild.Id)}ms");
+                await context.RespondAsync($"Pong! {context.Client.GetConnectionLatency(context.Guild.Id).Milliseconds} ms");
             }
         }
     }

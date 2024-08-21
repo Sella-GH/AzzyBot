@@ -52,6 +52,8 @@ public static class GeneralStrings
     public const string VoiceLeft = "I'm gone now.";
     public const string VoiceNotConnected = "You are not connected to a voice channel.";
     public const string VoiceNoUser = "Discord didn't told me you're in a voice channel, please rejoin.";
+    public const string VoiceNothingPlaying = "There is nothing playing right now.";
+    public const string VoicePlayingAzuraCast = "The current played song is from an AzuraCast station. Please use `music now-playing` to get the information.";
     public const string VoicePlayMount = "I'm starting to play **%station%** now.";
     public const string VoicePlaySong = "I'm starting to play **%track%** by **%artist%** now.";
     public const string VoiceStop = "I'm stopping the music now.";

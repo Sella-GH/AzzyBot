@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -107,11 +108,11 @@ public static class FileOperations
         return File.ReadAllTextAsync(path);
     }
 
-    public static IEnumerable<string> GetFilesInDirectory(string path)
+    public static IEnumerable<string> GetFilesInDirectory(string path, bool latest = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path, nameof(path));
 
-        return Directory.GetFiles(path);
+        return (!latest) ? Directory.GetFiles(path) : Directory.GetFiles(path).OrderDescending();
     }
 
     public static async Task WriteToFileAsync(string path, string content)

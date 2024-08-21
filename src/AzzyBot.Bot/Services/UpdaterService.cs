@@ -109,7 +109,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
         if (_settings.Updater.DisplayInstructions)
             embeds.Add(EmbedBuilder.BuildAzzyUpdatesInstructionsEmbed());
 
-        DiscordGuild? discordGuild = await _botService.GetDiscordGuildAsync();
+        DiscordGuild? discordGuild = _botService.GetDiscordGuild();
         if (discordGuild is null)
         {
             _logger.DiscordItemNotFound(nameof(DiscordGuild), _settings.ServerId);

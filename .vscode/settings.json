@@ -1,6 +1,8 @@
 {
     "csharp.debug.sourceFileMap":
     {
-        "./": "${workspaceFolder}/src/AzzyBot-Next.Bot/"
+        "./AzzyBot.Bot": "${workspaceFolder}/src/AzzyBot.Bot/",
+        "./AzzyBot.Core": "${workspaceFolder}/src/AzzyBot.Core/",
+        "./AzzyBot.Data": "${workspaceFolder}/src/AzzyBot.Data/",
     }
 }
