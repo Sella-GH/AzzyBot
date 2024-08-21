@@ -280,11 +280,11 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             Dictionary<string, string> commandOptions = new(ctx.Command.Parameters.Count);
             ProcessOptions(ctx.Arguments, commandOptions);
 
-            embed = CreateExceptionEmbed(ex, timestampString, info, discordMessage, discordUser, commandName, commandOptions);
+            embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture), info, discordMessage, discordUser, commandName, commandOptions);
         }
         else
         {
-            embed = CreateExceptionEmbed(ex, timestampString, info);
+            embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture), info);
         }
 
         try
@@ -586,7 +586,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             string name = kvp.Key.Name;
             string value = kvp.Value?.ToString() ?? "undefined";
 
-            if (!string.IsNullOrWhiteSpace(name) && value is not "0" && value is not "undefined")
+            if (!string.IsNullOrWhiteSpace(name) && value is not "0" or "undefined")
                 commandParameters.Add(name, value);
         }
     }
