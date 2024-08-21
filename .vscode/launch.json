@@ -5,13 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "AzzyBot-Next Debug",
+            "name": "AzzyBot Debug",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build-next",
-            "program": "${workspaceFolder}/artifacts/bin/AzzyBot-Next.Bot/Debug/AzzyBot-Dev.dll",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/artifacts/bin/AzzyBot.Bot/Debug/AzzyBot-Dev.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/artifacts/bin/AzzyBot-Next.Bot/Debug",
+            "cwd": "${workspaceFolder}/artifacts/bin/AzzyBot.Bot/Debug",
             "env": {
                 "DYLD_LIBRARY_PATH": "/opt/homebrew/opt/openssl@3/lib"
             },

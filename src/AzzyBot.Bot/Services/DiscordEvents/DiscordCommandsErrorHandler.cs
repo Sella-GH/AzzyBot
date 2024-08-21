@@ -6,24 +6,22 @@ using DSharpPlus.Commands.EventArgs;
 using DSharpPlus.Commands.Exceptions;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Exceptions;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.DiscordEvents;
 
-public static class DiscordCommandsErrorHandler
+public sealed class DiscordCommandsErrorHandler(ILogger<DiscordCommandsErrorHandler> logger, DiscordBotService botService)
 {
-    public static async Task CommandErroredAsync(CommandsExtension c, CommandErroredEventArgs e)
+    private readonly ILogger<DiscordCommandsErrorHandler> _logger = logger;
+    private readonly DiscordBotService _botService = botService;
+
+    public async Task CommandErroredAsync(CommandsExtension c, CommandErroredEventArgs e)
     {
         ArgumentNullException.ThrowIfNull(c, nameof(c));
         ArgumentNullException.ThrowIfNull(e, nameof(e));
 
-        IServiceProvider sp = c.ServiceProvider;
-        ILogger logger = sp.GetRequiredService<ILogger>();
-        DiscordBotService botService = sp.GetRequiredService<DiscordBotService>();
-
-        logger.CommandsError();
-        logger.CommandsErrorType(e.Exception.GetType().Name);
+        _logger.CommandsError();
+        _logger.CommandsErrorType(e.Exception.GetType().Name);
 
         Exception ex = e.Exception;
         DateTime now = DateTime.Now;
@@ -33,22 +31,22 @@ public static class DiscordCommandsErrorHandler
 
         if (e.Context is not SlashCommandContext slashContext)
         {
-            await botService.LogExceptionAsync(ex, now, guildId: guildId);
+            await _botService.LogExceptionAsync(ex, now, guildId: guildId);
             return;
         }
 
         switch (ex)
         {
             case ChecksFailedException checksFailed:
-                await botService.RespondToChecksExceptionAsync(checksFailed, slashContext);
+                await _botService.RespondToChecksExceptionAsync(checksFailed, slashContext);
                 break;
 
             case DiscordException:
-                await botService.LogExceptionAsync(ex, now, slashContext, guildId, ((DiscordException)e.Exception).JsonMessage);
+                await _botService.LogExceptionAsync(ex, now, slashContext, guildId, ((DiscordException)e.Exception).JsonMessage);
                 break;
 
             default:
-                await botService.LogExceptionAsync(ex, now, slashContext, guildId);
+                await _botService.LogExceptionAsync(ex, now, slashContext, guildId);
                 break;
         }
     }

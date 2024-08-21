@@ -694,7 +694,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            await PutToApiAsync(baseUrl, endpoint, headers: CreateHeader(apiKey));
+            await PutToApiAsync(baseUrl, endpoint, headers: CreateHeader(apiKey), ignoreException: true);
         }
         catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException or TaskCanceledException)
         {
