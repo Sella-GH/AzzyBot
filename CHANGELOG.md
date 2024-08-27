@@ -1,6 +1,6 @@
 ## 2.1.0
 ### Dependencies
-- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02357
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02358
 - Updated [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET) to version 4.0.24
 
 ### Improvements
