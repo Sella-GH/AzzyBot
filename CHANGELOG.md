@@ -1,3 +1,11 @@
+## 2.0.2
+### General
+- Recreation of docker images because of vulnerabilites
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02360
+- Updated [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET) to version 4.0.25
+
 ## 2.0.1
 ### General
 - `admin change-bot-status` requires activity, status and doing to be set now
