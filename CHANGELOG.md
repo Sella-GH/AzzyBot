@@ -1,11 +1,19 @@
 ## 2.1.0
-### Dependencies
-- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02358
-- Updated [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET) to version 4.0.24
+### Additions
+- Added a new hidden environment variable "FORCE_TRACE" to docker-compose which forces the app to trace log (not recommended for production)
+  - This only works in dev mode
 
 ### Improvements
 - Exception embeds now produce json output instead of a stacktrace.log file
 - Changed file logging naming scheme to be less confusing
+
+## 2.0.2 - 2024-09-03
+### General
+- Recreation of docker images because of vulnerabilites
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02360
+- Updated [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET) to version 4.0.25
 
 ## 2.0.1 - 2024-08-18
 ### General

@@ -33,7 +33,7 @@ public static class ILoggingBuilderExtensions
         return builder;
     }
 
-    public static void AzzyBotLogging(this ILoggingBuilder logging, bool isDev = false, bool forceDebug = false)
+    public static void AzzyBotLogging(this ILoggingBuilder logging, bool isDev = false, bool forceDebug = false, bool forceTrace = false)
     {
         if (!Directory.Exists("Logs"))
             Directory.CreateDirectory("Logs");
@@ -61,5 +61,7 @@ public static class ILoggingBuilderExtensions
             config.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
         });
         logging.SetMinimumLevel((isDev || forceDebug) ? LogLevel.Debug : LogLevel.Information);
+        if (isDev && forceTrace)
+            logging.SetMinimumLevel(LogLevel.Trace);
     }
 }
