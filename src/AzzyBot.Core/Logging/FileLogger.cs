@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Core.Logging;
@@ -12,7 +13,7 @@ public sealed class FileLogger(string name, Func<FileLoggerConfiguration> getCon
     private readonly string _name = name;
     private readonly Func<FileLoggerConfiguration> _getConfig = getConfig;
     private static StreamWriter? LogStream;
-    private static readonly object Lock = new();
+    private static readonly Lock Lock = new();
     private static string? CurrentLogFilePath;
     private static DateTime LastFileCreationTime;
 
