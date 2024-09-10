@@ -12,6 +12,13 @@
 - Changed file logging naming scheme to be less confusing
 - Startup logging now shows the .NET version too
 
+## 2.0.3 - 2024-09-10
+### General
+- Recreation of docker images because of vulnerabilites
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02361
+
 ## 2.0.2 - 2024-09-03
 ### General
 - Recreation of docker images because of vulnerabilites
