@@ -1,5 +1,5 @@
 # BUILD IMAGE
-FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0-preview-alpine AS build
 USER root
 RUN apk update && apk upgrade && apk cache sync
 WORKDIR /build
@@ -11,7 +11,7 @@ RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --force --no-cache
 RUN dotnet publish ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -a $ARCH -c $CONFIG --os $OS -o out
 
 # RUNNER IMAGE
-FROM mcr.microsoft.com/dotnet/runtime:9.0-alpine
+FROM mcr.microsoft.com/dotnet/runtime:9.0-preview-alpine
 USER root
 
 # Add environment variables
