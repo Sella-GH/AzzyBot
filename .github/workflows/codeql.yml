@@ -80,8 +80,10 @@ jobs:
       with:
         dotnet-version: '9'
 
-    - name: Build
-      run: dotnet publish /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Debug
+    - name: Build Debug
+      run: |
+        dotnet restore --force --no-cache
+        dotnet publish /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Debug
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3

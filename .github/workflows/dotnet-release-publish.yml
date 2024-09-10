@@ -90,6 +90,7 @@ jobs:
       
       - name: Publish Bot Release
         run: |
+          dotnet restore --force --no-cache
           dotnet publish /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Release -r ${{ matrix.os }}-${{ matrix.arch }}
           
       #- name: Download and extract Lavalink
