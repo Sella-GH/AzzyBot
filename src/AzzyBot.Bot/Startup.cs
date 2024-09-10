@@ -17,6 +17,7 @@ public static class Startup
         bool isDev = environment == Environments.Development;
         bool isDocker = HardwareStats.CheckIfDocker;
         bool forceDebug = (isDocker) ? (Environment.GetEnvironmentVariable("FORCE_DEBUG") is "true") : (args?.Length > 0 && args.Contains("-forceDebug"));
+        bool forceTrace = (isDocker) ? (Environment.GetEnvironmentVariable("FORCE_TRACE") is "true") : (args?.Length > 0 && args.Contains("-forceTrace"));
         bool SkipWaiting = (isDocker) ? (Environment.GetEnvironmentVariable("SKIP_WAITING") is "true") : (args?.Length > 0 && args.Contains("-skipWaiting"));
 
         if (isDocker && !SkipWaiting)
@@ -46,7 +47,7 @@ public static class Startup
 
         #region Add logging
 
-        appBuilder.Logging.AzzyBotLogging(isDev, forceDebug);
+        appBuilder.Logging.AzzyBotLogging(isDev, forceDebug, forceTrace);
 
         #endregion Add logging
 
