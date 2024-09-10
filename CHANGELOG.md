@@ -10,6 +10,7 @@
 ### Improvements
 - Exception embeds now produce json output instead of a stacktrace.log file
 - Changed file logging naming scheme to be less confusing
+- Startup logging now shows the .NET version too
 
 ## 2.0.2 - 2024-09-03
 ### General

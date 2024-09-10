@@ -30,8 +30,9 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
         string version = SoftwareStats.GetAppVersion;
         string arch = HardwareStats.GetSystemOsArch;
         string os = HardwareStats.GetSystemOs;
+        string dotnet = SoftwareStats.GetAppDotNetVersion;
 
-        _logger.BotStarting(name, version, os, arch);
+        _logger.BotStarting(name, version, os, arch, dotnet);
 
         if (_settings.Database is not null && !string.IsNullOrWhiteSpace(_settings.Database.NewEncryptionKey) && (_settings.Database.NewEncryptionKey != _settings.Database.EncryptionKey))
             await ReencryptDatabaseAsync();
