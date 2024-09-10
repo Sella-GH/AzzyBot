@@ -37,7 +37,7 @@
     <PackageProjectUrl>https://github.com/Sella-GH/AzzyBot</PackageProjectUrl>
     <RepositoryType>Git</RepositoryType>
     <RepositoryUrl>https://github.com/Sella-GH/AzzyBot</RepositoryUrl>
-    <Version>2.0.2</Version>
+    <Version>2.0.3</Version>
   </PropertyGroup>
 
   <!-- Package stuff -->
