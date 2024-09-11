@@ -1,5 +1,5 @@
 # BUILD IMAGE
-FROM mcr.microsoft.com/dotnet/sdk:9.0-preview-bookworm-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0-bookworm-slim AS build
 USER root
 RUN apt update && apt upgrade -y && apt autoremove -y && apt clean -y
 WORKDIR /build
@@ -11,7 +11,7 @@ RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --force --no-cache
 RUN dotnet publish ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -a $ARCH -c $CONFIG --os $OS -o out
 
 # RUNNER IMAGE
-FROM mcr.microsoft.com/dotnet/runtime:9.0-preview-bookworm-slim
+FROM mcr.microsoft.com/dotnet/runtime:9.0-bookworm-slim
 USER root
 
 # Add environment variables
