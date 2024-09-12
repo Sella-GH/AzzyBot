@@ -9,9 +9,10 @@
     <PackageVersion Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02361" />
     <PackageVersion Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="8.1.3" />
     <PackageVersion Include="Lavalink4NET.DSharpPlus.Nightly" Version="4.0.25" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0-preview.7.24405.3" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0-rc.1.24451.1" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.0-rc.1.24431.7" />
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0-preview.7" />
+    <PackageVersion Include="Npgsql" Version="9.0.0-preview.1-ci.20240910T140933" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0-rc.1-ci.20240902T175811" />
     <PackageVersion Include="Roslynator.Analyzers" Version="4.12.4" />
     <PackageVersion Include="Roslynator.CodeAnalysis.Analyzers" Version="4.12.4" />
     <PackageVersion Include="Roslynator.CodeFixes" Version="4.12.4" />
