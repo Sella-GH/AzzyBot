@@ -7,7 +7,7 @@ COPY ./ ./
 ARG ARCH
 ARG CONFIG
 ARG OS
-RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --force --no-cache
+RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --force --no-http-cache
 RUN dotnet publish ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -a $ARCH -c $CONFIG --os $OS -o out
 
 # RUNNER IMAGE
