@@ -11,7 +11,7 @@ RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --force --no-http-cache
 RUN dotnet publish ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -a $ARCH -c $CONFIG --os $OS -o out
 
 # RUNNER IMAGE
-FROM mcr.microsoft.com/dotnet/runtime:9.0-bookworm-slim
+FROM mcr.microsoft.com/dotnet/runtime:9.0-bookworm-slim AS runner
 USER root
 
 # Add environment variables
