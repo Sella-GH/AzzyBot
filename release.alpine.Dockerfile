@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:labs
+
 # BUILD IMAGE
 FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
 USER root
