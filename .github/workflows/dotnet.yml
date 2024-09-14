@@ -70,7 +70,7 @@ jobs:
       
      - name: Publish Bot Debug
        run: |
-         dotnet restore --force --no-cache
+         dotnet restore --force --no-http-cache --configfile ./Nuget.config
          dotnet publish /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Debug -r ${{ matrix.os }}-${{ matrix.arch }}
 
      #- name: Download and extract Lavalink
