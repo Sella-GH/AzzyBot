@@ -5,6 +5,7 @@
     <DebugType>embedded</DebugType>
     <Optimize Condition="'$(Configuration)'=='Debug' OR '$(Configuration)'=='Docker-debug'">False</Optimize>
     <Optimize Condition="'$(Configuration)'=='Release' OR '$(Configuration)'=='Docker'">True</Optimize>
+    <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <!-- Development stuff -->

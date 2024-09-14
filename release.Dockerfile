@@ -25,7 +25,7 @@ RUN apt install -y --no-install-recommends iputils-ping
 
 # Copy the built app
 WORKDIR /app
-COPY --from=build /build/out .
+COPY --exclude=*.xml --from=build /build/out .
 
 # Add commit, timestamp and lines of code
 ARG COMMIT

@@ -1,7 +1,7 @@
 ## 2.1.0
 ### General
-- Updated to .NET 9
-  - This includes all dependencies coming from [Microsoft.Extensions.X](https://github.com/dotnet/runtime)
+- Updated to .NET 9 including all dependencies
+- Dockerfile improvements to improve image size
 
 ### Additions
 - Added a new hidden environment variable "FORCE_TRACE" to docker-compose which forces the app to trace log (not recommended for production)
