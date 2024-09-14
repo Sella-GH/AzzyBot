@@ -12,7 +12,7 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0-rc.1.24451.1" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.0-rc.1.24431.7" />
     <PackageVersion Include="Npgsql" Version="9.0.0-preview.1-ci.20240913T160017" />
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0-rc.1-ci.20240902T175811" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0-rc.1" />
     <PackageVersion Include="Roslynator.Analyzers" Version="4.12.5" />
     <PackageVersion Include="Roslynator.CodeAnalysis.Analyzers" Version="4.12.5" />
     <PackageVersion Include="Roslynator.CodeFixes" Version="4.12.5" />
