@@ -7,6 +7,20 @@
 - Exception embeds now produce json output instead of a stacktrace.log file
 - Changed file logging naming scheme to be less confusing
 
+## 2.0.4 - 2024-09-21
+### Dependencies
+- Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.12.5
+
+### Fixes
+- AzuraCast Central update responses are now more reliable and don't throw exceptions anymore
+
+## 2.0.3 - 2024-09-10
+### General
+- Recreation of docker images because of vulnerabilites
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02361
+
 ## 2.0.2 - 2024-09-03
 ### General
 - Recreation of docker images because of vulnerabilites
