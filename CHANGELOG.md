@@ -1,3 +1,10 @@
+## 2.0.4
+### Dependencies
+- Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.12.5
+
+### Fixes
+- AzuraCast Central update responses are now more reliable and don't throw exceptions anymore
+
 ## 2.0.3
 ### General
 - Recreation of docker images because of vulnerabilites
