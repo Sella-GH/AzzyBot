@@ -30,6 +30,7 @@ public static class GeneralStrings
     public const string GuildNotFound = "This server does not exist in the database.";
     public const string HlsNotAvailable = "This station does not support HLS streaming.";
     public const string InstanceNotFound = "AzuraCast is not set up for this server.";
+    public const string InstanceUpdateError = "An error occurred while checking for AzuraCast updates.";
     public const string InstanceUpToDate = "AzuraCast is already up to date.";
     public const string MessageSentToAll = "Your message has been sent to all servers.";
     public const string MountPointNotFound = "This mount point does not exist.";
