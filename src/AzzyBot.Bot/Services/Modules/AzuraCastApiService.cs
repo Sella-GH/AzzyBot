@@ -180,7 +180,10 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
             return default;
 
         if (typeof(T) == typeof(string))
-            return (T)(object)body;
+        {
+            object? obj = body;
+            return (T)obj;
+        }
 
         try
         {
