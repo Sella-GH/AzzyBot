@@ -162,7 +162,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         Uri url = new($"{baseUrl}api/{endpoint}");
         try
         {
-            return await _webService.GetWebAsync(url, headers, true);
+            return await _webService.GetWebAsync(url, headers, acceptJson: true);
         }
         catch (HttpRequestException ex)
         {
@@ -175,9 +175,15 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
-        string? body = await _webService.GetWebAsync(uri, headers, true, noLogging: noLogging);
+        string? body = await _webService.GetWebAsync(uri, headers, acceptJson: true, noLogging: noLogging);
         if (body is null)
             return default;
+
+        if (typeof(T) == typeof(string))
+        {
+            object? obj = body;
+            return (T)obj;
+        }
 
         try
         {
@@ -290,7 +296,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentException.ThrowIfNullOrWhiteSpace(downloadPath, nameof(downloadPath));
 
-        await _webService.DownloadAsync(url, downloadPath, CreateHeader(apiKey), true);
+        await _webService.DownloadAsync(url, downloadPath, CreateHeader(apiKey), acceptJson: true);
     }
 
     public async Task<IEnumerable<AzuraFilesRecord>> GetFilesLocalAsync(int guildId, int azuraCastId, int databaseId, int stationId)
@@ -530,13 +536,13 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         return GetFromApiAsync<AzuraSystemLogsRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
-    public Task<AzuraUpdateRecord?> GetUpdatesAsync(Uri baseUrl, string apiKey)
+    public Task<string?> GetUpdatesAsync(Uri baseUrl, string apiKey)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Updates}";
 
-        return GetFromApiAsync<AzuraUpdateRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+        return GetFromApiAsync<string>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
     public async Task ModifyStationAdminConfigAsync(Uri baseUrl, string apiKey, int stationId, AzuraAdminStationConfigRecord config)
