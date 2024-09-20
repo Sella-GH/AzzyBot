@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Utilities;
@@ -30,7 +31,25 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
         {
             string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
 
-            AzuraUpdateRecord? update = await _azuraCastApiService.GetUpdatesAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), apiKey);
+            string? body = await _azuraCastApiService.GetUpdatesAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), apiKey);
+            if (string.IsNullOrWhiteSpace(body))
+            {
+                await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative updates** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                return;
+            }
+
+            AzuraUpdateRecord? update = null;
+            try
+            {
+                update = JsonSerializer.Deserialize<AzuraUpdateRecord>(body);
+            }
+            catch (JsonException ex)
+            {
+                AzuraUpdateErrorRecord? errorRecord = JsonSerializer.Deserialize<AzuraUpdateErrorRecord>(body) ?? throw new InvalidOperationException($"Failed to deserialize body: {body}", ex);
+                await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"Failed to check for updates: {errorRecord.FormattedMessage}");
+                return;
+            }
+
             if (update is null)
             {
                 await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative updates** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
