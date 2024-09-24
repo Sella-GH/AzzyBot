@@ -26,7 +26,8 @@ public sealed class AzzyViewLogsAutocomplete : IAutoCompleteProvider
             if (!string.IsNullOrWhiteSpace(search) && !file.Contains(search, StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            results.Add(Path.GetFileName(file), file);
+            FileInfo fileInfo = new(file);
+            results.Add($"{fileInfo.Name} ({Math.Round(fileInfo.Length / (1024.0 * 1024.0), 2)} MB)", file);
         }
 
         return new ValueTask<IReadOnlyDictionary<string, object>>(results);

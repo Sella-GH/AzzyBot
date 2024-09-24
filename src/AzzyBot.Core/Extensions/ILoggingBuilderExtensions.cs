@@ -1,45 +1,43 @@
 using System;
+using System.Globalization;
 using System.IO;
-using AzzyBot.Core.Logging;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Linq;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Configuration;
 using Microsoft.Extensions.Logging.Console;
+using NReco.Logging.File;
 
 namespace AzzyBot.Core.Extensions;
 
 public static class ILoggingBuilderExtensions
 {
-    public static ILoggingBuilder AddFile(this ILoggingBuilder builder)
-    {
-        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-
-        builder.AddConfiguration();
-        builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, FileLoggerProvider>());
-        LoggerProviderOptions.RegisterProviderOptions<FileLoggerConfiguration, FileLoggerProvider>(builder.Services);
-
-        return builder;
-    }
-
-    public static ILoggingBuilder AddFile(this ILoggingBuilder builder, Action<FileLoggerConfiguration> configure)
-    {
-        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-        ArgumentNullException.ThrowIfNull(configure, nameof(configure));
-
-        builder.AddFile();
-        builder.Services.Configure(configure);
-
-        return builder;
-    }
-
-    public static void AzzyBotLogging(this ILoggingBuilder logging, bool isDev = false, bool forceDebug = false, bool forceTrace = false)
+    public static void AzzyBotLogging(this ILoggingBuilder logging, int logDays = 7, bool isDev = false, bool forceDebug = false, bool forceTrace = false)
     {
         if (!Directory.Exists("Logs"))
             Directory.CreateDirectory("Logs");
 
+        foreach (string file in Directory.GetFiles("Logs").Where(static f => !f.StartsWith("AzzyBot_", StringComparison.InvariantCultureIgnoreCase)))
+        {
+            File.Delete(file);
+        }
+
         logging.AddConsole();
-        logging.AddFile(static config => config.Directory = "Logs");
+        logging.AddFile(Path.Combine("Logs", $"AzzyBot_{DateTime.Now:yyyy-MM-dd}.log"), c =>
+        {
+            c.Append = true;
+            c.FileSizeLimitBytes = 10380902; // ~9.9 MB
+            c.MaxRollingFiles = logDays;
+            c.RollingFilesConvention = FileLoggerOptions.FileRollingConvention.Descending;
+            c.UseUtcTimestamp = false;
+            c.FormatLogFileName = static (logTime) => string.Format(CultureInfo.InvariantCulture, logTime, $"{DateTime.Now:yyyy-MM-dd}");
+            c.FormatLogEntry = static (message) =>
+            {
+                string logMessage = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message.LogLevel}: {message.LogName}[{message.EventId}] {message.Message}";
+                if (message.Exception is not null)
+                    logMessage += Environment.NewLine + message.Exception;
+
+                return logMessage;
+            };
+        });
         logging.AddFilter("Microsoft.EntityFrameworkCore.ChangeTracking", LogLevel.Warning);
         logging.AddFilter("Microsoft.EntityFrameworkCore.Database", (isDev || forceDebug) ? LogLevel.Debug : LogLevel.Warning);
         logging.AddFilter("Microsoft.EntityFrameworkCore.Database.Connection", LogLevel.Warning);

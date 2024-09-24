@@ -10,7 +10,6 @@ public sealed record AzzyBotSettingsRecord
     public required ulong ServerId { get; init; }
     public required ulong ErrorChannelId { get; init; }
     public required ulong NotificationChannelId { get; init; }
-    public required int LogRetentionDays { get; init; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public AppDatabaseSettings? Database { get; init; }
