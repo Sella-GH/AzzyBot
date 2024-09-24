@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using NReco.Logging.File;
@@ -14,10 +15,9 @@ public static class ILoggingBuilderExtensions
         if (!Directory.Exists("Logs"))
             Directory.CreateDirectory("Logs");
 
-        foreach (string file in Directory.GetFiles("Logs"))
+        foreach (string file in Directory.GetFiles("Logs").Where(static f => !f.StartsWith("AzzyBot_", StringComparison.InvariantCultureIgnoreCase)))
         {
-            if (!file.StartsWith("AzzyBot_", StringComparison.InvariantCultureIgnoreCase))
-                File.Delete(file);
+            File.Delete(file);
         }
 
         logging.AddConsole();
