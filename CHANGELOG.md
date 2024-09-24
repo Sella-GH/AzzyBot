@@ -1,11 +1,16 @@
 ## 2.1.0
+### Dependencies
+- Added [NReco.Logging.File](https://github.com/nreco/logging) in version 1.2.1
+
 ### Additions
 - Added a new hidden environment variable "FORCE_TRACE" to docker-compose which forces the app to trace log (not recommended for production)
   - This only works in dev mode
+- Added a new environment variable "LOG_RETENTION_DAYS" to docker-compose which defines how many days the logs should be kept
+  - Default is 7 days
 
 ### Improvements
 - Exception embeds now produce json output instead of a stacktrace.log file
-- Changed file logging naming scheme to be less confusing
+- Reworked the whole file logging system
 
 ## 2.0.4 - 2024-09-21
 ### Dependencies

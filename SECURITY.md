@@ -37,6 +37,7 @@ AzzyBot is not responsible for the development or maintenance of several pieces 
 * [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
 * [Microsoft.Extensions.X Libs](https://github.com/dotnet/runtime)
 * [Npsql](https://github.com/npgsql/npgsql)
+* [NReco.Logging.File](https://github.com/NReco/Logging)
 * [PostgreSQL](https://www.postgresql.org/)
 * [Roslynator](https://github.com/dotnet/roslynator)
 * [System.Linq.Async](https://github.com/dotnet/reactive)
