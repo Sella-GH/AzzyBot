@@ -217,7 +217,7 @@ public sealed class AdminCommands
             string dateTime;
             if (!string.IsNullOrWhiteSpace(logfile))
             {
-                dateTime = Path.GetFileNameWithoutExtension(logfile).Split("_")[0];
+                dateTime = Path.GetFileNameWithoutExtension(logfile).Split("_")[1];
             }
             else
             {
