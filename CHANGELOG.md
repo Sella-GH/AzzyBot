@@ -1,11 +1,17 @@
-## 2.0.4
+## 2.0.5
+- Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.12.6
+
+### Fixes
+- There is no database error anymore when the bot is added to a guild. [#181](https://github.com/Sella-GH/AzzyBot/issues/181)
+
+## 2.0.4 - 2024-09-21
 ### Dependencies
 - Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.12.5
 
 ### Fixes
 - AzuraCast Central update responses are now more reliable and don't throw exceptions anymore
 
-## 2.0.3
+## 2.0.3 - 2024-09-10
 ### General
 - Recreation of docker images because of vulnerabilites
 
