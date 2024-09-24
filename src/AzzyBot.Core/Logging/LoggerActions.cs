@@ -6,12 +6,6 @@ namespace AzzyBot.Core.Logging;
 
 public static partial class LoggerActions
 {
-    [LoggerMessage(0, LogLevel.Debug, "Starting logfile cleaning")]
-    public static partial void LogfileCleaning(this ILogger logger);
-
-    [LoggerMessage(1, LogLevel.Debug, "{number} logfiles were deleted")]
-    public static partial void LogfileDeleted(this ILogger logger, int number);
-
     [LoggerMessage(9, LogLevel.Debug, "Cluster logging test intervall {i}")]
     public static partial void ClusterLoggingTest(this ILogger logger, int i);
 

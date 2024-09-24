@@ -2,22 +2,19 @@
 ### General
 - Updated to .NET 9 including all dependencies
 - Dockerfile improvements to improve image size
+### Dependencies
+- Added [NReco.Logging.File](https://github.com/nreco/logging) in version 1.2.1
 
 ### Additions
 - Added a new hidden environment variable "FORCE_TRACE" to docker-compose which forces the app to trace log (not recommended for production)
   - This only works in dev mode
+- Added a new environment variable "LOG_RETENTION_DAYS" to docker-compose which defines how many days the logs should be kept
+  - Default is 7 days
 
 ### Improvements
 - Exception embeds now produce json output instead of a stacktrace.log file
 - Changed file logging naming scheme to be less confusing
 - Startup logging now shows the .NET version too
-
-## 2.0.3 - 2024-09-10
-### General
-- Recreation of docker images because of vulnerabilites
-
-### Dependencies
-- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02361
 
 ## 2.0.4 - 2024-09-21
 ### Dependencies
