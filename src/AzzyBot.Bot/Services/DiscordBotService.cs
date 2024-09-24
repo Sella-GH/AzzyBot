@@ -430,7 +430,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         List<FileStream> streams = new(10);
         if (filePaths?.Count > 0 && filePaths.Count <= 10)
         {
-            const long maxFileSize = 26214400; // 25 MB
+            const long maxFileSize = 10380902; // ~9-9 MB
             long allFileSize = 0;
 
             foreach (string path in filePaths)
