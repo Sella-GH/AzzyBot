@@ -719,7 +719,7 @@ public sealed class AzuraCastCommands
             {
                 dateTime = DateTime.Today;
             }
-            else if (!DateTime.TryParse(date, out dateTime))
+            else if (!DateTime.TryParse(date, CultureInfo.CurrentCulture, out dateTime))
             {
                 await context.EditResponseAsync(GeneralStrings.DateFormatInvalid);
                 return;
