@@ -666,9 +666,12 @@ public static class EmbedBuilder
             ["By"] = new(track.Author, true)
         };
 
+        // Evalute this once there is a bug
+        // As of 2024-09-26 this should work flawlessly
+        // Specificially the *elapsed.Value* variable
         string songDuration = track.Duration.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
-        string songElapsed = (elapsed.HasValue) ? elapsed.Value.ToString(@"mm\:ss", CultureInfo.InvariantCulture) : TimeSpan.FromTicks(0).ToString(@"mm\:ss", CultureInfo.InvariantCulture);
-        string progressBar = Misc.GetProgressBar(14, (elapsed.HasValue) ? elapsed.Value.TotalSeconds : 0, track.Duration.TotalSeconds);
+        string songElapsed = elapsed.Value.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
+        string progressBar = Misc.GetProgressBar(14, elapsed.Value.TotalSeconds, track.Duration.TotalSeconds);
 
         fields.Add("Duration", new($"{progressBar} `[{songElapsed} / {songDuration}]`"));
 

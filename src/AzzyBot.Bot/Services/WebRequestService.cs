@@ -345,7 +345,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             isIpAddress = true;
 
         // If it's an IP address, we can skip the DNS lookup
-        IPAddress[] iPAddresses = (isIpAddress) ? [ipAddress ?? IPAddress.Parse(url.Host)] : await Dns.GetHostAddressesAsync(url.Host);
+        IPAddress[] iPAddresses = (isIpAddress) ? [ipAddress!] : await Dns.GetHostAddressesAsync(url.Host);
 
         if (iPAddresses.Length is 1)
             return iPAddresses[0].AddressFamily;
