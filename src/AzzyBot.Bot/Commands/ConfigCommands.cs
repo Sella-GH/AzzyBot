@@ -457,7 +457,7 @@ public sealed class ConfigCommands
                     return;
                 }
 
-                if (guild.AzuraCast.Stations.FirstOrDefault(s => s.Id == station) is not AzuraCastStationEntity acStation)
+                if (guild.AzuraCast.Stations.FirstOrDefault(s => s.Id == station) is null)
                 {
                     _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, guild.AzuraCast.Id, station);
                     await context.EditResponseAsync(GeneralStrings.StationNotFound);
@@ -521,7 +521,7 @@ public sealed class ConfigCommands
                     return;
                 }
 
-                if (guild.AzuraCast.Stations.FirstOrDefault(s => s.Id == station) is not AzuraCastStationEntity acStation)
+                if (guild.AzuraCast.Stations.FirstOrDefault(s => s.Id == station) is null)
                 {
                     _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, guild.AzuraCast.Id, station);
                     return;
