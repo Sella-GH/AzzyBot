@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Checks;
+using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
@@ -31,8 +32,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
     private readonly AzzyBotSettingsRecord _settings = settings;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordClient _client = client;
-    private const string BugReportUrl = "https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D";
-    private const string BugReportMessage = $"Send a [bug report]({BugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
+    private const string BugReportMessage = "Send a [bug report]([BugReportUri]) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
     private const string ErrorChannelNotConfigured = $"**If you're seeing this message then I am not configured correctly!**\nTell your server admin to run */config modify-core*\n\n{BugReportMessage}";
 
     public bool CheckIfClientIsConnected
@@ -292,7 +292,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             string jsonDump = JsonSerializer.Serialize<SerializableExceptionsRecord>(new(ex, info), FileOperations.JsonOptions);
             string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, $"AzzyBotException_{timestampString}.json");
 
-            bool messageSent = await SendMessageAsync(errorChannelId, (errorChannelConfigured) ? BugReportMessage : ErrorChannelNotConfigured, [embed], [tempFilePath]);
+            bool messageSent = await SendMessageAsync(errorChannelId, (errorChannelConfigured) ? BugReportMessage.Replace("[BugReportUri]", UriStrings.BugReportUri, StringComparison.InvariantCultureIgnoreCase) : ErrorChannelNotConfigured, [embed], [tempFilePath]);
             if (!messageSent)
                 _logger.UnableToSendMessage("Error message was not sent");
 
@@ -640,7 +640,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
         builder.AddField("OS", os);
         builder.AddField("Arch", arch);
-        builder.WithAuthor(botName, BugReportUrl, botIconUrl);
+        builder.WithAuthor(botName, UriStrings.BugReportUri, botIconUrl);
         builder.WithFooter($"Version: {botVersion}");
 
         return builder;

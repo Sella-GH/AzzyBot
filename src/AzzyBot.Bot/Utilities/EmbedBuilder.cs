@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Utilities;
@@ -428,14 +429,10 @@ public static class EmbedBuilder
     public static DiscordEmbed BuildAzzyInfoStatsEmbed(Uri avaUrl, string dspVersion, string commit, in DateTime compileDate, int loc)
     {
         const string title = "AzzyBot Informational Stats";
-        const string githubUrl = "https://github.com/Sella-GH";
-        const string botUrl = $"{githubUrl}/AzzyBot";
-        const string commitUrl = $"{botUrl}/commit";
-        const string contribUrl = $"{botUrl}/graphs/contributors";
         string[] authors = SoftwareStats.GetAppAuthors.Split(',');
         string sourceCode = $"{loc} lines";
-        string formattedAuthors = $"- [{authors[0].Trim()}]({githubUrl})\n- [{authors[1].Trim()}]({contribUrl})";
-        string formattedCommit = $"[{commit}]({commitUrl}/{commit})";
+        string formattedAuthors = $"- [{authors[0].Trim()}]({UriStrings.GitHubCreatorUri})\n- [{authors[1].Trim()}]({UriStrings.GitHubRepoContribUri})";
+        string formattedCommit = $"[{commit}]({UriStrings.GitHubRepoCommitUri}/{commit})";
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(11)
         {
@@ -444,7 +441,7 @@ public static class EmbedBuilder
             [".NET Version"] = new(SoftwareStats.GetAppDotNetVersion, true),
             ["D#+ Version"] = new(dspVersion, true),
             ["Authors"] = new(formattedAuthors, true),
-            ["Repository"] = new($"[GitHub]({botUrl})", true),
+            ["Repository"] = new($"[GitHub]({UriStrings.GitHubRepoUri})", true),
             ["Environment"] = new(SoftwareStats.GetAppEnvironment, true),
             ["Source Code"] = new(sourceCode, true),
             ["Memory Usage"] = new($"{SoftwareStats.GetAppMemoryUsage()} GB", true),

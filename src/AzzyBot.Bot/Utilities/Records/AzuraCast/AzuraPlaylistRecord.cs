@@ -1,5 +1,6 @@
 using System;
 using System.Text.Json.Serialization;
+using AzzyBot.Bot.Resources;
 
 namespace AzzyBot.Bot.Utilities.Records.AzuraCast;
 
@@ -21,22 +22,22 @@ public sealed record AzuraPlaylistRecord
     public string ShortName { get; init; } = string.Empty;
 
     [JsonPropertyName("links")]
-    public AzuraPlaylistLinkRecord Links { get; init; } = new AzuraPlaylistLinkRecord();
+    public AzuraPlaylistLinkRecord Links { get; init; } = new();
 }
 
 public sealed record AzuraPlaylistLinkRecord
 {
     [JsonPropertyName("export")]
-    public AzuraPlaylistLinkExportRecord Export { get; init; } = new AzuraPlaylistLinkExportRecord();
+    public AzuraPlaylistLinkExportRecord Export { get; init; } = new();
 }
 
 public sealed record AzuraPlaylistLinkExportRecord
 {
     [JsonPropertyName("pls")]
-    public Uri PLS { get; init; } = new Uri("https://github.com");
+    public Uri PLS { get; init; } = new(UriStrings.GitHubUri);
 
     [JsonPropertyName("m3u")]
-    public Uri M3U { get; init; } = new Uri("https://github.com");
+    public Uri M3U { get; init; } = new(UriStrings.GitHubUri);
 }
 
 public sealed record AzuraPlaylistStateRecord
