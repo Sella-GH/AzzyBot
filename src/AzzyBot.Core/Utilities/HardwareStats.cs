@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using AzzyBot.Core.Utilities.Records;
@@ -156,7 +155,7 @@ public static class HardwareStats
 
     public static AppDiskUsageRecord GetSystemDiskUsage()
     {
-        DriveInfo drive = DriveInfo.GetDrives().FirstOrDefault(static d => d.IsReady && d.Name == "/") ?? throw new InvalidOperationException("There is more than one root drive");
+        DriveInfo drive = Array.Find(DriveInfo.GetDrives(), static d => d.IsReady && d.Name == "/") ?? throw new InvalidOperationException("There is more than one root drive");
         double totalSize = drive.TotalSize / (1024.0 * 1024.0 * 1024.0);
         double totalFreeSpace = drive.TotalFreeSpace / (1024.0 * 1024.0 * 1024.0);
         double totalUsedSpace = totalSize - totalFreeSpace;
