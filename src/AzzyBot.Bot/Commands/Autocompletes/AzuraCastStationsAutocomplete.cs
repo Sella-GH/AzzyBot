@@ -29,7 +29,6 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
         ArgumentNullException.ThrowIfNull(context, nameof(context));
         ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
 
-        // TODO Solve this more clean and nicer when it's possible
         AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true);
         if (azuraCast is null)
         {

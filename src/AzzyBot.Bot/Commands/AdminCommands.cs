@@ -108,11 +108,17 @@ public sealed class AdminCommands
                 return;
             }
 
-            // TODO This is not suitable for more than a few houndred servers
+            const string tooManyServers = "... and more!";
             StringBuilder stringBuilder = new();
             stringBuilder.AppendLine("I am in the following servers:");
             foreach (DiscordGuild guild in guilds.Values)
             {
+                if (stringBuilder.Length + tooManyServers.Length > 2000)
+                {
+                    stringBuilder.AppendLine(tooManyServers);
+                    break;
+                }
+
                 stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"- {guild.Name} ({guild.Id})");
             }
 
