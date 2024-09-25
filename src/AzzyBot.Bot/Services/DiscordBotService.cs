@@ -134,13 +134,13 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
                 if (guild.AzuraCast.Preferences.OutagesChannelId is not 0)
                     channels.Add(guild.AzuraCast.Preferences.OutagesChannelId);
 
-                foreach (AzuraCastStationEntity station in guild.AzuraCast.Stations)
+                foreach (AzuraCastStationPreferencesEntity station in guild.AzuraCast.Stations.Select(s => s.Preferences))
                 {
-                    if (station.Preferences.FileUploadChannelId is not 0)
-                        channels.Add(station.Preferences.FileUploadChannelId);
+                    if (station.FileUploadChannelId is not 0)
+                        channels.Add(station.FileUploadChannelId);
 
-                    if (station.Preferences.RequestsChannelId is not 0)
-                        channels.Add(station.Preferences.RequestsChannelId);
+                    if (station.RequestsChannelId is not 0)
+                        channels.Add(station.RequestsChannelId);
                 }
             }
 

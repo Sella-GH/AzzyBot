@@ -31,20 +31,20 @@ public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings) : IAuto
         bool adminServer = botOwners.Any(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId);
         bool approvedDebug = guildId == _settings.ServerId;
         Dictionary<string, object> results = new(25);
-        foreach (KeyValuePair<string, List<AzzyHelpRecord>> kvp in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member))
+        foreach (List<AzzyHelpRecord> kvp in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member).Select(k => k.Value))
         {
             if (results.Count is 25)
                 break;
 
-            if (!string.IsNullOrWhiteSpace(search) && kvp.Value.All(r => !r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)))
+            if (!string.IsNullOrWhiteSpace(search) && kvp.All(r => !r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)))
                 continue;
 
-            foreach (AzzyHelpRecord record in kvp.Value.Where(r => r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)))
+            foreach (string record in kvp.Where(r => r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)).Select(r => r.Name))
             {
                 if (results.Count is 25)
                     break;
 
-                results.Add(record.Name, record.Name);
+                results.Add(record, record);
             }
         }
 

@@ -632,19 +632,19 @@ public static class EmbedBuilder
         StringBuilder builder = new();
 
         int count = 0;
-        foreach (ITrackQueueItem item in history.Where(static i => i.Track is not null))
+        foreach (LavalinkTrack item in history.Where(static i => i.Track is not null).Select(i => i.Track!))
         {
             if (title.Length + builder.Length > 6000)
                 break;
 
             if (isQueue)
             {
-                builder.AppendLine(CultureInfo.InvariantCulture, $"- [{count}] **[{item.Track!.Title}]({item.Track!.Uri})** by **{item.Track!.Author}** ({item.Track!.Duration.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture)})");
+                builder.AppendLine(CultureInfo.InvariantCulture, $"- [{count}] **[{item.Title}]({item.Uri})** by **{item.Author}** ({item.Duration.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture)})");
                 count++;
             }
             else
             {
-                builder.AppendLine(CultureInfo.InvariantCulture, $"- **[{item.Track!.Title}]({item.Track!.Uri})** by **{item.Track!.Author}** ({item.Track!.Duration.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture)})");
+                builder.AppendLine(CultureInfo.InvariantCulture, $"- **[{item.Title}]({item.Uri})** by **{item.Author}** ({item.Duration.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture)})");
             }
         }
 
