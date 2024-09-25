@@ -14,7 +14,7 @@ public static class EFCoreExtensions
         return (condition) ? transform(query) : query;
     }
 
-    public static IQueryable<T> InlcudeIf<T, T2>(this IIncludableQueryable<T, T2> query, bool condition, Func<IIncludableQueryable<T, T2>, bool, IQueryable<T>> transform) where T : class
+    public static IQueryable<T> IncludeIf<T, T2>(this IIncludableQueryable<T, T2> query, bool condition, Func<IIncludableQueryable<T, T2>, bool, IQueryable<T>> transform) where T : class
     {
         ArgumentNullException.ThrowIfNull(transform, nameof(transform));
 
