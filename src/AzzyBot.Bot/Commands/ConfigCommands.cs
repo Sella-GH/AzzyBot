@@ -277,22 +277,20 @@ public sealed class ConfigCommands
 
             if (notificationsChannel is not null || outagesChannel is not null)
             {
-                ulong[] channels = [];
-                if (notificationsChannel is null && outagesChannel is not null)
+                ulong[] channels = new ulong[2];
+                if (notificationsChannel is not null)
+                    channels[0] = notificationsChannel.Id;
+
+                if (outagesChannel is not null && channels.Length > 1)
                 {
-                    channels = [outagesChannel.Id];
+                    channels[1] = outagesChannel.Id;
                 }
-                else if (outagesChannel is null && notificationsChannel is not null)
+                else if (outagesChannel is not null)
                 {
-                    channels = [notificationsChannel.Id];
-                }
-                else if (notificationsChannel is not null && outagesChannel is not null)
-                {
-                    channels = [notificationsChannel.Id, outagesChannel.Id];
+                    channels[0] = outagesChannel.Id;
                 }
 
-                if (channels.Length is not 0)
-                    await _botService.CheckPermissionsAsync(context.Guild, channels);
+                await _botService.CheckPermissionsAsync(context.Guild, [.. channels]);
             }
 
             if (url is not null)
@@ -558,18 +556,17 @@ public sealed class ConfigCommands
 
             await context.EditResponseAsync(GeneralStrings.CoreSettingsModified);
 
-            ulong[] channels = [];
-            if (adminChannel is not null && errorChannel is null)
+            ulong[] channels = new ulong[2];
+            if (adminChannel is not null)
+                channels[0] = adminChannel.Id;
+
+            if (errorChannel is not null && channels.Length > 1)
             {
-                channels = [adminChannel.Id];
+                channels[1] = errorChannel.Id;
             }
-            else if (errorChannel is not null && adminChannel is null)
+            else if (errorChannel is not null)
             {
-                channels = [errorChannel.Id];
-            }
-            else if (adminChannel is not null && errorChannel is not null)
-            {
-                channels = [adminChannel.Id, errorChannel.Id];
+                channels[0] = errorChannel.Id;
             }
 
             if (channels.Length is not 0)

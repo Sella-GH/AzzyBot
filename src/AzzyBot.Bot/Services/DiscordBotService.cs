@@ -470,14 +470,14 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             await channel.SendMessageAsync(builder);
         }
 
-        if (streams.Count > 0 && filePaths?.Count > 0)
+        if (streams.Count > 0)
         {
             foreach (FileStream stream in streams)
             {
                 await stream.DisposeAsync();
             }
 
-            foreach (string path in filePaths)
+            foreach (string path in filePaths!)
             {
                 FileOperations.DeleteFile(path);
             }
