@@ -101,8 +101,8 @@ public sealed class ConfigCommands
                 return;
             }
 
-            AzuraCastEntity? azuraCast = guild.AzuraCast;
-            if (azuraCast is not null)
+            AzuraCastEntity? ac = guild.AzuraCast;
+            if (ac is not null)
             {
                 _logger.DatabaseAzuraCastNotFound(guildId);
                 await context.DeleteResponseAsync();
@@ -196,15 +196,15 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(DeleteAzuraCastAsync), context.User.GlobalName);
 
-            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
-            if (azuraCast is null)
+            AzuraCastEntity? ac = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
+            if (ac is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
                 await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
-            FileOperations.DeleteFiles(_azuraCast.FilePath, $"{azuraCast.Id}-");
+            FileOperations.DeleteFiles(_azuraCast.FilePath, $"{ac.Id}-");
             await _dbActions.DeleteAzuraCastAsync(context.Guild.Id);
 
             await context.EditResponseAsync(GeneralStrings.ConfigInstanceDeleted);
@@ -616,18 +616,18 @@ public sealed class ConfigCommands
 
             if (guild.AzuraCast is not null)
             {
-                AzuraCastEntity azuraCast = guild.AzuraCast;
+                AzuraCastEntity ac = guild.AzuraCast;
                 AzuraStationRecord? stationRecord;
-                Dictionary<ulong, string> stationRoles = new(azuraCast.Stations.Count);
-                Dictionary<int, string> stationNames = new(azuraCast.Stations.Count);
-                foreach (AzuraCastStationEntity station in azuraCast.Stations)
+                Dictionary<ulong, string> stationRoles = new(ac.Stations.Count);
+                Dictionary<int, string> stationNames = new(ac.Stations.Count);
+                foreach (AzuraCastStationEntity station in ac.Stations)
                 {
                     DiscordRole? stationAdminRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationAdminRoleId);
                     DiscordRole? stationDjRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationDjRoleId);
                     stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? "Name not found");
                     stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found");
 
-                    stationRecord = await _azuraCast.GetStationAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), station.StationId);
+                    stationRecord = await _azuraCast.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), station.StationId);
                     if (stationRecord is null)
                     {
                         await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
@@ -637,8 +637,8 @@ public sealed class ConfigCommands
                     stationNames.Add(station.Id, stationRecord.Name);
                 }
 
-                DiscordRole? instanceAdminRole = roles.FirstOrDefault(r => r.Id == azuraCast.Preferences.InstanceAdminRoleId);
-                IEnumerable<DiscordEmbed> azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(azuraCast, $"{instanceAdminRole?.Name} ({instanceAdminRole?.Id})", stationRoles, stationNames);
+                DiscordRole? instanceAdminRole = roles.FirstOrDefault(r => r.Id == ac.Preferences.InstanceAdminRoleId);
+                IEnumerable<DiscordEmbed> azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(ac, $"{instanceAdminRole?.Name} ({instanceAdminRole?.Id})", stationRoles, stationNames);
 
                 messageBuilder.AddEmbeds(azuraEmbed);
             }
