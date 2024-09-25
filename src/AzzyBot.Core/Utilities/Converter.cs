@@ -23,7 +23,7 @@ public static class Converter
     /// <returns>The Unix time as <see langword="long"/>.</returns>
     public static long ConvertToUnixTime(in DateTime time)
     {
-        DateTime epoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        DateTime epoch = DateTime.UnixEpoch;
         TimeSpan elapsed = time.ToUniversalTime() - epoch;
 
         return (long)elapsed.TotalSeconds;
