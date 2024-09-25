@@ -28,13 +28,7 @@ public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings) : IAuto
         ulong guildId = context.Guild.Id;
         DiscordMember member = context.Member;
 
-        bool adminServer = false;
-        foreach (DiscordUser _ in botOwners.Where(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId))
-        {
-            adminServer = true;
-            break;
-        }
-
+        bool adminServer = botOwners.Any(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId);
         bool approvedDebug = guildId == _settings.ServerId;
         Dictionary<string, object> results = new(25);
         foreach (KeyValuePair<string, List<AzzyHelpRecord>> kvp in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member))

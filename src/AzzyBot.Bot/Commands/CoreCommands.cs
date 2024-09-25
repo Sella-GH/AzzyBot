@@ -75,13 +75,8 @@ public sealed class CoreCommands
             IEnumerable<DiscordUser> botOwners = context.Client.CurrentApplication.Owners;
             ulong guildId = context.Guild.Id;
             DiscordMember member = context.Member;
-            bool adminServer = false;
-            foreach (DiscordUser _ in botOwners.Where(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId))
-            {
-                adminServer = true;
-                break;
-            }
 
+            bool adminServer = botOwners.Any(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId);
             bool approvedDebug = guildId == _settings.ServerId;
             List<DiscordEmbed> embeds = new(10);
             if (string.IsNullOrWhiteSpace(command))
