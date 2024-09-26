@@ -25,7 +25,7 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
+        ArgumentNullException.ThrowIfNull(azuraCast);
 
         try
         {

@@ -28,17 +28,6 @@ public static class Startup
             await Task.Delay(TimeSpan.FromSeconds(30));
         }
 
-        // https://stackoverflow.com/a/71786309
-        // It works!
-        /*
-        if (AzzyStatsHardware.CheckIfMacOs && (!isDev || isDocker))
-        {
-            await Console.Error.WriteLineAsync("This bot does not support macOS.");
-            await Console.Error.WriteLineAsync("Please use another platform for it, as this one can't handle the security requirements of the AES encryption standard.");
-            return;
-        }
-        */
-
         HostApplicationBuilderSettings appSettings = new()
         {
             ContentRootPath = Directory.GetCurrentDirectory(),

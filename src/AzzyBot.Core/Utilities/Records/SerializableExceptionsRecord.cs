@@ -27,7 +27,7 @@ public sealed record SerializableExceptionsRecord
 
     public SerializableExceptionsRecord(Exception ex, string? info = null)
     {
-        ArgumentNullException.ThrowIfNull(ex, nameof(ex));
+        ArgumentNullException.ThrowIfNull(ex);
 
         Source = ex.Source;
         Type = ex.GetType().ToString();

@@ -49,7 +49,7 @@ public sealed class AdminCommands
             [Description("Reset the bot status to default."), SlashChoiceProvider<BooleanYesNoStateProvider>] int reset = 0
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(ChangeStatusAsync), context.User.GlobalName);
 
@@ -74,7 +74,7 @@ public sealed class AdminCommands
             [Description("Select the server you want to get more information about."), SlashAutoCompleteProvider<GuildsAutocomplete>] string? serverId = null
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(GetJoinedGuildsAsync), context.User.GlobalName);
 
@@ -108,11 +108,17 @@ public sealed class AdminCommands
                 return;
             }
 
-            // TODO This is not suitable for more than a few houndred servers
+            const string tooManyServers = "... and more!";
             StringBuilder stringBuilder = new();
             stringBuilder.AppendLine("I am in the following servers:");
             foreach (DiscordGuild guild in guilds.Values)
             {
+                if (stringBuilder.Length + tooManyServers.Length > 2000)
+                {
+                    stringBuilder.AppendLine(tooManyServers);
+                    break;
+                }
+
                 stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"- {guild.Name} ({guild.Id})");
             }
 
@@ -126,7 +132,7 @@ public sealed class AdminCommands
             [Description("Select the server you want to remove."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(RemoveJoinedGuildAsync), context.User.GlobalName);
 
@@ -164,7 +170,7 @@ public sealed class AdminCommands
             [Description("The message you want to send."), MinMaxLength(1, 2000)] string message
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(SendBotWideMessageAsync), context.User.GlobalName);
 
@@ -208,7 +214,7 @@ public sealed class AdminCommands
             [Description("The log file you want to read."), SlashAutoCompleteProvider<AzzyViewLogsAutocomplete>] string? logfile = null
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(ViewLogsAsync), context.User.GlobalName);
 

@@ -20,9 +20,9 @@ public static class Misc
 
     public static string GetProgressBar(double number, double elapsed, double duration)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(number, nameof(number));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(elapsed, nameof(elapsed));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(duration, nameof(duration));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(number);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(elapsed);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(duration);
 
         int pos = Convert.ToInt32(Math.Floor(number * (elapsed / duration)));
 

@@ -25,8 +25,8 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, A
 
     public Task HandleEventAsync(DiscordClient sender, GuildCreatedEventArgs eventArgs)
     {
-        ArgumentNullException.ThrowIfNull(sender, nameof(sender));
-        ArgumentNullException.ThrowIfNull(eventArgs, nameof(eventArgs));
+        ArgumentNullException.ThrowIfNull(sender);
+        ArgumentNullException.ThrowIfNull(eventArgs);
 
         _logger.GuildCreated(eventArgs.Guild.Name);
 
@@ -35,8 +35,8 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, A
 
     public async Task HandleEventAsync(DiscordClient sender, GuildDeletedEventArgs eventArgs)
     {
-        ArgumentNullException.ThrowIfNull(sender, nameof(sender));
-        ArgumentNullException.ThrowIfNull(eventArgs, nameof(eventArgs));
+        ArgumentNullException.ThrowIfNull(sender);
+        ArgumentNullException.ThrowIfNull(eventArgs);
 
         if (eventArgs.Guild.Id == _settings.ServerId)
         {
@@ -61,8 +61,8 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, A
 
     public async Task HandleEventAsync(DiscordClient sender, GuildDownloadCompletedEventArgs eventArgs)
     {
-        ArgumentNullException.ThrowIfNull(sender, nameof(sender));
-        ArgumentNullException.ThrowIfNull(eventArgs, nameof(eventArgs));
+        ArgumentNullException.ThrowIfNull(sender);
+        ArgumentNullException.ThrowIfNull(eventArgs);
 
         if (!eventArgs.Guilds.ContainsKey(_settings.ServerId))
         {

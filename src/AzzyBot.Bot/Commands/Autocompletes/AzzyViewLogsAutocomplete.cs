@@ -13,7 +13,7 @@ public sealed class AzzyViewLogsAutocomplete : IAutoCompleteProvider
 {
     public ValueTask<IReadOnlyDictionary<string, object>> AutoCompleteAsync(AutoCompleteContext context)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         Dictionary<string, object> results = new(25);
         string search = context.UserInput;

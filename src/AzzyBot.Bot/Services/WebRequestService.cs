@@ -64,8 +64,8 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
     public async Task<IReadOnlyList<bool>> CheckForApiPermissionsAsync(IReadOnlyList<Uri> urls, Dictionary<string, string> headers)
     {
-        ArgumentNullException.ThrowIfNull(urls, nameof(urls));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(urls.Count, nameof(urls));
+        ArgumentNullException.ThrowIfNull(urls);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(urls.Count);
 
         List<bool> results = new(urls.Count);
         foreach (Uri url in urls)
@@ -154,7 +154,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
     public async Task<long> GetPingAsync(Uri uri)
     {
-        ArgumentNullException.ThrowIfNull(uri, nameof(uri));
+        ArgumentNullException.ThrowIfNull(uri);
 
         try
         {
@@ -337,7 +337,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
     private static async Task<AddressFamily> GetPreferredIpMethodAsync(Uri url)
     {
-        ArgumentNullException.ThrowIfNull(url, nameof(url));
+        ArgumentNullException.ThrowIfNull(url);
 
         // First check if the host is an IP address
         bool isIpAddress = false;
@@ -345,7 +345,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             isIpAddress = true;
 
         // If it's an IP address, we can skip the DNS lookup
-        IPAddress[] iPAddresses = (isIpAddress) ? [ipAddress ?? IPAddress.Parse(url.Host)] : await Dns.GetHostAddressesAsync(url.Host);
+        IPAddress[] iPAddresses = (isIpAddress) ? [ipAddress!] : await Dns.GetHostAddressesAsync(url.Host);
 
         if (iPAddresses.Length is 1)
             return iPAddresses[0].AddressFamily;
@@ -363,7 +363,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
     private static async Task<bool> TestIfPreferredMethodIsReachableAsync(Uri url, AddressFamily addressFamily)
     {
-        ArgumentNullException.ThrowIfNull(url, nameof(url));
+        ArgumentNullException.ThrowIfNull(url);
 
         try
         {

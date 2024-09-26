@@ -11,7 +11,7 @@ public sealed class DiscordErrorsHandler(DiscordBotService botService) : IClient
 
     public async ValueTask HandleEventHandlerError(string name, Exception exception, Delegate invokedDelegate, object sender, object args)
     {
-        ArgumentNullException.ThrowIfNull(exception, nameof(exception));
+        ArgumentNullException.ThrowIfNull(exception);
 
         if (_botService is null)
             return;

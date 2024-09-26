@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Checks;
+using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
@@ -31,8 +32,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
     private readonly AzzyBotSettingsRecord _settings = settings;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordClient _client = client;
-    private const string BugReportUrl = "https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D";
-    private const string BugReportMessage = $"Send a [bug report]({BugReportUrl}) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
+    private const string BugReportMessage = "Send a [bug report]([BugReportUri]) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
     private const string ErrorChannelNotConfigured = $"**If you're seeing this message then I am not configured correctly!**\nTell your server admin to run */config modify-core*\n\n{BugReportMessage}";
 
     public bool CheckIfClientIsConnected
@@ -40,8 +40,8 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
     public async Task<bool> CheckChannelPermissionsAsync(DiscordMember member, ulong channelId, DiscordPermissions permissions)
     {
-        ArgumentNullException.ThrowIfNull(member, nameof(member));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
+        ArgumentNullException.ThrowIfNull(member);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId);
 
         DiscordChannel? channel = await GetDiscordChannelAsync(channelId);
         if (channel is null)
@@ -55,9 +55,9 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
     public async Task CheckPermissionsAsync(DiscordGuild guild, ulong[] channelIds)
     {
-        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
-        ArgumentNullException.ThrowIfNull(channelIds, nameof(channelIds));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelIds.Length, nameof(channelIds));
+        ArgumentNullException.ThrowIfNull(guild);
+        ArgumentNullException.ThrowIfNull(channelIds);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelIds.Length);
 
         DiscordMember? member = await GetDiscordMemberAsync(guild.Id);
         if (member is null)
@@ -100,7 +100,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
     public async Task CheckPermissionsAsync(IAsyncEnumerable<GuildEntity> guilds)
     {
-        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
+        ArgumentNullException.ThrowIfNull(guilds);
 
         DiscordMember? member;
         List<ulong> channels = [];
@@ -134,13 +134,13 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
                 if (guild.AzuraCast.Preferences.OutagesChannelId is not 0)
                     channels.Add(guild.AzuraCast.Preferences.OutagesChannelId);
 
-                foreach (AzuraCastStationEntity station in guild.AzuraCast.Stations)
+                foreach (AzuraCastStationPreferencesEntity station in guild.AzuraCast.Stations.Select(s => s.Preferences))
                 {
-                    if (station.Preferences.FileUploadChannelId is not 0)
-                        channels.Add(station.Preferences.FileUploadChannelId);
+                    if (station.FileUploadChannelId is not 0)
+                        channels.Add(station.FileUploadChannelId);
 
-                    if (station.Preferences.RequestsChannelId is not 0)
-                        channels.Add(station.Preferences.RequestsChannelId);
+                    if (station.RequestsChannelId is not 0)
+                        channels.Add(station.RequestsChannelId);
                 }
             }
 
@@ -228,7 +228,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
     public async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, SlashCommandContext? ctx = null, ulong guildId = 0, string? info = null)
     {
-        ArgumentNullException.ThrowIfNull(ex, nameof(ex));
+        ArgumentNullException.ThrowIfNull(ex);
 
         _logger.ExceptionOccured(ex);
 
@@ -292,7 +292,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             string jsonDump = JsonSerializer.Serialize<SerializableExceptionsRecord>(new(ex, info), FileOperations.JsonOptions);
             string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, $"AzzyBotException_{timestampString}.json");
 
-            bool messageSent = await SendMessageAsync(errorChannelId, (errorChannelConfigured) ? BugReportMessage : ErrorChannelNotConfigured, [embed], [tempFilePath]);
+            bool messageSent = await SendMessageAsync(errorChannelId, (errorChannelConfigured) ? BugReportMessage.Replace("[BugReportUri]", UriStrings.BugReportUri, StringComparison.InvariantCultureIgnoreCase) : ErrorChannelNotConfigured, [embed], [tempFilePath]);
             if (!messageSent)
                 _logger.UnableToSendMessage("Error message was not sent");
 
@@ -316,9 +316,9 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             return;
         }
 
-        ArgumentNullException.ThrowIfNull(ex, nameof(ex));
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
-        ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+        ArgumentNullException.ThrowIfNull(ex);
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(context.Guild);
 
         await using DiscordMessageBuilder builder = new();
         builder.WithAllowedMention(RoleMention.All);
@@ -414,7 +414,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             return false;
         }
 
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId);
 
         await using DiscordMessageBuilder builder = new();
 
@@ -470,14 +470,14 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             await channel.SendMessageAsync(builder);
         }
 
-        if (streams.Count > 0 && filePaths?.Count > 0)
+        if (streams.Count > 0)
         {
             foreach (FileStream stream in streams)
             {
                 await stream.DisposeAsync();
             }
 
-            foreach (string path in filePaths)
+            foreach (string path in filePaths!)
             {
                 FileOperations.DeleteFile(path);
             }
@@ -579,7 +579,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
     private static void ProcessOptions(IReadOnlyDictionary<CommandParameter, object?> paramaters, Dictionary<string, string> commandParameters)
     {
-        ArgumentNullException.ThrowIfNull(paramaters, nameof(paramaters));
+        ArgumentNullException.ThrowIfNull(paramaters);
 
         foreach (KeyValuePair<CommandParameter, object?> kvp in paramaters)
         {
@@ -593,8 +593,8 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
     private DiscordEmbedBuilder CreateExceptionEmbed(Exception ex, string timestamp, string? jsonMessage = null, DiscordMessage? message = null, DiscordUser? user = null, string? commandName = null, Dictionary<string, string>? commandOptions = null)
     {
-        ArgumentNullException.ThrowIfNull(ex, nameof(ex));
-        ArgumentNullException.ThrowIfNull(timestamp, nameof(timestamp));
+        ArgumentNullException.ThrowIfNull(ex);
+        ArgumentNullException.ThrowIfNull(timestamp);
 
         string os = HardwareStats.GetSystemOs;
         string arch = HardwareStats.GetSystemOsArch;
@@ -640,7 +640,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
         builder.AddField("OS", os);
         builder.AddField("Arch", arch);
-        builder.WithAuthor(botName, BugReportUrl, botIconUrl);
+        builder.WithAuthor(botName, UriStrings.BugReportUri, botIconUrl);
         builder.WithFooter($"Version: {botVersion}");
 
         return builder;

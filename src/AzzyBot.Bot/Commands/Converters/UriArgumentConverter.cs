@@ -19,12 +19,12 @@ public sealed class UriArgumentConverter : ISlashArgumentConverter<Uri>
 
     public static Task<Optional<Uri>> ConvertAsync(string? value)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(value));
+        ArgumentException.ThrowIfNullOrWhiteSpace(value);
 
         if (!value.Contains("https://", StringComparison.OrdinalIgnoreCase) && !value.Contains("http://", StringComparison.OrdinalIgnoreCase))
             value = $"http://{value}";
 
-        return (Uri.TryCreate(value, UriKind.RelativeOrAbsolute, out Uri? uri) && uri is not null)
+        return (Uri.TryCreate(value, UriKind.RelativeOrAbsolute, out Uri? uri))
             ? Task.FromResult(Optional.FromValue(uri))
             : Task.FromResult(Optional.FromNoValue<Uri>());
     }
