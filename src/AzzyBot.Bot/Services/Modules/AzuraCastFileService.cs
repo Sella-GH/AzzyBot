@@ -29,7 +29,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, A
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        ArgumentNullException.ThrowIfNull(station, nameof(station));
+        ArgumentNullException.ThrowIfNull(station);
 
         if (!Directory.Exists(_azuraCast.FilePath))
             Directory.CreateDirectory(_azuraCast.FilePath);
@@ -64,8 +64,8 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, A
 
     private async Task CheckIfFilesWereModifiedAsync(IEnumerable<AzuraFilesRecord> onlineFiles, IEnumerable<AzuraFilesRecord> localFiles, AzuraCastStationEntity station, string stationName, ulong channelId)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
-        ArgumentException.ThrowIfNullOrWhiteSpace(stationName, nameof(stationName));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(stationName);
 
         HashSet<AzuraFilesRecord> onlineHashSet = new(onlineFiles, new AzuraFileComparer());
         HashSet<AzuraFilesRecord> localHashSet = new(localFiles, new AzuraFileComparer());

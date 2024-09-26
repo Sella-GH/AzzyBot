@@ -20,7 +20,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
 
     private async Task<bool> ExecuteDbActionAsync(Func<AzzyDbContext, Task> action)
     {
-        ArgumentNullException.ThrowIfNull(action, nameof(action));
+        ArgumentNullException.ThrowIfNull(action);
 
         await using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync();
 
@@ -44,7 +44,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
 
     public Task<bool> AddAzuraCastAsync(ulong guildId, Uri baseUrl, string apiKey, ulong instanceAdminGroup, ulong notificationId, ulong outagesId, bool serverStatus, bool updates, bool changelog)
     {
-        ArgumentNullException.ThrowIfNull(baseUrl, nameof(baseUrl));
+        ArgumentNullException.ThrowIfNull(baseUrl);
 
         return ExecuteDbActionAsync(async context =>
         {
@@ -139,7 +139,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
     /// <returns>An <see cref="IEnumerable{T}"/>with the added <see cref="DiscordGuild"/>s.</returns>
     public async Task<IEnumerable<DiscordGuild>> AddGuildsAsync(IReadOnlyDictionary<ulong, DiscordGuild> guilds)
     {
-        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
+        ArgumentNullException.ThrowIfNull(guilds);
 
         IEnumerable<GuildEntity> existingGuilds = _dbContext.Guilds
             .OrderBy(static g => g.Id);
@@ -183,7 +183,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
     /// <returns>An <see cref="IEnumerable{T}"/>with the deleted <see cref="DiscordGuild"/> ids as a <see langword="ulong"/>.</returns>
     public async Task<IEnumerable<ulong>> DeleteGuildsAsync(IReadOnlyDictionary<ulong, DiscordGuild> guilds)
     {
-        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
+        ArgumentNullException.ThrowIfNull(guilds);
 
         IEnumerable<GuildEntity> existingGuilds = _dbContext.Guilds
             .OrderBy(static g => g.Id);

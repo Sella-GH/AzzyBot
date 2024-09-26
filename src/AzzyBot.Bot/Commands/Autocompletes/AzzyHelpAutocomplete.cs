@@ -17,10 +17,10 @@ public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings) : IAuto
 
     public ValueTask<IReadOnlyDictionary<string, object>> AutoCompleteAsync(AutoCompleteContext context)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
-        ArgumentNullException.ThrowIfNull(context.Client.CurrentApplication.Owners, nameof(context.Client.CurrentApplication.Owners));
-        ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
-        ArgumentNullException.ThrowIfNull(context.Member, nameof(context.Member));
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(context.Client.CurrentApplication.Owners);
+        ArgumentNullException.ThrowIfNull(context.Guild);
+        ArgumentNullException.ThrowIfNull(context.Member);
 
         string search = context.UserInput;
 

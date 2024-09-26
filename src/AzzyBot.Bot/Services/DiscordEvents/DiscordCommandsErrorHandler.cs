@@ -17,8 +17,8 @@ public sealed class DiscordCommandsErrorHandler(ILogger<DiscordCommandsErrorHand
 
     public async Task CommandErroredAsync(CommandsExtension c, CommandErroredEventArgs e)
     {
-        ArgumentNullException.ThrowIfNull(c, nameof(c));
-        ArgumentNullException.ThrowIfNull(e, nameof(e));
+        ArgumentNullException.ThrowIfNull(c);
+        ArgumentNullException.ThrowIfNull(e);
 
         _logger.CommandsError();
         _logger.CommandsErrorType(e.Exception.GetType().Name);

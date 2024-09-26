@@ -35,7 +35,7 @@ public static class HardwareStats
 
         static long CalculateTimes(long[] times)
         {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(times.Length, nameof(times));
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(times.Length);
 
             long sum = 0;
             foreach (long time in times)
@@ -48,7 +48,7 @@ public static class HardwareStats
 
         static long[] ConvertToLongArray(string line)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(line, nameof(line));
+            ArgumentException.ThrowIfNullOrWhiteSpace(line);
 
             string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             long[] values = new long[parts.Length - 1];
@@ -171,7 +171,7 @@ public static class HardwareStats
 
         static long ParseValue(string line)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(line, nameof(line));
+            ArgumentException.ThrowIfNullOrWhiteSpace(line);
 
             string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 

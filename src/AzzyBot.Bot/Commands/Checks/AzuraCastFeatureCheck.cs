@@ -21,9 +21,9 @@ public sealed class FeatureAvailableCheck(ILogger<FeatureAvailableCheck> logger,
 
     public async ValueTask<string?> ExecuteCheckAsync(FeatureAvailableCheckAttribute attribute, CommandContext context)
     {
-        ArgumentNullException.ThrowIfNull(attribute, nameof(attribute));
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
-        ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+        ArgumentNullException.ThrowIfNull(attribute);
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(context.Guild);
 
         SlashCommandContext? ctx = context as SlashCommandContext;
         if (ctx?.Interaction.ResponseState is DiscordInteractionResponseState.Unacknowledged)

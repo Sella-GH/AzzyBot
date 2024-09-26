@@ -19,7 +19,7 @@ public sealed class UriArgumentConverter : ISlashArgumentConverter<Uri>
 
     public static Task<Optional<Uri>> ConvertAsync(string? value)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(value));
+        ArgumentException.ThrowIfNullOrWhiteSpace(value);
 
         if (!value.Contains("https://", StringComparison.OrdinalIgnoreCase) && !value.Contains("http://", StringComparison.OrdinalIgnoreCase))
             value = $"http://{value}";

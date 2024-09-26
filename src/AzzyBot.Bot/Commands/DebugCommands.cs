@@ -32,7 +32,7 @@ public sealed class DebugCommands
             [Description("Set the amount of log entries to be written.")] int logAmount = 1000000
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(DebugClusterLoggingAsync), context.User.GlobalName);
 
@@ -52,7 +52,7 @@ public sealed class DebugCommands
             [Description("Enter the text which should be encrypted and decrypted again."), MinMaxLength(0, 1000)] string text
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(DebugEncryptDecryptAsync), context.User.GlobalName);
 
@@ -72,7 +72,7 @@ public sealed class DebugCommands
             [Description("Enable to throw the exception after a reply was already made."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int afterReply = 0
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(DebugTriggerExceptionAsync), context.User.GlobalName);
 
@@ -95,7 +95,7 @@ public sealed class DebugCommands
             [Description("Enter a valid url like the following: https://google.com")] Uri url
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(DebugWebServiceTestsAsync), context.User.GlobalName);
 

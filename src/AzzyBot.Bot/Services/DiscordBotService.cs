@@ -40,8 +40,8 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
     public async Task<bool> CheckChannelPermissionsAsync(DiscordMember member, ulong channelId, DiscordPermissions permissions)
     {
-        ArgumentNullException.ThrowIfNull(member, nameof(member));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
+        ArgumentNullException.ThrowIfNull(member);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId);
 
         DiscordChannel? channel = await GetDiscordChannelAsync(channelId);
         if (channel is null)
@@ -55,9 +55,9 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
     public async Task CheckPermissionsAsync(DiscordGuild guild, ulong[] channelIds)
     {
-        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
-        ArgumentNullException.ThrowIfNull(channelIds, nameof(channelIds));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelIds.Length, nameof(channelIds));
+        ArgumentNullException.ThrowIfNull(guild);
+        ArgumentNullException.ThrowIfNull(channelIds);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelIds.Length);
 
         DiscordMember? member = await GetDiscordMemberAsync(guild.Id);
         if (member is null)
@@ -100,7 +100,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
     public async Task CheckPermissionsAsync(IAsyncEnumerable<GuildEntity> guilds)
     {
-        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
+        ArgumentNullException.ThrowIfNull(guilds);
 
         DiscordMember? member;
         List<ulong> channels = [];
@@ -228,7 +228,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
     public async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, SlashCommandContext? ctx = null, ulong guildId = 0, string? info = null)
     {
-        ArgumentNullException.ThrowIfNull(ex, nameof(ex));
+        ArgumentNullException.ThrowIfNull(ex);
 
         _logger.ExceptionOccured(ex);
 
@@ -316,9 +316,9 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             return;
         }
 
-        ArgumentNullException.ThrowIfNull(ex, nameof(ex));
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
-        ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+        ArgumentNullException.ThrowIfNull(ex);
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(context.Guild);
 
         await using DiscordMessageBuilder builder = new();
         builder.WithAllowedMention(RoleMention.All);
@@ -414,7 +414,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             return false;
         }
 
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId, nameof(channelId));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId);
 
         await using DiscordMessageBuilder builder = new();
 
@@ -579,7 +579,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
     private static void ProcessOptions(IReadOnlyDictionary<CommandParameter, object?> paramaters, Dictionary<string, string> commandParameters)
     {
-        ArgumentNullException.ThrowIfNull(paramaters, nameof(paramaters));
+        ArgumentNullException.ThrowIfNull(paramaters);
 
         foreach (KeyValuePair<CommandParameter, object?> kvp in paramaters)
         {
@@ -593,8 +593,8 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
     private DiscordEmbedBuilder CreateExceptionEmbed(Exception ex, string timestamp, string? jsonMessage = null, DiscordMessage? message = null, DiscordUser? user = null, string? commandName = null, Dictionary<string, string>? commandOptions = null)
     {
-        ArgumentNullException.ThrowIfNull(ex, nameof(ex));
-        ArgumentNullException.ThrowIfNull(timestamp, nameof(timestamp));
+        ArgumentNullException.ThrowIfNull(ex);
+        ArgumentNullException.ThrowIfNull(timestamp);
 
         string os = HardwareStats.GetSystemOs;
         string arch = HardwareStats.GetSystemOsArch;

@@ -29,17 +29,17 @@ public static class AzzyHelp
 
     public static IReadOnlyDictionary<string, List<AzzyHelpRecord>> GetAllCommands(IReadOnlyDictionary<string, Command> commands, bool adminServer, bool approvedDebug, DiscordMember member)
     {
-        ArgumentNullException.ThrowIfNull(commands, nameof(commands));
-        ArgumentOutOfRangeException.ThrowIfZero(commands.Count, nameof(commands));
+        ArgumentNullException.ThrowIfNull(commands);
+        ArgumentOutOfRangeException.ThrowIfZero(commands.Count);
 
         return GetCommandGroups(commands, adminServer, approvedDebug, member);
     }
 
     public static AzzyHelpRecord GetSingleCommand(IReadOnlyDictionary<string, Command> commands, string commandName, bool adminServer, bool approvedDebug, DiscordMember member)
     {
-        ArgumentNullException.ThrowIfNull(commands, nameof(commands));
-        ArgumentOutOfRangeException.ThrowIfZero(commands.Count, nameof(commands));
-        ArgumentException.ThrowIfNullOrWhiteSpace(commandName, nameof(commandName));
+        ArgumentNullException.ThrowIfNull(commands);
+        ArgumentOutOfRangeException.ThrowIfZero(commands.Count);
+        ArgumentException.ThrowIfNullOrWhiteSpace(commandName);
 
         string[] parts = commandName.Split(' ');
 
@@ -83,7 +83,7 @@ public static class AzzyHelp
 
     private static Dictionary<string, string> GetCommandParameters(Command command)
     {
-        ArgumentNullException.ThrowIfNull(command, nameof(command));
+        ArgumentNullException.ThrowIfNull(command);
 
         Dictionary<string, string> parameters = new(command.Parameters.Count);
         foreach (CommandParameter parameter in command.Parameters)

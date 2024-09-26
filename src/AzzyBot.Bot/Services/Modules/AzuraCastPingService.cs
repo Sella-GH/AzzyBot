@@ -22,7 +22,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, A
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
+        ArgumentNullException.ThrowIfNull(azuraCast);
 
         try
         {
