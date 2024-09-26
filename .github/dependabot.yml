@@ -47,6 +47,15 @@ updates:
     labels:
       - "area-dependencies"
     groups:
+      Analyzers:
+        applies-to: version-updates
+        patterns:
+        - "Roslynator.*"
+        - "SonarAnalyzer.*"
+        update-types:
+        - "major"
+        - "minor"
+        - "patch"
       DSharpPlus:
         applies-to: version-updates
         patterns:
@@ -62,14 +71,7 @@ updates:
         - "EntityFrameworkCore.*"
         - "Microsoft.*"
         - "Npgsql.*"
-        update-types:
-        - "major"
-        - "minor"
-        - "patch"
-      Roslynator:
-        applies-to: version-updates
-        patterns:
-        - "Roslynator.*"
+        - "NReco.*"
         update-types:
         - "major"
         - "minor"
@@ -81,8 +83,10 @@ updates:
         - "DSharpPlus.*"
         - "EntityFrameworkCore.*"
         - "Microsoft.*"
-        - "Pomelo.*"
+        - "Npgsql.*"
+        - "NReco.*"
         - "Roslynator.*"
+        - "SonarAnalyzer.*"
         update-types:
         - "major"
         - "minor"

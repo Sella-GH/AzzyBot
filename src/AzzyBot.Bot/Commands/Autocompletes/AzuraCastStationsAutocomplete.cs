@@ -26,10 +26,9 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
 
     public async ValueTask<IReadOnlyDictionary<string, object>> AutoCompleteAsync(AutoCompleteContext context)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
-        ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(context.Guild);
 
-        // TODO Solve this more clean and nicer when it's possible
         AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true);
         if (azuraCast is null)
         {
@@ -45,22 +44,22 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
         Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
         string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
         Dictionary<string, object> results = new(25);
-        foreach (AzuraCastStationEntity station in stationsInDb)
+        foreach (int station in stationsInDb.Select(s => s.StationId))
         {
             if (results.Count is 25)
                 break;
 
-            AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(baseUrl, station.StationId);
+            AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(baseUrl, station);
             if (azuraStation is null)
             {
-                await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
                 return new Dictionary<string, object>();
             }
 
             if (!string.IsNullOrWhiteSpace(search) && azuraStation.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            AzuraAdminStationConfigRecord? config = await _azuraCast.GetStationAdminConfigAsync(baseUrl, apiKey, station.StationId);
+            AzuraAdminStationConfigRecord? config = await _azuraCast.GetStationAdminConfigAsync(baseUrl, apiKey, station);
             if (config is null)
             {
                 await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
@@ -71,7 +70,7 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
             {
                 case "play-mount":
                     if (config.IsEnabled)
-                        results.Add(azuraStation.Name, station.StationId);
+                        results.Add(azuraStation.Name, station);
 
                     break;
 
@@ -81,15 +80,15 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
 
                 case "start-station" when !config.IsEnabled:
                 case "stop-station" when config.IsEnabled:
-                    results.Add($"{azuraStation.Name} ({Misc.GetReadableBool(config.IsEnabled, ReadableBool.StartedStopped, true)})", station.StationId);
+                    results.Add($"{azuraStation.Name} ({Misc.GetReadableBool(config.IsEnabled, ReadableBool.StartedStopped, true)})", station);
                     break;
 
                 case "toggle-song-requests":
-                    results.Add($"{azuraStation.Name} ({Misc.GetReadableBool(config.EnableRequests, ReadableBool.EnabledDisabled, true)})", station.StationId);
+                    results.Add($"{azuraStation.Name} ({Misc.GetReadableBool(config.EnableRequests, ReadableBool.EnabledDisabled, true)})", station);
                     break;
 
                 default:
-                    results.Add(azuraStation.Name, station.StationId);
+                    results.Add(azuraStation.Name, station);
                     break;
             }
         }

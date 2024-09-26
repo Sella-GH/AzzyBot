@@ -38,7 +38,7 @@ public sealed class CoreCommands
         [Command("force-channel-permissions-check"), Description("Forces a check of the permissions for the bot in the necessary channel."), RequirePermissions(DiscordPermissions.None, DiscordPermissions.ManageChannels)]
         public async ValueTask ForceChannelPermissionsCheckAsync(SlashCommandContext context)
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(ForceChannelPermissionsCheckAsync), context.User.GlobalName);
 
@@ -63,10 +63,10 @@ public sealed class CoreCommands
             [Description("The command you want to get more information about."), SlashAutoCompleteProvider<AzzyHelpAutocomplete>] string? command = null
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-            ArgumentNullException.ThrowIfNull(context.Client.CurrentApplication.Owners, nameof(context.Client.CurrentApplication.Owners));
-            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
-            ArgumentNullException.ThrowIfNull(context.Member, nameof(context.Member));
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Client.CurrentApplication.Owners);
+            ArgumentNullException.ThrowIfNull(context.Guild);
+            ArgumentNullException.ThrowIfNull(context.Member);
 
             _logger.CommandRequested(nameof(HelpAsync), context.User.GlobalName);
 
@@ -75,13 +75,8 @@ public sealed class CoreCommands
             IEnumerable<DiscordUser> botOwners = context.Client.CurrentApplication.Owners;
             ulong guildId = context.Guild.Id;
             DiscordMember member = context.Member;
-            bool adminServer = false;
-            foreach (DiscordUser _ in botOwners.Where(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId))
-            {
-                adminServer = true;
-                break;
-            }
 
+            bool adminServer = botOwners.Any(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId);
             bool approvedDebug = guildId == _settings.ServerId;
             List<DiscordEmbed> embeds = new(10);
             if (string.IsNullOrWhiteSpace(command))
@@ -117,8 +112,8 @@ public sealed class CoreCommands
             [Command("hardware"), Description("Shows information about the hardware side of the bot.")]
             public async ValueTask HardwareStatsAsync(SlashCommandContext context)
             {
-                ArgumentNullException.ThrowIfNull(context, nameof(context));
-                ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+                ArgumentNullException.ThrowIfNull(context);
+                ArgumentNullException.ThrowIfNull(context.Guild);
 
                 _logger.CommandRequested(nameof(HardwareStatsAsync), context.User.GlobalName);
 
@@ -133,7 +128,7 @@ public sealed class CoreCommands
             [Command("info"), Description("Shows information about the bot and it's components.")]
             public async ValueTask InfoStatsAsync(SlashCommandContext context)
             {
-                ArgumentNullException.ThrowIfNull(context, nameof(context));
+                ArgumentNullException.ThrowIfNull(context);
 
                 _logger.CommandRequested(nameof(InfoStatsAsync), context.User.GlobalName);
 
@@ -149,8 +144,8 @@ public sealed class CoreCommands
             [Command("ping"), Description("Ping the bot and get the latency to discord.")]
             public async ValueTask PingAsync(SlashCommandContext context)
             {
-                ArgumentNullException.ThrowIfNull(context, nameof(context));
-                ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+                ArgumentNullException.ThrowIfNull(context);
+                ArgumentNullException.ThrowIfNull(context.Guild);
 
                 _logger.CommandRequested(nameof(PingAsync), context.User.GlobalName);
 

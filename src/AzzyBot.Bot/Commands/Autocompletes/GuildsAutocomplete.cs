@@ -17,7 +17,7 @@ public sealed class GuildsAutocomplete(AzzyBotSettingsRecord settings, DiscordBo
 
     public ValueTask<IReadOnlyDictionary<string, object>> AutoCompleteAsync(AutoCompleteContext context)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
         if (guilds.Count is 0)

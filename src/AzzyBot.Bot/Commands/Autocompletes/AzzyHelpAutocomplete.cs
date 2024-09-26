@@ -17,10 +17,10 @@ public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings) : IAuto
 
     public ValueTask<IReadOnlyDictionary<string, object>> AutoCompleteAsync(AutoCompleteContext context)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
-        ArgumentNullException.ThrowIfNull(context.Client.CurrentApplication.Owners, nameof(context.Client.CurrentApplication.Owners));
-        ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
-        ArgumentNullException.ThrowIfNull(context.Member, nameof(context.Member));
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(context.Client.CurrentApplication.Owners);
+        ArgumentNullException.ThrowIfNull(context.Guild);
+        ArgumentNullException.ThrowIfNull(context.Member);
 
         string search = context.UserInput;
 
@@ -28,29 +28,23 @@ public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings) : IAuto
         ulong guildId = context.Guild.Id;
         DiscordMember member = context.Member;
 
-        bool adminServer = false;
-        foreach (DiscordUser _ in botOwners.Where(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId))
-        {
-            adminServer = true;
-            break;
-        }
-
+        bool adminServer = botOwners.Any(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId);
         bool approvedDebug = guildId == _settings.ServerId;
         Dictionary<string, object> results = new(25);
-        foreach (KeyValuePair<string, List<AzzyHelpRecord>> kvp in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member))
+        foreach (List<AzzyHelpRecord> kvp in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member).Select(k => k.Value))
         {
             if (results.Count is 25)
                 break;
 
-            if (!string.IsNullOrWhiteSpace(search) && kvp.Value.All(r => !r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)))
+            if (!string.IsNullOrWhiteSpace(search) && kvp.TrueForAll(r => !r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)))
                 continue;
 
-            foreach (AzzyHelpRecord record in kvp.Value.Where(r => r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)))
+            foreach (string record in kvp.Where(r => r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)).Select(r => r.Name))
             {
                 if (results.Count is 25)
                     break;
 
-                results.Add(record.Name, record.Name);
+                results.Add(record, record);
             }
         }
 
