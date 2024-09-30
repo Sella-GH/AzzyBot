@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Settings;
@@ -52,7 +53,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
         if (localVersion == onlineVersion)
             return;
 
-        if (!DateTime.TryParse(updaterRecord.CreatedAt, out DateTime releaseDate))
+        if (!DateTime.TryParse(updaterRecord.CreatedAt, CultureInfo.CurrentCulture, out DateTime releaseDate))
             releaseDate = DateTime.Now;
 
         await SendUpdateMessageAsync(onlineVersion, releaseDate, updaterRecord.Body);

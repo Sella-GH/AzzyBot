@@ -44,7 +44,9 @@ public record AzuraCpuTotalData
     public required string Steal { get; init; }
 }
 
+#pragma warning disable S2094 // Classes should not be empty - Required for deserialization
 public sealed record AzuraCoreData : AzuraCpuTotalData;
+#pragma warning restore S2094 // Classes should not be empty - Required for deserialization
 
 public sealed record AzuraMemoryData
 {

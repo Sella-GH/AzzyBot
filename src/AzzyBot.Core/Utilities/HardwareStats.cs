@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using AzzyBot.Core.Utilities.Records;
@@ -36,7 +35,7 @@ public static class HardwareStats
 
         static long CalculateTimes(long[] times)
         {
-            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(times.Length, nameof(times));
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(times.Length);
 
             long sum = 0;
             foreach (long time in times)
@@ -49,7 +48,7 @@ public static class HardwareStats
 
         static long[] ConvertToLongArray(string line)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(line, nameof(line));
+            ArgumentException.ThrowIfNullOrWhiteSpace(line);
 
             string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             long[] values = new long[parts.Length - 1];
@@ -156,7 +155,7 @@ public static class HardwareStats
 
     public static AppDiskUsageRecord GetSystemDiskUsage()
     {
-        DriveInfo drive = DriveInfo.GetDrives().FirstOrDefault(static d => d.IsReady && d.Name == "/") ?? throw new InvalidOperationException("There is more than one root drive");
+        DriveInfo drive = Array.Find(DriveInfo.GetDrives(), static d => d.IsReady && d.Name == "/") ?? throw new InvalidOperationException("There is more than one root drive");
         double totalSize = drive.TotalSize / (1024.0 * 1024.0 * 1024.0);
         double totalFreeSpace = drive.TotalFreeSpace / (1024.0 * 1024.0 * 1024.0);
         double totalUsedSpace = totalSize - totalFreeSpace;
@@ -172,7 +171,7 @@ public static class HardwareStats
 
         static long ParseValue(string line)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(line, nameof(line));
+            ArgumentException.ThrowIfNullOrWhiteSpace(line);
 
             string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 

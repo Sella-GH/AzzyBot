@@ -27,9 +27,9 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
     private async Task<LavalinkPlayer?> GetLavalinkPlayerAsync(SlashCommandContext context, bool useDefault = true, bool connectToVoice = false, bool suppressResponse = false, bool ignoreVoice = false)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
-        ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
-        ArgumentNullException.ThrowIfNull(context.Member, nameof(context.Member));
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentNullException.ThrowIfNull(context.Guild);
+        ArgumentNullException.ThrowIfNull(context.Member);
 
         if (context.Member.VoiceState is null)
         {
@@ -127,14 +127,14 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
     private async Task<PlayerResult<LavalinkPlayer>> GetLavalinkDefaultPlayerAsync(ulong guildId, ulong channelId, LavalinkPlayerOptions playerOptions, PlayerRetrieveOptions retrieveOptions)
     {
-        ArgumentNullException.ThrowIfNull(playerOptions, nameof(playerOptions));
+        ArgumentNullException.ThrowIfNull(playerOptions);
 
         return await _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Default, Options.Create(playerOptions), retrieveOptions);
     }
 
     private async Task<PlayerResult<QueuedLavalinkPlayer>> GetLavalinkQueuedPlayerAsync(ulong guildId, ulong channelId, QueuedLavalinkPlayerOptions playerOptions, PlayerRetrieveOptions retrieveOptions)
     {
-        ArgumentNullException.ThrowIfNull(playerOptions, nameof(playerOptions));
+        ArgumentNullException.ThrowIfNull(playerOptions);
 
         return await _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Queued, Options.Create(playerOptions), retrieveOptions);
     }
@@ -155,8 +155,8 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
     public async Task<bool> CheckIfPlayedMusicIsStationAsync(SlashCommandContext context, string station)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
-        ArgumentException.ThrowIfNullOrWhiteSpace(station, nameof(station));
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentException.ThrowIfNullOrWhiteSpace(station);
 
         LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, suppressResponse: true, ignoreVoice: true);
 
@@ -177,7 +177,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
     public async Task<bool> ClearQueueAsync(SlashCommandContext context, int position = -1)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         if (await GetLavalinkPlayerAsync(context, useDefault: false) is not QueuedLavalinkPlayer player)
             return false;
@@ -196,7 +196,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
     public async Task<TimeSpan?> GetCurrentPositionAsync(SlashCommandContext context)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         try
         {
@@ -213,7 +213,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     [SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "Code style")]
     public async Task<IEnumerable<ITrackQueueItem>?> HistoryAsync(SlashCommandContext context, bool queue = false)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         if (await GetLavalinkPlayerAsync(context, useDefault: false, suppressResponse: true, ignoreVoice: true) is not QueuedLavalinkPlayer player)
             return [];
@@ -223,7 +223,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
     public async Task<bool> JoinChannelAsync(SlashCommandContext context)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, connectToVoice: true);
 
@@ -232,7 +232,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
     public async Task<LavalinkTrack?> NowPlayingAsync(SlashCommandContext context)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         try
         {
@@ -248,7 +248,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
     public async Task<bool> PauseAsync(SlashCommandContext context)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         if (await GetLavalinkPlayerAsync(context, useDefault: false) is not QueuedLavalinkPlayer player)
             return false;
@@ -260,8 +260,8 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
     public async Task<string?> PlayMusicAsync(SlashCommandContext context, string query, TrackSearchMode searchMode)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
-        ArgumentException.ThrowIfNullOrWhiteSpace(query, nameof(query));
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentException.ThrowIfNullOrWhiteSpace(query);
 
         if (await GetLavalinkPlayerAsync(context, useDefault: false, connectToVoice: true) is not QueuedLavalinkPlayer player)
             return null;
@@ -290,8 +290,8 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
     public async Task<bool> PlayMountMusicAsync(SlashCommandContext context, string mountPoint)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
-        ArgumentException.ThrowIfNullOrWhiteSpace(mountPoint, nameof(mountPoint));
+        ArgumentNullException.ThrowIfNull(context);
+        ArgumentException.ThrowIfNullOrWhiteSpace(mountPoint);
 
         LavalinkPlayer? player = await GetLavalinkPlayerAsync(context, connectToVoice: true);
         if (player is null)
@@ -318,7 +318,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
     public async Task<bool> ResumeAsync(SlashCommandContext context)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         if (await GetLavalinkPlayerAsync(context, useDefault: false) is not QueuedLavalinkPlayer player)
             return false;
@@ -330,7 +330,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
     public async Task<bool> SetVolumeAsync(SlashCommandContext context, float volume, bool reset = false)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         LavalinkPlayer? player = await GetLavalinkPlayerAsync(context);
         if (player is null)
@@ -349,7 +349,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
     public async Task<bool> SkipSongAsync(SlashCommandContext context, int count = 1)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         if (await GetLavalinkPlayerAsync(context, useDefault: false, suppressResponse: true) is not QueuedLavalinkPlayer player)
             return false;
@@ -361,7 +361,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
     public async Task<bool> StopMusicAsync(SlashCommandContext context, bool disconnect = false)
     {
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentNullException.ThrowIfNull(context);
 
         LavalinkPlayer? player = await GetLavalinkPlayerAsync(context);
         if (player is null)

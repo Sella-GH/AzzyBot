@@ -46,7 +46,7 @@ public sealed class MusicStreamingCommands
             [Description("The volume you want to set.")] int volume
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(ChangeVolumeAsync), context.User.GlobalName);
 
@@ -67,7 +67,7 @@ public sealed class MusicStreamingCommands
         [Command("history"), Description("Show the already played song history for this server.")]
         public async ValueTask HistoryAsync(SlashCommandContext context)
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(HistoryAsync), context.User.GlobalName);
 
@@ -87,10 +87,10 @@ public sealed class MusicStreamingCommands
         [Command("join"), Description("Join the voice channel.")]
         public async ValueTask JoinAsync(SlashCommandContext context)
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
-            ArgumentNullException.ThrowIfNull(context.Member, nameof(context.Member));
-            ArgumentNullException.ThrowIfNull(context.Member.VoiceState, nameof(context.Member.VoiceState));
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
+            ArgumentNullException.ThrowIfNull(context.Member);
+            ArgumentNullException.ThrowIfNull(context.Member.VoiceState);
 
             _logger.CommandRequested(nameof(JoinAsync), context.User.GlobalName);
 
@@ -117,7 +117,7 @@ public sealed class MusicStreamingCommands
         [Command("leave"), Description("Leave the voice channel.")]
         public async ValueTask LeaveAsync(SlashCommandContext context)
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(LeaveAsync), context.User.GlobalName);
 
@@ -132,7 +132,7 @@ public sealed class MusicStreamingCommands
         [Command("now-playing"), Description("Show the song which is playing right now.")]
         public async ValueTask NowPlayingAsync(SlashCommandContext context)
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(NowPlayingAsync), context.User.GlobalName);
 
@@ -159,7 +159,7 @@ public sealed class MusicStreamingCommands
         [Command("pause"), Description("Pause the current played song.")]
         public async ValueTask PauseAsync(SlashCommandContext context)
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(PauseAsync), context.User.GlobalName);
 
@@ -191,7 +191,7 @@ public sealed class MusicStreamingCommands
             [Description("The url of the track you want to play.")] string track
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(PlayAsync), context.User.GlobalName);
 
@@ -212,8 +212,8 @@ public sealed class MusicStreamingCommands
             [Description("The mount point of the station."), SlashAutoCompleteProvider<AzuraCastMountAutocomplete>] int mountPoint
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
 
             _logger.CommandRequested(nameof(PlayMountAsync), context.User.GlobalName);
 
@@ -255,7 +255,7 @@ public sealed class MusicStreamingCommands
         [Command("queue"), Description("Shows the songs which will be played after this one.")]
         public async ValueTask QueueAsync(SlashCommandContext context)
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(QueueAsync), context.User.GlobalName);
 
@@ -279,7 +279,7 @@ public sealed class MusicStreamingCommands
             [Description("The number of the song which you want to clear. Use the queue command first to get all song numbers.")] int songNumber = -1
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(QueueClearAsync), context.User.GlobalName);
 
@@ -294,7 +294,7 @@ public sealed class MusicStreamingCommands
         [Command("resume"), Description("Resume the paused player and play music again.")]
         public async ValueTask ResumeAsync(SlashCommandContext context)
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(ResumeAsync), context.User.GlobalName);
 
@@ -325,7 +325,7 @@ public sealed class MusicStreamingCommands
             [Description("Specify how many songs you want to skip.")] int count = 1
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(SkipAsync), context.User.GlobalName);
 
@@ -356,7 +356,7 @@ public sealed class MusicStreamingCommands
             [Description("Leave the voice channel."), SlashChoiceProvider<BooleanYesNoStateProvider>] int leave = 0
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
+            ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(StopAsync), context.User.GlobalName);
 

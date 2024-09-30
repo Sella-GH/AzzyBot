@@ -20,7 +20,7 @@ public sealed class AzuraRequestBackgroundTask(ILogger<AzuraRequestBackgroundTas
 
     public async Task CreateRequestAsync(AzuraCustomQueueItemRecord record)
     {
-        ArgumentNullException.ThrowIfNull(record, nameof(record));
+        ArgumentNullException.ThrowIfNull(record);
 
         _logger.BackgroundServiceWorkItem(nameof(CreateRequestAsync));
 

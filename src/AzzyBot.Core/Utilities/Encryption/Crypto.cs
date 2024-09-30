@@ -4,10 +4,10 @@ using System.Text;
 
 namespace AzzyBot.Core.Utilities.Encryption;
 
-[SuppressMessage("Usage", "CA2211:Non-constant fields should not be visible", Justification = "This is an application not a library")]
+[SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "Well it still does for security.")]
 public static class Crypto
 {
-    public static byte[] EncryptionKey = [];
+    public static byte[] EncryptionKey { get; set; } = [];
 
     public static string Encrypt(string plain, byte[]? newKey = null)
     {

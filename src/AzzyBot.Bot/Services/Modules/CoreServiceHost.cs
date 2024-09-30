@@ -47,9 +47,9 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
     private async Task ReencryptDatabaseAsync()
     {
         ArgumentNullException.ThrowIfNull(_settings.Database);
-        ArgumentException.ThrowIfNullOrWhiteSpace(_settings.Database.EncryptionKey, nameof(_settings.Database.EncryptionKey));
-        ArgumentException.ThrowIfNullOrWhiteSpace(_settings.Database.NewEncryptionKey, nameof(_settings.Database.NewEncryptionKey));
-        ArgumentException.ThrowIfNullOrWhiteSpace(_settings.SettingsFile, nameof(_settings.SettingsFile));
+        ArgumentException.ThrowIfNullOrWhiteSpace(_settings.Database.EncryptionKey);
+        ArgumentException.ThrowIfNullOrWhiteSpace(_settings.Database.NewEncryptionKey);
+        ArgumentException.ThrowIfNullOrWhiteSpace(_settings.SettingsFile);
 
         _logger.DatabaseReencryptionStart();
 

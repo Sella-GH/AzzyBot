@@ -21,7 +21,7 @@ public sealed class QueuedBackgroundTask
 
     public async ValueTask QueueBackgroundWorkItemAsync(Func<CancellationToken, ValueTask> workItem)
     {
-        ArgumentNullException.ThrowIfNull(workItem, nameof(workItem));
+        ArgumentNullException.ThrowIfNull(workItem);
 
         await _queue.Writer.WriteAsync(workItem);
     }
