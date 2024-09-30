@@ -11,7 +11,7 @@
     <PackageVersion Include="Lavalink4NET.DSharpPlus.Nightly" Version="4.0.25" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0-rc.1.24451.1" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.0-rc.1.24431.7" />
-    <PackageVersion Include="Npgsql" Version="9.0.0-preview.1-ci.20240913T160017" />
+    <PackageVersion Include="Npgsql" Version="9.0.0-preview.1-ci.20240927T160325" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0-rc.1" />
     <PackageVersion Include="NReco.Logging.File" Version="1.2.1" />
     <PackageVersion Include="Roslynator.Analyzers" Version="4.12.6" />
