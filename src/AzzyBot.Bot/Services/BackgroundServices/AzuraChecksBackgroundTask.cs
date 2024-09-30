@@ -27,7 +27,7 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
         if (_cancellationToken.IsCancellationRequested)
             return;
 
-        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
+        ArgumentNullException.ThrowIfNull(guilds);
 
         _logger.BackgroundServiceWorkItem(nameof(QueueApiPermissionChecks));
 
@@ -49,8 +49,8 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
         if (_cancellationToken.IsCancellationRequested)
             return;
 
-        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
-        ArgumentNullException.ThrowIfNull(guild.AzuraCast, nameof(guild.AzuraCast));
+        ArgumentNullException.ThrowIfNull(guild);
+        ArgumentNullException.ThrowIfNull(guild.AzuraCast);
 
         _logger.BackgroundServiceWorkItem(nameof(QueueApiPermissionChecks));
 
@@ -77,20 +77,17 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
         if (_cancellationToken.IsCancellationRequested)
             return;
 
-        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
+        ArgumentNullException.ThrowIfNull(guilds);
 
         _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecksAsync));
 
         int counter = 0;
-        await foreach (GuildEntity guild in guilds)
+        await foreach (GuildEntity guild in guilds.Where(g => g.AzuraCast?.IsOnline == true))
         {
-            if (guild.AzuraCast?.IsOnline is true)
+            foreach (AzuraCastStationEntity station in guild.AzuraCast!.Stations.Where(s => s.Checks.FileChanges && now > s.Checks.LastFileChangesCheck.AddHours(0.98)))
             {
-                foreach (AzuraCastStationEntity station in guild.AzuraCast!.Stations.Where(s => s.Checks.FileChanges && now > s.Checks.LastFileChangesCheck.AddHours(0.98)))
-                {
-                    _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _fileService.CheckForFileChangesAsync(station, ct)));
-                    counter++;
-                }
+                _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _fileService.CheckForFileChangesAsync(station, ct)));
+                counter++;
             }
         }
 
@@ -102,8 +99,8 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
         if (_cancellationToken.IsCancellationRequested)
             return;
 
-        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
-        ArgumentNullException.ThrowIfNull(guild.AzuraCast, nameof(guild.AzuraCast));
+        ArgumentNullException.ThrowIfNull(guild);
+        ArgumentNullException.ThrowIfNull(guild.AzuraCast);
 
         _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecks));
 
@@ -133,7 +130,7 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
         if (_cancellationToken.IsCancellationRequested)
             return;
 
-        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
+        ArgumentNullException.ThrowIfNull(guilds);
 
         _logger.BackgroundServiceWorkItem(nameof(QueueInstancePingAsync));
 
@@ -155,8 +152,8 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
         if (_cancellationToken.IsCancellationRequested)
             return;
 
-        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
-        ArgumentNullException.ThrowIfNull(guild.AzuraCast, nameof(guild.AzuraCast));
+        ArgumentNullException.ThrowIfNull(guild);
+        ArgumentNullException.ThrowIfNull(guild.AzuraCast);
 
         _logger.BackgroundServiceWorkItem(nameof(QueueInstancePing));
 
@@ -169,7 +166,7 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
         if (_cancellationToken.IsCancellationRequested)
             return;
 
-        ArgumentNullException.ThrowIfNull(guilds, nameof(guilds));
+        ArgumentNullException.ThrowIfNull(guilds);
 
         _logger.BackgroundServiceWorkItem(nameof(QueueUpdatesAsync));
 
@@ -191,8 +188,8 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
         if (_cancellationToken.IsCancellationRequested)
             return;
 
-        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
-        ArgumentNullException.ThrowIfNull(guild.AzuraCast, nameof(guild.AzuraCast));
+        ArgumentNullException.ThrowIfNull(guild);
+        ArgumentNullException.ThrowIfNull(guild.AzuraCast);
 
         _logger.BackgroundServiceWorkItem(nameof(QueueUpdates));
 

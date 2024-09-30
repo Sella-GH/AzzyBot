@@ -23,25 +23,20 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, A
 
     private const string NewGuildText = "Thank you for adding me to your server **%GUILD%**! Before you can make good use of me, you have to set my settings first.\n\nPlease use the command `config modify-core` for this.\nOnly administrators are able to execute this command right now.";
 
-    public async Task HandleEventAsync(DiscordClient sender, GuildCreatedEventArgs eventArgs)
+    public Task HandleEventAsync(DiscordClient sender, GuildCreatedEventArgs eventArgs)
     {
-        ArgumentNullException.ThrowIfNull(sender, nameof(sender));
-        ArgumentNullException.ThrowIfNull(eventArgs, nameof(eventArgs));
+        ArgumentNullException.ThrowIfNull(sender);
+        ArgumentNullException.ThrowIfNull(eventArgs);
 
         _logger.GuildCreated(eventArgs.Guild.Name);
 
-        await _dbActions.AddGuildAsync(eventArgs.Guild.Id);
-        DiscordMember owner = await eventArgs.Guild.GetGuildOwnerAsync();
-        await owner.SendMessageAsync(NewGuildText.Replace("%GUILD%", eventArgs.Guild.Name, StringComparison.OrdinalIgnoreCase));
-
-        DiscordEmbed embed = await EmbedBuilder.BuildGuildAddedEmbedAsync(eventArgs.Guild);
-        await _botService.SendMessageAsync(_settings.NotificationChannelId, embeds: [embed]);
+        return Task.CompletedTask;
     }
 
     public async Task HandleEventAsync(DiscordClient sender, GuildDeletedEventArgs eventArgs)
     {
-        ArgumentNullException.ThrowIfNull(sender, nameof(sender));
-        ArgumentNullException.ThrowIfNull(eventArgs, nameof(eventArgs));
+        ArgumentNullException.ThrowIfNull(sender);
+        ArgumentNullException.ThrowIfNull(eventArgs);
 
         if (eventArgs.Guild.Id == _settings.ServerId)
         {
@@ -66,8 +61,8 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, A
 
     public async Task HandleEventAsync(DiscordClient sender, GuildDownloadCompletedEventArgs eventArgs)
     {
-        ArgumentNullException.ThrowIfNull(sender, nameof(sender));
-        ArgumentNullException.ThrowIfNull(eventArgs, nameof(eventArgs));
+        ArgumentNullException.ThrowIfNull(sender);
+        ArgumentNullException.ThrowIfNull(eventArgs);
 
         if (!eventArgs.Guilds.ContainsKey(_settings.ServerId))
         {

@@ -13,7 +13,7 @@ public static class IHostExtensions
 {
     public static void ApplyDbMigrations(this IHost app)
     {
-        ArgumentNullException.ThrowIfNull(app, nameof(app));
+        ArgumentNullException.ThrowIfNull(app);
 
         using IServiceScope scope = app.Services.CreateScope();
         AzzyDbContext db = scope.ServiceProvider.GetRequiredService<AzzyDbContext>();

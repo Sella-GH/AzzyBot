@@ -37,7 +37,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public async Task CheckForApiPermissionsAsync(AzuraCastEntity azuraCast)
     {
-        ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
+        ArgumentNullException.ThrowIfNull(azuraCast);
 
         await CheckForAdminApiPermissionsAsync(azuraCast);
         foreach (AzuraCastStationEntity station in azuraCast.Stations)
@@ -48,7 +48,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public Task CheckForApiPermissionsAsync(AzuraCastStationEntity station)
     {
-        ArgumentNullException.ThrowIfNull(station, nameof(station));
+        ArgumentNullException.ThrowIfNull(station);
 
         return CheckForStationApiPermissionsAsync(station);
     }
@@ -125,9 +125,9 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     private async Task<IReadOnlyList<string>> ExecuteApiPermissionCheckAsync(List<Uri> apis, string apiKey)
     {
-        ArgumentNullException.ThrowIfNull(apis, nameof(apis));
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(apis.Count, nameof(apis));
+        ArgumentNullException.ThrowIfNull(apis);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(apis.Count);
 
         IReadOnlyList<bool> checks = await _webService.CheckForApiPermissionsAsync(apis, CreateHeader(apiKey));
         List<string> missing = new(apis.Count);
@@ -142,7 +142,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     private async Task DeleteToApiAsync(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
+        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint);
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
         try
@@ -157,12 +157,12 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     private async Task<string?> GetFromApiAsync(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
+        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint);
 
         Uri url = new($"{baseUrl}api/{endpoint}");
         try
         {
-            return await _webService.GetWebAsync(url, headers, true);
+            return await _webService.GetWebAsync(url, headers, acceptJson: true);
         }
         catch (HttpRequestException ex)
         {
@@ -172,12 +172,18 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     private async Task<T?> GetFromApiAsync<T>(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null, bool noLogging = false)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
+        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint);
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
-        string? body = await _webService.GetWebAsync(uri, headers, true, noLogging: noLogging);
+        string? body = await _webService.GetWebAsync(uri, headers, acceptJson: true, noLogging: noLogging);
         if (body is null)
             return default;
+
+        if (typeof(T) == typeof(string))
+        {
+            object? obj = body;
+            return (T)obj;
+        }
 
         try
         {
@@ -191,7 +197,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     private async Task<IEnumerable<T>?> GetFromApiListAsync<T>(Uri baseUrl, string endpoint, Dictionary<string, string>? headers = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
+        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint);
 
         string? body = await GetFromApiAsync(baseUrl, endpoint, headers);
         if (body is null)
@@ -209,8 +215,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     private string GetLocalFile(int guildId, int azuraCastId, int databaseId, int stationId)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(databaseId, nameof(databaseId));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(databaseId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         IEnumerable<string> files = FileOperations.GetFilesInDirectory(FilePath);
         string fileName = $"{guildId}-{azuraCastId}-{databaseId}-{stationId}-files.json";
@@ -220,7 +226,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     private async Task PostToApiAsync(Uri baseUrl, string endpoint, string? content = null, Dictionary<string, string>? headers = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
+        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint);
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
         try
@@ -235,7 +241,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     private async Task PutToApiAsync(Uri baseUrl, string endpoint, string? content = null, Dictionary<string, string>? headers = null, bool ignoreException = false)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
+        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint);
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
         try
@@ -253,9 +259,9 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     private async Task<string?> UploadToApiAsync(Uri baseUrl, string endpoint, string file, string fileName, string filePath, Dictionary<string, string>? headers = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint, nameof(endpoint));
-        ArgumentException.ThrowIfNullOrWhiteSpace(fileName, nameof(fileName));
-        ArgumentException.ThrowIfNullOrWhiteSpace(filePath, nameof(filePath));
+        ArgumentException.ThrowIfNullOrWhiteSpace(endpoint);
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
         Uri uri = new($"{baseUrl}api/{endpoint}");
         try
@@ -270,8 +276,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public async Task DeleteStationSongRequestAsync(Uri baseUrl, string apiKey, int stationId, int requestId = 0)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}/" + ((requestId is 0) ? AzuraApiEndpoints.Clear : requestId);
 
@@ -287,17 +293,17 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public async Task DownloadPlaylistAsync(Uri url, string apiKey, string downloadPath)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentException.ThrowIfNullOrWhiteSpace(downloadPath, nameof(downloadPath));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentException.ThrowIfNullOrWhiteSpace(downloadPath);
 
-        await _webService.DownloadAsync(url, downloadPath, CreateHeader(apiKey), true);
+        await _webService.DownloadAsync(url, downloadPath, CreateHeader(apiKey), acceptJson: true);
     }
 
     public async Task<IEnumerable<AzuraFilesRecord>> GetFilesLocalAsync(int guildId, int azuraCastId, int databaseId, int stationId)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(azuraCastId, nameof(azuraCastId));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(databaseId, nameof(databaseId));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(azuraCastId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(databaseId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string file = GetLocalFile(guildId, azuraCastId, databaseId, stationId);
         if (string.IsNullOrWhiteSpace(file))
@@ -319,8 +325,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public Task<IEnumerable<T>?> GetFilesOnlineAsync<T>(Uri baseUrl, string apiKey, int stationId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}";
 
@@ -329,7 +335,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public async Task<AzuraHardwareStatsRecord?> GetHardwareStatsAsync(Uri baseUrl, string apiKey)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
 
         const string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Server}/{AzuraApiEndpoints.Stats}";
         AzuraHardwareStatsRecord? stats = await GetFromApiAsync<AzuraHardwareStatsRecord>(baseUrl, endpoint, CreateHeader(apiKey));
@@ -350,7 +356,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public Task<AzuraNowPlayingDataRecord?> GetNowPlayingAsync(Uri baseUrl, int stationId, bool noLogging = false)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = $"{AzuraApiEndpoints.NowPlaying}/{stationId}";
 
@@ -359,8 +365,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public Task<AzuraPlaylistRecord?> GetPlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlist}/{playlistId}";
 
@@ -369,8 +375,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public Task<IEnumerable<AzuraPlaylistRecord>?> GetPlaylistsAsync(Uri baseUrl, string apiKey, int stationId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlists}";
 
@@ -379,8 +385,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public async Task<IEnumerable<AzuraPlaylistRecord>?> GetPlaylistsWithRequestsAsync(Uri baseUrl, string apiKey, int stationId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         IEnumerable<AzuraPlaylistRecord>? playlists = await GetPlaylistsAsync(baseUrl, apiKey, stationId);
 
@@ -389,8 +395,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public async Task<AzuraRequestRecord?> GetRequestableSongAsync(Uri baseUrl, string apiKey, int stationId, string? songId = null, string? name = null, string? artist = null, string? album = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         IEnumerable<AzuraRequestRecord>? songs = await GetRequestableSongsAsync(baseUrl, apiKey, stationId);
 
@@ -404,8 +410,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public Task<IEnumerable<AzuraRequestRecord>?> GetRequestableSongsAsync(Uri baseUrl, string apiKey, int stationId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Requests}";
 
@@ -414,9 +420,9 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public Task<IEnumerable<AzuraMediaItemRecord>?> GetSongsInPlaylistAsync(Uri baseUrl, string apiKey, int stationId, AzuraPlaylistRecord playlist)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
-        ArgumentNullException.ThrowIfNull(playlist, nameof(playlist));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
+        ArgumentNullException.ThrowIfNull(playlist);
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}/{AzuraApiFilters.List}?{AzuraApiFilters.SearchPhrase}={AzuraApiFilters.Playlist}:{playlist.ShortName}";
 
@@ -425,8 +431,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public async Task<AzuraSongDataRecord?> GetSongInfoAsync(Uri baseUrl, string apiKey, AzuraCastStationEntity station, bool online, string? uniqueId = null, string? songId = null, string? name = null, string? artist = null, string? album = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentNullException.ThrowIfNull(station, nameof(station));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentNullException.ThrowIfNull(station);
 
         IEnumerable<AzuraFilesRecord>? songs = (online) ? await GetFilesOnlineAsync<AzuraFilesRecord>(baseUrl, apiKey, station.StationId) : await GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
         if (songs is null)
@@ -455,7 +461,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public Task<AzuraStationRecord?> GetStationAsync(Uri baseUrl, int stationId)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}";
 
@@ -464,8 +470,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public Task<AzuraAdminStationConfigRecord?> GetStationAdminConfigAsync(Uri baseUrl, string apiKey, int stationId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}";
 
@@ -474,8 +480,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public Task<IEnumerable<AzuraStationHistoryItemRecord>?> GetStationHistoryAsync(Uri baseUrl, string apiKey, int stationId, in DateTime start, in DateTime end)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}?{AzuraApiFilters.Start}={start:yyyy-MM-dd}&{AzuraApiFilters.End}={end:yyyy-MM-dd}";
 
@@ -484,8 +490,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public Task<IEnumerable<AzuraStationQueueItemDetailedRecord>?> GetStationQueueAsync(Uri baseUrl, string apiKey, int stationId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}";
 
@@ -494,8 +500,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public Task<IEnumerable<AzuraRequestQueueItemRecord>?> GetStationRequestItemsAsync(Uri baseUrl, string apiKey, int stationId, bool history)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = (history)
             ? $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}?{AzuraApiFilters.Type}={AzuraApiFilters.History}"
@@ -506,8 +512,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public async Task<AzuraSystemLogRecord?> GetSystemLogAsync(Uri baseUrl, string apiKey, string logName)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentException.ThrowIfNullOrWhiteSpace(logName, nameof(logName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentException.ThrowIfNullOrWhiteSpace(logName);
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Log}/{logName}";
 
@@ -523,27 +529,27 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public Task<AzuraSystemLogsRecord?> GetSystemLogsAsync(Uri baseUrl, string apiKey)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Logs}";
 
         return GetFromApiAsync<AzuraSystemLogsRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
-    public Task<AzuraUpdateRecord?> GetUpdatesAsync(Uri baseUrl, string apiKey)
+    public Task<string?> GetUpdatesAsync(Uri baseUrl, string apiKey)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Updates}";
 
-        return GetFromApiAsync<AzuraUpdateRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+        return GetFromApiAsync<string>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
     public async Task ModifyStationAdminConfigAsync(Uri baseUrl, string apiKey, int stationId, AzuraAdminStationConfigRecord config)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
-        ArgumentNullException.ThrowIfNull(config, nameof(config));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
+        ArgumentNullException.ThrowIfNull(config);
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}";
 
@@ -552,8 +558,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public async Task RequestSongAsync(Uri baseUrl, int stationId, string songId)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
-        ArgumentException.ThrowIfNullOrWhiteSpace(songId, nameof(songId));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(songId);
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Request}/{songId}";
 
@@ -562,8 +568,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public async Task SkipSongAsync(Uri baseUrl, string apiKey, int stationId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Backend}/{AzuraApiEndpoints.Skip}";
 
@@ -572,9 +578,9 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public async Task<bool> StartStationAsync(Uri baseUrl, string apiKey, int stationId, SlashCommandContext context)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
-        ArgumentNullException.ThrowIfNull(context, nameof(context));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
+        ArgumentNullException.ThrowIfNull(context);
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}";
         AzuraAdminStationConfigRecord? config = await GetFromApiAsync<AzuraAdminStationConfigRecord>(baseUrl, endpoint, CreateHeader(apiKey));
@@ -631,8 +637,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public async Task<bool> StopStationAsync(Uri baseUrl, string apiKey, int stationId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}";
 
@@ -649,9 +655,9 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public async Task<List<AzuraPlaylistStateRecord>?> SwitchPlaylistsAsync(Uri baseUrl, string apiKey, int stationId, int playlistId, bool removeOld)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playlistId, nameof(playlistId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playlistId);
 
         IEnumerable<AzuraPlaylistRecord>? playlists = await GetPlaylistsAsync(baseUrl, apiKey, stationId);
         if (playlists is null)
@@ -677,9 +683,9 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public async Task TogglePlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playlistId, nameof(playlistId));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playlistId);
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlist}/{playlistId}/{AzuraApiEndpoints.Toggle}";
 
@@ -688,7 +694,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public async Task UpdateInstanceAsync(Uri baseUrl, string apiKey)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Updates}";
 
@@ -724,10 +730,10 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     public async Task<T?> UploadFileAsync<T>(Uri baseUrl, string apiKey, int stationId, string file, string fileName, string filePath)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));
-        ArgumentException.ThrowIfNullOrWhiteSpace(fileName, nameof(fileName));
-        ArgumentException.ThrowIfNullOrWhiteSpace(filePath, nameof(filePath));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}";
         string? result = await UploadToApiAsync(baseUrl, endpoint, file, fileName, filePath, CreateHeader(apiKey));

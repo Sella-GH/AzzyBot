@@ -56,8 +56,8 @@ public sealed class ConfigCommands
             [Description("Enable or disable the addition of the changelog to the posted AzuraCast updates."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int updatesChangelog
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
 
             _logger.CommandRequested(nameof(AddAzuraCastAsync), context.User.GlobalName);
 
@@ -101,8 +101,8 @@ public sealed class ConfigCommands
                 return;
             }
 
-            AzuraCastEntity? azuraCast = guild.AzuraCast;
-            if (azuraCast is not null)
+            AzuraCastEntity? ac = guild.AzuraCast;
+            if (ac is not null)
             {
                 _logger.DatabaseAzuraCastNotFound(guildId);
                 await context.DeleteResponseAsync();
@@ -143,8 +143,8 @@ public sealed class ConfigCommands
             [Description("Select the group that has the dj permissions on this station.")] DiscordRole? djGroup = null
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
 
             _logger.CommandRequested(nameof(AddAzuraCastStationAsync), context.User.GlobalName);
 
@@ -191,20 +191,20 @@ public sealed class ConfigCommands
         [Command("delete-azuracast"), Description("Delete the existing AzuraCast setup."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask DeleteAzuraCastAsync(SlashCommandContext context)
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
 
             _logger.CommandRequested(nameof(DeleteAzuraCastAsync), context.User.GlobalName);
 
-            AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
-            if (azuraCast is null)
+            AzuraCastEntity? ac = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
+            if (ac is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
                 await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
-            FileOperations.DeleteFiles(_azuraCast.FilePath, $"{azuraCast.Id}-");
+            FileOperations.DeleteFiles(_azuraCast.FilePath, $"{ac.Id}-");
             await _dbActions.DeleteAzuraCastAsync(context.Guild.Id);
 
             await context.EditResponseAsync(GeneralStrings.ConfigInstanceDeleted);
@@ -217,8 +217,8 @@ public sealed class ConfigCommands
             [Description("Choose the station you want to delete."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
 
             _logger.CommandRequested(nameof(DeleteAzuraCastStationAsync), context.User.GlobalName);
 
@@ -247,8 +247,8 @@ public sealed class ConfigCommands
             [Description("Update the channel to get notifications when your azuracast instance is down."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? outagesChannel = null
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
 
             _logger.CommandRequested(nameof(UpdateAzuraCastAsync), context.User.GlobalName);
 
@@ -277,22 +277,20 @@ public sealed class ConfigCommands
 
             if (notificationsChannel is not null || outagesChannel is not null)
             {
-                ulong[] channels = [];
-                if (notificationsChannel is null && outagesChannel is not null)
+                ulong[] channels = new ulong[2];
+                if (notificationsChannel is not null)
+                    channels[0] = notificationsChannel.Id;
+
+                if (outagesChannel is not null && channels.Length > 1)
                 {
-                    channels = [outagesChannel.Id];
+                    channels[1] = outagesChannel.Id;
                 }
-                else if (outagesChannel is null && notificationsChannel is not null)
+                else if (outagesChannel is not null)
                 {
-                    channels = [notificationsChannel.Id];
-                }
-                else if (notificationsChannel is not null && outagesChannel is not null)
-                {
-                    channels = [notificationsChannel.Id, outagesChannel.Id];
+                    channels[0] = outagesChannel.Id;
                 }
 
-                if (channels.Length is not 0)
-                    await _botService.CheckPermissionsAsync(context.Guild, channels);
+                await _botService.CheckPermissionsAsync(context.Guild, [.. channels]);
             }
 
             if (url is not null)
@@ -308,8 +306,8 @@ public sealed class ConfigCommands
             [Description("Enable or disable the addition of the changelog to the posted AzuraCast updates."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int updatesChangelog = 0
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
 
             _logger.CommandRequested(nameof(UpdateAzuraCastChecksAsync), context.User.GlobalName);
 
@@ -393,8 +391,8 @@ public sealed class ConfigCommands
             [Description("Enable or disable the showing of the playlist in the nowplaying embed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int showPlaylist = 0
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
 
             _logger.CommandRequested(nameof(UpdateAzuraCastStationAsync), context.User.GlobalName);
 
@@ -457,7 +455,7 @@ public sealed class ConfigCommands
                     return;
                 }
 
-                if (guild.AzuraCast.Stations.FirstOrDefault(s => s.Id == station) is not AzuraCastStationEntity acStation)
+                if (guild.AzuraCast.Stations.FirstOrDefault(s => s.Id == station) is null)
                 {
                     _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, guild.AzuraCast.Id, station);
                     await context.EditResponseAsync(GeneralStrings.StationNotFound);
@@ -480,8 +478,8 @@ public sealed class ConfigCommands
             [Description("Enable or disable the automatic check if files have been changed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int fileChanges = 0
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
 
             _logger.CommandRequested(nameof(UpdateAzuraCastStationChecksAsync), context.User.GlobalName);
 
@@ -521,7 +519,7 @@ public sealed class ConfigCommands
                     return;
                 }
 
-                if (guild.AzuraCast.Stations.FirstOrDefault(s => s.Id == station) is not AzuraCastStationEntity acStation)
+                if (guild.AzuraCast.Stations.FirstOrDefault(s => s.Id == station) is null)
                 {
                     _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, guild.AzuraCast.Id, station);
                     return;
@@ -541,8 +539,8 @@ public sealed class ConfigCommands
             [Description("Select a channel to get notifications when the bot runs into an issue."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? errorChannel = null
         )
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
 
             _logger.CommandRequested(nameof(UpdateCoreAsync), context.User.GlobalName);
 
@@ -558,18 +556,17 @@ public sealed class ConfigCommands
 
             await context.EditResponseAsync(GeneralStrings.CoreSettingsModified);
 
-            ulong[] channels = [];
-            if (adminChannel is not null && errorChannel is null)
+            ulong[] channels = new ulong[2];
+            if (adminChannel is not null)
+                channels[0] = adminChannel.Id;
+
+            if (errorChannel is not null && channels.Length > 1)
             {
-                channels = [adminChannel.Id];
+                channels[1] = errorChannel.Id;
             }
-            else if (errorChannel is not null && adminChannel is null)
+            else if (errorChannel is not null)
             {
-                channels = [errorChannel.Id];
-            }
-            else if (adminChannel is not null && errorChannel is not null)
-            {
-                channels = [adminChannel.Id, errorChannel.Id];
+                channels[0] = errorChannel.Id;
             }
 
             if (channels.Length is not 0)
@@ -579,9 +576,9 @@ public sealed class ConfigCommands
         [Command("get-settings"), Description("Get all configured settings in a direct message.")]
         public async ValueTask GetSettingsAsync(SlashCommandContext context)
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
-            ArgumentNullException.ThrowIfNull(context.Member, nameof(context.Member));
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
+            ArgumentNullException.ThrowIfNull(context.Member);
 
             _logger.CommandRequested(nameof(GetSettingsAsync), context.User.GlobalName);
 
@@ -616,18 +613,18 @@ public sealed class ConfigCommands
 
             if (guild.AzuraCast is not null)
             {
-                AzuraCastEntity azuraCast = guild.AzuraCast;
+                AzuraCastEntity ac = guild.AzuraCast;
                 AzuraStationRecord? stationRecord;
-                Dictionary<ulong, string> stationRoles = new(azuraCast.Stations.Count);
-                Dictionary<int, string> stationNames = new(azuraCast.Stations.Count);
-                foreach (AzuraCastStationEntity station in azuraCast.Stations)
+                Dictionary<ulong, string> stationRoles = new(ac.Stations.Count);
+                Dictionary<int, string> stationNames = new(ac.Stations.Count);
+                foreach (AzuraCastStationEntity station in ac.Stations)
                 {
                     DiscordRole? stationAdminRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationAdminRoleId);
                     DiscordRole? stationDjRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationDjRoleId);
                     stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? "Name not found");
                     stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found");
 
-                    stationRecord = await _azuraCast.GetStationAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), station.StationId);
+                    stationRecord = await _azuraCast.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), station.StationId);
                     if (stationRecord is null)
                     {
                         await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
@@ -637,8 +634,8 @@ public sealed class ConfigCommands
                     stationNames.Add(station.Id, stationRecord.Name);
                 }
 
-                DiscordRole? instanceAdminRole = roles.FirstOrDefault(r => r.Id == azuraCast.Preferences.InstanceAdminRoleId);
-                IEnumerable<DiscordEmbed> azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(azuraCast, $"{instanceAdminRole?.Name} ({instanceAdminRole?.Id})", stationRoles, stationNames);
+                DiscordRole? instanceAdminRole = roles.FirstOrDefault(r => r.Id == ac.Preferences.InstanceAdminRoleId);
+                IEnumerable<DiscordEmbed> azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(ac, $"{instanceAdminRole?.Name} ({instanceAdminRole?.Id})", stationRoles, stationNames);
 
                 messageBuilder.AddEmbeds(azuraEmbed);
             }
@@ -651,8 +648,8 @@ public sealed class ConfigCommands
         [Command("reset-settings"), Description("Reset all of your settings, you have to reconfigure everything again.")]
         public async ValueTask ResetSettingsAsync(SlashCommandContext context)
         {
-            ArgumentNullException.ThrowIfNull(context, nameof(context));
-            ArgumentNullException.ThrowIfNull(context.Guild, nameof(context.Guild));
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
 
             _logger.CommandRequested(nameof(ResetSettingsAsync), context.User.GlobalName);
 

@@ -59,6 +59,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="SonarAnalyzer.CSharp">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="System.Linq.Async" />
     <PackageReference Include="TagLibSharp" />
   </ItemGroup>
@@ -88,6 +92,10 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>CommandParamNames.resx</DependentUpon>
+    <Compile Update="Resources\UriStrings.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>UriStrings.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 
@@ -107,6 +115,9 @@
     <EmbeddedResource Update="Localization\CommandParamNames.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>CommandParamNames.Designer.cs</LastGenOutput>
+    <EmbeddedResource Update="Resources\UriStrings.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>UriStrings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 

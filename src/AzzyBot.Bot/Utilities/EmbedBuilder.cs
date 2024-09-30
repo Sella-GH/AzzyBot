@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Utilities;
@@ -25,7 +26,7 @@ public static class EmbedBuilder
 
     private static DiscordEmbedBuilder CreateBasicEmbed(string title, string? description = null, DiscordColor? color = null, Uri? thumbnailUrl = null, string? footerText = null, Uri? url = null, Dictionary<string, AzzyDiscordEmbedRecord>? fields = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(title, nameof(title));
+        ArgumentException.ThrowIfNullOrWhiteSpace(title);
 
         DiscordEmbedBuilder builder = new()
         {
@@ -60,7 +61,7 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildAzuraCastFileChangesEmbed(string stationName, int added, int removed)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(stationName, nameof(stationName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(stationName);
 
         const string title = "File Changes";
         string addedFiles = "**No** files were added.";
@@ -96,7 +97,7 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildAzuraCastHardwareStatsEmbed(AzuraHardwareStatsRecord stats)
     {
-        ArgumentNullException.ThrowIfNull(stats, nameof(stats));
+        ArgumentNullException.ThrowIfNull(stats);
 
         const string title = "AzuraCast Hardware Stats";
         StringBuilder cpuUsage = new();
@@ -151,7 +152,7 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildAzuraCastMusicNowPlayingEmbed(AzuraNowPlayingDataRecord data, string? playlistName = null)
     {
-        ArgumentNullException.ThrowIfNull(data, nameof(data));
+        ArgumentNullException.ThrowIfNull(data);
 
         const string title = "Now Playing";
         string? message = null;
@@ -195,7 +196,7 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildAzuraCastMusicSearchSongEmbed(AzuraRequestRecord song, bool isQueued, bool isPlayed)
     {
-        ArgumentNullException.ThrowIfNull(song, nameof(song));
+        ArgumentNullException.ThrowIfNull(song);
 
         const string title = "Song Search";
         const string description = "Here is the song you requested.";
@@ -227,7 +228,7 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildAzuraCastUpdatesAvailableEmbed(AzuraUpdateRecord update)
     {
-        ArgumentNullException.ThrowIfNull(update, nameof(update));
+        ArgumentNullException.ThrowIfNull(update);
 
         const string title = "AzuraCast Updates Available";
         string description = $"Your AzuraCast installation needs **{update.RollingUpdatesList.Count}** updates.";
@@ -250,7 +251,7 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildAzuraCastUpdatesChangelogEmbed(IEnumerable<string> changelog, bool isRolling)
     {
-        ArgumentNullException.ThrowIfNull(changelog, nameof(changelog));
+        ArgumentNullException.ThrowIfNull(changelog);
 
         const string title = "AzuraCast Updates Changelog";
 
@@ -268,8 +269,8 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildAzuraCastUploadFileEmbed(AzuraFilesDetailedRecord file, int fileSize, string stationName)
     {
-        ArgumentNullException.ThrowIfNull(file, nameof(file));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(fileSize, nameof(fileSize));
+        ArgumentNullException.ThrowIfNull(file);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(fileSize);
 
         const string title = "File Uploaded";
         const string description = "Your song was uploaded successfully.";
@@ -394,7 +395,7 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildAzzyHelpEmbed(AzzyHelpRecord command)
     {
-        ArgumentNullException.ThrowIfNull(command, nameof(command));
+        ArgumentNullException.ThrowIfNull(command);
 
         string title = command.Name;
         string description = command.Description;
@@ -410,8 +411,8 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildAzzyHelpEmbed(IReadOnlyList<AzzyHelpRecord> commands)
     {
-        ArgumentNullException.ThrowIfNull(commands, nameof(commands));
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(commands.Count, nameof(commands));
+        ArgumentNullException.ThrowIfNull(commands);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(commands.Count);
 
         // Make the first letter an uppercase one and append the rest
         string title = $"Command List For {string.Concat(commands[0].SubCommand[0].ToString().ToUpperInvariant(), commands[0].SubCommand.AsSpan(1))} Group";
@@ -428,14 +429,10 @@ public static class EmbedBuilder
     public static DiscordEmbed BuildAzzyInfoStatsEmbed(Uri avaUrl, string dspVersion, string commit, in DateTime compileDate, int loc)
     {
         const string title = "AzzyBot Informational Stats";
-        const string githubUrl = "https://github.com/Sella-GH";
-        const string botUrl = $"{githubUrl}/AzzyBot";
-        const string commitUrl = $"{botUrl}/commit";
-        const string contribUrl = $"{botUrl}/graphs/contributors";
         string[] authors = SoftwareStats.GetAppAuthors.Split(',');
         string sourceCode = $"{loc} lines";
-        string formattedAuthors = $"- [{authors[0].Trim()}]({githubUrl})\n- [{authors[1].Trim()}]({contribUrl})";
-        string formattedCommit = $"[{commit}]({commitUrl}/{commit})";
+        string formattedAuthors = $"- [{authors[0].Trim()}]({UriStrings.GitHubCreatorUri})\n- [{authors[1].Trim()}]({UriStrings.GitHubRepoContribUri})";
+        string formattedCommit = $"[{commit}]({UriStrings.GitHubRepoCommitUri}/{commit})";
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(11)
         {
@@ -444,7 +441,7 @@ public static class EmbedBuilder
             [".NET Version"] = new(SoftwareStats.GetAppDotNetVersion, true),
             ["D#+ Version"] = new(dspVersion, true),
             ["Authors"] = new(formattedAuthors, true),
-            ["Repository"] = new($"[GitHub]({botUrl})", true),
+            ["Repository"] = new($"[GitHub]({UriStrings.GitHubRepoUri})", true),
             ["Environment"] = new(SoftwareStats.GetAppEnvironment, true),
             ["Source Code"] = new(sourceCode, true),
             ["Memory Usage"] = new($"{SoftwareStats.GetAppMemoryUsage()} GB", true),
@@ -457,7 +454,7 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildAzzyUpdatesAvailableEmbed(string version, in DateTime updateDate, Uri url)
     {
-        ArgumentNullException.ThrowIfNull(version, nameof(version));
+        ArgumentNullException.ThrowIfNull(version);
 
         const string title = "Azzy Updates Available";
         const string description = "Update now to get the latest bug fixes, features and improvements!";
@@ -496,8 +493,8 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildGetSettingsGuildEmbed(string serverName, GuildEntity guild, string adminRole)
     {
-        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
-        ArgumentException.ThrowIfNullOrWhiteSpace(serverName, nameof(serverName));
+        ArgumentNullException.ThrowIfNull(guild);
+        ArgumentException.ThrowIfNullOrWhiteSpace(serverName);
 
         const string title = "Settings Overview";
         string description = $"Here are all settings which are currently set for **{serverName}**";
@@ -516,7 +513,7 @@ public static class EmbedBuilder
 
     public static IEnumerable<DiscordEmbed> BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast, string instanceRole, IReadOnlyDictionary<ulong, string> stationRoles, IReadOnlyDictionary<int, string> stationNames)
     {
-        ArgumentNullException.ThrowIfNull(azuraCast, nameof(azuraCast));
+        ArgumentNullException.ThrowIfNull(azuraCast);
 
         const string title = "AzuraCast Settings";
         List<DiscordEmbed> embeds = new(1 + azuraCast.Stations.Count);
@@ -590,7 +587,7 @@ public static class EmbedBuilder
 
     public static async Task<DiscordEmbed> BuildGuildAddedEmbedAsync(DiscordGuild guild, bool getInfo = false)
     {
-        ArgumentNullException.ThrowIfNull(guild, nameof(guild));
+        ArgumentNullException.ThrowIfNull(guild);
 
         string title = (getInfo) ? "Guild Information" : "Guild Added";
         string description = (getInfo) ? $"Here is everything I know about **{guild.Name}**" : $"I was added to **{guild.Name}**.";
@@ -613,7 +610,7 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildGuildRemovedEmbed(ulong guildId, DiscordGuild? guild = null)
     {
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId, nameof(guildId));
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId);
 
         const string title = "Guild Removed";
         string description = $"I was removed from **{((!string.IsNullOrWhiteSpace(guild?.Name)) ? guild.Name : guildId)}**.";
@@ -635,19 +632,19 @@ public static class EmbedBuilder
         StringBuilder builder = new();
 
         int count = 0;
-        foreach (ITrackQueueItem item in history.Where(static i => i.Track is not null))
+        foreach (LavalinkTrack item in history.Where(static i => i.Track is not null).Select(i => i.Track!))
         {
             if (title.Length + builder.Length > 6000)
                 break;
 
             if (isQueue)
             {
-                builder.AppendLine(CultureInfo.InvariantCulture, $"- [{count}] **[{item.Track!.Title}]({item.Track!.Uri})** by **{item.Track!.Author}** ({item.Track!.Duration.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture)})");
+                builder.AppendLine(CultureInfo.InvariantCulture, $"- [{count}] **[{item.Title}]({item.Uri})** by **{item.Author}** ({item.Duration.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture)})");
                 count++;
             }
             else
             {
-                builder.AppendLine(CultureInfo.InvariantCulture, $"- **[{item.Track!.Title}]({item.Track!.Uri})** by **{item.Track!.Author}** ({item.Track!.Duration.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture)})");
+                builder.AppendLine(CultureInfo.InvariantCulture, $"- **[{item.Title}]({item.Uri})** by **{item.Author}** ({item.Duration.ToString(@"hh\:mm\:ss", CultureInfo.InvariantCulture)})");
             }
         }
 
@@ -656,7 +653,7 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildMusicStreamingNowPlayingEmbed(LavalinkTrack track, TimeSpan? elapsed)
     {
-        ArgumentNullException.ThrowIfNull(track, nameof(track));
+        ArgumentNullException.ThrowIfNull(track);
         if (elapsed is null)
             throw new ArgumentNullException(nameof(elapsed), "Elapsed time cannot be null.");
 
@@ -669,9 +666,12 @@ public static class EmbedBuilder
             ["By"] = new(track.Author, true)
         };
 
+        // Evalute this once there is a bug
+        // As of 2024-09-26 this should work flawlessly
+        // Specificially the *elapsed.Value* variable
         string songDuration = track.Duration.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
-        string songElapsed = (elapsed.HasValue) ? elapsed.Value.ToString(@"mm\:ss", CultureInfo.InvariantCulture) : TimeSpan.FromTicks(0).ToString(@"mm\:ss", CultureInfo.InvariantCulture);
-        string progressBar = Misc.GetProgressBar(14, (elapsed.HasValue) ? elapsed.Value.TotalSeconds : 0, track.Duration.TotalSeconds);
+        string songElapsed = elapsed.Value.ToString(@"mm\:ss", CultureInfo.InvariantCulture);
+        string progressBar = Misc.GetProgressBar(14, elapsed.Value.TotalSeconds, track.Duration.TotalSeconds);
 
         fields.Add("Duration", new($"{progressBar} `[{songElapsed} / {songDuration}]`"));
 
