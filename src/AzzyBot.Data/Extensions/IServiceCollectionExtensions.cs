@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using AzzyBot.Core.Utilities.Encryption;
 using EntityFramework.Exceptions.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +13,7 @@ public static class IServiceCollectionExtensions
     {
         // Set the encryption key
         Crypto.EncryptionKey = Encoding.UTF8.GetBytes(encryptionKey);
-
+      
         string connectionString = GetConnectionString(host, port, user, password, database);
         services.AddDbContextPool<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor().EnableSensitiveDataLogging(isDev));
         services.AddSingleton<DbActions>();
