@@ -171,9 +171,9 @@ public static class IServiceCollectionExtensions
     private static void DiscordClientCommands(this IServiceCollection services, AzzyBotSettingsRecord settings)
     {
         services.AddSingleton<DiscordCommandsErrorHandler>();
-        services.AddCommandsExtension(c =>
+        services.AddCommandsExtension((IServiceProvider sp, CommandsExtension c) =>
         {
-            DiscordCommandsErrorHandler handler = c.ServiceProvider.GetRequiredService<DiscordCommandsErrorHandler>();
+            DiscordCommandsErrorHandler handler = sp.GetRequiredService<DiscordCommandsErrorHandler>();
 
             c.CommandErrored += handler.CommandErroredAsync;
 
