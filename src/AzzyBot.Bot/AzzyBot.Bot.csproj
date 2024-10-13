@@ -92,6 +92,7 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>CommandParamNames.resx</DependentUpon>
+    </Compile>
     <Compile Update="Resources\UriStrings.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -115,6 +116,7 @@
     <EmbeddedResource Update="Localization\CommandParamNames.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>CommandParamNames.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\UriStrings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>UriStrings.Designer.cs</LastGenOutput>
