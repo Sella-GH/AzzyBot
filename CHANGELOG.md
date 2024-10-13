@@ -13,7 +13,23 @@
 - Exception embeds now produce json output instead of a stacktrace.log file
 - Reworked the whole file logging system
 
+## 2.0.6 - 2024-10-13
+### General
+- Recreated docker images because of vulnerabilities
+
+### Dependencies
+- Now dependent on [Npgsql](https://github.com/npgsql/npgsql) in version 8.0.5
+- Updated [Microsoft.Extensions.Hosting](https://github.com/dotnet/runtime) to version 8.0.1
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 8.0.10
+- Updated [Npgsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg) to version 8.0.8
+- Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.12.8
+- Updated [System.Text.Json](https://github.com/dotnet/runtime) to version 8.0.5
+
+### Improvements
+- Tiny code changes
+
 ## 2.0.5 - 2024-09-24
+### Dependencies
 - Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.12.6
 
 ### Fixes
