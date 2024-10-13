@@ -2,19 +2,20 @@
 using System.Threading.Tasks;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Commands.Trees;
+using DSharpPlus.Entities;
 
 namespace AzzyBot.Bot.Commands.Choices;
 
 public sealed class BotStatusProvider : IChoiceProvider
 {
-    private readonly IReadOnlyDictionary<string, object> _botStatus = new Dictionary<string, object>(4)
-    {
-        ["Offline"] = 0,
-        ["Online"] = 1,
-        ["Idle"] = 2,
-        ["Do Not Disturb"] = 4
-    };
+    private static readonly IEnumerable<DiscordApplicationCommandOptionChoice> BotStatusChoices =
+    [
+        new("Offline", 0),
+        new("Online", 1),
+        new("Idle", 2),
+        new("Do Not Disturb", 4)
+    ];
 
-    public ValueTask<IReadOnlyDictionary<string, object>> ProvideAsync(CommandParameter parameter)
-        => ValueTask.FromResult(_botStatus);
+    public ValueTask<IEnumerable<DiscordApplicationCommandOptionChoice>> ProvideAsync(CommandParameter parameter)
+        => ValueTask.FromResult(BotStatusChoices);
 }

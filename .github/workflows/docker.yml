@@ -3,6 +3,7 @@ name: Build Docker Image
 on:
   push:
     branches:
+      - "dependabot/**"
       - "dev/**"
       - "main"
       - "rel/**"
@@ -47,7 +48,7 @@ jobs:
       - name: Get build environment
         id: get-environment
         run: |
-          if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') || contains(github.event.ref, 'dev/') }}; then
+          if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') || contains(github.event.ref, 'dev/') || contains(github.event.ref, 'dependabot/') }}; then
             echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
             echo "environment_alpine=${{ github.ref_name }}-alpine" >> "$GITHUB_OUTPUT"
           elif ${{ contains(github.ref_name, 'main') && (!contains(github.event.head_commit.message, '[pre-release]') || !contains(github.event.head_commit.message, '[release]')) }}; then
