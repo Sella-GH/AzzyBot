@@ -2,17 +2,18 @@
 using System.Threading.Tasks;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Commands.Trees;
+using DSharpPlus.Entities;
 
 namespace AzzyBot.Bot.Commands.Choices;
 
 public sealed class BooleanEnableDisableStateProvider : IChoiceProvider
 {
-    private readonly IReadOnlyDictionary<string, object> _booleanStates = new Dictionary<string, object>(2)
-    {
-        ["Enable"] = 1,
-        ["Disable"] = 2
-    };
+    private static readonly IEnumerable<DiscordApplicationCommandOptionChoice> BooleanStates =
+    [
+        new("Enable", 1),
+        new("Disable", 2)
+    ];
 
-    public ValueTask<IReadOnlyDictionary<string, object>> ProvideAsync(CommandParameter parameter)
-        => ValueTask.FromResult(_booleanStates);
+    public ValueTask<IEnumerable<DiscordApplicationCommandOptionChoice>> ProvideAsync(CommandParameter parameter)
+        => ValueTask.FromResult(BooleanStates);
 }
