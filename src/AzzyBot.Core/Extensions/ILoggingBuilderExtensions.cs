@@ -62,6 +62,6 @@ public static class ILoggingBuilderExtensions
         if (isDev && forceTrace)
             logging.SetMinimumLevel(LogLevel.Trace);
     }
-  
+
     public static void AddAzzyBotWebFilters(this ILoggingBuilder logging) => logging.SetMinimumLevel(LogLevel.Information);
 }

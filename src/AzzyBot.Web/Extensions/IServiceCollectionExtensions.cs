@@ -50,41 +50,43 @@ public static class IServiceCollectionExtensions
         //});
     }
 
-    //public static void AzzyBotWebSettings(this IServiceCollection services, bool isDev = false, bool isDocker = false)
-    //{
-        //string settingsFile = "AzzyBotWebSettings.json";
-        //if (isDev)
-        //{
-        //    settingsFile = "AzzyBotWebSettings-Dev.json";
-        //}
-        //else if (isDocker)
-        //{
-        //    settingsFile = "AzzyBotWebSettings-Docker.json";
-        //}
+    /*
+    public static void AzzyBotWebSettings(this IServiceCollection services, bool isDev = false, bool isDocker = false)
+    {
+        string settingsFile = "AzzyBotWebSettings.json";
+        if (isDev)
+        {
+            settingsFile = "AzzyBotWebSettings-Dev.json";
+        }
+        else if (isDocker)
+        {
+            settingsFile = "AzzyBotWebSettings-Docker.json";
+        }
 
-        //string path = Path.Combine("Settings", settingsFile);
+        string path = Path.Combine("Settings", settingsFile);
 
-        //AzzyBotWebSettingsRecord? settings = GetConfiguration(path).Get<AzzyBotWebSettingsRecord>();
-        //if (settings is null)
-        //{
-        //    Console.Error.WriteLine("No web configuration found! Please set your settings.");
-        //    if (!HardwareStats.CheckIfLinuxOs)
-        //        Console.ReadKey();
+        AzzyBotWebSettingsRecord? settings = GetConfiguration(path).Get<AzzyBotWebSettingsRecord>();
+        if (settings is null)
+        {
+            Console.Error.WriteLine("No web configuration found! Please set your settings.");
+            if (!HardwareStats.CheckIfLinuxOs)
+                Console.ReadKey();
 
-        //    Environment.Exit(1);
-        //}
+            Environment.Exit(1);
+        }
 
-        //SettingsCheck.CheckSettings(settings);
+        SettingsCheck.CheckSettings(settings);
 
-        //services.AddSingleton(settings);
-    //}
+        services.AddSingleton(settings);
+    }
 
-    //private static IConfiguration GetConfiguration(string path)
-    //{
-    //    ConfigurationBuilder configBuilder = new();
-    //    configBuilder.Sources.Clear();
-    //    configBuilder.AddJsonFile(path, false, false);
+    private static IConfiguration GetConfiguration(string path)
+    {
+        ConfigurationBuilder configBuilder = new();
+        configBuilder.Sources.Clear();
+        configBuilder.AddJsonFile(path, false, false);
 
-    //    return configBuilder.Build();
-    //}
+        return configBuilder.Build();
+    }
+    */
 }
