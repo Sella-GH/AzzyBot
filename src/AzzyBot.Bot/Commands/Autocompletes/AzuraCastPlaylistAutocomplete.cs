@@ -14,6 +14,7 @@ using AzzyBot.Data;
 using AzzyBot.Data.Entities;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
+using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
@@ -25,14 +26,14 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
 
-    public async ValueTask<IReadOnlyDictionary<string, object>> AutoCompleteAsync(AutoCompleteContext context)
+    public async ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(context.Guild);
 
         int stationId = Convert.ToInt32(context.Options.Single(static o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
         if (stationId is 0)
-            return new Dictionary<string, object>();
+            return [];
 
         AzuraCastStationEntity? station;
         try
@@ -41,26 +42,26 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
             if (station is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, stationId);
-                return new Dictionary<string, object>();
+                return [];
             }
         }
         catch (InvalidOperationException)
         {
-            return new Dictionary<string, object>();
+            return [];
         }
 
         bool needState = context.Command.Name is "switch-playlist";
-        string search = context.UserInput;
+        string? search = context.UserInput;
         string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(station.AzuraCast.AdminApiKey);
         string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
         IEnumerable<AzuraPlaylistRecord>? playlists = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, stationId);
         if (playlists is null)
         {
             await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station ({stationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
-            return new Dictionary<string, object>();
+            return [];
         }
 
-        Dictionary<string, object> results = new(25);
+        List<DiscordAutoCompleteChoice> results = new(25);
         foreach (AzuraPlaylistRecord playlist in playlists)
         {
             if (results.Count is 25)
@@ -71,11 +72,11 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
 
             if (needState)
             {
-                results.Add($"{playlist.Name} ({Misc.GetReadableBool(playlist.IsEnabled, ReadableBool.EnabledDisabled, true)})", playlist.Id);
+                results.Add(new($"{playlist.Name} ({Misc.GetReadableBool(playlist.IsEnabled, ReadableBool.EnabledDisabled, true)})", playlist.Id));
             }
             else
             {
-                results.Add(playlist.Name, playlist.Id);
+                results.Add(new(playlist.Name, playlist.Id));
             }
         }
 

@@ -6,17 +6,18 @@ using System.Threading.Tasks;
 using AzzyBot.Core.Utilities;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
+using DSharpPlus.Entities;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
 public sealed class AzzyViewLogsAutocomplete : IAutoCompleteProvider
 {
-    public ValueTask<IReadOnlyDictionary<string, object>> AutoCompleteAsync(AutoCompleteContext context)
+    public ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        Dictionary<string, object> results = new(25);
-        string search = context.UserInput;
+        List<DiscordAutoCompleteChoice> results = new(25);
+        string? search = context.UserInput;
 
         foreach (string file in FileOperations.GetFilesInDirectory("Logs").OrderByDescending(static f => f))
         {
@@ -27,9 +28,9 @@ public sealed class AzzyViewLogsAutocomplete : IAutoCompleteProvider
                 continue;
 
             FileInfo fileInfo = new(file);
-            results.Add($"{fileInfo.Name} ({Math.Round(fileInfo.Length / (1024.0 * 1024.0), 2)} MB)", file);
+            results.Add(new($"{fileInfo.Name} ({Math.Round(fileInfo.Length / (1024.0 * 1024.0), 2)} MB)", file));
         }
 
-        return new ValueTask<IReadOnlyDictionary<string, object>>(results);
+        return ValueTask.FromResult(results.AsEnumerable());
     }
 }
