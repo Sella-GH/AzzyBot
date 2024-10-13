@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
+using DSharpPlus.Commands.Converters;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Entities;
-using DSharpPlus.EventArgs;
 
 namespace AzzyBot.Bot.Commands.Converters;
 
@@ -14,12 +14,14 @@ public sealed class UriArgumentConverter : ISlashArgumentConverter<Uri>
     public string ReadableName
         => "Url";
 
-    public Task<Optional<Uri>> ConvertAsync(InteractionConverterContext context, InteractionCreatedEventArgs eventArgs)
-        => ConvertAsync(context?.Argument?.RawValue);
-
-    public static Task<Optional<Uri>> ConvertAsync(string? value)
+    public Task<Optional<Uri>> ConvertAsync(ConverterContext context)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(value);
+        ArgumentNullException.ThrowIfNull(context);
+
+        string? value = context.Argument?.ToString();
+
+        if (string.IsNullOrWhiteSpace(value))
+            return Task.FromResult(Optional.FromNoValue<Uri>());
 
         if (!value.Contains("https://", StringComparison.OrdinalIgnoreCase) && !value.Contains("http://", StringComparison.OrdinalIgnoreCase))
             value = $"http://{value}";
