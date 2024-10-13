@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Settings;
@@ -15,17 +16,17 @@ public sealed class GuildsAutocomplete(AzzyBotSettingsRecord settings, DiscordBo
     private readonly AzzyBotSettingsRecord _settings = settings;
     private readonly DiscordBotService _botService = botService;
 
-    public ValueTask<IReadOnlyDictionary<string, object>> AutoCompleteAsync(AutoCompleteContext context)
+    public ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
         IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
         if (guilds.Count is 0)
-            return new ValueTask<IReadOnlyDictionary<string, object>>();
+            return ValueTask.FromResult(new List<DiscordAutoCompleteChoice>(1).AsEnumerable());
 
-        string search = context.UserInput;
+        string? search = context.UserInput;
 
-        Dictionary<string, object> results = new(25);
+        List<DiscordAutoCompleteChoice> results = new(25);
         string commandName = context.Command.Name;
         foreach (DiscordGuild guild in guilds.Values)
         {
@@ -38,9 +39,9 @@ public sealed class GuildsAutocomplete(AzzyBotSettingsRecord settings, DiscordBo
             if (guild.Id == _settings.ServerId && commandName is not "get-joined-server")
                 continue;
 
-            results.Add(guild.Name, guild.Id.ToString(CultureInfo.InvariantCulture));
+            results.Add(new(guild.Name, guild.Id.ToString(CultureInfo.InvariantCulture)));
         }
 
-        return new ValueTask<IReadOnlyDictionary<string, object>>(results);
+        return ValueTask.FromResult(results.AsEnumerable());
     }
 }

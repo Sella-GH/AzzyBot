@@ -26,6 +26,6 @@ public sealed class QueuedBackgroundTask
         await _queue.Writer.WriteAsync(workItem);
     }
 
-    public async ValueTask<Func<CancellationToken, ValueTask>> DequeueAsync(CancellationToken cancellationToken)
-        => await _queue.Reader.ReadAsync(cancellationToken);
+    public ValueTask<Func<CancellationToken, ValueTask>> DequeueAsync(in CancellationToken cancellationToken)
+        => _queue.Reader.ReadAsync(cancellationToken);
 }

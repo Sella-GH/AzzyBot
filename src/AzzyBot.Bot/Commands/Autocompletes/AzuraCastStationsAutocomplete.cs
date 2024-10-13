@@ -13,6 +13,7 @@ using AzzyBot.Data;
 using AzzyBot.Data.Entities;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
+using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
@@ -24,7 +25,7 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
 
-    public async ValueTask<IReadOnlyDictionary<string, object>> AutoCompleteAsync(AutoCompleteContext context)
+    public async ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(context.Guild);
@@ -33,17 +34,17 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
         if (azuraCast is null)
         {
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-            return new Dictionary<string, object>();
+            return [];
         }
 
         IEnumerable<AzuraCastStationEntity> stationsInDb = azuraCast.Stations;
         if (!stationsInDb.Any())
-            return new Dictionary<string, object>();
+            return [];
 
-        string search = context.UserInput;
+        string? search = context.UserInput;
         Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
         string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
-        Dictionary<string, object> results = new(25);
+        List<DiscordAutoCompleteChoice> results = new(25);
         foreach (int station in stationsInDb.Select(s => s.StationId))
         {
             if (results.Count is 25)
@@ -53,7 +54,7 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
             if (azuraStation is null)
             {
                 await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
-                return new Dictionary<string, object>();
+                return results;
             }
 
             if (!string.IsNullOrWhiteSpace(search) && azuraStation.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
@@ -63,14 +64,14 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
             if (config is null)
             {
                 await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
-                return new Dictionary<string, object>();
+                return results;
             }
 
             switch (context.Command.Name)
             {
                 case "play-mount":
                     if (config.IsEnabled)
-                        results.Add(azuraStation.Name, station);
+                        results.Add(new(azuraStation.Name, station));
 
                     break;
 
@@ -80,15 +81,15 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
 
                 case "start-station" when !config.IsEnabled:
                 case "stop-station" when config.IsEnabled:
-                    results.Add($"{azuraStation.Name} ({Misc.GetReadableBool(config.IsEnabled, ReadableBool.StartedStopped, true)})", station);
+                    results.Add(new($"{azuraStation.Name} ({Misc.GetReadableBool(config.IsEnabled, ReadableBool.StartedStopped, true)})", station));
                     break;
 
                 case "toggle-song-requests":
-                    results.Add($"{azuraStation.Name} ({Misc.GetReadableBool(config.EnableRequests, ReadableBool.EnabledDisabled, true)})", station);
+                    results.Add(new($"{azuraStation.Name} ({Misc.GetReadableBool(config.EnableRequests, ReadableBool.EnabledDisabled, true)})", station));
                     break;
 
                 default:
-                    results.Add(azuraStation.Name, station);
+                    results.Add(new(azuraStation.Name, station));
                     break;
             }
         }
