@@ -120,8 +120,23 @@
   <data name="change-bot-status" xml:space="preserve">
     <value>Ändert den globalen Status des Bots nach deinen Wünschen.</value>
   </data>
+  <data name="force-channel-permissions-check" xml:space="preserve">
+    <value>Erzwingt eine Prüfung ob der Bot die nötigen Rechte für seine Channels hat.</value>
+  </data>
   <data name="get-joined-server" xml:space="preserve">
     <value>Zeigt alle beigetretenen Server an.</value>
+  </data>
+  <data name="hardware" xml:space="preserve">
+    <value>Zeigt Informationen über die Hardware des Bots.</value>
+  </data>
+  <data name="help" xml:space="preserve">
+    <value>Zeigt eine Übersicht über alle verfügbaren Befehle.</value>
+  </data>
+  <data name="info" xml:space="preserve">
+    <value>Zeigt allgemeine Informationen über den Bot und seine Komponenten.</value>
+  </data>
+  <data name="ping" xml:space="preserve">
+    <value>Pingt den Bot und zeigt die Latenz zu Discord.</value>
   </data>
   <data name="remove-joined-server" xml:space="preserve">
     <value>Entfernt den Bot von einem beigetretenen Server.</value>

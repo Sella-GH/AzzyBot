@@ -70,6 +70,15 @@ namespace AzzyBot.Bot.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to command.
+        /// </summary>
+        internal static string command {
+            get {
+                return ResourceManager.GetString("command", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to doing.
         /// </summary>
         internal static string doing {

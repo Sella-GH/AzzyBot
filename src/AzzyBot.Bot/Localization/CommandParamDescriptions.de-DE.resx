@@ -133,12 +133,15 @@
     <value>Setzt den Bot Status auf den Standard zurück.</value>
   </data>
   <data name="serverid" xml:space="preserve">
-    <value>Wähle den richtigen Server aus.</value>
+    <value>Wähle einen Server aus.</value>
   </data>
   <data name="message" xml:space="preserve">
     <value>Die Nachricht welche du versenden möchtest.</value>
   </data>
   <data name="logfile" xml:space="preserve">
     <value>Die Logfile welche du sehen möchtest.</value>
+  </data>
+  <data name="command" xml:space="preserve">
+    <value>Der Befehl über welchen du mehr Informationen erhalten möchtest.</value>
   </data>
 </root>

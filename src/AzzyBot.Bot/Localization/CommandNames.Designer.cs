@@ -79,11 +79,56 @@ namespace AzzyBot.Bot.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to force-channel-permissions-check.
+        /// </summary>
+        internal static string force_channel_permissions_check {
+            get {
+                return ResourceManager.GetString("force-channel-permissions-check", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to get-joined-server.
         /// </summary>
         internal static string get_joined_server {
             get {
                 return ResourceManager.GetString("get-joined-server", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to hardware.
+        /// </summary>
+        internal static string hardware {
+            get {
+                return ResourceManager.GetString("hardware", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to help.
+        /// </summary>
+        internal static string help {
+            get {
+                return ResourceManager.GetString("help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to info.
+        /// </summary>
+        internal static string info {
+            get {
+                return ResourceManager.GetString("info", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ping.
+        /// </summary>
+        internal static string ping {
+            get {
+                return ResourceManager.GetString("ping", resourceCulture);
             }
         }
         
@@ -102,6 +147,15 @@ namespace AzzyBot.Bot.Localization {
         internal static string send_bot_wide_message {
             get {
                 return ResourceManager.GetString("send-bot-wide-message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to stats.
+        /// </summary>
+        internal static string stats {
+            get {
+                return ResourceManager.GetString("stats", resourceCulture);
             }
         }
         

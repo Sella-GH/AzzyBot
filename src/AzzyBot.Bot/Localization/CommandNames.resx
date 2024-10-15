@@ -123,14 +123,32 @@
   <data name="change-bot-status" xml:space="preserve">
     <value>change-bot-status</value>
   </data>
+  <data name="force-channel-permissions-check" xml:space="preserve">
+    <value>force-channel-permissions-check</value>
+  </data>
   <data name="get-joined-server" xml:space="preserve">
     <value>get-joined-server</value>
+  </data>
+  <data name="hardware" xml:space="preserve">
+    <value>hardware</value>
+  </data>
+  <data name="help" xml:space="preserve">
+    <value>help</value>
+  </data>
+  <data name="info" xml:space="preserve">
+    <value>info</value>
+  </data>
+  <data name="ping" xml:space="preserve">
+    <value>ping</value>
   </data>
   <data name="remove-joined-server" xml:space="preserve">
     <value>remove-joined-server</value>
   </data>
   <data name="send-bot-wide-message" xml:space="preserve">
     <value>send-bot-wide-message</value>
+  </data>
+  <data name="stats" xml:space="preserve">
+    <value>stats</value>
   </data>
   <data name="view-logs" xml:space="preserve">
     <value>view-logs</value>

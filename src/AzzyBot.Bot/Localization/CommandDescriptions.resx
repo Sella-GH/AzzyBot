@@ -120,8 +120,23 @@
   <data name="change-bot-status" xml:space="preserve">
     <value>Change the global bot status according to your likes.</value>
   </data>
+  <data name="force-channel-permissions-check" xml:space="preserve">
+    <value>Forces a check of the permissions for the bot in the necessary channels.</value>
+  </data>
   <data name="get-joined-server" xml:space="preserve">
     <value>Displays all servers the bot is in.</value>
+  </data>
+  <data name="hardware" xml:space="preserve">
+    <value>Shows information about the hardware side of the bot.</value>
+  </data>
+  <data name="help" xml:space="preserve">
+    <value>Gives you can overview about all the available commands.</value>
+  </data>
+  <data name="info" xml:space="preserve">
+    <value>Shows information about the bot and it's components.</value>
+  </data>
+  <data name="ping" xml:space="preserve">
+    <value>Ping the bot and get the latency to discord.</value>
   </data>
   <data name="remove-joined-server" xml:space="preserve">
     <value>Removes the bot from a server.</value>

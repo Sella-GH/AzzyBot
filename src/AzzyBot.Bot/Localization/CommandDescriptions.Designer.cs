@@ -70,11 +70,56 @@ namespace AzzyBot.Bot.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Forces a check of the permissions for the bot in the necessary channels..
+        /// </summary>
+        internal static string force_channel_permissions_check {
+            get {
+                return ResourceManager.GetString("force-channel-permissions-check", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Displays all servers the bot is in..
         /// </summary>
         internal static string get_joined_server {
             get {
                 return ResourceManager.GetString("get-joined-server", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shows information about the hardware side of the bot..
+        /// </summary>
+        internal static string hardware {
+            get {
+                return ResourceManager.GetString("hardware", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gives you can overview about all the available commands..
+        /// </summary>
+        internal static string help {
+            get {
+                return ResourceManager.GetString("help", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shows information about the bot and it&apos;s components..
+        /// </summary>
+        internal static string info {
+            get {
+                return ResourceManager.GetString("info", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ping the bot and get the latency to discord..
+        /// </summary>
+        internal static string ping {
+            get {
+                return ResourceManager.GetString("ping", resourceCulture);
             }
         }
         

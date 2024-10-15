@@ -141,4 +141,7 @@
   <data name="logfile" xml:space="preserve">
     <value>logfile</value>
   </data>
+  <data name="command" xml:space="preserve">
+    <value>command</value>
+  </data>
 </root>

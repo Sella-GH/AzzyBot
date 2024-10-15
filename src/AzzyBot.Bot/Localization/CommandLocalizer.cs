@@ -1,17 +1,18 @@
 ﻿#pragma warning disable S125 // Sections of code should not be commented out
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Resources;
 using System.Threading.Tasks;
 using DSharpPlus.Commands.Processors.SlashCommands.Localization;
-//using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Localization;
 
-public sealed class CommandLocalizer(/*ILogger<CommandLocalizer> logger*/) : IInteractionLocalizer
+public sealed class CommandLocalizer(ILogger<CommandLocalizer> logger) : IInteractionLocalizer
 {
-    //private readonly ILogger<CommandLocalizer> _logger = logger;
+    private readonly ILogger<CommandLocalizer> _logger = logger;
 
     public ValueTask<IReadOnlyDictionary<DiscordLocale, string>> TranslateAsync(string fullSymbolName)
     {
@@ -21,6 +22,8 @@ public sealed class CommandLocalizer(/*ILogger<CommandLocalizer> logger*/) : IIn
         bool isParameter = false;
         string symbolName = string.Empty;
         string[] parts;
+
+        // TODO: Rework this so it's not confused when having 2 nested command groups
         if (!fullSymbolName.Contains("parameters", StringComparison.OrdinalIgnoreCase))
         {
             parts = fullSymbolName.Split('.');
@@ -57,20 +60,35 @@ public sealed class CommandLocalizer(/*ILogger<CommandLocalizer> logger*/) : IIn
             ResourceManager resources = (!isParameter) ? new(typeof(CommandNames)) : new(typeof(CommandParamNames));
             locales.Add(DiscordLocale.de, resources.GetString(symbolName, new CultureInfo(1031)) ?? string.Empty);
         }
-        else if (fullSymbolName.EndsWith(".description", StringComparison.OrdinalIgnoreCase) && !topLevelCommand)
+        else if (fullSymbolName.EndsWith(".description", StringComparison.OrdinalIgnoreCase) && (!topLevelCommand || CheckIfCommandIsExcluded(fullSymbolName)))
         {
             ResourceManager resources = (!isParameter) ? new(typeof(CommandDescriptions)) : new(typeof(CommandParamDescriptions));
             locales.Add(DiscordLocale.de, resources.GetString(symbolName, new CultureInfo(1031)) ?? string.Empty);
         }
 
-        //_logger.LogWarning(fullSymbolName);
-        //_logger.LogWarning(symbolName);
-        //foreach (KeyValuePair<DiscordLocale, string> locale in locales)
-        //{
-        //    _logger.LogWarning($"{locale.Key}: {locale.Value}");
-        //}
+        _logger.LogWarning(fullSymbolName);
+        _logger.LogWarning(symbolName);
+        foreach (KeyValuePair<DiscordLocale, string> locale in locales)
+        {
+            _logger.LogWarning($"{locale.Key}: {locale.Value} ({locale.Value.Length})");
+        }
 
         return new ValueTask<IReadOnlyDictionary<DiscordLocale, string>>(locales);
+    }
+
+    [SuppressMessage("Minor Code Smell", "S3267:Loops should be simplified with \"LINQ\" expressions", Justification = "Linq is about 8x slower than this.")]
+    private static bool CheckIfCommandIsExcluded(string fullSymbolName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(fullSymbolName);
+
+        string[] excludedCommands = ["core.stats"];
+        foreach (string excluded in excludedCommands)
+        {
+            if (fullSymbolName.EndsWith($"{excluded}.description", StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
     }
 }
 
