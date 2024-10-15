@@ -80,16 +80,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
-      - name: Setup .NET 8.0.x
+      - name: Setup .NET 9
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: '9'
 
       - name: Install GitHub CLI
         run: sudo apt-get update && sudo apt-get install -y gh
       
       - name: Publish Bot Release
         run: |
+          dotnet restore --force --no-http-cache --configfile ./Nuget.config
           dotnet publish /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Release -r ${{ matrix.os }}-${{ matrix.arch }}
           
       #- name: Download and extract Lavalink

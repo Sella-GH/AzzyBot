@@ -1,4 +1,7 @@
 ## 2.1.0
+### General
+- Updated to .NET 9 including all dependencies
+- Dockerfile improvements to improve image size
 ### Dependencies
 - Added [NReco.Logging.File](https://github.com/nreco/logging) in version 1.2.1
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02363
@@ -11,7 +14,8 @@
 
 ### Improvements
 - Exception embeds now produce json output instead of a stacktrace.log file
-- Reworked the whole file logging system
+- Changed file logging naming scheme to be less confusing
+- Startup logging now shows the .NET version too
 
 ## 2.0.6 - 2024-10-13
 ### General

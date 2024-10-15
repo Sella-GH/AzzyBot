@@ -5,6 +5,7 @@
     <DebugType>embedded</DebugType>
     <Optimize Condition="'$(Configuration)'=='Debug' OR '$(Configuration)'=='Docker-debug'">False</Optimize>
     <Optimize Condition="'$(Configuration)'=='Release' OR '$(Configuration)'=='Docker'">True</Optimize>
+    <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <!-- Development stuff -->
@@ -21,7 +22,7 @@
     <Platforms>x64;ARM64;AnyCPU</Platforms>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
 	  <UseArtifactsOutput>true</UseArtifactsOutput>
     <WarningsAsErrors>nullable</WarningsAsErrors>
   </PropertyGroup>
