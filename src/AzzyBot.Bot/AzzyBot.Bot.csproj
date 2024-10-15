@@ -73,6 +73,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Localization\CommandChoices.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CommandChoices.resx</DependentUpon>
+    </Compile>
     <Compile Update="Localization\CommandDescriptions.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -101,6 +106,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Localization\CommandChoices.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CommandChoices.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="Localization\CommandDescriptions.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>CommandDescriptions.Designer.cs</LastGenOutput>

@@ -117,22 +117,49 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="admin" xml:space="preserve">
-    <value>admin</value>
+  <data name="AzuraExportPlaylistProvider.m3u" xml:space="preserve">
+    <value>M3U</value>
   </data>
-  <data name="change-bot-status" xml:space="preserve">
-    <value>bot-status-ändern</value>
+  <data name="AzuraExportPlaylistProvider.pls" xml:space="preserve">
+    <value>PLS</value>
   </data>
-  <data name="get-joined-server" xml:space="preserve">
-    <value>zeige-beigetretenen-server</value>
+  <data name="BooleanEnableDisableStateProvider.Disable" xml:space="preserve">
+    <value>Deaktivieren</value>
   </data>
-  <data name="remove-joined-server" xml:space="preserve">
-    <value>entferne-beigetretenen-server</value>
+  <data name="BooleanEnableDisableStateProvider.Enable" xml:space="preserve">
+    <value>Aktivieren</value>
   </data>
-  <data name="send-bot-wide-message" xml:space="preserve">
-    <value>sende-bot-weite-nachricht</value>
+  <data name="BooleanYesNoStateProvider.No" xml:space="preserve">
+    <value>Nein</value>
   </data>
-  <data name="view-logs" xml:space="preserve">
-    <value>zeige-logs</value>
+  <data name="BooleanYesNoStateProvider.Yes" xml:space="preserve">
+    <value>Ja</value>
+  </data>
+  <data name="BotActivityProvider.Competing" xml:space="preserve">
+    <value>Kämpft</value>
+  </data>
+  <data name="BotActivityProvider.Listening" xml:space="preserve">
+    <value>Hört</value>
+  </data>
+  <data name="BotActivityProvider.Playing" xml:space="preserve">
+    <value>Spielt</value>
+  </data>
+  <data name="BotActivityProvider.Streaming" xml:space="preserve">
+    <value>Streamt</value>
+  </data>
+  <data name="BotActivityProvider.Watching" xml:space="preserve">
+    <value>Schaut</value>
+  </data>
+  <data name="BotStatusProvider.Dnd" xml:space="preserve">
+    <value>Bitte nicht stören</value>
+  </data>
+  <data name="BotStatusProvider.Idle" xml:space="preserve">
+    <value>Abwesend</value>
+  </data>
+  <data name="BotStatusProvider.Offline" xml:space="preserve">
+    <value>Unsichtbar</value>
+  </data>
+  <data name="BotStatusProvider.Online" xml:space="preserve">
+    <value>Online</value>
   </data>
 </root>

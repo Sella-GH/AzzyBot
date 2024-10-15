@@ -79,11 +79,38 @@ namespace AzzyBot.Bot.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to logfile.
+        /// </summary>
+        internal static string logfile {
+            get {
+                return ResourceManager.GetString("logfile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to message.
+        /// </summary>
+        internal static string message {
+            get {
+                return ResourceManager.GetString("message", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to reset.
         /// </summary>
         internal static string reset {
             get {
                 return ResourceManager.GetString("reset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to serverid.
+        /// </summary>
+        internal static string serverid {
+            get {
+                return ResourceManager.GetString("serverid", resourceCulture);
             }
         }
         

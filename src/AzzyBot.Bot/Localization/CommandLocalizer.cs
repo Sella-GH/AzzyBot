@@ -1,20 +1,21 @@
-﻿using System;
+﻿#pragma warning disable S125 // Sections of code should not be commented out
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Resources;
 using System.Threading.Tasks;
 using DSharpPlus.Commands.Processors.SlashCommands.Localization;
-using Microsoft.Extensions.Logging;
+//using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Localization;
 
-public sealed class CommandLocalizer(ILogger<CommandLocalizer> logger) : IInteractionLocalizer
+public sealed class CommandLocalizer(/*ILogger<CommandLocalizer> logger*/) : IInteractionLocalizer
 {
-    private readonly ILogger<CommandLocalizer> _logger = logger;
+    //private readonly ILogger<CommandLocalizer> _logger = logger;
 
     public ValueTask<IReadOnlyDictionary<DiscordLocale, string>> TranslateAsync(string fullSymbolName)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(fullSymbolName, nameof(fullSymbolName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(fullSymbolName);
 
         bool topLevelCommand = false;
         bool isParameter = false;
@@ -50,27 +51,27 @@ public sealed class CommandLocalizer(ILogger<CommandLocalizer> logger) : IIntera
 
         // Use this as reference for the LCID:
         // https://learn.microsoft.com/en-us/openspecs/office_standards/ms-oe376/6c085406-a698-4e12-9d4d-c3b0ee3dbc4a
-        Dictionary<DiscordLocale, string> locales = new(2);
+        Dictionary<DiscordLocale, string> locales = new(1);
         if (fullSymbolName.EndsWith(".name", StringComparison.OrdinalIgnoreCase))
         {
             ResourceManager resources = (!isParameter) ? new(typeof(CommandNames)) : new(typeof(CommandParamNames));
             locales.Add(DiscordLocale.de, resources.GetString(symbolName, new CultureInfo(1031)) ?? string.Empty);
-            locales.Add(DiscordLocale.en_US, resources.GetString(symbolName, new CultureInfo(1033)) ?? string.Empty);
         }
         else if (fullSymbolName.EndsWith(".description", StringComparison.OrdinalIgnoreCase) && !topLevelCommand)
         {
             ResourceManager resources = (!isParameter) ? new(typeof(CommandDescriptions)) : new(typeof(CommandParamDescriptions));
             locales.Add(DiscordLocale.de, resources.GetString(symbolName, new CultureInfo(1031)) ?? string.Empty);
-            locales.Add(DiscordLocale.en_US, resources.GetString(symbolName, new CultureInfo(1033)) ?? string.Empty);
         }
 
-        _logger.LogWarning(fullSymbolName);
-        _logger.LogWarning(symbolName);
-        foreach (KeyValuePair<DiscordLocale, string> locale in locales)
-        {
-            _logger.LogWarning($"{locale.Key}: {locale.Value}");
-        }
+        //_logger.LogWarning(fullSymbolName);
+        //_logger.LogWarning(symbolName);
+        //foreach (KeyValuePair<DiscordLocale, string> locale in locales)
+        //{
+        //    _logger.LogWarning($"{locale.Key}: {locale.Value}");
+        //}
 
         return new ValueTask<IReadOnlyDictionary<DiscordLocale, string>>(locales);
     }
 }
+
+#pragma warning restore S125 // Sections of code should not be commented out
