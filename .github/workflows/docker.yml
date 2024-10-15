@@ -83,6 +83,7 @@ jobs:
           format: "YYYY-MM-DDTHH:mm:ss"
 
       - name: Calculate Lines of Source Code
+        if: ${{ github.actor != 'dependabot[bot]' }}
         id: get-loc_cs
         uses: PavanMudigonda/lines-of-code-reporter@v1.6
         with:

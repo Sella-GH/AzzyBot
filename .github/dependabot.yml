@@ -56,15 +56,6 @@ updates:
         - "major"
         - "minor"
         - "patch"
-      DSharpPlus:
-        applies-to: version-updates
-        patterns:
-        - "DSharpPlus*"
-        - "DSharpPlus.*"
-        update-types:
-        - "major"
-        - "minor"
-        - "patch"
       Microsoft:
         applies-to: version-updates
         patterns:
