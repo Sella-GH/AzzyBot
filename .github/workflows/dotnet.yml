@@ -25,18 +25,19 @@ jobs:
        uses: actions/checkout@v4
        with:
          fetch-depth: 0
-
-     - name: Calculate Lines of Source Code
-       id: loc_cs
-       uses: PavanMudigonda/lines-of-code-reporter@v1.6
-       with:
-         include_lang: "C#,MSBuild script"
           
      - name: Get Date and Time
        id: dateTime
        uses: Kaven-Universe/github-action-current-date-time@v1
        with:
          format: "YYYY-MM-DDTHH:mm:ss"
+
+     - name: Calculate Lines of Source Code
+       if: ${{ github.actor != 'dependabot[bot]' }}
+       id: loc_cs
+       uses: PavanMudigonda/lines-of-code-reporter@v1.6
+       with:
+         include_lang: "C#,MSBuild script"
 
   build-amd:
     name: Build DEBUG for ${{ matrix.os }} - ${{ matrix.arch }}
