@@ -16,6 +16,7 @@ using AzzyBot.Data.Extensions;
 using DSharpPlus;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.Processors.SlashCommands;
+using DSharpPlus.Commands.Processors.SlashCommands.NamingPolicies;
 using DSharpPlus.Extensions;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
@@ -198,7 +199,10 @@ public static class IServiceCollectionExtensions
             c.AddCheck<FeatureAvailableCheck>();
             c.AddCheck<ModuleActivatedCheck>();
 
-            SlashCommandProcessor slashCommandProcessor = new();
+            SlashCommandProcessor slashCommandProcessor = new(new SlashCommandConfiguration()
+            {
+                NamingPolicy = new KebabCaseNamingPolicy()
+            });
             slashCommandProcessor.AddConverter<Uri>(new UriArgumentConverter());
 
             c.AddProcessor(slashCommandProcessor);
