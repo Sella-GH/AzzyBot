@@ -27,19 +27,22 @@ You can report any vulnerabilities directly to us if they relate to the core Azz
 ## Out of Scope
 
 AzzyBot is not responsible for the development or maintenance of several pieces of "upstream" software that we incorporate into our own product. This list of software includes, but is not limited to:
-* [.NET](https://github.com/dotnet/runtime/)
+* [AzuraCast](https://github.com/AzuraCast/AzuraCast)
+* [.NET 9](https://github.com/dotnet/runtime/)
 * [CsvHelper](https://github.com/JoshClose/CsvHelper)
 * [Docker](https://docker.com/)
 * [Docker Compose](https://docker.com/)
 * [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus)
-* [EntityFrameworkCore](https://github.com/dotnet/efcore)
-* [Lavalink](https://github.com/lavalink-devs/lavalink)
+* [EntityFrameworkCore.Exceptions.PostgreSQL](https://github.com/Giorgi/EntityFramework.Exceptions)
+* [Lavalink](https://github.com/lavalink-devs/Lavalink)
 * [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
+* [Microsoft.EntityFrameworkCore](https://github.com/dotnet/efcore)
 * [Microsoft.Extensions.X Libs](https://github.com/dotnet/runtime)
 * [Npsql](https://github.com/npgsql/npgsql)
+* [Npsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg)
 * [NReco.Logging.File](https://github.com/NReco/Logging)
-* [PostgreSQL](https://www.postgresql.org/)
 * [Roslynator](https://github.com/dotnet/roslynator)
+* [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet)
 * [System.Linq.Async](https://github.com/dotnet/reactive)
 * [TagLibSharp](https://github.com/mono/taglib-sharp)
 

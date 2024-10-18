@@ -66,7 +66,8 @@ Follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wi
 
 ## Built With
 ### Software
-* [.NET 8](https://github.com/dotnet/runtime)
+* [AzuraCast](https://github.com/AzuraCast/AzuraCast)
+* [.NET 9](https://github.com/dotnet/runtime)
 * [Docker](https://docker.com/)
 * [Docker Compose](https://docker.com/)
 * [Lavalink](https://github.com/lavalink-devs/Lavalink)
@@ -76,13 +77,15 @@ Follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wi
 ### Dependancies
 * [CsvHelper](https://github.com/JoshClose/CsvHelper)
 * [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus)
-* [EntityFrameworkCore](https://github.com/dotnet/efcore)
 * [EntityFrameworkCore.Exceptions.PostgreSQL](https://github.com/Giorgi/EntityFramework.Exceptions)
 * [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
+* [Microsoft.EntityFrameworkCore](https://github.com/dotnet/efcore)
 * [Microsoft.Extensions.X Libs](https://github.com/dotnet/runtime)
 * [Npsql](https://github.com/npgsql/npgsql)
+* [Npsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg)
 * [NReco.Logging.File](https://github.com/NReco/Logging)
 * [Roslynator](https://github.com/dotnet/roslynator)
+* [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet)
 * [System.Linq.Async](https://github.com/dotnet/reactive)
 * [TagLibSharp](https://github.com/mono/taglib-sharp)
 
