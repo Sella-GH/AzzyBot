@@ -61,16 +61,17 @@ jobs:
        with:
          fetch-depth: 0
       
-     - name: Setup .NET 8.0.x
+     - name: Setup .NET 9
        uses: actions/setup-dotnet@v4
        with:
-         dotnet-version: '8.0.x'
+         dotnet-version: '9'
 
      - name: Install GitHub CLI
        run: sudo apt update && sudo apt install -y gh
       
      - name: Publish Bot Debug
        run: |
+         dotnet restore --force --no-http-cache --configfile ./Nuget.config
          dotnet publish /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Debug -r ${{ matrix.os }}-${{ matrix.arch }}
 
      #- name: Download and extract Lavalink

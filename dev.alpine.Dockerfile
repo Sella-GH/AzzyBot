@@ -1,5 +1,7 @@
+# syntax=docker/dockerfile:labs
+
 # BUILD IMAGE
-FROM mcr.microsoft.com/dotnet/sdk:8.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
 USER root
 RUN apk update && apk upgrade && apk cache sync
 WORKDIR /build
@@ -7,11 +9,12 @@ COPY ./ ./
 ARG ARCH
 ARG CONFIG
 ARG OS
-RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj
+COPY ./Nuget.config ./Nuget.config
+RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --force --no-http-cache --configfile ./Nuget.config
 RUN dotnet publish ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -a $ARCH -c $CONFIG --os $OS -o out
 
 # RUNNER IMAGE
-FROM mcr.microsoft.com/dotnet/runtime:8.0-alpine
+FROM mcr.microsoft.com/dotnet/runtime:9.0-alpine AS runner
 USER root
 
 # Add environment variables
@@ -24,7 +27,7 @@ RUN apk add --no-cache icu-data-full icu-libs iputils-ping sed tzdata
 
 # Copy the built app
 WORKDIR /app
-COPY --from=build /build/out .
+COPY --exclude=*.xml --from=build /build/out .
 
 # Add commit, timestamp and lines of code
 ARG COMMIT
