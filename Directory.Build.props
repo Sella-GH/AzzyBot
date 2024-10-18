@@ -60,8 +60,5 @@
 
     <!-- Globalization -->
     <InvariantGlobalization>False</InvariantGlobalization>
-	
-	<!-- Networking -->
-	<RuntimeHostConfigurationOption Value="true" Include="System.Net.SocketsHttpHandler.Http3Support" />
   </PropertyGroup>
 </Project>
