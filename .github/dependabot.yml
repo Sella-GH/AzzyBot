@@ -46,21 +46,15 @@ updates:
       include: "scope"
     labels:
       - "area-dependencies"
+    ignore:
+      - dependency-name: "DSharpPlus*"
+      - dependency-name: "DSharpPlus.*"
     groups:
       Analyzers:
         applies-to: version-updates
         patterns:
         - "Roslynator.*"
         - "SonarAnalyzer.*"
-        update-types:
-        - "major"
-        - "minor"
-        - "patch"
-      DSharpPlus:
-        applies-to: version-updates
-        patterns:
-        - "DSharpPlus*"
-        - "DSharpPlus.*"
         update-types:
         - "major"
         - "minor"
@@ -79,8 +73,6 @@ updates:
       Others:
         applies-to: version-updates
         exclude-patterns:
-        - "DSharpPlus*"
-        - "DSharpPlus.*"
         - "EntityFrameworkCore.*"
         - "Microsoft.*"
         - "Npgsql.*"

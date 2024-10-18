@@ -4,7 +4,8 @@
 - Dockerfile improvements to improve image size
 ### Dependencies
 - Added [NReco.Logging.File](https://github.com/nreco/logging) in version 1.2.1
-- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02363
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02384
+- Updated [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET) to version 4.0.26-preview.4
 
 ### Additions
 - Added a new hidden environment variable "FORCE_TRACE" to docker-compose which forces the app to trace log (not recommended for production)
