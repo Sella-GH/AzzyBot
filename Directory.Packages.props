@@ -4,14 +4,14 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="CsvHelper" Version="33.0.1" />
-    <PackageVersion Include="DSharpPlus" Version="5.0.0-nightly-02384" />
-    <PackageVersion Include="DSharpPlus.Commands" Version="5.0.0-nightly-02384" />
-    <PackageVersion Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02384" />
+    <PackageVersion Include="DSharpPlus" Version="5.0.0-nightly-02387" />
+    <PackageVersion Include="DSharpPlus.Commands" Version="5.0.0-nightly-02387" />
+    <PackageVersion Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02387" />
     <PackageVersion Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="8.1.3" />
     <PackageVersion Include="Lavalink4NET.DSharpPlus.Nightly" Version="4.0.26-preview.4" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.8" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.10" />
     <PackageVersion Include="NReco.Logging.File" Version="1.2.1" />
     <PackageVersion Include="Roslynator.Analyzers" Version="4.12.8" />
     <PackageVersion Include="Roslynator.CodeAnalysis.Analyzers" Version="4.12.8" />
