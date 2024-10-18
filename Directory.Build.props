@@ -45,4 +45,21 @@
   <ItemGroup>
     <None Include="..\..\LICENSE" Pack="true" PackagePath="" />
   </ItemGroup>
+  
+  <!-- Runtimeconfig settings -->
+  <PropertyGroup>
+    <!-- JIT Settings -->
+    <TieredCompilation>True</TieredCompilation>
+    <TieredCompilationQuickJit>True</TieredCompilationQuickJit>
+    <TieredCompilationQuickJitForLoops>False</TieredCompilationQuickJitForLoops>
+    <TieredPGO>True</TieredPGO>
+
+    <!-- Garbage Collection -->
+    <ServerGarbageCollection>True</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>True</ConcurrentGarbageCollection>
+    <GarbageCollectionAdaptationMode>1</GarbageCollectionAdaptationMode>
+
+    <!-- Globalization -->
+    <InvariantGlobalization>False</InvariantGlobalization>
+  </PropertyGroup>
 </Project>
