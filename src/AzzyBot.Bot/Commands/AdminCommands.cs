@@ -174,6 +174,12 @@ public sealed class AdminCommands
 
             _logger.CommandRequested(nameof(SendBotWideMessageAsync), context.User.GlobalName);
 
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                await context.RespondAsync(GeneralStrings.AdminBotWideMessageEmpty);
+                return;
+            }
+
             await context.DeferResponseAsync();
 
             IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
@@ -195,7 +201,7 @@ public sealed class AdminCommands
 
                 if (guildEntity.ConfigSet && guildEntity.Preferences.AdminNotifyChannelId is not 0)
                 {
-                    await _botService.SendMessageAsync(guildEntity.Preferences.AdminNotifyChannelId, message);
+                    await _botService.SendMessageAsync(guildEntity.Preferences.AdminNotifyChannelId, message.Replace("\\n", Environment.NewLine, StringComparison.OrdinalIgnoreCase));
                 }
                 else
                 {
