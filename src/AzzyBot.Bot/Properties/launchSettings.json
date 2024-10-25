@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "AzzyBot.Bot": {
+      "commandName": "Project"
+    },
+    "Trace logs": {
+      "commandName": "Project",
+      "commandLineArgs": "-forceTrace"
+    }
+  }
+}
