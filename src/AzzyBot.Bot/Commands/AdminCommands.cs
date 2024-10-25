@@ -189,6 +189,7 @@ public sealed class AdminCommands
                 return;
             }
 
+            string newMessage = message.Replace("\\n", Environment.NewLine, StringComparison.OrdinalIgnoreCase);
             IAsyncEnumerable<GuildEntity> guildsEntities = _dbActions.GetGuildsAsync(true);
             foreach (DiscordGuild guild in guilds.Values)
             {
@@ -201,12 +202,12 @@ public sealed class AdminCommands
 
                 if (guildEntity.ConfigSet && guildEntity.Preferences.AdminNotifyChannelId is not 0)
                 {
-                    await _botService.SendMessageAsync(guildEntity.Preferences.AdminNotifyChannelId, message.Replace("\\n", Environment.NewLine, StringComparison.OrdinalIgnoreCase));
+                    await _botService.SendMessageAsync(guildEntity.Preferences.AdminNotifyChannelId, newMessage);
                 }
                 else
                 {
                     DiscordMember owner = await guild.GetGuildOwnerAsync();
-                    await owner.SendMessageAsync(message);
+                    await owner.SendMessageAsync(newMessage);
                 }
             }
 
