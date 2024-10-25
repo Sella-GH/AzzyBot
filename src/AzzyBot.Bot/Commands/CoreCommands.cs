@@ -97,7 +97,8 @@ public sealed class CoreCommands
                 embeds.Add(embed);
             }
 
-            if (embeds.Count is not 10)
+            AzuraCastEntity? ac = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
+            if (embeds.Count is not 10 && ac is not null)
             {
                 DiscordEmbed embed = EmbedBuilder.BuildAzzyHelpSetupEmbed();
                 embeds.Add(embed);
