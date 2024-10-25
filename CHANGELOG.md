@@ -1,3 +1,10 @@
+## 2.0.7 - 2024-10-25
+### Dependencies
+- Added and updated [Microsoft.Extensions.Caching.Memory](https://github.com/dotnet/runtime) to version 8.0.1 to fix vulnerabilities
+
+### Improvements
+- `core help` now shows an additional embed telling the user how to correctly set up the bot
+
 ## 2.0.6 - 2024-10-13
 ### General
 - Recreated docker images because of vulnerabilities

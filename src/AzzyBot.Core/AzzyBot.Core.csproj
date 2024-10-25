@@ -30,6 +30,7 @@
     <PackageReference Include="CsvHelper" />
     <PackageReference Include="DSharpPlus" />
     <PackageReference Include="DSharpPlus.Commands" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="Roslynator.Analyzers">
       <PrivateAssets>all</PrivateAssets>

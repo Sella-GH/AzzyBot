@@ -29,6 +29,7 @@
   <ItemGroup>
     <PackageReference Include="DSharpPlus" />
     <PackageReference Include="EntityFrameworkCore.Exceptions.PostgreSQL" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
     <PackageReference Include="Npgsql" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Roslynator.Analyzers">
