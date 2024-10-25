@@ -97,6 +97,12 @@ public sealed class CoreCommands
                 embeds.Add(embed);
             }
 
+            if (embeds.Count is not 10)
+            {
+                DiscordEmbed embed = EmbedBuilder.BuildAzzyHelpSetupEmbed();
+                embeds.Add(embed);
+            }
+
             await using DiscordMessageBuilder messageBuilder = new();
             messageBuilder.AddEmbeds(embeds);
 

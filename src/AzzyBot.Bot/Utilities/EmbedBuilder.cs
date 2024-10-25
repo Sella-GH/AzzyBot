@@ -23,6 +23,7 @@ public static class EmbedBuilder
     private static readonly Uri AzuraCastPic = new("https://raw.githubusercontent.com/AzuraCast/AzuraCast/main/resources/icon.png");
     private static readonly Uri AzuraCastRollingUrl = new("https://github.com/AzuraCast/AzuraCast/commits/main");
     private static readonly Uri AzuraCastStableUrl = new("https://github.com/AzuraCast/AzuraCast/blob/main/CHANGELOG.md");
+    private static readonly Uri SetupInstructions = new("https://github.com/Sella-GH/AzzyBot/wiki/Setup-instructions");
 
     private static DiscordEmbedBuilder CreateBasicEmbed(string title, string? description = null, DiscordColor? color = null, Uri? thumbnailUrl = null, string? footerText = null, Uri? url = null, Dictionary<string, AzzyDiscordEmbedRecord>? fields = null)
     {
@@ -424,6 +425,14 @@ public static class EmbedBuilder
         }
 
         return CreateBasicEmbed(title, color: DiscordColor.Blurple, fields: fields);
+    }
+
+    public static DiscordEmbed BuildAzzyHelpSetupEmbed()
+    {
+        const string title = "Setup help";
+        string description = $"If you need help on how to setup the bot on your server, please check out the following URL:\n\n[Setup description (GitHub)]({SetupInstructions})";
+
+        return CreateBasicEmbed(title, description, DiscordColor.Blurple);
     }
 
     public static DiscordEmbed BuildAzzyInfoStatsEmbed(Uri avaUrl, string dspVersion, string commit, in DateTime compileDate, int loc)
