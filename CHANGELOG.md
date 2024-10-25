@@ -4,7 +4,7 @@
 - Dockerfile improvements to improve image size
 ### Dependencies
 - Added [NReco.Logging.File](https://github.com/nreco/logging) in version 1.2.1
-- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02384
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02394
 - Updated [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET) to version 4.0.26-preview.4
 
 ### Additions
@@ -15,8 +15,16 @@
 
 ### Improvements
 - Exception embeds now produce json output instead of a stacktrace.log file
-- Changed file logging naming scheme to be less confusing
 - Startup logging now shows the .NET version too
+- Reworked the whole file logging system
+- `admin send-bot-wide-message` now allows linebreaks using `\n` and includes a message if it's sent directly to the server owner
+
+## 2.0.7 - 2024-10-25
+### Dependencies
+- Added and updated [Microsoft.Extensions.Caching.Memory](https://github.com/dotnet/runtime) to version 8.0.1 to fix vulnerabilities
+
+### Improvements
+- `core help` now shows an additional embed telling the user how to correctly set up the bot
 
 ## 2.0.6 - 2024-10-13
 ### General
