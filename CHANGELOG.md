@@ -13,8 +13,12 @@
 ### Improvements
 - Exception embeds now produce json output instead of a stacktrace.log file
 - Reworked the whole file logging system
+- `admin send-bot-wide-message` now allows linebreaks using `\n` and includes a message if it's sent directly to the server owner
 
 ## 2.0.7 - 2024-10-25
+### Dependencies
+- Added and updated [Microsoft.Extensions.Caching.Memory](https://github.com/dotnet/runtime) to version 8.0.1 to fix vulnerabilities
+
 ### Improvements
 - `core help` now shows an additional embed telling the user how to correctly set up the bot
 

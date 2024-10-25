@@ -2,6 +2,7 @@
 
 public static class GeneralStrings
 {
+    public const string AdminBotWideMessageEmpty = "You have to provide a message first!";
     public const string BotStatusChanged = "Bot status has been updated!";
     public const string BotStatusReset = "Bot status has been reset!";
     public const string CanNotLeaveServer = "You can't make me leave my own home server!";
