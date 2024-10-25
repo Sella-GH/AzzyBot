@@ -14,6 +14,10 @@
 - Exception embeds now produce json output instead of a stacktrace.log file
 - Reworked the whole file logging system
 
+## 2.0.7 - 2024-10-25
+### Improvements
+- `core help` now shows an additional embed telling the user how to correctly set up the bot
+
 ## 2.0.6 - 2024-10-13
 ### General
 - Recreated docker images because of vulnerabilities
