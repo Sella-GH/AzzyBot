@@ -189,6 +189,7 @@ public sealed class AdminCommands
                 return;
             }
 
+            const string dmAddition = "You receive this message directly because you haven't provided a notification channel in your server.";
             string newMessage = message.Replace("\\n", Environment.NewLine, StringComparison.OrdinalIgnoreCase);
             IAsyncEnumerable<GuildEntity> guildsEntities = _dbActions.GetGuildsAsync(true);
             foreach (DiscordGuild guild in guilds.Values)
@@ -207,7 +208,13 @@ public sealed class AdminCommands
                 else
                 {
                     DiscordMember owner = await guild.GetGuildOwnerAsync();
-                    await owner.SendMessageAsync(newMessage);
+                    string ownerMessage = newMessage;
+                    if (newMessage.Length < 2000 - dmAddition.Length)
+                    {
+                        ownerMessage += dmAddition;
+                    }
+
+                    await owner.SendMessageAsync(ownerMessage);
                 }
             }
 
