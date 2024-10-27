@@ -21,6 +21,7 @@ on:
 jobs:
   extract_meta:
     name: Extract metadata for use
+    if: ${{ github.actor != 'dependabot[bot]' }}
     runs-on: ubuntu-latest
     outputs:
       clean_version: ${{ steps.get-version.outputs.clean_version }}
