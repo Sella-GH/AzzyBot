@@ -176,6 +176,12 @@ public sealed class AdminCommands
 
             _logger.CommandRequested(nameof(SendBotWideMessageAsync), context.User.GlobalName);
 
+            if (string.IsNullOrWhiteSpace(message))
+            {
+                await context.RespondAsync(GeneralStrings.AdminBotWideMessageEmpty);
+                return;
+            }
+
             await context.DeferResponseAsync();
 
             IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
@@ -185,6 +191,8 @@ public sealed class AdminCommands
                 return;
             }
 
+            const string dmAddition = "You receive this message directly because you haven't provided a notification channel in your server.";
+            string newMessage = message.Replace("\\n", Environment.NewLine, StringComparison.OrdinalIgnoreCase);
             IAsyncEnumerable<GuildEntity> guildsEntities = _dbActions.GetGuildsAsync(true);
             foreach (DiscordGuild guild in guilds.Values)
             {
@@ -197,12 +205,18 @@ public sealed class AdminCommands
 
                 if (guildEntity.ConfigSet && guildEntity.Preferences.AdminNotifyChannelId is not 0)
                 {
-                    await _botService.SendMessageAsync(guildEntity.Preferences.AdminNotifyChannelId, message);
+                    await _botService.SendMessageAsync(guildEntity.Preferences.AdminNotifyChannelId, newMessage);
                 }
                 else
                 {
                     DiscordMember owner = await guild.GetGuildOwnerAsync();
-                    await owner.SendMessageAsync(message);
+                    string ownerMessage = newMessage;
+                    if (newMessage.Length < 2000 - dmAddition.Length)
+                    {
+                        ownerMessage += dmAddition;
+                    }
+
+                    await owner.SendMessageAsync(ownerMessage);
                 }
             }
 

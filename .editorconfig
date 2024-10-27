@@ -1007,6 +1007,10 @@ dotnet_diagnostic.rcs9010.severity = suggestion
 ## Specify ExportCodeFixProviderAttribute.Name
 dotnet_diagnostic.rcs9011.severity = suggestion
 
+# SonarLinting
+## S1116: Empty statements should be removed
+dotnet_diagnostic.S1116.severity = none
+
 # Json files
 [*.{json,JSON}]
 indent_size = 2
