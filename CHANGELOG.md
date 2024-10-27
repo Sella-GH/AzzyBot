@@ -1,3 +1,11 @@
+## 2.0.8 - 2024-10-27
+### Dependencies
+- Updated [Npgsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg) to version 8.0.10
+- Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.12.9
+
+### Improvements
+- Set the database context and related services to transient to prevent issues with the database connection
+
 ## 2.0.7 - 2024-10-25
 ### Dependencies
 - Added and updated [Microsoft.Extensions.Caching.Memory](https://github.com/dotnet/runtime) to version 8.0.1 to fix vulnerabilities
