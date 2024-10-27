@@ -84,28 +84,25 @@ public static partial class LoggerActions
     [LoggerMessage(100, LogLevel.Information, "Starting {name} in version {version} on {os}-{arch} using .NET {dotnet}")]
     public static partial void BotStarting(this ILogger logger, string name, string version, string os, string arch, string dotnet);
 
-    [LoggerMessage(101, LogLevel.Information, "AzzyBot is ready to accept commands")]
-    public static partial void BotReady(this ILogger logger);
-
-    [LoggerMessage(102, LogLevel.Information, "Invite me using the following url: {invite}")]
+    [LoggerMessage(101, LogLevel.Information, "Invite me using the following url: {invite}")]
     public static partial void InviteUrl(this ILogger logger, string invite);
 
-    [LoggerMessage(103, LogLevel.Information, "Command {command} requested by {user} to execute")]
+    [LoggerMessage(102, LogLevel.Information, "Command {command} requested by {user} to execute")]
     public static partial void CommandRequested(this ILogger logger, string command, string user);
 
-    [LoggerMessage(104, LogLevel.Information, "Commands error is: {ex}")]
+    [LoggerMessage(103, LogLevel.Information, "Commands error is: {ex}")]
     public static partial void CommandsErrorType(this ILogger logger, string ex);
 
-    [LoggerMessage(105, LogLevel.Information, "Starting Database Reencryption")]
+    [LoggerMessage(104, LogLevel.Information, "Starting Database Reencryption")]
     public static partial void DatabaseReencryptionStart(this ILogger logger);
 
-    [LoggerMessage(106, LogLevel.Information, "Database Reencryption completed")]
+    [LoggerMessage(105, LogLevel.Information, "Database Reencryption completed")]
     public static partial void DatabaseReencryptionComplete(this ILogger logger);
 
-    [LoggerMessage(107, LogLevel.Information, "Starting database cleanup of guilds.")]
+    [LoggerMessage(106, LogLevel.Information, "Starting database cleanup of guilds.")]
     public static partial void DatabaseCleanupStart(this ILogger logger);
 
-    [LoggerMessage(108, LogLevel.Information, "Database cleanup of guilds completed, {count} guilds were deleted.")]
+    [LoggerMessage(107, LogLevel.Information, "Database cleanup of guilds completed, {count} guilds were deleted.")]
     public static partial void DatabaseCleanupComplete(this ILogger logger, int count);
 
     [LoggerMessage(110, LogLevel.Information, "AzzyBot joined the following Guild: {guild}")]
