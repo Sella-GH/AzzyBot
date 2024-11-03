@@ -71,9 +71,8 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
             if (now - _lastAzzyBotUpdateCheck >= TimeSpan.FromHours(5.98))
             {
                 _logger.GlobalTimerCheckForUpdates();
-                _lastAzzyBotUpdateCheck = now;
-
                 await _updaterService.CheckForAzzyUpdatesAsync();
+                _lastAzzyBotUpdateCheck = now;
             }
 
             IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildsAsync(loadEverything: true);
@@ -84,6 +83,7 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
             {
                 _logger.GlobalTimerCheckForChannelPermissions(guildCount);
                 await _discordBotService.CheckPermissionsAsync(guilds);
+                _lastChannelPermissionCheck = now;
             }
 
             await _azuraChecksBackgroundService.QueueInstancePingAsync(guilds, now);
