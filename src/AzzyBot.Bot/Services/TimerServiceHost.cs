@@ -27,6 +27,7 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBotSe
     private readonly Task _completedTask = Task.CompletedTask;
     private DateTime _lastAzzyBotUpdateCheck = DateTime.MinValue;
     private DateTime _lastCleanup = DateTime.MinValue;
+    private DateTime _lastChannelPermissionCheck = DateTime.MinValue;
     private Timer? _timer;
     private bool _firstRun = true;
 
@@ -84,7 +85,7 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBotSe
             int guildCount = _discordBotService.GetDiscordGuilds.Count;
             int delay = 5 + guildCount;
 
-            if (!_firstRun)
+            if (!_firstRun && now - _lastChannelPermissionCheck >= TimeSpan.FromHours(11.98))
             {
                 _logger.GlobalTimerCheckForChannelPermissions(guildCount);
                 await _discordBotService.CheckPermissionsAsync(guilds);
