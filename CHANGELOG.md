@@ -1,3 +1,7 @@
+## 2.0.9 - 2024-11-03
+### Fixes
+- The bot now only checks each 12h if the discord permissions are set to prevent hitting discord ratelimits
+
 ## 2.0.8 - 2024-10-27
 ### Dependencies
 - Updated [Npgsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg) to version 8.0.10
