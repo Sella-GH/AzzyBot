@@ -23,7 +23,6 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
     private readonly Task _completedTask = Task.CompletedTask;
     private DateTime _lastAzzyBotUpdateCheck = DateTime.MinValue;
     private DateTime _lastCleanup = DateTime.MinValue;
-    private DateTime _lastChannelPermissionCheck = DateTime.MinValue;
     private Timer? _timer;
     private bool _firstRun = true;
 
@@ -59,10 +58,10 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
 
         _logger.GlobalTimerTick();
 
-        DateTime now = DateTime.Now;
+        DateTime now = DateTime.UtcNow;
         try
         {
-            if (now - _lastCleanup >= TimeSpan.FromDays(1))
+            if (now - _lastCleanup >= TimeSpan.FromHours(23.98))
             {
                 await _dbMaintenance.CleanupLeftoverGuildsAsync(_discordBotService.GetDiscordGuilds);
                 _lastCleanup = now;
@@ -79,11 +78,14 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
             int guildCount = _discordBotService.GetDiscordGuilds.Count;
             int delay = 5 + guildCount;
 
-            if (!_firstRun && now - _lastChannelPermissionCheck >= TimeSpan.FromHours(11.98))
+            if (!_firstRun)
             {
                 _logger.GlobalTimerCheckForChannelPermissions(guildCount);
                 await _discordBotService.CheckPermissionsAsync(guilds);
-                _lastChannelPermissionCheck = now;
+            }
+            else
+            {
+                _firstRun = false;
             }
 
             await _azuraChecksBackgroundService.QueueInstancePingAsync(guilds, now);
@@ -98,8 +100,6 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
 
             await _azuraChecksBackgroundService.QueueFileChangesChecksAsync(guilds, now);
             await _azuraChecksBackgroundService.QueueUpdatesAsync(guilds, now);
-
-            _firstRun = false;
         }
         catch (Exception ex)
         {

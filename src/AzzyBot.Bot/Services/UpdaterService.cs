@@ -61,25 +61,21 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
 
     public static bool CheckUpdateNotification(int notifyCounter, in DateTime lastNotificationTime)
     {
-        DateTime now = DateTime.Now;
-        bool dayNotification = false;
-        bool halfDayNotification = false;
-        bool quarterDayNotification = false;
-
-        if (notifyCounter < 3 && now > lastNotificationTime.AddHours(23).AddMinutes(59))
+        DateTime now = DateTime.UtcNow;
+        if (notifyCounter < 3 && now - lastNotificationTime > TimeSpan.FromHours(23.98))
         {
-            dayNotification = true;
+            return true;
         }
-        else if (notifyCounter >= 3 && now > lastNotificationTime.AddHours(11).AddMinutes(59))
+        else if (notifyCounter >= 3 && now - lastNotificationTime > TimeSpan.FromHours(11.98))
         {
-            halfDayNotification = true;
+            return true;
         }
-        else if (notifyCounter >= 7 && now > lastNotificationTime.AddHours(5).AddMinutes(59))
+        else if (notifyCounter >= 7 && now - lastNotificationTime > TimeSpan.FromHours(5.98))
         {
-            quarterDayNotification = true;
+            return true;
         }
 
-        return dayNotification || halfDayNotification || quarterDayNotification;
+        return false;
     }
 
     private async Task SendUpdateMessageAsync(string updateVersion, DateTime releaseDate, string changelog)
@@ -93,7 +89,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
         if (!CheckUpdateNotification(_azzyNotifyCounter, _lastAzzyUpdateNotificationTime))
             return;
 
-        _lastAzzyUpdateNotificationTime = DateTime.Now;
+        _lastAzzyUpdateNotificationTime = DateTime.UtcNow;
         _lastOnlineVersion = updateVersion;
         _azzyNotifyCounter++;
 
