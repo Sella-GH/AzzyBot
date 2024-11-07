@@ -59,7 +59,7 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
 
         _logger.GlobalTimerTick();
 
-        DateTime now = DateTime.Now;
+        DateTime now = DateTime.UtcNow;
         try
         {
             if (now - _lastCleanup >= TimeSpan.FromDays(1))
