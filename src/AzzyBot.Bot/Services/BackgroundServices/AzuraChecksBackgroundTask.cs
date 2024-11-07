@@ -137,9 +137,9 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
         int counter = 0;
         await foreach (GuildEntity guild in guilds)
         {
-            if (guild.AzuraCast?.Checks.ServerStatus is true && now - guild.AzuraCast.Checks.LastServerStatusCheck > TimeSpan.FromMinutes(14.98))
+            if (guild.AzuraCast?.Checks.ServerStatus is true && now - guild.AzuraCast?.Checks.LastServerStatusCheck > TimeSpan.FromMinutes(14.98))
             {
-                _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _pingService.PingInstanceAsync(guild.AzuraCast, ct)));
+                _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _pingService.PingInstanceAsync(guild.AzuraCast!, ct)));
                 counter++;
             }
         }
