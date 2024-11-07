@@ -1,3 +1,7 @@
+## 2.0.10 - 2024-11-07
+### Improvements
+- Reworked how the background check system works to fix issues
+
 ## 2.0.9 - 2024-11-03
 ### Fixes
 - The bot now only checks each 12h if the discord permissions are set to prevent hitting discord ratelimits
