@@ -62,7 +62,7 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
         DateTime now = DateTime.UtcNow;
         try
         {
-            if (now - _lastCleanup >= TimeSpan.FromDays(1))
+            if (now - _lastCleanup >= TimeSpan.FromHours(23.98))
             {
                 await _dbMaintenance.CleanupLeftoverGuildsAsync(_discordBotService.GetDiscordGuilds);
                 _lastCleanup = now;
