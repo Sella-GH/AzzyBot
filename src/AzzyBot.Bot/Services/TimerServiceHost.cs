@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Services.BackgroundServices;
 using AzzyBot.Core.Logging;
+using AzzyBot.Core.Utilities;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
 using Microsoft.Extensions.Hosting;
@@ -30,7 +31,7 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
     public Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.GlobalTimerStart();
-        _timer = new(new TimerCallback(TimerTimeoutAsync), null, TimeSpan.Zero, TimeSpan.FromMinutes(15));
+        _timer = new(new TimerCallback(TimerTimeoutAsync), null, TimeSpan.Zero, TimeSpan.FromMinutes((SoftwareStats.GetAppEnvironment is "Production") ? 15 : 1));
 
         return _completedTask;
     }
