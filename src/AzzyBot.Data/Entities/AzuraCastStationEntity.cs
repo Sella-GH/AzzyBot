@@ -34,20 +34,20 @@ public sealed class AzuraCastStationEntity
     public AzuraCastStationPreferencesEntity Preferences { get; set; } = new();
 
     /// <summary>
-    /// The last saved <see cref="DateTime"/> timestamp after a song was skipped.
+    /// The last saved <see cref="DateTimeOffset"/> timestamp after a song was skipped.
     /// </summary>
     /// <remarks>
-    /// Always use <see cref="DateTime.UtcNow"/> to set this value.
+    /// Always use <see cref="DateTimeOffset.UtcNow"/> to set this value.
     /// </remarks>
-    public DateTime LastSkipTime { get; set; }
+    public DateTimeOffset LastSkipTime { get; set; }
 
     /// <summary>
-    /// The last saved <see cref="DateTime"/> timestamp after a song was requested.
+    /// The last saved <see cref="DateTimeOffset"/> timestamp after a song was requested.
     /// </summary>
     /// <remarks>
-    /// Always use <see cref="DateTime.UtcNow"/> to set this value.
+    /// Always use <see cref="DateTimeOffset.UtcNow"/> to set this value.
     /// </remarks>
-    public DateTime LastRequestTime { get; set; }
+    public DateTimeOffset LastRequestTime { get; set; }
 
     /// <summary>
     /// The database id of the parenting <see cref="AzuraCastEntity"/> database item.
