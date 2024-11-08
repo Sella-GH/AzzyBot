@@ -1,4 +1,5 @@
-﻿using DSharpPlus.Entities;
+﻿using System;
+using DSharpPlus.Entities;
 
 namespace AzzyBot.Data.Entities;
 
@@ -18,6 +19,14 @@ public sealed class GuildEntity
     /// The state if the core config was set.
     /// </summary>
     public bool ConfigSet { get; set; }
+
+    /// <summary>
+    /// The last saved <see cref="DateTimeOffset"/> timestamp when the <see cref="DiscordGuild"/> was checked for correct channel permissions.
+    /// </summary>
+    /// <remarks>
+    /// Always use <see cref="DateTimeOffset.UtcNow"/> to set this value.
+    /// </remarks>
+    public DateTimeOffset LastPermissionCheck { get; set; }
 
     /// <summary>
     /// The user-defined preferences of the <see cref="GuildEntity"/> object.
