@@ -29,7 +29,7 @@ public static class SoftwareStats
         return Math.Round(app.WorkingSet64 / (1024.0 * 1024.0 * 1024.0), 2);
     }
 
-    public static DateTime GetAppUptime()
+    public static DateTimeOffset GetAppUptime()
     {
         using Process app = Process.GetCurrentProcess();
 

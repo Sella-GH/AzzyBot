@@ -435,7 +435,7 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.Blurple);
     }
 
-    public static DiscordEmbed BuildAzzyInfoStatsEmbed(Uri avaUrl, string dspVersion, string commit, in DateTime compileDate, int loc)
+    public static DiscordEmbed BuildAzzyInfoStatsEmbed(Uri avaUrl, string dspVersion, string commit, in DateTimeOffset compileDate, int loc)
     {
         const string title = "AzzyBot Informational Stats";
         string[] authors = SoftwareStats.GetAppAuthors.Split(',');
@@ -461,7 +461,7 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl, fields: fields);
     }
 
-    public static DiscordEmbed BuildAzzyUpdatesAvailableEmbed(string version, in DateTime updateDate, Uri url)
+    public static DiscordEmbed BuildAzzyUpdatesAvailableEmbed(string version, in DateTimeOffset updateDate, Uri url)
     {
         ArgumentNullException.ThrowIfNull(version);
 
@@ -628,7 +628,7 @@ public static class EmbedBuilder
         if (guild is not null)
         {
             fields.Add("Guild ID", new(guild.Id.ToString(CultureInfo.InvariantCulture)));
-            fields.Add("Removal Date", new($"<t:{Converter.ConvertToUnixTime(DateTime.Now)}>"));
+            fields.Add("Removal Date", new($"<t:{Converter.ConvertToUnixTime(DateTimeOffset.Now)}>"));
             fields.Add("Owner", new($"<@!{guild.OwnerId}>"));
         }
 

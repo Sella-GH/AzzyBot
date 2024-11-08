@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Services.BackgroundServices;
@@ -21,8 +22,8 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
     private readonly DiscordBotService _discordBotService = discordBotService;
     private readonly UpdaterService _updaterService = updaterService;
     private readonly Task _completedTask = Task.CompletedTask;
-    private DateTime _lastAzzyBotUpdateCheck = DateTime.MinValue;
-    private DateTime _lastCleanup = DateTime.MinValue;
+    private DateTimeOffset _lastAzzyBotUpdateCheck = DateTimeOffset.MinValue;
+    private DateTimeOffset _lastCleanup = DateTimeOffset.MinValue;
     private Timer? _timer;
     private bool _firstRun = true;
 
@@ -58,16 +59,16 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
 
         _logger.GlobalTimerTick();
 
-        DateTime now = DateTime.UtcNow;
+        DateTimeOffset now = DateTimeOffset.UtcNow;
         try
         {
-            if (now - _lastCleanup >= TimeSpan.FromHours(23.98))
+            if (now - _lastCleanup > TimeSpan.FromHours(23.98))
             {
                 await _dbMaintenance.CleanupLeftoverGuildsAsync(_discordBotService.GetDiscordGuilds);
                 _lastCleanup = now;
             }
 
-            if (now - _lastAzzyBotUpdateCheck >= TimeSpan.FromHours(5.98))
+            if (now - _lastAzzyBotUpdateCheck > TimeSpan.FromHours(5.98))
             {
                 _logger.GlobalTimerCheckForUpdates();
                 await _updaterService.CheckForAzzyUpdatesAsync();
@@ -75,12 +76,11 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
             }
 
             IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildsAsync(loadEverything: true);
-            int guildCount = _discordBotService.GetDiscordGuilds.Count;
-            int delay = 5 + guildCount;
+            int delay = 5 + await guilds.CountAsync();
 
             if (!_firstRun)
             {
-                _logger.GlobalTimerCheckForChannelPermissions(guildCount);
+                _logger.GlobalTimerCheckForChannelPermissions();
                 await _discordBotService.CheckPermissionsAsync(guilds);
             }
             else
