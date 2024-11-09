@@ -13,7 +13,7 @@ public static class IServiceCollectionExtensions
     {
         if (isDev)
         {
-            services.AddSingleton(new AppStatsRecord("Unknown", DateTime.Now, 0));
+            services.AddSingleton(new AppStatsRecord("Unknown", DateTimeOffset.Now, 0));
             return;
         }
 

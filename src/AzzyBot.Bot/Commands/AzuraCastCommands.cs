@@ -121,7 +121,7 @@ public sealed class AzuraCastCommands
                 await _azuraCast.DownloadPlaylistAsync(playlistUrl, apiKey, fileName);
             }
 
-            string zFileName = $"{ac.Id}-{acStation.Id}-{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_{((filePaths.Count > 1) ? "Playlists" : "Playlist")}_{format}.zip";
+            string zFileName = $"{ac.Id}-{acStation.Id}-{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss}_{((filePaths.Count > 1) ? "Playlists" : "Playlist")}_{format}.zip";
             await FileOperations.CreateZipFileAsync(zFileName, _azuraCast.FilePath, tempDir);
             filePaths.Add(Path.Combine(_azuraCast.FilePath, zFileName));
 
@@ -270,7 +270,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            string fileName = $"{ac.Id}_{logName}_{DateTime.Now:yyyy-MM-dd_hh-mm-ss-fffffff}.log";
+            string fileName = $"{ac.Id}_{logName}_{DateTimeOffset.Now:yyyy-MM-dd_hh-mm-ss-fffffff}.log";
             string filePath = await FileOperations.CreateTempFileAsync(systemLog.Content, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
             await using DiscordMessageBuilder builder = new();
@@ -602,7 +602,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            if (acStation.LastSkipTime.AddSeconds(30) > DateTime.UtcNow)
+            if (acStation.LastSkipTime.AddSeconds(30) > DateTimeOffset.UtcNow)
             {
                 await context.EditResponseAsync(GeneralStrings.SkipToFast);
                 return;
@@ -626,7 +626,7 @@ public sealed class AzuraCastCommands
 
             await _azuraCast.SkipSongAsync(new(baseUrl), apiKey, station);
 
-            await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, null, null, DateTime.UtcNow);
+            await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, null, null, DateTimeOffset.UtcNow);
 
             await context.EditResponseAsync($"I skipped **{nowPlaying.NowPlaying.Song.Title}** by **{nowPlaying.NowPlaying.Song.Artist}**.");
         }
@@ -714,12 +714,12 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(GetSongHistoryAsync), context.User.GlobalName);
 
-            DateTime dateTime;
+            DateTimeOffset dateTime;
             if (date is null)
             {
                 dateTime = DateTime.Today;
             }
-            else if (!DateTime.TryParse(date, CultureInfo.CurrentCulture, out dateTime))
+            else if (!DateTimeOffset.TryParse(date, CultureInfo.CurrentCulture, out dateTime))
             {
                 await context.EditResponseAsync(GeneralStrings.DateFormatInvalid);
                 return;
@@ -997,7 +997,7 @@ public sealed class AzuraCastCommands
                     return;
                 }
 
-                long threshold = Converter.ConvertToUnixTime(DateTime.UtcNow.AddMinutes(-stationConfig.RequestThreshold));
+                long threshold = Converter.ConvertToUnixTime(DateTimeOffset.UtcNow.AddMinutes(-stationConfig.RequestThreshold));
                 isPlayed = requestsPlayed.Any(r => (r.Track.SongId == songRequest.Song.SongId || r.Track.UniqueId == songRequest.Song.UniqueId) && r.Timestamp >= threshold);
             }
 
@@ -1020,7 +1020,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            DiscordButtonComponent button = new(DiscordButtonStyle.Success, $"request_song_{context.User.Id}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Request Song");
+            DiscordButtonComponent button = new(DiscordButtonStyle.Success, $"request_song_{context.User.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Request Song");
             await using DiscordMessageBuilder builder = new();
             builder.AddEmbed(embed);
             builder.AddComponents(button);
@@ -1046,11 +1046,11 @@ public sealed class AzuraCastCommands
                 }
 
                 string response = string.Empty;
-                DateTime lastRequest = acStation.LastRequestTime.AddSeconds(16);
-                DateTime now = DateTime.UtcNow;
+                DateTimeOffset lastRequest = acStation.LastRequestTime.AddSeconds(16);
+                DateTimeOffset now = DateTimeOffset.UtcNow;
                 if (lastRequest > now)
                 {
-                    AzuraCustomQueueItemRecord record = new(context.Guild.Id, baseUrl, station, songRequest.RequestId, DateTime.UtcNow);
+                    AzuraCustomQueueItemRecord record = new(context.Guild.Id, baseUrl, station, songRequest.RequestId, DateTimeOffset.UtcNow);
                     _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _requestBackgroundTask.CreateRequestAsync(record)));
 
                     response = GeneralStrings.SongRequestQueued;
@@ -1058,7 +1058,7 @@ public sealed class AzuraCastCommands
                 else
                 {
                     await _azuraCast.RequestSongAsync(baseUrl, station, songRequest.RequestId);
-                    await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, acStation.StationId, lastRequestTime: DateTime.UtcNow.AddSeconds(16));
+                    await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, acStation.StationId, lastRequestTime: DateTimeOffset.UtcNow.AddSeconds(16));
 
                     response = GeneralStrings.SongRequested;
                 }
@@ -1124,7 +1124,7 @@ public sealed class AzuraCastCommands
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
 
-            string filePath = Path.Combine(Path.GetTempPath(), $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{ac.GuildId}-{ac.Id}-{acStation.Id}_{file.FileName}");
+            string filePath = Path.Combine(Path.GetTempPath(), $"{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{ac.GuildId}-{ac.Id}-{acStation.Id}_{file.FileName}");
             await _webRequest.DownloadAsync(new(file.Url), filePath);
 
             AzuraFileComplianceRecord compliance = AzuraFileChecker.FileIsCompliant(filePath);

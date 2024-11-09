@@ -4,9 +4,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="CsvHelper" Version="33.0.1" />
-    <PackageVersion Include="DSharpPlus" Version="5.0.0-nightly-02396" />
-    <PackageVersion Include="DSharpPlus.Commands" Version="5.0.0-nightly-02396" />
-    <PackageVersion Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02396" />
+    <PackageVersion Include="DSharpPlus" Version="5.0.0-nightly-02401" />
+    <PackageVersion Include="DSharpPlus.Commands" Version="5.0.0-nightly-02401" />
+    <PackageVersion Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02401" />
     <PackageVersion Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="8.1.3" />
     <PackageVersion Include="Lavalink4NET.DSharpPlus.Nightly" Version="4.0.26-preview.4" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10" />
