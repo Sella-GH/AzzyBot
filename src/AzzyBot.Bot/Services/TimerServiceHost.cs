@@ -28,12 +28,11 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBotSe
     private DateTimeOffset _lastAzzyBotUpdateCheck = DateTimeOffset.MinValue;
     private DateTimeOffset _lastCleanup = DateTimeOffset.MinValue;
     private Timer? _timer;
-    private bool _firstRun = true;
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.GlobalTimerStart();
-        _timer = new(new TimerCallback(TimerTimeoutAsync), null, TimeSpan.Zero, TimeSpan.FromMinutes(15));
+        _timer = new(new TimerCallback(TimerTimeoutAsync), null, TimeSpan.FromSeconds(30), TimeSpan.FromMinutes(15));
 
         return _completedTask;
     }
@@ -57,9 +56,6 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBotSe
     [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "General exception is there to log unkown exceptions")]
     private async void TimerTimeoutAsync(object? o)
     {
-        if (_firstRun)
-            await Task.Delay(TimeSpan.FromSeconds(30));
-
         _logger.GlobalTimerTick();
 
         DateTimeOffset now = DateTimeOffset.UtcNow;
@@ -82,15 +78,8 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBotSe
             IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildsAsync(loadEverything: true);
             int delay = 5 + await guilds.CountAsync();
 
-            if (!_firstRun)
-            {
-                _logger.GlobalTimerCheckForChannelPermissions();
-                await _discordBotService.CheckPermissionsAsync(guilds);
-            }
-            else
-            {
-                _firstRun = false;
-            }
+            _logger.GlobalTimerCheckForChannelPermissions();
+            await _discordBotService.CheckPermissionsAsync(guilds);
 
             await _azuraChecksBackgroundService.QueueInstancePingAsync(guilds, now);
 
