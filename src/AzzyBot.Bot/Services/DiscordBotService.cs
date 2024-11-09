@@ -103,7 +103,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         DiscordMember? member;
         List<ulong> channels = [];
         List<ulong> channelNotAccessible = [];
-        await foreach (GuildEntity guild in guilds)
+        await foreach (GuildEntity guild in guilds.Where(g => DateTimeOffset.UtcNow - g.LastPermissionCheck > TimeSpan.FromHours(11.98)))
         {
             if (guild.UniqueId == _settings.ServerId)
             {
