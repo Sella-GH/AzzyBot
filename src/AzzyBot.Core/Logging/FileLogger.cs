@@ -12,7 +12,7 @@ public sealed class FileLogger : ILogger
     private static StreamWriter? LogStream;
     private static readonly object Lock = new();
     private static string? CurrentLogFilePath;
-    private static DateTime LastFileCreationTime;
+    private static DateTimeOffset LastFileCreationTime;
 
     public FileLogger(string name, Func<FileLoggerConfiguration> getConfig)
     {
@@ -38,7 +38,7 @@ public sealed class FileLogger : ILogger
             }
 
             CurrentLogFilePath = GetLogFilePath(config.Directory, config);
-            LastFileCreationTime = DateTime.Now;
+            LastFileCreationTime = DateTimeOffset.Now;
 
             LogStream = new StreamWriter(CurrentLogFilePath, true, Encoding.UTF8)
             {
@@ -52,7 +52,7 @@ public sealed class FileLogger : ILogger
         => !string.IsNullOrWhiteSpace(CurrentLogFilePath) && new FileInfo(CurrentLogFilePath).Length >= config.MaxFileSize;
 
     private static bool ShouldRotateBecauseOfTime(FileLoggerConfiguration config)
-        => DateTime.Now - LastFileCreationTime >= config.MaxTimeSpan;
+        => DateTimeOffset.Now - LastFileCreationTime >= config.MaxTimeSpan;
 
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull
         => default!;
@@ -62,7 +62,7 @@ public sealed class FileLogger : ILogger
 
     private static string GetLogFilePath(string directory, FileLoggerConfiguration config)
     {
-        DateTime now = DateTime.Now;
+        DateTimeOffset now = DateTimeOffset.Now;
         string[] files = Directory.GetFiles(directory, $"{now:yyyy-MM-dd}_*.log");
         if (files.Length is 0)
             return Path.Combine(directory, $"{now:yyyy-MM-dd_HH-mm-ss}.log");
@@ -84,7 +84,7 @@ public sealed class FileLogger : ILogger
         lock (Lock)
         {
             string message = formatter(state, exception);
-            string logMessage = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {logLevel}: {_name}[{eventId.Id}] {message}{exception}";
+            string logMessage = $"[{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss}] {logLevel}: {_name}[{eventId.Id}] {message}{exception}";
 
             LogStream?.WriteLine(logMessage);
         }

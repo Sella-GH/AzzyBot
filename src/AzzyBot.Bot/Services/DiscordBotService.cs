@@ -155,13 +155,15 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
                     channelNotAccessible.Add(channelId);
             }
 
+            await _dbActions.UpdateGuildAsync(guild.UniqueId, DateTimeOffset.UtcNow);
+
             if (channelNotAccessible.Count is 0)
             {
                 channels.Clear();
                 continue;
             }
 
-            DiscordGuild? dGuild = await _client.GetGuildsAsync().FirstOrDefaultAsync(g => g.Id == guild.UniqueId);
+            DiscordGuild? dGuild = await _client.GetGuildAsync(guild.UniqueId);
             if (dGuild is null)
             {
                 _logger.DiscordItemNotFound(nameof(DiscordGuild), guild.UniqueId);
@@ -224,7 +226,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         return member;
     }
 
-    public async Task<bool> LogExceptionAsync(Exception ex, DateTime timestamp, SlashCommandContext? ctx = null, ulong guildId = 0, string? info = null)
+    public async Task<bool> LogExceptionAsync(Exception ex, DateTimeOffset timestamp, SlashCommandContext? ctx = null, ulong guildId = 0, string? info = null)
     {
         ArgumentNullException.ThrowIfNull(ex, nameof(ex));
 

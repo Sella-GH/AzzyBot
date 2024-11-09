@@ -11,19 +11,19 @@ public static class Converter
     /// <returns>The converted time as <seealso cref="TimeSpan"/>.</returns>
     public static TimeSpan ConvertFromUnixTime(long unixTime)
     {
-        DateTime offset = DateTimeOffset.FromUnixTimeSeconds(unixTime).DateTime.ToLocalTime();
+        DateTimeOffset offset = DateTimeOffset.FromUnixTimeSeconds(unixTime).DateTime.ToLocalTime();
 
         return new(offset.Hour, offset.Minute, offset.Second);
     }
 
     /// <summary>
-    /// Converts a <seealso cref="DateTime"/> object to Unix time.
+    /// Converts a <seealso cref="DateTimeOffset"/> object to Unix time.
     /// </summary>
-    /// <param name="time">The <seealso cref="DateTime"/> object to convert.</param>
+    /// <param name="time">The <seealso cref="DateTimeOffset"/> object to convert.</param>
     /// <returns>The Unix time as <see langword="long"/>.</returns>
-    public static long ConvertToUnixTime(in DateTime time)
+    public static long ConvertToUnixTime(in DateTimeOffset time)
     {
-        DateTime epoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        DateTimeOffset epoch = DateTimeOffset.UnixEpoch;
         TimeSpan elapsed = time.ToUniversalTime() - epoch;
 
         return (long)elapsed.TotalSeconds;

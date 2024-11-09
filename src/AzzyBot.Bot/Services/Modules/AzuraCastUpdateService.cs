@@ -55,7 +55,7 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
                 return;
             }
 
-            DateTime now = DateTime.UtcNow;
+            DateTimeOffset now = DateTimeOffset.UtcNow;
             if (!update.NeedsReleaseUpdate && !update.NeedsRollingUpdate)
             {
                 await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: 0, lastUpdateCheck: now);

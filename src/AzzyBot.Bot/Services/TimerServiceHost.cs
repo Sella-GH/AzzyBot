@@ -25,8 +25,8 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBotSe
     private readonly DiscordBotService _discordBotService = discordBotService;
     private readonly UpdaterService _updaterService = updaterService;
     private readonly Task _completedTask = Task.CompletedTask;
-    private DateTime _lastAzzyBotUpdateCheck = DateTime.MinValue;
-    private DateTime _lastCleanup = DateTime.MinValue;
+    private DateTimeOffset _lastAzzyBotUpdateCheck = DateTimeOffset.MinValue;
+    private DateTimeOffset _lastCleanup = DateTimeOffset.MinValue;
     private Timer? _timer;
     private bool _firstRun = true;
 
@@ -62,17 +62,17 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBotSe
 
         _logger.GlobalTimerTick();
 
-        DateTime now = DateTime.UtcNow;
+        DateTimeOffset now = DateTimeOffset.UtcNow;
         try
         {
-            if (now - _lastCleanup >= TimeSpan.FromHours(23.98))
+            if (now - _lastCleanup > TimeSpan.FromHours(23.98))
             {
                 LogfileCleaning();
                 await _dbMaintenance.CleanupLeftoverGuildsAsync(_discordBotService.GetDiscordGuilds);
                 _lastCleanup = now;
             }
 
-            if (now - _lastAzzyBotUpdateCheck >= TimeSpan.FromHours(5.98))
+            if (now - _lastAzzyBotUpdateCheck > TimeSpan.FromHours(5.98))
             {
                 _logger.GlobalTimerCheckForUpdates();
                 await _updaterService.CheckForAzzyUpdatesAsync();
@@ -80,12 +80,11 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBotSe
             }
 
             IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildsAsync(loadEverything: true);
-            int guildCount = _discordBotService.GetDiscordGuilds.Count;
-            int delay = 5 + guildCount;
+            int delay = 5 + await guilds.CountAsync();
 
             if (!_firstRun)
             {
-                _logger.GlobalTimerCheckForChannelPermissions(guildCount);
+                _logger.GlobalTimerCheckForChannelPermissions();
                 await _discordBotService.CheckPermissionsAsync(guilds);
             }
             else
@@ -116,7 +115,7 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzzyBotSe
     {
         _logger.LogfileCleaning();
 
-        DateTime date = DateTime.Today.AddDays(-_settings.LogRetentionDays);
+        DateTimeOffset date = DateTime.Today.AddDays(-_settings.LogRetentionDays);
         string logPath = Path.Combine(Environment.CurrentDirectory, "Logs");
         int counter = 0;
         foreach (string logFile in Directory.GetFiles(logPath, "*.log").Where(f => File.GetLastWriteTime(f) < date))

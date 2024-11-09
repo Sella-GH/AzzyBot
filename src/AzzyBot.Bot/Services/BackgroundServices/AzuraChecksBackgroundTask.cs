@@ -22,7 +22,7 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
     private readonly CancellationToken _cancellationToken = applicationLifetime.ApplicationStopping;
     private readonly QueuedBackgroundTask _queue = queue;
 
-    public async Task QueueApiPermissionChecksAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
+    public async Task QueueApiPermissionChecksAsync(IAsyncEnumerable<GuildEntity> guilds, DateTimeOffset now)
     {
         if (_cancellationToken.IsCancellationRequested)
             return;
@@ -72,7 +72,7 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
         }
     }
 
-    public async Task QueueFileChangesChecksAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
+    public async Task QueueFileChangesChecksAsync(IAsyncEnumerable<GuildEntity> guilds, DateTimeOffset now)
     {
         if (_cancellationToken.IsCancellationRequested)
             return;
@@ -128,7 +128,7 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
         }
     }
 
-    public async Task QueueInstancePingAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
+    public async Task QueueInstancePingAsync(IAsyncEnumerable<GuildEntity> guilds, DateTimeOffset now)
     {
         if (_cancellationToken.IsCancellationRequested)
             return;
@@ -164,7 +164,7 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
             _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _pingService.PingInstanceAsync(guild.AzuraCast, ct)));
     }
 
-    public async Task QueueUpdatesAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
+    public async Task QueueUpdatesAsync(IAsyncEnumerable<GuildEntity> guilds, DateTimeOffset now)
     {
         if (_cancellationToken.IsCancellationRequested)
             return;

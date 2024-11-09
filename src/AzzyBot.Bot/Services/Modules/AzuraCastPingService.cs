@@ -55,7 +55,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, A
                 _logger.BackgroundServiceInstanceStatus(azuraCast.GuildId, azuraCast.Id, "unkown or offline");
             }
 
-            await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, lastServerStatusCheck: DateTime.UtcNow);
+            await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, lastServerStatusCheck: DateTimeOffset.UtcNow);
         }
         catch (OperationCanceledException)
         {

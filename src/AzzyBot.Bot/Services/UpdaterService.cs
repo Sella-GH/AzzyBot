@@ -18,7 +18,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
     private readonly AzzyBotSettingsRecord _settings = settings;
     private readonly DiscordBotService _botService = botService;
     private readonly WebRequestService _webService = webService;
-    private DateTime _lastAzzyUpdateNotificationTime = DateTime.MinValue;
+    private DateTimeOffset _lastAzzyUpdateNotificationTime = DateTimeOffset.MinValue;
     private string _lastOnlineVersion = string.Empty;
     private int _azzyNotifyCounter;
     private readonly Uri _latestUrl = new("https://api.github.com/repos/Sella-GH/AzzyBot/releases/latest");
@@ -52,15 +52,15 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
         if (localVersion == onlineVersion)
             return;
 
-        if (!DateTime.TryParse(updaterRecord.CreatedAt, out DateTime releaseDate))
-            releaseDate = DateTime.Now;
+        if (!DateTimeOffset.TryParse(updaterRecord.CreatedAt, out DateTimeOffset releaseDate))
+            releaseDate = DateTimeOffset.Now;
 
         await SendUpdateMessageAsync(onlineVersion, releaseDate, updaterRecord.Body);
     }
 
-    public static bool CheckUpdateNotification(int notifyCounter, in DateTime lastNotificationTime)
+    public static bool CheckUpdateNotification(int notifyCounter, in DateTimeOffset lastNotificationTime)
     {
-        DateTime now = DateTime.UtcNow;
+        DateTimeOffset now = DateTimeOffset.UtcNow;
         if (notifyCounter < 3 && now - lastNotificationTime > TimeSpan.FromHours(23.98))
         {
             return true;
@@ -77,18 +77,18 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
         return false;
     }
 
-    private async Task SendUpdateMessageAsync(string updateVersion, DateTime releaseDate, string changelog)
+    private async Task SendUpdateMessageAsync(string updateVersion, DateTimeOffset releaseDate, string changelog)
     {
         if (_lastOnlineVersion != updateVersion)
         {
-            _lastAzzyUpdateNotificationTime = DateTime.MinValue;
+            _lastAzzyUpdateNotificationTime = DateTimeOffset.MinValue;
             _azzyNotifyCounter = 0;
         }
 
         if (!CheckUpdateNotification(_azzyNotifyCounter, _lastAzzyUpdateNotificationTime))
             return;
 
-        _lastAzzyUpdateNotificationTime = DateTime.UtcNow;
+        _lastAzzyUpdateNotificationTime = DateTimeOffset.UtcNow;
         _lastOnlineVersion = updateVersion;
         _azzyNotifyCounter++;
 
