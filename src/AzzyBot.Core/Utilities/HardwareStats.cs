@@ -250,6 +250,6 @@ public static class HardwareStats
     public static string GetSystemOsArch
         => RuntimeInformation.OSArchitecture.ToString();
 
-    public static DateTime GetSystemUptime
-        => DateTime.Now.AddMilliseconds(-Environment.TickCount64);
+    public static DateTimeOffset GetSystemUptime
+        => DateTimeOffset.Now.AddMilliseconds(-Environment.TickCount64);
 }

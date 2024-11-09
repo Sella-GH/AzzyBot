@@ -38,7 +38,7 @@ public sealed class AzuraRequestBackgroundTask(ILogger<AzuraRequestBackgroundTas
             _logger.BackgroundServiceSongRequestWaiting(record.SongId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId, diff.Seconds);
             await Task.Delay(diff);
 
-            record.Timestamp = DateTime.UtcNow;
+            record.Timestamp = DateTimeOffset.UtcNow;
             _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await CreateRequestAsync(record)));
             _logger.BackgroundServiceSongRequestRequed(record.SongId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
 
@@ -48,13 +48,13 @@ public sealed class AzuraRequestBackgroundTask(ILogger<AzuraRequestBackgroundTas
         try
         {
             await _apiService.RequestSongAsync(record.BaseUri, record.StationId, record.SongId);
-            await _dbActions.UpdateAzuraCastStationAsync(record.GuildId, record.StationId, lastRequestTime: DateTime.UtcNow.AddSeconds(16));
+            await _dbActions.UpdateAzuraCastStationAsync(record.GuildId, record.StationId, lastRequestTime: DateTimeOffset.UtcNow.AddSeconds(16));
 
             _logger.BackgroundServiceSongRequestFinished(record.SongId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
         }
         catch (HttpRequestException)
         {
-            record.Timestamp = DateTime.UtcNow;
+            record.Timestamp = DateTimeOffset.UtcNow;
             _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await CreateRequestAsync(record)));
 
             _logger.BackgroundServiceSongRequestRequed(record.SongId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);

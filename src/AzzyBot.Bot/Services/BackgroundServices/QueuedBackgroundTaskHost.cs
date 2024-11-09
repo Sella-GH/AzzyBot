@@ -41,7 +41,7 @@ public sealed class QueuedBackgroundTaskHost(ILogger<QueuedBackgroundTaskHost> l
             }
             catch (Exception ex)
             {
-                await _botService.LogExceptionAsync(ex, DateTime.Now);
+                await _botService.LogExceptionAsync(ex, DateTimeOffset.Now);
             }
         }
     }

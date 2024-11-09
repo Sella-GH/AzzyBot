@@ -10,13 +10,13 @@ public sealed record AppStatsRecord
     public string Commit { get; init; }
 
     [JsonPropertyName(nameof(CompilationDate))]
-    public DateTime CompilationDate { get; init; }
+    public DateTimeOffset CompilationDate { get; init; }
 
     [JsonPropertyName(nameof(LocCs))]
     public int LocCs { get; init; }
 
     [SuppressMessage("Roslynator", "RCS1231:Make parameter ref read-only", Justification = "This is a constructor and does not allow referencing.")]
-    public AppStatsRecord(string commit, DateTime compilationDate, int locCs)
+    public AppStatsRecord(string commit, DateTimeOffset compilationDate, int locCs)
     {
         Commit = commit;
         CompilationDate = compilationDate;
