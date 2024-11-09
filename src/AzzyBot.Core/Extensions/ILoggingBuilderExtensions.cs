@@ -21,17 +21,17 @@ public static class ILoggingBuilderExtensions
         }
 
         logging.AddConsole();
-        logging.AddFile(Path.Combine("Logs", $"AzzyBot_{DateTime.Now:yyyy-MM-dd}.log"), c =>
+        logging.AddFile(Path.Combine("Logs", $"AzzyBot_{DateTimeOffset.Now:yyyy-MM-dd}.log"), c =>
         {
             c.Append = true;
             c.FileSizeLimitBytes = 10380902; // ~9.9 MB
             c.MaxRollingFiles = logDays;
             c.RollingFilesConvention = FileLoggerOptions.FileRollingConvention.Descending;
             c.UseUtcTimestamp = false;
-            c.FormatLogFileName = static (logTime) => string.Format(CultureInfo.InvariantCulture, logTime, $"{DateTime.Now:yyyy-MM-dd}");
+            c.FormatLogFileName = static (logTime) => string.Format(CultureInfo.InvariantCulture, logTime, $"{DateTimeOffset.Now:yyyy-MM-dd}");
             c.FormatLogEntry = static (message) =>
             {
-                string logMessage = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message.LogLevel}: {message.LogName}[{message.EventId}] {message.Message}";
+                string logMessage = $"[{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss}] {message.LogLevel}: {message.LogName}[{message.EventId}] {message.Message}";
                 if (message.Exception is not null)
                     logMessage += Environment.NewLine + message.Exception;
 
