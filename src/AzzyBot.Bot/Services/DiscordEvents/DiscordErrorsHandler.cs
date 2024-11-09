@@ -16,7 +16,7 @@ public sealed class DiscordErrorsHandler(DiscordBotService botService) : IClient
         if (_botService is null)
             return;
 
-        DateTime now = DateTime.Now;
+        DateTimeOffset now = DateTimeOffset.Now;
 
         switch (exception)
         {
@@ -44,5 +44,5 @@ public sealed class DiscordErrorsHandler(DiscordBotService botService) : IClient
     }
 
     public async ValueTask HandleGatewayError(Exception exception)
-        => await _botService.LogExceptionAsync(exception, DateTime.Now);
+        => await _botService.LogExceptionAsync(exception, DateTimeOffset.Now);
 }

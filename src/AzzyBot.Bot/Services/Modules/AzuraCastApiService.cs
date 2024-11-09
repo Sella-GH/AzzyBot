@@ -478,7 +478,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         return GetFromApiAsync<AzuraAdminStationConfigRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
-    public Task<IEnumerable<AzuraStationHistoryItemRecord>?> GetStationHistoryAsync(Uri baseUrl, string apiKey, int stationId, in DateTime start, in DateTime end)
+    public Task<IEnumerable<AzuraStationHistoryItemRecord>?> GetStationHistoryAsync(Uri baseUrl, string apiKey, int stationId, in DateTimeOffset start, in DateTimeOffset end)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey, nameof(apiKey));
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId, nameof(stationId));

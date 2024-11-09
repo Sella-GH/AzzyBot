@@ -24,7 +24,7 @@ public sealed class DiscordCommandsErrorHandler(ILogger<DiscordCommandsErrorHand
         _logger.CommandsErrorType(e.Exception.GetType().Name);
 
         Exception ex = e.Exception;
-        DateTime now = DateTime.Now;
+        DateTimeOffset now = DateTimeOffset.Now;
         ulong guildId = 0;
         if (e.Context.Guild is not null)
             guildId = e.Context.Guild.Id;

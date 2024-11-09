@@ -33,20 +33,20 @@ public sealed class AzuraCastChecksEntity
     public int UpdateNotificationCounter { get; set; }
 
     /// <summary>
-    /// The <see cref="DateTime"/> of the last server status check.
+    /// The <see cref="DateTimeOffset"/> of the last server status check.
     /// </summary>
     /// <remarks>
-    /// Always use <see cref="DateTime.UtcNow"/> to set this value.
+    /// Always use <see cref="DateTimeOffset.UtcNow"/> to set this value.
     /// </remarks>
-    public DateTime LastServerStatusCheck { get; set; }
+    public DateTimeOffset LastServerStatusCheck { get; set; }
 
     /// <summary>
-    /// The <see cref="DateTime"/> of the last update check.
+    /// The <see cref="DateTimeOffset"/> of the last update check.
     /// </summary>
     /// <remarks>
-    /// Always use <see cref="DateTime.UtcNow"/> to set this value.
+    /// Always use <see cref="DateTimeOffset.UtcNow"/> to set this value.
     /// </remarks>
-    public DateTime LastUpdateCheck { get; set; }
+    public DateTimeOffset LastUpdateCheck { get; set; }
 
     /// <summary>
     /// The database id of the parenting <see cref="AzuraCastEntity"/> database item.
