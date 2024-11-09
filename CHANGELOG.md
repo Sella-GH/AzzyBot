@@ -15,6 +15,11 @@
 - Reworked the whole file logging system
 - `admin send-bot-wide-message` now allows linebreaks using `\n` and includes a message if it's sent directly to the server owner
 
+## 2.0.11 - 2024-11-09
+### Improvements
+- Moved from `DateTime` to `DateTimeOffset` to prevent issues with timezones
+  - This should now hopefully fix all the issues occuring with the timer
+
 ## 2.0.10 - 2024-11-07
 ### Improvements
 - Reworked how the background check system works to fix issues
