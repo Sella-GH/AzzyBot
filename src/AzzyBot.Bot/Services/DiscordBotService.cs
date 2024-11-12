@@ -155,7 +155,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
                     channelNotAccessible.Add(channelId);
             }
 
-            await _dbActions.UpdateGuildAsync(guild.UniqueId, DateTimeOffset.UtcNow);
+            await _dbActions.UpdateGuildAsync(guild.UniqueId, true);
 
             if (channelNotAccessible.Count is 0)
             {

@@ -1,3 +1,8 @@
+## 2.0.12 - 2024-11-12
+### Improvements
+- Removed all parameters from database relevant methods which are intended to pass `DateTimeOffset.UtcNow` values and replaced them with direct calls inside the respecting method
+  - This *is* the final fix for the timer issues
+
 ## 2.0.11 - 2024-11-09
 ### Improvements
 - Moved from `DateTime` to `DateTimeOffset` to prevent issues with timezones

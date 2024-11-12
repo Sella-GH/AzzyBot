@@ -55,10 +55,9 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
                 return;
             }
 
-            DateTimeOffset now = DateTimeOffset.UtcNow;
             if (!update.NeedsReleaseUpdate && !update.NeedsRollingUpdate)
             {
-                await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: 0, lastUpdateCheck: now);
+                await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: 0, lastUpdateCheck: true);
                 return;
             }
 
@@ -66,7 +65,7 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
             if (!forced && !UpdaterService.CheckUpdateNotification(checks.UpdateNotificationCounter, checks.LastUpdateCheck))
                 return;
 
-            await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: checks.UpdateNotificationCounter + 1, lastUpdateCheck: now);
+            await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: checks.UpdateNotificationCounter + 1, lastUpdateCheck: true);
 
             List<DiscordEmbed> embeds = new(2)
             {
