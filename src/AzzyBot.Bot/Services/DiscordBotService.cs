@@ -38,7 +38,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
     public bool CheckIfClientIsConnected
         => _client.AllShardsConnected;
 
-    public async Task<bool> CheckChannelPermissionsAsync(DiscordMember member, ulong channelId, DiscordPermissions permissions)
+    public async Task<bool> CheckChannelPermissionsAsync(DiscordMember member, ulong channelId, DiscordPermission[] permissions)
     {
         ArgumentNullException.ThrowIfNull(member);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId);
@@ -50,7 +50,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             return false;
         }
 
-        return channel.PermissionsFor(member).HasPermission(permissions);
+        return channel.PermissionsFor(member).HasAllPermissions(permissions);
     }
 
     public async Task CheckPermissionsAsync(DiscordGuild guild, ulong[] channelIds)
@@ -71,7 +71,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         foreach (ulong channelId in channelIds)
         {
             channels.Add(channelId);
-            if (!await CheckChannelPermissionsAsync(member, channelId, DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages))
+            if (!await CheckChannelPermissionsAsync(member, channelId, [DiscordPermission.SendMessages, DiscordPermission.ViewChannel]))
                 channelNotAccessible.Add(channelId);
         }
 
@@ -153,7 +153,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
                     continue;
                 }
 
-                if (!channel.PermissionsFor(member).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages))
+                if (!channel.PermissionsFor(member).HasAllPermissions(DiscordPermission.SendMessages, DiscordPermission.ViewChannel))
                     channelNotAccessible.Add(channelId);
             }
 
@@ -463,7 +463,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
                 return false;
             }
 
-            if (!channel.PermissionsFor(dMember).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages))
+            if (!channel.PermissionsFor(dMember).HasAllPermissions(DiscordPermission.SendMessages, DiscordPermission.ViewChannel))
             {
                 _logger.UnableToSendMessage($"Bot has no permission to send messages in channel: {channel.Name} ({channel.Id})");
                 return false;
@@ -576,7 +576,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             return null;
         }
 
-        return guild.Channels.FirstOrDefault(c => c.Value.Type is DiscordChannelType.Text && c.Value.PermissionsFor(member).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages)).Value;
+        return guild.Channels.FirstOrDefault(c => c.Value.Type is DiscordChannelType.Text && c.Value.PermissionsFor(member).HasAllPermissions(DiscordPermission.SendMessages, DiscordPermission.ViewChannel)).Value;
     }
 
     private static void ProcessOptions(IReadOnlyDictionary<CommandParameter, object?> paramaters, Dictionary<string, string> commandParameters)

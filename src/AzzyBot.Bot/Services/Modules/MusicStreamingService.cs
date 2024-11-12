@@ -63,7 +63,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
                 _logger.DiscordItemNotFound(nameof(DiscordMember), context.Guild.Id);
                 notConnecting = true;
             }
-            else if (!await _botService.CheckChannelPermissionsAsync(bot, channelId, DiscordPermissions.AccessChannels | DiscordPermissions.UseVoice))
+            else if (!await _botService.CheckChannelPermissionsAsync(bot, channelId, [DiscordPermission.Speak, DiscordPermission.ViewChannel]))
             {
                 notConnecting = true;
             }
