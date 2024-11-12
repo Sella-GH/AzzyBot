@@ -18,6 +18,12 @@
 - Startup logging now shows the .NET version too
 - Reworked the whole file logging system
 - `admin send-bot-wide-message` now allows linebreaks using `\n` and includes a message if it's sent directly to the server owner
+- QuickJit for loops was activated to improve performance of the bot
+
+## 2.0.12 - 2024-11-12
+### Improvements
+- Removed all parameters from database relevant methods which are intended to pass `DateTimeOffset.UtcNow` values and replaced them with direct calls inside the respecting method
+  - This *is* the final fix for the timer issues
 
 ## 2.0.11 - 2024-11-09
 ### Improvements
