@@ -48,7 +48,7 @@ public sealed class AzuraRequestBackgroundTask(ILogger<AzuraRequestBackgroundTas
         try
         {
             await _apiService.RequestSongAsync(record.BaseUri, record.StationId, record.SongId);
-            await _dbActions.UpdateAzuraCastStationAsync(record.GuildId, record.StationId, lastRequestTime: DateTimeOffset.UtcNow.AddSeconds(16));
+            await _dbActions.UpdateAzuraCastStationAsync(record.GuildId, record.StationId, lastRequestTime: true);
 
             _logger.BackgroundServiceSongRequestFinished(record.SongId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
         }

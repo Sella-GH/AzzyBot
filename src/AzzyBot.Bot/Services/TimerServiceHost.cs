@@ -77,18 +77,18 @@ public sealed class TimerServiceHost(ILogger<TimerServiceHost> logger, AzuraChec
             _logger.GlobalTimerCheckForChannelPermissions();
             await _discordBotService.CheckPermissionsAsync(guilds);
 
-            await _azuraChecksBackgroundService.QueueInstancePingAsync(guilds, now);
+            await _azuraChecksBackgroundService.QueueInstancePingAsync(guilds);
 
             // Properly wait if there's an exception or not
             await Task.Delay(TimeSpan.FromSeconds(delay));
 
-            await _azuraChecksBackgroundService.QueueApiPermissionChecksAsync(guilds, now);
+            await _azuraChecksBackgroundService.QueueApiPermissionChecksAsync(guilds);
 
             // Wait again
             await Task.Delay(TimeSpan.FromSeconds(delay));
 
-            await _azuraChecksBackgroundService.QueueFileChangesChecksAsync(guilds, now);
-            await _azuraChecksBackgroundService.QueueUpdatesAsync(guilds, now);
+            await _azuraChecksBackgroundService.QueueFileChangesChecksAsync(guilds);
+            await _azuraChecksBackgroundService.QueueUpdatesAsync(guilds);
         }
         catch (Exception ex)
         {

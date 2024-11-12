@@ -626,7 +626,7 @@ public sealed class AzuraCastCommands
 
             await _azuraCast.SkipSongAsync(new(baseUrl), apiKey, station);
 
-            await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, null, null, DateTimeOffset.UtcNow);
+            await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, null, null, true);
 
             await context.EditResponseAsync($"I skipped **{nowPlaying.NowPlaying.Song.Title}** by **{nowPlaying.NowPlaying.Song.Artist}**.");
         }
@@ -1058,7 +1058,7 @@ public sealed class AzuraCastCommands
                 else
                 {
                     await _azuraCast.RequestSongAsync(baseUrl, station, songRequest.RequestId);
-                    await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, acStation.StationId, lastRequestTime: DateTimeOffset.UtcNow.AddSeconds(16));
+                    await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, acStation.StationId, lastRequestTime: true);
 
                     response = GeneralStrings.SongRequested;
                 }
