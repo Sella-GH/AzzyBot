@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using AzzyBot.Bot.Localization;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
@@ -10,8 +11,8 @@ public sealed class BooleanYesNoStateProvider : IChoiceProvider
 {
     private static readonly IEnumerable<DiscordApplicationCommandOptionChoice> BooleanStates =
     [
-        new("Yes", 1),
-        new("No", 2)
+        new("Yes", 1, CommandChoiceLocalizer.GenerateTranslations(nameof(BooleanYesNoStateProvider), "Yes")),
+        new("No", 2, CommandChoiceLocalizer.GenerateTranslations(nameof(BooleanYesNoStateProvider), "No")),
     ];
 
     public ValueTask<IEnumerable<DiscordApplicationCommandOptionChoice>> ProvideAsync(CommandParameter parameter)
