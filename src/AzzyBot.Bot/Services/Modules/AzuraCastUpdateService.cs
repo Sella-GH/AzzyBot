@@ -30,7 +30,6 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
         try
         {
             string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
-
             string? body = await _azuraCastApiService.GetUpdatesAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), apiKey);
             if (string.IsNullOrWhiteSpace(body))
             {
@@ -38,7 +37,7 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
                 return;
             }
 
-            AzuraUpdateRecord? update = null;
+            AzuraUpdateRecord? update;
             try
             {
                 update = JsonSerializer.Deserialize<AzuraUpdateRecord>(body);
@@ -58,7 +57,7 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
 
             if (!update.NeedsReleaseUpdate && !update.NeedsRollingUpdate)
             {
-                await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: 0, lastUpdateCheck: DateTime.UtcNow);
+                await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: 0, lastUpdateCheck: true);
                 return;
             }
 
@@ -66,7 +65,7 @@ public sealed class AzuraCastUpdateService(ILogger<AzuraCastUpdateService> logge
             if (!forced && !UpdaterService.CheckUpdateNotification(checks.UpdateNotificationCounter, checks.LastUpdateCheck))
                 return;
 
-            await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: checks.UpdateNotificationCounter + 1, lastUpdateCheck: DateTime.UtcNow);
+            await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: checks.UpdateNotificationCounter + 1, lastUpdateCheck: true);
 
             List<DiscordEmbed> embeds = new(2)
             {

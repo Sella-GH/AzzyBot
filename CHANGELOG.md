@@ -14,6 +14,25 @@
 - Exception embeds now produce json output instead of a stacktrace.log file
 - Reworked the whole file logging system
 - `admin send-bot-wide-message` now allows linebreaks using `\n` and includes a message if it's sent directly to the server owner
+- QuickJit for loops was activated to improve performance of the bot
+
+## 2.0.12 - 2024-11-12
+### Improvements
+- Removed all parameters from database relevant methods which are intended to pass `DateTimeOffset.UtcNow` values and replaced them with direct calls inside the respecting method
+  - This *is* the final fix for the timer issues
+
+## 2.0.11 - 2024-11-09
+### Improvements
+- Moved from `DateTime` to `DateTimeOffset` to prevent issues with timezones
+  - This should now hopefully fix all the issues occuring with the timer
+
+## 2.0.10 - 2024-11-07
+### Improvements
+- Reworked how the background check system works to fix issues
+
+## 2.0.9 - 2024-11-03
+### Fixes
+- The bot now only checks each 12h if the discord permissions are set to prevent hitting discord ratelimits
 
 ## 2.0.8 - 2024-10-27
 ### Dependencies

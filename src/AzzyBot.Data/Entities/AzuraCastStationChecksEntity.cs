@@ -15,12 +15,12 @@ public sealed class AzuraCastStationChecksEntity
     public bool FileChanges { get; set; }
 
     /// <summary>
-    /// The <see cref="DateTime"/> of the last file changes check.
+    /// The <see cref="DateTimeOffset"/> of the last file changes check.
     /// </summary>
     /// <remarks>
-    /// Always use <see cref="DateTime.UtcNow"/> to set this value.
+    /// Always use <see cref="DateTimeOffset.UtcNow"/> to set this value.
     /// </remarks>
-    public DateTime LastFileChangesCheck { get; set; }
+    public DateTimeOffset LastFileChangesCheck { get; set; }
 
     /// <summary>
     /// The database id of the parenting <see cref="AzuraCastStationEntity"/> database item.

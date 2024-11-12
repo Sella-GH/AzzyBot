@@ -22,7 +22,7 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
     private readonly CancellationToken _cancellationToken = applicationLifetime.ApplicationStopping;
     private readonly QueuedBackgroundTask _queue = queue;
 
-    public async Task QueueApiPermissionChecksAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
+    public async Task QueueApiPermissionChecksAsync(IAsyncEnumerable<GuildEntity> guilds)
     {
         if (_cancellationToken.IsCancellationRequested)
             return;
@@ -34,7 +34,7 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
         int counter = 0;
         await foreach (GuildEntity guild in guilds)
         {
-            if (guild.AzuraCast?.IsOnline is true && now > guild.AzuraCast.Checks.LastServerStatusCheck.AddMinutes(14.98))
+            if (guild.AzuraCast?.IsOnline is true && DateTimeOffset.UtcNow - guild.AzuraCast.Checks.LastServerStatusCheck > TimeSpan.FromHours(11.98))
             {
                 _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _apiService.CheckForApiPermissionsAsync(guild.AzuraCast)));
                 counter++;
@@ -72,7 +72,7 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
         }
     }
 
-    public async Task QueueFileChangesChecksAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
+    public async Task QueueFileChangesChecksAsync(IAsyncEnumerable<GuildEntity> guilds)
     {
         if (_cancellationToken.IsCancellationRequested)
             return;
@@ -84,7 +84,7 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
         int counter = 0;
         await foreach (GuildEntity guild in guilds.Where(g => g.AzuraCast?.IsOnline == true))
         {
-            foreach (AzuraCastStationEntity station in guild.AzuraCast!.Stations.Where(s => s.Checks.FileChanges && now > s.Checks.LastFileChangesCheck.AddHours(0.98)))
+            foreach (AzuraCastStationEntity station in guild.AzuraCast!.Stations.Where(s => s.Checks.FileChanges && DateTimeOffset.UtcNow - s.Checks.LastFileChangesCheck > TimeSpan.FromHours(0.98)))
             {
                 _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _fileService.CheckForFileChangesAsync(station, ct)));
                 counter++;
@@ -125,7 +125,7 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
         }
     }
 
-    public async Task QueueInstancePingAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
+    public async Task QueueInstancePingAsync(IAsyncEnumerable<GuildEntity> guilds)
     {
         if (_cancellationToken.IsCancellationRequested)
             return;
@@ -137,9 +137,9 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
         int counter = 0;
         await foreach (GuildEntity guild in guilds)
         {
-            if (guild.AzuraCast?.Checks.ServerStatus is true && now > guild.AzuraCast?.Checks.LastServerStatusCheck.AddMinutes(14.98))
+            if (guild.AzuraCast?.Checks.ServerStatus is true && DateTimeOffset.UtcNow - guild.AzuraCast?.Checks.LastServerStatusCheck > TimeSpan.FromMinutes(14.98))
             {
-                _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _pingService.PingInstanceAsync(guild.AzuraCast, ct)));
+                _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _pingService.PingInstanceAsync(guild.AzuraCast!, ct)));
                 counter++;
             }
         }
@@ -161,7 +161,7 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
             _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _pingService.PingInstanceAsync(guild.AzuraCast, ct)));
     }
 
-    public async Task QueueUpdatesAsync(IAsyncEnumerable<GuildEntity> guilds, DateTime now)
+    public async Task QueueUpdatesAsync(IAsyncEnumerable<GuildEntity> guilds)
     {
         if (_cancellationToken.IsCancellationRequested)
             return;
@@ -173,7 +173,7 @@ public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicati
         int counter = 0;
         await foreach (GuildEntity guild in guilds)
         {
-            if (guild.AzuraCast?.IsOnline is true && guild.AzuraCast.Checks.Updates && now > guild.AzuraCast.Checks.LastUpdateCheck.AddHours(11.98))
+            if (guild.AzuraCast?.IsOnline is true && guild.AzuraCast.Checks.Updates && DateTimeOffset.UtcNow - guild.AzuraCast.Checks.LastUpdateCheck > TimeSpan.FromHours(11.98))
             {
                 _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _updaterService.CheckForAzuraCastUpdatesAsync(guild.AzuraCast!, ct)));
                 counter++;

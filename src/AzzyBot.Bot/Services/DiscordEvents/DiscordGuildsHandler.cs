@@ -23,14 +23,15 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, A
 
     private const string NewGuildText = "Thank you for adding me to your server **%GUILD%**! Before you can make good use of me, you have to set my settings first.\n\nPlease use the command `config modify-core` for this.\nOnly administrators are able to execute this command right now.";
 
-    public Task HandleEventAsync(DiscordClient sender, GuildCreatedEventArgs eventArgs)
+    public async Task HandleEventAsync(DiscordClient sender, GuildCreatedEventArgs eventArgs)
     {
         ArgumentNullException.ThrowIfNull(sender);
         ArgumentNullException.ThrowIfNull(eventArgs);
 
         _logger.GuildCreated(eventArgs.Guild.Name);
 
-        return Task.CompletedTask;
+        await _dbActions.AddGuildAsync(eventArgs.Guild.Id);
+        await GuildCreatedHelperAsync([eventArgs.Guild]);
     }
 
     public async Task HandleEventAsync(DiscordClient sender, GuildDeletedEventArgs eventArgs)
@@ -72,20 +73,13 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, A
             return;
         }
 
-        DiscordEmbed embed;
-        DiscordMember owner;
         IEnumerable<DiscordGuild> addedGuilds = await _dbActions.AddGuildsAsync(eventArgs.Guilds);
         if (addedGuilds.Any())
         {
-            foreach (DiscordGuild guild in addedGuilds)
-            {
-                owner = await guild.GetGuildOwnerAsync();
-                await owner.SendMessageAsync(NewGuildText.Replace("%GUILD%", guild.Name, StringComparison.OrdinalIgnoreCase));
-                embed = await EmbedBuilder.BuildGuildAddedEmbedAsync(guild);
-                await _botService.SendMessageAsync(_settings.NotificationChannelId, embeds: [embed]);
-            }
+            await GuildCreatedHelperAsync(addedGuilds);
         }
 
+        DiscordEmbed embed;
         IEnumerable<ulong> removedGuilds = await _dbActions.DeleteGuildsAsync(eventArgs.Guilds);
         if (removedGuilds.Any())
         {
@@ -98,5 +92,20 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, A
 
         IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildsAsync(loadEverything: true);
         await _botService.CheckPermissionsAsync(guilds);
+    }
+
+    private async Task GuildCreatedHelperAsync(IEnumerable<DiscordGuild> guilds)
+    {
+        ArgumentNullException.ThrowIfNull(guilds);
+
+        DiscordEmbed embed;
+        DiscordMember owner;
+        foreach (DiscordGuild guild in guilds)
+        {
+            owner = await guild.GetGuildOwnerAsync();
+            await owner.SendMessageAsync(NewGuildText.Replace("%GUILD%", guild.Name, StringComparison.OrdinalIgnoreCase));
+            embed = await EmbedBuilder.BuildGuildAddedEmbedAsync(guild);
+            await _botService.SendMessageAsync(_settings.NotificationChannelId, embeds: [embed]);
+        }
     }
 }
