@@ -6,12 +6,10 @@ USER root
 RUN apt update && apt upgrade -y && apt autoremove -y && apt clean -y
 WORKDIR /build
 COPY ./ ./
-ARG ARCH
 ARG CONFIG
-ARG OS
 COPY ./Nuget.config ./Nuget.config
-RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --force --no-http-cache --configfile ./Nuget.config
-RUN dotnet publish ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --no-restore -a $ARCH -c $CONFIG --os $OS -o out
+RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.config --force --no-cache --ucr
+RUN dotnet publish ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --no-restore -c $CONFIG -o out --ucr
 
 # RUNNER IMAGE
 FROM mcr.microsoft.com/dotnet/runtime:9.0-bookworm-slim AS runner
