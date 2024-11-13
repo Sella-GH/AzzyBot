@@ -20,7 +20,7 @@
     <PackageVersion Include="Roslynator.Refactorings" Version="4.12.9" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="9.32.0.97167" />
     <PackageVersion Include="System.Linq.Async" Version="6.0.1" />
-    <PackageVersion Include="System.Text.Json" Version="8.0.5" />
+    <PackageVersion Include="System.Text.Json" Version="9.0.0" />
     <PackageVersion Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
 </Project>
