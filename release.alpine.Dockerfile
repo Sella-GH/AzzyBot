@@ -11,13 +11,14 @@ ARG CONFIG
 ARG OS
 COPY ./Nuget.config ./Nuget.config
 RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --force --no-http-cache --configfile ./Nuget.config
-RUN dotnet publish ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -a $ARCH -c $CONFIG --os $OS -o out
+RUN dotnet publish ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --no-restore -a $ARCH -c $CONFIG --os $OS -o out
 
 # RUNNER IMAGE
 FROM mcr.microsoft.com/dotnet/runtime:9.0-alpine AS runner
 USER root
 
 # Add environment variables
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 ENV LC_ALL=en.US.UTF-8
 ENV LANG=en.US.UTF-8
 
