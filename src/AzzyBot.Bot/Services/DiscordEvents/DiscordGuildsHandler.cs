@@ -75,22 +75,20 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, A
 
         IEnumerable<DiscordGuild> addedGuilds = await _dbActions.AddGuildsAsync(eventArgs.Guilds);
         if (addedGuilds.Any())
-        {
             await GuildCreatedHelperAsync(addedGuilds);
-        }
 
         DiscordEmbed embed;
         IEnumerable<ulong> removedGuilds = await _dbActions.DeleteGuildsAsync(eventArgs.Guilds);
         if (removedGuilds.Any())
         {
-            foreach (ulong guild in removedGuilds)
+            foreach (ulong removedGuild in removedGuilds)
             {
-                embed = EmbedBuilder.BuildGuildRemovedEmbed(guild);
+                embed = EmbedBuilder.BuildGuildRemovedEmbed(removedGuild);
                 await _botService.SendMessageAsync(_settings.NotificationChannelId, embeds: [embed]);
             }
         }
 
-        IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildsAsync(loadEverything: true);
+        IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
         await _botService.CheckPermissionsAsync(guilds);
     }
 

@@ -25,7 +25,7 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
     {
         _logger.GlobalTimerTick();
-        List<GuildEntity> guilds = await _dbActions.GetGuildsAsync(loadEverything: true).ToListAsync(token);
+        IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
 
         _logger.GlobalTimerCheckForChannelPermissions();
         List<GuildEntity> guildsWorkingSet = guilds.Where(static g => DateTimeOffset.UtcNow - g.LastPermissionCheck >= TimeSpan.FromHours(12)).ToList();

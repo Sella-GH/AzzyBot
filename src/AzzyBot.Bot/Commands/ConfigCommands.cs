@@ -85,7 +85,7 @@ public sealed class ConfigCommands
             await context.DeferResponseAsync();
 
             ulong guildId = context.Guild.Id;
-            GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true).FirstOrDefaultAsync();
+            GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true);
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);
@@ -115,7 +115,7 @@ public sealed class ConfigCommands
             await context.DeleteResponseAsync();
             await context.FollowupAsync(GeneralStrings.ConfigInstanceAdded);
 
-            guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true).FirstOrDefaultAsync();
+            guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true);
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);
@@ -168,7 +168,7 @@ public sealed class ConfigCommands
             await context.FollowupAsync(GeneralStrings.ConfigStationAdded);
 
             ulong guildId = context.Guild.Id;
-            GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true).FirstOrDefaultAsync();
+            GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true);
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);
@@ -268,7 +268,7 @@ public sealed class ConfigCommands
             await context.FollowupAsync(GeneralStrings.ConfigInstanceModified);
 
             ulong guildId = context.Guild.Id;
-            GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true).FirstOrDefaultAsync();
+            GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true);
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);
@@ -355,7 +355,7 @@ public sealed class ConfigCommands
             if (serverStatus is 1 || updates is 1)
             {
                 ulong guildId = context.Guild.Id;
-                GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true).FirstOrDefaultAsync();
+                GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true);
                 if (guild is null)
                 {
                     _logger.DatabaseGuildNotFound(guildId);
@@ -440,7 +440,7 @@ public sealed class ConfigCommands
                 await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, apiKey);
 
                 ulong guildId = context.Guild.Id;
-                GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true).FirstOrDefaultAsync();
+                GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true);
                 if (guild is null)
                 {
                     _logger.DatabaseGuildNotFound(guildId);
@@ -506,7 +506,7 @@ public sealed class ConfigCommands
             if (fileChanges is 1)
             {
                 ulong guildId = context.Guild.Id;
-                GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true).FirstOrDefaultAsync();
+                GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true);
                 if (guild is null)
                 {
                     _logger.DatabaseGuildNotFound(guildId);
@@ -587,16 +587,7 @@ public sealed class ConfigCommands
             ulong guildId = context.Guild.Id;
             string guildName = context.Guild.Name;
             DiscordMember member = context.Member;
-            GuildEntity? guild = null;
-            await foreach (GuildEntity itGuild in _dbActions.GetGuildAsync(guildId, loadEverything: true))
-            {
-                if (itGuild.UniqueId == guildId)
-                {
-                    guild = itGuild;
-                    break;
-                }
-            }
-
+            GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true);
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);

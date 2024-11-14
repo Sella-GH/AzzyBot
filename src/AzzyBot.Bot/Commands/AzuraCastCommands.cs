@@ -154,7 +154,7 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceApiPermissionCheckAsync), context.User.GlobalName);
 
-            GuildEntity? dGuild = await _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true).FirstOrDefaultAsync();
+            GuildEntity? dGuild = await _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
             if (dGuild is null)
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
@@ -186,7 +186,7 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceCacheRefreshAsync), context.User.GlobalName);
 
-            GuildEntity? dGuild = await _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true).FirstOrDefaultAsync();
+            GuildEntity? dGuild = await _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
             if (dGuild is null)
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
@@ -207,7 +207,7 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceOnlineCheckAsync), context.User.GlobalName);
 
-            GuildEntity? dGuild = await _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true).FirstOrDefaultAsync();
+            GuildEntity? dGuild = await _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
             if (dGuild is null)
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
@@ -228,7 +228,7 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceUpdateCheckAsync), context.User.GlobalName);
 
-            GuildEntity? dGuild = await _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true).FirstOrDefaultAsync();
+            GuildEntity? dGuild = await _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
             if (dGuild is null)
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
