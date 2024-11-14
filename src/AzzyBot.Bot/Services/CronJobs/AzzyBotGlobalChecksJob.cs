@@ -72,7 +72,7 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
             _logger.GlobalTimerCheckForAzuraCastUpdates(guildsWorkingSet.Count);
             foreach (GuildEntity guild in guildsWorkingSet)
             {
-                await _azuraUpdateService.CheckForAzuraCastUpdatesAsync(guild.AzuraCast!, token);
+                await _azuraUpdateService.CheckForAzuraCastUpdatesAsync(guild.AzuraCast!);
             }
         }
     }

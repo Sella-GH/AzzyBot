@@ -9,7 +9,6 @@ using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Choices;
 using AzzyBot.Bot.Services;
-using AzzyBot.Bot.Services.CronJobs;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Enums;
@@ -34,13 +33,13 @@ namespace AzzyBot.Bot.Commands;
 public sealed class ConfigCommands
 {
     [Command("config"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
-    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraChecksBackgroundTask backgroundService, DbActions dbActions, DiscordBotService botService)
+    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, DbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<ConfigGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCastApi = azuraCastApi;
         private readonly AzuraCastFileService _azuraCastFile = azuraCastFile;
         private readonly AzuraCastPingService _azuraCastPing = azuraCastPing;
-        private readonly AzuraChecksBackgroundTask _backgroundService = backgroundService;
+        private readonly AzuraCastUpdateService _azuraCastUpdate = azuraCastUpdate;
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
 
@@ -362,7 +361,7 @@ public sealed class ConfigCommands
                     await _azuraCastPing.PingInstanceAsync(dAzuraCast);
 
                 if (updates is 1)
-                    _backgroundService.QueueUpdates(guild);
+                    await _azuraCastUpdate.CheckForAzuraCastUpdatesAsync(dAzuraCast);
             }
         }
 
