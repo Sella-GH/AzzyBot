@@ -21,6 +21,15 @@
 - `admin send-bot-wide-message` now allows linebreaks using `\n` and includes a message if it's sent directly to the server owner
 - QuickJit for loops was activated to improve performance of the bot
 
+## 2.0.13 - 2024-11-14
+### Dependencies
+- Updated [Microsoft.Extensions.Caching.Memory](https://github.com/dotnet/runtime) to version 9.0.0
+- Updated [Microsoft.Extensions.Hosting](https://github.com/dotnet/runtime) to version 9.0.0
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 9.0.0
+- Updated [System.Text.Json](https://github.com/dotnet/runtime) to version 9.0.0
+### Improvements
+- Sets the Service Lifetime of database services to `Singleton` again with the exception of the `AzzyBotDbContext` which is now `Scoped`
+
 ## 2.0.12 - 2024-11-12
 ### Improvements
 - Removed all parameters from database relevant methods which are intended to pass `DateTimeOffset.UtcNow` values and replaced them with direct calls inside the respecting method
