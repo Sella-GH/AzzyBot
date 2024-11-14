@@ -5,7 +5,7 @@ using AzzyBot.Bot.Commands;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Converters;
 using AzzyBot.Bot.Services;
-using AzzyBot.Bot.Services.BackgroundServices;
+using AzzyBot.Bot.Services.CronJobs;
 using AzzyBot.Bot.Services.DiscordEvents;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Settings;
@@ -64,9 +64,6 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<AzuraCastUpdateService>();
         services.AddSingleton<AzuraChecksBackgroundTask>();
         services.AddSingleton<AzuraRequestBackgroundTask>();
-
-        services.AddSingleton<TimerServiceHost>();
-        services.AddHostedService(static s => s.GetRequiredService<TimerServiceHost>());
 
         services.AddLavalink();
         services.ConfigureLavalink(config =>

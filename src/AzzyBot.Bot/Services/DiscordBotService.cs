@@ -98,14 +98,14 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         await owner.SendMessageAsync(builder.ToString());
     }
 
-    public async Task CheckPermissionsAsync(IAsyncEnumerable<GuildEntity> guilds)
+    public async Task CheckPermissionsAsync(IReadOnlyList<GuildEntity> guilds)
     {
         ArgumentNullException.ThrowIfNull(guilds);
 
         DiscordMember? member;
         List<ulong> channels = [];
         List<ulong> channelNotAccessible = [];
-        await foreach (GuildEntity guild in guilds.Where(g => DateTimeOffset.UtcNow - g.LastPermissionCheck > TimeSpan.FromHours(11.98)))
+        foreach (GuildEntity guild in guilds)
         {
             if (guild.UniqueId == _settings.ServerId)
             {
