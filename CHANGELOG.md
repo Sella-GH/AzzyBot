@@ -1,6 +1,7 @@
 ## 2.1.0
 ### Dependencies
 - Added [NReco.Logging.File](https://github.com/nreco/logging) in version 1.2.1
+- Added [NCronJob](https://github.com/NCronJob-Dev/NCronJob) in version 3.3.5
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02394
 - Updated [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET) to version 4.0.26-preview.4
 
@@ -15,6 +16,9 @@
 - Reworked the whole file logging system
 - `admin send-bot-wide-message` now allows linebreaks using `\n` and includes a message if it's sent directly to the server owner
 - QuickJit for loops was activated to improve performance of the bot
+- Reworked background tasks to use NCronJob instead of a custom implementation
+- `azuracast force-cache-refresh` parameter `station` is now optional
+  - If there is no value given it will refresh the cache of all configured stations
 
 ## 2.0.13 - 2024-11-14
 ### Dependencies
