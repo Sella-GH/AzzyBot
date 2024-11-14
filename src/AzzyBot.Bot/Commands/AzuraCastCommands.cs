@@ -42,11 +42,12 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AzuraCastCommands
 {
     [Command("azuracast"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator), ModuleActivatedCheck(AzzyModules.AzuraCast)]
-    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraChecksBackgroundTask backgroundService, DbActions dbActions, DiscordBotService botService, MusicStreamingService musicStreaming)
+    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraChecksBackgroundTask backgroundService, DbActions dbActions, DiscordBotService botService, MusicStreamingService musicStreaming)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCastApi = azuraCastApi;
         private readonly AzuraCastFileService _azuraCastFile = azuraCastFile;
+        private readonly AzuraCastPingService _azuraCastPing = azuraCastPing;
         private readonly AzuraChecksBackgroundTask _backgroundService = backgroundService;
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
@@ -234,17 +235,16 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceOnlineCheckAsync), context.User.GlobalName);
 
-            GuildEntity? dGuild = await _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
-            if (dGuild is null)
+            AzuraCastEntity? dAzuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadGuild: true);
+            if (dAzuraCast is null)
             {
-                _logger.DatabaseGuildNotFound(context.Guild.Id);
-                await context.EditResponseAsync(GeneralStrings.GuildNotFound);
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
-            _backgroundService.QueueInstancePing(dGuild);
-
             await context.EditResponseAsync("I initiated the online check for the AzuraCast instance.");
+            await _azuraCastPing.PingInstanceAsync(dAzuraCast);
         }
 
         [Command("force-update-check"), Description("Force the bot to search for AzuraCast Updates."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]

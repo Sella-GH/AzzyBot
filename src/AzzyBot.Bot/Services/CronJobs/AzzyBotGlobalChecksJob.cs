@@ -38,7 +38,7 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
             _logger.GlobalTimerCheckForAzuraCastStatus(guildsWorkingSet.Count);
             foreach (GuildEntity guild in guildsWorkingSet)
             {
-                await _azuraPingService.PingInstanceAsync(guild.AzuraCast!, token);
+                await _azuraPingService.PingInstanceAsync(guild.AzuraCast!);
             }
         }
 
@@ -61,7 +61,7 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
             {
                 foreach (AzuraCastStationEntity station in guild.AzuraCast!.Stations.Where(s => s.Checks.FileChanges && DateTimeOffset.UtcNow - s.Checks.LastFileChangesCheck >= TimeSpan.FromHours(1)))
                 {
-                    await _azuraFileService.CheckForFileChangesAsync(station, token);
+                    await _azuraFileService.CheckForFileChangesAsync(station);
                 }
             }
         }
