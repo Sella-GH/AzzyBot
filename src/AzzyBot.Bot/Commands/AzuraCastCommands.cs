@@ -154,21 +154,29 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceApiPermissionCheckAsync), context.User.GlobalName);
 
-            GuildEntity? dGuild = await _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
-            if (dGuild is null)
+            AzuraCastEntity? dAzuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true, loadStationChecks: true);
+            if (dAzuraCast is null)
             {
-                _logger.DatabaseGuildNotFound(context.Guild.Id);
-                await context.EditResponseAsync(GeneralStrings.GuildNotFound);
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
-            if (station.HasValue)
+            if (!station.HasValue)
             {
-                _backgroundService.QueueApiPermissionChecks(dGuild, station.Value);
+                await _azuraCast.CheckForApiPermissionsAsync(dAzuraCast);
             }
             else
             {
-                _backgroundService.QueueApiPermissionChecks(dGuild);
+                AzuraCastStationEntity? dStation = dAzuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+                if (dStation is null)
+                {
+                    _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, dAzuraCast.Id, station.Value);
+                    await context.EditResponseAsync(GeneralStrings.StationNotFound);
+                    return;
+                }
+
+                await _azuraCast.CheckForApiPermissionsAsync(dStation);
             }
 
             await context.EditResponseAsync("I initiated the permission check.\nThere won't be another message if your permissions are set correctly.");

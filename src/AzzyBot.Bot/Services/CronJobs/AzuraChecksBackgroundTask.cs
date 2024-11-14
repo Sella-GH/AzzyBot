@@ -12,43 +12,14 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicationLifetime, ILogger<AzuraChecksBackgroundTask> logger, AzuraCastApiService azuraCastApiService, AzuraCastFileService azuraCastFileService, AzuraCastPingService azuraCastPingService, AzuraCastUpdateService updaterService, QueuedBackgroundTask queue)
+public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicationLifetime, ILogger<AzuraChecksBackgroundTask> logger, AzuraCastFileService azuraCastFileService, AzuraCastPingService azuraCastPingService, AzuraCastUpdateService updaterService, QueuedBackgroundTask queue)
 {
     private readonly ILogger<AzuraChecksBackgroundTask> _logger = logger;
-    private readonly AzuraCastApiService _apiService = azuraCastApiService;
     private readonly AzuraCastFileService _fileService = azuraCastFileService;
     private readonly AzuraCastPingService _pingService = azuraCastPingService;
     private readonly AzuraCastUpdateService _updaterService = updaterService;
     private readonly CancellationToken _cancellationToken = applicationLifetime.ApplicationStopping;
     private readonly QueuedBackgroundTask _queue = queue;
-
-    public void QueueApiPermissionChecks(GuildEntity guild, int stationId = 0)
-    {
-        if (_cancellationToken.IsCancellationRequested)
-            return;
-
-        ArgumentNullException.ThrowIfNull(guild);
-        ArgumentNullException.ThrowIfNull(guild.AzuraCast);
-
-        _logger.BackgroundServiceWorkItem(nameof(QueueApiPermissionChecks));
-
-        IEnumerable<AzuraCastStationEntity> stations = guild.AzuraCast.Stations;
-        if (stationId is not 0)
-        {
-            AzuraCastStationEntity? station = stations.FirstOrDefault(s => s.StationId == stationId);
-            if (station is null)
-            {
-                _logger.DatabaseAzuraCastStationNotFound(guild.UniqueId, guild.AzuraCast.Id, stationId);
-                return;
-            }
-
-            _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _apiService.CheckForApiPermissionsAsync(station)));
-        }
-        else
-        {
-            _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _apiService.CheckForApiPermissionsAsync(guild.AzuraCast)));
-        }
-    }
 
     public void QueueFileChangesChecks(GuildEntity guild, int stationId = 0)
     {
