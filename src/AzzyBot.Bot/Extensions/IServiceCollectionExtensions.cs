@@ -25,6 +25,7 @@ using Lavalink4NET.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NCronJob;
 
 namespace AzzyBot.Bot.Extensions;
 
@@ -62,37 +63,9 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<AzuraCastFileService>();
         services.AddSingleton<AzuraCastPingService>();
         services.AddSingleton<AzuraCastUpdateService>();
-        services.AddSingleton<AzuraChecksBackgroundTask>();
+        services.AddNCronJob(static o => o.AddJob<AzzyBotGlobalChecksJob>(j => j.WithCronExpression("*/15 * * * *").WithName(nameof(AzzyBotGlobalChecksJob))));
         services.AddSingleton<AzuraRequestBackgroundTask>();
 
-        services.AddLavalink();
-        services.ConfigureLavalink(config =>
-        {
-            Uri baseAddress = (isDocker) ? new("http://AzzyBot-Ms:2333") : new("http://localhost:2333");
-            if (settings.MusicStreaming is not null)
-            {
-                if (!string.IsNullOrWhiteSpace(settings.MusicStreaming.LavalinkHost) && settings.MusicStreaming.LavalinkPort is not 0)
-                {
-                    baseAddress = new($"http://{settings.MusicStreaming.LavalinkHost}:{settings.MusicStreaming.LavalinkPort}");
-                }
-                else if (!string.IsNullOrWhiteSpace(settings.MusicStreaming.LavalinkHost) && settings.MusicStreaming.LavalinkPort is 0)
-                {
-                    baseAddress = new($"http://{settings.MusicStreaming.LavalinkHost}:2333");
-                }
-                else if (string.IsNullOrWhiteSpace(settings.MusicStreaming.LavalinkHost) && settings.MusicStreaming.LavalinkPort is not 0)
-                {
-                    baseAddress = (isDocker) ? new($"http://AzzyBot-Ms:{settings.MusicStreaming.LavalinkPort}") : new($"http://localhost:{settings.MusicStreaming.LavalinkPort}");
-                }
-
-                if (!string.IsNullOrWhiteSpace(settings.MusicStreaming.LavalinkPassword))
-                    config.Passphrase = settings.MusicStreaming.LavalinkPassword;
-            }
-
-            config.BaseAddress = baseAddress;
-            config.Label = "AzzyBot";
-            config.ReadyTimeout = TimeSpan.FromSeconds(30);
-            config.ResumptionOptions = new(TimeSpan.Zero);
-        });
         services.AddSingleton<MusicStreamingService>();
     }
 
