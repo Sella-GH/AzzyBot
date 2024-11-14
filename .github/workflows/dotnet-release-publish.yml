@@ -211,7 +211,7 @@ jobs:
             # Download the artifact
             curl -L -o "${ARTIFACT_NAME}.zip" -H "Authorization: token $GITHUB_TOKEN" "$ARTIFACT_DOWNLOAD_URL"
             # Upload the artifact to the release
-            gh release upload ${{ needs.create_release.outputs.release_version }} "${ARTIFACT_NAME}.zip" --repo ${{ github.repository }}
+            gh release upload ${{ needs.create_release.outputs.release_version }} "${ARTIFACT_NAME}.zip" --clobber --repo ${{ github.repository }}
           done
 
         env:
