@@ -12,45 +12,13 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicationLifetime, ILogger<AzuraChecksBackgroundTask> logger, AzuraCastFileService azuraCastFileService, AzuraCastPingService azuraCastPingService, AzuraCastUpdateService updaterService, QueuedBackgroundTask queue)
+public sealed class AzuraChecksBackgroundTask(IHostApplicationLifetime applicationLifetime, ILogger<AzuraChecksBackgroundTask> logger, AzuraCastPingService azuraCastPingService, AzuraCastUpdateService updaterService, QueuedBackgroundTask queue)
 {
     private readonly ILogger<AzuraChecksBackgroundTask> _logger = logger;
-    private readonly AzuraCastFileService _fileService = azuraCastFileService;
     private readonly AzuraCastPingService _pingService = azuraCastPingService;
     private readonly AzuraCastUpdateService _updaterService = updaterService;
     private readonly CancellationToken _cancellationToken = applicationLifetime.ApplicationStopping;
     private readonly QueuedBackgroundTask _queue = queue;
-
-    public void QueueFileChangesChecks(GuildEntity guild, int stationId = 0)
-    {
-        if (_cancellationToken.IsCancellationRequested)
-            return;
-
-        ArgumentNullException.ThrowIfNull(guild);
-        ArgumentNullException.ThrowIfNull(guild.AzuraCast);
-
-        _logger.BackgroundServiceWorkItem(nameof(QueueFileChangesChecks));
-
-        IEnumerable<AzuraCastStationEntity> stations = guild.AzuraCast.Stations.Where(static s => s.Checks.FileChanges);
-        if (stationId is not 0)
-        {
-            AzuraCastStationEntity? station = stations.FirstOrDefault(s => s.StationId == stationId);
-            if (station is null)
-            {
-                _logger.DatabaseAzuraCastStationNotFound(guild.UniqueId, guild.AzuraCast.Id, stationId);
-                return;
-            }
-
-            _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _fileService.CheckForFileChangesAsync(station, ct)));
-        }
-        else
-        {
-            foreach (AzuraCastStationEntity station in stations)
-            {
-                _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _fileService.CheckForFileChangesAsync(station, ct)));
-            }
-        }
-    }
 
     public void QueueInstancePing(GuildEntity guild)
     {

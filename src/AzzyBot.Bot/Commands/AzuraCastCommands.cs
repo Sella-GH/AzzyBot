@@ -42,10 +42,11 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AzuraCastCommands
 {
     [Command("azuracast"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator), ModuleActivatedCheck(AzzyModules.AzuraCast)]
-    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCast, AzuraChecksBackgroundTask backgroundService, DbActions dbActions, DiscordBotService botService, MusicStreamingService musicStreaming)
+    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraChecksBackgroundTask backgroundService, DbActions dbActions, DiscordBotService botService, MusicStreamingService musicStreaming)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
-        private readonly AzuraCastApiService _azuraCast = azuraCast;
+        private readonly AzuraCastApiService _azuraCastApi = azuraCastApi;
+        private readonly AzuraCastFileService _azuraCastFile = azuraCastFile;
         private readonly AzuraChecksBackgroundTask _backgroundService = backgroundService;
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
@@ -83,11 +84,11 @@ public sealed class AzuraCastCommands
 
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
-            string tempDir = Path.Combine(_azuraCast.FilePath, "Temp");
+            string tempDir = Path.Combine(_azuraCastApi.FilePath, "Temp");
             if (!Directory.Exists(tempDir))
                 Directory.CreateDirectory(tempDir);
 
-            IEnumerable<AzuraPlaylistRecord>? playlists = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, station);
+            IEnumerable<AzuraPlaylistRecord>? playlists = await _azuraCastApi.GetPlaylistsAsync(new(baseUrl), apiKey, station);
             if (playlists is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
@@ -103,7 +104,7 @@ public sealed class AzuraCastCommands
                     Uri playlistUrl = (format is "m3u") ? playlist.Links.Export.M3U : playlist.Links.Export.PLS;
                     string fileName = Path.Combine(tempDir, $"{ac.Id}-{acStation.Id}-{playlist.ShortName}.{format}");
                     filePaths.Add(fileName);
-                    await _azuraCast.DownloadPlaylistAsync(playlistUrl, apiKey, fileName);
+                    await _azuraCastApi.DownloadPlaylistAsync(playlistUrl, apiKey, fileName);
                 }
             }
             else
@@ -118,16 +119,16 @@ public sealed class AzuraCastCommands
                 Uri playlistUrl = (format is "m3u") ? playlist.Links.Export.M3U : playlist.Links.Export.PLS;
                 string fileName = Path.Combine(tempDir, $"{ac.Id}-{acStation.Id}-{playlist.ShortName}.{format}");
                 filePaths.Add(fileName);
-                await _azuraCast.DownloadPlaylistAsync(playlistUrl, apiKey, fileName);
+                await _azuraCastApi.DownloadPlaylistAsync(playlistUrl, apiKey, fileName);
             }
 
             string zFileName = $"{ac.Id}-{acStation.Id}-{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss}_{((filePaths.Count > 1) ? "Playlists" : "Playlist")}_{format}.zip";
-            await FileOperations.CreateZipFileAsync(zFileName, _azuraCast.FilePath, tempDir);
-            filePaths.Add(Path.Combine(_azuraCast.FilePath, zFileName));
+            await FileOperations.CreateZipFileAsync(zFileName, _azuraCastApi.FilePath, tempDir);
+            filePaths.Add(Path.Combine(_azuraCastApi.FilePath, zFileName));
 
-            await using FileStream fileStream = new(Path.Combine(_azuraCast.FilePath, zFileName), FileMode.Open, FileAccess.Read);
+            await using FileStream fileStream = new(Path.Combine(_azuraCastApi.FilePath, zFileName), FileMode.Open, FileAccess.Read);
             await using DiscordMessageBuilder builder = new();
-            AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
+            AzuraStationRecord? azuraStation = await _azuraCastApi.GetStationAsync(new(baseUrl), station);
             if (azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
@@ -164,7 +165,7 @@ public sealed class AzuraCastCommands
 
             if (!station.HasValue)
             {
-                await _azuraCast.CheckForApiPermissionsAsync(dAzuraCast);
+                await _azuraCastApi.CheckForApiPermissionsAsync(dAzuraCast);
             }
             else
             {
@@ -176,7 +177,7 @@ public sealed class AzuraCastCommands
                     return;
                 }
 
-                await _azuraCast.CheckForApiPermissionsAsync(dStation);
+                await _azuraCastApi.CheckForApiPermissionsAsync(dStation);
             }
 
             await context.EditResponseAsync("I initiated the permission check.\nThere won't be another message if your permissions are set correctly.");
@@ -186,7 +187,7 @@ public sealed class AzuraCastCommands
         public async ValueTask ForceCacheRefreshAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to refresh the cache."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station
+            [Description("The station of which you want to refresh the cache."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int? station = null
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -194,17 +195,35 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceCacheRefreshAsync), context.User.GlobalName);
 
-            GuildEntity? dGuild = await _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
-            if (dGuild is null)
+            AzuraCastEntity? dAzuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true, loadStationChecks: true);
+            if (dAzuraCast is null)
             {
-                _logger.DatabaseGuildNotFound(context.Guild.Id);
-                await context.EditResponseAsync(GeneralStrings.GuildNotFound);
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
-            _backgroundService.QueueFileChangesChecks(dGuild, station);
+            if (!station.HasValue)
+            {
+                foreach (AzuraCastStationEntity dStation in dAzuraCast.Stations)
+                {
+                    await _azuraCastFile.CheckForFileChangesAsync(dStation);
+                }
+            }
+            else
+            {
+                AzuraCastStationEntity? dStation = dAzuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+                if (dStation is null)
+                {
+                    _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, dAzuraCast.Id, station.Value);
+                    await context.EditResponseAsync(GeneralStrings.StationNotFound);
+                    return;
+                }
 
-            await context.EditResponseAsync("I initiated the cache refresh.");
+                await _azuraCastFile.CheckForFileChangesAsync(dStation);
+            }
+
+            await context.EditResponseAsync((!station.HasValue) ? "I initiated the cache refresh for all stations." : "I initiated the cache refresh for the selected station.");
         }
 
         [Command("force-online-check"), Description("Force the bot to check if the AzuraCast instance is online."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -271,7 +290,7 @@ public sealed class AzuraCastCommands
 
             string apiKey = Crypto.Decrypt(ac.AdminApiKey);
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
-            AzuraSystemLogRecord? systemLog = await _azuraCast.GetSystemLogAsync(new(baseUrl), apiKey, logName);
+            AzuraSystemLogRecord? systemLog = await _azuraCastApi.GetSystemLogAsync(new(baseUrl), apiKey, logName);
             if (systemLog is null)
             {
                 await context.EditResponseAsync(GeneralStrings.SystemLogEmpty);
@@ -308,7 +327,7 @@ public sealed class AzuraCastCommands
             string apiKey = Crypto.Decrypt(ac.AdminApiKey);
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
 
-            AzuraHardwareStatsRecord? hardwareStats = await _azuraCast.GetHardwareStatsAsync(new(baseUrl), apiKey);
+            AzuraHardwareStatsRecord? hardwareStats = await _azuraCastApi.GetHardwareStatsAsync(new(baseUrl), apiKey);
             if (hardwareStats is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
@@ -352,9 +371,9 @@ public sealed class AzuraCastCommands
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
 
-            await _azuraCast.StartStationAsync(new(baseUrl), apiKey, station, context);
+            await _azuraCastApi.StartStationAsync(new(baseUrl), apiKey, station, context);
 
-            AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
+            AzuraStationRecord? azuraStation = await _azuraCastApi.GetStationAsync(new(baseUrl), station);
             if (azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
@@ -395,7 +414,7 @@ public sealed class AzuraCastCommands
 
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
-            AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
+            AzuraStationRecord? azuraStation = await _azuraCastApi.GetStationAsync(new(baseUrl), station);
             if (azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
@@ -412,7 +431,7 @@ public sealed class AzuraCastCommands
                 await Task.Delay(TimeSpan.FromSeconds(30));
             }
 
-            await _azuraCast.StopStationAsync(new(baseUrl), apiKey, station);
+            await _azuraCastApi.StopStationAsync(new(baseUrl), apiKey, station);
 
             DiscordMessage? message = await context.GetResponseAsync();
             if (message is not null)
@@ -456,7 +475,7 @@ public sealed class AzuraCastCommands
             string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
 
-            AzuraAdminStationConfigRecord? stationConfig = await _azuraCast.GetStationAdminConfigAsync(new(baseUrl), apiKey, station);
+            AzuraAdminStationConfigRecord? stationConfig = await _azuraCastApi.GetStationAdminConfigAsync(new(baseUrl), apiKey, station);
             if (stationConfig is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
@@ -465,7 +484,7 @@ public sealed class AzuraCastCommands
             }
 
             stationConfig.EnableRequests = !stationConfig.EnableRequests;
-            await _azuraCast.ModifyStationAdminConfigAsync(new(baseUrl), apiKey, station, stationConfig);
+            await _azuraCastApi.ModifyStationAdminConfigAsync(new(baseUrl), apiKey, station, stationConfig);
 
             await context.EditResponseAsync($"I {Misc.GetReadableBool(stationConfig.EnableRequests, ReadableBool.EnabledDisabled, true)} song requests for station **{stationConfig.Name}**.");
         }
@@ -489,7 +508,7 @@ public sealed class AzuraCastCommands
             string apiKey = Crypto.Decrypt(ac.AdminApiKey);
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
 
-            string? body = await _azuraCast.GetUpdatesAsync(new(baseUrl), apiKey);
+            string? body = await _azuraCastApi.GetUpdatesAsync(new(baseUrl), apiKey);
             if (string.IsNullOrWhiteSpace(body))
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
@@ -525,7 +544,7 @@ public sealed class AzuraCastCommands
 
             await context.EditResponseAsync("I initiated the update for the AzuraCast instance. Please wait a little until it restarts.");
 
-            await _azuraCast.UpdateInstanceAsync(new(baseUrl), apiKey);
+            await _azuraCastApi.UpdateInstanceAsync(new(baseUrl), apiKey);
 
             await context.FollowupAsync("The update was successful. Your instance is fully ready again.");
         }

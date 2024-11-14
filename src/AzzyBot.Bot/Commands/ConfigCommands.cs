@@ -34,10 +34,11 @@ namespace AzzyBot.Bot.Commands;
 public sealed class ConfigCommands
 {
     [Command("config"), RequireGuild, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator)]
-    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCast, AzuraChecksBackgroundTask backgroundService, DbActions dbActions, DiscordBotService botService)
+    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraChecksBackgroundTask backgroundService, DbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<ConfigGroup> _logger = logger;
-        private readonly AzuraCastApiService _azuraCast = azuraCast;
+        private readonly AzuraCastApiService _azuraCastApi = azuraCastApi;
+        private readonly AzuraCastFileService _azuraCastFile = azuraCastFile;
         private readonly AzuraChecksBackgroundTask _backgroundService = backgroundService;
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
@@ -162,30 +163,22 @@ public sealed class ConfigCommands
                 return;
             }
 
+            ulong guildId = context.Guild.Id;
+
             await _dbActions.AddAzuraCastStationAsync(context.Guild.Id, station, adminGroup.Id, requestsChannel.Id, showPlaylist is 1, fileChanges is 1, uploadChannel?.Id, uploadPath, apiKey, djGroup?.Id);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync(GeneralStrings.ConfigStationAdded);
 
-            ulong guildId = context.Guild.Id;
-            GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true);
-            if (guild is null)
+            AzuraCastStationEntity? dStation = await _dbActions.GetAzuraCastStationAsync(guildId, station, loadChecks: true, loadAzuraCast: true);
+            if (dStation is null)
             {
-                _logger.DatabaseGuildNotFound(guildId);
+                _logger.DatabaseAzuraCastStationNotFound(guildId, 0, station);
                 return;
             }
 
-            if (guild.AzuraCast is null)
-            {
-                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                return;
-            }
-
-            ulong[] channels = (uploadChannel is null) ? [requestsChannel.Id] : [requestsChannel.Id, uploadChannel.Id];
-            await _botService.CheckPermissionsAsync(context.Guild, channels);
-
-            if (guild.AzuraCast.IsOnline)
-                _backgroundService.QueueFileChangesChecks(guild, station);
+            if (dStation.AzuraCast.IsOnline)
+                await _azuraCastFile.CheckForFileChangesAsync(dStation);
         }
 
         [Command("delete-azuracast"), Description("Delete the existing AzuraCast setup."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -204,7 +197,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            FileOperations.DeleteFiles(_azuraCast.FilePath, $"{ac.Id}-");
+            FileOperations.DeleteFiles(_azuraCastApi.FilePath, $"{ac.Id}-");
             await _dbActions.DeleteAzuraCastAsync(context.Guild.Id);
 
             await context.EditResponseAsync(GeneralStrings.ConfigInstanceDeleted);
@@ -230,7 +223,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            FileOperations.DeleteFile(Path.Combine(_azuraCast.FilePath, $"{acStation.AzuraCast.GuildId}-{acStation.AzuraCastId}-{acStation.Id}-{acStation.StationId}-files.json"));
+            FileOperations.DeleteFile(Path.Combine(_azuraCastApi.FilePath, $"{acStation.AzuraCast.GuildId}-{acStation.AzuraCastId}-{acStation.Id}-{acStation.StationId}-files.json"));
             await _dbActions.DeleteAzuraCastStationAsync(station);
 
             await context.EditResponseAsync(GeneralStrings.ConfigStationDeleted);
@@ -403,7 +396,6 @@ public sealed class ConfigCommands
             }
 
             bool? showPlaylistInEmbed = null;
-
             if (showPlaylist is 1)
             {
                 showPlaylistInEmbed = true;
@@ -440,30 +432,16 @@ public sealed class ConfigCommands
                 await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, apiKey);
 
                 ulong guildId = context.Guild.Id;
-                GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true);
-                if (guild is null)
+
+                AzuraCastStationEntity? dStation = await _dbActions.GetAzuraCastStationAsync(guildId, station, loadChecks: true, loadAzuraCast: true);
+                if (dStation is null)
                 {
-                    _logger.DatabaseGuildNotFound(guildId);
-                    await context.EditResponseAsync(GeneralStrings.GuildNotFound);
+                    _logger.DatabaseAzuraCastStationNotFound(guildId, 0, station);
                     return;
                 }
 
-                if (guild.AzuraCast is null)
-                {
-                    _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                    await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
-                    return;
-                }
-
-                if (guild.AzuraCast.Stations.FirstOrDefault(s => s.Id == station) is null)
-                {
-                    _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, guild.AzuraCast.Id, station);
-                    await context.EditResponseAsync(GeneralStrings.StationNotFound);
-                    return;
-                }
-
-                if (guild.AzuraCast.IsOnline)
-                    _backgroundService.QueueFileChangesChecks(guild, station);
+                if (dStation.AzuraCast.IsOnline)
+                    await _azuraCastFile.CheckForFileChangesAsync(dStation);
             }
 
             await context.DeleteResponseAsync();
@@ -506,27 +484,15 @@ public sealed class ConfigCommands
             if (fileChanges is 1)
             {
                 ulong guildId = context.Guild.Id;
-                GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true);
-                if (guild is null)
+                AzuraCastStationEntity? dStation = await _dbActions.GetAzuraCastStationAsync(guildId, station, loadChecks: true, loadAzuraCast: true);
+                if (dStation is null)
                 {
-                    _logger.DatabaseGuildNotFound(guildId);
+                    _logger.DatabaseAzuraCastStationNotFound(guildId, 0, station);
                     return;
                 }
 
-                if (guild.AzuraCast is null)
-                {
-                    _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                    return;
-                }
-
-                if (guild.AzuraCast.Stations.FirstOrDefault(s => s.Id == station) is null)
-                {
-                    _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, guild.AzuraCast.Id, station);
-                    return;
-                }
-
-                if (guild.AzuraCast.IsOnline)
-                    _backgroundService.QueueFileChangesChecks(guild, station);
+                if (dStation.AzuraCast.IsOnline)
+                    await _azuraCastFile.CheckForFileChangesAsync(dStation);
             }
         }
 
@@ -615,7 +581,7 @@ public sealed class ConfigCommands
                     stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? "Name not found");
                     stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found");
 
-                    stationRecord = await _azuraCast.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), station.StationId);
+                    stationRecord = await _azuraCastApi.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), station.StationId);
                     if (stationRecord is null)
                     {
                         await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
