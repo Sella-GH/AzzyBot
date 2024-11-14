@@ -16,8 +16,8 @@ public static class IServiceCollectionExtensions
 
         string connectionString = GetConnectionString(host, port, user, password, database);
         services.AddDbContext<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor().EnableSensitiveDataLogging(isDev), ServiceLifetime.Transient);
-        services.AddSingleton<DbActions>();
-        services.AddSingleton<DbMaintenance>();
+        services.AddTransient<DbActions>();
+        services.AddTransient<DbMaintenance>();
     }
 
     private static string GetConnectionString(string host, int port, string user, string password, string database)
