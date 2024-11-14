@@ -15,7 +15,7 @@ public static class IServiceCollectionExtensions
         Crypto.EncryptionKey = Encoding.UTF8.GetBytes(encryptionKey);
 
         string connectionString = GetConnectionString(host, port, user, password, database);
-        services.AddDbContext<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor().EnableSensitiveDataLogging(isDev), ServiceLifetime.Scoped);
+        services.AddDbContext<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor().EnableSensitiveDataLogging(isDev), ServiceLifetime.Transient);
         services.AddSingleton<DbActions>();
         services.AddSingleton<DbMaintenance>();
     }
