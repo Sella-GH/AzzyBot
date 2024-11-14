@@ -22,6 +22,7 @@
 - Updated [Microsoft.Extensions.Hosting](https://github.com/dotnet/runtime) to version 9.0.0
 - Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 8.0.11
 - Updated [System.Text.Json](https://github.com/dotnet/runtime) to version 9.0.0
+
 ### Improvements
 - Sets the Service Lifetime of database services to `Singleton` again with the exception of the `AzzyBotDbContext` which is now `Scoped`
 

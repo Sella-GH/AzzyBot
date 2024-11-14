@@ -72,7 +72,7 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
             }
         }
 
-        guildsWorkingSet = guilds.Where(g => g.AzuraCast?.IsOnline is true && g.AzuraCast.Stations.Any(s => s.Checks.FileChanges)).ToList();
+        guildsWorkingSet = guilds.Where(g => g.AzuraCast?.IsOnline is true && g.AzuraCast.Stations.Any(s => s.Checks.FileChanges && utcNow - s.Checks.LastFileChangesCheck >= TimeSpan.FromHours(1))).ToList();
         _logger.GlobalTimerCheckForAzuraCastFiles(guildsWorkingSet.Count);
         if (guildsWorkingSet.Count is not 0)
         {
