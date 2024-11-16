@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
@@ -25,41 +24,32 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, A
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = discordBotService;
 
-    public async Task CheckForFileChangesAsync(AzuraCastStationEntity station, CancellationToken cancellationToken)
+    public async Task CheckForFileChangesAsync(AzuraCastStationEntity station)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-
         ArgumentNullException.ThrowIfNull(station);
 
         if (!Directory.Exists(_azuraCast.FilePath))
             Directory.CreateDirectory(_azuraCast.FilePath);
 
-        try
+        string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
+        string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? station.AzuraCast.AdminApiKey : station.ApiKey;
+
+        IEnumerable<AzuraFilesRecord>? onlineFiles = await _azuraCast.GetFilesOnlineAsync<AzuraFilesRecord>(new(Crypto.Decrypt(station.AzuraCast.BaseUrl)), Crypto.Decrypt(apiKey), station.StationId);
+        if (onlineFiles is null)
         {
-            string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
-            string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? station.AzuraCast.AdminApiKey : station.ApiKey;
-
-            IEnumerable<AzuraFilesRecord>? onlineFiles = await _azuraCast.GetFilesOnlineAsync<AzuraFilesRecord>(new(Crypto.Decrypt(station.AzuraCast.BaseUrl)), Crypto.Decrypt(apiKey), station.StationId);
-            if (onlineFiles is null)
-            {
-                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station ({station.StationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
-                return;
-            }
-
-            IEnumerable<AzuraFilesRecord> localFiles = await _azuraCast.GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
-            AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station.StationId);
-            if (azuraStation is null)
-            {
-                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station ({station.StationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
-                return;
-            }
-
-            await CheckIfFilesWereModifiedAsync(onlineFiles, localFiles, station, azuraStation.Name, station.AzuraCast.Preferences.NotificationChannelId);
+            await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station ({station.StationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+            return;
         }
-        catch (OperationCanceledException)
+
+        IEnumerable<AzuraFilesRecord> localFiles = await _azuraCast.GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
+        AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station.StationId);
+        if (azuraStation is null)
         {
-            _logger.OperationCanceled(nameof(CheckForFileChangesAsync));
+            await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station ({station.StationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+            return;
         }
+
+        await CheckIfFilesWereModifiedAsync(onlineFiles, localFiles, station, azuraStation.Name, station.AzuraCast.Preferences.NotificationChannelId);
     }
 
     private async Task CheckIfFilesWereModifiedAsync(IEnumerable<AzuraFilesRecord> onlineFiles, IEnumerable<AzuraFilesRecord> localFiles, AzuraCastStationEntity station, string stationName, ulong channelId)

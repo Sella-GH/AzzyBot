@@ -10,7 +10,6 @@ using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records;
-using AzzyBot.Core.Extensions;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Records;
 using AzzyBot.Data;
@@ -44,8 +43,8 @@ public sealed class CoreCommands
 
             await context.DeferResponseAsync();
 
-            IAsyncEnumerable<GuildEntity> guild = _dbActions.GetGuildAsync(_settings.ServerId, loadEverything: true);
-            if (!await guild.ContainsOneItemAsync())
+            GuildEntity? guild = await _dbActions.GetGuildAsync(_settings.ServerId, loadEverything: true);
+            if (guild is null)
             {
                 await context.RespondAsync(GeneralStrings.GuildNotFound);
                 return;
@@ -53,7 +52,7 @@ public sealed class CoreCommands
 
             await context.EditResponseAsync("I initiated a check of the permissions for the bot, please wait a little for the result.");
 
-            await _botService.CheckPermissionsAsync(guild);
+            await _botService.CheckPermissionsAsync([guild]);
         }
 
         [Command("help"), Description("Gives you an overview about all the available commands.")]

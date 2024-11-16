@@ -9,7 +9,7 @@ using AzzyBot.Data;
 using AzzyBot.Data.Entities;
 using Microsoft.Extensions.Logging;
 
-namespace AzzyBot.Bot.Services.BackgroundServices;
+namespace AzzyBot.Bot.Services.CronJobs;
 
 public sealed class AzuraRequestBackgroundTask(ILogger<AzuraRequestBackgroundTask> logger, AzuraCastApiService azuraCastApiService, DbActions dbActions, QueuedBackgroundTask queue)
 {
