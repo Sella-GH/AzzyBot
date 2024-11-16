@@ -5,7 +5,7 @@ using AzzyBot.Bot.Commands;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Converters;
 using AzzyBot.Bot.Services;
-using AzzyBot.Bot.Services.BackgroundServices;
+using AzzyBot.Bot.Services.CronJobs;
 using AzzyBot.Bot.Services.DiscordEvents;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Settings;
@@ -25,6 +25,7 @@ using Lavalink4NET.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NCronJob;
 
 namespace AzzyBot.Bot.Extensions;
 
@@ -62,11 +63,8 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<AzuraCastFileService>();
         services.AddSingleton<AzuraCastPingService>();
         services.AddSingleton<AzuraCastUpdateService>();
-        services.AddSingleton<AzuraChecksBackgroundTask>();
+        services.AddNCronJob(static o => o.AddJob<AzzyBotGlobalChecksJob>(j => j.WithCronExpression("*/15 * * * *").WithName(nameof(AzzyBotGlobalChecksJob))));
         services.AddSingleton<AzuraRequestBackgroundTask>();
-
-        services.AddSingleton<TimerServiceHost>();
-        services.AddHostedService(static s => s.GetRequiredService<TimerServiceHost>());
 
         services.AddLavalink();
         services.ConfigureLavalink(config =>

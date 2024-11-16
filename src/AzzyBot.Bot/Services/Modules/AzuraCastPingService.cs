@@ -1,6 +1,5 @@
 using System;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
@@ -18,48 +17,39 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, A
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = discordBotService;
 
-    public async Task PingInstanceAsync(AzuraCastEntity azuraCast, CancellationToken cancellationToken)
+    public async Task PingInstanceAsync(AzuraCastEntity azuraCast)
     {
-        cancellationToken.ThrowIfCancellationRequested();
-
         ArgumentNullException.ThrowIfNull(azuraCast);
 
+        Uri uri = new(Crypto.Decrypt(azuraCast.BaseUrl));
+        AzuraStatusRecord? status = null;
         try
         {
-            Uri uri = new(Crypto.Decrypt(azuraCast.BaseUrl));
-            AzuraStatusRecord? status = null;
-            try
-            {
-                status = await _azuraCast.GetInstanceStatusAsync(uri);
-            }
-            catch (HttpRequestException)
-            {
-                _logger.BackgroundServiceInstanceStatus(azuraCast.GuildId, azuraCast.Id, "offline");
-
-                await _dbActions.UpdateAzuraCastAsync(azuraCast.Guild.UniqueId, isOnline: false);
-                await _botService.SendMessageAsync(azuraCast.Preferences.OutagesChannelId, $"AzuraCast instance **{uri}** is **down**!");
-            }
-
-            if (status is not null)
-            {
-                _logger.BackgroundServiceInstanceStatus(azuraCast.GuildId, azuraCast.Id, "online");
-
-                if (!azuraCast.IsOnline)
-                {
-                    await _dbActions.UpdateAzuraCastAsync(azuraCast.Guild.UniqueId, isOnline: true);
-                    await _botService.SendMessageAsync(azuraCast.Preferences.OutagesChannelId, $"AzuraCast instance **{uri}** is **up** again!");
-                }
-            }
-            else
-            {
-                _logger.BackgroundServiceInstanceStatus(azuraCast.GuildId, azuraCast.Id, "unkown or offline");
-            }
-
-            await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, lastServerStatusCheck: true);
+            status = await _azuraCast.GetInstanceStatusAsync(uri);
         }
-        catch (OperationCanceledException)
+        catch (HttpRequestException)
         {
-            _logger.OperationCanceled(nameof(PingInstanceAsync));
+            _logger.BackgroundServiceInstanceStatus(azuraCast.GuildId, azuraCast.Id, "offline");
+
+            await _dbActions.UpdateAzuraCastAsync(azuraCast.Guild.UniqueId, isOnline: false);
+            await _botService.SendMessageAsync(azuraCast.Preferences.OutagesChannelId, $"AzuraCast instance **{uri}** is **down**!");
         }
+
+        if (status is not null)
+        {
+            _logger.BackgroundServiceInstanceStatus(azuraCast.GuildId, azuraCast.Id, "online");
+
+            if (!azuraCast.IsOnline)
+            {
+                await _dbActions.UpdateAzuraCastAsync(azuraCast.Guild.UniqueId, isOnline: true);
+                await _botService.SendMessageAsync(azuraCast.Preferences.OutagesChannelId, $"AzuraCast instance **{uri}** is **up** again!");
+            }
+        }
+        else
+        {
+            _logger.BackgroundServiceInstanceStatus(azuraCast.GuildId, azuraCast.Id, "unkown or offline");
+        }
+
+        await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, lastServerStatusCheck: true);
     }
 }

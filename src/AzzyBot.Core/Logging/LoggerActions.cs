@@ -18,8 +18,8 @@ public static partial class LoggerActions
     [LoggerMessage(12, LogLevel.Debug, "Global timer checking for bot updates")]
     public static partial void GlobalTimerCheckForUpdates(this ILogger logger);
 
-    [LoggerMessage(13, LogLevel.Debug, "Global timer checking guilds for channel permissions")]
-    public static partial void GlobalTimerCheckForChannelPermissions(this ILogger logger);
+    [LoggerMessage(13, LogLevel.Debug, "Global timer checking {counter} guilds for channel permissions")]
+    public static partial void GlobalTimerCheckForChannelPermissions(this ILogger logger, int counter);
 
     [LoggerMessage(14, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast files changes")]
     public static partial void GlobalTimerCheckForAzuraCastFiles(this ILogger logger, int counter);
