@@ -81,8 +81,8 @@ public static partial class LoggerActions
     [LoggerMessage(99, LogLevel.Debug, "Operation {ops} canceled by CancellationToken")]
     public static partial void OperationCanceled(this ILogger logger, string ops);
 
-    [LoggerMessage(100, LogLevel.Information, "Starting {name} in version {version} on {os}-{arch}")]
-    public static partial void BotStarting(this ILogger logger, string name, string version, string os, string arch);
+    [LoggerMessage(100, LogLevel.Information, "Starting {name} in version {version} on {os}-{arch} using .NET {dotnet}")]
+    public static partial void BotStarting(this ILogger logger, string name, string version, string os, string arch, string dotnet);
 
     [LoggerMessage(101, LogLevel.Information, "Invite me using the following url: {invite}")]
     public static partial void InviteUrl(this ILogger logger, string invite);

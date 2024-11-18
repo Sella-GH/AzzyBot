@@ -1,8 +1,12 @@
 ## 2.1.0
+### General
+- Updated to .NET 9 including all dependencies
+- Dockerfile improvements to improve image size
+
 ### Dependencies
-- Added [NReco.Logging.File](https://github.com/nreco/logging) in version 1.2.1
+- Added [NReco.Logging.File](https://github.com/nreco/logging) in version 1.2.2
 - Added [NCronJob](https://github.com/NCronJob-Dev/NCronJob) in version 3.3.8
-- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02394
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02422
 - Updated [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET) to version 4.0.26-preview.4
 
 ### Additions
@@ -13,6 +17,7 @@
 
 ### Improvements
 - Exception embeds now produce json output instead of a stacktrace.log file
+- Startup logging now shows the .NET version too
 - Reworked the whole file logging system
 - `admin send-bot-wide-message` now allows linebreaks using `\n` and includes a message if it's sent directly to the server owner
 - QuickJit for loops was activated to improve performance of the bot

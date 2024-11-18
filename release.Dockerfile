@@ -1,20 +1,22 @@
+# syntax=docker/dockerfile:labs
+
 # BUILD IMAGE
-FROM mcr.microsoft.com/dotnet/sdk:8.0-bookworm-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0-bookworm-slim AS build
 USER root
 RUN apt update && apt upgrade -y && apt autoremove -y && apt clean -y
 WORKDIR /build
 COPY ./ ./
-ARG ARCH
 ARG CONFIG
-ARG OS
-RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj
-RUN dotnet publish ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -a $ARCH -c $CONFIG --os $OS -o out
+COPY ./Nuget.config ./Nuget.config
+RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.config --force --no-cache --ucr
+RUN dotnet publish ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --no-restore -c $CONFIG -o out --ucr
 
 # RUNNER IMAGE
-FROM mcr.microsoft.com/dotnet/runtime:8.0-bookworm-slim
+FROM mcr.microsoft.com/dotnet/runtime:9.0-bookworm-slim AS runner
 USER root
 
 # Add environment variables
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 ENV LC_ALL=en.US.UTF-8
 ENV LANG=en.US.UTF-8
 
@@ -24,7 +26,7 @@ RUN apt install -y --no-install-recommends iputils-ping
 
 # Copy the built app
 WORKDIR /app
-COPY --from=build /build/out .
+COPY --exclude=*.xml --from=build /build/out .
 
 # Add commit, timestamp and lines of code
 ARG COMMIT

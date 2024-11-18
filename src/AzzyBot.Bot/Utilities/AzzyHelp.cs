@@ -16,10 +16,10 @@ public static class AzzyHelp
         return command switch
         {
             "admin" => adminServer,
-            "azuracast" => permissions.HasPermission(DiscordPermissions.Administrator),
-            "config" => permissions.HasPermission(DiscordPermissions.Administrator),
+            "azuracast" => permissions.HasPermission(DiscordPermission.Administrator),
+            "config" => permissions.HasPermission(DiscordPermission.Administrator),
             "core" => true,
-            "debug" => approvedDebug && permissions.HasPermission(DiscordPermissions.Administrator),
+            "debug" => approvedDebug && permissions.HasPermission(DiscordPermission.Administrator),
             "dj" => true,
             "music" => true,
             "player" => true,
