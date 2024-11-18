@@ -5,7 +5,7 @@
 
 ### Dependencies
 - Added [NReco.Logging.File](https://github.com/nreco/logging) in version 1.2.1
-- Added [NCronJob](https://github.com/NCronJob-Dev/NCronJob) in version 3.3.5
+- Added [NCronJob](https://github.com/NCronJob-Dev/NCronJob) in version 3.3.8
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02408
 - Updated [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET) to version 4.0.26-preview.4
 
