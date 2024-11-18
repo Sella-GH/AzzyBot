@@ -24,6 +24,7 @@
 - Reworked background tasks to use NCronJob instead of a custom implementation
 - `azuracast force-cache-refresh` parameter `station` is now optional
   - If there is no value given it will refresh the cache of all configured stations
+- `azuracast stop-station` now sends a message to the connected voice channels if it's playing and was stopped
 
 ## 2.0.13 - 2024-11-14
 ### Dependencies

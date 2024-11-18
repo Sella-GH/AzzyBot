@@ -58,6 +58,7 @@ public static class GeneralStrings
     public const string VoicePlayingAzuraCast = "The current played song is from an AzuraCast station. Please use `music now-playing` to get the information.";
     public const string VoicePlayMount = "I'm starting to play **%station%** now.";
     public const string VoicePlaySong = "I'm starting to play **%track%** by **%artist%** now.";
+    public const string VoiceStationStopped = "The station has been stopped, I am stopping to play music.";
     public const string VoiceStop = "I'm stopping the music now.";
     public const string VoiceStopLeft = "I'm stopping the music and leaving now.";
     public const string VolumeInvalid = "Please use a value between 0 and 100.";

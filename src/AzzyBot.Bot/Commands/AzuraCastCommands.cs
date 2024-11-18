@@ -425,7 +425,12 @@ public sealed class AzuraCastCommands
 
             if (await _musicStreaming.CheckIfPlayedMusicIsStationAsync(context, $"{Crypto.Decrypt(ac.BaseUrl)}/listen/{azuraStation.Shortcode}"))
             {
-                await _musicStreaming.StopMusicAsync(context, false);
+                await _musicStreaming.StopMusicAsync(context);
+
+                DiscordMember? bot = await _botService.GetDiscordMemberAsync(context.Guild.Id);
+                if (bot?.VoiceState.Channel is not null)
+                    await bot.VoiceState.Channel.SendMessageAsync(GeneralStrings.VoiceStationStopped);
+
                 await context.EditResponseAsync(GeneralStrings.StationUsersDisconnected);
                 await Task.Delay(TimeSpan.FromSeconds(30));
             }

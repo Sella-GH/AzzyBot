@@ -35,7 +35,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
     private const string BugReportMessage = "Send a [bug report]([BugReportUri]) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
     private const string ErrorChannelNotConfigured = $"**If you're seeing this message then I am not configured correctly!**\nTell your server admin to run */config modify-core*\n\n{BugReportMessage}";
 
-    public bool CheckIfClientIsConnected
+    private bool CheckIfClientIsConnected
         => _client.AllShardsConnected;
 
     public async Task<bool> CheckChannelPermissionsAsync(DiscordMember member, ulong channelId, DiscordPermission[] permissions)
