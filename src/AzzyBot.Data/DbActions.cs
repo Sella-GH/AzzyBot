@@ -129,6 +129,33 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         });
     }
 
+    public Task<bool> AddAzuraCastStationRequestAsync(ulong guildId, int stationId, string songId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(songId);
+
+        return ExecuteDbActionAsync(async context =>
+        {
+            AzuraCastStationEntity? station = await context.AzuraCastStations
+                .OrderBy(static s => s.Id)
+                .FirstOrDefaultAsync(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == stationId);
+
+            if (station is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(guildId, 0, stationId);
+                return;
+            }
+
+            AzuraCastStationRequestEntity request = new()
+            {
+                SongId = songId,
+                StationId = station.Id,
+                Timestamp = DateTimeOffset.UtcNow
+            };
+
+            await context.AzuraCastStationRequests.AddAsync(request);
+        });
+    }
+
     public Task<bool> AddGuildAsync(ulong guildId)
         => ExecuteDbActionAsync(async context => await context.Guilds.AddAsync(new() { UniqueId = guildId }));
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace AzzyBot.Data.Entities;
 
@@ -32,6 +33,11 @@ public sealed class AzuraCastStationEntity
     /// The user-defined preferences of the <see cref="AzuraCastStationEntity"/> object.
     /// </summary>
     public AzuraCastStationPreferencesEntity Preferences { get; set; } = new();
+
+    /// <summary>
+    /// A list of the associated <see cref="AzuraCastStationRequestEntity"/> database items.
+    /// </summary>
+    public ICollection<AzuraCastStationRequestEntity> Requests { get; } = [];
 
     /// <summary>
     /// The last saved <see cref="DateTimeOffset"/> timestamp after a song was skipped.
