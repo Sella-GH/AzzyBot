@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using AzzyBot.Core.Utilities.Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using NReco.Logging.File;
@@ -10,7 +11,7 @@ namespace AzzyBot.Core.Extensions;
 
 public static class ILoggingBuilderExtensions
 {
-    public static void AzzyBotLogging(this ILoggingBuilder logging, int logDays = 7, bool isDev = false, bool forceDebug = false, bool forceTrace = false)
+    public static void AzzyBotLogging(this ILoggingBuilder logging, bool isDev = false, bool forceDebug = false, bool forceTrace = false)
     {
         if (!Directory.Exists("Logs"))
             Directory.CreateDirectory("Logs");
@@ -23,15 +24,15 @@ public static class ILoggingBuilderExtensions
         logging.AddConsole();
         logging.AddFile(Path.Combine("Logs", $"AzzyBot_{DateTimeOffset.Now:yyyy-MM-dd}.log"), c =>
         {
+            DateTimeOffset now = DateTimeOffset.Now;
+
             c.Append = true;
-            c.FileSizeLimitBytes = 10380902; // ~9.9 MB
-            c.MaxRollingFiles = logDays;
-            c.RollingFilesConvention = FileLoggerOptions.FileRollingConvention.Descending;
+            c.FileSizeLimitBytes = FileSizes.DiscordFileSize;
             c.UseUtcTimestamp = false;
-            c.FormatLogFileName = static (logTime) => string.Format(CultureInfo.InvariantCulture, logTime, $"{DateTimeOffset.Now:yyyy-MM-dd}");
-            c.FormatLogEntry = static (message) =>
+            c.FormatLogFileName = (logTime) => string.Format(CultureInfo.InvariantCulture, logTime, $"{now:yyyy-MM-dd}");
+            c.FormatLogEntry = (message) =>
             {
-                string logMessage = $"[{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss}] {message.LogLevel}: {message.LogName}[{message.EventId}] {message.Message}";
+                string logMessage = $"[{now:yyyy-MM-dd HH:mm:ss}] {message.LogLevel}: {message.LogName}[{message.EventId}] {message.Message}";
                 if (message.Exception is not null)
                     logMessage += Environment.NewLine + message.Exception;
 

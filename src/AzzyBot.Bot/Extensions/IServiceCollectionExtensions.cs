@@ -31,7 +31,7 @@ namespace AzzyBot.Bot.Extensions;
 
 public static class IServiceCollectionExtensions
 {
-    public static void AzzyBotServices(this IServiceCollection services, bool isDev, bool isDocker)
+    public static void AzzyBotServices(this IServiceCollection services, bool isDev, bool isDocker, int logDays = 7)
     {
         IServiceProvider serviceProvider = services.BuildServiceProvider();
         AzzyBotSettingsRecord settings = serviceProvider.GetRequiredService<AzzyBotSettingsRecord>();
@@ -63,7 +63,11 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<AzuraCastFileService>();
         services.AddSingleton<AzuraCastPingService>();
         services.AddSingleton<AzuraCastUpdateService>();
-        services.AddNCronJob(static o => o.AddJob<AzzyBotGlobalChecksJob>(j => j.WithCronExpression("*/15 * * * *").WithName(nameof(AzzyBotGlobalChecksJob))));
+        services.AddNCronJob(o =>
+        {
+            o.AddJob<AzzyBotGlobalChecksJob>(j => j.WithCronExpression("*/15 * * * *").WithName(nameof(AzzyBotGlobalChecksJob))); // Every 15 minutes
+            o.AddJob<LogfileCleaningJob>(j => j.WithCronExpression("0 0 */1 * *").WithName(nameof(LogfileCleaningJob)).WithParameter(logDays)); // Every day
+        });
         services.AddSingleton<AzuraRequestBackgroundTask>();
 
         services.AddLavalink();
