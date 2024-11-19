@@ -250,7 +250,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .FirstOrDefaultAsync();
     }
 
-    public Task<AzuraCastStationEntity?> GetAzuraCastStationAsync(ulong guildId, int stationId, bool loadChecks = false, bool loadPrefs = false, bool loadAzuraCast = false, bool loadAzuraCastPrefs = false)
+    public Task<AzuraCastStationEntity?> GetAzuraCastStationAsync(ulong guildId, int stationId, bool loadChecks = false, bool loadPrefs = false, bool loadRequests = false, bool loadAzuraCast = false, bool loadAzuraCastPrefs = false)
     {
         return _dbContext.AzuraCastStations
             .AsNoTracking()
@@ -258,6 +258,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .OrderBy(static s => s.Id)
             .IncludeIf(loadChecks, static q => q.Include(static s => s.Checks))
             .IncludeIf(loadPrefs, static q => q.Include(static s => s.Preferences))
+            .IncludeIf(loadRequests, static q => q.Include(static s => s.Requests))
             .IncludeIf(loadAzuraCast, static q => q.Include(static s => s.AzuraCast))
             .IncludeIf(loadAzuraCastPrefs, static q => q.Include(static s => s.AzuraCast.Preferences))
             .FirstOrDefaultAsync();
@@ -283,6 +284,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast).Include(static g => g.AzuraCast!.Checks).Include(static g => g.AzuraCast!.Preferences))
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Checks))
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Preferences))
+            .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Requests))
             .FirstOrDefaultAsync();
     }
 
@@ -295,6 +297,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast).Include(static g => g.AzuraCast!.Checks).Include(static g => g.AzuraCast!.Preferences))
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Checks))
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Preferences))
+            .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Requests))
             .ToListAsync();
     }
 
