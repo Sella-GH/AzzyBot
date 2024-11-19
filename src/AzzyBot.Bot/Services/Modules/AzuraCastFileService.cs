@@ -62,7 +62,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, A
 
         List<AzuraFilesRecord> addedFiles = onlineHashSet.Except(localHashSet).ToList();
         List<AzuraFilesRecord> removedFiles = localHashSet.Except(onlineHashSet).ToList();
-        bool filesChanged = addedFiles.Count is not 0 && removedFiles.Count is not 0;
+        bool filesChanged = addedFiles.Count is not 0 || removedFiles.Count is not 0;
         await _dbActions.UpdateAzuraCastStationChecksAsync(station.AzuraCast.Guild.UniqueId, station.StationId, lastFileChangesCheck: true);
         if (!filesChanged)
             return;

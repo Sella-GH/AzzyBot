@@ -26,6 +26,9 @@
   - If there is no value given it will refresh the cache of all configured stations
 - `azuracast stop-station` now sends a message to the connected voice channels if it's playing and was stopped
 
+### Fixes
+- The AzuraCast station cache refresh works again
+
 ## 2.0.13 - 2024-11-14
 ### Dependencies
 - Updated [Microsoft.Extensions.Caching.Memory](https://github.com/dotnet/runtime) to version 9.0.0

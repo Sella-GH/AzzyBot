@@ -169,14 +169,21 @@ public sealed class ConfigCommands
             await context.DeleteResponseAsync();
             await context.FollowupAsync(GeneralStrings.ConfigStationAdded);
 
-            AzuraCastStationEntity? dStation = await _dbActions.GetAzuraCastStationAsync(guildId, station, loadChecks: true, loadAzuraCast: true);
-            if (dStation is null)
+            AzuraCastEntity? dAzuraCast = await _dbActions.GetAzuraCastAsync(guildId, loadPrefs: true, loadStations: true, loadGuild: true);
+            if (dAzuraCast is null)
             {
-                _logger.DatabaseAzuraCastStationNotFound(guildId, 0, station);
+                _logger.DatabaseAzuraCastNotFound(guildId);
                 return;
             }
 
-            if (dStation.AzuraCast.IsOnline)
+            AzuraCastStationEntity? dStation = dAzuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+            if (dStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(guildId, dAzuraCast.Id, station);
+                return;
+            }
+
+            if (dAzuraCast.IsOnline)
                 await _azuraCastFile.CheckForFileChangesAsync(dStation);
         }
 
@@ -429,14 +436,21 @@ public sealed class ConfigCommands
 
                 ulong guildId = context.Guild.Id;
 
-                AzuraCastStationEntity? dStation = await _dbActions.GetAzuraCastStationAsync(guildId, station, loadChecks: true, loadAzuraCast: true);
-                if (dStation is null)
+                AzuraCastEntity? dAzuraCast = await _dbActions.GetAzuraCastAsync(guildId, loadPrefs: true, loadStations: true, loadGuild: true);
+                if (dAzuraCast is null)
                 {
-                    _logger.DatabaseAzuraCastStationNotFound(guildId, 0, station);
+                    _logger.DatabaseAzuraCastNotFound(guildId);
                     return;
                 }
 
-                if (dStation.AzuraCast.IsOnline)
+                AzuraCastStationEntity? dStation = dAzuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+                if (dStation is null)
+                {
+                    _logger.DatabaseAzuraCastStationNotFound(guildId, dAzuraCast.Id, station);
+                    return;
+                }
+
+                if (dAzuraCast.IsOnline)
                     await _azuraCastFile.CheckForFileChangesAsync(dStation);
             }
 
@@ -480,14 +494,21 @@ public sealed class ConfigCommands
             if (fileChanges is 1)
             {
                 ulong guildId = context.Guild.Id;
-                AzuraCastStationEntity? dStation = await _dbActions.GetAzuraCastStationAsync(guildId, station, loadChecks: true, loadAzuraCast: true);
-                if (dStation is null)
+                AzuraCastEntity? dAzuraCast = await _dbActions.GetAzuraCastAsync(guildId, loadPrefs: true, loadStations: true, loadGuild: true);
+                if (dAzuraCast is null)
                 {
-                    _logger.DatabaseAzuraCastStationNotFound(guildId, 0, station);
+                    _logger.DatabaseAzuraCastNotFound(guildId);
                     return;
                 }
 
-                if (dStation.AzuraCast.IsOnline)
+                AzuraCastStationEntity? dStation = dAzuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+                if (dStation is null)
+                {
+                    _logger.DatabaseAzuraCastStationNotFound(guildId, dAzuraCast.Id, station);
+                    return;
+                }
+
+                if (dAzuraCast.IsOnline)
                     await _azuraCastFile.CheckForFileChangesAsync(dStation);
             }
         }
