@@ -12,6 +12,7 @@ using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
+using AzzyBot.Core.Utilities.Helpers;
 using AzzyBot.Core.Utilities.Records;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
@@ -432,7 +433,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         List<FileStream> streams = new(10);
         if (filePaths?.Count > 0 && filePaths.Count <= 10)
         {
-            const long maxFileSize = 10380902; // ~9-9 MB
+            const int maxFileSize = FileSizes.DiscordFileSize;
             long allFileSize = 0;
 
             foreach (string path in filePaths)
