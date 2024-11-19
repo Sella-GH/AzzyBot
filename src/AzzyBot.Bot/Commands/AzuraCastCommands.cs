@@ -13,14 +13,12 @@ using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Choices;
 using AzzyBot.Bot.Services;
-using AzzyBot.Bot.Services.CronJobs;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
-using AzzyBot.Core.Services.BackgroundServices;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Core.Utilities.Enums;
@@ -722,14 +720,13 @@ public sealed class AzuraCastCommands
     }
 
     [Command("music"), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
-    public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastApiService azuraCast, AzuraRequestBackgroundTask requestBackgroundTask, DbActions dbActions, DiscordBotService botService, QueuedBackgroundTask queue, WebRequestService webRequest)
+    public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastApiService azuraCast, CronJobManager cronJobManager, DbActions dbActions, DiscordBotService botService, WebRequestService webRequest)
     {
         private readonly ILogger<MusicGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCast = azuraCast;
-        private readonly AzuraRequestBackgroundTask _requestBackgroundTask = requestBackgroundTask;
+        private readonly CronJobManager _cronJobManager = cronJobManager;
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
-        private readonly QueuedBackgroundTask _queue = queue;
         private readonly WebRequestService _webRequest = webRequest;
 
         [Command("get-song-history"), Description("Get the song history of the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
@@ -1082,7 +1079,7 @@ public sealed class AzuraCastCommands
                 if (lastRequest > now)
                 {
                     AzuraCustomQueueItemRecord record = new(context.Guild.Id, baseUrl, station, songRequest.RequestId, DateTimeOffset.UtcNow);
-                    _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _requestBackgroundTask.CreateRequestAsync(record)));
+                    _cronJobManager.RunAzuraRequestJob(record);
 
                     response = GeneralStrings.SongRequestQueued;
                 }
