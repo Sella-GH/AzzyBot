@@ -129,6 +129,33 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         });
     }
 
+    public Task<bool> AddAzuraCastStationRequestAsync(ulong guildId, int stationId, string songId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(songId);
+
+        return ExecuteDbActionAsync(async context =>
+        {
+            AzuraCastStationEntity? station = await context.AzuraCastStations
+                .OrderBy(static s => s.Id)
+                .FirstOrDefaultAsync(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == stationId);
+
+            if (station is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(guildId, 0, stationId);
+                return;
+            }
+
+            AzuraCastStationRequestEntity request = new()
+            {
+                SongId = songId,
+                StationId = station.Id,
+                Timestamp = DateTimeOffset.UtcNow
+            };
+
+            await context.AzuraCastStationRequests.AddAsync(request);
+        });
+    }
+
     public Task<bool> AddGuildAsync(ulong guildId)
         => ExecuteDbActionAsync(async context => await context.Guilds.AddAsync(new() { UniqueId = guildId }));
 
@@ -223,7 +250,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .FirstOrDefaultAsync();
     }
 
-    public Task<AzuraCastStationEntity?> GetAzuraCastStationAsync(ulong guildId, int stationId, bool loadChecks = false, bool loadPrefs = false, bool loadAzuraCast = false, bool loadAzuraCastPrefs = false)
+    public Task<AzuraCastStationEntity?> GetAzuraCastStationAsync(ulong guildId, int stationId, bool loadChecks = false, bool loadPrefs = false, bool loadRequests = false, bool loadAzuraCast = false, bool loadAzuraCastPrefs = false)
     {
         return _dbContext.AzuraCastStations
             .AsNoTracking()
@@ -231,6 +258,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .OrderBy(static s => s.Id)
             .IncludeIf(loadChecks, static q => q.Include(static s => s.Checks))
             .IncludeIf(loadPrefs, static q => q.Include(static s => s.Preferences))
+            .IncludeIf(loadRequests, static q => q.Include(static s => s.Requests))
             .IncludeIf(loadAzuraCast, static q => q.Include(static s => s.AzuraCast))
             .IncludeIf(loadAzuraCastPrefs, static q => q.Include(static s => s.AzuraCast.Preferences))
             .FirstOrDefaultAsync();
@@ -246,13 +274,21 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .FirstOrDefaultAsync();
     }
 
-    public Task<GuildEntity?> GetGuildAsync(ulong guildId, bool loadGuildPrefs = false, bool loadEverything = false)
+    public Task<int> GetAzuraCastStationRequestsCountAsync(ulong guildId, int stationId)
+    {
+        return _dbContext.AzuraCastStationRequests
+            .AsNoTracking()
+            .Where(r => r.Station.AzuraCast.Guild.UniqueId == guildId && r.Station.StationId == stationId)
+            .CountAsync();
+    }
+
+    public Task<GuildEntity?> GetGuildAsync(ulong guildId, bool loadEverything = false)
     {
         return _dbContext.Guilds
             .AsNoTracking()
             .Where(g => g.UniqueId == guildId)
             .OrderBy(static g => g.Id)
-            .IncludeIf(loadGuildPrefs || loadEverything, static q => q.Include(static g => g.Preferences))
+            .IncludeIf(loadEverything, static q => q.Include(static g => g.Preferences))
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast).Include(static g => g.AzuraCast!.Checks).Include(static g => g.AzuraCast!.Preferences))
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Checks))
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Preferences))

@@ -13,14 +13,12 @@ using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Choices;
 using AzzyBot.Bot.Services;
-using AzzyBot.Bot.Services.CronJobs;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
-using AzzyBot.Core.Services.BackgroundServices;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Core.Utilities.Enums;
@@ -197,7 +195,7 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceCacheRefreshAsync), context.User.GlobalName);
 
-            AzuraCastEntity? dAzuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true, loadStationChecks: true);
+            AzuraCastEntity? dAzuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true, loadStationChecks: true, loadGuild: true);
             if (dAzuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
@@ -723,14 +721,13 @@ public sealed class AzuraCastCommands
     }
 
     [Command("music"), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
-    public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastApiService azuraCast, AzuraRequestBackgroundTask requestBackgroundTask, DbActions dbActions, DiscordBotService botService, QueuedBackgroundTask queue, WebRequestService webRequest)
+    public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastApiService azuraCast, CronJobManager cronJobManager, DbActions dbActions, DiscordBotService botService, WebRequestService webRequest)
     {
         private readonly ILogger<MusicGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCast = azuraCast;
-        private readonly AzuraRequestBackgroundTask _requestBackgroundTask = requestBackgroundTask;
+        private readonly CronJobManager _cronJobManager = cronJobManager;
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
-        private readonly QueuedBackgroundTask _queue = queue;
         private readonly WebRequestService _webRequest = webRequest;
 
         [Command("get-song-history"), Description("Get the song history of the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
@@ -1061,43 +1058,12 @@ public sealed class AzuraCastCommands
             InteractivityResult<ComponentInteractionCreatedEventArgs> result = await message.WaitForButtonAsync(context.User, TimeSpan.FromMinutes(1));
             if (!result.TimedOut)
             {
-                ac = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true);
-                if (ac is null)
-                {
-                    _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                    await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
-                    return;
-                }
-
-                acStation = ac.Stations.FirstOrDefault(s => s.StationId == station);
-                if (acStation is null)
-                {
-                    _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, ac.Id, station);
-                    await context.EditResponseAsync(GeneralStrings.StationNotFound);
-                    return;
-                }
-
-                string response = string.Empty;
-                DateTimeOffset lastRequest = acStation.LastRequestTime.AddSeconds(16);
-                DateTimeOffset now = DateTimeOffset.UtcNow;
-                if (lastRequest > now)
-                {
-                    AzuraCustomQueueItemRecord record = new(context.Guild.Id, baseUrl, station, songRequest.RequestId, DateTimeOffset.UtcNow);
-                    _ = Task.Run(async () => await _queue.QueueBackgroundWorkItemAsync(async ct => await _requestBackgroundTask.CreateRequestAsync(record)));
-
-                    response = GeneralStrings.SongRequestQueued;
-                }
-                else
-                {
-                    await _azuraCast.RequestSongAsync(baseUrl, station, songRequest.RequestId);
-                    await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, acStation.StationId, lastRequestTime: true);
-
-                    response = GeneralStrings.SongRequested;
-                }
+                AzuraCustomQueueItemRecord record = new(context.Guild.Id, baseUrl, station, songRequest.RequestId, songRequest.Song.SongId, DateTimeOffset.UtcNow);
+                _cronJobManager.RunAzuraRequestJob(record);
 
                 await using DiscordInteractionResponseBuilder interaction = new()
                 {
-                    Content = response
+                    Content = GeneralStrings.SongRequestQueued
                 };
                 await result.Result.Interaction.CreateResponseAsync(DiscordInteractionResponseType.ChannelMessageWithSource, interaction);
                 await context.EditResponseAsync(embed);

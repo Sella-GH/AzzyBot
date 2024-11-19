@@ -191,7 +191,7 @@ public sealed class AdminCommands
 
             const string dmAddition = "You receive this message directly because you haven't provided a notification channel in your server.";
             string newMessage = message.Replace("\\n", Environment.NewLine, StringComparison.OrdinalIgnoreCase);
-            IReadOnlyList<GuildEntity> guildsEntities = await _dbActions.GetGuildsAsync(true);
+            IReadOnlyList<GuildEntity> guildsEntities = await _dbActions.GetGuildsAsync(loadGuildPrefs: true);
             foreach (DiscordGuild guild in guilds.Values)
             {
                 GuildEntity? guildEntity = guildsEntities.FirstOrDefault(e => e.UniqueId == guild.Id);

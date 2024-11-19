@@ -36,11 +36,8 @@ public static partial class LoggerActions
     [LoggerMessage(18, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast api permissions")]
     public static partial void GlobalTimerCheckForAzuraCastApi(this ILogger logger, int counter);
 
-    [LoggerMessage(20, LogLevel.Debug, "BackgroundServiceHost started")]
+    [LoggerMessage(20, LogLevel.Debug, "AzuraRequestsJob started")]
     public static partial void BackgroundServiceHostStart(this ILogger logger);
-
-    [LoggerMessage(21, LogLevel.Debug, "BackgroundService started")]
-    public static partial void BackgroundServiceStart(this ILogger logger);
 
     [LoggerMessage(22, LogLevel.Debug, "BackgroundServiceHost running")]
     public static partial void BackgroundServiceHostRun(this ILogger logger);

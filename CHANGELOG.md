@@ -14,6 +14,7 @@
   - This only works in dev mode
 - Added a new environment variable "LOG_RETENTION_DAYS" to docker-compose which defines how many days the logs should be kept
   - Default is 7 days
+- `config get-settings` now shows an additional value in the "station" section which shows how many times songs were requqested through the bot
 
 ### Improvements
 - Exception embeds now produce json output instead of a stacktrace.log file
@@ -25,6 +26,9 @@
 - `azuracast force-cache-refresh` parameter `station` is now optional
   - If there is no value given it will refresh the cache of all configured stations
 - `azuracast stop-station` now sends a message to the connected voice channels if it's playing and was stopped
+
+### Fixes
+- The AzuraCast station cache refresh works again
 
 ## 2.0.13 - 2024-11-14
 ### Dependencies

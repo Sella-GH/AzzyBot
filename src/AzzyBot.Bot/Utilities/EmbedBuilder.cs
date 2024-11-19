@@ -520,7 +520,7 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.White, fields: fields);
     }
 
-    public static IEnumerable<DiscordEmbed> BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast, string instanceRole, IReadOnlyDictionary<ulong, string> stationRoles, IReadOnlyDictionary<int, string> stationNames)
+    public static IEnumerable<DiscordEmbed> BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast, string instanceRole, IReadOnlyDictionary<ulong, string> stationRoles, IReadOnlyDictionary<int, string> stationNames, IReadOnlyDictionary<int, int> stationRequests)
     {
         ArgumentNullException.ThrowIfNull(azuraCast);
 
@@ -570,11 +570,12 @@ public static class EmbedBuilder
 
             string fileUploadChannel = (station.Preferences.FileUploadChannelId > 0) ? $"<#{station.Preferences.FileUploadChannelId}>" : "Not set";
             string requestsChannel = (station.Preferences.RequestsChannelId > 0) ? $"<#{station.Preferences.RequestsChannelId}>" : "Not set";
+            int requestCount = stationRequests.FirstOrDefault(x => x.Key == station.Id).Value;
             string fileUploadPath = (!string.IsNullOrWhiteSpace(station.Preferences.FileUploadPath)) ? station.Preferences.FileUploadPath : "Not set";
             string showPlaylist = Misc.GetReadableBool(station.Preferences.ShowPlaylistInNowPlaying, ReadableBool.EnabledDisabled);
             string fileChanges = Misc.GetReadableBool(station.Checks.FileChanges, ReadableBool.EnabledDisabled);
 
-            fields = new(10)
+            fields = new(11)
             {
                 ["Station Name"] = new(stationName),
                 ["Station ID"] = new(stationId),
@@ -583,6 +584,7 @@ public static class EmbedBuilder
                 ["Station DJ Role"] = new(stationDjRole),
                 ["File Upload Channel"] = new(fileUploadChannel),
                 ["Music Requests Channel"] = new(requestsChannel),
+                ["Song Request Count"] = new(requestCount.ToString(CultureInfo.InvariantCulture)),
                 ["File Upload Path"] = new(fileUploadPath),
                 ["Show Playlist In Now Playing"] = new(showPlaylist),
                 ["Automatic Checks"] = new($"- File Changes: {fileChanges}")

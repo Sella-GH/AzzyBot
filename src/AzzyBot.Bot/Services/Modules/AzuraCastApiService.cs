@@ -556,12 +556,12 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, FileOperations.JsonOptions), CreateHeader(apiKey));
     }
 
-    public async Task RequestSongAsync(Uri baseUrl, int stationId, string songId)
+    public async Task RequestSongAsync(Uri baseUrl, int stationId, string requestId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
-        ArgumentException.ThrowIfNullOrWhiteSpace(songId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(requestId);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Request}/{songId}";
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Request}/{requestId}";
 
         await PostToApiAsync(baseUrl, endpoint);
     }
