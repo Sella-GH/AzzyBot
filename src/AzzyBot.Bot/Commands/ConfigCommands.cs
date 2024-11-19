@@ -588,9 +588,9 @@ public sealed class ConfigCommands
             if (guild.AzuraCast is not null)
             {
                 AzuraCastEntity ac = guild.AzuraCast;
-                AzuraStationRecord? stationRecord;
                 Dictionary<ulong, string> stationRoles = new(ac.Stations.Count);
                 Dictionary<int, string> stationNames = new(ac.Stations.Count);
+                Dictionary<int, int> stationRequests = new(ac.Stations.Count);
                 foreach (AzuraCastStationEntity station in ac.Stations)
                 {
                     DiscordRole? stationAdminRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationAdminRoleId);
@@ -598,7 +598,7 @@ public sealed class ConfigCommands
                     stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? "Name not found");
                     stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found");
 
-                    stationRecord = await _azuraCastApi.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), station.StationId);
+                    AzuraStationRecord? stationRecord = await _azuraCastApi.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), station.StationId);
                     if (stationRecord is null)
                     {
                         await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
@@ -606,10 +606,13 @@ public sealed class ConfigCommands
                     }
 
                     stationNames.Add(station.Id, stationRecord.Name);
+
+                    int stationBotRequests = await _dbActions.GetAzuraCastStationRequestsCountAsync(guildId, station.StationId);
+                    stationRequests.Add(station.Id, stationBotRequests);
                 }
 
                 DiscordRole? instanceAdminRole = roles.FirstOrDefault(r => r.Id == ac.Preferences.InstanceAdminRoleId);
-                IEnumerable<DiscordEmbed> azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(ac, $"{instanceAdminRole?.Name} ({instanceAdminRole?.Id})", stationRoles, stationNames);
+                IEnumerable<DiscordEmbed> azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(ac, $"{instanceAdminRole?.Name} ({instanceAdminRole?.Id})", stationRoles, stationNames, stationRequests);
 
                 messageBuilder.AddEmbeds(azuraEmbed);
             }

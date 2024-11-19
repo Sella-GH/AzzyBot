@@ -58,7 +58,11 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<AzuraCastFileService>();
         services.AddSingleton<AzuraCastPingService>();
         services.AddSingleton<AzuraCastUpdateService>();
-        services.AddNCronJob(static o => o.AddJob<AzzyBotGlobalChecksJob>(j => j.WithCronExpression("*/15 * * * *").WithName(nameof(AzzyBotGlobalChecksJob))));
+        services.AddNCronJob(o =>
+        {
+            o.AddJob<AzuraRequestJob>();
+            o.AddJob<AzzyBotGlobalChecksJob>(j => j.WithCronExpression("*/15 * * * *").WithName(nameof(AzzyBotGlobalChecksJob))); // Every 15 minutes
+        });
         services.AddSingleton<CronJobManager>();
 
         services.AddLavalink();
