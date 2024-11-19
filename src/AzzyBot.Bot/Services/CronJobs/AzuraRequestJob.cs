@@ -41,24 +41,24 @@ public sealed class AzuraRequestJob(ILogger<AzuraRequestJob> logger, AzuraCastAp
         if (requestHasToWait)
         {
             TimeSpan diff = station.LastRequestTime - record.Timestamp;
-            _logger.BackgroundServiceSongRequestWaiting(record.SongId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId, diff.Seconds);
+            _logger.BackgroundServiceSongRequestWaiting(record.RequestId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId, diff.Seconds);
             await Task.Delay(diff, token);
         }
 
         try
         {
-            await _apiService.RequestSongAsync(record.BaseUri, record.StationId, record.SongId);
+            await _apiService.RequestSongAsync(record.BaseUri, record.StationId, record.RequestId);
             await _dbActions.UpdateAzuraCastStationAsync(record.GuildId, record.StationId, lastRequestTime: true);
             await _dbActions.AddAzuraCastStationRequestAsync(record.GuildId, record.StationId, record.SongId);
 
-            _logger.BackgroundServiceSongRequestFinished(record.SongId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
+            _logger.BackgroundServiceSongRequestFinished(record.RequestId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
         }
         catch (HttpRequestException)
         {
             record.Timestamp = DateTimeOffset.UtcNow;
             _cronJobManager.RunAzuraRequestJob(record);
 
-            _logger.BackgroundServiceSongRequestRequed(record.SongId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
+            _logger.BackgroundServiceSongRequestRequed(record.RequestId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
         }
     }
 }
