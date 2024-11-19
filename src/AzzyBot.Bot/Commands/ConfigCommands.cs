@@ -169,14 +169,21 @@ public sealed class ConfigCommands
             await context.DeleteResponseAsync();
             await context.FollowupAsync(GeneralStrings.ConfigStationAdded);
 
-            AzuraCastStationEntity? dStation = await _dbActions.GetAzuraCastStationAsync(guildId, station, loadChecks: true, loadAzuraCast: true);
-            if (dStation is null)
+            AzuraCastEntity? dAzuraCast = await _dbActions.GetAzuraCastAsync(guildId, loadPrefs: true, loadStations: true, loadGuild: true);
+            if (dAzuraCast is null)
             {
-                _logger.DatabaseAzuraCastStationNotFound(guildId, 0, station);
+                _logger.DatabaseAzuraCastNotFound(guildId);
                 return;
             }
 
-            if (dStation.AzuraCast.IsOnline)
+            AzuraCastStationEntity? dStation = dAzuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+            if (dStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(guildId, dAzuraCast.Id, station);
+                return;
+            }
+
+            if (dAzuraCast.IsOnline)
                 await _azuraCastFile.CheckForFileChangesAsync(dStation);
         }
 
@@ -429,14 +436,21 @@ public sealed class ConfigCommands
 
                 ulong guildId = context.Guild.Id;
 
-                AzuraCastStationEntity? dStation = await _dbActions.GetAzuraCastStationAsync(guildId, station, loadChecks: true, loadAzuraCast: true);
-                if (dStation is null)
+                AzuraCastEntity? dAzuraCast = await _dbActions.GetAzuraCastAsync(guildId, loadPrefs: true, loadStations: true, loadGuild: true);
+                if (dAzuraCast is null)
                 {
-                    _logger.DatabaseAzuraCastStationNotFound(guildId, 0, station);
+                    _logger.DatabaseAzuraCastNotFound(guildId);
                     return;
                 }
 
-                if (dStation.AzuraCast.IsOnline)
+                AzuraCastStationEntity? dStation = dAzuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+                if (dStation is null)
+                {
+                    _logger.DatabaseAzuraCastStationNotFound(guildId, dAzuraCast.Id, station);
+                    return;
+                }
+
+                if (dAzuraCast.IsOnline)
                     await _azuraCastFile.CheckForFileChangesAsync(dStation);
             }
 
@@ -480,14 +494,21 @@ public sealed class ConfigCommands
             if (fileChanges is 1)
             {
                 ulong guildId = context.Guild.Id;
-                AzuraCastStationEntity? dStation = await _dbActions.GetAzuraCastStationAsync(guildId, station, loadChecks: true, loadAzuraCast: true);
-                if (dStation is null)
+                AzuraCastEntity? dAzuraCast = await _dbActions.GetAzuraCastAsync(guildId, loadPrefs: true, loadStations: true, loadGuild: true);
+                if (dAzuraCast is null)
                 {
-                    _logger.DatabaseAzuraCastStationNotFound(guildId, 0, station);
+                    _logger.DatabaseAzuraCastNotFound(guildId);
                     return;
                 }
 
-                if (dStation.AzuraCast.IsOnline)
+                AzuraCastStationEntity? dStation = dAzuraCast.Stations.FirstOrDefault(s => s.StationId == station);
+                if (dStation is null)
+                {
+                    _logger.DatabaseAzuraCastStationNotFound(guildId, dAzuraCast.Id, station);
+                    return;
+                }
+
+                if (dAzuraCast.IsOnline)
                     await _azuraCastFile.CheckForFileChangesAsync(dStation);
             }
         }
@@ -567,9 +588,9 @@ public sealed class ConfigCommands
             if (guild.AzuraCast is not null)
             {
                 AzuraCastEntity ac = guild.AzuraCast;
-                AzuraStationRecord? stationRecord;
                 Dictionary<ulong, string> stationRoles = new(ac.Stations.Count);
                 Dictionary<int, string> stationNames = new(ac.Stations.Count);
+                Dictionary<int, int> stationRequests = new(ac.Stations.Count);
                 foreach (AzuraCastStationEntity station in ac.Stations)
                 {
                     DiscordRole? stationAdminRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationAdminRoleId);
@@ -577,7 +598,7 @@ public sealed class ConfigCommands
                     stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? "Name not found");
                     stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found");
 
-                    stationRecord = await _azuraCastApi.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), station.StationId);
+                    AzuraStationRecord? stationRecord = await _azuraCastApi.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), station.StationId);
                     if (stationRecord is null)
                     {
                         await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
@@ -585,10 +606,13 @@ public sealed class ConfigCommands
                     }
 
                     stationNames.Add(station.Id, stationRecord.Name);
+
+                    int stationBotRequests = await _dbActions.GetAzuraCastStationRequestsCountAsync(guildId, station.StationId);
+                    stationRequests.Add(station.Id, stationBotRequests);
                 }
 
                 DiscordRole? instanceAdminRole = roles.FirstOrDefault(r => r.Id == ac.Preferences.InstanceAdminRoleId);
-                IEnumerable<DiscordEmbed> azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(ac, $"{instanceAdminRole?.Name} ({instanceAdminRole?.Id})", stationRoles, stationNames);
+                IEnumerable<DiscordEmbed> azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(ac, $"{instanceAdminRole?.Name} ({instanceAdminRole?.Id})", stationRoles, stationNames, stationRequests);
 
                 messageBuilder.AddEmbeds(azuraEmbed);
             }

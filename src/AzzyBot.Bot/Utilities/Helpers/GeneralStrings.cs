@@ -41,7 +41,6 @@ public static class GeneralStrings
     public const string PermissionIssue = "I don't have the required permissions to do this.";
     public const string SkipAlmostOver = "This song is almost over. Please wait!";
     public const string SkipToFast = "You can only skip a song every 30 seconds.";
-    public const string SongRequested = "I requested the song for you.";
     public const string SongRequestNotFound = "This song does not exist.";
     public const string SongRequestQueued = "Your song request has been queued.";
     public const string StationNotFound = "This station does not exist.";

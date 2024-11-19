@@ -9,7 +9,6 @@ using AzzyBot.Bot.Services.CronJobs;
 using AzzyBot.Bot.Services.DiscordEvents;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Settings;
-using AzzyBot.Core.Services.BackgroundServices;
 using AzzyBot.Core.Settings;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Data.Extensions;
@@ -52,10 +51,6 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<DiscordBotServiceHost>();
         services.AddHostedService(static s => s.GetRequiredService<DiscordBotServiceHost>());
 
-        services.AddSingleton<QueuedBackgroundTask>();
-        services.AddSingleton<QueuedBackgroundTaskHost>();
-        services.AddHostedService(static s => s.GetRequiredService<QueuedBackgroundTaskHost>());
-
         services.AddSingleton<WebRequestService>();
         services.AddSingleton<UpdaterService>();
 
@@ -63,8 +58,12 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<AzuraCastFileService>();
         services.AddSingleton<AzuraCastPingService>();
         services.AddSingleton<AzuraCastUpdateService>();
-        services.AddNCronJob(static o => o.AddJob<AzzyBotGlobalChecksJob>(j => j.WithCronExpression("*/15 * * * *").WithName(nameof(AzzyBotGlobalChecksJob))));
-        services.AddSingleton<AzuraRequestBackgroundTask>();
+        services.AddNCronJob(o =>
+        {
+            o.AddJob<AzuraRequestJob>();
+            o.AddJob<AzzyBotGlobalChecksJob>(j => j.WithCronExpression("*/15 * * * *").WithName(nameof(AzzyBotGlobalChecksJob))); // Every 15 minutes
+        });
+        services.AddSingleton<CronJobManager>();
 
         services.AddLavalink();
         services.ConfigureLavalink(config =>

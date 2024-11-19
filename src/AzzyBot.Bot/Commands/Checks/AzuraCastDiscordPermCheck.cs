@@ -43,8 +43,11 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
         bool fillStation;
         switch (context.Command.FullName)
         {
-            case "azuracast export-playlists":
             case "azuracast force-cache-refresh":
+                fillStation = stationId is not 0;
+                break;
+
+            case "azuracast export-playlists":
             case "azuracast start-station":
             case "azuracast stop-station":
             case "azuracast toggle-song-requests":
