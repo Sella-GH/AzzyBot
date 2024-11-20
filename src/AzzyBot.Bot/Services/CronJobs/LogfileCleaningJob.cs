@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -24,7 +23,9 @@ public sealed class LogfileCleaningJob(ILogger<LogfileCleaningJob> logger) : IJo
         if (!Directory.Exists("Logs"))
             Directory.CreateDirectory("Logs");
 
-        int logDays = Convert.ToInt32(context.Parameter, CultureInfo.InvariantCulture);
+        if (context.Parameter is not int logDays)
+            throw new InvalidOperationException($"{nameof(LogfileCleaningJob)} requires a parameter of type int. context.Parameter is {context.Parameter!.GetType()}");
+
         List<string> files = Directory.GetFiles("Logs").Where(f => f.StartsWith("AzzyBot_", StringComparison.InvariantCultureIgnoreCase) && DateTimeOffset.UtcNow - File.GetLastWriteTimeUtc(f) > TimeSpan.FromDays(logDays)).ToList();
         foreach (string file in files)
         {
