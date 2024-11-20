@@ -22,6 +22,7 @@ using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Core.Utilities.Enums;
+using AzzyBot.Core.Utilities.Helpers;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
 using DSharpPlus.Commands;
@@ -1089,7 +1090,7 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(UploadFilesAsync), context.User.GlobalName);
 
-            if (file.FileSize > 52323942) // ~49.9 MB
+            if (file.FileSize > FileSizes.AzuraFileSize)
             {
                 await context.EditResponseAsync(GeneralStrings.FileTooBig);
                 return;

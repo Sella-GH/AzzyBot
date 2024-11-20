@@ -38,7 +38,7 @@ public static class Startup
 
         #region Add logging
 
-        appBuilder.Logging.AzzyBotLogging(logDays, isDev, forceDebug, forceTrace);
+        appBuilder.Logging.AzzyBotLogging(isDev, forceDebug, forceTrace);
 
         #endregion Add logging
 
@@ -46,7 +46,7 @@ public static class Startup
 
         appBuilder.Services.AzzyBotSettings(isDev, isDocker);
         appBuilder.Services.AzzyBotStats(isDev && !isDocker);
-        appBuilder.Services.AzzyBotServices(isDev, isDocker);
+        appBuilder.Services.AzzyBotServices(isDev, isDocker, logDays);
 
         #endregion Add services
 

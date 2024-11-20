@@ -56,7 +56,7 @@ public static class FileOperations
         string zipPath = Path.Combine(zipFileDir, zipFileName);
         await using FileStream stream = new(zipPath, FileMode.Create);
         using ZipArchive zipFile = new(stream, ZipArchiveMode.Create, false, Encoding.UTF8);
-        foreach (string file in Directory.GetFiles(filesDir))
+        foreach (string file in Directory.EnumerateFiles(filesDir))
         {
             string fileName = Path.GetFileName(file);
             zipFile.CreateEntryFromFile(file, fileName, CompressionLevel.SmallestSize);
@@ -88,7 +88,7 @@ public static class FileOperations
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         ArgumentException.ThrowIfNullOrWhiteSpace(startingName);
 
-        foreach (string file in Directory.GetFiles(path, $"{startingName}*"))
+        foreach (string file in Directory.EnumerateFiles(path, $"{startingName}*"))
         {
             File.Delete(file);
         }
@@ -112,7 +112,7 @@ public static class FileOperations
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
 
-        return (!latest) ? Directory.GetFiles(path) : Directory.GetFiles(path).OrderDescending();
+        return (!latest) ? Directory.EnumerateFiles(path) : Directory.EnumerateFiles(path).OrderDescending();
     }
 
     public static async Task WriteToFileAsync(string path, string content)

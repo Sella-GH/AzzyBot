@@ -10,26 +10,24 @@ namespace AzzyBot.Core.Extensions;
 
 public static class ILoggingBuilderExtensions
 {
-    public static void AzzyBotLogging(this ILoggingBuilder logging, int logDays = 7, bool isDev = false, bool forceDebug = false, bool forceTrace = false)
+    public static void AzzyBotLogging(this ILoggingBuilder logging, bool isDev = false, bool forceDebug = false, bool forceTrace = false)
     {
         if (!Directory.Exists("Logs"))
             Directory.CreateDirectory("Logs");
 
-        foreach (string file in Directory.GetFiles("Logs").Where(static f => !f.StartsWith("AzzyBot_", StringComparison.InvariantCultureIgnoreCase)))
+        foreach (string file in Directory.EnumerateFiles("Logs").Where(static f => !f.StartsWith(Path.Combine("Logs", "AzzyBot_"), StringComparison.InvariantCultureIgnoreCase)))
         {
             File.Delete(file);
         }
 
         logging.AddConsole();
-        logging.AddFile(Path.Combine("Logs", $"AzzyBot_{DateTimeOffset.Now:yyyy-MM-dd}.log"), c =>
+        logging.AddFile(Path.Combine("Logs", "AzzyBot_{0:yyyy-MM-dd_HH-mm}.log"), c =>
         {
-            c.Append = true;
-            c.FileSizeLimitBytes = 10380902; // ~9.9 MB
-            c.MaxRollingFiles = logDays;
-            c.RollingFilesConvention = FileLoggerOptions.FileRollingConvention.Descending;
+            string logPath = Path.Combine("Logs", "AzzyBot_{0:yyyy-MM-dd_HH-mm}.log");
+
             c.UseUtcTimestamp = false;
-            c.FormatLogFileName = static (logTime) => string.Format(CultureInfo.InvariantCulture, logTime, $"{DateTimeOffset.Now:yyyy-MM-dd}");
-            c.FormatLogEntry = static (message) =>
+            c.FormatLogFileName = _ => string.Format(CultureInfo.InvariantCulture, logPath, DateTimeOffset.Now);
+            c.FormatLogEntry = (message) =>
             {
                 string logMessage = $"[{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss}] {message.LogLevel}: {message.LogName}[{message.EventId}] {message.Message}";
                 if (message.Exception is not null)
