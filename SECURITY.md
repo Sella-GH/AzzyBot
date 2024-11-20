@@ -29,6 +29,7 @@ You can report any vulnerabilities directly to us if they relate to the core Azz
 AzzyBot is not responsible for the development or maintenance of several pieces of "upstream" software that we incorporate into our own product. This list of software includes, but is not limited to:
 * [AzuraCast](https://github.com/AzuraCast/AzuraCast)
 * [.NET 9](https://github.com/dotnet/runtime/)
+* [CommunityToolkit.Common](https://github.com/CommunityToolkit/dotnet)
 * [CsvHelper](https://github.com/JoshClose/CsvHelper)
 * [Docker](https://docker.com/)
 * [Docker Compose](https://docker.com/)
@@ -38,6 +39,7 @@ AzzyBot is not responsible for the development or maintenance of several pieces 
 * [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
 * [Microsoft.EntityFrameworkCore](https://github.com/dotnet/efcore)
 * [Microsoft.Extensions.X Libs](https://github.com/dotnet/runtime)
+* [NCronJob](https://github.com/NCronJob-Dev/NCronJob)
 * [Npsql](https://github.com/npgsql/npgsql)
 * [Npsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg)
 * [NReco.Logging.File](https://github.com/NReco/Logging)

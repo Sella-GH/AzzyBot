@@ -75,12 +75,14 @@ Follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wi
 * [Visual Studio 2022 Community](https://visualstudio.microsoft.com/de/downloads)
 
 ### Dependencies
+* [CommunityToolkit.Common](https://github.com/CommunityToolkit/dotnet)
 * [CsvHelper](https://github.com/JoshClose/CsvHelper)
 * [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus)
 * [EntityFrameworkCore.Exceptions.PostgreSQL](https://github.com/Giorgi/EntityFramework.Exceptions)
 * [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
 * [Microsoft.EntityFrameworkCore](https://github.com/dotnet/efcore)
 * [Microsoft.Extensions.X Libs](https://github.com/dotnet/runtime)
+* [NCronJob](https://github.com/NCronJob-Dev/NCronJob)
 * [Npsql](https://github.com/npgsql/npgsql)
 * [Npsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg)
 * [NReco.Logging.File](https://github.com/NReco/Logging)
