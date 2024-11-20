@@ -2,7 +2,6 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using AzzyBot.Core.Utilities.Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using NReco.Logging.File;
@@ -16,23 +15,21 @@ public static class ILoggingBuilderExtensions
         if (!Directory.Exists("Logs"))
             Directory.CreateDirectory("Logs");
 
-        foreach (string file in Directory.GetFiles("Logs").Where(static f => !f.StartsWith("AzzyBot_", StringComparison.InvariantCultureIgnoreCase)))
+        foreach (string file in Directory.GetFiles("Logs").Where(static f => !f.StartsWith(Path.Combine("Logs", "AzzyBot_"), StringComparison.InvariantCultureIgnoreCase)))
         {
             File.Delete(file);
         }
 
         logging.AddConsole();
-        logging.AddFile(Path.Combine("Logs", $"AzzyBot_{DateTimeOffset.Now:yyyy-MM-dd}.log"), c =>
+        logging.AddFile(string.Empty, c =>
         {
-            DateTimeOffset now = DateTimeOffset.Now;
+            string logPath = Path.Combine("Logs", "AzzyBot_{0:yyyy-MM-dd_HH}.log");
 
-            c.Append = true;
-            c.FileSizeLimitBytes = FileSizes.DiscordFileSize;
             c.UseUtcTimestamp = false;
-            c.FormatLogFileName = (logTime) => string.Format(CultureInfo.InvariantCulture, logTime, $"{now:yyyy-MM-dd}");
+            c.FormatLogFileName = (logTime) => string.Format(CultureInfo.InvariantCulture, logPath, DateTimeOffset.Now);
             c.FormatLogEntry = (message) =>
             {
-                string logMessage = $"[{now:yyyy-MM-dd HH:mm:ss}] {message.LogLevel}: {message.LogName}[{message.EventId}] {message.Message}";
+                string logMessage = $"[{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss}] {message.LogLevel}: {message.LogName}[{message.EventId}] {message.Message}";
                 if (message.Exception is not null)
                     logMessage += Environment.NewLine + message.Exception;
 
