@@ -15,7 +15,7 @@ public static class ILoggingBuilderExtensions
         if (!Directory.Exists("Logs"))
             Directory.CreateDirectory("Logs");
 
-        foreach (string file in Directory.GetFiles("Logs").Where(static f => !f.StartsWith(Path.Combine("Logs", "AzzyBot_"), StringComparison.InvariantCultureIgnoreCase)))
+        foreach (string file in Directory.EnumerateFiles("Logs").Where(static f => !f.StartsWith(Path.Combine("Logs", "AzzyBot_"), StringComparison.InvariantCultureIgnoreCase)))
         {
             File.Delete(file);
         }
