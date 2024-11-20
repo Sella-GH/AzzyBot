@@ -26,7 +26,7 @@ public static class ILoggingBuilderExtensions
             string logPath = Path.Combine("Logs", "AzzyBot_{0:yyyy-MM-dd_HH-mm}.log");
 
             c.UseUtcTimestamp = false;
-            c.FormatLogFileName = (logTime) => string.Format(CultureInfo.InvariantCulture, logPath, DateTimeOffset.Now);
+            c.FormatLogFileName = _ => string.Format(CultureInfo.InvariantCulture, logPath, DateTimeOffset.Now);
             c.FormatLogEntry = (message) =>
             {
                 string logMessage = $"[{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss}] {message.LogLevel}: {message.LogName}[{message.EventId}] {message.Message}";
