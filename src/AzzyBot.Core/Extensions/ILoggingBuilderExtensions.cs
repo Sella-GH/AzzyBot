@@ -21,9 +21,9 @@ public static class ILoggingBuilderExtensions
         }
 
         logging.AddConsole();
-        logging.AddFile(string.Empty, c =>
+        logging.AddFile(Path.Combine("Logs", "AzzyBot_{0:yyyy-MM-dd_HH-mm}.log"), c =>
         {
-            string logPath = Path.Combine("Logs", "AzzyBot_{0:yyyy-MM-dd}.log");
+            string logPath = Path.Combine("Logs", "AzzyBot_{0:yyyy-MM-dd_HH-mm}.log");
 
             c.UseUtcTimestamp = false;
             c.FormatLogFileName = (logTime) => string.Format(CultureInfo.InvariantCulture, logPath, DateTimeOffset.Now);
