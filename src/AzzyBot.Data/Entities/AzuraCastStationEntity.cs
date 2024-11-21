@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace AzzyBot.Data.Entities;
 
+/// <summary>
+/// Represents a station of an AzuraCast instance.
+/// </summary>
 public sealed class AzuraCastStationEntity
 {
     /// <summary>

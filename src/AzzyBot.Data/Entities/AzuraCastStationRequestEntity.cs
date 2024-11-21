@@ -2,6 +2,9 @@
 
 namespace AzzyBot.Data.Entities;
 
+/// <summary>
+/// Represents a request for a song on a station.
+/// </summary>
 public sealed class AzuraCastStationRequestEntity
 {
     /// <summary>

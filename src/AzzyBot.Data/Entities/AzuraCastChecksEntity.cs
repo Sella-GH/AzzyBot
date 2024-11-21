@@ -2,6 +2,9 @@
 
 namespace AzzyBot.Data.Entities;
 
+/// <summary>
+/// Represents the checks for an AzuraCast instance.
+/// </summary>
 public sealed class AzuraCastChecksEntity
 {
     /// <summary>

@@ -3,6 +3,9 @@ using DSharpPlus.Entities;
 
 namespace AzzyBot.Data.Entities;
 
+/// <summary>
+/// The guild database entity.
+/// </summary>
 public sealed class GuildEntity
 {
     /// <summary>

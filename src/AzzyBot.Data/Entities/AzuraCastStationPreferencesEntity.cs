@@ -2,6 +2,9 @@
 
 namespace AzzyBot.Data.Entities;
 
+/// <summary>
+/// Represents the user-defined preferences of the AzuraCast station.
+/// </summary>
 public sealed class AzuraCastStationPreferencesEntity
 {
     /// <summary>
