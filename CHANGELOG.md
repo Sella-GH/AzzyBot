@@ -29,6 +29,7 @@
 
 ### Fixes
 - The AzuraCast station cache refresh works again
+- `music now-playing` now shows the streamer artwork if a streamer is playing
 
 ## 2.0.13 - 2024-11-14
 ### Dependencies

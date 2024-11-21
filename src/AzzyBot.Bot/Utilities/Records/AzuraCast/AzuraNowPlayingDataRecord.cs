@@ -73,10 +73,10 @@ public sealed record AzuraNowPlayingLiveRecord
     [JsonPropertyName("broadcast_start")]
     public int? BroadcastStart { get; init; }
 
-    [JsonPropertyName("broadcast_end")]
     /// <summary>
     /// URL to the streamer artwork (if available).
     /// </summary>
+    [JsonPropertyName("art")]
     public string? Art { get; init; }
 }
 
