@@ -38,6 +38,7 @@ AzzyBot is not responsible for the development or maintenance of several pieces 
 * [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
 * [Microsoft.EntityFrameworkCore](https://github.com/dotnet/efcore)
 * [Microsoft.Extensions.X Libs](https://github.com/dotnet/runtime)
+* [NCronJob](https://github.com/NCronJob-Dev/NCronJob)
 * [Npsql](https://github.com/npgsql/npgsql)
 * [Npsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg)
 * [NReco.Logging.File](https://github.com/NReco/Logging)
