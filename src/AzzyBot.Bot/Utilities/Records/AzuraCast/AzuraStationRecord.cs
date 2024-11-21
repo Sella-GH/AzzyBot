@@ -76,4 +76,10 @@ public sealed record AzuraStationMountRecord
     /// </summary>
     [JsonPropertyName("format")]
     public required string Format { get; init; }
+
+    /// <summary>
+    /// If the mount is the default mount for the parent station
+    /// </summary>
+    [JsonPropertyName("is_default")]
+    public required bool IsDefault { get; init; }
 }

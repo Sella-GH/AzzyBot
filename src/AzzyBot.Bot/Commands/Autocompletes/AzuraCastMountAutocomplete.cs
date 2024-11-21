@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.Modules;
@@ -41,7 +42,6 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
         }
 
         string? search = context.UserInput;
-        string name = string.Empty;
         AzuraStationRecord? record = null;
         try
         {
@@ -68,11 +68,20 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
             if (!string.IsNullOrWhiteSpace(search) && !mount.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            name = (!mount.Name.Contains("kbps", StringComparison.OrdinalIgnoreCase))
-                ? $"{mount.Name} ({mount.Bitrate} kbps - {mount.Format})"
-                : mount.Name;
+            StringBuilder name = new();
+            if (!mount.Name.Contains("kbps", StringComparison.OrdinalIgnoreCase))
+            {
+                name.Append(CultureInfo.InvariantCulture, $"{mount.Name} ({mount.Bitrate} kbps - {mount.Format})");
+            }
+            else
+            {
+                name.Append(mount.Name);
+            }
 
-            results.Add(new(name, mount.Id));
+            if (mount.IsDefault)
+                name.Append(" (Default)");
+
+            results.Add(new(name.ToString(), mount.Id));
         }
 
         if ((string.IsNullOrWhiteSpace(search) || search.Contains("hls", StringComparison.OrdinalIgnoreCase)) && hlsAvailable)

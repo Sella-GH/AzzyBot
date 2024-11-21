@@ -26,6 +26,7 @@
 - `azuracast force-cache-refresh` parameter `station` is now optional
   - If there is no value given it will refresh the cache of all configured stations
 - `azuracast stop-station` now sends a message to the connected voice channels if it's playing and was stopped
+- `player play-mount` now shows in the autocomplete if the mount point is the default one
 
 ### Fixes
 - The AzuraCast station cache refresh works again
