@@ -70,6 +70,24 @@ namespace AzzyBot.Bot.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://api.ipify.org.
+        /// </summary>
+        internal static string GetIpv4Uri {
+            get {
+                return ResourceManager.GetString("GetIpv4Uri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://api6.ipify.org.
+        /// </summary>
+        internal static string GetIpv6Uri {
+            get {
+                return ResourceManager.GetString("GetIpv6Uri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://github.com/Sella-GH.
         /// </summary>
         internal static string GitHubCreatorUri {

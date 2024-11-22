@@ -488,6 +488,26 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         return GetFromApiListAsync<AzuraStationHistoryItemRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
+    public Task<IEnumerable<AzuraStationListenerRecord>?> GetStationListenersAsync(Uri baseUrl, string apiKey, int stationId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
+
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Listeners}";
+
+        return GetFromApiListAsync<AzuraStationListenerRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+    }
+
+    public Task<IEnumerable<AzuraHlsMountRecord>?> GetStationHlsMountPointsAsync(Uri baseUrl, string apiKey, int stationId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
+
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.HlsStreams}";
+
+        return GetFromApiListAsync<AzuraHlsMountRecord>(baseUrl, endpoint, CreateHeader(apiKey));
+    }
+
     public Task<IEnumerable<AzuraStationQueueItemDetailedRecord>?> GetStationQueueAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
