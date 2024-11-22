@@ -86,11 +86,11 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
 
             StringBuilder name = new();
             if (!string.IsNullOrEmpty(playingMountPoint) && playingMountPoint == mount.Name)
-                name.Append("(Playing ->) ");
+                name.Append("(Currently Playing) ");
 
             if (!mount.Name.Contains("kbps", StringComparison.OrdinalIgnoreCase))
             {
-                name.Append(CultureInfo.InvariantCulture, $"{mount.Name} ({mount.Bitrate} kbps {mount.Format})");
+                name.Append(CultureInfo.InvariantCulture, $"{mount.Name} ({mount.Bitrate} kbps - {mount.Format})");
             }
             else
             {
@@ -116,10 +116,10 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
 
             StringBuilder name = new();
             if (!string.IsNullOrEmpty(playingMountPoint) && hlsMounts.Any(m => $"HLS: {m.Name}" == playingMountPoint))
-                name.Append("(Playing ->) ");
+                name.Append("(Currently Playing) ");
 
             name.Append("HTTP Live Streaming ");
-            name.Append(CultureInfo.InvariantCulture, $"({hlsMinBitrate} - {hlsMaxBitrate} kbps AAC) ");
+            name.Append(CultureInfo.InvariantCulture, $"({hlsMinBitrate} - {hlsMaxBitrate} kbps - AAC) ");
             name.Append(CultureInfo.InvariantCulture, $"- {hlsListeners} {((hlsListeners is not 1) ? "Listeners" : "Listener")}");
             if (record.HlsIsDefault)
                 name.Append(" (Default)");
