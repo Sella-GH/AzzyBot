@@ -44,10 +44,16 @@ public sealed record AzuraNowPlayingDataRecord
 public sealed record AzuraNowPlayingListenersRecord
 {
     /// <summary>
+    /// Total non-unique current listeners
+    /// </summary>
+    [JsonPropertyName("total")]
+    public int Total { get; init; }
+
+    /// <summary>
     /// Total unique current listeners
     /// </summary>
     [JsonPropertyName("unique")]
-    public int Current { get; init; }
+    public int Unique { get; init; }
 }
 
 /// <summary>
