@@ -135,4 +135,10 @@
   <data name="GitHubRepoContribUri" xml:space="preserve">
     <value>https://github.com/Sella-GH/AzzyBot/graphs/contributors</value>
   </data>
+  <data name="GetIpv4Uri" xml:space="preserve">
+    <value>https://api.ipify.org</value>
+  </data>
+  <data name="GetIpv6Uri" xml:space="preserve">
+    <value>https://api6.ipify.org</value>
+  </data>
 </root>

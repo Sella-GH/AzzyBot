@@ -12,6 +12,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using AzzyBot.Bot.Resources;
+using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
@@ -150,6 +152,27 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
             throw;
         }
+    }
+
+    public async Task<AzzyIpAddressRecord> GetIpAddressesAsync()
+    {
+        string ipv4 = string.Empty;
+        string ipv6 = string.Empty;
+        try
+        {
+            ipv4 = await _httpClientV4.GetStringAsync(new Uri(UriStrings.GetIpv4Uri));
+            ipv6 = await _httpClient.GetStringAsync(new Uri(UriStrings.GetIpv6Uri));
+        }
+        catch (HttpRequestException)
+        {
+            if (string.IsNullOrEmpty(ipv4))
+                _logger.WebRequestFailed(HttpMethod.Get, "Failed to get IPv4 address", new(UriStrings.GetIpv4Uri));
+
+            if (string.IsNullOrEmpty(ipv6))
+                _logger.WebRequestFailed(HttpMethod.Get, "Failed to get IPv6 address", new(UriStrings.GetIpv6Uri));
+        }
+
+        return new(ipv4, ipv6);
     }
 
     public async Task<long> GetPingAsync(Uri uri)
