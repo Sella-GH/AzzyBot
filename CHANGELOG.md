@@ -1,3 +1,5 @@
+## 2.2.0
+
 ## 2.1.0 - 2024-11-22
 ### General
 - Updated to .NET 9 including all dependencies

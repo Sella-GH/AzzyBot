@@ -15,8 +15,9 @@ body :
     id : version
     attributes :
       label : "Version"
-      description : "Which version of Azzy are you using? Ensure you're using the latest version of your line!"
+      description : "Which version of Azzy are you using? Ensure you're using the latest minor version of your line!"
       options :
+        - "2.1.x"
         - "2.0.x"
         - "1.10.x"
         - "1.9.x"
