@@ -1,3 +1,7 @@
+## 2.1.1 - 2024-11-23
+### Improvements
+- The AzuraCast updater works fine now if a rolling release instance is expected to update to a stable release
+
 ## 2.1.0 - 2024-11-22
 ### General
 - Updated to .NET 9 including all dependencies
