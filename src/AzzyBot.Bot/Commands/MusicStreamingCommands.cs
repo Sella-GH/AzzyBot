@@ -188,16 +188,23 @@ public sealed class MusicStreamingCommands
         (
             SlashCommandContext context,
             [Description("The provider you want to search for."), SlashChoiceProvider<MusicStreamingPlatformProvider>] string provider,
-            [Description("The url of the track you want to play.")] string track
+            [Description("The url of the track you want to play.")] string track,
+            [Description("The volume which should be set. This is only respected when no music is being played.")] int volume = 100
         )
         {
             ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(PlayAsync), context.User.GlobalName);
 
+            if (volume is < 0 or > 100)
+            {
+                await context.RespondAsync(GeneralStrings.VolumeInvalid, true);
+                return;
+            }
+
             await context.DeferResponseAsync();
 
-            string? text = await _musicStreaming.PlayMusicAsync(context, track, new(provider));
+            string? text = await _musicStreaming.PlayMusicAsync(context, track, new(provider), volume);
             if (string.IsNullOrWhiteSpace(text))
                 return;
 
@@ -209,13 +216,20 @@ public sealed class MusicStreamingCommands
         (
             SlashCommandContext context,
             [Description("The station you want play."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
-            [Description("The mount point of the station."), SlashAutoCompleteProvider<AzuraCastMountAutocomplete>] int mountPoint
+            [Description("The mount point of the station."), SlashAutoCompleteProvider<AzuraCastMountAutocomplete>] int mountPoint,
+            [Description("The volume which should be set. This is only respected when no music is being played.")] int volume = 100
         )
         {
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
             _logger.CommandRequested(nameof(PlayMountAsync), context.User.GlobalName);
+
+            if (volume is < 0 or > 100)
+            {
+                await context.RespondAsync(GeneralStrings.VolumeInvalid, true);
+                return;
+            }
 
             AzuraCastEntity? azura = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
             if (azura is null)
@@ -246,7 +260,7 @@ public sealed class MusicStreamingCommands
                 return;
             }
 
-            if (!await _musicStreaming.PlayMountMusicAsync(context, mount))
+            if (!await _musicStreaming.PlayMountMusicAsync(context, mount, volume))
                 return;
 
             await context.EditResponseAsync(GeneralStrings.VoicePlayMount.Replace("%station%", nowPlaying.Station.Name, StringComparison.OrdinalIgnoreCase));
