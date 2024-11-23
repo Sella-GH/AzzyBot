@@ -64,7 +64,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         _httpClient?.Dispose();
     }
 
-    public async Task<IReadOnlyList<bool>> CheckForApiPermissionsAsync(IReadOnlyList<Uri> urls, Dictionary<string, string> headers)
+    public async Task<IReadOnlyList<bool>> CheckForApiPermissionsAsync(IReadOnlyList<Uri> urls, IReadOnlyDictionary<string, string> headers)
     {
         ArgumentNullException.ThrowIfNull(urls);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(urls.Count);
@@ -101,7 +101,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         return results;
     }
 
-    public async Task DeleteAsync(Uri uri, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    public async Task DeleteAsync(Uri uri, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(uri);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
@@ -127,7 +127,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task DownloadAsync(Uri url, string downloadPath, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    public async Task DownloadAsync(Uri url, string downloadPath, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
@@ -247,7 +247,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task PostWebAsync(Uri url, string? content = null, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    public async Task PostWebAsync(Uri url, string? content = null, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
@@ -274,7 +274,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task PutWebAsync(Uri url, string? content = null, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    public async Task PutWebAsync(Uri url, string? content = null, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
@@ -301,7 +301,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task<string?> UploadAsync(Uri url, string file, string fileName, string filePath, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    public async Task<string?> UploadAsync(Uri url, string file, string fileName, string filePath, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
