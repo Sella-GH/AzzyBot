@@ -52,7 +52,7 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
 
         bool needState = context.Command.Name is "switch-playlist";
         string? search = context.UserInput;
-        string apiKey = (!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(station.AzuraCast.AdminApiKey);
+        string apiKey = (!string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(station.AzuraCast.AdminApiKey);
         string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
         IEnumerable<AzuraPlaylistRecord>? playlists = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, stationId);
         if (playlists is null)

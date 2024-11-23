@@ -293,7 +293,8 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         try
         {
             string jsonDump = JsonSerializer.Serialize<SerializableExceptionsRecord>(new(ex, info), FileOperations.JsonOptions);
-            string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, $"AzzyBotException_{timestampString}.json");
+            string fileName = $"AzzyBotException_{timestampString}.json";
+            string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, fileName);
 
             bool messageSent = await SendMessageAsync(errorChannelId, (errorChannelConfigured) ? BugReportMessage.Replace("[BugReportUri]", UriStrings.BugReportUri, StringComparison.InvariantCultureIgnoreCase) : ErrorChannelNotConfigured, [embed], [tempFilePath]);
             if (!messageSent)
@@ -589,7 +590,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             string name = kvp.Key.Name;
             string value = kvp.Value?.ToString() ?? "undefined";
 
-            if (!string.IsNullOrWhiteSpace(name) && value is not "0" or "undefined")
+            if (!string.IsNullOrEmpty(name) && value is not "0" or "undefined")
                 commandParameters.Add(name, value);
         }
     }
@@ -613,12 +614,12 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         builder.AddField("Exception", ex.GetType().Name);
         builder.AddField("Description", ex.Message);
 
-        if (!string.IsNullOrWhiteSpace(jsonMessage))
+        if (!string.IsNullOrEmpty(jsonMessage))
             builder.AddField("Advanced Error", jsonMessage);
 
         builder.AddField("Timestamp", timestamp);
 
-        if (!string.IsNullOrWhiteSpace(ex.Source))
+        if (!string.IsNullOrEmpty(ex.Source))
             builder.AddField("Source", ex.Source);
 
         if (message is not null)
@@ -627,7 +628,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         if (user is not null)
             builder.AddField("User", user.Mention);
 
-        if (!string.IsNullOrWhiteSpace(commandName))
+        if (!string.IsNullOrEmpty(commandName))
             builder.AddField("Command", commandName);
 
         if (commandOptions?.Count > 0)

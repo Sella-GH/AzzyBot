@@ -23,7 +23,7 @@ public static class FileOperations
     {
         ArgumentNullException.ThrowIfNull(content);
 
-        string filePath = (!string.IsNullOrWhiteSpace(path)) ? Path.Combine(Path.GetTempPath(), path) : Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        string filePath = (!string.IsNullOrEmpty(path)) ? Path.Combine(Path.GetTempPath(), path) : Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         await using StreamWriter writer = new(filePath);
         CsvConfiguration config = new(CultureInfo.InvariantCulture)
         {
@@ -41,7 +41,7 @@ public static class FileOperations
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(content);
 
-        string tempFilePath = (!string.IsNullOrWhiteSpace(fileName)) ? Path.Combine(Path.GetTempPath(), fileName) : Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        string tempFilePath = (!string.IsNullOrEmpty(fileName)) ? Path.Combine(Path.GetTempPath(), fileName) : Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         await File.WriteAllTextAsync(tempFilePath, content);
 
         return tempFilePath;

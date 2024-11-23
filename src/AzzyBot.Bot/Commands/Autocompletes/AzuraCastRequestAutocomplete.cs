@@ -50,7 +50,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
         }
 
         string? search = context.UserInput;
-        string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.AzuraCast.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
+        string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.AzuraCast.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
         string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
         StringBuilder songResult = new();
         List<DiscordAutoCompleteChoice> results = new(25);
@@ -91,10 +91,10 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
                     continue;
 
                 songResult.Append(CultureInfo.InvariantCulture, $"{title}");
-                if (!string.IsNullOrWhiteSpace(artist))
+                if (!string.IsNullOrEmpty(artist))
                     songResult.Append(CultureInfo.InvariantCulture, $" - {artist}");
 
-                results.Add(new(songResult.ToString(), (string.IsNullOrWhiteSpace(uniqueId)) ? requestId.ToString(CultureInfo.InvariantCulture) : uniqueId));
+                results.Add(new(songResult.ToString(), (string.IsNullOrEmpty(uniqueId)) ? requestId.ToString(CultureInfo.InvariantCulture) : uniqueId));
                 songResult.Clear();
             }
         }

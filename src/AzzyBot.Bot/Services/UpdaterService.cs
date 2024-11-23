@@ -38,7 +38,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
         bool isPreview = localVersion.Contains("-preview", StringComparison.OrdinalIgnoreCase);
 
         string? body = await _webService.GetWebAsync((isPreview) ? _previewUrl : _latestUrl, _headers, true);
-        if (string.IsNullOrWhiteSpace(body))
+        if (string.IsNullOrEmpty(body))
         {
             _logger.OnlineVersionEmpty();
             return;

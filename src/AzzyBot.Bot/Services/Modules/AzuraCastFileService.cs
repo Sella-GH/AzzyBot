@@ -32,7 +32,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, A
             Directory.CreateDirectory(_azuraCast.FilePath);
 
         string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
-        string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? station.AzuraCast.AdminApiKey : station.ApiKey;
+        string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? station.AzuraCast.AdminApiKey : station.ApiKey;
 
         IEnumerable<AzuraFilesRecord>? onlineFiles = await _azuraCast.GetFilesOnlineAsync<AzuraFilesRecord>(new(Crypto.Decrypt(station.AzuraCast.BaseUrl)), Crypto.Decrypt(apiKey), station.StationId);
         if (onlineFiles is null)
