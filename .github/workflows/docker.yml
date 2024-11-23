@@ -13,9 +13,9 @@ on:
       - "**.json"
       - "**.props"
       - "**.sln"
-      - "**.yml"
       - "CHANGELOG.md"
       - "**.Dockerfile"
+      - "**/docker.yml"
   workflow_dispatch:
 
 jobs:
