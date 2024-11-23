@@ -102,7 +102,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             AzuraCastStationEntity station = new()
             {
                 StationId = stationId,
-                ApiKey = (string.IsNullOrWhiteSpace(apiKey)) ? string.Empty : Crypto.Encrypt(apiKey),
+                ApiKey = (string.IsNullOrEmpty(apiKey)) ? string.Empty : Crypto.Encrypt(apiKey),
                 LastSkipTime = DateTimeOffset.MinValue,
                 LastRequestTime = DateTimeOffset.MinValue,
                 AzuraCastId = azura.Id
@@ -335,7 +335,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             if (baseUrl is not null)
                 azuraCast.BaseUrl = Crypto.Encrypt(baseUrl.OriginalString);
 
-            if (!string.IsNullOrWhiteSpace(apiKey))
+            if (!string.IsNullOrEmpty(apiKey))
                 azuraCast.AdminApiKey = Crypto.Encrypt(apiKey);
 
             if (isOnline.HasValue)
@@ -428,7 +428,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             if (stationId.HasValue)
                 azuraStation.StationId = stationId.Value;
 
-            if (!string.IsNullOrWhiteSpace(apiKey))
+            if (!string.IsNullOrEmpty(apiKey))
                 azuraStation.ApiKey = Crypto.Encrypt(apiKey);
 
             if (lastSkipTime.HasValue)
@@ -493,7 +493,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             if (requestId.HasValue)
                 preferences.RequestsChannelId = requestId.Value;
 
-            if (!string.IsNullOrWhiteSpace(fileUploadPath))
+            if (!string.IsNullOrEmpty(fileUploadPath))
                 preferences.FileUploadPath = fileUploadPath;
 
             if (playlist.HasValue)
