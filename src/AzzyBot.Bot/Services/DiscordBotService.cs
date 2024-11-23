@@ -293,7 +293,8 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         try
         {
             string jsonDump = JsonSerializer.Serialize<SerializableExceptionsRecord>(new(ex, info), FileOperations.JsonOptions);
-            string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, $"AzzyBotException_{timestampString}.json");
+            string fileName = $"AzzyBotException_{timestampString}.json";
+            string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, fileName);
 
             bool messageSent = await SendMessageAsync(errorChannelId, (errorChannelConfigured) ? BugReportMessage.Replace("[BugReportUri]", UriStrings.BugReportUri, StringComparison.InvariantCultureIgnoreCase) : ErrorChannelNotConfigured, [embed], [tempFilePath]);
             if (!messageSent)
