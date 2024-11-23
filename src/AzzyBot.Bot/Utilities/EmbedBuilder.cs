@@ -20,10 +20,10 @@ namespace AzzyBot.Bot.Utilities;
 
 public static class EmbedBuilder
 {
-    private static readonly Uri AzuraCastPic = new("https://raw.githubusercontent.com/AzuraCast/AzuraCast/main/resources/icon.png");
-    private static readonly Uri AzuraCastRollingUrl = new("https://github.com/AzuraCast/AzuraCast/commits/main");
-    private static readonly Uri AzuraCastStableUrl = new("https://github.com/AzuraCast/AzuraCast/blob/main/CHANGELOG.md");
-    private static readonly Uri SetupInstructions = new("https://github.com/Sella-GH/AzzyBot/wiki/Setup-instructions");
+    private static readonly Uri AzuraCastPic = new(UriStrings.AzuraCastPic);
+    private static readonly Uri AzuraCastRollingUrl = new(UriStrings.AzuraCastRollingUrl);
+    private static readonly Uri AzuraCastStableUrl = new(UriStrings.AzuraCastStableUrl);
+    private static readonly Uri SetupInstructions = new(UriStrings.SetupInstructions);
 
     private static DiscordEmbedBuilder CreateBasicEmbed(string title, string? description = null, DiscordColor? color = null, Uri? thumbnailUrl = null, string? footerText = null, Uri? url = null, Dictionary<string, AzzyDiscordEmbedRecord>? fields = null)
     {
@@ -232,9 +232,17 @@ public static class EmbedBuilder
         ArgumentNullException.ThrowIfNull(update);
 
         const string title = "AzuraCast Updates Available";
-        string description = $"Your AzuraCast installation needs **{update.RollingUpdatesList.Count}** updates.";
-        if (update.RollingUpdatesList.Count == 1)
-            description = "Your AzuraCast installation needs **1** update.";
+        string description;
+        if (update.NeedsRollingUpdate)
+        {
+            description = $"Your AzuraCast installation needs **{update.RollingUpdatesList.Count}** updates.";
+            if (update.RollingUpdatesList.Count is 1)
+                description = "Your AzuraCast installation needs **1** update.";
+        }
+        else
+        {
+            description = "A new release of AzuraCast is available. Update now to get the latest bug fixes, features and improvements!";
+        }
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(3)
         {
@@ -242,7 +250,7 @@ public static class EmbedBuilder
         };
 
         if ((update.CurrentRelease != update.LatestRelease) && update.NeedsReleaseUpdate)
-            fields.Add("Latest Release", new(update.LatestRelease));
+            fields.Add("Latest Version", new(update.LatestRelease));
 
         if (update.CanSwitchToStable)
             fields.Add("Stable Switch Available?", new("Yes"));
@@ -250,16 +258,23 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.White, AzuraCastPic, fields: fields);
     }
 
-    public static DiscordEmbed BuildAzuraCastUpdatesChangelogEmbed(IEnumerable<string> changelog, bool isRolling)
+    public static DiscordEmbed BuildAzuraCastUpdatesChangelogEmbed(IEnumerable<string> changelog, bool isRolling, string? onlineChangelog = null)
     {
         ArgumentNullException.ThrowIfNull(changelog);
 
         const string title = "AzuraCast Updates Changelog";
 
         StringBuilder body = new();
-        foreach (string line in changelog.Reverse())
+        if (isRolling)
         {
-            body.AppendLine(CultureInfo.InvariantCulture, $"- {line}");
+            foreach (string line in changelog.Reverse())
+            {
+                body.AppendLine(CultureInfo.InvariantCulture, $"- {line}");
+            }
+        }
+        else if (!string.IsNullOrEmpty(onlineChangelog))
+        {
+            body.AppendLine(onlineChangelog);
         }
 
         if (body.Length > 4096 || title.Length + body.Length > 6000)

@@ -114,6 +114,11 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
                 isStationDj = userRoles.Contains(guildRoles.FirstOrDefault(r => r.Id == station.Preferences.StationDjRoleId));
                 break;
 
+            // This is only needed to suppress unnecessary warnings.
+            // Will only be extended as needed.
+            case "azuracast force-update-check":
+                break;
+
             default:
                 _logger.CommandNotFound(commandName);
                 break;
