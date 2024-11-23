@@ -13,6 +13,8 @@ name: "CodeQL"
 
 on:
   push:
+    branches-ignore:
+      - rel/**
     paths:
       - "**.cs"
       - "**.csproj"
@@ -80,10 +82,10 @@ jobs:
       with:
         dotnet-version: '9'
 
-    - name: Build Debug
+    - name: Build And Publish
       run: |
-        dotnet restore --force --no-http-cache --configfile ./Nuget.config
-        dotnet publish /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Debug
+        dotnet restore --configfile ./Nuget.config --force --no-cache --ucr
+        dotnet publish /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Release --ucr
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
