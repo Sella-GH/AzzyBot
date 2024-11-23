@@ -24,18 +24,19 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
     private int _azzyNotifyCounter;
     private readonly Uri _latestUrl = new("https://api.github.com/repos/Sella-GH/AzzyBot/releases/latest");
     private readonly Uri _previewUrl = new("https://api.github.com/repos/Sella-GH/AzzyBot/releases");
+    private readonly Dictionary<string, string> _headers = new(1)
+    {
+        ["User-Agent"] = SoftwareStats.GetAppName
+    };
+
+    public IReadOnlyDictionary<string, string> GitHubHeaders => _headers;
 
     public async Task CheckForAzzyUpdatesAsync()
     {
         string localVersion = SoftwareStats.GetAppVersion;
         bool isPreview = localVersion.Contains("-preview", StringComparison.OrdinalIgnoreCase);
 
-        Dictionary<string, string> headers = new(1)
-        {
-            ["User-Agent"] = SoftwareStats.GetAppName
-        };
-
-        string? body = await _webService.GetWebAsync((isPreview) ? _previewUrl : _latestUrl, headers, true);
+        string? body = await _webService.GetWebAsync((isPreview) ? _previewUrl : _latestUrl, _headers, true);
         if (string.IsNullOrWhiteSpace(body))
         {
             _logger.OnlineVersionEmpty();

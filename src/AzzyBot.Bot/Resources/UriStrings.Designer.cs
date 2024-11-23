@@ -79,6 +79,15 @@ namespace AzzyBot.Bot.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://raw.githubusercontent.com/AzuraCast/AzuraCast/refs/heads/stable/CHANGELOG.md.
+        /// </summary>
+        internal static string AzuraCastStableRawUrl {
+            get {
+                return ResourceManager.GetString("AzuraCastStableRawUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://github.com/AzuraCast/AzuraCast/blob/stable/CHANGELOG.md.
         /// </summary>
         internal static string AzuraCastStableUrl {

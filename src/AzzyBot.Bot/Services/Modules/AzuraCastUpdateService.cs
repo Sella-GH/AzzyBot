@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Utilities.Encryption;
@@ -11,11 +12,13 @@ using DSharpPlus.Entities;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiService, DbActions dbActions, DiscordBotService botService)
+public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiService, DbActions dbActions, DiscordBotService botService, UpdaterService updaterService, WebRequestService webRequest)
 {
     private readonly AzuraCastApiService _azuraCastApiService = azuraCastApiService;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
+    private readonly UpdaterService _updaterService = updaterService;
+    private readonly WebRequestService _webRequest = webRequest;
 
     public async Task CheckForAzuraCastUpdatesAsync(AzuraCastEntity azuraCast, bool forced = false)
     {
@@ -65,7 +68,17 @@ public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiServi
             };
 
         if (azuraCast.Checks.UpdatesShowChangelog)
-            embeds.Add(EmbedBuilder.BuildAzuraCastUpdatesChangelogEmbed(update.RollingUpdatesList, update.NeedsRollingUpdate));
+        {
+            string? onlineChangelog = null;
+            if (update.NeedsReleaseUpdate)
+            {
+                onlineChangelog = await _webRequest.GetWebAsync(new(UriStrings.AzuraCastStableRawUrl), _updaterService.GitHubHeaders);
+                if (!string.IsNullOrEmpty(onlineChangelog))
+                    onlineChangelog = onlineChangelog.Split("---")[1];
+            }
+
+            embeds.Add(EmbedBuilder.BuildAzuraCastUpdatesChangelogEmbed(update.RollingUpdatesList, update.NeedsRollingUpdate, onlineChangelog));
+        }
 
         await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, embeds: embeds);
     }

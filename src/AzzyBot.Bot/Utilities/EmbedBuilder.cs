@@ -258,16 +258,23 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.White, AzuraCastPic, fields: fields);
     }
 
-    public static DiscordEmbed BuildAzuraCastUpdatesChangelogEmbed(IEnumerable<string> changelog, bool isRolling)
+    public static DiscordEmbed BuildAzuraCastUpdatesChangelogEmbed(IEnumerable<string> changelog, bool isRolling, string? onlineChangelog = null)
     {
         ArgumentNullException.ThrowIfNull(changelog);
 
         const string title = "AzuraCast Updates Changelog";
 
         StringBuilder body = new();
-        foreach (string line in changelog.Reverse())
+        if (isRolling)
         {
-            body.AppendLine(CultureInfo.InvariantCulture, $"- {line}");
+            foreach (string line in changelog.Reverse())
+            {
+                body.AppendLine(CultureInfo.InvariantCulture, $"- {line}");
+            }
+        }
+        else if (!string.IsNullOrEmpty(onlineChangelog))
+        {
+            body.AppendLine(onlineChangelog);
         }
 
         if (body.Length > 4096 || title.Length + body.Length > 6000)

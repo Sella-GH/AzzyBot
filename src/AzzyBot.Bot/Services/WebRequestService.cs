@@ -198,7 +198,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task<string?> GetWebAsync(Uri url, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true, bool noLogging = false)
+    public async Task<string?> GetWebAsync(Uri url, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true, bool noLogging = false)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
@@ -333,7 +333,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    private void AddHeaders(AddressFamily addressFamily, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    private void AddHeaders(AddressFamily addressFamily, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         string botName = SoftwareStats.GetAppName.Replace("Bot", string.Empty, StringComparison.OrdinalIgnoreCase);
         string botVersion = SoftwareStats.GetAppVersion;
