@@ -73,10 +73,11 @@ jobs:
      - name: Install GitHub CLI
        run: sudo apt update && sudo apt install -y gh
       
-     - name: Publish Bot Debug
+     - name: Restore, Build And Publish
        run: |
-         dotnet restore --configfile ./Nuget.config --force --no-cache --ucr
-         dotnet publish /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Debug --ucr
+         dotnet restore /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.config --force --no-cache --ucr
+         dotnet build /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Debug --no-incremental --no-restore --no-self-contained --ucr
+         dotnet publish /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Debug --no-build --no-restore --no-self-contained --ucr
 
      #- name: Download and extract Lavalink
      #  run: |
