@@ -67,7 +67,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
         }
 
         // Try to detect if the bot is already listening to the station
-        string apiKey = (string.IsNullOrWhiteSpace(stationEntity.ApiKey)) ? Crypto.Decrypt(azuraCastEntity.AdminApiKey) : Crypto.Decrypt(stationEntity.ApiKey);
+        string apiKey = (string.IsNullOrEmpty(stationEntity.ApiKey)) ? Crypto.Decrypt(azuraCastEntity.AdminApiKey) : Crypto.Decrypt(stationEntity.ApiKey);
         IEnumerable<AzuraStationListenerRecord>? listeners = await _azuraCast.GetStationListenersAsync(baseUrl, apiKey, stationId);
         AzzyIpAddressRecord ipAddresses = await _webRequest.GetIpAddressesAsync();
         string? playingMountPoint = listeners?.FirstOrDefault(l => l.Ip == ipAddresses.Ipv4 || l.Ip == ipAddresses.Ipv6)?.MountName;

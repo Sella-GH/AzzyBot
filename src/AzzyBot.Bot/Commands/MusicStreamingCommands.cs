@@ -205,7 +205,7 @@ public sealed class MusicStreamingCommands
             await context.DeferResponseAsync();
 
             string? text = await _musicStreaming.PlayMusicAsync(context, track, new(provider), volume);
-            if (string.IsNullOrWhiteSpace(text))
+            if (string.IsNullOrEmpty(text))
                 return;
 
             await context.EditResponseAsync(text);

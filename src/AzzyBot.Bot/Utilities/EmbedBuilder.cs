@@ -157,7 +157,7 @@ public static class EmbedBuilder
 
         const string title = "Now Playing";
         string? message = null;
-        string thumbnailUrl = (!string.IsNullOrWhiteSpace(data.Live.Art)) ? data.Live.Art : data.NowPlaying.Song.Art;
+        string thumbnailUrl = (!string.IsNullOrEmpty(data.Live.Art)) ? data.Live.Art : data.NowPlaying.Song.Art;
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(8)
         {
@@ -166,10 +166,10 @@ public static class EmbedBuilder
             ["By"] = new(data.NowPlaying.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true)
         };
 
-        if (!string.IsNullOrWhiteSpace(data.NowPlaying.Song.Album))
+        if (!string.IsNullOrEmpty(data.NowPlaying.Song.Album))
             fields.Add("On", new(data.NowPlaying.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true));
 
-        if (!string.IsNullOrWhiteSpace(data.NowPlaying.Song.Genre))
+        if (!string.IsNullOrEmpty(data.NowPlaying.Song.Genre))
             fields.Add("Genre", new(data.NowPlaying.Song.Genre, true));
 
         if (data.Live.IsLive)
@@ -179,7 +179,7 @@ public static class EmbedBuilder
         }
         else
         {
-            if (!string.IsNullOrWhiteSpace(playlistName))
+            if (!string.IsNullOrEmpty(playlistName))
                 fields.Add("Playlist", new(playlistName, true));
 
             TimeSpan duration = TimeSpan.FromSeconds(data.NowPlaying.Duration);
@@ -209,13 +209,13 @@ public static class EmbedBuilder
             ["By"] = new(song.Song.Artist, true)
         };
 
-        if (!string.IsNullOrWhiteSpace(song.Song.Album))
+        if (!string.IsNullOrEmpty(song.Song.Album))
             fields.Add("On", new(song.Song.Album, true));
 
-        if (!string.IsNullOrWhiteSpace(song.Song.Genre))
+        if (!string.IsNullOrEmpty(song.Song.Genre))
             fields.Add("Genre", new(song.Song.Genre));
 
-        if (!string.IsNullOrWhiteSpace(song.Song.Isrc))
+        if (!string.IsNullOrEmpty(song.Song.Isrc))
             fields.Add("ISRC", new(song.Song.Isrc));
 
         if (isQueued)
@@ -298,15 +298,15 @@ public static class EmbedBuilder
             ["Artist"] = new(file.Artist, true)
         };
 
-        if (!string.IsNullOrWhiteSpace(file.Album))
+        if (!string.IsNullOrEmpty(file.Album))
             fields.Add("Album", new(file.Album, true));
 
-        if (!string.IsNullOrWhiteSpace(file.Genre))
+        if (!string.IsNullOrEmpty(file.Genre))
             fields.Add("Genre", new(file.Genre, true));
 
         fields.Add("Duration", new(file.Length, true));
 
-        if (!string.IsNullOrWhiteSpace(file.Isrc))
+        if (!string.IsNullOrEmpty(file.Isrc))
             fields.Add("ISRC", new(file.Isrc));
 
         fields.Add("File Size", new($"{Math.Round(fileSize / (1024.0 * 1024.0), 2)} MB"));
@@ -526,7 +526,7 @@ public static class EmbedBuilder
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(5)
         {
             ["Server ID"] = new(guild.UniqueId.ToString(CultureInfo.InvariantCulture)),
-            ["Admin Role"] = new((!string.IsNullOrWhiteSpace(adminRole?.Trim()) && adminRole.Trim() is not "()") ? adminRole.Trim() : "Not set"),
+            ["Admin Role"] = new((!string.IsNullOrEmpty(adminRole?.Trim()) && adminRole.Trim() is not "()") ? adminRole.Trim() : "Not set"),
             ["Admin Notify Channel"] = new((guild.Preferences.AdminNotifyChannelId > 0) ? $"<#{guild.Preferences.AdminNotifyChannelId}>" : "Not set"),
             ["Error Channel"] = new((guild.Preferences.ErrorChannelId > 0) ? $"<#{guild.Preferences.ErrorChannelId}>" : "Not set"),
             ["Configuration Complete"] = new(Misc.GetReadableBool(guild.ConfigSet, ReadableBool.YesNo))
@@ -543,9 +543,9 @@ public static class EmbedBuilder
         List<DiscordEmbed> embeds = new(1 + azuraCast.Stations.Count);
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(6)
         {
-            ["Base Url"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.BaseUrl)) ? Crypto.Decrypt(azuraCast.BaseUrl) : "Not set")}||"),
-            ["Admin Api Key"] = new($"||{((!string.IsNullOrWhiteSpace(azuraCast.AdminApiKey)) ? Crypto.Decrypt(azuraCast.AdminApiKey) : "Not set")}||"),
-            ["Instance Admin Role"] = new((!string.IsNullOrWhiteSpace(instanceRole?.Trim()) && instanceRole.Trim() is not "()") ? instanceRole.Trim() : "Not set"),
+            ["Base Url"] = new($"||{((!string.IsNullOrEmpty(azuraCast.BaseUrl)) ? Crypto.Decrypt(azuraCast.BaseUrl) : "Not set")}||"),
+            ["Admin Api Key"] = new($"||{((!string.IsNullOrEmpty(azuraCast.AdminApiKey)) ? Crypto.Decrypt(azuraCast.AdminApiKey) : "Not set")}||"),
+            ["Instance Admin Role"] = new((!string.IsNullOrEmpty(instanceRole?.Trim()) && instanceRole.Trim() is not "()") ? instanceRole.Trim() : "Not set"),
             ["Notification Channel"] = new((azuraCast.Preferences.NotificationChannelId > 0) ? $"<#{azuraCast.Preferences.NotificationChannelId}>" : "Not set"),
             ["Outages Channel"] = new((azuraCast.Preferences.OutagesChannelId > 0) ? $"<#{azuraCast.Preferences.OutagesChannelId}>" : "Not set"),
             ["Automatic Checks"] = new($"- Server Status: {Misc.GetReadableBool(azuraCast.Checks.ServerStatus, ReadableBool.EnabledDisabled)}\n- Updates: {Misc.GetReadableBool(azuraCast.Checks.Updates, ReadableBool.EnabledDisabled)}\n- Updates Changelog: {Misc.GetReadableBool(azuraCast.Checks.UpdatesShowChangelog, ReadableBool.EnabledDisabled)}")
@@ -558,7 +558,7 @@ public static class EmbedBuilder
         {
             string stationName = stationNames.FirstOrDefault(x => x.Key == station.Id).Value;
             string stationId = station.StationId.ToString(CultureInfo.InvariantCulture);
-            string stationApiKey = $"||{((!string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : "Not set")}||";
+            string stationApiKey = $"||{((!string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : "Not set")}||";
             string stationAdminRole;
             if (station.Preferences.StationAdminRoleId > 0)
             {
@@ -586,7 +586,7 @@ public static class EmbedBuilder
             string fileUploadChannel = (station.Preferences.FileUploadChannelId > 0) ? $"<#{station.Preferences.FileUploadChannelId}>" : "Not set";
             string requestsChannel = (station.Preferences.RequestsChannelId > 0) ? $"<#{station.Preferences.RequestsChannelId}>" : "Not set";
             int requestCount = stationRequests.FirstOrDefault(x => x.Key == station.Id).Value;
-            string fileUploadPath = (!string.IsNullOrWhiteSpace(station.Preferences.FileUploadPath)) ? station.Preferences.FileUploadPath : "Not set";
+            string fileUploadPath = (!string.IsNullOrEmpty(station.Preferences.FileUploadPath)) ? station.Preferences.FileUploadPath : "Not set";
             string showPlaylist = Misc.GetReadableBool(station.Preferences.ShowPlaylistInNowPlaying, ReadableBool.EnabledDisabled);
             string fileChanges = Misc.GetReadableBool(station.Checks.FileChanges, ReadableBool.EnabledDisabled);
 
@@ -639,7 +639,7 @@ public static class EmbedBuilder
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId);
 
         const string title = "Guild Removed";
-        string description = $"I was removed from **{((!string.IsNullOrWhiteSpace(guild?.Name)) ? guild.Name : guildId)}**.";
+        string description = $"I was removed from **{((!string.IsNullOrEmpty(guild?.Name)) ? guild.Name : guildId)}**.";
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(3);
         if (guild is not null)

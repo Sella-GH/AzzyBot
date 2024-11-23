@@ -106,7 +106,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         if (station.Checks.FileChanges)
             apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}"));
 
-        string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? station.AzuraCast.AdminApiKey : station.ApiKey;
+        string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? station.AzuraCast.AdminApiKey : station.ApiKey;
         IEnumerable<string> missing = await ExecuteApiPermissionCheckAsync(apis, Crypto.Decrypt(apiKey));
         if (!missing.Any())
             return;
@@ -306,11 +306,11 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string file = GetLocalFile(guildId, azuraCastId, databaseId, stationId);
-        if (string.IsNullOrWhiteSpace(file))
+        if (string.IsNullOrEmpty(file))
             return [];
 
         string content = await FileOperations.GetFileContentAsync(file);
-        if (string.IsNullOrWhiteSpace(content))
+        if (string.IsNullOrEmpty(content))
             return [];
 
         try

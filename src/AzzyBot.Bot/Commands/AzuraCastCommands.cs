@@ -82,7 +82,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
+            string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
             string tempDir = Path.Combine(_azuraCastApi.FilePath, "Temp");
             if (!Directory.Exists(tempDir))
@@ -366,7 +366,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
+            string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
 
             await _azuraCastApi.StartStationAsync(new(baseUrl), apiKey, station, context);
@@ -410,7 +410,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
+            string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
             AzuraStationRecord? azuraStation = await _azuraCastApi.GetStationAsync(new(baseUrl), station);
             if (azuraStation is null)
@@ -475,7 +475,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
+            string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
 
             AzuraAdminStationConfigRecord? stationConfig = await _azuraCastApi.GetStationAdminConfigAsync(new(baseUrl), apiKey, station);
@@ -512,7 +512,7 @@ public sealed class AzuraCastCommands
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
 
             string? body = await _azuraCastApi.GetUpdatesAsync(new(baseUrl), apiKey);
-            if (string.IsNullOrWhiteSpace(body))
+            if (string.IsNullOrEmpty(body))
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
                 await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative updates** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
@@ -590,7 +590,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
+            string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
 
             await _azuraCast.DeleteStationSongRequestAsync(new(baseUrl), apiKey, station, requestId);
@@ -638,7 +638,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
+            string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
 
             AzuraNowPlayingDataRecord? nowPlaying;
@@ -691,7 +691,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
+            string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
             AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
             if (azuraStation is null)
@@ -771,7 +771,7 @@ public sealed class AzuraCastCommands
             }
 
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
-            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
+            string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             string dateString = dateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             string dateStringFile = dateTime.ToString("yyyy-MM-dd_HH-mm-ss-fffffff", CultureInfo.InvariantCulture);
 
@@ -839,7 +839,7 @@ public sealed class AzuraCastCommands
             }
 
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
-            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
+            string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
 
             AzuraPlaylistRecord? playlist;
             try
@@ -929,7 +929,7 @@ public sealed class AzuraCastCommands
             string? playlistName = null;
             if (acStation.Preferences.ShowPlaylistInNowPlaying)
             {
-                string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
+                string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
                 IEnumerable<AzuraPlaylistRecord>? playlist = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, station);
                 if (playlist is null)
                 {
@@ -975,7 +975,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
+            string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             Uri baseUrl = new(Crypto.Decrypt(ac.BaseUrl));
 
             AzuraAdminStationConfigRecord? stationConfig = await _azuraCast.GetStationAdminConfigAsync(baseUrl, apiKey, station);
@@ -1119,7 +1119,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            string apiKey = (!string.IsNullOrWhiteSpace(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
+            string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
 
             string filePath = Path.Combine(Path.GetTempPath(), $"{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{ac.GuildId}-{ac.Id}-{acStation.Id}_{file.FileName}");
@@ -1141,7 +1141,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            string uploadPath = (string.IsNullOrWhiteSpace(acStation.Preferences.FileUploadPath)) ? "/" : acStation.Preferences.FileUploadPath;
+            string uploadPath = (string.IsNullOrEmpty(acStation.Preferences.FileUploadPath)) ? "/" : acStation.Preferences.FileUploadPath;
 
             AzuraFilesDetailedRecord? uploadedFile = await _azuraCast.UploadFileAsync<AzuraFilesDetailedRecord>(new(baseUrl), apiKey, station, filePath, file.FileName, uploadPath);
             AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
