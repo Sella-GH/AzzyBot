@@ -241,7 +241,7 @@ public static class EmbedBuilder
         }
         else
         {
-            description = "A new release of AzuraCast is available. Update now to enjoy the newest features, improvements and bug fixes.";
+            description = "A new release of AzuraCast is available. Update now to get the latest bug fixes, features and improvements!";
         }
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(3)
