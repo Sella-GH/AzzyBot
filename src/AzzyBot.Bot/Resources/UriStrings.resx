@@ -141,4 +141,16 @@
   <data name="GetIpv6Uri" xml:space="preserve">
     <value>https://api6.ipify.org</value>
   </data>
+  <data name="AzuraCastPic" xml:space="preserve">
+    <value>https://raw.githubusercontent.com/AzuraCast/AzuraCast/main/resources/icon.png</value>
+  </data>
+  <data name="AzuraCastRollingUrl" xml:space="preserve">
+    <value>https://github.com/AzuraCast/AzuraCast/commits/main</value>
+  </data>
+  <data name="AzuraCastStableUrl" xml:space="preserve">
+    <value>https://github.com/AzuraCast/AzuraCast/blob/stable/CHANGELOG.md</value>
+  </data>
+  <data name="SetupInstructions" xml:space="preserve">
+    <value>https://github.com/Sella-GH/AzzyBot/wiki/Setup-instructions</value>
+  </data>
 </root>

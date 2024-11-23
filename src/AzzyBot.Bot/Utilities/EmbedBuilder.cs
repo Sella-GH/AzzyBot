@@ -20,10 +20,10 @@ namespace AzzyBot.Bot.Utilities;
 
 public static class EmbedBuilder
 {
-    private static readonly Uri AzuraCastPic = new("https://raw.githubusercontent.com/AzuraCast/AzuraCast/main/resources/icon.png");
-    private static readonly Uri AzuraCastRollingUrl = new("https://github.com/AzuraCast/AzuraCast/commits/main");
-    private static readonly Uri AzuraCastStableUrl = new("https://github.com/AzuraCast/AzuraCast/blob/main/CHANGELOG.md");
-    private static readonly Uri SetupInstructions = new("https://github.com/Sella-GH/AzzyBot/wiki/Setup-instructions");
+    private static readonly Uri AzuraCastPic = new(UriStrings.AzuraCastPic);
+    private static readonly Uri AzuraCastRollingUrl = new(UriStrings.AzuraCastRollingUrl);
+    private static readonly Uri AzuraCastStableUrl = new(UriStrings.AzuraCastStableUrl);
+    private static readonly Uri SetupInstructions = new(UriStrings.SetupInstructions);
 
     private static DiscordEmbedBuilder CreateBasicEmbed(string title, string? description = null, DiscordColor? color = null, Uri? thumbnailUrl = null, string? footerText = null, Uri? url = null, Dictionary<string, AzzyDiscordEmbedRecord>? fields = null)
     {
