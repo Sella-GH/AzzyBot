@@ -1,7 +1,11 @@
-name: Build debug
+name: Build And Publish Debug
 
 on:
   push:
+    branches:
+      - "dependabot/**"
+      - "dev/**"
+      - "main"
     paths:
       - "**.cs"
       - "**.csproj"
