@@ -87,14 +87,14 @@ public sealed class AdminCommands
                 return;
             }
 
-            if (!string.IsNullOrWhiteSpace(serverId))
+            // If a server id is provided, show the information of that server.
+            if (!ulong.TryParse(serverId, out ulong guildIdValue))
             {
-                if (!ulong.TryParse(serverId, out ulong guildIdValue))
-                {
-                    await context.EditResponseAsync(GeneralStrings.GuildIdInvalid);
-                    return;
-                }
-
+                await context.EditResponseAsync(GeneralStrings.GuildIdInvalid);
+                return;
+            }
+            else if (guildIdValue is not 0)
+            {
                 if (!guilds.TryGetValue(guildIdValue, out DiscordGuild? guild))
                 {
                     _logger.DiscordItemNotFound(nameof(DiscordGuild), guildIdValue);
@@ -108,6 +108,7 @@ public sealed class AdminCommands
                 return;
             }
 
+            // If no server id is provided, show all servers the bot is in.
             const string tooManyServers = "... and more!";
             StringBuilder stringBuilder = new();
             stringBuilder.AppendLine("I am in the following servers:");
