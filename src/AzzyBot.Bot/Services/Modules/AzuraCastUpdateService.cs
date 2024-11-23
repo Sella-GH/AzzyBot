@@ -23,7 +23,7 @@ public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiServi
 
         string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
         string? body = await _azuraCastApiService.GetUpdatesAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), apiKey);
-        if (string.IsNullOrWhiteSpace(body))
+        if (string.IsNullOrEmpty(body))
         {
             await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative updates** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
             return;
