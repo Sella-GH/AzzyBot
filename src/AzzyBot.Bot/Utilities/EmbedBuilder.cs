@@ -232,9 +232,17 @@ public static class EmbedBuilder
         ArgumentNullException.ThrowIfNull(update);
 
         const string title = "AzuraCast Updates Available";
-        string description = $"Your AzuraCast installation needs **{update.RollingUpdatesList.Count}** updates.";
-        if (update.RollingUpdatesList.Count == 1)
-            description = "Your AzuraCast installation needs **1** update.";
+        string description;
+        if (update.NeedsRollingUpdate)
+        {
+            description = $"Your AzuraCast installation needs **{update.RollingUpdatesList.Count}** updates.";
+            if (update.RollingUpdatesList.Count is 1)
+                description = "Your AzuraCast installation needs **1** update.";
+        }
+        else
+        {
+            description = "A new release of AzuraCast is available. Update now to enjoy the newest features, improvements and bug fixes.";
+        }
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(3)
         {
@@ -242,7 +250,7 @@ public static class EmbedBuilder
         };
 
         if ((update.CurrentRelease != update.LatestRelease) && update.NeedsReleaseUpdate)
-            fields.Add("Latest Release", new(update.LatestRelease));
+            fields.Add("Latest Version", new(update.LatestRelease));
 
         if (update.CanSwitchToStable)
             fields.Add("Stable Switch Available?", new("Yes"));
