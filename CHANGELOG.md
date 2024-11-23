@@ -1,4 +1,7 @@
 ## 2.2.0
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02425
+
 ### Additions
 - `player play` and `player play-mount` gained an additional optional parameter `volume` which allows to set the volume of the player at startup
   - The volume can be set between 0 and 100
