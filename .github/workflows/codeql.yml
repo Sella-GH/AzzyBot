@@ -82,10 +82,10 @@ jobs:
       with:
         dotnet-version: '9'
 
-    - name: Build And Publish
+    - name: Restore And Build
       run: |
-        dotnet restore --configfile ./Nuget.config --force --no-cache --ucr
-        dotnet publish /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Release --ucr
+        dotnet restore /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.config --force --no-cache --ucr
+        dotnet build /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Release --no-incremental --no-restore --no-self-contained --ucr
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
