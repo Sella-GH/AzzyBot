@@ -68,23 +68,28 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
                 string artist = string.Empty;
                 string uniqueId = string.Empty;
                 int requestId = 0;
-                if (song is AzuraRequestRecord request)
+                switch (song)
                 {
-                    title = request.Song.Title ?? string.Empty;
-                    artist = request.Song.Artist ?? string.Empty;
-                    uniqueId = request.Song.SongId ?? string.Empty;
-                }
-                else if (song is AzuraFilesRecord file)
-                {
-                    title = file.Title ?? string.Empty;
-                    artist = file.Artist ?? string.Empty;
-                    uniqueId = file.UniqueId ?? string.Empty;
-                }
-                else if (song is AzuraRequestQueueItemRecord requestQueueItem)
-                {
-                    title = requestQueueItem.Track.Title ?? string.Empty;
-                    artist = requestQueueItem.Track.Artist ?? string.Empty;
-                    requestId = requestQueueItem.Id;
+                    case AzuraRequestRecord request:
+                        title = request.Song.Title ?? string.Empty;
+                        artist = request.Song.Artist ?? string.Empty;
+                        uniqueId = request.Song.SongId ?? string.Empty;
+                        break;
+
+                    case AzuraFilesRecord file:
+                        title = file.Title ?? string.Empty;
+                        artist = file.Artist ?? string.Empty;
+                        uniqueId = file.UniqueId ?? string.Empty;
+                        break;
+
+                    case AzuraRequestQueueItemRecord requestQueueItem:
+                        title = requestQueueItem.Track.Title ?? string.Empty;
+                        artist = requestQueueItem.Track.Artist ?? string.Empty;
+                        requestId = requestQueueItem.Id;
+                        break;
+
+                    default:
+                        continue;
                 }
 
                 if (!string.IsNullOrWhiteSpace(search) && (!title.Contains(search, StringComparison.OrdinalIgnoreCase) && !artist.Contains(search, StringComparison.OrdinalIgnoreCase)))
@@ -101,7 +106,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
 
         if (station.AzuraCast.IsOnline && context.Command.Name is "delete-song-request")
         {
-            IEnumerable<AzuraRequestQueueItemRecord>? requests = await _azuraCast.GetStationRequestItemsAsync(new(baseUrl), apiKey, stationId, false);
+            IEnumerable<AzuraRequestQueueItemRecord>? requests = await _azuraCast.GetStationRequestItemsAsync(new(baseUrl), apiKey, stationId, history: false);
             if (requests is null)
             {
                 await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **requests** endpoint on station ({stationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
