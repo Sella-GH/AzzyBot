@@ -79,7 +79,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
                     case AzuraFilesRecord file:
                         title = file.Title ?? string.Empty;
                         artist = file.Artist ?? string.Empty;
-                        uniqueId = file.UniqueId ?? string.Empty;
+                        uniqueId = file.SongId ?? string.Empty;
                         break;
 
                     case AzuraRequestQueueItemRecord requestQueueItem:
@@ -95,7 +95,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
                 if (!string.IsNullOrWhiteSpace(search) && (!title.Contains(search, StringComparison.OrdinalIgnoreCase) && !artist.Contains(search, StringComparison.OrdinalIgnoreCase)))
                     continue;
 
-                songResult.Append(CultureInfo.InvariantCulture, $"{title}");
+                songResult.Append(title);
                 if (!string.IsNullOrEmpty(artist))
                     songResult.Append(CultureInfo.InvariantCulture, $" - {artist}");
 
@@ -154,6 +154,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
                     return results;
                 }
 
+                // Get all files that are in the playlists that have requests enabled
                 IEnumerable<AzuraFilesRecord> fileRequests = filesOnline.Where(f => f.Playlists.Any(p => playlists.Any(pl => pl.Id == p.Id)));
                 AddResultsFromSong(fileRequests);
             }
