@@ -25,6 +25,9 @@ using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
+using DSharpPlus.EventArgs;
+using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands;
@@ -631,6 +634,19 @@ public sealed class ConfigCommands
             _logger.CommandRequested(nameof(ResetSettingsAsync), context.User.GlobalName);
 
             await context.DeferResponseAsync();
+
+            DiscordButtonComponent button = new(DiscordButtonStyle.Danger, $"reset_settings_{context.User.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Confirm reset.");
+            await using DiscordMessageBuilder messageBuilder = new();
+            messageBuilder.AddComponents(button);
+            messageBuilder.WithContent("Are you sure you want to reset all of your settings?");
+
+            DiscordMessage message = await context.EditResponseAsync(messageBuilder);
+            InteractivityResult<ComponentInteractionCreatedEventArgs> result = await message.WaitForButtonAsync(context.User, TimeSpan.FromMinutes(1));
+            if (result.TimedOut)
+            {
+                await context.EditResponseAsync("You haven't confirmed the reset within the timespan. Settings remain unchanged.");
+                return;
+            }
 
             await _dbActions.DeleteGuildAsync(context.Guild.Id);
             await _dbActions.AddGuildAsync(context.Guild.Id);
