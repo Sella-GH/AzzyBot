@@ -129,7 +129,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         });
     }
 
-    public Task<bool> AddAzuraCastStationRequestAsync(ulong guildId, int stationId, string songId)
+    public Task<bool> AddAzuraCastStationRequestAsync(ulong guildId, int stationId, string songId, bool isInternal = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(songId);
 
@@ -149,7 +149,8 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             {
                 SongId = songId,
                 StationId = station.Id,
-                Timestamp = DateTimeOffset.UtcNow
+                Timestamp = DateTimeOffset.UtcNow,
+                IsInternal = isInternal
             };
 
             await context.AzuraCastStationRequests.AddAsync(request);

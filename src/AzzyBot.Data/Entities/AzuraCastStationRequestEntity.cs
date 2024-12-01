@@ -13,7 +13,7 @@ public sealed class AzuraCastStationRequestEntity
     public int Id { get; set; }
 
     /// <summary>
-    /// The unique id of the song.
+    /// The 32 character unique id of the song.
     /// </summary>
     public string SongId { get; set; } = string.Empty;
 
@@ -24,6 +24,11 @@ public sealed class AzuraCastStationRequestEntity
     /// Always use <see cref="DateTimeOffset.UtcNow"/> to set this value.
     /// </remarks>
     public DateTimeOffset Timestamp { get; set; }
+
+    /// <summary>
+    /// Whether this request was made internally to the AutoDj.
+    /// </summary>
+    public bool IsInternal { get; set; }
 
     /// <summary>
     /// The database id of the parenting <see cref="AzuraCastStationEntity"/> database item.
