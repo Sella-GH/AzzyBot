@@ -12,6 +12,9 @@
   - These kind of song requests are not logged inside AzuraCast and should be used with caution!
   - The bot however logs these kind of requests
 
+### Improvements
+- Server info embed for admins was slightly improved and fixed
+
 ## 2.1.1 - 2024-11-23
 ### Improvements
 - The AzuraCast updater works fine now if a rolling release instance is expected to update to a stable release

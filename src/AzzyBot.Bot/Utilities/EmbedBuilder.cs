@@ -623,7 +623,7 @@ public static class EmbedBuilder
         {
             ["Guild ID"] = new(guild.Id.ToString(CultureInfo.InvariantCulture)),
             ["Creation Date"] = new($"<t:{Converter.ConvertToUnixTime(guild.CreationTimestamp.Date)}>"),
-            ["Owner"] = new(owner.Mention, true),
+            ["Owner"] = new($"{owner.DisplayName} ({owner.Id})", true),
             ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture), true)
         };
 
