@@ -1,12 +1,16 @@
 ## 2.2.0
 ### Dependencies
-- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02425
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02426
 
 ### Additions
 - `player play` and `player play-mount` gained an additional optional parameter `volume` which allows to set the volume of the player at startup
   - The volume can be set between 0 and 100
   - The default volume is 100
   - This value is only respected if the player is not playing anything
+- `dj add-internal-song-request` command added
+  - This command allows you to add a song quietly into the AutoDj queue
+  - These kind of song requests are not logged inside AzuraCast and should be used with caution!
+  - The bot however logs these kind of requests
 
 ## 2.1.1 - 2024-11-23
 ### Improvements
