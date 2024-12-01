@@ -561,6 +561,81 @@ public sealed class AzuraCastCommands
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
 
+        [Command("add-internal-song-request"), Description("Adds an internal song request which will be played ASAP."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationDJGroup, AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        public async ValueTask AddInternalSongRequestAsync
+        (
+            SlashCommandContext context,
+            [Description("The station of which you want to add the song request."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
+            [Description("The song you want to request."), SlashAutoCompleteProvider(typeof(AzuraCastRequestAutocomplete))] string song
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
+
+            _logger.CommandRequested(nameof(AddInternalSongRequestAsync), context.User.GlobalName);
+
+            AzuraCastEntity? ac = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true);
+            if (ac is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
+                return;
+            }
+
+            AzuraCastStationEntity? acStation = ac.Stations.FirstOrDefault(s => s.StationId == station);
+            if (acStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, ac.Id, station);
+                await context.EditResponseAsync(GeneralStrings.StationNotFound);
+                return;
+            }
+
+            string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
+            Uri baseUrl = new(Crypto.Decrypt(ac.BaseUrl));
+
+            AzuraAdminStationConfigRecord? stationConfig = await _azuraCast.GetStationAdminConfigAsync(baseUrl, apiKey, station);
+            if (stationConfig is null)
+            {
+                await context.EditResponseAsync(GeneralStrings.PermissionIssue);
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                return;
+            }
+
+            if (!stationConfig.IsEnabled)
+            {
+                await context.EditResponseAsync(GeneralStrings.StationOffline);
+                return;
+            }
+
+            IEnumerable<AzuraFilesRecord>? songs = await _azuraCast.GetFilesOnlineAsync<AzuraFilesRecord>(baseUrl, apiKey, station);
+            if (songs is null)
+            {
+                await context.EditResponseAsync(GeneralStrings.PermissionIssue);
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                return;
+            }
+
+            AzuraFilesRecord? songData = songs.FirstOrDefault(s => s.SongId == song);
+            if (songData is null)
+            {
+                await context.EditResponseAsync(GeneralStrings.SongRequestNotFound);
+                return;
+            }
+
+            await _azuraCast.RequestInternalSongAsync(baseUrl, apiKey, station, songData.Path);
+            await _dbActions.AddAzuraCastStationRequestAsync(context.Guild.Id, station, songData.SongId, isInternal: true);
+
+            AzuraRequestRecord? request = await _azuraCast.GetRequestableSongAsync(baseUrl, apiKey, station, songData.SongId);
+            if (request is not null)
+            {
+                DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicSearchSongEmbed(request, isQueued: false, isPlayed: false);
+                await context.EditResponseAsync("You're sneaky! But I slid in the song quietly.", embed);
+                return;
+            }
+
+            await context.EditResponseAsync($"You're sneaky! I slid in the song **{songData.Title}** by **{songData.Artist}**.");
+        }
+
         [Command("delete-song-request"), Description("Delete a song request from the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationDJGroup, AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask DeleteSongRequestAsync
         (
