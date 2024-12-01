@@ -1,6 +1,44 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace AzzyBot.Bot.Utilities.Records.AzuraCast;
+
+/// <summary>
+/// Represents the data for an internal song request.
+/// </summary>
+public sealed record AzuraInternalRequestRecord
+{
+    /// <summary>
+    /// The current directory of the request.
+    /// </summary>
+    [JsonPropertyName("current_directory")]
+    public string CurrentDirectory { get; init; }
+
+    /// <summary>
+    /// The directories that are part of the request.
+    /// </summary>
+    [JsonPropertyName("dirs")]
+    public IReadOnlyList<string> Directories { get; init; } = [];
+
+    /// <summary>
+    /// What the request is doing.
+    /// </summary>
+    [JsonPropertyName("do")]
+    public string Do { get; init; }
+
+    /// <summary>
+    /// The files paths that are part of the request.
+    /// </summary>
+    [JsonPropertyName("files")]
+    public IReadOnlyList<string> Files { get; init; }
+
+    public AzuraInternalRequestRecord(string currDir, string doing, IReadOnlyList<string> files)
+    {
+        CurrentDirectory = currDir;
+        Do = doing;
+        Files = files;
+    }
+}
 
 /// <summary>
 /// Represents the data for a song request.

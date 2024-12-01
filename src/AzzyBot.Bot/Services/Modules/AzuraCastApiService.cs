@@ -576,6 +576,23 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, FileOperations.JsonOptions), CreateHeader(apiKey));
     }
 
+    public async Task RequestInternalSongAsync(Uri baseUrl, string apiKey, int stationId, string songPath)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
+        ArgumentException.ThrowIfNullOrWhiteSpace(songPath);
+
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}/{AzuraApiEndpoints.Batch}";
+
+        // Get the last slash to separate the path from the song
+        int lastSlash = songPath.LastIndexOf('/');
+        if (lastSlash is -1)
+            throw new InvalidOperationException($"Invalid song path: {songPath}");
+
+        AzuraInternalRequestRecord songRequest = new(songPath.Substring(0, lastSlash), AzuraApiEndpoints.Queue, [songPath]);
+
+        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(songRequest, FileOperations.JsonOptions), CreateHeader(apiKey));
+    }
+
     public async Task RequestSongAsync(Uri baseUrl, int stationId, string requestId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
