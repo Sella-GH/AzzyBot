@@ -21,11 +21,8 @@ public static class SettingsCheck
 
         if (settings is ISettings settingsInterface)
         {
-            foreach (KeyValuePair<string, object?> kvp in settingsInterface.GetProperties())
+            foreach (KeyValuePair<string, object?> kvp in settingsInterface.GetProperties().Where(p => excluded?.Contains(p.Key) is false))
             {
-                if (excluded?.Contains(kvp.Key) is true)
-                    continue;
-
                 switch (kvp.Value)
                 {
                     case int i when i is 0:
