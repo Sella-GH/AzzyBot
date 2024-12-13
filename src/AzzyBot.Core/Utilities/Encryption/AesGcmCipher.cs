@@ -17,7 +17,7 @@ public sealed class AesGcmCipher(byte[] nonce, byte[] tag, byte[] cipher)
         byte[] dataBytes = Convert.FromBase64String(data);
 
         return new(
-            dataBytes.Take(AesGcm.NonceByteSizes.MaxSize).ToArray(),
+            [.. dataBytes.Take(AesGcm.NonceByteSizes.MaxSize)],
             dataBytes[^AesGcm.TagByteSizes.MaxSize..],
             dataBytes[AesGcm.NonceByteSizes.MaxSize..^AesGcm.TagByteSizes.MaxSize]
         );

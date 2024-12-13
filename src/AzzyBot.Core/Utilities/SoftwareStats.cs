@@ -40,7 +40,7 @@ public static class SoftwareStats
     {
         using Process app = Process.GetCurrentProcess();
 
-        string fileName = app.MainModule!.FileName;
+        string? fileName = app.MainModule?.FileName;
 
         return (!string.IsNullOrEmpty(fileName))
             ? Path.Combine(AppContext.BaseDirectory, fileName)
