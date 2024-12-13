@@ -122,25 +122,4 @@ public static class FileOperations
 
         await File.WriteAllTextAsync(path, content);
     }
-
-    public static async Task WriteToFilesAsync(string directoryPath, IReadOnlyDictionary<string, string> files)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(directoryPath);
-        ArgumentNullException.ThrowIfNull(files);
-
-        foreach (KeyValuePair<string, string> file in files)
-        {
-            string filePath = Path.Combine(directoryPath, file.Key);
-            await File.WriteAllTextAsync(filePath, file.Value);
-        }
-    }
-
-    public static async Task WriteToJsonFileAsync<T>(string path, T content)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        ArgumentNullException.ThrowIfNull(content);
-
-        string json = JsonSerializer.Serialize(content, JsonOptions);
-        await File.WriteAllTextAsync(path, json);
-    }
 }

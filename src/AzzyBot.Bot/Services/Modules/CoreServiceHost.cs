@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Settings;
@@ -91,7 +92,8 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
         _settings.Database.EncryptionKey = _settings.Database.NewEncryptionKey;
         _settings.Database.NewEncryptionKey = string.Empty;
 
-        await FileOperations.WriteToJsonFileAsync(_settings.SettingsFile, _settings);
+        string json = JsonSerializer.Serialize(_settings, FileOperations.JsonOptions);
+        await FileOperations.WriteToFileAsync(_settings.SettingsFile, json);
 
         _logger.DatabaseReencryptionComplete();
     }
