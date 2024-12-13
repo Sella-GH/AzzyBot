@@ -63,5 +63,5 @@ public static class SettingsCheck
 
 public interface ISettings
 {
-    Dictionary<string, object?> GetProperties();
+    public Dictionary<string, object?> GetProperties();
 }
