@@ -5,7 +5,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -14,11 +13,6 @@ namespace AzzyBot.Core.Utilities;
 
 public static class FileOperations
 {
-    public static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        WriteIndented = true
-    };
-
     public static async Task<string> CreateCsvFileAsync<T>(IEnumerable<T> content, string? path = null)
     {
         ArgumentNullException.ThrowIfNull(content);

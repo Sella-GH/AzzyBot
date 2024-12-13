@@ -522,11 +522,11 @@ public sealed class AzuraCastCommands
             AzuraUpdateRecord? update = null;
             try
             {
-                update = JsonSerializer.Deserialize<AzuraUpdateRecord>(body);
+                update = JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.AzuraUpdateRecord);
             }
             catch (JsonException ex)
             {
-                AzuraUpdateErrorRecord? errorRecord = JsonSerializer.Deserialize<AzuraUpdateErrorRecord>(body) ?? throw new InvalidOperationException($"Failed to deserialize body: {body}", ex);
+                AzuraUpdateErrorRecord? errorRecord = JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.AzuraUpdateErrorRecord) ?? throw new InvalidOperationException($"Failed to deserialize body: {body}", ex);
                 await context.EditResponseAsync(GeneralStrings.InstanceUpdateError);
                 await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"Failed to check for updates: {errorRecord.FormattedMessage}");
                 return;

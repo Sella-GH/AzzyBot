@@ -13,8 +13,8 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Resources;
+using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records;
-using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using Microsoft.Extensions.Logging;
@@ -311,8 +311,9 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         {
             byte[] fileBytes = await FileOperations.GetBase64BytesFromFileAsync(file);
             string base64String = Convert.ToBase64String(fileBytes);
+            string json = JsonSerializer.Serialize(new($"{filePath}/{fileName}", base64String), JsonSourceGenerationContext.Default.AzuraFileUploadRecord);
 
-            using HttpContent jsonPayload = new StringContent(JsonSerializer.Serialize<AzuraFileUploadRecord>(new($"{filePath}/{fileName}", base64String)), Encoding.UTF8, MediaType);
+            using HttpContent jsonPayload = new StringContent(json, Encoding.UTF8, MediaType);
             using HttpResponseMessage response = await client.PostAsync(url, jsonPayload);
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadAsStringAsync();

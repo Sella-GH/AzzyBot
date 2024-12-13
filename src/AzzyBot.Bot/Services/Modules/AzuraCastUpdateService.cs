@@ -35,11 +35,11 @@ public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiServi
         AzuraUpdateRecord? update;
         try
         {
-            update = JsonSerializer.Deserialize<AzuraUpdateRecord>(body);
+            update = JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.AzuraUpdateRecord);
         }
         catch (JsonException ex)
         {
-            AzuraUpdateErrorRecord? errorRecord = JsonSerializer.Deserialize<AzuraUpdateErrorRecord>(body) ?? throw new InvalidOperationException($"Failed to deserialize body: {body}", ex);
+            AzuraUpdateErrorRecord? errorRecord = JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.AzuraUpdateErrorRecord) ?? throw new InvalidOperationException($"Failed to deserialize body: {body}", ex);
             await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"Failed to check for updates: {errorRecord.FormattedMessage}");
             return;
         }
