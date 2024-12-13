@@ -1,6 +1,8 @@
 ## 2.2.0
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02426
+- Updated [Npgsql](https://github.com/npgsql/npgsql) to version 9.0.2
+- Updated [Npgsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg) to version 9.0.2
 
 ### Additions
 - `player play` and `player play-mount` gained an additional optional parameter `volume` which allows to set the volume of the player at startup
