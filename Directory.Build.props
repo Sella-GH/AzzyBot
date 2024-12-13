@@ -16,6 +16,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <ImplicitUsings>disable</ImplicitUsings>
     <IsPublishable>True</IsPublishable>
+    <JsonSerializerIsReflectionEnabledByDefault>False</JsonSerializerIsReflectionEnabledByDefault>
     <NoWarn>$(NoWarn);CA2007</NoWarn>
     <Nullable>enable</Nullable>
     <PathMap>$(MSBuildProjectDirectory)=./$(MSBuildProjectName)</PathMap>
@@ -23,7 +24,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <TargetFramework>net9.0</TargetFramework>
-	  <UseArtifactsOutput>true</UseArtifactsOutput>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
     <WarningsAsErrors>nullable</WarningsAsErrors>
   </PropertyGroup>
 
