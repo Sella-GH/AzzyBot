@@ -30,7 +30,7 @@ public sealed record AzzyBotSettingsRecord : ISettings
 
     public Dictionary<string, object?> GetProperties()
     {
-        return new()
+        return new(8)
         {
             { nameof(BotToken), BotToken },
             { nameof(ServerId), ServerId },
@@ -60,7 +60,7 @@ public sealed record DiscordStatus : ISettings
 
     public Dictionary<string, object?> GetProperties()
     {
-        return new()
+        return new(4)
         {
             { nameof(Activity), Activity },
             { nameof(Doing), Doing },
@@ -83,7 +83,7 @@ public sealed record MusicStreamingSettings : ISettings
 
     public Dictionary<string, object?> GetProperties()
     {
-        return new()
+        return new(3)
         {
             { nameof(LavalinkHost), LavalinkHost },
             { nameof(LavalinkPort), LavalinkPort },
@@ -99,7 +99,7 @@ public sealed record CoreUpdater : ISettings
 
     public Dictionary<string, object?> GetProperties()
     {
-        return new()
+        return new(2)
         {
             { nameof(DisplayChangelog), DisplayChangelog },
             { nameof(DisplayInstructions), DisplayInstructions }
