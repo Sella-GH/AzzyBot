@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
@@ -187,7 +188,19 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            return JsonSerializer.Deserialize<T>(body);
+            return typeof(T) switch
+            {
+                Type t when t == typeof(AzuraHardwareStatsRecord) => (T)(object)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.AzuraHardwareStatsRecord)!,
+                Type t when t == typeof(AzuraStatusRecord) => (T)(object)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.AzuraStatusRecord)!,
+                Type t when t == typeof(AzuraNowPlayingDataRecord) => (T)(object)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.AzuraNowPlayingDataRecord)!,
+                Type t when t == typeof(AzuraPlaylistRecord) => (T)(object)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.AzuraPlaylistRecord)!,
+                Type t when t == typeof(AzuraStationRecord) => (T)(object)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.AzuraStationRecord)!,
+                Type t when t == typeof(AzuraAdminStationConfigRecord) => (T)(object)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.AzuraAdminStationConfigRecord)!,
+                Type t when t == typeof(AzuraSystemLogRecord) => (T)(object)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.AzuraSystemLogRecord)!,
+                Type t when t == typeof(AzuraSystemLogsRecord) => (T)(object)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.AzuraSystemLogsRecord)!,
+                Type t when t == typeof(AzuraStationStatusRecord) => (T)(object)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.AzuraStationStatusRecord)!,
+                _ => throw new InvalidOperationException($"Type {typeof(T)} is not supported."),
+            };
         }
         catch (JsonException ex)
         {
@@ -205,7 +218,20 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            return JsonSerializer.Deserialize<IEnumerable<T>>(body);
+            return typeof(T) switch
+            {
+                Type t when t == typeof(AzuraFilesDetailedRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.IEnumerableAzuraFilesDetailedRecord)!,
+                Type t when t == typeof(AzuraFilesRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.IEnumerableAzuraFilesRecord)!,
+                Type t when t == typeof(AzuraPlaylistRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.IEnumerableAzuraPlaylistRecord)!,
+                Type t when t == typeof(AzuraRequestRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.IEnumerableAzuraRequestRecord)!,
+                Type t when t == typeof(AzuraMediaItemRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.IEnumerableAzuraMediaItemRecord)!,
+                Type t when t == typeof(AzuraStationHistoryItemRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.IEnumerableAzuraStationHistoryItemRecord)!,
+                Type t when t == typeof(AzuraStationListenerRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.IEnumerableAzuraStationListenerRecord)!,
+                Type t when t == typeof(AzuraHlsMountRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.IEnumerableAzuraHlsMountRecord)!,
+                Type t when t == typeof(AzuraStationQueueItemDetailedRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.IEnumerableAzuraStationQueueItemDetailedRecord)!,
+                Type t when t == typeof(AzuraRequestQueueItemRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonSourceGenerationContext.Default.IEnumerableAzuraRequestQueueItemRecord)!,
+                _ => throw new InvalidOperationException($"Type {typeof(T)} is not supported."),
+            };
         }
         catch (JsonException ex)
         {
@@ -315,7 +341,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            return JsonSerializer.Deserialize<IEnumerable<AzuraFilesRecord>>(content) ?? throw new InvalidOperationException($"Could not deserialize content: {content}");
+            return JsonSerializer.Deserialize(content, JsonSourceGenerationContext.Default.IEnumerableAzuraFilesRecord) ?? throw new InvalidOperationException($"Could not deserialize content: {content}");
         }
         catch (JsonException ex)
         {
@@ -573,7 +599,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}";
 
-        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, FileOperations.JsonOptions), CreateHeader(apiKey));
+        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, JsonSourceGenerationContext.Default.AzuraAdminStationConfigRecord), CreateHeader(apiKey));
     }
 
     public async Task RequestInternalSongAsync(Uri baseUrl, string apiKey, int stationId, string songPath)
@@ -590,7 +616,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         AzuraInternalRequestRecord songRequest = new(songPath.Substring(0, lastSlash), AzuraApiEndpoints.Queue, [songPath]);
 
-        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(songRequest, FileOperations.JsonOptions), CreateHeader(apiKey));
+        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(songRequest, JsonSourceGenerationContext.Default.AzuraInternalRequestRecord), CreateHeader(apiKey));
     }
 
     public async Task RequestSongAsync(Uri baseUrl, int stationId, string requestId)
@@ -779,7 +805,11 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            return JsonSerializer.Deserialize<T>(result);
+            return typeof(T) switch
+            {
+                Type t when t == typeof(AzuraFilesDetailedRecord) => (T)(object)JsonSerializer.Deserialize(result, JsonSourceGenerationContext.Default.AzuraFilesDetailedRecord)!,
+                _ => throw new InvalidOperationException($"Type {typeof(T)} is not supported."),
+            };
         }
         catch (JsonException ex)
         {

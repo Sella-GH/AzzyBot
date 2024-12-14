@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using AzzyBot.Core.Utilities;
 
 namespace AzzyBot.Core.Settings;
@@ -14,46 +12,35 @@ public static class SettingsCheck
         if (settings is null)
             throw new InvalidOperationException("Settings is null");
 
-        PropertyInfo[] properties = settings.GetType().GetProperties();
         int missingSettings = 0;
-
         void LogAndIncrement(string settingName)
         {
             Console.Error.WriteLine("{0} has to be filled out!", settingName);
             missingSettings++;
         }
 
-        foreach (PropertyInfo property in properties.Where(p => excluded?.Contains(p.Name) == false))
+        if (settings is ISettings settingsInterface)
         {
-            object? value = property.GetValue(settings);
-            switch (property.PropertyType)
+            foreach (KeyValuePair<string, object?> kvp in settingsInterface.GetProperties().Where(p => excluded?.Contains(p.Key) is false))
             {
-                case Type t when t.Equals(typeof(string)):
-                    if (string.IsNullOrWhiteSpace((string?)value))
-                        LogAndIncrement(property.Name);
+                switch (kvp.Value)
+                {
+                    case int i when i is 0:
+                    case ulong ul when ul is 0:
+                    case string str when string.IsNullOrWhiteSpace(str):
+                    case TimeSpan ts when ts == TimeSpan.Zero:
+                        LogAndIncrement(kvp.Key);
+                        break;
 
-                    break;
-
-                case Type t when t.Equals(typeof(ulong)) || t.Equals(typeof(int)):
-                    if (Convert.ToInt64(value, CultureInfo.InvariantCulture) is 0)
-                        LogAndIncrement(property.Name);
-
-                    break;
-
-                case Type t when t.Equals(typeof(TimeSpan)):
-                    if (value is TimeSpan timespan && timespan.Equals(TimeSpan.Zero))
-                        LogAndIncrement(property.Name);
-
-                    break;
-
-                case Type t when t.IsClass:
-                    missingSettings = CheckSettings(value, excluded, true);
-
-                    continue;
-
-                default:
-                    continue;
+                    case ISettings nestedSettings:
+                        missingSettings += CheckSettings(nestedSettings, excluded, true);
+                        break;
+                }
             }
+        }
+        else
+        {
+            throw new InvalidOperationException($"Settings object does not implement {nameof(ISettings)} interface");
         }
 
         if (missingSettings is 0 || isClass)
@@ -69,4 +56,9 @@ public static class SettingsCheck
 
         return 0;
     }
+}
+
+public interface ISettings
+{
+    public Dictionary<string, object?> GetProperties();
 }

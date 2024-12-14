@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Settings;
+using AzzyBot.Bot.Utilities;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Helpers;
-using AzzyBot.Core.Utilities.Records;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
 using DSharpPlus;
@@ -292,7 +292,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
         try
         {
-            string jsonDump = JsonSerializer.Serialize<SerializableExceptionsRecord>(new(ex, info), FileOperations.JsonOptions);
+            string jsonDump = JsonSerializer.Serialize(new(ex, info), JsonSourceGenerationContext.Default.SerializableExceptionsRecord);
             string fileName = $"AzzyBotException_{timestampString}.json";
             string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, fileName);
 

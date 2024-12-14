@@ -17,6 +17,7 @@
 ### Improvements
 - Server info embed for admins was slightly improved and fixed
 - `config reset-settings` now shows a confirmation message before resetting the settings
+- Refactored the code to use `System.Text.Json` source generator and removed `System.Reflection` calls
 
 ## 2.1.1 - 2024-11-23
 ### Improvements
