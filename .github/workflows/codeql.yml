@@ -59,7 +59,6 @@ jobs:
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
-        config-file: ./.github/codeql/codeql-config.yml
         languages: ${{ matrix.language }}
         queries: security-and-quality
         # If you wish to specify custom queries, you can do so here or in a config file.
@@ -92,3 +91,17 @@ jobs:
       uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{matrix.language}}"
+
+    - name: Filter Sarif Results
+      uses: advanced-security/filter-sarif@v1
+      with:
+        patterns: |
+          -**/obj/**
+          -**.g.cs
+        input: sarif-results/csharp.sarif
+        output: sarif-results/csharp.sarif
+
+    - name: Upload Sarif
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: sarif-results/csharp.sarif
