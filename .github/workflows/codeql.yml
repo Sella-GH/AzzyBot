@@ -97,7 +97,7 @@ jobs:
       with:
         patterns: |
           -**/obj/**
-          -**.g.cs
+          -**/*.g.cs
         input: /home/runner/work/AzzyBot/results/csharp.sarif
         output: /home/runner/work/AzzyBot/results/csharp.sarif
 
