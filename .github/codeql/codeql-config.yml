@@ -1,0 +1,4 @@
+paths:
+  - '/home/runner/work/AzzyBot/AzzyBot/artifacts/bin'
+paths-ignore:
+  - '/home/runner/work/AzzyBot/AzzyBot/artifacts/obj'  
