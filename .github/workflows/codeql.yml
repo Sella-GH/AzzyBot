@@ -91,6 +91,8 @@ jobs:
       uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{matrix.language}}"
+        output: sarif-results
+        upload: failure-only
 
     - name: Filter Sarif Results
       uses: advanced-security/filter-sarif@v1
@@ -98,10 +100,17 @@ jobs:
         patterns: |
           -**/obj/**
           -**/*.g.cs
-        input: /home/runner/work/AzzyBot/results/csharp.sarif
-        output: /home/runner/work/AzzyBot/results/csharp.sarif
+        input: sarif-results/csharp.sarif
+        output: sarif-results/csharp.sarif
 
     - name: Upload Sarif
       uses: github/codeql-action/upload-sarif@v3
       with:
-        sarif_file: /home/runner/work/AzzyBot/results/csharp.sarif
+        sarif_file: sarif-results/csharp.sarif
+
+    - name: Upload loc as a build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: sarif-results
+        path: sarif-results
+        retention-days: 1
