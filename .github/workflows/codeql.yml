@@ -98,10 +98,10 @@ jobs:
         patterns: |
           -**/obj/**
           -**.g.cs
-        input: sarif-results/csharp.sarif
-        output: sarif-results/csharp.sarif
+        input: /home/runner/work/AzzyBot/results/csharp.sarif
+        output: /home/runner/work/AzzyBot/results/csharp.sarif
 
     - name: Upload Sarif
       uses: github/codeql-action/upload-sarif@v3
       with:
-        sarif_file: sarif-results/csharp.sarif
+        sarif_file: /home/runner/work/AzzyBot/results/csharp.sarif
