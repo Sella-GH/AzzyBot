@@ -612,7 +612,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         };
 
         builder.AddField("Exception", ex.GetType().Name);
-        builder.AddField("Description", ex.Message);
+        builder.AddField("Description", (ex.Message.Length <= 1024) ? ex.Message : "Description too big for embed.");
 
         if (!string.IsNullOrEmpty(jsonMessage))
             builder.AddField("Advanced Error", jsonMessage);

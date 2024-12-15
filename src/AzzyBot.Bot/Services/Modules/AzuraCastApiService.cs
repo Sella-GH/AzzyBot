@@ -206,7 +206,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            return (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.GetTypeInfo(typeof(T))!)!;
+            return (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonDeserializationListSourceGen.Default.GetTypeInfo(typeof(IEnumerable<T>))!)!;
         }
         catch (JsonException ex)
         {
@@ -316,7 +316,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            return JsonSerializer.Deserialize(content, JsonDeserializationSourceGen.Default.IEnumerableAzuraFilesRecord) ?? throw new InvalidOperationException($"Could not deserialize content: {content}");
+            return JsonSerializer.Deserialize(content, JsonDeserializationListSourceGen.Default.IEnumerableAzuraFilesRecord) ?? throw new InvalidOperationException($"Could not deserialize content: {content}");
         }
         catch (JsonException ex)
         {

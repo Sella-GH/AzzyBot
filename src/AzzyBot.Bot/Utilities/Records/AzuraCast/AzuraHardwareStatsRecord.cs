@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace AzzyBot.Bot.Utilities.Records.AzuraCast;
@@ -86,12 +87,11 @@ public record AzuraCpuTotalData
     public required string Steal { get; init; }
 }
 
-#pragma warning disable S2094 // Classes should not be empty - Required for deserialization
 /// <summary>
 /// Represents the cpu data per core for an AzuraCast instance.
 /// </summary>
+[SuppressMessage("Minor Code Smell", "S2094:Classes should not be empty", Justification = "Required for deserialization.")]
 public sealed record AzuraCoreData : AzuraCpuTotalData;
-#pragma warning restore S2094 // Classes should not be empty - Required for deserialization
 
 /// <summary>
 /// Represents the memory data for an AzuraCast instance.
