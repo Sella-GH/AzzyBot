@@ -119,7 +119,7 @@ public sealed class ConfigCommands
             await context.DeleteResponseAsync();
             await context.FollowupAsync(GeneralStrings.ConfigInstanceAdded);
 
-            dAzuraCast = await _dbActions.GetAzuraCastAsync(guildId, loadPrefs: true, loadGuild: true);
+            dAzuraCast = await _dbActions.GetAzuraCastAsync(guildId, loadChecks: true, loadPrefs: true, loadGuild: true);
             if (dAzuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(guildId);
