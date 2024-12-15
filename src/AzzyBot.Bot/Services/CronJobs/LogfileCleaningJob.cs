@@ -26,7 +26,7 @@ public sealed class LogfileCleaningJob(ILogger<LogfileCleaningJob> logger) : IJo
         if (context.Parameter is not int logDays)
             throw new InvalidOperationException($"{nameof(LogfileCleaningJob)} requires a parameter of type int. context.Parameter is {context.Parameter!.GetType()}");
 
-        List<string> files = Directory.EnumerateFiles("Logs").Where(f => f.StartsWith("AzzyBot_", StringComparison.InvariantCultureIgnoreCase) && DateTimeOffset.UtcNow - File.GetLastWriteTimeUtc(f) > TimeSpan.FromDays(logDays)).ToList();
+        List<string> files = [.. Directory.EnumerateFiles("Logs").Where(f => f.StartsWith("AzzyBot_", StringComparison.InvariantCultureIgnoreCase) && DateTimeOffset.UtcNow - File.GetLastWriteTimeUtc(f) > TimeSpan.FromDays(logDays))];
         foreach (string file in files)
         {
             File.Delete(file);

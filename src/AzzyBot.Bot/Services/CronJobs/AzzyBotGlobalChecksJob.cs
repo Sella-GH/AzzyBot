@@ -47,12 +47,12 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
             _lastAzzyUpdateCheck = utcNow;
         }
 
-        List<GuildEntity> guildsWorkingSet = guilds.Where(g => utcNow - g.LastPermissionCheck >= TimeSpan.FromHours(12)).ToList();
+        List<GuildEntity> guildsWorkingSet = [.. guilds.Where(g => utcNow - g.LastPermissionCheck >= TimeSpan.FromHours(12))];
         _logger.GlobalTimerCheckForChannelPermissions(guildsWorkingSet.Count);
         if (guildsWorkingSet.Count is not 0)
             await _botService.CheckPermissionsAsync(guildsWorkingSet);
 
-        guildsWorkingSet = guilds.Where(g => g.AzuraCast?.Checks.ServerStatus is true && utcNow - g.AzuraCast.Checks.LastServerStatusCheck >= TimeSpan.FromMinutes(15)).ToList();
+        guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.Checks.ServerStatus is true && utcNow - g.AzuraCast.Checks.LastServerStatusCheck >= TimeSpan.FromMinutes(15))];
         _logger.GlobalTimerCheckForAzuraCastStatus(guildsWorkingSet.Count);
         if (guildsWorkingSet.Count is not 0)
         {
@@ -62,7 +62,7 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
             }
         }
 
-        guildsWorkingSet = guilds.Where(g => g.AzuraCast?.IsOnline is true && utcNow - g.AzuraCast.Checks.LastServerStatusCheck >= TimeSpan.FromHours(12)).ToList();
+        guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.IsOnline is true && utcNow - g.AzuraCast.Checks.LastServerStatusCheck >= TimeSpan.FromHours(12))];
         _logger.GlobalTimerCheckForAzuraCastApi(guildsWorkingSet.Count);
         if (guildsWorkingSet.Count is not 0)
         {
@@ -72,7 +72,7 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
             }
         }
 
-        guildsWorkingSet = guilds.Where(g => g.AzuraCast?.IsOnline is true && g.AzuraCast.Stations.Any(s => s.Checks.FileChanges && utcNow - s.Checks.LastFileChangesCheck >= TimeSpan.FromHours(1))).ToList();
+        guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.IsOnline is true && g.AzuraCast.Stations.Any(s => s.Checks.FileChanges && utcNow - s.Checks.LastFileChangesCheck >= TimeSpan.FromHours(1)))];
         _logger.GlobalTimerCheckForAzuraCastFiles(guildsWorkingSet.Count);
         if (guildsWorkingSet.Count is not 0)
         {
@@ -85,7 +85,7 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
             }
         }
 
-        guildsWorkingSet = guilds.Where(g => g.AzuraCast?.IsOnline is true && g.AzuraCast.Checks.Updates && utcNow - g.AzuraCast.Checks.LastUpdateCheck >= TimeSpan.FromHours(6)).ToList();
+        guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.IsOnline is true && g.AzuraCast.Checks.Updates && utcNow - g.AzuraCast.Checks.LastUpdateCheck >= TimeSpan.FromHours(6))];
         _logger.GlobalTimerCheckForAzuraCastUpdates(guildsWorkingSet.Count);
         if (guildsWorkingSet.Count is not 0)
         {
