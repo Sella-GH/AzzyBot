@@ -1,9 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Utilities.Records;
-using System.Diagnostics.CodeAnalysis;
-using System.Collections.Generic;
 
 namespace AzzyBot.Bot.Utilities;
 
