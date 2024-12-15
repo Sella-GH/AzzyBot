@@ -93,7 +93,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
         _settings.Database.EncryptionKey = _settings.Database.NewEncryptionKey;
         _settings.Database.NewEncryptionKey = string.Empty;
 
-        string json = JsonSerializer.Serialize(_settings, JsonSourceGenerationContext.Default.AzzyUpdateRecord);
+        string json = JsonSerializer.Serialize(_settings, JsonSerializationSourceGen.Default.AzzyUpdateRecord);
         await FileOperations.WriteToFileAsync(_settings.SettingsFile, json);
 
         _logger.DatabaseReencryptionComplete();

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities.Records;
@@ -7,18 +8,17 @@ using AzzyBot.Core.Utilities.Records;
 
 namespace AzzyBot.Bot.Utilities;
 
-[JsonSourceGenerationOptions(WriteIndented = true)]
+[SuppressMessage("Roslynator", "RCS1251:Remove unnecessary braces from record declaration", Justification = "Class has to be empty.")]
+[JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
 [JsonSerializable(typeof(AppStatsRecord))]
 [JsonSerializable(typeof(AzuraAdminStationConfigRecord))]
 [JsonSerializable(typeof(AzuraAdminStationConfigBackendRecord))]
 [JsonSerializable(typeof(AzuraCustomQueueItemRecord))]
-[JsonSerializable(typeof(AzuraFilesRecord))]
 [JsonSerializable(typeof(IEnumerable<AzuraFilesRecord>))]
 [JsonSerializable(typeof(AzuraFilesDetailedRecord))]
 [JsonSerializable(typeof(IEnumerable<AzuraFilesDetailedRecord>))]
 [JsonSerializable(typeof(AzuraFilesPlaylistRecord))]
 [JsonSerializable(typeof(AzuraFileComplianceRecord))]
-[JsonSerializable(typeof(AzuraFileUploadRecord))]
 [JsonSerializable(typeof(AzuraHardwareStatsRecord))]
 [JsonSerializable(typeof(AzuraCpuData))]
 [JsonSerializable(typeof(AzuraCpuTotalData))]
@@ -47,7 +47,6 @@ namespace AzzyBot.Bot.Utilities;
 [JsonSerializable(typeof(AzuraPlaylistLinkRecord))]
 [JsonSerializable(typeof(AzuraPlaylistLinkExportRecord))]
 [JsonSerializable(typeof(AzuraPlaylistStateRecord))]
-[JsonSerializable(typeof(AzuraInternalRequestRecord))]
 [JsonSerializable(typeof(AzuraRequestRecord))]
 [JsonSerializable(typeof(IEnumerable<AzuraRequestRecord>))]
 [JsonSerializable(typeof(AzuraRequestQueueItemRecord))]
@@ -75,9 +74,7 @@ namespace AzzyBot.Bot.Utilities;
 [JsonSerializable(typeof(AzuraUpdateRecord))]
 [JsonSerializable(typeof(AzuraUpdateErrorRecord))]
 [JsonSerializable(typeof(AzzyBotSettingsRecord))]
-[JsonSerializable(typeof(AzzyUpdateRecord))]
-[JsonSerializable(typeof(SerializableExceptionsRecord))]
 [JsonSerializable(typeof(List<AzzyUpdateRecord>))]
-public sealed partial class JsonSourceGenerationContext : JsonSerializerContext
+public sealed partial class JsonDeserializationSourceGen : JsonSerializerContext
 {
 }

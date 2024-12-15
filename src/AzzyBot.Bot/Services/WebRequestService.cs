@@ -311,7 +311,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         {
             byte[] fileBytes = await FileOperations.GetBase64BytesFromFileAsync(file);
             string base64String = Convert.ToBase64String(fileBytes);
-            string json = JsonSerializer.Serialize(new($"{filePath}/{fileName}", base64String), JsonSourceGenerationContext.Default.AzuraFileUploadRecord);
+            string json = JsonSerializer.Serialize(new($"{filePath}/{fileName}", base64String), JsonSerializationSourceGen.Default.AzuraFileUploadRecord);
 
             using HttpContent jsonPayload = new StringContent(json, Encoding.UTF8, MediaType);
             using HttpResponseMessage response = await client.PostAsync(url, jsonPayload);

@@ -60,8 +60,8 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, A
         HashSet<AzuraFilesRecord> onlineHashSet = new(onlineFiles, new AzuraFileComparer());
         HashSet<AzuraFilesRecord> localHashSet = new(localFiles, new AzuraFileComparer());
 
-        List<AzuraFilesRecord> addedFiles = onlineHashSet.Except(localHashSet).ToList();
-        List<AzuraFilesRecord> removedFiles = localHashSet.Except(onlineHashSet).ToList();
+        List<AzuraFilesRecord> addedFiles = [.. onlineHashSet.Except(localHashSet)];
+        List<AzuraFilesRecord> removedFiles = [.. localHashSet.Except(onlineHashSet)];
         bool filesChanged = addedFiles.Count is not 0 || removedFiles.Count is not 0;
         await _dbActions.UpdateAzuraCastStationChecksAsync(station.AzuraCast.Guild.UniqueId, station.StationId, lastFileChangesCheck: true);
         if (!filesChanged)
@@ -93,7 +93,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, A
             paths.Add(removedFileName);
         }
 
-        await FileOperations.WriteToFileAsync(Path.Combine(_azuraCast.FilePath, $"{station.AzuraCast.GuildId}-{station.AzuraCastId}-{station.Id}-{station.StationId}-files.json"), JsonSerializer.Serialize(onlineFiles, JsonSourceGenerationContext.Default.AzuraFilesRecord));
+        await FileOperations.WriteToFileAsync(Path.Combine(_azuraCast.FilePath, $"{station.AzuraCast.GuildId}-{station.AzuraCastId}-{station.Id}-{station.StationId}-files.json"), JsonSerializer.Serialize(onlineFiles, JsonSerializationSourceGen.Default.AzuraFilesRecord));
         DiscordEmbed embed = EmbedBuilder.BuildAzuraCastFileChangesEmbed(stationName, addedFiles.Count, removedFiles.Count);
         await _botService.SendMessageAsync(channelId, $"Changes in the files of station **{stationName}** detected. Check the details below.", [embed], paths);
     }
