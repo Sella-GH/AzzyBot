@@ -188,19 +188,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            return typeof(T) switch
-            {
-                Type t when t == typeof(AzuraHardwareStatsRecord) => (T)(object)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.AzuraHardwareStatsRecord)!,
-                Type t when t == typeof(AzuraStatusRecord) => (T)(object)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.AzuraStatusRecord)!,
-                Type t when t == typeof(AzuraNowPlayingDataRecord) => (T)(object)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.AzuraNowPlayingDataRecord)!,
-                Type t when t == typeof(AzuraPlaylistRecord) => (T)(object)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.AzuraPlaylistRecord)!,
-                Type t when t == typeof(AzuraStationRecord) => (T)(object)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.AzuraStationRecord)!,
-                Type t when t == typeof(AzuraAdminStationConfigRecord) => (T)(object)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.AzuraAdminStationConfigRecord)!,
-                Type t when t == typeof(AzuraSystemLogRecord) => (T)(object)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.AzuraSystemLogRecord)!,
-                Type t when t == typeof(AzuraSystemLogsRecord) => (T)(object)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.AzuraSystemLogsRecord)!,
-                Type t when t == typeof(AzuraStationStatusRecord) => (T)(object)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.AzuraStationStatusRecord)!,
-                _ => throw new InvalidOperationException($"Type {typeof(T)} is not supported."),
-            };
+            return (T)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.GetTypeInfo(typeof(T))!)!;
         }
         catch (JsonException ex)
         {
@@ -805,11 +793,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            return typeof(T) switch
-            {
-                Type t when t == typeof(AzuraFilesDetailedRecord) => (T)(object)JsonSerializer.Deserialize(result, JsonDeserializationSourceGen.Default.AzuraFilesDetailedRecord)!,
-                _ => throw new InvalidOperationException($"Type {typeof(T)} is not supported."),
-            };
+            return (T)JsonSerializer.Deserialize(result, JsonDeserializationSourceGen.Default.GetTypeInfo(typeof(T))!)!;
         }
         catch (JsonException ex)
         {
