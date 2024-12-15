@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
-using AzzyBot.Bot.Utilities.Records;
+using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Utilities.Records;
 
@@ -13,7 +13,7 @@ namespace AzzyBot.Bot.Utilities;
 [JsonSerializable(typeof(IEnumerable<AzuraFilesRecord>))]
 [JsonSerializable(typeof(AzuraFileUploadRecord))]
 [JsonSerializable(typeof(AzuraInternalRequestRecord))]
-[JsonSerializable(typeof(AzzyUpdateRecord))]
+[JsonSerializable(typeof(AzzyBotSettingsRecord))]
 [JsonSerializable(typeof(SerializableExceptionsRecord))]
 public sealed partial class JsonSerializationSourceGen : JsonSerializerContext
 {
