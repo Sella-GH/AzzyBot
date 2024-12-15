@@ -608,11 +608,10 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
         DiscordEmbedBuilder builder = new()
         {
+            Title = ex.GetType().Name,
+            Description = (ex.Message.Length <= 4096) ? ex.Message : "Description too big for embed.",
             Color = DiscordColor.Red
         };
-
-        builder.AddField("Exception", ex.GetType().Name);
-        builder.AddField("Description", (ex.Message.Length <= 1024) ? ex.Message : "Description too big for embed.");
 
         if (!string.IsNullOrEmpty(jsonMessage))
             builder.AddField("Advanced Error", jsonMessage);
@@ -645,7 +644,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         builder.AddField("OS", os);
         builder.AddField("Arch", arch);
         builder.WithAuthor(botName, UriStrings.BugReportUri, botIconUrl);
-        builder.WithFooter($"Version: {botVersion}");
+        builder.WithFooter($"Version: {botVersion} / {SoftwareStats.GetAppEnvironment.ToUpperInvariant()}");
 
         return builder;
     }

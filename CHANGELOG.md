@@ -16,6 +16,7 @@
 - Server info embed for admins was slightly improved and fixed
 - `config reset-settings` now shows a confirmation message before resetting the settings
 - Refactored the code to use `System.Text.Json` source generator and removed `System.Reflection` calls
+- The exception embed was slightly improved with more details
 
 ## 2.1.2 - 2024-12-15
 ### Dependencies
