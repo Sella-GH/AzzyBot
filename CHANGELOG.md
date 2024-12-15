@@ -1,8 +1,6 @@
 ## 2.2.0
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02428
-- Updated [Npgsql](https://github.com/npgsql/npgsql) to version 9.0.2
-- Updated [Npgsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg) to version 9.0.2
 
 ### Additions
 - `player play` and `player play-mount` gained an additional optional parameter `volume` which allows to set the volume of the player at startup
@@ -18,6 +16,15 @@
 - Server info embed for admins was slightly improved and fixed
 - `config reset-settings` now shows a confirmation message before resetting the settings
 - Refactored the code to use `System.Text.Json` source generator and removed `System.Reflection` calls
+
+## 2.1.2 - 2024-12-15
+### Dependencies
+- Updated [Npgsql](https://github.com/npgsql/npgsql) to version 9.0.2
+- Updated [Npgsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg) to version 9.0.2
+
+### Fixes
+- `music get-song-history` works again
+- The initial online check after creating an instance works again
 
 ## 2.1.1 - 2024-11-23
 ### Improvements
