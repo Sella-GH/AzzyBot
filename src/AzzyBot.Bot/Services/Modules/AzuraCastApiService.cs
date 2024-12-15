@@ -206,20 +206,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            return typeof(T) switch
-            {
-                Type t when t == typeof(AzuraFilesDetailedRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.IEnumerableAzuraFilesDetailedRecord)!,
-                Type t when t == typeof(AzuraFilesRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.IEnumerableAzuraFilesRecord)!,
-                Type t when t == typeof(AzuraPlaylistRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.IEnumerableAzuraPlaylistRecord)!,
-                Type t when t == typeof(AzuraRequestRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.IEnumerableAzuraRequestRecord)!,
-                Type t when t == typeof(AzuraMediaItemRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.IEnumerableAzuraMediaItemRecord)!,
-                Type t when t == typeof(AzuraStationHistoryItemRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.IEnumerableAzuraStationHistoryItemRecord)!,
-                Type t when t == typeof(AzuraStationListenerRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.IEnumerableAzuraStationListenerRecord)!,
-                Type t when t == typeof(AzuraHlsMountRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.IEnumerableAzuraHlsMountRecord)!,
-                Type t when t == typeof(AzuraStationQueueItemDetailedRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.IEnumerableAzuraStationQueueItemDetailedRecord)!,
-                Type t when t == typeof(AzuraRequestQueueItemRecord) => (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.IEnumerableAzuraRequestQueueItemRecord)!,
-                _ => throw new InvalidOperationException($"Type {typeof(T)} is not supported."),
-            };
+            return (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.GetTypeInfo(typeof(T))!)!;
         }
         catch (JsonException ex)
         {
