@@ -23,7 +23,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
     <TargetFramework>net9.0</TargetFramework>
-	  <UseArtifactsOutput>true</UseArtifactsOutput>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
     <WarningsAsErrors>nullable</WarningsAsErrors>
   </PropertyGroup>
 
@@ -38,7 +38,7 @@
     <PackageProjectUrl>https://github.com/Sella-GH/AzzyBot</PackageProjectUrl>
     <RepositoryType>Git</RepositoryType>
     <RepositoryUrl>https://github.com/Sella-GH/AzzyBot</RepositoryUrl>
-    <Version>2.1.1</Version>
+    <Version>2.1.2</Version>
   </PropertyGroup>
 
   <!-- Package stuff -->

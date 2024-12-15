@@ -1,3 +1,12 @@
+## 2.1.2 - 2024-12-15
+### Dependencies
+- Updated [Npgsql](https://github.com/npgsql/npgsql) to version 9.0.2
+- Updated [Npgsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg) to version 9.0.2
+
+### Fixes
+- `music get-song-history` works again
+- The initial online check after creating an instance works again
+
 ## 2.1.1 - 2024-11-23
 ### Improvements
 - The AzuraCast updater works fine now if a rolling release instance is expected to update to a stable release
