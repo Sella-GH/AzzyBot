@@ -121,8 +121,13 @@ jobs:
       with:
         sarif_file: sarif-results/csharp.sarif
 
-    - if: matrix.language == 'csharp'
-      name: Upload loc as a build artifact
+    - if: matrix.language == 'actions'
+      name: Upload Sarif
+      uses: github/codeql-action/upload-sarif@v3
+      with:
+        sarif_file: sarif-results/actions.sarif
+
+    - name: Upload loc as a build artifact
       uses: actions/upload-artifact@v4
       with:
         name: sarif-results
