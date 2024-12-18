@@ -52,7 +52,7 @@ jobs:
         - language: actions
           build-mode: none
         - language: csharp
-          build-mode: auto
+          build-mode: manual
           queries: security-and-quality
         # CodeQL supports the following values keywords for 'language': 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift'
         # Use `c-cpp` to analyze code written in C, C++ or both
@@ -105,7 +105,8 @@ jobs:
         output: sarif-results
         upload: failure-only
 
-    - name: Filter Sarif Results
+    - if: matrix.language == 'csharp'
+      name: Filter Sarif Results
       uses: advanced-security/filter-sarif@v1
       with:
         patterns: |
@@ -114,12 +115,14 @@ jobs:
         input: sarif-results/csharp.sarif
         output: sarif-results/csharp.sarif
 
-    - name: Upload Sarif
+    - if: matrix.language == 'csharp'
+      name: Upload Sarif
       uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: sarif-results/csharp.sarif
 
-    - name: Upload loc as a build artifact
+    - if: matrix.language == 'csharp'
+      name: Upload loc as a build artifact
       uses: actions/upload-artifact@v4
       with:
         name: sarif-results
