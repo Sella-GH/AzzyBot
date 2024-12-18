@@ -98,7 +98,14 @@ jobs:
         dotnet restore /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.config --force --no-cache --ucr
         dotnet build /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Release --no-incremental --no-restore --no-self-contained --ucr
 
-    - name: Perform CodeQL Analysis
+    - if: matrix.language == 'actions'
+      name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"
+    
+    - if: matrix.language == 'csharp'
+      name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:
         category: "/language:${{matrix.language}}"
@@ -121,13 +128,8 @@ jobs:
       with:
         sarif_file: sarif-results/csharp.sarif
 
-    - if: matrix.language == 'actions'
-      name: Upload Sarif
-      uses: github/codeql-action/upload-sarif@v3
-      with:
-        sarif_file: sarif-results/actions.sarif
-
-    - name: Upload loc as a build artifact
+    - if: matrix.language == 'csharp'
+      name: Upload loc as a build artifact
       uses: actions/upload-artifact@v4
       with:
         name: sarif-results
