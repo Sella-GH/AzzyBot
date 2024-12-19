@@ -8,12 +8,13 @@ using AzzyBot.Bot.Utilities.Records;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class AzzyHelpAutocomplete(AzzyBotSettings settings) : IAutoCompleteProvider
+public sealed class AzzyHelpAutocomplete(IOptions<AzzyBotSettings> settings) : IAutoCompleteProvider
 {
-    private readonly AzzyBotSettings _settings = settings;
+    private readonly AzzyBotSettings _settings = settings.Value;
 
     public ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)
     {

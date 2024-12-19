@@ -45,7 +45,9 @@ public static class Startup
 
         #region Add configuration
 
-        appBuilder.Configuration.AddAppConfiguration(isDev, isDocker);
+        string settingsFilePath = Path.Combine("Settings", GetAppSettingsPath(isDev, isDocker));
+
+        appBuilder.Configuration.AddAppConfiguration(isDev, settingsFilePath);
 
         #endregion Add configuration
 
@@ -53,7 +55,7 @@ public static class Startup
 
         try
         {
-            appBuilder.Services.AddAppSettings();
+            appBuilder.Services.AddAppSettings(settingsFilePath);
             appBuilder.Services.AzzyBotServices(isDev, isDocker, logDays);
         }
         catch (OptionsValidationException ex)
@@ -71,5 +73,19 @@ public static class Startup
         app.ApplyDbMigrations();
         await app.StartAsync();
         await app.WaitForShutdownAsync();
+    }
+
+    private static string GetAppSettingsPath(bool isDev, bool isDocker)
+    {
+        if (isDev)
+        {
+            return "AzzyBotSettings-Dev.json";
+        }
+        else if (isDocker)
+        {
+            return "AzzyBotSettings-Docker.json";
+        }
+
+        return "AzzyBotSettings.json";
     }
 }

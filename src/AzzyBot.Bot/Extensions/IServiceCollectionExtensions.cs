@@ -99,7 +99,7 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<MusicStreamingService>();
     }
 
-    public static void AddAppSettings(this IServiceCollection services)
+    public static void AddAppSettings(this IServiceCollection services, string settingsFile)
     {
         services.AddSingleton<IValidateOptions<AzzyBotSettings>, AzzyBotSettingsValidator>().AddOptionsWithValidateOnStart<AzzyBotSettings>();
         services.AddSingleton<IValidateOptions<DatabaseSettings>, DatabaseSettingsValidator>().AddOptionsWithValidateOnStart<DatabaseSettings>();
@@ -108,7 +108,7 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<IValidateOptions<CoreUpdaterSettings>, CoreUpdaterValidator>().AddOptionsWithValidateOnStart<CoreUpdaterSettings>();
         services.AddSingleton<IValidateOptions<AppStats>, AppStatsValidator>().AddOptionsWithValidateOnStart<AppStats>();
 
-        services.AddOptions<AzzyBotSettings>().BindConfiguration(nameof(AzzyBotSettings));
+        services.AddOptions<AzzyBotSettings>().BindConfiguration(nameof(AzzyBotSettings)).Configure(c => c.SettingsFile = settingsFile);
         services.AddOptions<DatabaseSettings>().BindConfiguration(nameof(DatabaseSettings));
         services.AddOptions<DiscordStatusSettings>().BindConfiguration(nameof(DiscordStatusSettings));
         services.AddOptions<MusicStreamingSettings>().BindConfiguration(nameof(MusicStreamingSettings));
