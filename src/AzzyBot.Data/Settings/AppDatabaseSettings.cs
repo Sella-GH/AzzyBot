@@ -1,26 +1,28 @@
-using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace AzzyBot.Data.Settings;
 
-[SuppressMessage("Roslynator", "RCS1181:Convert comment to documentation comment", Justification = "Informational comment")]
 public sealed record AppDatabaseSettings
 {
-    public required string EncryptionKey { get; set; } // 32 Characters
-    public string? NewEncryptionKey { get; set; } // 32 Characters
+    [Required, Length(32, 32, ErrorMessage = $"The {nameof(EncryptionKey)} must contain exactly 32 characters!")]
+    public required string EncryptionKey { get; set; }
+
+    [Length(32, 32, ErrorMessage = $"The {nameof(NewEncryptionKey)} must contain exactly 32 characters!")]
+    public string? NewEncryptionKey { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public string Host { get; init; } = "AzzyBot-Db";
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Range(0, ushort.MaxValue), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int Port { get; init; } = 5432;
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Length(1, 63), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public string User { get; init; } = "azzybot";
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Length(1, 1000), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public string Password { get; init; } = "thisIsAzzyB0!P@ssw0rd";
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Length(1, 63), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public string DatabaseName { get; init; } = "azzybot";
 }

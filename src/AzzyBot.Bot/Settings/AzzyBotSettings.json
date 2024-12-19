@@ -1,8 +1,10 @@
 {
-  "BotToken": null,
-  "ServerId": 0,
-  "ErrorChannelId": 0,
-  "NotificationChannelId": 0,
+  "AzzyBotSettings": {
+    "BotToken": null,
+    "ServerId": 0,
+    "ErrorChannelId": 0,
+    "NotificationChannelId": 0
+  },
   "Database": {
     "EncryptionKey": null,
     "NewEncryptionKey": null,

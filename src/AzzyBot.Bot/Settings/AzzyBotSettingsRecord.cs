@@ -1,108 +1,59 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using AzzyBot.Core.Settings;
-using AzzyBot.Data.Settings;
 
 namespace AzzyBot.Bot.Settings;
 
-public sealed record AzzyBotSettingsRecord : ISettings
+public sealed record AzzyBotSettingsRecord
 {
+    [Required]
     public required string BotToken { get; init; }
+
+    [Required, Range(ulong.MinValue, ulong.MaxValue)]
     public required ulong ServerId { get; init; }
+
+    [Required, Range(ulong.MinValue, ulong.MaxValue)]
     public required ulong ErrorChannelId { get; init; }
+
+    [Required, Range(ulong.MinValue, ulong.MaxValue)]
     public required ulong NotificationChannelId { get; init; }
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public AppDatabaseSettings? Database { get; init; }
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public DiscordStatus? DiscordStatus { get; init; }
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public MusicStreamingSettings? MusicStreaming { get; init; }
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public required CoreUpdater Updater { get; init; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.Always)]
     public string? SettingsFile { get; set; }
-
-    public Dictionary<string, object?> GetProperties()
-    {
-        return new(8)
-        {
-            { nameof(BotToken), BotToken },
-            { nameof(ServerId), ServerId },
-            { nameof(ErrorChannelId), ErrorChannelId },
-            { nameof(NotificationChannelId), NotificationChannelId },
-            { nameof(Database), Database },
-            { nameof(DiscordStatus), DiscordStatus },
-            { nameof(MusicStreaming), MusicStreaming },
-            { nameof(Updater), Updater }
-        };
-    }
 }
 
-public sealed record DiscordStatus : ISettings
+public sealed record DiscordStatus
 {
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Range(0, 5), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int Activity { get; init; } = 2;
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public string? Doing { get; init; } = "Music";
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Range(0, 5), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int Status { get; init; } = 1;
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Url, JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public Uri? StreamUrl { get; init; }
-
-    public Dictionary<string, object?> GetProperties()
-    {
-        return new(4)
-        {
-            { nameof(Activity), Activity },
-            { nameof(Doing), Doing },
-            { nameof(Status), Status },
-            { nameof(StreamUrl), StreamUrl }
-        };
-    }
 }
 
-public sealed record MusicStreamingSettings : ISettings
+public sealed record MusicStreamingSettings
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? LavalinkHost { get; init; } = "AzzyBot-Ms";
 
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Range(0, ushort.MaxValue), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int LavalinkPort { get; init; } = 2333;
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? LavalinkPassword { get; init; } = "AzzyB0TMus1cStr3am!ng";
-
-    public Dictionary<string, object?> GetProperties()
-    {
-        return new(3)
-        {
-            { nameof(LavalinkHost), LavalinkHost },
-            { nameof(LavalinkPort), LavalinkPort },
-            { nameof(LavalinkPassword), LavalinkPassword }
-        };
-    }
 }
 
-public sealed record CoreUpdater : ISettings
+public sealed record CoreUpdater
 {
+    [Required]
     public required bool DisplayChangelog { get; init; }
-    public required bool DisplayInstructions { get; init; }
 
-    public Dictionary<string, object?> GetProperties()
-    {
-        return new(2)
-        {
-            { nameof(DisplayChangelog), DisplayChangelog },
-            { nameof(DisplayInstructions), DisplayInstructions }
-        };
-    }
+    [Required]
+    public required bool DisplayInstructions { get; init; }
 }
