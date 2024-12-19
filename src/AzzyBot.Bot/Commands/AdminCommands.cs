@@ -31,10 +31,10 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AdminCommands
 {
     [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(BotPermissions = [], UserPermissions = [DiscordPermission.Administrator])]
-    public sealed class AdminGroup(ILogger<AdminGroup> logger, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotService botService)
+    public sealed class AdminGroup(ILogger<AdminGroup> logger, AzzyBotSettings settings, DbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<AdminGroup> _logger = logger;
-        private readonly AzzyBotSettingsRecord _settings = settings;
+        private readonly AzzyBotSettings _settings = settings;
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
 

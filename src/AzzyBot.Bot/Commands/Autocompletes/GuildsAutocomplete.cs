@@ -11,9 +11,9 @@ using DSharpPlus.Entities;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class GuildsAutocomplete(AzzyBotSettingsRecord settings, DiscordBotService botService) : IAutoCompleteProvider
+public sealed class GuildsAutocomplete(AzzyBotSettings settings, DiscordBotService botService) : IAutoCompleteProvider
 {
-    private readonly AzzyBotSettingsRecord _settings = settings;
+    private readonly AzzyBotSettings _settings = settings;
     private readonly DiscordBotService _botService = botService;
 
     public ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)

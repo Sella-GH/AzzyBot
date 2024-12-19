@@ -27,10 +27,10 @@ namespace AzzyBot.Bot.Commands;
 public sealed class CoreCommands
 {
     [Command("core"), RequireGuild]
-    public sealed class CoreGroup(ILogger<CoreGroup> logger, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotService botService)
+    public sealed class CoreGroup(ILogger<CoreGroup> logger, AzzyBotSettings settings, DbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<CoreGroup> _logger = logger;
-        private readonly AzzyBotSettingsRecord _settings = settings;
+        private readonly AzzyBotSettings _settings = settings;
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
 
@@ -110,9 +110,9 @@ public sealed class CoreCommands
         }
 
         [Command("stats")]
-        public sealed class CoreStats(AppStatsRecord stats, ILogger<CoreStats> logger)
+        public sealed class CoreStats(AppStats stats, ILogger<CoreStats> logger)
         {
-            private readonly AppStatsRecord _stats = stats;
+            private readonly AppStats _stats = stats;
             private readonly ILogger<CoreStats> _logger = logger;
 
             [Command("hardware"), Description("Shows information about the hardware side of the bot.")]

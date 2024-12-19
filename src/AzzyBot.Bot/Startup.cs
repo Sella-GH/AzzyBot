@@ -7,6 +7,7 @@ using AzzyBot.Bot.Extensions;
 using AzzyBot.Core.Extensions;
 using AzzyBot.Core.Utilities;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot;
 
@@ -42,11 +43,27 @@ public static class Startup
 
         #endregion Add logging
 
+        #region Add configuration
+
+        appBuilder.Configuration.AddAppConfiguration(isDev, isDocker);
+
+        #endregion Add configuration
+
         #region Add services
 
-        appBuilder.Services.AzzyBotSettings(isDev, isDocker);
-        appBuilder.Services.AzzyBotStats(isDev && !isDocker);
-        appBuilder.Services.AzzyBotServices(isDev, isDocker, logDays);
+        try
+        {
+            appBuilder.Services.AddAppSettings();
+            appBuilder.Services.AzzyBotServices(isDev, isDocker, logDays);
+        }
+        catch (OptionsValidationException ex)
+        {
+            Console.WriteLine(ex.Message);
+            if (!HardwareStats.CheckIfLinuxOs)
+                Console.ReadKey();
+
+            return;
+        }
 
         #endregion Add services
 
