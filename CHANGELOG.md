@@ -1,6 +1,12 @@
 ## 2.2.0
+
+### BREAKING CHANGES
+- The settings file structure changed and will require a migration!
+
 ### Dependencies
-- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02430
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02432
+- Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.12.10
+- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.4.0.108396
 
 ### Additions
 - `player play` and `player play-mount` gained an additional optional parameter `volume` which allows to set the volume of the player at startup
@@ -17,6 +23,7 @@
 - `config reset-settings` now shows a confirmation message before resetting the settings
 - Refactored the code to use `System.Text.Json` source generator and removed `System.Reflection` calls
 - The exception embed was slightly improved with more details
+- Refactored the settings code to use the Options Pattern with source generation validation
 
 ## 2.1.2 - 2024-12-15
 ### Dependencies
