@@ -3,6 +3,6 @@
 namespace AzzyBot.Bot.Settings.Validators;
 
 [OptionsValidator]
-public sealed partial class MusicStreamingSettingsValidator : IValidateOptions<MusicStreaming>
+public sealed partial class MusicStreamingSettingsValidator : IValidateOptions<MusicStreamingSettings>
 {
 }

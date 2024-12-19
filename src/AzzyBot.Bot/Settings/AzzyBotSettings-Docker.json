@@ -5,20 +5,20 @@
     "ErrorChannelId": 0,
     "NotificationChannelId": 0
   },
-  "Database": {
+  "DatabaseSettings": {
     "EncryptionKey": null,
     "NewEncryptionKey": null
   },
-  "DiscordStatus": {
+  "DiscordStatusSettings": {
     "Activity": 2,
     "Doing": "Music",
     "Status": 1,
     "StreamUrl": null
   },
-  "MusicStreaming": {
+  "MusicStreamingSettings": {
     "LavalinkPassword": "AzzyB0TMus1cStr3am!ng"
   },
-  "CoreUpdater": {
+  "CoreUpdaterSettings": {
     "DisplayChangelog": true,
     "DisplayInstructions": true
   }

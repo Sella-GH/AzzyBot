@@ -12,17 +12,23 @@ using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSettings settings, AzzyDbContext dbContext) : IHostedService
+public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<AzzyBotSettings> azzySettings, IOptions<CoreUpdaterSettings> updaterSettings, IOptions<DatabaseSettings> dbSettings, IOptions<DiscordStatusSettings> discordSettings, IOptions<MusicStreamingSettings> musicStreamingSettings, AzzyDbContext dbContext) : IHostedService
 {
     private readonly ILogger<CoreServiceHost> _logger = logger;
-    private readonly AzzyBotSettings _settings = settings;
+    private readonly AzzyBotSettings _azzySettings = azzySettings.Value;
+    private readonly CoreUpdaterSettings _updaterSettings = updaterSettings.Value;
+    private readonly DatabaseSettings _dbSettings = dbSettings.Value;
+    private readonly DiscordStatusSettings _discordSettings = discordSettings.Value;
+    private readonly MusicStreamingSettings _musicStreamingSettings = musicStreamingSettings.Value;
     private readonly AzzyDbContext _dbContext = dbContext;
     private readonly Task _completed = Task.CompletedTask;
 
@@ -36,7 +42,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
 
         _logger.BotStarting(name, version, os, arch, dotnet);
 
-        if (_settings.Database is not null && !string.IsNullOrWhiteSpace(_settings.Database.NewEncryptionKey) && (_settings.Database.NewEncryptionKey != _settings.Database.EncryptionKey))
+        if (!string.IsNullOrWhiteSpace(_dbSettings.NewEncryptionKey) && (_dbSettings.NewEncryptionKey != _dbSettings.EncryptionKey))
             await ReencryptDatabaseAsync();
     }
 
@@ -49,14 +55,13 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
 
     private async Task ReencryptDatabaseAsync()
     {
-        ArgumentNullException.ThrowIfNull(_settings.Database);
-        ArgumentException.ThrowIfNullOrWhiteSpace(_settings.Database.EncryptionKey);
-        ArgumentException.ThrowIfNullOrWhiteSpace(_settings.Database.NewEncryptionKey);
-        ArgumentException.ThrowIfNullOrWhiteSpace(_settings.SettingsFile);
+        ArgumentException.ThrowIfNullOrWhiteSpace(_dbSettings.EncryptionKey);
+        ArgumentException.ThrowIfNullOrWhiteSpace(_dbSettings.NewEncryptionKey);
+        ArgumentException.ThrowIfNullOrWhiteSpace(_azzySettings.SettingsFile);
 
         _logger.DatabaseReencryptionStart();
 
-        byte[] newEncryptionKey = Encoding.UTF8.GetBytes(_settings.Database.NewEncryptionKey);
+        byte[] newEncryptionKey = Encoding.UTF8.GetBytes(_dbSettings.NewEncryptionKey);
 
         await using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync();
 
@@ -90,11 +95,20 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
         }
 
         Crypto.EncryptionKey = newEncryptionKey;
-        _settings.Database.EncryptionKey = _settings.Database.NewEncryptionKey;
-        _settings.Database.NewEncryptionKey = string.Empty;
+        _dbSettings.EncryptionKey = _dbSettings.NewEncryptionKey;
+        _dbSettings.NewEncryptionKey = string.Empty;
 
-        string json = JsonSerializer.Serialize(_settings, JsonSerializationSourceGen.Default.AzzyBotSettingsRecord);
-        await FileOperations.WriteToFileAsync(_settings.SettingsFile, json);
+        AppSettingsRecord appSettings = new()
+        {
+            AzzyBotSettings = _azzySettings,
+            DatabaseSettings = _dbSettings,
+            DiscordStatusSettings = _discordSettings,
+            MusicStreamingSettings = _musicStreamingSettings,
+            CoreUpdaterSettings = _updaterSettings
+        };
+
+        string json = JsonSerializer.Serialize(appSettings, JsonSerializationSourceGen.Default.AppSettingsRecord);
+        await FileOperations.WriteToFileAsync(_azzySettings.SettingsFile, json);
 
         _logger.DatabaseReencryptionComplete();
     }

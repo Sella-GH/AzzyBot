@@ -5,7 +5,7 @@
     "ErrorChannelId": 0,
     "NotificationChannelId": 0
   },
-  "Database": {
+  "DatabaseSettings": {
     "EncryptionKey": null,
     "NewEncryptionKey": null,
     "Host": "localhost",
@@ -14,18 +14,18 @@
     "Password": null,
     "DatabaseName": "azzybot"
   },
-  "DiscordStatus": {
+  "DiscordStatusSettings": {
     "Activity": 2,
     "Doing": "Music",
     "Status": 1,
     "StreamUrl": null
   },
-  "MusicStreaming": {
+  "MusicStreamingSettings": {
     "LavalinkHost": "localhost",
     "LavalinkPort": 2333,
     "LavalinkPassword": "AzzyB0TMus1cStr3am!ng"
   },
-  "CoreUpdater": {
+  "CoreUpdaterSettings": {
     "DisplayChangelog": true,
     "DisplayInstructions": true
   }

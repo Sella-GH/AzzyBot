@@ -3,6 +3,6 @@
 namespace AzzyBot.Bot.Settings.Validators;
 
 [OptionsValidator]
-public sealed partial class CoreUpdaterValidator : IValidateOptions<CoreUpdater>
+public sealed partial class CoreUpdaterValidator : IValidateOptions<CoreUpdaterSettings>
 {
 }

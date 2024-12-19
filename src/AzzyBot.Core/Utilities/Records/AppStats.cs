@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace AzzyBot.Core.Utilities.Records;
@@ -12,26 +12,18 @@ public sealed record AppStats
     /// <summary>
     /// The commit hash.
     /// </summary>
-    [JsonPropertyName(nameof(Commit))]
-    public string Commit { get; init; }
+    [Length(0, 40, ErrorMessage = "CommitHash must be exactly 40 characters long."), JsonPropertyName(nameof(Commit))]
+    public string Commit { get; set; } = "Unknown";
 
     /// <summary>
     /// The compilation date.
     /// </summary>
     [JsonPropertyName(nameof(CompilationDate))]
-    public DateTimeOffset CompilationDate { get; init; }
+    public DateTimeOffset CompilationDate { get; set; } = DateTimeOffset.UtcNow;
 
     /// <summary>
     /// The lines of code in C#.
     /// </summary>
     [JsonPropertyName(nameof(LocCs))]
-    public int LocCs { get; init; }
-
-    [SuppressMessage("Roslynator", "RCS1231:Make parameter ref read-only", Justification = "This is a constructor and does not allow referencing.")]
-    public AppStats(string commit, DateTimeOffset compilationDate, int locCs)
-    {
-        Commit = commit;
-        CompilationDate = compilationDate;
-        LocCs = locCs;
-    }
+    public int LocCs { get; set; }
 }

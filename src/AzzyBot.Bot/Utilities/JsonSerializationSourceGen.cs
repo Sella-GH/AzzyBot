@@ -8,10 +8,10 @@ namespace AzzyBot.Bot.Utilities;
 
 [SuppressMessage("Roslynator", "RCS1251:Remove unnecessary braces from record declaration", Justification = "Class has to be empty.")]
 [JsonSourceGenerationOptions(WriteIndented = true, GenerationMode = JsonSourceGenerationMode.Serialization)]
+[JsonSerializable(typeof(AppSettingsRecord))]
 [JsonSerializable(typeof(AzuraAdminStationConfigRecord))]
 [JsonSerializable(typeof(AzuraFileUploadRecord))]
 [JsonSerializable(typeof(AzuraInternalRequestRecord))]
-[JsonSerializable(typeof(AzzyBotSettings))]
 [JsonSerializable(typeof(SerializableExceptionsRecord))]
 public sealed partial class JsonSerializationSourceGen : JsonSerializerContext
 {

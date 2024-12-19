@@ -10,13 +10,15 @@ using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettings settings, DiscordBotService botService, WebRequestService webService)
+public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<AzzyBotSettings> botSettings, IOptions<CoreUpdaterSettings> updaterSettings, DiscordBotService botService, WebRequestService webService)
 {
     private readonly ILogger<UpdaterService> _logger = logger;
-    private readonly AzzyBotSettings _settings = settings;
+    private readonly AzzyBotSettings _botSettings = botSettings.Value;
+    private readonly CoreUpdaterSettings _updaterSettings = updaterSettings.Value;
     private readonly DiscordBotService _botService = botService;
     private readonly WebRequestService _webService = webService;
     private DateTimeOffset _lastAzzyUpdateNotificationTime = DateTimeOffset.MinValue;
@@ -102,26 +104,26 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, AzzyBotSettin
             EmbedBuilder.BuildAzzyUpdatesAvailableEmbed(updateVersion, releaseDate, _latestUrl)
         };
 
-        if (_settings.Updater.DisplayChangelog)
+        if (_updaterSettings.DisplayChangelog)
             embeds.Add(EmbedBuilder.BuildAzzyUpdatesChangelogEmbed(changelog, _latestUrl));
 
-        if (_settings.Updater.DisplayInstructions)
+        if (_updaterSettings.DisplayInstructions)
             embeds.Add(EmbedBuilder.BuildAzzyUpdatesInstructionsEmbed());
 
         DiscordGuild? discordGuild = _botService.GetDiscordGuild();
         if (discordGuild is null)
         {
-            _logger.DiscordItemNotFound(nameof(DiscordGuild), _settings.ServerId);
+            _logger.DiscordItemNotFound(nameof(DiscordGuild), _botSettings.ServerId);
             return;
         }
 
-        ulong channelId = _settings.NotificationChannelId;
+        ulong channelId = _botSettings.NotificationChannelId;
         if (channelId is 0)
         {
             DiscordChannel? discordChannel = await discordGuild.GetSystemChannelAsync();
             if (discordChannel is null)
             {
-                _logger.DiscordItemNotFound(nameof(DiscordChannel), _settings.ServerId);
+                _logger.DiscordItemNotFound(nameof(DiscordChannel), _botSettings.ServerId);
                 return;
             }
 

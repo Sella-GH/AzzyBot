@@ -12,6 +12,7 @@
   <PropertyGroup>
     <AnalysisLevel>latest-all</AnalysisLevel>
     <Configurations>Debug;Release;Docker;Docker-debug</Configurations>
+    <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <ImplicitUsings>disable</ImplicitUsings>

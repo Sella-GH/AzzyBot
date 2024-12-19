@@ -6,21 +6,22 @@ using DSharpPlus;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class DiscordBotServiceHost(ILogger<DiscordBotServiceHost> logger, AzzyBotSettings settings, DiscordClient client) : IHostedService
+public sealed class DiscordBotServiceHost(ILogger<DiscordBotServiceHost> logger, IOptions<DiscordStatusSettings> settings, DiscordClient client) : IHostedService
 {
     private readonly ILogger<DiscordBotServiceHost> _logger = logger;
-    private readonly AzzyBotSettings _settings = settings;
+    private readonly DiscordStatusSettings _settings = settings.Value;
     private readonly DiscordClient _client = client;
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        DiscordActivity activity = DiscordBotService.SetBotStatusActivity(_settings.DiscordStatus?.Activity ?? 2, _settings.DiscordStatus?.Doing ?? "Music", _settings.DiscordStatus?.StreamUrl);
-        DiscordUserStatus status = DiscordBotService.SetBotStatusUserStatus(_settings.DiscordStatus?.Status ?? 1);
+        DiscordActivity activity = DiscordBotService.SetBotStatusActivity(_settings.Activity, _settings.Doing, _settings.StreamUrl);
+        DiscordUserStatus status = DiscordBotService.SetBotStatusUserStatus(_settings.Status);
 
         await _client.ConnectAsync(activity, status);
 

@@ -33,7 +33,9 @@ public static class IServiceCollectionExtensions
     public static void AzzyBotServices(this IServiceCollection services, bool isDev, bool isDocker, int logDays = 7)
     {
         IServiceProvider serviceProvider = services.BuildServiceProvider();
-        AzzyBotSettings settings = serviceProvider.GetRequiredService<AzzyBotSettings>();
+        DatabaseSettings dbSettings = serviceProvider.GetRequiredService<IOptions<DatabaseSettings>>().Value;
+        AzzyBotSettings botSettings = serviceProvider.GetRequiredService<IOptions<AzzyBotSettings>>().Value;
+        MusicStreamingSettings musicSettings = serviceProvider.GetRequiredService<IOptions<MusicStreamingSettings>>().Value;
 
         // Need to register as Singleton first
         // Otherwise DI doesn't work properly
@@ -41,10 +43,10 @@ public static class IServiceCollectionExtensions
         services.AddHostedService(static s => s.GetRequiredService<CoreServiceHost>());
 
         // Register the database services
-        services.AzzyBotDataServices(isDev, settings.Database!.EncryptionKey, settings.Database.Host, settings.Database.Port, settings.Database.User, settings.Database.Password, settings.Database.DatabaseName);
+        services.AzzyBotDataServices(isDev, dbSettings.EncryptionKey, dbSettings.Host, dbSettings.Port, dbSettings.User, dbSettings.Password, dbSettings.DatabaseName);
 
-        services.DiscordClient(settings.BotToken);
-        services.DiscordClientCommands(settings);
+        services.DiscordClient(botSettings.BotToken);
+        services.DiscordClientCommands(botSettings);
         services.DiscordClientInteractivity();
 
         services.AddSingleton<DiscordBotService>();
@@ -70,23 +72,23 @@ public static class IServiceCollectionExtensions
         services.ConfigureLavalink(config =>
         {
             Uri baseAddress = (isDocker) ? new("http://AzzyBot-Ms:2333") : new("http://localhost:2333");
-            if (settings.MusicStreaming is not null)
+            if (musicSettings is not null)
             {
-                if (!string.IsNullOrWhiteSpace(settings.MusicStreaming.LavalinkHost) && settings.MusicStreaming.LavalinkPort is not 0)
+                if (!string.IsNullOrWhiteSpace(musicSettings.LavalinkHost) && musicSettings.LavalinkPort is not 0)
                 {
-                    baseAddress = new($"http://{settings.MusicStreaming.LavalinkHost}:{settings.MusicStreaming.LavalinkPort}");
+                    baseAddress = new($"http://{musicSettings.LavalinkHost}:{musicSettings.LavalinkPort}");
                 }
-                else if (!string.IsNullOrWhiteSpace(settings.MusicStreaming.LavalinkHost) && settings.MusicStreaming.LavalinkPort is 0)
+                else if (!string.IsNullOrWhiteSpace(musicSettings.LavalinkHost) && musicSettings.LavalinkPort is 0)
                 {
-                    baseAddress = new($"http://{settings.MusicStreaming.LavalinkHost}:2333");
+                    baseAddress = new($"http://{musicSettings.LavalinkHost}:2333");
                 }
-                else if (string.IsNullOrWhiteSpace(settings.MusicStreaming.LavalinkHost) && settings.MusicStreaming.LavalinkPort is not 0)
+                else if (string.IsNullOrWhiteSpace(musicSettings.LavalinkHost) && musicSettings.LavalinkPort is not 0)
                 {
-                    baseAddress = (isDocker) ? new($"http://AzzyBot-Ms:{settings.MusicStreaming.LavalinkPort}") : new($"http://localhost:{settings.MusicStreaming.LavalinkPort}");
+                    baseAddress = (isDocker) ? new($"http://AzzyBot-Ms:{musicSettings.LavalinkPort}") : new($"http://localhost:{musicSettings.LavalinkPort}");
                 }
 
-                if (!string.IsNullOrWhiteSpace(settings.MusicStreaming.LavalinkPassword))
-                    config.Passphrase = settings.MusicStreaming.LavalinkPassword;
+                if (!string.IsNullOrWhiteSpace(musicSettings.LavalinkPassword))
+                    config.Passphrase = musicSettings.LavalinkPassword;
             }
 
             config.BaseAddress = baseAddress;
@@ -100,17 +102,17 @@ public static class IServiceCollectionExtensions
     public static void AddAppSettings(this IServiceCollection services)
     {
         services.AddSingleton<IValidateOptions<AzzyBotSettings>, AzzyBotSettingsValidator>().AddOptionsWithValidateOnStart<AzzyBotSettings>();
-        services.AddSingleton<IValidateOptions<AppDatabaseSettings>, DatabaseSettingsValidator>().AddOptionsWithValidateOnStart<AppDatabaseSettings>();
-        services.AddSingleton<IValidateOptions<DiscordStatus>, DiscordStatusSettingsValidator>().AddOptionsWithValidateOnStart<DiscordStatus>();
-        services.AddSingleton<IValidateOptions<MusicStreaming>, MusicStreamingSettingsValidator>().AddOptionsWithValidateOnStart<MusicStreaming>();
-        services.AddSingleton<IValidateOptions<CoreUpdater>, CoreUpdaterValidator>().AddOptionsWithValidateOnStart<CoreUpdater>();
+        services.AddSingleton<IValidateOptions<DatabaseSettings>, DatabaseSettingsValidator>().AddOptionsWithValidateOnStart<DatabaseSettings>();
+        services.AddSingleton<IValidateOptions<DiscordStatusSettings>, DiscordStatusSettingsValidator>().AddOptionsWithValidateOnStart<DiscordStatusSettings>();
+        services.AddSingleton<IValidateOptions<MusicStreamingSettings>, MusicStreamingSettingsValidator>().AddOptionsWithValidateOnStart<MusicStreamingSettings>();
+        services.AddSingleton<IValidateOptions<CoreUpdaterSettings>, CoreUpdaterValidator>().AddOptionsWithValidateOnStart<CoreUpdaterSettings>();
         services.AddSingleton<IValidateOptions<AppStats>, AppStatsValidator>().AddOptionsWithValidateOnStart<AppStats>();
 
         services.AddOptions<AzzyBotSettings>().BindConfiguration(nameof(AzzyBotSettings));
-        services.AddOptions<AppDatabaseSettings>().BindConfiguration(nameof(AppDatabaseSettings));
-        services.AddOptions<DiscordStatus>().BindConfiguration(nameof(DiscordStatus));
-        services.AddOptions<MusicStreaming>().BindConfiguration(nameof(MusicStreaming));
-        services.AddOptions<CoreUpdater>().BindConfiguration(nameof(CoreUpdater));
+        services.AddOptions<DatabaseSettings>().BindConfiguration(nameof(DatabaseSettings));
+        services.AddOptions<DiscordStatusSettings>().BindConfiguration(nameof(DiscordStatusSettings));
+        services.AddOptions<MusicStreamingSettings>().BindConfiguration(nameof(MusicStreamingSettings));
+        services.AddOptions<CoreUpdaterSettings>().BindConfiguration(nameof(CoreUpdaterSettings));
         services.AddOptions<AppStats>().BindConfiguration(nameof(AppStats));
     }
 
