@@ -42,10 +42,15 @@ public static class Startup
 
         #endregion Add logging
 
+        #region Add configuration
+
+        appBuilder.Configuration.AddAppConfiguration(isDev, isDocker);
+
+        #endregion Add configuration
+
         #region Add services
 
         appBuilder.Services.AzzyBotSettings(isDev, isDocker);
-        appBuilder.Services.AzzyBotStats(isDev && !isDocker);
         appBuilder.Services.AzzyBotServices(isDev, isDocker, logDays);
 
         #endregion Add services

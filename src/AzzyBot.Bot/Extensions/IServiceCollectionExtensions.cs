@@ -99,18 +99,6 @@ public static class IServiceCollectionExtensions
 
     public static void AzzyBotSettings(this IServiceCollection services, bool isDev, bool isDocker)
     {
-        string settingsFile = "AzzyBotSettings.json";
-        if (isDev)
-        {
-            settingsFile = "AzzyBotSettings-Dev.json";
-        }
-        else if (isDocker)
-        {
-            settingsFile = "AzzyBotSettings-Docker.json";
-        }
-
-        string path = Path.Combine("Settings", settingsFile);
-
         AzzyBotSettingsRecord? settings = Misc.GetConfiguration(path).Get<AzzyBotSettingsRecord>();
         if (settings is null)
         {
