@@ -11,7 +11,7 @@ namespace AzzyBot.Bot.Utilities;
 [JsonSerializable(typeof(AzuraAdminStationConfigRecord))]
 [JsonSerializable(typeof(AzuraFileUploadRecord))]
 [JsonSerializable(typeof(AzuraInternalRequestRecord))]
-[JsonSerializable(typeof(AzzyBotSettingsRecord))]
+[JsonSerializable(typeof(AzzyBotSettings))]
 [JsonSerializable(typeof(SerializableExceptionsRecord))]
 public sealed partial class JsonSerializationSourceGen : JsonSerializerContext
 {

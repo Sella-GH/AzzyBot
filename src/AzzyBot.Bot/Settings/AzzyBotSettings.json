@@ -25,7 +25,7 @@
     "LavalinkPort": 2333,
     "LavalinkPassword": "AzzyB0TMus1cStr3am!ng"
   },
-  "Updater": {
+  "CoreUpdater": {
     "DisplayChangelog": true,
     "DisplayInstructions": true
   }

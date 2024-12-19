@@ -19,10 +19,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSettingsRecord settings, AzzyDbContext dbContext) : IHostedService
+public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSettings settings, AzzyDbContext dbContext) : IHostedService
 {
     private readonly ILogger<CoreServiceHost> _logger = logger;
-    private readonly AzzyBotSettingsRecord _settings = settings;
+    private readonly AzzyBotSettings _settings = settings;
     private readonly AzzyDbContext _dbContext = dbContext;
     private readonly Task _completed = Task.CompletedTask;
 

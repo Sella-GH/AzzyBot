@@ -14,10 +14,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.DiscordEvents;
 
-public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, AzzyBotSettingsRecord settings, DiscordBotService botService, DbActions dbActions) : IEventHandler<GuildCreatedEventArgs>, IEventHandler<GuildDeletedEventArgs>, IEventHandler<GuildDownloadCompletedEventArgs>
+public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, AzzyBotSettings settings, DiscordBotService botService, DbActions dbActions) : IEventHandler<GuildCreatedEventArgs>, IEventHandler<GuildDeletedEventArgs>, IEventHandler<GuildDownloadCompletedEventArgs>
 {
     private readonly ILogger<DiscordGuildsHandler> _logger = logger;
-    private readonly AzzyBotSettingsRecord _settings = settings;
+    private readonly AzzyBotSettings _settings = settings;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
 

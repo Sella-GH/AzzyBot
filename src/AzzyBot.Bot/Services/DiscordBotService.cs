@@ -27,10 +27,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordClient client)
+public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBotSettings settings, DbActions dbActions, DiscordClient client)
 {
     private readonly ILogger<DiscordBotService> _logger = logger;
-    private readonly AzzyBotSettingsRecord _settings = settings;
+    private readonly AzzyBotSettings _settings = settings;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordClient _client = client;
     private const string BugReportMessage = "Send a [bug report]([BugReportUri]) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";

@@ -7,7 +7,7 @@ namespace AzzyBot.Core.Utilities.Records;
 /// <summary>
 /// Represents the application statistics record.
 /// </summary>
-public sealed record AppStatsRecord
+public sealed record AppStats
 {
     /// <summary>
     /// The commit hash.
@@ -28,7 +28,7 @@ public sealed record AppStatsRecord
     public int LocCs { get; init; }
 
     [SuppressMessage("Roslynator", "RCS1231:Make parameter ref read-only", Justification = "This is a constructor and does not allow referencing.")]
-    public AppStatsRecord(string commit, DateTimeOffset compilationDate, int locCs)
+    public AppStats(string commit, DateTimeOffset compilationDate, int locCs)
     {
         Commit = commit;
         CompilationDate = compilationDate;

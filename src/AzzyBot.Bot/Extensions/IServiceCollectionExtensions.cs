@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using AzzyBot.Bot.Commands;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Converters;
@@ -9,9 +7,11 @@ using AzzyBot.Bot.Services.CronJobs;
 using AzzyBot.Bot.Services.DiscordEvents;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Settings;
-using AzzyBot.Core.Settings;
+using AzzyBot.Bot.Settings.Validators;
 using AzzyBot.Core.Utilities;
+using AzzyBot.Core.Utilities.Records;
 using AzzyBot.Data.Extensions;
+using AzzyBot.Data.Settings;
 using DSharpPlus;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.Processors.SlashCommands;
@@ -21,9 +21,9 @@ using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
 using Lavalink4NET.Extensions;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using NCronJob;
 
 namespace AzzyBot.Bot.Extensions;
@@ -33,7 +33,7 @@ public static class IServiceCollectionExtensions
     public static void AzzyBotServices(this IServiceCollection services, bool isDev, bool isDocker, int logDays = 7)
     {
         IServiceProvider serviceProvider = services.BuildServiceProvider();
-        AzzyBotSettingsRecord settings = serviceProvider.GetRequiredService<AzzyBotSettingsRecord>();
+        AzzyBotSettings settings = serviceProvider.GetRequiredService<AzzyBotSettings>();
 
         // Need to register as Singleton first
         // Otherwise DI doesn't work properly
@@ -97,56 +97,21 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<MusicStreamingService>();
     }
 
-    public static void AzzyBotSettings(this IServiceCollection services, bool isDev, bool isDocker)
+    public static void AddAppSettings(this IServiceCollection services)
     {
-        AzzyBotSettingsRecord? settings = Misc.GetConfiguration(path).Get<AzzyBotSettingsRecord>();
-        if (settings is null)
-        {
-            Console.Error.Write("No bot configuration found! Please set your settings.");
-            if (!HardwareStats.CheckIfLinuxOs)
-                Console.ReadKey();
+        services.AddSingleton<IValidateOptions<AzzyBotSettings>, AzzyBotSettingsValidator>().AddOptionsWithValidateOnStart<AzzyBotSettings>();
+        services.AddSingleton<IValidateOptions<AppDatabaseSettings>, DatabaseSettingsValidator>().AddOptionsWithValidateOnStart<AppDatabaseSettings>();
+        services.AddSingleton<IValidateOptions<DiscordStatus>, DiscordStatusSettingsValidator>().AddOptionsWithValidateOnStart<DiscordStatus>();
+        services.AddSingleton<IValidateOptions<MusicStreaming>, MusicStreamingSettingsValidator>().AddOptionsWithValidateOnStart<MusicStreaming>();
+        services.AddSingleton<IValidateOptions<CoreUpdater>, CoreUpdaterValidator>().AddOptionsWithValidateOnStart<CoreUpdater>();
+        services.AddSingleton<IValidateOptions<AppStats>, AppStatsValidator>().AddOptionsWithValidateOnStart<AppStats>();
 
-            Environment.Exit(1);
-        }
-
-        settings.SettingsFile = path;
-
-        // Check settings if something is missing
-        List<string> exclusions = new(11)
-        {
-            nameof(settings.Database.NewEncryptionKey),
-            nameof(settings.DiscordStatus.StreamUrl),
-            nameof(settings.MusicStreaming),
-            nameof(settings.MusicStreaming.LavalinkHost),
-            nameof(settings.MusicStreaming.LavalinkPort),
-            nameof(settings.MusicStreaming.LavalinkPassword)
-        };
-
-        if (isDocker)
-        {
-            exclusions.Add(nameof(settings.Database.Host));
-            exclusions.Add(nameof(settings.Database.Port));
-            exclusions.Add(nameof(settings.Database.User));
-            exclusions.Add(nameof(settings.Database.Password));
-            exclusions.Add(nameof(settings.Database.DatabaseName));
-        }
-        else
-        {
-            exclusions.Add(nameof(settings.Database.Password));
-        }
-
-        SettingsCheck.CheckSettings(settings, exclusions);
-
-        if (settings.Database!.EncryptionKey.Length is not 32)
-        {
-            Console.Error.WriteLine($"The {nameof(settings.Database.EncryptionKey)} must contain exactly 32 characters!");
-            if (!HardwareStats.CheckIfLinuxOs)
-                Console.ReadKey();
-
-            Environment.Exit(1);
-        }
-
-        services.AddSingleton(settings);
+        services.AddOptions<AzzyBotSettings>().BindConfiguration(nameof(AzzyBotSettings));
+        services.AddOptions<AppDatabaseSettings>().BindConfiguration(nameof(AppDatabaseSettings));
+        services.AddOptions<DiscordStatus>().BindConfiguration(nameof(DiscordStatus));
+        services.AddOptions<MusicStreaming>().BindConfiguration(nameof(MusicStreaming));
+        services.AddOptions<CoreUpdater>().BindConfiguration(nameof(CoreUpdater));
+        services.AddOptions<AppStats>().BindConfiguration(nameof(AppStats));
     }
 
     private static void DiscordClient(this IServiceCollection services, string token)
@@ -155,7 +120,7 @@ public static class IServiceCollectionExtensions
         services.ConfigureEventHandlers(static e => e.AddEventHandlers<DiscordGuildsHandler>(ServiceLifetime.Singleton));
     }
 
-    private static void DiscordClientCommands(this IServiceCollection services, AzzyBotSettingsRecord settings)
+    private static void DiscordClientCommands(this IServiceCollection services, AzzyBotSettings settings)
     {
         services.AddSingleton<DiscordCommandsErrorHandler>();
         services.AddCommandsExtension((IServiceProvider sp, CommandsExtension c) =>

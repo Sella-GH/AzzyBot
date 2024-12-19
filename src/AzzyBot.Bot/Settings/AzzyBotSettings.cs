@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace AzzyBot.Bot.Settings;
 
-public sealed record AzzyBotSettingsRecord
+public sealed record AzzyBotSettings
 {
     [Required]
     public required string BotToken { get; init; }
@@ -37,7 +37,7 @@ public sealed record DiscordStatus
     public Uri? StreamUrl { get; init; }
 }
 
-public sealed record MusicStreamingSettings
+public sealed record MusicStreaming
 {
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? LavalinkHost { get; init; } = "AzzyBot-Ms";
