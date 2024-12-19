@@ -1,5 +1,4 @@
 ## 2.2.0
-
 ### BREAKING CHANGES
 - The settings file structure changed and will require a migration!
 
