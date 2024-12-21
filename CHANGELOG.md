@@ -3,7 +3,7 @@
 - The settings file structure changed and will require a migration!
 
 ### Dependencies
-- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02432
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02438
 - Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.12.10
 - Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.4.0.108396
 
