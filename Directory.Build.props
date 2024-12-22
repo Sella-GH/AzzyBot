@@ -3,9 +3,17 @@
   <PropertyGroup>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <DebugType>embedded</DebugType>
-    <Optimize Condition="'$(Configuration)'=='Debug' OR '$(Configuration)'=='Docker-debug'">False</Optimize>
-    <Optimize Condition="'$(Configuration)'=='Release' OR '$(Configuration)'=='Docker'">True</Optimize>
     <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug' OR '$(Configuration)'=='Docker-debug'">
+    <DefineConstants>DEBUG;DOCKER_DEBUG</DefineConstants>
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release' OR '$(Configuration)'=='Docker'">
+    <DefineConstants>RELEASE;DOCKER</DefineConstants>
+    <Optimize>True</Optimize>
   </PropertyGroup>
 
   <!-- Development stuff -->

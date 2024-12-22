@@ -24,6 +24,7 @@
 - The exception embed was slightly improved with more details
 - Refactored the settings code to use the Options Pattern with source generation validation
 - Improvements regarding information security
+- Debug code was excluded from compiling in release mode
 
 ## 2.1.2 - 2024-12-15
 ### Dependencies

@@ -8,7 +8,6 @@ using AzzyBot.Bot.Services.DiscordEvents;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Settings.Validators;
-using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Records;
 using AzzyBot.Data.Extensions;
 using AzzyBot.Data.Settings;
@@ -22,7 +21,6 @@ using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
 using Lavalink4NET.Extensions;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using NCronJob;
 
@@ -142,9 +140,9 @@ public static class IServiceCollectionExtensions
             c.AddCommand(typeof(CoreCommands.CoreGroup));
             c.AddCommand(typeof(MusicStreamingCommands.PlayerGroup));
 
-            // Only add debug commands if it's a dev build
-            if (SoftwareStats.GetAppEnvironment == Environments.Development)
-                c.AddCommand(typeof(DebugCommands.DebugGroup), settings.ServerId);
+#if DEBUG || DOCKER_DEBUG
+            c.AddCommand(typeof(DebugCommands.DebugGroup), settings.ServerId);
+#endif
 
             c.AddCheck<AzuraCastDiscordChannelCheck>();
             c.AddCheck<AzuraCastDiscordPermCheck>();
