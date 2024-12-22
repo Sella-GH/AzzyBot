@@ -5,7 +5,7 @@ using AzzyBot.Core.Logging;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
 
-namespace AzzyBot.Data;
+namespace AzzyBot.Data.Services;
 
 public sealed class DbMaintenance(ILogger<DbMaintenance> logger, DbActions dbActions)
 {

@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
-using AzzyBot.Data;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Services;
 using Microsoft.Extensions.Logging;
 using NCronJob;
 

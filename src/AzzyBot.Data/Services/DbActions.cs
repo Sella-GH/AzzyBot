@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
-namespace AzzyBot.Data;
+namespace AzzyBot.Data.Services;
 
 public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext)
 {
@@ -102,7 +102,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             AzuraCastStationEntity station = new()
             {
                 StationId = stationId,
-                ApiKey = (string.IsNullOrEmpty(apiKey)) ? string.Empty : Crypto.Encrypt(apiKey),
+                ApiKey = string.IsNullOrEmpty(apiKey) ? string.Empty : Crypto.Encrypt(apiKey),
                 LastSkipTime = DateTimeOffset.MinValue,
                 LastRequestTime = DateTimeOffset.MinValue,
                 AzuraCastId = azura.Id
@@ -186,7 +186,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .Where(guild => guilds.ContainsKey(guild.UniqueId))
             .Select(guild => guilds[guild.UniqueId]);
 
-        return (success) ? addedGuilds : [];
+        return success ? addedGuilds : [];
     }
 
     public Task<bool> DeleteAzuraCastAsync(ulong guildId)
@@ -233,7 +233,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .Where(guild => !guilds.ContainsKey(guild.UniqueId))
             .Select(static guld => guld.UniqueId);
 
-        return (success) ? deletedGuilds : [];
+        return success ? deletedGuilds : [];
     }
 
     public Task<AzuraCastEntity?> GetAzuraCastAsync(ulong guildId, bool loadChecks = false, bool loadPrefs = false, bool loadStations = false, bool loadStationChecks = false, bool loadStationPrefs = false, bool loadGuild = false)

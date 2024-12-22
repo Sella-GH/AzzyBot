@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
-using AzzyBot.Data;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Services;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
