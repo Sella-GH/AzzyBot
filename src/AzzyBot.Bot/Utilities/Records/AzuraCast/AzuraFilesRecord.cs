@@ -21,12 +21,6 @@ public record AzuraFilesRecord
     public required string SongId { get; init; }
 
     /// <summary>
-    /// URL to the album artwork (if available).
-    /// </summary>
-    [JsonPropertyName("art")]
-    public required string Art { get; init; }
-
-    /// <summary>
     /// The relative path of the media file.
     /// </summary>
     [JsonPropertyName("path")]

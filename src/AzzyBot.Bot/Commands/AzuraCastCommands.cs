@@ -1227,7 +1227,8 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            DiscordEmbed embed = EmbedBuilder.BuildAzuraCastUploadFileEmbed(uploadedFile, file.FileSize, azuraStation.Name);
+            string artUrl = $"{baseUrl}/api/{AzuraApiEndpoints.Station}/{acStation.StationId}/{AzuraApiEndpoints.Art}/{uploadedFile.UniqueId}";
+            DiscordEmbed embed = EmbedBuilder.BuildAzuraCastUploadFileEmbed(uploadedFile, file.FileSize, azuraStation.Name, artUrl);
 
             await context.EditResponseAsync(embed);
 

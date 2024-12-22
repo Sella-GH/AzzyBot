@@ -283,7 +283,7 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, body.ToString(), DiscordColor.White);
     }
 
-    public static DiscordEmbed BuildAzuraCastUploadFileEmbed(AzuraFilesDetailedRecord file, int fileSize, string stationName)
+    public static DiscordEmbed BuildAzuraCastUploadFileEmbed(AzuraFilesDetailedRecord file, int fileSize, string stationName, string stationArt)
     {
         ArgumentNullException.ThrowIfNull(file);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(fileSize);
@@ -311,7 +311,7 @@ public static class EmbedBuilder
 
         fields.Add("File Size", new($"{Math.Round(fileSize / (1024.0 * 1024.0), 2)} MB"));
 
-        return CreateBasicEmbed(title, description, DiscordColor.SpringGreen, new(file.Art), fields: fields);
+        return CreateBasicEmbed(title, description, DiscordColor.SpringGreen, new(stationArt), fields: fields);
     }
 
     public static async Task<DiscordEmbed> BuildAzzyHardwareStatsEmbedAsync(Uri avaUrl, int ping)

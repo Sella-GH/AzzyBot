@@ -3,6 +3,7 @@ namespace AzzyBot.Bot.Utilities.Helpers;
 public static class AzuraApiEndpoints
 {
     public const string Admin = "admin";
+    public const string Art = "art";
     public const string Backend = "backend";
     public const string Batch = "batch";
     public const string Clear = "clear";
