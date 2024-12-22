@@ -139,7 +139,7 @@ public sealed class ConfigCommands
             [Description("Select the group that has the admin permissions on this station.")] DiscordRole adminGroup,
             [Description("Select a channel to get music requests when a request is not found on the server."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel requestsChannel,
             [Description("Enable or disable the showing of the playlist in the nowplaying embed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int showPlaylist,
-            [Description("Enable or disable the automatic check if files have been changed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int fileChanges,
+            [Description("Enable or disable the check if server files have been changed. This also enables local file caching."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int fileChanges,
             [Description("Select a channel where users are able to upload their own songs to your station."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? uploadChannel = null,
             [Description("Enter a custom path where the user uploaded songs are stored. Like /Requests")] string? uploadPath = null,
             [Description("Enter the api key of the new station. This is optional if the admin one has the permission.")] string? apiKey = null,
@@ -466,7 +466,7 @@ public sealed class ConfigCommands
         (
             SlashCommandContext context,
             [Description("Choose the station you want to modify the checks."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
-            [Description("Enable or disable the automatic check if files have been changed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int fileChanges = 0
+            [Description("Enable or disable the check if server files have been changed. This also enables local file caching."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int fileChanges = 0
         )
         {
             ArgumentNullException.ThrowIfNull(context);
