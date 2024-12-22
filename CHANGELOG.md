@@ -8,10 +8,13 @@
 - Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.4.0.108396
 
 ### Additions
+#### New parameters
 - `player play` and `player play-mount` gained an additional optional parameter `volume` which allows to set the volume of the player at startup
   - The volume can be set between 0 and 100
   - The default volume is 100
   - This value is only respected if the player is not playing anything
+
+#### New commands
 - `dj add-internal-song-request` command added
   - This command allows you to add a song quietly into the AutoDj queue
   - These kind of song requests are not logged inside AzuraCast and should be used with caution!
