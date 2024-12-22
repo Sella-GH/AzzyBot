@@ -2,22 +2,11 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using AzzyBot.Core.Utilities.Enums;
-using Microsoft.Extensions.Configuration;
 
 namespace AzzyBot.Core.Utilities;
 
 public static class Misc
 {
-    public static IConfiguration GetConfiguration(string path)
-    {
-        ConfigurationBuilder configBuilder = new();
-
-        configBuilder.Sources.Clear();
-        configBuilder.AddJsonFile(path, false, false);
-
-        return configBuilder.Build();
-    }
-
     public static string GetProgressBar(double number, double elapsed, double duration)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(number);

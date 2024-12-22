@@ -56,8 +56,14 @@ public static class ILoggingBuilderExtensions
             config.SingleLine = true;
             config.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
         });
-        logging.SetMinimumLevel((isDev || forceDebug) ? LogLevel.Debug : LogLevel.Information);
-        if (isDev && forceTrace)
+
+        if (!isDev || !forceTrace)
+        {
+            logging.SetMinimumLevel((isDev || forceDebug) ? LogLevel.Debug : LogLevel.Information);
+        }
+        else
+        {
             logging.SetMinimumLevel(LogLevel.Trace);
+        }
     }
 }
