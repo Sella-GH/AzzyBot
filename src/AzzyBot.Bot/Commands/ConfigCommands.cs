@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
@@ -583,7 +584,7 @@ public sealed class ConfigCommands
             await using DiscordMessageBuilder messageBuilder = new();
             messageBuilder.AddEmbeds([guildEmbed]);
 
-            if (guild.AzuraCast is not null)
+            if (guild.AzuraCast?.IsOnline is true)
             {
                 AzuraCastEntity ac = guild.AzuraCast;
                 Dictionary<ulong, string> stationRoles = new(ac.Stations.Count);
@@ -596,7 +597,17 @@ public sealed class ConfigCommands
                     stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? "Name not found");
                     stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found");
 
-                    AzuraStationRecord? stationRecord = await _azuraCastApi.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), station.StationId);
+                    AzuraStationRecord? stationRecord = null;
+                    try
+                    {
+                        stationRecord = await _azuraCastApi.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), station.StationId);
+                    }
+                    catch (HttpRequestException)
+                    {
+                        await _azuraCastPing.PingInstanceAsync(ac);
+                        break;
+                    }
+
                     if (stationRecord is null)
                     {
                         await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
@@ -613,6 +624,10 @@ public sealed class ConfigCommands
                 IEnumerable<DiscordEmbed> azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(ac, $"{instanceAdminRole?.Name} ({instanceAdminRole?.Id})", stationRoles, stationNames, stationRequests);
 
                 messageBuilder.AddEmbeds(azuraEmbed);
+            }
+            else if (guild.AzuraCast is not null)
+            {
+                messageBuilder.WithContent("Appearently you have an AzuraCast instance configured, but it's not online.");
             }
 
             await member.SendMessageAsync(messageBuilder);
