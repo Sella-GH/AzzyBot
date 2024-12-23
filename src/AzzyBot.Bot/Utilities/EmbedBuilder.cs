@@ -328,14 +328,12 @@ public static class EmbedBuilder
             ["Operating System"] = new(os, true),
             ["Architecture"] = new(osArch, true),
             ["Dockerized?"] = new(Misc.GetReadableBool(isDocker, ReadableBool.YesNo), true),
-            ["System Uptime"] = new($"<t:{uptime}>", true)
+            ["System Uptime"] = new($"<t:{uptime}>", true),
+            ["Bot Memory"] = new($"{SoftwareStats.GetAppMemoryUsage()} GB", true)
         };
 
         if (ping is not 0)
-        {
-            fields.Add("Ping", new($"{ping} ms", true));
-            fields.Add("\u200b", new("\u200b", true)); // Empty field to make the embed look better
-        }
+            fields.Add("Discord Ping", new($"{ping} ms", true));
 
         if (!HardwareStats.CheckIfLinuxOs)
             return CreateBasicEmbed(title, color: DiscordColor.Orange, footerText: notLinux, fields: fields);
@@ -458,19 +456,21 @@ public static class EmbedBuilder
         string formattedAuthors = $"- [{authors[0].Trim()}]({UriStrings.GitHubCreatorUri})\n- [{authors[1].Trim()}]({UriStrings.GitHubRepoContribUri})";
         string formattedCommit = $"[{commit}]({UriStrings.GitHubRepoCommitUri}/{commit})";
 
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(11)
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(13)
         {
-            ["Uptime"] = new($"<t:{Converter.ConvertToUnixTime(SoftwareStats.GetAppUptime().ToLocalTime())}>", true),
-            ["Bot Version"] = new(SoftwareStats.GetAppVersion, true),
-            [".NET Version"] = new(SoftwareStats.GetAppDotNetVersion, true),
-            ["D#+ Version"] = new(dspVersion, true),
             ["Authors"] = new(formattedAuthors, true),
             ["Repository"] = new($"[GitHub]({UriStrings.GitHubRepoUri})", true),
             ["Environment"] = new(SoftwareStats.GetAppEnvironment, true),
+            ["Bot Version"] = new(SoftwareStats.GetAppVersion, true),
+            [".NET Version"] = new(SoftwareStats.GetAppDotNetVersion, true),
+            ["D#+ Version"] = new(dspVersion, true),
             ["Source Code"] = new(sourceCode, true),
-            ["Memory Usage"] = new($"{SoftwareStats.GetAppMemoryUsage()} GB", true),
             ["Compilation Date"] = new($"<t:{Converter.ConvertToUnixTime(compileDate.ToLocalTime())}>", true),
-            ["AzzyBot GitHub Commit"] = new(formattedCommit)
+            ["AzzyBot GitHub Commit"] = new(formattedCommit),
+            ["Uptime"] = new($"<t:{Converter.ConvertToUnixTime(SoftwareStats.GetAppUptime().ToLocalTime())}>"),
+            ["License"] = new($"[AGPL-3.0]({UriStrings.GitHubRepoLicenseUrl})", true),
+            ["Terms Of Service"] = new($"[Terms Of Service]({UriStrings.GitHubRepoTosUrl})", true),
+            ["Privacy Policy"] = new($"[Privacy Policy]({UriStrings.GitHubRepoPrivacyPolicyUrl})", true)
         };
 
         return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl, fields: fields);
