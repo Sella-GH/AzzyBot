@@ -39,11 +39,14 @@ public static class SoftwareStats
     private static string GetAppFilePath()
     {
         string fileName = Path.Combine(AppContext.BaseDirectory, AppDomain.CurrentDomain.FriendlyName);
+        Console.WriteLine(fileName);
         if (!HardwareStats.CheckIfLinuxOs)
             fileName += ".exe";
 
+        Console.WriteLine(fileName);
+
         return (!string.IsNullOrEmpty(fileName))
-            ? Path.Combine(AppContext.BaseDirectory, fileName)
+            ? fileName
             : throw new InvalidOperationException("Bot file path not found");
     }
 }
