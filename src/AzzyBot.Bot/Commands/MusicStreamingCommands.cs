@@ -56,8 +56,6 @@ public sealed class MusicStreamingCommands
                 return;
             }
 
-            await context.DeferResponseAsync();
-
             if (!await _musicStreaming.SetVolumeAsync(context, volume))
                 return;
 
@@ -70,8 +68,6 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(HistoryAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
 
             IEnumerable<ITrackQueueItem>? history = await _musicStreaming.HistoryAsync(context);
             if (history?.Any() is not true)
@@ -93,8 +89,6 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context.Member.VoiceState);
 
             _logger.CommandRequested(nameof(JoinAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
 
             if (context.Member.VoiceState.Channel is null)
             {
@@ -121,8 +115,6 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(LeaveAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
             if (!await _musicStreaming.StopMusicAsync(context, true))
                 return;
 
@@ -135,8 +127,6 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(NowPlayingAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
 
             LavalinkTrack? track = await _musicStreaming.NowPlayingAsync(context);
             TimeSpan? pos = await _musicStreaming.GetCurrentPositionAsync(context);
@@ -162,8 +152,6 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(PauseAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
 
             LavalinkTrack? track = await _musicStreaming.NowPlayingAsync(context);
             if (track is null)
@@ -201,8 +189,6 @@ public sealed class MusicStreamingCommands
                 await context.RespondAsync(GeneralStrings.VolumeInvalid, true);
                 return;
             }
-
-            await context.DeferResponseAsync();
 
             string? text = await _musicStreaming.PlayMusicAsync(context, track, new(provider), volume);
             if (string.IsNullOrEmpty(text))
@@ -273,8 +259,6 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(QueueAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
             IEnumerable<ITrackQueueItem>? history = await _musicStreaming.HistoryAsync(context, true);
             if (history?.Any() is not true)
             {
@@ -297,8 +281,6 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(QueueClearAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
             if (!await _musicStreaming.ClearQueueAsync(context, songNumber))
                 return;
 
@@ -311,8 +293,6 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(ResumeAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
 
             LavalinkTrack? track = await _musicStreaming.NowPlayingAsync(context);
             if (track is null)
@@ -343,8 +323,6 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(SkipAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
             LavalinkTrack? track = await _musicStreaming.NowPlayingAsync(context);
             if (track is null)
             {
@@ -373,8 +351,6 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(StopAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
 
             bool leaving = leave is 1;
             if (!await _musicStreaming.StopMusicAsync(context, leaving))

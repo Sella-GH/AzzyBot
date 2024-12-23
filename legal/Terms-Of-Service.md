@@ -9,7 +9,7 @@ This Terms of Service Agreement ("Agreement") is a binding legal document betwee
 By utilizing the Bot, the User unequivocally consents to the stipulations of this Agreement. Non-acceptance of these terms mandates the immediate cessation of Bot usage.
 
 ### 1. Effective Date
-This Privacy Policy is effective as of 2024-12-22.
+This Agreement is effective as of 2024-12-22.
 
 ### 2. Scope of Usage
 The Bot Owner extends to the User a revocable, non-exclusive, non-transferable, and limited license strictly for engagement with the Bot. This license does not confer ownership or any proprietary interest in the Bot.

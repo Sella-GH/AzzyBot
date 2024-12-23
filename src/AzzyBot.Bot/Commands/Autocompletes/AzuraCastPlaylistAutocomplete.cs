@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.Modules;
@@ -19,10 +20,11 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutocomplete> logger, AzuraCastApiService azuraCast, DbActions dbActions, DiscordBotService botService) : IAutoCompleteProvider
+public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutocomplete> logger, AzuraCastApiService azuraCastApi, AzuraCastPingService azuraCastPing, DbActions dbActions, DiscordBotService botService) : IAutoCompleteProvider
 {
     private readonly ILogger<AzuraCastPlaylistAutocomplete> _logger = logger;
-    private readonly AzuraCastApiService _azuraCast = azuraCast;
+    private readonly AzuraCastApiService _azuraCast = azuraCastApi;
+    private readonly AzuraCastPingService _azuraCastPing = azuraCastPing;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
 
@@ -54,10 +56,19 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
         string? search = context.UserInput;
         string apiKey = (!string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(station.AzuraCast.AdminApiKey);
         string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
-        IEnumerable<AzuraPlaylistRecord>? playlists = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, stationId);
-        if (playlists is null)
+        IEnumerable<AzuraPlaylistRecord>? playlists;
+        try
         {
-            await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station ({stationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+            playlists = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, stationId);
+            if (playlists is null)
+            {
+                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station ({stationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                return [];
+            }
+        }
+        catch (HttpRequestException)
+        {
+            await _azuraCastPing.PingInstanceAsync(station.AzuraCast);
             return [];
         }
 

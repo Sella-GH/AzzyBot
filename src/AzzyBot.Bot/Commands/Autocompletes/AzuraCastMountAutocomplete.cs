@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Services;
@@ -19,10 +20,11 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplete> logger, AzuraCastApiService azuraCast, DbActions dbActions, DiscordBotService botService, WebRequestService webRequest) : IAutoCompleteProvider
+public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplete> logger, AzuraCastApiService azuraCast, AzuraCastPingService azuraCastPing, DbActions dbActions, DiscordBotService botService, WebRequestService webRequest) : IAutoCompleteProvider
 {
     private readonly ILogger<AzuraCastMountAutocomplete> _logger = logger;
     private readonly AzuraCastApiService _azuraCast = azuraCast;
+    private readonly AzuraCastPingService _azuraCastPing = azuraCastPing;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
     private readonly WebRequestService _webRequest = webRequest;
@@ -36,38 +38,36 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
         if (stationId is 0)
             return [];
 
-        AzuraCastEntity? azuraCastEntity = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true);
-        if (azuraCastEntity is null)
-        {
-            _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-            return [];
-        }
-
-        AzuraCastStationEntity? stationEntity = azuraCastEntity.Stations.FirstOrDefault(s => s.StationId == stationId);
+        AzuraCastStationEntity? stationEntity = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId, loadAzuraCast: true, loadAzuraCastPrefs: true);
         if (stationEntity is null)
         {
-            _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, azuraCastEntity.Id, stationId);
+            _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, stationId);
+            return [];
+        }
+        else if (!stationEntity.AzuraCast.IsOnline)
+        {
             return [];
         }
 
-        Uri baseUrl = new(Crypto.Decrypt(azuraCastEntity.BaseUrl));
+        Uri baseUrl = new(Crypto.Decrypt(stationEntity.AzuraCast.BaseUrl));
         AzuraStationRecord? record = null;
         try
         {
             record = await _azuraCast.GetStationAsync(baseUrl, stationId);
             if (record is null)
             {
-                await _botService.SendMessageAsync(azuraCastEntity.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({stationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(stationEntity.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({stationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
                 return [];
             }
         }
-        catch (InvalidOperationException)
+        catch (Exception e) when (e is HttpRequestException or InvalidOperationException)
         {
+            await _azuraCastPing.PingInstanceAsync(stationEntity.AzuraCast);
             return [];
         }
 
         // Try to detect if the bot is already listening to the station
-        string apiKey = (string.IsNullOrEmpty(stationEntity.ApiKey)) ? Crypto.Decrypt(azuraCastEntity.AdminApiKey) : Crypto.Decrypt(stationEntity.ApiKey);
+        string apiKey = (string.IsNullOrEmpty(stationEntity.ApiKey)) ? Crypto.Decrypt(stationEntity.AzuraCast.AdminApiKey) : Crypto.Decrypt(stationEntity.ApiKey);
         IEnumerable<AzuraStationListenerRecord>? listeners = await _azuraCast.GetStationListenersAsync(baseUrl, apiKey, stationId);
         AzzyIpAddressRecord ipAddresses = await _webRequest.GetIpAddressesAsync();
         string? playingMountPoint = listeners?.FirstOrDefault(l => l.Ip == ipAddresses.Ipv4 || l.Ip == ipAddresses.Ipv6)?.MountName;
