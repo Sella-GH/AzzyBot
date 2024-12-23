@@ -504,7 +504,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         });
     }
 
-    public Task<bool> UpdateGuildAsync(ulong guildId, bool? lastPermissionCheck = null, bool? legalsAccepted = false)
+    public Task<bool> UpdateGuildAsync(ulong guildId, bool? lastPermissionCheck = null, bool? legalsAccepted = null)
     {
         return ExecuteDbActionAsync(async context =>
         {
