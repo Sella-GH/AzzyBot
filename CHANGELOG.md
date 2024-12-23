@@ -39,6 +39,10 @@
 - The stats embed was restructured and now includes the legal stuff (License, Privacy Policy, Terms Of Service)
 - Updated the invite link so the bot now needs the "Embed Links" permission too
 
+### Fixes
+- The 15 minute cron job won't error anymore when the instance is offline
+- The settings embed now gets created again when the instance is offline
+
 ### Development
 - Refactored the code to use `System.Text.Json` source generator and removed `System.Reflection` calls
 - Refactored the settings code to use the Options Pattern with source generation validation
