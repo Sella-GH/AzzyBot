@@ -31,7 +31,7 @@ namespace AzzyBot.Bot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class AdminCommands
 {
-    [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(BotPermissions = [], UserPermissions = [DiscordPermission.Administrator])]
+    [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(UserPermissions = [DiscordPermission.Administrator])]
     public sealed class AdminGroup(ILogger<AdminGroup> logger, IOptions<AzzyBotSettings> settings, DbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<AdminGroup> _logger = logger;
@@ -165,6 +165,29 @@ public sealed class AdminCommands
             await context.EditResponseAsync($"I left **{guild.Name}** ({guild.Id}).");
         }
 
+        [Command("reset-legals"), Description("Resets the legals for all guilds where the bot is in.")]
+        public async ValueTask ResetLegalsAsync(SlashCommandContext context)
+        {
+            ArgumentNullException.ThrowIfNull(context);
+
+            _logger.CommandRequested(nameof(ResetLegalsAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            await _dbActions.UpdateGuildLegalsAsync();
+
+            IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
+            if (guilds.Count is 0)
+            {
+                await context.EditResponseAsync(GeneralStrings.NoGuildFound);
+                return;
+            }
+
+            await SendMessageAsync(guilds, GeneralStrings.LegalsReset);
+
+            await context.EditResponseAsync(GeneralStrings.MessageSentToAll);
+        }
+
         [Command("send-bot-wide-message"), Description("Sends a message to all servers the bot is in.")]
         public async ValueTask SendBotWideMessageAsync
         (
@@ -191,34 +214,7 @@ public sealed class AdminCommands
                 return;
             }
 
-            const string dmAddition = "You receive this message directly because you haven't provided a notification channel in your server.";
-            string newMessage = message.Replace("\\n", Environment.NewLine, StringComparison.OrdinalIgnoreCase);
-            IReadOnlyList<GuildEntity> guildsEntities = await _dbActions.GetGuildsAsync(loadGuildPrefs: true);
-            foreach (DiscordGuild guild in guilds.Values)
-            {
-                GuildEntity? guildEntity = guildsEntities.FirstOrDefault(e => e.UniqueId == guild.Id);
-                if (guildEntity is null)
-                {
-                    _logger.DatabaseGuildNotFound(guild.Id);
-                    continue;
-                }
-
-                if (guildEntity.ConfigSet && guildEntity.Preferences.AdminNotifyChannelId is not 0)
-                {
-                    await _botService.SendMessageAsync(guildEntity.Preferences.AdminNotifyChannelId, newMessage);
-                }
-                else
-                {
-                    DiscordMember owner = await guild.GetGuildOwnerAsync();
-                    string ownerMessage = newMessage;
-                    if (newMessage.Length < 2000 - dmAddition.Length)
-                    {
-                        ownerMessage += dmAddition;
-                    }
-
-                    await owner.SendMessageAsync(ownerMessage);
-                }
-            }
+            await SendMessageAsync(guilds, message);
 
             await context.EditResponseAsync(GeneralStrings.MessageSentToAll);
         }
@@ -252,6 +248,38 @@ public sealed class AdminCommands
             builder.WithContent($"Here are the logs from **{dateTime}**.");
             builder.AddFile($"{dateTime}.log", fileStream);
             await context.EditResponseAsync(builder);
+        }
+
+        private async ValueTask SendMessageAsync(IReadOnlyDictionary<ulong, DiscordGuild> guilds, string message)
+        {
+            const string dmAddition = "You receive this message directly because you haven't provided a notification channel in your server.";
+            string newMessage = message.Replace("\\n", Environment.NewLine, StringComparison.OrdinalIgnoreCase);
+            IReadOnlyList<GuildEntity> dbGuilds = await _dbActions.GetGuildsAsync(loadGuildPrefs: true);
+            foreach (DiscordGuild guild in guilds.Values)
+            {
+                GuildEntity? guildEntity = dbGuilds.FirstOrDefault(e => e.UniqueId == guild.Id);
+                if (guildEntity is null)
+                {
+                    _logger.DatabaseGuildNotFound(guild.Id);
+                    continue;
+                }
+
+                if (guildEntity.ConfigSet && guildEntity.Preferences.AdminNotifyChannelId is not 0)
+                {
+                    await _botService.SendMessageAsync(guildEntity.Preferences.AdminNotifyChannelId, newMessage);
+                }
+                else
+                {
+                    DiscordMember owner = await guild.GetGuildOwnerAsync();
+                    string ownerMessage = newMessage;
+                    if (newMessage.Length < 2000 - dmAddition.Length)
+                    {
+                        ownerMessage += dmAddition;
+                    }
+
+                    await owner.SendMessageAsync(ownerMessage);
+                }
+            }
         }
     }
 }

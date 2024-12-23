@@ -15,6 +15,9 @@
   - This value is only respected if the player is not playing anything
 
 #### New commands
+- `admin reset-legals` command added
+  - This command is only for administrators of the bot (the main server)
+  - It resets the accepted legals for every guild and requires them to reaccept
 - `dj add-internal-song-request` command added
   - This command allows you to add a song quietly into the AutoDj queue
   - These kind of song requests are not logged inside AzuraCast and should be used with caution!
