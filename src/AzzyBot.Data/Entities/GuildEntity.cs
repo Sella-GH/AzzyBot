@@ -24,6 +24,11 @@ public sealed class GuildEntity
     public bool ConfigSet { get; set; }
 
     /// <summary>
+    /// The state if the guild accepted the legal terms.
+    /// </summary>
+    public bool LegalsAccepted { get; set; }
+
+    /// <summary>
     /// The last saved <see cref="DateTimeOffset"/> timestamp when the <see cref="DiscordGuild"/> was checked for correct channel permissions.
     /// </summary>
     /// <remarks>

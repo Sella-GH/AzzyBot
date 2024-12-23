@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Choices;
+using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
@@ -652,6 +653,60 @@ public sealed class ConfigCommands
             await _dbActions.AddGuildAsync(context.Guild.Id);
 
             await context.EditResponseAsync(GeneralStrings.ConfigReset);
+        }
+    }
+
+    [Command("legals"), RequireGuild, RequirePermissions(UserPermissions = [DiscordPermission.Administrator])]
+    public sealed class LegalsGroup(ILogger<LegalsGroup> logger, DbActions dbActions)
+    {
+        private readonly ILogger<LegalsGroup> _logger = logger;
+        private readonly DbActions _dbActions = dbActions;
+
+        [Command("accept-legals"), Description("Provides you the links and guides you through the steps how to accept the legal conditions.")]
+        public async ValueTask AcceptLegalsAsync(SlashCommandContext context)
+        {
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
+
+            _logger.CommandRequested(nameof(AcceptLegalsAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            GuildEntity? guild = await _dbActions.GetGuildAsync(context.Guild.Id);
+            if (guild is null)
+            {
+                _logger.DatabaseGuildNotFound(context.Guild.Id);
+                await context.EditResponseAsync(GeneralStrings.GuildNotFound);
+                return;
+            }
+
+            if (guild.LegalsAccepted)
+            {
+                await context.EditResponseAsync(GeneralStrings.LegalsAlreadyAccepted);
+                return;
+            }
+
+            DiscordButtonComponent button = new(DiscordButtonStyle.Primary, $"accept_legals_{context.Guild.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Accept Legals.");
+            await using DiscordMessageBuilder messageBuilder = new();
+            messageBuilder.AddComponents(button);
+            string content = GeneralStrings.LegalsInformation
+                .Replace("%PP%", UriStrings.GitHubRepoPrivacyPolicyUrl, StringComparison.OrdinalIgnoreCase)
+                .Replace("%TOS%", UriStrings.GitHubRepoTosUrl, StringComparison.OrdinalIgnoreCase)
+                .Replace("%LICENSE%", UriStrings.GitHubRepoLicenseUrl, StringComparison.OrdinalIgnoreCase);
+
+            messageBuilder.WithContent(content);
+
+            DiscordMessage message = await context.EditResponseAsync(messageBuilder);
+            InteractivityResult<ComponentInteractionCreatedEventArgs> result = await message.WaitForButtonAsync(context.User, TimeSpan.FromMinutes(30));
+            if (result.TimedOut)
+            {
+                await context.EditResponseAsync("You haven't accepted the legals within the timespan. Please accept them to be able to use me.");
+                return;
+            }
+
+            await _dbActions.UpdateGuildAsync(context.Guild.Id, legalsAccepted: true);
+
+            await context.EditResponseAsync(GeneralStrings.LegalsAccepted);
         }
     }
 }

@@ -22,6 +22,8 @@
   - This command allows you to add a song quietly into the AutoDj queue
   - These kind of song requests are not logged inside AzuraCast and should be used with caution!
   - The bot however logs these kind of requests
+- `legals accept-legals` command added
+  - This command allows you to accept our legal terms and policies
 
 ### Improvements
 - Server info embed for admins was slightly improved and fixed
