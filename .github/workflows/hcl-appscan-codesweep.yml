@@ -8,12 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
       
       - name: Run AppScan CodeSweep
-        uses: HCL-TECH-SOFTWARE/appscan-codesweep-action@v2
+        uses: HCL-TECH-SOFTWARE/appscan-codesweep-action@c9d5958469145a0aaf3ac41eaa0190e7757e4eba
         with:
           status: action_required
           

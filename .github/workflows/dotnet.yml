@@ -26,20 +26,20 @@ jobs:
 
     steps:
      - name: Checkout
-       uses: actions/checkout@v4
+       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
        with:
          fetch-depth: 0
           
      - name: Get Date and Time
        id: dateTime
-       uses: Kaven-Universe/github-action-current-date-time@v1
+       uses: Kaven-Universe/github-action-current-date-time@f2c12d90cff9c3e7b1f50430886e632fe31fcee1
        with:
          format: "YYYY-MM-DDTHH:mm:ss"
 
      - name: Calculate Lines of Source Code
        if: ${{ github.actor != 'dependabot[bot]' }}
        id: loc_cs
-       uses: PavanMudigonda/lines-of-code-reporter@v1.6
+       uses: PavanMudigonda/lines-of-code-reporter@6c5507f592136d1c05cb1e8c30889dc4eb5561f5
        with:
          include_lang: "C#,MSBuild script"
 
@@ -61,12 +61,12 @@ jobs:
 
     steps:
      - name: Checkout
-       uses: actions/checkout@v4
+       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
        with:
          fetch-depth: 0
       
      - name: Setup .NET 9
-       uses: actions/setup-dotnet@v4
+       uses: actions/setup-dotnet@3e891b0cb619bf60e2c25674b222b8940e2c1c25
        with:
          dotnet-version: '9'
 
@@ -96,7 +96,7 @@ jobs:
          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
      - name: Archive Bot Build Artifact
-       uses: actions/upload-artifact@v4
+       uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b
        with:
          name: debug-bot-${{ matrix.os }}-${{ matrix.arch }}
          path: ./artifacts/publish/AzzyBot.Bot/debug
