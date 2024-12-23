@@ -23,11 +23,14 @@
 ### Improvements
 - Server info embed for admins was slightly improved and fixed
 - `config reset-settings` now shows a confirmation message before resetting the settings
-- Refactored the code to use `System.Text.Json` source generator and removed `System.Reflection` calls
 - The exception embed was slightly improved with more details
-- Refactored the settings code to use the Options Pattern with source generation validation
 - Improvements regarding information security
+
+### Development
+- Refactored the code to use `System.Text.Json` source generator and removed `System.Reflection` calls
+- Refactored the settings code to use the Options Pattern with source generation validation
 - Debug code was excluded from compiling in release mode
+- `.editorconfig` now default to warnings
 
 ## 2.1.2 - 2024-12-15
 ### Dependencies
