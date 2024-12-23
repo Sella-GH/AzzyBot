@@ -5,7 +5,7 @@ using DSharpPlus.Commands.ContextChecks;
 namespace AzzyBot.Bot.Commands.Checks;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
-public sealed class ModuleActivatedCheckAttribute(AzzyModules module) : ContextCheckAttribute
+public sealed class ModuleActivatedCheckAttribute(AzzyModules[] modules) : ContextCheckAttribute
 {
-    public AzzyModules Module { get; } = module;
+    public AzzyModules[] Modules { get; } = modules;
 }

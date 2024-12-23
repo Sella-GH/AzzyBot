@@ -2,5 +2,6 @@
 
 public enum AzzyModules
 {
-    AzuraCast
+    AzuraCast,
+    LegalTerms
 }

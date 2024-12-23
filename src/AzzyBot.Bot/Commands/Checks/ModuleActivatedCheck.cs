@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Utilities.Enums;
+using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
@@ -26,20 +27,39 @@ public sealed class ModuleActivatedCheck(ILogger<ModuleActivatedCheck> logger, D
         if (context is SlashCommandContext ctx && ctx.Interaction.ResponseState is DiscordInteractionResponseState.Unacknowledged)
             await context.DeferResponseAsync();
 
-        switch (attribute.Module)
+        foreach (AzzyModules module in attribute.Modules)
         {
-            case AzzyModules.AzuraCast:
-                AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
-                if (azuraCast is null)
-                {
-                    _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                    return "AzuraCast is null!";
-                }
+            switch (module)
+            {
+                case AzzyModules.AzuraCast:
+                    AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
+                    if (azuraCast is null)
+                    {
+                        _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                        return CheckMessages.AzuraCastIsNull;
+                    }
 
-                return null;
+                    return null;
 
-            default:
-                return "Module not found!";
+                case AzzyModules.LegalTerms:
+                    GuildEntity? guild = await _dbActions.GetGuildAsync(context.Guild.Id);
+                    if (guild is null)
+                    {
+                        _logger.DatabaseGuildNotFound(context.Guild.Id);
+                        return CheckMessages.GuildIsNull;
+                    }
+                    else if (!guild.LegalsAccepted)
+                    {
+                        return CheckMessages.LegalsNotAccepted;
+                    }
+
+                    return null;
+
+                default:
+                    return CheckMessages.ModuleNotFound;
+            }
         }
+
+        return null;
     }
 }
