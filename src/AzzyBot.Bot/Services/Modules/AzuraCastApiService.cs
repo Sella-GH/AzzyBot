@@ -456,7 +456,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
             Artist = song.Artist,
             Title = song.Title,
             Text = $"{song.Title} - {song.Artist}",
-            Art = song.Art
+            Art = $"{baseUrl}api/{AzuraApiEndpoints.Station}/{station.StationId}/{AzuraApiEndpoints.Art}/{song.UniqueId}"
         };
     }
 

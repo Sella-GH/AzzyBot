@@ -8,7 +8,6 @@ using AzzyBot.Bot.Services.DiscordEvents;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Settings.Validators;
-using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Records;
 using AzzyBot.Data.Extensions;
 using AzzyBot.Data.Settings;
@@ -22,7 +21,6 @@ using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
 using Lavalink4NET.Extensions;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using NCronJob;
 
@@ -39,8 +37,7 @@ public static class IServiceCollectionExtensions
 
         // Need to register as Singleton first
         // Otherwise DI doesn't work properly
-        services.AddSingleton<CoreServiceHost>();
-        services.AddHostedService(static s => s.GetRequiredService<CoreServiceHost>());
+        services.AddSingleton<CoreServiceHost>().AddHostedService(static s => s.GetRequiredService<CoreServiceHost>());
 
         // Register the database services
         services.AzzyBotDataServices(isDev, dbSettings.EncryptionKey, dbSettings.Host, dbSettings.Port, dbSettings.User, dbSettings.Password, dbSettings.DatabaseName);
@@ -50,8 +47,7 @@ public static class IServiceCollectionExtensions
         services.DiscordClientInteractivity();
 
         services.AddSingleton<DiscordBotService>();
-        services.AddSingleton<DiscordBotServiceHost>();
-        services.AddHostedService(static s => s.GetRequiredService<DiscordBotServiceHost>());
+        services.AddSingleton<DiscordBotServiceHost>().AddHostedService(static s => s.GetRequiredService<DiscordBotServiceHost>());
 
         services.AddSingleton<WebRequestService>();
         services.AddSingleton<UpdaterService>();
@@ -101,19 +97,30 @@ public static class IServiceCollectionExtensions
 
     public static void AddAppSettings(this IServiceCollection services, string settingsFile)
     {
-        services.AddSingleton<IValidateOptions<AzzyBotSettings>, AzzyBotSettingsValidator>().AddOptionsWithValidateOnStart<AzzyBotSettings>();
-        services.AddSingleton<IValidateOptions<DatabaseSettings>, DatabaseSettingsValidator>().AddOptionsWithValidateOnStart<DatabaseSettings>();
-        services.AddSingleton<IValidateOptions<DiscordStatusSettings>, DiscordStatusSettingsValidator>().AddOptionsWithValidateOnStart<DiscordStatusSettings>();
-        services.AddSingleton<IValidateOptions<MusicStreamingSettings>, MusicStreamingSettingsValidator>().AddOptionsWithValidateOnStart<MusicStreamingSettings>();
-        services.AddSingleton<IValidateOptions<CoreUpdaterSettings>, CoreUpdaterValidator>().AddOptionsWithValidateOnStart<CoreUpdaterSettings>();
-        services.AddSingleton<IValidateOptions<AppStats>, AppStatsValidator>().AddOptionsWithValidateOnStart<AppStats>();
+        services.AddSingleton<IValidateOptions<AzzyBotSettings>, AzzyBotSettingsValidator>()
+            .AddOptionsWithValidateOnStart<AzzyBotSettings>()
+            .BindConfiguration(nameof(AzzyBotSettings))
+            .Configure(c => c.SettingsFile = settingsFile);
 
-        services.AddOptions<AzzyBotSettings>().BindConfiguration(nameof(AzzyBotSettings)).Configure(c => c.SettingsFile = settingsFile);
-        services.AddOptions<DatabaseSettings>().BindConfiguration(nameof(DatabaseSettings));
-        services.AddOptions<DiscordStatusSettings>().BindConfiguration(nameof(DiscordStatusSettings));
-        services.AddOptions<MusicStreamingSettings>().BindConfiguration(nameof(MusicStreamingSettings));
-        services.AddOptions<CoreUpdaterSettings>().BindConfiguration(nameof(CoreUpdaterSettings));
-        services.AddOptions<AppStats>().BindConfiguration(nameof(AppStats));
+        services.AddSingleton<IValidateOptions<DatabaseSettings>, DatabaseSettingsValidator>()
+            .AddOptionsWithValidateOnStart<DatabaseSettings>()
+            .BindConfiguration(nameof(DatabaseSettings));
+
+        services.AddSingleton<IValidateOptions<DiscordStatusSettings>, DiscordStatusSettingsValidator>()
+            .AddOptionsWithValidateOnStart<DiscordStatusSettings>()
+            .BindConfiguration(nameof(DiscordStatusSettings));
+
+        services.AddSingleton<IValidateOptions<MusicStreamingSettings>, MusicStreamingSettingsValidator>()
+            .AddOptionsWithValidateOnStart<MusicStreamingSettings>()
+            .BindConfiguration(nameof(MusicStreamingSettings));
+
+        services.AddSingleton<IValidateOptions<CoreUpdaterSettings>, CoreUpdaterValidator>()
+            .AddOptionsWithValidateOnStart<CoreUpdaterSettings>()
+            .BindConfiguration(nameof(CoreUpdaterSettings));
+
+        services.AddSingleton<IValidateOptions<AppStats>, AppStatsValidator>()
+            .AddOptionsWithValidateOnStart<AppStats>()
+            .BindConfiguration(nameof(AppStats));
     }
 
     private static void DiscordClient(this IServiceCollection services, string token)
@@ -139,12 +146,13 @@ public static class IServiceCollectionExtensions
             c.AddCommand(typeof(AzuraCastCommands.DjGroup));
             c.AddCommand(typeof(AzuraCastCommands.MusicGroup));
             c.AddCommand(typeof(ConfigCommands.ConfigGroup));
+            c.AddCommand(typeof(ConfigCommands.LegalsGroup));
             c.AddCommand(typeof(CoreCommands.CoreGroup));
             c.AddCommand(typeof(MusicStreamingCommands.PlayerGroup));
 
-            // Only add debug commands if it's a dev build
-            if (SoftwareStats.GetAppEnvironment == Environments.Development)
-                c.AddCommand(typeof(DebugCommands.DebugGroup), settings.ServerId);
+#if DEBUG || DOCKER_DEBUG
+            c.AddCommand(typeof(DebugCommands.DebugGroup), settings.ServerId);
+#endif
 
             c.AddCheck<AzuraCastDiscordChannelCheck>();
             c.AddCheck<AzuraCastDiscordPermCheck>();

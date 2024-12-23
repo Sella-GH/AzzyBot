@@ -2,27 +2,48 @@
 ### BREAKING CHANGES
 - The settings file structure changed and will require a migration!
 
+### General
+- Upon invitation the bot will now require acceptance of the Privacy Policy and Terms Of Service
+
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02438
 - Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.12.10
 - Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.4.0.108396
 
 ### Additions
+#### New parameters
 - `player play` and `player play-mount` gained an additional optional parameter `volume` which allows to set the volume of the player at startup
   - The volume can be set between 0 and 100
   - The default volume is 100
   - This value is only respected if the player is not playing anything
+
+#### New commands
+- `admin reset-legals` command added
+  - This command is only for administrators of the bot (the main server)
+  - It resets the accepted legals for every guild and requires them to reaccept
 - `dj add-internal-song-request` command added
   - This command allows you to add a song quietly into the AutoDj queue
   - These kind of song requests are not logged inside AzuraCast and should be used with caution!
   - The bot however logs these kind of requests
+- `legals accept-legals` command added
+  - This command allows you to accept our legal terms and policies
 
 ### Improvements
 - Server info embed for admins was slightly improved and fixed
 - `config reset-settings` now shows a confirmation message before resetting the settings
-- Refactored the code to use `System.Text.Json` source generator and removed `System.Reflection` calls
 - The exception embed was slightly improved with more details
+- Improvements regarding information security
+- The bot respects in all cases now when the user decides to disable local file caching
+  - This means that it's not possible to retrieve information about uploaded files when the whole instance is offline
+- The hardware embed now includes the amount of memory which the bot uses
+- The stats embed was restructured and now includes the legal stuff (License, Privacy Policy, Terms Of Service)
+- Updated the invite link so the bot now needs the "Embed Links" permission too
+
+### Development
+- Refactored the code to use `System.Text.Json` source generator and removed `System.Reflection` calls
 - Refactored the settings code to use the Options Pattern with source generation validation
+- Debug code was excluded from compiling in release mode
+- `.editorconfig` now default to warnings
 
 ## 2.1.2 - 2024-12-15
 ### Dependencies

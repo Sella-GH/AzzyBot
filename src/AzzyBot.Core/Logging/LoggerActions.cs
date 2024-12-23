@@ -6,8 +6,10 @@ namespace AzzyBot.Core.Logging;
 
 public static partial class LoggerActions
 {
+#if DEBUG || DOCKER_DEBUG
     [LoggerMessage(9, LogLevel.Debug, "Cluster logging test intervall {i}")]
     public static partial void ClusterLoggingTest(this ILogger logger, int i);
+#endif
 
     [LoggerMessage(10, LogLevel.Debug, "Starting logfile cleanup")]
     public static partial void LogfileCleanupStart(this ILogger logger);
@@ -35,12 +37,6 @@ public static partial class LoggerActions
 
     [LoggerMessage(18, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast api permissions")]
     public static partial void GlobalTimerCheckForAzuraCastApi(this ILogger logger, int counter);
-
-    [LoggerMessage(20, LogLevel.Debug, "AzuraRequestsJob started")]
-    public static partial void BackgroundServiceHostStart(this ILogger logger);
-
-    [LoggerMessage(22, LogLevel.Debug, "BackgroundServiceHost running")]
-    public static partial void BackgroundServiceHostRun(this ILogger logger);
 
     [LoggerMessage(23, LogLevel.Debug, "Creating work items for: {item}")]
     public static partial void BackgroundServiceWorkItem(this ILogger logger, string item);
@@ -71,15 +67,6 @@ public static partial class LoggerActions
 
     [LoggerMessage(50, LogLevel.Debug, "Expected failure of a {type} request to {uri} with exception name {ex}")]
     public static partial void WebRequestExpectedFailure(this ILogger logger, HttpMethod type, Uri uri, string ex);
-
-    [LoggerMessage(90, LogLevel.Debug, "Stopping global timer")]
-    public static partial void GlobalTimerStop(this ILogger logger);
-
-    [LoggerMessage(91, LogLevel.Debug, "BackgroundServiceHost stopped")]
-    public static partial void BackgroundServiceHostStop(this ILogger logger);
-
-    [LoggerMessage(99, LogLevel.Debug, "Operation {ops} canceled by CancellationToken")]
-    public static partial void OperationCanceled(this ILogger logger, string ops);
 
     [LoggerMessage(100, LogLevel.Information, "Starting {name} in version {version} on {os}-{arch} using .NET {dotnet}")]
     public static partial void BotStarting(this ILogger logger, string name, string version, string os, string arch, string dotnet);
@@ -180,27 +167,15 @@ public static partial class LoggerActions
     [LoggerMessage(303, LogLevel.Error, "The {type} request to {uri} failed with error: {ex}")]
     public static partial void WebRequestFailed(this ILogger logger, HttpMethod type, string ex, Uri uri);
 
-    [LoggerMessage(310, LogLevel.Error, "An error occured while executing the background task: {ex}")]
-    public static partial void BackgroundTaskError(this ILogger logger, string ex);
-
     [LoggerMessage(320, LogLevel.Error, "Database transaction failed with error: ")]
     public static partial void DatabaseTransactionFailed(this ILogger logger, Exception ex);
 
     [LoggerMessage(400, LogLevel.Critical, "An exception occured: ")]
     public static partial void ExceptionOccured(this ILogger logger, Exception ex);
 
-    [LoggerMessage(401, LogLevel.Critical, "A gateway error occured: ")]
-    public static partial void GatewayException(this ILogger logger, Exception ex);
-
     [LoggerMessage(402, LogLevel.Critical, "I'm not inside the server with the id {id} - please invite me to my hometown or I won't start!")]
     public static partial void NotInHomeGuild(this ILogger logger, ulong id);
 
     [LoggerMessage(403, LogLevel.Critical, "You removed me from my hometown server with the id {id}! I'm going to shutdown now.")]
     public static partial void RemovedFromHomeGuild(this ILogger logger, ulong id);
-
-    [LoggerMessage(410, LogLevel.Critical, "The given settings can't be parsed, are they filled out?")]
-    public static partial void UnableToParseSettings(this ILogger logger);
-
-    [LoggerMessage(411, LogLevel.Critical, "The given BotToken is either missing or invalid")]
-    public static partial void BotTokenInvalid(this ILogger logger);
 }

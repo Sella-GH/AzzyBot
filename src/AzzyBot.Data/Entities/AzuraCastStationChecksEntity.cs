@@ -15,6 +15,9 @@ public sealed class AzuraCastStationChecksEntity
     /// <summary>
     /// The state of the check if files have been changed.
     /// </summary>
+    /// <remarks>
+    /// This also enables file caching.
+    /// </remarks>
     public bool FileChanges { get; set; }
 
     /// <summary>

@@ -3,9 +3,17 @@
   <PropertyGroup>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <DebugType>embedded</DebugType>
-    <Optimize Condition="'$(Configuration)'=='Debug' OR '$(Configuration)'=='Docker-debug'">False</Optimize>
-    <Optimize Condition="'$(Configuration)'=='Release' OR '$(Configuration)'=='Docker'">True</Optimize>
     <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug' OR '$(Configuration)'=='Docker-debug'">
+    <DefineConstants>DEBUG;DOCKER_DEBUG</DefineConstants>
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release' OR '$(Configuration)'=='Docker'">
+    <DefineConstants>RELEASE;DOCKER</DefineConstants>
+    <Optimize>True</Optimize>
   </PropertyGroup>
 
   <!-- Development stuff -->
@@ -36,17 +44,10 @@
     <Description>Kind of music bot for discord, written in C# and with DSharpPlus. This bot is dedicated for the use with AzuraCast and does not work at it's fully glory without it.</Description>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <NeutralLanguage>en</NeutralLanguage>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageProjectUrl>https://github.com/Sella-GH/AzzyBot</PackageProjectUrl>
     <RepositoryType>Git</RepositoryType>
     <RepositoryUrl>https://github.com/Sella-GH/AzzyBot</RepositoryUrl>
     <Version>2.1.2</Version>
   </PropertyGroup>
-
-  <!-- Package stuff -->
-  <ItemGroup>
-    <None Include="..\..\LICENSE" Pack="true" PackagePath="" />
-  </ItemGroup>
   
   <!-- Runtimeconfig settings -->
   <PropertyGroup>

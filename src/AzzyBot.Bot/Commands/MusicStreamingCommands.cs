@@ -15,8 +15,8 @@ using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
-using AzzyBot.Data;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Services;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
@@ -31,7 +31,7 @@ namespace AzzyBot.Bot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class MusicStreamingCommands
 {
-    [Command("player"), RequireGuild, RequirePermissions(BotPermissions = [DiscordPermission.Connect, DiscordPermission.Speak], UserPermissions = [DiscordPermission.Connect])]
+    [Command("player"), RequireGuild, RequirePermissions(BotPermissions = [DiscordPermission.Connect, DiscordPermission.Speak], UserPermissions = [DiscordPermission.Connect]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
     public sealed class PlayerGroup(ILogger<PlayerGroup> logger, AzuraCastApiService azuraCast, DbActions dbActions, MusicStreamingService musicStreaming)
     {
         private readonly ILogger<PlayerGroup> _logger = logger;
@@ -211,7 +211,7 @@ public sealed class MusicStreamingCommands
             await context.EditResponseAsync(text);
         }
 
-        [Command("play-mount"), Description("Choose a mount point of the station to play it."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+        [Command("play-mount"), Description("Choose a mount point of the station to play it."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastOnlineCheck]
         public async ValueTask PlayMountAsync
         (
             SlashCommandContext context,

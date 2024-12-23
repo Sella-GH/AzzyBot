@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Choices;
+using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
@@ -17,8 +18,8 @@ using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
-using AzzyBot.Data;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Services;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ArgumentModifiers;
 using DSharpPlus.Commands.ContextChecks;
@@ -35,7 +36,7 @@ namespace AzzyBot.Bot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class ConfigCommands
 {
-    [Command("config"), RequireGuild, RequirePermissions(BotPermissions = [], UserPermissions = [DiscordPermission.Administrator])]
+    [Command("config"), RequireGuild, RequirePermissions(UserPermissions = [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
     public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, DbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<ConfigGroup> _logger = logger;
@@ -131,7 +132,7 @@ public sealed class ConfigCommands
                 await _azuraCastPing.PingInstanceAsync(dAzuraCast);
         }
 
-        [Command("add-azuracast-station"), Description("Add an AzuraCast station to your instance."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("add-azuracast-station"), Description("Add an AzuraCast station to your instance."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask AddAzuraCastStationAsync
         (
             SlashCommandContext context,
@@ -139,7 +140,7 @@ public sealed class ConfigCommands
             [Description("Select the group that has the admin permissions on this station.")] DiscordRole adminGroup,
             [Description("Select a channel to get music requests when a request is not found on the server."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel requestsChannel,
             [Description("Enable or disable the showing of the playlist in the nowplaying embed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int showPlaylist,
-            [Description("Enable or disable the automatic check if files have been changed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int fileChanges,
+            [Description("Enable or disable the check if server files have been changed. This also enables local file caching."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int fileChanges,
             [Description("Select a channel where users are able to upload their own songs to your station."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? uploadChannel = null,
             [Description("Enter a custom path where the user uploaded songs are stored. Like /Requests")] string? uploadPath = null,
             [Description("Enter the api key of the new station. This is optional if the admin one has the permission.")] string? apiKey = null,
@@ -190,7 +191,7 @@ public sealed class ConfigCommands
                 await _azuraCastFile.CheckForFileChangesAsync(dStation);
         }
 
-        [Command("delete-azuracast"), Description("Delete the existing AzuraCast setup."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("delete-azuracast"), Description("Delete the existing AzuraCast setup."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask DeleteAzuraCastAsync(SlashCommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -212,7 +213,7 @@ public sealed class ConfigCommands
             await context.EditResponseAsync(GeneralStrings.ConfigInstanceDeleted);
         }
 
-        [Command("delete-azuracast-station"), Description("Delete an existing AzuraCast station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("delete-azuracast-station"), Description("Delete an existing AzuraCast station."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask DeleteAzuraCastStationAsync
         (
             SlashCommandContext context,
@@ -238,7 +239,7 @@ public sealed class ConfigCommands
             await context.EditResponseAsync(GeneralStrings.ConfigStationDeleted);
         }
 
-        [Command("modify-azuracast"), Description("Modify the general AzuraCast settings."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("modify-azuracast"), Description("Modify the general AzuraCast settings."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask UpdateAzuraCastAsync
         (
             SlashCommandContext context,
@@ -302,7 +303,7 @@ public sealed class ConfigCommands
             }
         }
 
-        [Command("modify-azuracast-checks"), Description("Modify the automatic checks for your AzuraCast instance."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("modify-azuracast-checks"), Description("Modify the automatic checks for your AzuraCast instance."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask UpdateAzuraCastChecksAsync
         (
             SlashCommandContext context,
@@ -375,7 +376,7 @@ public sealed class ConfigCommands
             }
         }
 
-        [Command("modify-azuracast-station"), Description("Modify one AzuraCast station you already added."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("modify-azuracast-station"), Description("Modify one AzuraCast station you already added."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask UpdateAzuraCastStationAsync
         (
             SlashCommandContext context,
@@ -461,12 +462,12 @@ public sealed class ConfigCommands
             await context.FollowupAsync(GeneralStrings.ConfigStationModified);
         }
 
-        [Command("modify-azuracast-station-checks"), Description("Modify the automatic checks inside an AzuraCast station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("modify-azuracast-station-checks"), Description("Modify the automatic checks inside an AzuraCast station."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask UpdateAzuraCastStationChecksAsync
         (
             SlashCommandContext context,
             [Description("Choose the station you want to modify the checks."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
-            [Description("Enable or disable the automatic check if files have been changed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int fileChanges = 0
+            [Description("Enable or disable the check if server files have been changed. This also enables local file caching."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int fileChanges = 0
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -652,6 +653,60 @@ public sealed class ConfigCommands
             await _dbActions.AddGuildAsync(context.Guild.Id);
 
             await context.EditResponseAsync(GeneralStrings.ConfigReset);
+        }
+    }
+
+    [Command("legals"), RequireGuild, RequirePermissions(UserPermissions = [DiscordPermission.Administrator])]
+    public sealed class LegalsGroup(ILogger<LegalsGroup> logger, DbActions dbActions)
+    {
+        private readonly ILogger<LegalsGroup> _logger = logger;
+        private readonly DbActions _dbActions = dbActions;
+
+        [Command("accept-legals"), Description("Provides you the links and guides you through the steps how to accept the legal conditions.")]
+        public async ValueTask AcceptLegalsAsync(SlashCommandContext context)
+        {
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
+
+            _logger.CommandRequested(nameof(AcceptLegalsAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            GuildEntity? guild = await _dbActions.GetGuildAsync(context.Guild.Id);
+            if (guild is null)
+            {
+                _logger.DatabaseGuildNotFound(context.Guild.Id);
+                await context.EditResponseAsync(GeneralStrings.GuildNotFound);
+                return;
+            }
+
+            if (guild.LegalsAccepted)
+            {
+                await context.EditResponseAsync(GeneralStrings.LegalsAlreadyAccepted);
+                return;
+            }
+
+            DiscordButtonComponent button = new(DiscordButtonStyle.Primary, $"accept_legals_{context.Guild.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Accept Legals.");
+            await using DiscordMessageBuilder messageBuilder = new();
+            messageBuilder.AddComponents(button);
+            string content = GeneralStrings.LegalsInformation
+                .Replace("%PP%", UriStrings.GitHubRepoPrivacyPolicyUrl, StringComparison.OrdinalIgnoreCase)
+                .Replace("%TOS%", UriStrings.GitHubRepoTosUrl, StringComparison.OrdinalIgnoreCase)
+                .Replace("%LICENSE%", UriStrings.GitHubRepoLicenseUrl, StringComparison.OrdinalIgnoreCase);
+
+            messageBuilder.WithContent(content);
+
+            DiscordMessage message = await context.EditResponseAsync(messageBuilder);
+            InteractivityResult<ComponentInteractionCreatedEventArgs> result = await message.WaitForButtonAsync(context.User, TimeSpan.FromMinutes(30));
+            if (result.TimedOut)
+            {
+                await context.EditResponseAsync("You haven't accepted the legal terms within the given time. Please accept them to continue using the bot.");
+                return;
+            }
+
+            await _dbActions.UpdateGuildAsync(context.Guild.Id, legalsAccepted: true);
+
+            await context.EditResponseAsync(GeneralStrings.LegalsAccepted);
         }
     }
 }

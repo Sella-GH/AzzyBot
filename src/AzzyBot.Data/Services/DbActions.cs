@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
-namespace AzzyBot.Data;
+namespace AzzyBot.Data.Services;
 
 public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext)
 {
@@ -504,7 +504,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         });
     }
 
-    public Task<bool> UpdateGuildAsync(ulong guildId, bool? lastPermissionCheck = null)
+    public Task<bool> UpdateGuildAsync(ulong guildId, bool? lastPermissionCheck = null, bool? legalsAccepted = false)
     {
         return ExecuteDbActionAsync(async context =>
         {
@@ -522,9 +522,15 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             if (lastPermissionCheck.HasValue)
                 guild.LastPermissionCheck = DateTimeOffset.UtcNow;
 
+            if (legalsAccepted.HasValue)
+                guild.LegalsAccepted = legalsAccepted.Value;
+
             context.Guilds.Update(guild);
         });
     }
+
+    public Task<bool> UpdateGuildLegalsAsync()
+        => ExecuteDbActionAsync(static async context => await context.Guilds.ExecuteUpdateAsync(g => g.SetProperty(p => p.LegalsAccepted, false)));
 
     public Task<bool> UpdateGuildPreferencesAsync(ulong guildId, ulong? adminRoleId = null, ulong? adminNotifiyChannelId = null, ulong? errorChannelId = null)
     {

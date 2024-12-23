@@ -151,6 +151,33 @@ namespace AzzyBot.Bot.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://github.com/Sella-GH/AzzyBot/blob/main/LICENSE.
+        /// </summary>
+        internal static string GitHubRepoLicenseUrl {
+            get {
+                return ResourceManager.GetString("GitHubRepoLicenseUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://github.com/Sella-GH/AzzyBot/blob/main/legal/Privacy-Policy.md.
+        /// </summary>
+        internal static string GitHubRepoPrivacyPolicyUrl {
+            get {
+                return ResourceManager.GetString("GitHubRepoPrivacyPolicyUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://github.com/Sella-GH/AzzyBot/blob/main/legal/Terms-Of-Service.md.
+        /// </summary>
+        internal static string GitHubRepoTosUrl {
+            get {
+                return ResourceManager.GetString("GitHubRepoTosUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://github.com/Sella-GH/AzzyBot.
         /// </summary>
         internal static string GitHubRepoUri {

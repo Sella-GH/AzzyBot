@@ -25,7 +25,7 @@ public sealed class DiscordBotServiceHost(ILogger<DiscordBotServiceHost> logger,
 
         await _client.ConnectAsync(activity, status);
 
-        string invite = _client.CurrentApplication.GenerateOAuthUri(null, new(DiscordPermission.AttachFiles, DiscordPermission.SendMessages, DiscordPermission.ViewChannel), DiscordOAuthScope.ApplicationsCommands, DiscordOAuthScope.Bot);
+        string invite = _client.CurrentApplication.GenerateOAuthUri(null, new(DiscordPermission.AttachFiles, DiscordPermission.EmbedLinks, DiscordPermission.SendMessages, DiscordPermission.ViewChannel), DiscordOAuthScope.ApplicationsCommands, DiscordOAuthScope.Bot);
         _logger.InviteUrl(invite);
     }
 

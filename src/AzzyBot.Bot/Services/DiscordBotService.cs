@@ -11,11 +11,12 @@ using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
+using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Helpers;
-using AzzyBot.Data;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Services;
 using DSharpPlus;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Exceptions;
@@ -331,7 +332,27 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         ContextCheckFailedData? moduleActivatedCheck = ex.Errors.FirstOrDefault(static e => e.ContextCheckAttribute is ModuleActivatedCheckAttribute);
         if (moduleActivatedCheck is not null)
         {
-            builder.WithContent("This module is not activated, you are unable to use commands from it.");
+            string reply = string.Empty;
+            switch (moduleActivatedCheck.ErrorMessage)
+            {
+                case CheckMessages.AzuraCastIsNull:
+                    reply = "The AzuraCast module is not activated, you are unable to use commands from it.";
+                    break;
+
+                case CheckMessages.GuildIsNull:
+                    reply = "Your server is not registered within the bot.";
+                    break;
+
+                case CheckMessages.LegalsNotAccepted:
+                    reply = GeneralStrings.LegalsNotAccepted;
+                    break;
+
+                case CheckMessages.ModuleNotFound:
+                    reply = "The requested module was not found, what have you done?";
+                    break;
+            }
+
+            builder.WithContent(reply);
             await context.EditResponseAsync(builder);
             return;
         }

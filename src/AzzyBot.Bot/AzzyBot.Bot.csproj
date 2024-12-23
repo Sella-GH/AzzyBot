@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <RootNamespace>AzzyBot.Bot</RootNamespace>
@@ -26,6 +26,10 @@
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <AssemblyName>AzzyBot</AssemblyName>
   </PropertyGroup>
+
+  <ItemGroup Condition="'$(Configuration)'=='Release' OR '$(Configuration)'=='Docker'">
+    <Compile Remove="Commands\DebugCommands.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Lavalink4NET.DSharpPlus.Nightly" />

@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using AzzyBot.Core.Utilities.Encryption;
+using AzzyBot.Data.Services;
 using EntityFramework.Exceptions.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,7 +27,6 @@ public static class IServiceCollectionExtensions
         builder.Host = host;
         builder.Port = port;
         builder.Username = user;
-        builder.ConnectionIdleLifetime = 1200; // 20 minutes
         builder.Password = password;
         builder.Database = database;
 
