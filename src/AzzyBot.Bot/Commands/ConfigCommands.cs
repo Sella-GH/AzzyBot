@@ -700,7 +700,7 @@ public sealed class ConfigCommands
             InteractivityResult<ComponentInteractionCreatedEventArgs> result = await message.WaitForButtonAsync(context.User, TimeSpan.FromMinutes(30));
             if (result.TimedOut)
             {
-                await context.EditResponseAsync("You haven't accepted the legals within the timespan. Please accept them to be able to use me.");
+                await context.EditResponseAsync("You haven't accepted the legal terms within the given time. Please accept them to continue using the bot.");
                 return;
             }
 

@@ -17,7 +17,7 @@ The Bot Owner disclaims all liability for damages arising from the utilization o
 - Any indirect, consequential, or intangible detriment.
 
 ### 4. Modification and Discontinuation
-The Bot Owner reserves the unilateral right to modify, suspend, or discontinue the Bot’s functionality without prior notice or liability. The User acknowledges and accepts that such changes may occur at the sole discretion of the Bot Owner.
+The Bot Owner reserves the unilateral right to modify, suspend, or discontinue the Bot's functionality without prior notice or liability. The User acknowledges and accepts that such changes may occur at the sole discretion of the Bot Owner.
 
 ### 5. Intellectual Property Ownership
 The Bot is licensed under the GNU Affero General Public License, version 3 (AGPL-3.0). Users are granted the right to use, modify, and distribute the Bot’s codebase, design, and functionality, provided that such use complies with the terms of the AGPL-3.0. Any modified versions or derivative works must also be licensed under the AGPL-3.0, and the source code must be made available to end users in accordance with its terms.
