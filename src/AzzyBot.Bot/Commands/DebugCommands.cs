@@ -1,5 +1,4 @@
-﻿#if DEBUG || DOCKER_DEBUG
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
@@ -108,4 +107,3 @@ public sealed class DebugCommands
         }
     }
 }
-#endif
