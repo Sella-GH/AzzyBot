@@ -87,8 +87,6 @@ public sealed class ConfigCommands
                 return;
             }
 
-            await context.DeferResponseAsync();
-
             ulong guildId = context.Guild.Id;
             GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true);
             if (guild is null)
@@ -537,8 +535,6 @@ public sealed class ConfigCommands
                 return;
             }
 
-            await context.DeferResponseAsync();
-
             await _dbActions.UpdateGuildPreferencesAsync(context.Guild.Id, adminRole?.Id, adminChannel?.Id, errorChannel?.Id);
 
             await context.EditResponseAsync(GeneralStrings.CoreSettingsModified);
@@ -568,8 +564,6 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context.Member);
 
             _logger.CommandRequested(nameof(GetSettingsAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
 
             ulong guildId = context.Guild.Id;
             string guildName = context.Guild.Name;
@@ -633,8 +627,6 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context.Guild);
 
             _logger.CommandRequested(nameof(ResetSettingsAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
 
             DiscordButtonComponent button = new(DiscordButtonStyle.Danger, $"reset_settings_{context.User.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Confirm reset.");
             await using DiscordMessageBuilder messageBuilder = new();

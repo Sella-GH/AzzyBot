@@ -44,8 +44,6 @@ public sealed class CoreCommands
 
             _logger.CommandRequested(nameof(ForceChannelPermissionsCheckAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
             GuildEntity? guild = await _dbActions.GetGuildAsync(_settings.ServerId, loadEverything: true);
             if (guild is null)
             {
@@ -71,8 +69,6 @@ public sealed class CoreCommands
             ArgumentNullException.ThrowIfNull(context.Member);
 
             _logger.CommandRequested(nameof(HelpAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
 
             IEnumerable<DiscordUser> botOwners = context.Client.CurrentApplication.Owners;
             ulong guildId = context.Guild.Id;
@@ -126,8 +122,6 @@ public sealed class CoreCommands
 
                 _logger.CommandRequested(nameof(HardwareStatsAsync), context.User.GlobalName);
 
-                await context.DeferResponseAsync();
-
                 Uri avaUrl = new(context.Client.CurrentUser.AvatarUrl);
                 DiscordEmbed embed = await EmbedBuilder.BuildAzzyHardwareStatsEmbedAsync(avaUrl, context.Client.GetConnectionLatency(context.Guild.Id).Milliseconds);
 
@@ -140,8 +134,6 @@ public sealed class CoreCommands
                 ArgumentNullException.ThrowIfNull(context);
 
                 _logger.CommandRequested(nameof(InfoStatsAsync), context.User.GlobalName);
-
-                await context.DeferResponseAsync();
 
                 Uri avaUrl = new(context.Client.CurrentUser.AvatarUrl);
                 string dspVersion = context.Client.VersionString.Split('+')[0];
