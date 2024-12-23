@@ -38,9 +38,9 @@ public static class SoftwareStats
 
     private static string GetAppFilePath()
     {
-        using Process app = Process.GetCurrentProcess();
-
-        string? fileName = app.MainModule?.FileName;
+        string fileName = Path.Combine(AppContext.BaseDirectory, AppDomain.CurrentDomain.FriendlyName);
+        if (!HardwareStats.CheckIfLinuxOs)
+            fileName += ".exe";
 
         return (!string.IsNullOrEmpty(fileName))
             ? Path.Combine(AppContext.BaseDirectory, fileName)
