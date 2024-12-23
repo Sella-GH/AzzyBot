@@ -162,6 +162,9 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
             return results;
         }
 
+        if (!station.Checks.FileChanges)
+            return results;
+
         IEnumerable<AzuraFilesRecord> filesLocal = await _azuraCast.GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCast.Id, station.Id, station.StationId);
         AddResultsFromSong(filesLocal);
 

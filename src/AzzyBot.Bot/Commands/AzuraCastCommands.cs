@@ -561,7 +561,7 @@ public sealed class AzuraCastCommands
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
 
-        [Command("add-internal-song-request"), Description("Adds an internal song request which will be played ASAP."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationDJGroup, AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("add-internal-song-request"), Description("Adds an internal song request which will be played ASAP. This bypasses the usual api."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationDJGroup, AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask AddInternalSongRequestAsync
         (
             SlashCommandContext context,
@@ -1034,7 +1034,7 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(SearchSongAsync), context.User.GlobalName);
 
-            AzuraCastEntity? ac = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true);
+            AzuraCastEntity? ac = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadStations: true, loadStationChecks: true);
             if (ac is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
@@ -1073,7 +1073,24 @@ public sealed class AzuraCastCommands
             }
             else
             {
-                AzuraSongDataRecord? songData = await _azuraCast.GetSongInfoAsync(baseUrl, apiKey, acStation, false, song);
+                // First we check if the instance is online
+                // If not we check if the station allows file changes
+                // If not we return that the we can't search
+                AzuraSongDataRecord? songData = null;
+                if (ac.IsOnline)
+                {
+                    songData = await _azuraCast.GetSongInfoAsync(baseUrl, apiKey, acStation, online: true, songId: song);
+                }
+                else if (acStation.Checks.FileChanges)
+                {
+                    songData = await _azuraCast.GetSongInfoAsync(baseUrl, apiKey, acStation, online: false, songId: song);
+                }
+                else
+                {
+                    await context.EditResponseAsync(GeneralStrings.SongRequestOffline);
+                    return;
+                }
+
                 if (songData is null)
                 {
                     await context.EditResponseAsync(GeneralStrings.SongRequestNotFound);
@@ -1118,7 +1135,7 @@ public sealed class AzuraCastCommands
             isRequested = requestsPending.Any(r => r.Track.SongId == songRequest.Song.SongId && r.Track.UniqueId == songRequest.Song.UniqueId);
 
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicSearchSongEmbed(songRequest, isQueued || isRequested, isPlayed);
-            if (!ac.IsOnline || !stationConfig.IsEnabled || !stationConfig.EnableRequests || isQueued || isRequested || isPlayed)
+            if (!stationConfig.IsEnabled || !stationConfig.EnableRequests || isQueued || isRequested || isPlayed)
             {
                 await context.EditResponseAsync(embed);
                 return;

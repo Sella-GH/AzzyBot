@@ -42,6 +42,7 @@ public static class GeneralStrings
     public const string SkipAlmostOver = "This song is almost over. Please wait!";
     public const string SkipToFast = "You can only skip a song every 30 seconds.";
     public const string SongRequestNotFound = "This song does not exist.";
+    public const string SongRequestOffline = "Because local file caching is disabled, I can't request infos about songs while your instance is offline.";
     public const string SongRequestQueued = "Your song request has been queued.";
     public const string StationNotFound = "This station does not exist.";
     public const string StationOffline = "This station is currently offline.";
