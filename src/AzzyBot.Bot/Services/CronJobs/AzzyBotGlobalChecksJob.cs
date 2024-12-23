@@ -62,6 +62,8 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
             }
         }
 
+        // Get it just one more time to check if the instance is offline
+        guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
         guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.IsOnline is true && utcNow - g.AzuraCast.Checks.LastServerStatusCheck >= TimeSpan.FromHours(12))];
         _logger.GlobalTimerCheckForAzuraCastApi(guildsWorkingSet.Count);
         if (guildsWorkingSet.Count is not 0)
