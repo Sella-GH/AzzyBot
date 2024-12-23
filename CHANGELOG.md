@@ -25,6 +25,10 @@
 - `config reset-settings` now shows a confirmation message before resetting the settings
 - The exception embed was slightly improved with more details
 - Improvements regarding information security
+- The bot respects in all cases now when the user decides to disable local file caching
+  - This means that it's not possible to retrieve information about uploaded files when the whole instance is offline
+- The hardware embed now includes the amount of memory which the bot uses
+- The stats embed was restructured and now includes the legal stuff (License, Privacy Policy, Terms Of Service)
 
 ### Development
 - Refactored the code to use `System.Text.Json` source generator and removed `System.Reflection` calls
