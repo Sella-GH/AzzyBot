@@ -2,6 +2,9 @@
 ### BREAKING CHANGES
 - The settings file structure changed and will require a migration!
 
+### General
+- Upon invitation the bot will now require acceptance of the Privacy Policy and Terms Of Service
+
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02438
 - Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.12.10
@@ -34,6 +37,7 @@
   - This means that it's not possible to retrieve information about uploaded files when the whole instance is offline
 - The hardware embed now includes the amount of memory which the bot uses
 - The stats embed was restructured and now includes the legal stuff (License, Privacy Policy, Terms Of Service)
+- Updated the invite link so the bot now needs the "Embed Links" permission too
 
 ### Development
 - Refactored the code to use `System.Text.Json` source generator and removed `System.Reflection` calls

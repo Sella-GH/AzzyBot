@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
+using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
@@ -21,8 +22,6 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, I
     private readonly AzzyBotSettings _settings = settings.Value;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
-
-    private const string NewGuildText = "Thank you for adding me to your server **%GUILD%**! Before you can make good use of me, you have to set my settings first.\n\nPlease use the command `config modify-core` for this.\nOnly administrators are able to execute this command right now.";
 
     public async Task HandleEventAsync(DiscordClient sender, GuildCreatedEventArgs eventArgs)
     {
@@ -102,7 +101,7 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, I
         foreach (DiscordGuild guild in guilds)
         {
             owner = await guild.GetGuildOwnerAsync();
-            await owner.SendMessageAsync(NewGuildText.Replace("%GUILD%", guild.Name, StringComparison.OrdinalIgnoreCase));
+            await owner.SendMessageAsync(GeneralStrings.LegalsRequired.Replace("%GUILD%", guild.Name, StringComparison.OrdinalIgnoreCase));
             embed = await EmbedBuilder.BuildGuildAddedEmbedAsync(guild);
             await _botService.SendMessageAsync(_settings.NotificationChannelId, embeds: [embed]);
         }

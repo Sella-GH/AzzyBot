@@ -33,6 +33,12 @@ public static class GeneralStrings
     public const string InstanceNotFound = "AzuraCast is not set up for this server.";
     public const string InstanceUpdateError = "An error occurred while checking for AzuraCast updates.";
     public const string InstanceUpToDate = "AzuraCast is already up to date.";
+    public const string LegalsAlreadyAccepted = "You already accepted the legals! No more action required.";
+    public const string LegalsAccepted = "Thank you for accepting the terms! Now you have to set my settings through `/config modify-core`.\nBe aware that only administrators are able to execute this command right now.";
+    public const string LegalsInformation = "Please accept the following three legal agreements to use me in your server:\n\n1. **[Privacy Policy](%PP%)**\n2. **[Terms Of Service](%TOS%)**";
+    public const string LegalsNotAccepted = "You have to accept the legal conditions first before you're able to use me!";
+    public const string LegalsRequired = "Thank you for adding me to your server **%GUILD%**! Before you're able to use me, you have to accept my legal conditions.\n\nPlease use the command `/legal accept-legals` for this.\nAfter the whole functionality will be unlocked.";
+    public const string LegalsReset = "Attention!\n\nThe associated legal agreements (Privacy Policy & Terms Of Service) have changed. Please accept them again if you wish to continue your usage of the bot. Use the command `/legal accept-legals` for this.\n\nIf you do not accept you're unable to use the bot in your server anymore.";
     public const string MessageSentToAll = "Your message has been sent to all servers.";
     public const string MountPointNotFound = "This mount point does not exist.";
     public const string NoGuildFound = "I'm not in any server.";

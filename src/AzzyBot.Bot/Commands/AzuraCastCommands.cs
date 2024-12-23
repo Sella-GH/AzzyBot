@@ -40,7 +40,7 @@ namespace AzzyBot.Bot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class AzuraCastCommands
 {
-    [Command("azuracast"), RequireGuild, RequirePermissions(BotPermissions = [], UserPermissions = [DiscordPermission.Administrator]), ModuleActivatedCheck(AzzyModules.AzuraCast)]
+    [Command("azuracast"), RequireGuild, RequirePermissions(UserPermissions = [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast]), AzuraCastOnlineCheck]
     public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, DbActions dbActions, DiscordBotService botService, MusicStreamingService musicStreaming)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
@@ -52,7 +52,7 @@ public sealed class AzuraCastCommands
         private readonly DiscordBotService _botService = botService;
         private readonly MusicStreamingService _musicStreaming = musicStreaming;
 
-        [Command("export-playlists"), Description("Export all playlists from the selected AzuraCast station into a zip file."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("export-playlists"), Description("Export all playlists from the selected AzuraCast station into a zip file."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask ExportPlaylistsAsync
         (
             SlashCommandContext context,
@@ -143,7 +143,7 @@ public sealed class AzuraCastCommands
             FileOperations.DeleteFiles(filePaths);
         }
 
-        [Command("force-api-permission-check"), Description("Force the bot to check if the entered api key has access to all required permissions."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("force-api-permission-check"), Description("Force the bot to check if the entered api key has access to all required permissions."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask ForceApiPermissionCheckAsync
         (
             SlashCommandContext context,
@@ -183,7 +183,7 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync("I initiated the permission check.\nThere won't be another message if your permissions are set correctly.");
         }
 
-        [Command("force-cache-refresh"), Description("Force the bot to refresh it's local song cache for a specific station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("force-cache-refresh"), Description("Force the bot to refresh it's local song cache for a specific station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask ForceCacheRefreshAsync
         (
             SlashCommandContext context,
@@ -226,7 +226,7 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync((!station.HasValue) ? "I initiated the cache refresh for all stations." : "I initiated the cache refresh for the selected station.");
         }
 
-        [Command("force-online-check"), Description("Force the bot to check if the AzuraCast instance is online."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("force-online-check"), Description("Force the bot to check if the AzuraCast instance is online."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask ForceOnlineCheckAsync(SlashCommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -246,7 +246,7 @@ public sealed class AzuraCastCommands
             await _azuraCastPing.PingInstanceAsync(dAzuraCast);
         }
 
-        [Command("force-update-check"), Description("Force the bot to search for AzuraCast Updates."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("force-update-check"), Description("Force the bot to search for AzuraCast Updates."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask ForceUpdateCheckAsync(SlashCommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -266,7 +266,7 @@ public sealed class AzuraCastCommands
             await _azuraCastUpdate.CheckForAzuraCastUpdatesAsync(dAzuraCast, true);
         }
 
-        [Command("get-system-logs"), Description("Get the system logs of the AzuraCast instance."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("get-system-logs"), Description("Get the system logs of the AzuraCast instance."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask GetSystemLogsAsync
         (
             SlashCommandContext context,
@@ -306,7 +306,7 @@ public sealed class AzuraCastCommands
             FileOperations.DeleteFile(filePath);
         }
 
-        [Command("hardware-stats"), Description("Get the hardware stats of the running server."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+        [Command("hardware-stats"), Description("Get the hardware stats of the running server."), AzuraCastOnlineCheck]
         public async ValueTask GetHardwareStatsAsync(SlashCommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -338,7 +338,7 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync(embed);
         }
 
-        [Command("start-station"), Description("Start the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("start-station"), Description("Start the selected station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask StartStationAsync
         (
             SlashCommandContext context,
@@ -382,7 +382,7 @@ public sealed class AzuraCastCommands
             await context.FollowupAsync($"I started the station **{azuraStation.Name}**.");
         }
 
-        [Command("stop-station"), Description("Stop the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("stop-station"), Description("Stop the selected station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask StopStationAsync
         (
             SlashCommandContext context,
@@ -447,7 +447,7 @@ public sealed class AzuraCastCommands
             }
         }
 
-        [Command("toggle-song-requests"), Description("Enable or disable song requests for the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("toggle-song-requests"), Description("Enable or disable song requests for the selected station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask ToggleSongRequestsAsync
         (
             SlashCommandContext context,
@@ -492,7 +492,7 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync($"I {Misc.GetReadableBool(stationConfig.EnableRequests, ReadableBool.EnabledDisabled, true)} song requests for station **{stationConfig.Name}**.");
         }
 
-        [Command("update-instance"), Description("Update the AzuraCast instance to the latest version."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("update-instance"), Description("Update the AzuraCast instance to the latest version."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask UpdateInstanceAsync(SlashCommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -553,7 +553,7 @@ public sealed class AzuraCastCommands
         }
     }
 
-    [Command("dj"), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+    [Command("dj"), RequireGuild, ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast]), AzuraCastOnlineCheck]
     public sealed class DjGroup(ILogger<DjGroup> logger, AzuraCastApiService azuraCast, DbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<DjGroup> _logger = logger;
@@ -561,7 +561,7 @@ public sealed class AzuraCastCommands
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
 
-        [Command("add-internal-song-request"), Description("Adds an internal song request which will be played ASAP. This bypasses the usual api."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationDJGroup, AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("add-internal-song-request"), Description("Adds an internal song request which will be played ASAP. This bypasses the usual api."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationDJGroup, AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask AddInternalSongRequestAsync
         (
             SlashCommandContext context,
@@ -636,7 +636,7 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync($"You're sneaky! I slid in the song **{songData.Title}** by **{songData.Artist}**.");
         }
 
-        [Command("delete-song-request"), Description("Delete a song request from the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationDJGroup, AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("delete-song-request"), Description("Delete a song request from the selected station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationDJGroup, AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask DeleteSongRequestAsync
         (
             SlashCommandContext context,
@@ -679,7 +679,7 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync($"I deleted the song request with the id **{requestId}**.");
         }
 
-        [Command("skip-song"), Description("Skips the current song of the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationDJGroup, AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("skip-song"), Description("Skips the current song of the selected station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationDJGroup, AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask SkipSongAsync
         (
             SlashCommandContext context,
@@ -736,7 +736,7 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync($"I skipped **{nowPlaying.NowPlaying.Song.Title}** by **{nowPlaying.NowPlaying.Song.Artist}**.");
         }
 
-        [Command("switch-playlist"), Description("Switch the current playlist of the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationDJGroup, AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("switch-playlist"), Description("Switch the current playlist of the selected station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationDJGroup, AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask SwitchPlaylistAsync
         (
             SlashCommandContext context,
@@ -795,7 +795,7 @@ public sealed class AzuraCastCommands
         }
     }
 
-    [Command("music"), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+    [Command("music"), RequireGuild, ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast]), AzuraCastOnlineCheck]
     public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastApiService azuraCast, CronJobManager cronJobManager, DbActions dbActions, DiscordBotService botService, WebRequestService webRequest)
     {
         private readonly ILogger<MusicGroup> _logger = logger;
@@ -805,7 +805,7 @@ public sealed class AzuraCastCommands
         private readonly DiscordBotService _botService = botService;
         private readonly WebRequestService _webRequest = webRequest;
 
-        [Command("get-song-history"), Description("Get the song history of the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+        [Command("get-song-history"), Description("Get the song history of the selected station.")]
         public async ValueTask GetSongHistoryAsync
         (
             SlashCommandContext context,
@@ -884,7 +884,7 @@ public sealed class AzuraCastCommands
             FileOperations.DeleteFile(filePath);
         }
 
-        [Command("get-songs-in-playlist"), Description("Get all songs in the selected playlist."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+        [Command("get-songs-in-playlist"), Description("Get all songs in the selected playlist.")]
         public async ValueTask GetSongsInPlaylistAsync
         (
             SlashCommandContext context,
@@ -958,7 +958,7 @@ public sealed class AzuraCastCommands
             FileOperations.DeleteFile(filePath);
         }
 
-        [Command("now-playing"), Description("Get the currently playing song on the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+        [Command("now-playing"), Description("Get the currently playing song on the selected station.")]
         public async ValueTask GetNowPlayingAsync
         (
             SlashCommandContext context,
@@ -1021,7 +1021,7 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync(embed);
         }
 
-        [Command("search-song"), Description("Search for a song on the selected station."), RequireGuild, ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, AzuraCastDiscordChannelCheck]
+        [Command("search-song"), Description("Search for a song on the selected station."), AzuraCastDiscordChannelCheck]
         public async ValueTask SearchSongAsync
         (
             SlashCommandContext context,
@@ -1166,7 +1166,7 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync(embed);
         }
 
-        [Command("upload-files"), Description("Upload a file to the selected station."), RequireGuild, RequirePermissions(BotPermissions = [], UserPermissions = [DiscordPermission.AttachFiles]), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck, FeatureAvailableCheck(AzuraCastFeatures.FileUploading), AzuraCastDiscordChannelCheck]
+        [Command("upload-files"), Description("Upload a file to the selected station."), RequirePermissions(UserPermissions = [DiscordPermission.AttachFiles]), FeatureAvailableCheck(AzuraCastFeatures.FileUploading), AzuraCastDiscordChannelCheck]
         public async ValueTask UploadFilesAsync
         (
             SlashCommandContext context,

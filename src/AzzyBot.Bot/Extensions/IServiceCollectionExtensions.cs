@@ -146,6 +146,7 @@ public static class IServiceCollectionExtensions
             c.AddCommand(typeof(AzuraCastCommands.DjGroup));
             c.AddCommand(typeof(AzuraCastCommands.MusicGroup));
             c.AddCommand(typeof(ConfigCommands.ConfigGroup));
+            c.AddCommand(typeof(ConfigCommands.LegalsGroup));
             c.AddCommand(typeof(CoreCommands.CoreGroup));
             c.AddCommand(typeof(MusicStreamingCommands.PlayerGroup));
 

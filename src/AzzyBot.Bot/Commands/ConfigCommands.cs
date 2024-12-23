@@ -36,7 +36,7 @@ namespace AzzyBot.Bot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class ConfigCommands
 {
-    [Command("config"), RequireGuild, RequirePermissions(BotPermissions = [], UserPermissions = [DiscordPermission.Administrator])]
+    [Command("config"), RequireGuild, RequirePermissions(UserPermissions = [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
     public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, DbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<ConfigGroup> _logger = logger;
@@ -132,7 +132,7 @@ public sealed class ConfigCommands
                 await _azuraCastPing.PingInstanceAsync(dAzuraCast);
         }
 
-        [Command("add-azuracast-station"), Description("Add an AzuraCast station to your instance."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("add-azuracast-station"), Description("Add an AzuraCast station to your instance."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask AddAzuraCastStationAsync
         (
             SlashCommandContext context,
@@ -191,7 +191,7 @@ public sealed class ConfigCommands
                 await _azuraCastFile.CheckForFileChangesAsync(dStation);
         }
 
-        [Command("delete-azuracast"), Description("Delete the existing AzuraCast setup."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("delete-azuracast"), Description("Delete the existing AzuraCast setup."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask DeleteAzuraCastAsync(SlashCommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -213,7 +213,7 @@ public sealed class ConfigCommands
             await context.EditResponseAsync(GeneralStrings.ConfigInstanceDeleted);
         }
 
-        [Command("delete-azuracast-station"), Description("Delete an existing AzuraCast station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("delete-azuracast-station"), Description("Delete an existing AzuraCast station."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask DeleteAzuraCastStationAsync
         (
             SlashCommandContext context,
@@ -239,7 +239,7 @@ public sealed class ConfigCommands
             await context.EditResponseAsync(GeneralStrings.ConfigStationDeleted);
         }
 
-        [Command("modify-azuracast"), Description("Modify the general AzuraCast settings."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("modify-azuracast"), Description("Modify the general AzuraCast settings."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask UpdateAzuraCastAsync
         (
             SlashCommandContext context,
@@ -303,7 +303,7 @@ public sealed class ConfigCommands
             }
         }
 
-        [Command("modify-azuracast-checks"), Description("Modify the automatic checks for your AzuraCast instance."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("modify-azuracast-checks"), Description("Modify the automatic checks for your AzuraCast instance."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask UpdateAzuraCastChecksAsync
         (
             SlashCommandContext context,
@@ -376,7 +376,7 @@ public sealed class ConfigCommands
             }
         }
 
-        [Command("modify-azuracast-station"), Description("Modify one AzuraCast station you already added."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("modify-azuracast-station"), Description("Modify one AzuraCast station you already added."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask UpdateAzuraCastStationAsync
         (
             SlashCommandContext context,
@@ -462,7 +462,7 @@ public sealed class ConfigCommands
             await context.FollowupAsync(GeneralStrings.ConfigStationModified);
         }
 
-        [Command("modify-azuracast-station-checks"), Description("Modify the automatic checks inside an AzuraCast station."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("modify-azuracast-station-checks"), Description("Modify the automatic checks inside an AzuraCast station."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask UpdateAzuraCastStationChecksAsync
         (
             SlashCommandContext context,

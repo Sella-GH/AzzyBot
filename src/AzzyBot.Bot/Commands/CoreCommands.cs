@@ -5,9 +5,11 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
+using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
+using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Core.Logging;
@@ -27,7 +29,7 @@ namespace AzzyBot.Bot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class CoreCommands
 {
-    [Command("core"), RequireGuild]
+    [Command("core"), RequireGuild, ModuleActivatedCheck([AzzyModules.LegalTerms])]
     public sealed class CoreGroup(ILogger<CoreGroup> logger, IOptions<AzzyBotSettings> settings, DbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<CoreGroup> _logger = logger;
@@ -35,7 +37,7 @@ public sealed class CoreCommands
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
 
-        [Command("force-channel-permissions-check"), Description("Forces a check of the permissions for the bot in the necessary channel."), RequirePermissions(BotPermissions = [], UserPermissions = [DiscordPermission.ManageChannels])]
+        [Command("force-channel-permissions-check"), Description("Forces a check of the permissions for the bot in the necessary channel."), RequirePermissions(UserPermissions = [DiscordPermission.Administrator])]
         public async ValueTask ForceChannelPermissionsCheckAsync(SlashCommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
