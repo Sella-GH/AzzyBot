@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
 using System.Threading;
-using System;
+using System.Threading.Tasks;
 using AzzyBot.Bot.Services.CronJobs;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using NCronJob;
