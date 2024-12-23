@@ -9,7 +9,7 @@
     <a href="https://github.com/Sella-GH/AzzyBot/wiki"><strong>Explore the docs »</strong></a>
     <br/>
     <br/>
-    <a href="https://discord.com/oauth2/authorize?client_id=1270502179936931840&scope=applications.commands%20bot&permissions=35840">Invite AzzyBot to your server!</a>
+    <a href="https://discord.com/application-directory/1270502179936931840">Invite AzzyBot to your server!</a>
     <br/>
     <br/>
     <a href="https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=bug&projects=&template=bug_report.yml&title=%5BBUG%5D">Report a bug</a>
