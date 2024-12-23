@@ -627,7 +627,7 @@ public sealed class ConfigCommands
             }
             else if (guild.AzuraCast is not null)
             {
-                messageBuilder.WithContent("Appearently you have an AzuraCast instance configured, but it's not online.");
+                messageBuilder.WithContent("Apparently you have an AzuraCast instance configured, but it's not online.");
             }
 
             await member.SendMessageAsync(messageBuilder);
