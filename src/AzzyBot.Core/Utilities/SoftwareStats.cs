@@ -8,7 +8,7 @@ namespace AzzyBot.Core.Utilities;
 public static class SoftwareStats
 {
     public static string GetAppAuthors
-        => FileVersionInfo.GetVersionInfo(GetAppFilePath()).CompanyName ?? "Bot authors not found";
+        => FileVersionInfo.GetVersionInfo(GetAppFilePath).CompanyName ?? "Bot authors not found";
 
     public static string GetAppDotNetVersion
         => Environment.Version.ToString() ?? ".NET version not found";
@@ -17,10 +17,10 @@ public static class SoftwareStats
         => (GetAppName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase)) ? Environments.Development : Environments.Production;
 
     public static string GetAppName
-        => FileVersionInfo.GetVersionInfo(GetAppFilePath()).ProductName?.Split('.')[0] ?? "Bot name not found";
+        => FileVersionInfo.GetVersionInfo(GetAppFilePath).ProductName?.Split('.')[0] ?? "Bot name not found";
 
     public static string GetAppVersion
-        => FileVersionInfo.GetVersionInfo(GetAppFilePath()).ProductVersion ?? "Bot version not found";
+        => FileVersionInfo.GetVersionInfo(GetAppFilePath).ProductVersion ?? "Bot version not found";
 
     public static double GetAppMemoryUsage()
     {
@@ -36,17 +36,6 @@ public static class SoftwareStats
         return app.StartTime;
     }
 
-    private static string GetAppFilePath()
-    {
-        string fileName = Path.Combine(AppContext.BaseDirectory, AppDomain.CurrentDomain.FriendlyName);
-        Console.WriteLine(fileName);
-        if (!HardwareStats.CheckIfLinuxOs)
-            fileName += ".exe";
-
-        Console.WriteLine(fileName);
-
-        return (!string.IsNullOrEmpty(fileName))
-            ? fileName
-            : throw new InvalidOperationException("Bot file path not found");
-    }
+    private static string GetAppFilePath
+        => $"{Path.Combine(AppContext.BaseDirectory, AppDomain.CurrentDomain.FriendlyName)}.dll";
 }
