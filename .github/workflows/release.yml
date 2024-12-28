@@ -2,6 +2,8 @@ name: Automated .NET Release
 
 on:
   push:
+    paths-ignore:
+    - "**.yml"
     branches:
     - "main"
     - "rel/**"
