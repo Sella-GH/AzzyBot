@@ -47,7 +47,6 @@ jobs:
           build-mode: none
         - language: csharp
           build-mode: manual
-          queries: security-and-quality
         # CodeQL supports the following values keywords for 'language': 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift'
         # Use `c-cpp` to analyze code written in C, C++ or both
         # Use 'java-kotlin' to analyze code written in Java, Kotlin or both
@@ -67,6 +66,7 @@ jobs:
         config-file: ./.github/codeql/codeql-config.yml
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
+        queries: ${{ matrix.language == 'csharp' && 'security-and-quality' || 'security-extended' }}
         # If you wish to specify custom queries, you can do so here or in a config file.
         # By default, queries listed here will override any specified in a config file.
         # Prefix the list here with "+" to use these queries and those in the config file.

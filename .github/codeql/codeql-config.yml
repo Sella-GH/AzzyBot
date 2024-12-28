@@ -1,9 +1,5 @@
 name: "AzzyBot CodeQL config"
 
-queries:
-  csharp:
-    - uses: security-and-quality
-
 packs:
   csharp:
     - githubsecuritylab/codeql-csharp-queries
