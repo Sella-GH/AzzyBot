@@ -16,8 +16,8 @@ using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
-using AzzyBot.Data;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Services;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ArgumentModifiers;
 using DSharpPlus.Commands.ContextChecks;
@@ -26,17 +26,18 @@ using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Commands.Processors.SlashCommands.Localization;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Commands;
 
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class AdminCommands
 {
-    [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(DiscordPermissions.None, DiscordPermissions.Administrator), InteractionLocalizer<CommandLocalizer>]
-    public sealed class AdminGroup(ILogger<AdminGroup> logger, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotService botService)
+    [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(UserPermissions = [DiscordPermission.Administrator]), InteractionLocalizer<CommandLocalizer>]
+    public sealed class AdminGroup(ILogger<AdminGroup> logger, IOptions<AzzyBotSettings> settings, DbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<AdminGroup> _logger = logger;
-        private readonly AzzyBotSettingsRecord _settings = settings;
+        private readonly AzzyBotSettings _settings = settings.Value;
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
 
@@ -89,14 +90,14 @@ public sealed class AdminCommands
                 return;
             }
 
-            if (!string.IsNullOrWhiteSpace(serverId))
+            // If a server id is provided, show the information of that server.
+            if (!ulong.TryParse(serverId, out ulong guildIdValue))
             {
-                if (!ulong.TryParse(serverId, out ulong guildIdValue))
-                {
-                    await context.EditResponseAsync(GeneralStrings.GuildIdInvalid);
-                    return;
-                }
-
+                await context.EditResponseAsync(GeneralStrings.GuildIdInvalid);
+                return;
+            }
+            else if (guildIdValue is not 0)
+            {
                 if (!guilds.TryGetValue(guildIdValue, out DiscordGuild? guild))
                 {
                     _logger.DiscordItemNotFound(nameof(DiscordGuild), guildIdValue);
@@ -110,6 +111,7 @@ public sealed class AdminCommands
                 return;
             }
 
+            // If no server id is provided, show all servers the bot is in.
             const string tooManyServers = "... and more!";
             StringBuilder stringBuilder = new();
             stringBuilder.AppendLine("I am in the following servers:");
@@ -165,6 +167,29 @@ public sealed class AdminCommands
             await context.EditResponseAsync($"I left **{guild.Name}** ({guild.Id}).");
         }
 
+        [Command("reset-legals"), Description("Resets the legals for all guilds where the bot is in.")]
+        public async ValueTask ResetLegalsAsync(SlashCommandContext context)
+        {
+            ArgumentNullException.ThrowIfNull(context);
+
+            _logger.CommandRequested(nameof(ResetLegalsAsync), context.User.GlobalName);
+
+            await context.DeferResponseAsync();
+
+            await _dbActions.UpdateGuildLegalsAsync();
+
+            IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
+            if (guilds.Count is 0)
+            {
+                await context.EditResponseAsync(GeneralStrings.NoGuildFound);
+                return;
+            }
+
+            await SendMessageAsync(guilds, GeneralStrings.LegalsReset);
+
+            await context.EditResponseAsync(GeneralStrings.MessageSentToAll);
+        }
+
         [Command("send-bot-wide-message"), Description("Sends a message to all servers the bot is in."), InteractionLocalizer<CommandLocalizer>]
         public async ValueTask SendBotWideMessageAsync
         (
@@ -191,34 +216,7 @@ public sealed class AdminCommands
                 return;
             }
 
-            const string dmAddition = "You receive this message directly because you haven't provided a notification channel in your server.";
-            string newMessage = message.Replace("\\n", Environment.NewLine, StringComparison.OrdinalIgnoreCase);
-            IAsyncEnumerable<GuildEntity> guildsEntities = _dbActions.GetGuildsAsync(true);
-            foreach (DiscordGuild guild in guilds.Values)
-            {
-                GuildEntity? guildEntity = await guildsEntities.Where(e => e.UniqueId == guild.Id).FirstOrDefaultAsync();
-                if (guildEntity is null)
-                {
-                    _logger.DatabaseGuildNotFound(guild.Id);
-                    continue;
-                }
-
-                if (guildEntity.ConfigSet && guildEntity.Preferences.AdminNotifyChannelId is not 0)
-                {
-                    await _botService.SendMessageAsync(guildEntity.Preferences.AdminNotifyChannelId, newMessage);
-                }
-                else
-                {
-                    DiscordMember owner = await guild.GetGuildOwnerAsync();
-                    string ownerMessage = newMessage;
-                    if (newMessage.Length < 2000 - dmAddition.Length)
-                    {
-                        ownerMessage += dmAddition;
-                    }
-
-                    await owner.SendMessageAsync(ownerMessage);
-                }
-            }
+            await SendMessageAsync(guilds, message);
 
             await context.EditResponseAsync(GeneralStrings.MessageSentToAll);
         }
@@ -252,6 +250,38 @@ public sealed class AdminCommands
             builder.WithContent($"Here are the logs from **{dateTime}**.");
             builder.AddFile($"{dateTime}.log", fileStream);
             await context.EditResponseAsync(builder);
+        }
+
+        private async ValueTask SendMessageAsync(IReadOnlyDictionary<ulong, DiscordGuild> guilds, string message)
+        {
+            const string dmAddition = "You receive this message directly because you haven't provided a notification channel in your server.";
+            string newMessage = message.Replace("\\n", Environment.NewLine, StringComparison.OrdinalIgnoreCase);
+            IReadOnlyList<GuildEntity> dbGuilds = await _dbActions.GetGuildsAsync(loadGuildPrefs: true);
+            foreach (DiscordGuild guild in guilds.Values)
+            {
+                GuildEntity? guildEntity = dbGuilds.FirstOrDefault(e => e.UniqueId == guild.Id);
+                if (guildEntity is null)
+                {
+                    _logger.DatabaseGuildNotFound(guild.Id);
+                    continue;
+                }
+
+                if (guildEntity.ConfigSet && guildEntity.Preferences.AdminNotifyChannelId is not 0)
+                {
+                    await _botService.SendMessageAsync(guildEntity.Preferences.AdminNotifyChannelId, newMessage);
+                }
+                else
+                {
+                    DiscordMember owner = await guild.GetGuildOwnerAsync();
+                    string ownerMessage = newMessage;
+                    if (newMessage.Length < 2000 - dmAddition.Length)
+                    {
+                        ownerMessage += dmAddition;
+                    }
+
+                    await owner.SendMessageAsync(ownerMessage);
+                }
+            }
         }
     }
 }

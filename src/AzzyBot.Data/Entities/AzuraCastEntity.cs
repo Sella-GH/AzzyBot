@@ -4,6 +4,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace AzzyBot.Data.Entities;
 
+/// <summary>
+/// Represents an AzuraCast instance.
+/// </summary>
 [SuppressMessage("Design", "CA1056:URI-like properties should not be strings", Justification = "Entity Framework Core is unable to handle Uri")]
 public sealed class AzuraCastEntity
 {

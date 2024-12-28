@@ -1,7 +1,7 @@
 ﻿using AzzyBot.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace AzzyBot.Data;
+namespace AzzyBot.Data.Services;
 
 public sealed class AzzyDbContext : DbContext
 {
@@ -21,4 +21,5 @@ public sealed class AzzyDbContext : DbContext
     public DbSet<AzuraCastStationEntity> AzuraCastStations { get; set; }
     public DbSet<AzuraCastStationChecksEntity> AzuraCastStationChecks { get; set; }
     public DbSet<AzuraCastStationPreferencesEntity> AzuraCastStationPreferences { get; set; }
+    public DbSet<AzuraCastStationRequestEntity> AzuraCastStationRequests { get; set; }
 }

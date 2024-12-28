@@ -3,6 +3,9 @@ using DSharpPlus.Entities;
 
 namespace AzzyBot.Data.Entities;
 
+/// <summary>
+/// The guild database entity.
+/// </summary>
 public sealed class GuildEntity
 {
     /// <summary>
@@ -19,6 +22,11 @@ public sealed class GuildEntity
     /// The state if the core config was set.
     /// </summary>
     public bool ConfigSet { get; set; }
+
+    /// <summary>
+    /// The state if the guild accepted the legal terms.
+    /// </summary>
+    public bool LegalsAccepted { get; set; }
 
     /// <summary>
     /// The last saved <see cref="DateTimeOffset"/> timestamp when the <see cref="DiscordGuild"/> was checked for correct channel permissions.

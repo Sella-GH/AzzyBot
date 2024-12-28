@@ -2,6 +2,9 @@
 
 namespace AzzyBot.Data.Entities;
 
+/// <summary>
+/// Represents a station checks entity of an AzuraCast instance.
+/// </summary>
 public sealed class AzuraCastStationChecksEntity
 {
     /// <summary>
@@ -12,6 +15,9 @@ public sealed class AzuraCastStationChecksEntity
     /// <summary>
     /// The state of the check if files have been changed.
     /// </summary>
+    /// <remarks>
+    /// This also enables file caching.
+    /// </remarks>
     public bool FileChanges { get; set; }
 
     /// <summary>

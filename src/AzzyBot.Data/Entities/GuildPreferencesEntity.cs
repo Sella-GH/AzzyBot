@@ -2,6 +2,9 @@
 
 namespace AzzyBot.Data.Entities;
 
+/// <summary>
+/// The user-defined preferences of the guild object.
+/// </summary>
 public sealed class GuildPreferencesEntity
 {
     /// <summary>

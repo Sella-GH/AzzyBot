@@ -8,12 +8,13 @@ using AzzyBot.Bot.Utilities.Records;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
+using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings) : IAutoCompleteProvider
+public sealed class AzzyHelpAutocomplete(IOptions<AzzyBotSettings> settings) : IAutoCompleteProvider
 {
-    private readonly AzzyBotSettingsRecord _settings = settings;
+    private readonly AzzyBotSettings _settings = settings.Value;
 
     public ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)
     {
@@ -28,7 +29,7 @@ public sealed class AzzyHelpAutocomplete(AzzyBotSettingsRecord settings) : IAuto
         ulong guildId = context.Guild.Id;
         DiscordMember member = context.Member;
 
-        bool adminServer = botOwners.Any(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId);
+        bool adminServer = botOwners.Any(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermission.Administrator) && guildId == _settings.ServerId);
         bool approvedDebug = guildId == _settings.ServerId;
         List<DiscordAutoCompleteChoice> results = new(25);
         foreach (List<AzzyHelpRecord> kvp in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member).Select(k => k.Value))

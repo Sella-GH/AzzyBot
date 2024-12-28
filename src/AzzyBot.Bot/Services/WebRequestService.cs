@@ -12,7 +12,9 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using AzzyBot.Bot.Utilities.Records.AzuraCast;
+using AzzyBot.Bot.Resources;
+using AzzyBot.Bot.Utilities;
+using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using Microsoft.Extensions.Logging;
@@ -62,7 +64,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         _httpClient?.Dispose();
     }
 
-    public async Task<IReadOnlyList<bool>> CheckForApiPermissionsAsync(IReadOnlyList<Uri> urls, Dictionary<string, string> headers)
+    public async Task<IReadOnlyList<bool>> CheckForApiPermissionsAsync(IReadOnlyList<Uri> urls, IReadOnlyDictionary<string, string> headers)
     {
         ArgumentNullException.ThrowIfNull(urls);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(urls.Count);
@@ -99,7 +101,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         return results;
     }
 
-    public async Task DeleteAsync(Uri uri, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    public async Task DeleteAsync(Uri uri, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(uri);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
@@ -125,7 +127,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task DownloadAsync(Uri url, string downloadPath, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    public async Task DownloadAsync(Uri url, string downloadPath, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
@@ -152,6 +154,27 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
+    public async Task<AzzyIpAddressRecord> GetIpAddressesAsync()
+    {
+        string ipv4 = string.Empty;
+        string ipv6 = string.Empty;
+        try
+        {
+            ipv4 = await _httpClientV4.GetStringAsync(new Uri(UriStrings.GetIpv4Uri));
+            ipv6 = await _httpClient.GetStringAsync(new Uri(UriStrings.GetIpv6Uri));
+        }
+        catch (HttpRequestException)
+        {
+            if (string.IsNullOrEmpty(ipv4))
+                _logger.WebRequestFailed(HttpMethod.Get, "Failed to get IPv4 address", new(UriStrings.GetIpv4Uri));
+
+            if (string.IsNullOrEmpty(ipv6))
+                _logger.WebRequestFailed(HttpMethod.Get, "Failed to get IPv6 address", new(UriStrings.GetIpv6Uri));
+        }
+
+        return new(ipv4, ipv6);
+    }
+
     public async Task<long> GetPingAsync(Uri uri)
     {
         ArgumentNullException.ThrowIfNull(uri);
@@ -175,7 +198,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task<string?> GetWebAsync(Uri url, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true, bool noLogging = false)
+    public async Task<string?> GetWebAsync(Uri url, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true, bool noLogging = false)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
@@ -224,7 +247,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task PostWebAsync(Uri url, string? content = null, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    public async Task PostWebAsync(Uri url, string? content = null, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
@@ -251,7 +274,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task PutWebAsync(Uri url, string? content = null, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    public async Task PutWebAsync(Uri url, string? content = null, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
@@ -278,7 +301,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    public async Task<string?> UploadAsync(Uri url, string file, string fileName, string filePath, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    public async Task<string?> UploadAsync(Uri url, string file, string fileName, string filePath, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
         AddHeaders(addressFamily, headers, acceptJson, noCache);
@@ -288,8 +311,9 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         {
             byte[] fileBytes = await FileOperations.GetBase64BytesFromFileAsync(file);
             string base64String = Convert.ToBase64String(fileBytes);
+            string json = JsonSerializer.Serialize(new($"{filePath}/{fileName}", base64String), JsonSerializationSourceGen.Default.AzuraFileUploadRecord);
 
-            using HttpContent jsonPayload = new StringContent(JsonSerializer.Serialize<AzuraFileUploadRecord>(new($"{filePath}/{fileName}", base64String)), Encoding.UTF8, MediaType);
+            using HttpContent jsonPayload = new StringContent(json, Encoding.UTF8, MediaType);
             using HttpResponseMessage response = await client.PostAsync(url, jsonPayload);
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadAsStringAsync();
@@ -310,7 +334,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         }
     }
 
-    private void AddHeaders(AddressFamily addressFamily, Dictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    private void AddHeaders(AddressFamily addressFamily, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         string botName = SoftwareStats.GetAppName.Replace("Bot", string.Empty, StringComparison.OrdinalIgnoreCase);
         string botVersion = SoftwareStats.GetAppVersion;

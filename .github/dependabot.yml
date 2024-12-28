@@ -67,7 +67,6 @@ updates:
         - "Npgsql.*"
         - "NReco.*"
         update-types:
-        - "major"
         - "minor"
         - "patch"
       Others:

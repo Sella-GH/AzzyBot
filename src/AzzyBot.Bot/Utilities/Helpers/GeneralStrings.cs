@@ -33,6 +33,12 @@ public static class GeneralStrings
     public const string InstanceNotFound = "AzuraCast is not set up for this server.";
     public const string InstanceUpdateError = "An error occurred while checking for AzuraCast updates.";
     public const string InstanceUpToDate = "AzuraCast is already up to date.";
+    public const string LegalsAlreadyAccepted = "You already accepted the legals! No more action required.";
+    public const string LegalsAccepted = "Thank you for accepting the terms! Now you have to set my settings through `/config modify-core`.\nBe aware that only administrators are able to execute this command right now.";
+    public const string LegalsInformation = "Please accept the following three legal agreements to use me in your server:\n\n1. **[Privacy Policy](%PP%)**\n2. **[Terms Of Service](%TOS%)**";
+    public const string LegalsNotAccepted = "You have to accept the legal conditions first before you're able to use me!";
+    public const string LegalsRequired = "Thank you for adding me to your server **%GUILD%**! Before you're able to use me, you have to accept my legal conditions.\n\nPlease use the command `/legal accept-legals` for this.\nAfter the whole functionality will be unlocked.";
+    public const string LegalsReset = "Attention!\n\nThe associated legal agreements (Privacy Policy & Terms Of Service) have changed. Please accept them again if you wish to continue your usage of the bot. Use the command `/legal accept-legals` for this.\n\nIf you do not accept you're unable to use the bot in your server anymore.";
     public const string MessageSentToAll = "Your message has been sent to all servers.";
     public const string MountPointNotFound = "This mount point does not exist.";
     public const string NoGuildFound = "I'm not in any server.";
@@ -41,8 +47,8 @@ public static class GeneralStrings
     public const string PermissionIssue = "I don't have the required permissions to do this.";
     public const string SkipAlmostOver = "This song is almost over. Please wait!";
     public const string SkipToFast = "You can only skip a song every 30 seconds.";
-    public const string SongRequested = "I requested the song for you.";
     public const string SongRequestNotFound = "This song does not exist.";
+    public const string SongRequestOffline = "Because local file caching is disabled, I can't request infos about songs while your instance is offline.";
     public const string SongRequestQueued = "Your song request has been queued.";
     public const string StationNotFound = "This station does not exist.";
     public const string StationOffline = "This station is currently offline.";
@@ -58,6 +64,7 @@ public static class GeneralStrings
     public const string VoicePlayingAzuraCast = "The current played song is from an AzuraCast station. Please use `music now-playing` to get the information.";
     public const string VoicePlayMount = "I'm starting to play **%station%** now.";
     public const string VoicePlaySong = "I'm starting to play **%track%** by **%artist%** now.";
+    public const string VoiceStationStopped = "The station has been stopped, I am stopping to play music.";
     public const string VoiceStop = "I'm stopping the music now.";
     public const string VoiceStopLeft = "I'm stopping the music and leaving now.";
     public const string VolumeInvalid = "Please use a value between 0 and 100.";

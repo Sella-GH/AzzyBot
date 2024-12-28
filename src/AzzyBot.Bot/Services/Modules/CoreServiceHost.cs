@@ -2,25 +2,33 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Settings;
+using AzzyBot.Bot.Utilities;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
-using AzzyBot.Data;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Services;
+using AzzyBot.Data.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSettingsRecord settings, AzzyDbContext dbContext) : IHostedService
+public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<AzzyBotSettings> azzySettings, IOptions<CoreUpdaterSettings> updaterSettings, IOptions<DatabaseSettings> dbSettings, IOptions<DiscordStatusSettings> discordSettings, IOptions<MusicStreamingSettings> musicStreamingSettings, AzzyDbContext dbContext) : IHostedService
 {
     private readonly ILogger<CoreServiceHost> _logger = logger;
-    private readonly AzzyBotSettingsRecord _settings = settings;
+    private readonly AzzyBotSettings _azzySettings = azzySettings.Value;
+    private readonly CoreUpdaterSettings _updaterSettings = updaterSettings.Value;
+    private readonly DatabaseSettings _dbSettings = dbSettings.Value;
+    private readonly DiscordStatusSettings _discordSettings = discordSettings.Value;
+    private readonly MusicStreamingSettings _musicStreamingSettings = musicStreamingSettings.Value;
     private readonly AzzyDbContext _dbContext = dbContext;
     private readonly Task _completed = Task.CompletedTask;
 
@@ -30,10 +38,11 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
         string version = SoftwareStats.GetAppVersion;
         string arch = HardwareStats.GetSystemOsArch;
         string os = HardwareStats.GetSystemOs;
+        string dotnet = SoftwareStats.GetAppDotNetVersion;
 
-        _logger.BotStarting(name, version, os, arch);
+        _logger.BotStarting(name, version, os, arch, dotnet);
 
-        if (_settings.Database is not null && !string.IsNullOrWhiteSpace(_settings.Database.NewEncryptionKey) && (_settings.Database.NewEncryptionKey != _settings.Database.EncryptionKey))
+        if (!string.IsNullOrWhiteSpace(_dbSettings.NewEncryptionKey) && (_dbSettings.NewEncryptionKey != _dbSettings.EncryptionKey))
             await ReencryptDatabaseAsync();
     }
 
@@ -46,14 +55,13 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
 
     private async Task ReencryptDatabaseAsync()
     {
-        ArgumentNullException.ThrowIfNull(_settings.Database);
-        ArgumentException.ThrowIfNullOrWhiteSpace(_settings.Database.EncryptionKey);
-        ArgumentException.ThrowIfNullOrWhiteSpace(_settings.Database.NewEncryptionKey);
-        ArgumentException.ThrowIfNullOrWhiteSpace(_settings.SettingsFile);
+        ArgumentException.ThrowIfNullOrWhiteSpace(_dbSettings.EncryptionKey);
+        ArgumentException.ThrowIfNullOrWhiteSpace(_dbSettings.NewEncryptionKey);
+        ArgumentException.ThrowIfNullOrWhiteSpace(_azzySettings.SettingsFile);
 
         _logger.DatabaseReencryptionStart();
 
-        byte[] newEncryptionKey = Encoding.UTF8.GetBytes(_settings.Database.NewEncryptionKey);
+        byte[] newEncryptionKey = Encoding.UTF8.GetBytes(_dbSettings.NewEncryptionKey);
 
         await using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync();
 
@@ -71,7 +79,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
                 entity.AdminApiKey = Crypto.Encrypt(entity.AdminApiKey, newEncryptionKey);
             }
 
-            foreach (AzuraCastStationEntity entity in azuraCastStations.Where(static e => !string.IsNullOrWhiteSpace(e.ApiKey)))
+            foreach (AzuraCastStationEntity entity in azuraCastStations.Where(static e => !string.IsNullOrEmpty(e.ApiKey)))
             {
                 entity.ApiKey = Crypto.Decrypt(entity.ApiKey);
                 entity.ApiKey = Crypto.Encrypt(entity.ApiKey, newEncryptionKey);
@@ -87,10 +95,20 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, AzzyBotSett
         }
 
         Crypto.EncryptionKey = newEncryptionKey;
-        _settings.Database.EncryptionKey = _settings.Database.NewEncryptionKey;
-        _settings.Database.NewEncryptionKey = string.Empty;
+        _dbSettings.EncryptionKey = _dbSettings.NewEncryptionKey;
+        _dbSettings.NewEncryptionKey = string.Empty;
 
-        await FileOperations.WriteToJsonFileAsync(_settings.SettingsFile, _settings);
+        AppSettingsRecord appSettings = new()
+        {
+            AzzyBotSettings = _azzySettings,
+            DatabaseSettings = _dbSettings,
+            DiscordStatusSettings = _discordSettings,
+            MusicStreamingSettings = _musicStreamingSettings,
+            CoreUpdaterSettings = _updaterSettings
+        };
+
+        string json = JsonSerializer.Serialize(appSettings, JsonSerializationSourceGen.Default.AppSettingsRecord);
+        await FileOperations.WriteToFileAsync(_azzySettings.SettingsFile, json);
 
         _logger.DatabaseReencryptionComplete();
     }

@@ -10,11 +10,13 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Settings;
+using AzzyBot.Bot.Utilities;
+using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
-using AzzyBot.Core.Utilities.Records;
-using AzzyBot.Data;
+using AzzyBot.Core.Utilities.Helpers;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Services;
 using DSharpPlus;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Exceptions;
@@ -23,22 +25,23 @@ using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordClient client)
+public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOptions<AzzyBotSettings> settings, DbActions dbActions, DiscordClient client)
 {
     private readonly ILogger<DiscordBotService> _logger = logger;
-    private readonly AzzyBotSettingsRecord _settings = settings;
+    private readonly AzzyBotSettings _settings = settings.Value;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordClient _client = client;
     private const string BugReportMessage = "Send a [bug report]([BugReportUri]) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
     private const string ErrorChannelNotConfigured = $"**If you're seeing this message then I am not configured correctly!**\nTell your server admin to run */config modify-core*\n\n{BugReportMessage}";
 
-    public bool CheckIfClientIsConnected
+    private bool CheckIfClientIsConnected
         => _client.AllShardsConnected;
 
-    public async Task<bool> CheckChannelPermissionsAsync(DiscordMember member, ulong channelId, DiscordPermissions permissions)
+    public async Task<bool> CheckChannelPermissionsAsync(DiscordMember member, ulong channelId, DiscordPermission[] permissions)
     {
         ArgumentNullException.ThrowIfNull(member);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId);
@@ -50,7 +53,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             return false;
         }
 
-        return channel.PermissionsFor(member).HasPermission(permissions);
+        return channel.PermissionsFor(member).HasAllPermissions(permissions);
     }
 
     public async Task CheckPermissionsAsync(DiscordGuild guild, ulong[] channelIds)
@@ -71,7 +74,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         foreach (ulong channelId in channelIds)
         {
             channels.Add(channelId);
-            if (!await CheckChannelPermissionsAsync(member, channelId, DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages))
+            if (!await CheckChannelPermissionsAsync(member, channelId, [DiscordPermission.SendMessages, DiscordPermission.ViewChannel]))
                 channelNotAccessible.Add(channelId);
         }
 
@@ -98,14 +101,14 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         await owner.SendMessageAsync(builder.ToString());
     }
 
-    public async Task CheckPermissionsAsync(IAsyncEnumerable<GuildEntity> guilds)
+    public async Task CheckPermissionsAsync(IReadOnlyList<GuildEntity> guilds)
     {
         ArgumentNullException.ThrowIfNull(guilds);
 
         DiscordMember? member;
         List<ulong> channels = [];
         List<ulong> channelNotAccessible = [];
-        await foreach (GuildEntity guild in guilds.Where(g => DateTimeOffset.UtcNow - g.LastPermissionCheck > TimeSpan.FromHours(11.98)))
+        foreach (GuildEntity guild in guilds)
         {
             if (guild.UniqueId == _settings.ServerId)
             {
@@ -153,7 +156,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
                     continue;
                 }
 
-                if (!channel.PermissionsFor(member).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages))
+                if (!channel.PermissionsFor(member).HasAllPermissions(DiscordPermission.SendMessages, DiscordPermission.ViewChannel))
                     channelNotAccessible.Add(channelId);
             }
 
@@ -291,8 +294,9 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
         try
         {
-            string jsonDump = JsonSerializer.Serialize<SerializableExceptionsRecord>(new(ex, info), FileOperations.JsonOptions);
-            string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, $"AzzyBotException_{timestampString}.json");
+            string jsonDump = JsonSerializer.Serialize(new(ex, info), JsonSerializationSourceGen.Default.SerializableExceptionsRecord);
+            string fileName = $"AzzyBotException_{timestampString}.json";
+            string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, fileName);
 
             bool messageSent = await SendMessageAsync(errorChannelId, (errorChannelConfigured) ? BugReportMessage.Replace("[BugReportUri]", UriStrings.BugReportUri, StringComparison.InvariantCultureIgnoreCase) : ErrorChannelNotConfigured, [embed], [tempFilePath]);
             if (!messageSent)
@@ -328,7 +332,27 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         ContextCheckFailedData? moduleActivatedCheck = ex.Errors.FirstOrDefault(static e => e.ContextCheckAttribute is ModuleActivatedCheckAttribute);
         if (moduleActivatedCheck is not null)
         {
-            builder.WithContent("This module is not activated, you are unable to use commands from it.");
+            string reply = string.Empty;
+            switch (moduleActivatedCheck.ErrorMessage)
+            {
+                case CheckMessages.AzuraCastIsNull:
+                    reply = "The AzuraCast module is not activated, you are unable to use commands from it.";
+                    break;
+
+                case CheckMessages.GuildIsNull:
+                    reply = "Your server is not registered within the bot.";
+                    break;
+
+                case CheckMessages.LegalsNotAccepted:
+                    reply = GeneralStrings.LegalsNotAccepted;
+                    break;
+
+                case CheckMessages.ModuleNotFound:
+                    reply = "The requested module was not found, what have you done?";
+                    break;
+            }
+
+            builder.WithContent(reply);
             await context.EditResponseAsync(builder);
             return;
         }
@@ -432,7 +456,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         List<FileStream> streams = new(10);
         if (filePaths?.Count > 0 && filePaths.Count <= 10)
         {
-            const long maxFileSize = 10380902; // ~9-9 MB
+            const int maxFileSize = FileSizes.DiscordFileSize;
             long allFileSize = 0;
 
             foreach (string path in filePaths)
@@ -463,7 +487,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
                 return false;
             }
 
-            if (!channel.PermissionsFor(dMember).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages))
+            if (!channel.PermissionsFor(dMember).HasAllPermissions(DiscordPermission.SendMessages, DiscordPermission.ViewChannel))
             {
                 _logger.UnableToSendMessage($"Bot has no permission to send messages in channel: {channel.Name} ({channel.Id})");
                 return false;
@@ -576,7 +600,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             return null;
         }
 
-        return guild.Channels.FirstOrDefault(c => c.Value.Type is DiscordChannelType.Text && c.Value.PermissionsFor(member).HasPermission(DiscordPermissions.AccessChannels | DiscordPermissions.SendMessages)).Value;
+        return guild.Channels.FirstOrDefault(c => c.Value.Type is DiscordChannelType.Text && c.Value.PermissionsFor(member).HasAllPermissions(DiscordPermission.SendMessages, DiscordPermission.ViewChannel)).Value;
     }
 
     private static void ProcessOptions(IReadOnlyDictionary<CommandParameter, object?> paramaters, Dictionary<string, string> commandParameters)
@@ -588,7 +612,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
             string name = kvp.Key.Name;
             string value = kvp.Value?.ToString() ?? "undefined";
 
-            if (!string.IsNullOrWhiteSpace(name) && value is not "0" or "undefined")
+            if (!string.IsNullOrEmpty(name) && value is not "0" or "undefined")
                 commandParameters.Add(name, value);
         }
     }
@@ -606,18 +630,17 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
 
         DiscordEmbedBuilder builder = new()
         {
+            Title = ex.GetType().Name,
+            Description = (ex.Message.Length <= 4096) ? ex.Message : "Description too big for embed.",
             Color = DiscordColor.Red
         };
 
-        builder.AddField("Exception", ex.GetType().Name);
-        builder.AddField("Description", ex.Message);
-
-        if (!string.IsNullOrWhiteSpace(jsonMessage))
+        if (!string.IsNullOrEmpty(jsonMessage))
             builder.AddField("Advanced Error", jsonMessage);
 
         builder.AddField("Timestamp", timestamp);
 
-        if (!string.IsNullOrWhiteSpace(ex.Source))
+        if (!string.IsNullOrEmpty(ex.Source))
             builder.AddField("Source", ex.Source);
 
         if (message is not null)
@@ -626,7 +649,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         if (user is not null)
             builder.AddField("User", user.Mention);
 
-        if (!string.IsNullOrWhiteSpace(commandName))
+        if (!string.IsNullOrEmpty(commandName))
             builder.AddField("Command", commandName);
 
         if (commandOptions?.Count > 0)
@@ -643,7 +666,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, AzzyBot
         builder.AddField("OS", os);
         builder.AddField("Arch", arch);
         builder.WithAuthor(botName, UriStrings.BugReportUri, botIconUrl);
-        builder.WithFooter($"Version: {botVersion}");
+        builder.WithFooter($"Version: {botVersion} / {SoftwareStats.GetAppEnvironment.ToUpperInvariant()}");
 
         return builder;
     }

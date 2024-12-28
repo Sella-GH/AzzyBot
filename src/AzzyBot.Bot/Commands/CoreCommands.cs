@@ -5,17 +5,18 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
+using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Localization;
 using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
+using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records;
-using AzzyBot.Core.Extensions;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Records;
-using AzzyBot.Data;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Services;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
@@ -23,31 +24,30 @@ using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Commands.Processors.SlashCommands.Localization;
 using DSharpPlus.Entities;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Commands;
 
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class CoreCommands
 {
-    [Command("core"), RequireGuild, InteractionLocalizer<CommandLocalizer>]
-    public sealed class CoreGroup(ILogger<CoreGroup> logger, AzzyBotSettingsRecord settings, DbActions dbActions, DiscordBotService botService)
+    [Command("core"), RequireGuild, ModuleActivatedCheck([AzzyModules.LegalTerms]), InteractionLocalizer<CommandLocalizer>]
+    public sealed class CoreGroup(ILogger<CoreGroup> logger, IOptions<AzzyBotSettings> settings, DbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<CoreGroup> _logger = logger;
-        private readonly AzzyBotSettingsRecord _settings = settings;
+        private readonly AzzyBotSettings _settings = settings.Value;
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
 
-        [Command("force-channel-permissions-check"), Description("Forces a check of the permissions for the bot in the necessary channels."), RequirePermissions(DiscordPermissions.None, DiscordPermissions.ManageChannels), InteractionLocalizer<CommandLocalizer>]
+        [Command("force-channel-permissions-check"), Description("Forces a check of the permissions for the bot in the necessary channel."), RequirePermissions(UserPermissions = [DiscordPermission.Administrator]), InteractionLocalizer<CommandLocalizer>]
         public async ValueTask ForceChannelPermissionsCheckAsync(SlashCommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(ForceChannelPermissionsCheckAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
-            IAsyncEnumerable<GuildEntity> guild = _dbActions.GetGuildAsync(_settings.ServerId, loadEverything: true);
-            if (!await guild.ContainsOneItemAsync())
+            GuildEntity? guild = await _dbActions.GetGuildAsync(_settings.ServerId, loadEverything: true);
+            if (guild is null)
             {
                 await context.RespondAsync(GeneralStrings.GuildNotFound);
                 return;
@@ -55,7 +55,7 @@ public sealed class CoreCommands
 
             await context.EditResponseAsync("I initiated a check of the permissions for the bot, please wait a little for the result.");
 
-            await _botService.CheckPermissionsAsync(guild);
+            await _botService.CheckPermissionsAsync([guild]);
         }
 
         [Command("help"), Description("Gives you an overview about all the available commands."), InteractionLocalizer<CommandLocalizer>]
@@ -72,13 +72,11 @@ public sealed class CoreCommands
 
             _logger.CommandRequested(nameof(HelpAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
             IEnumerable<DiscordUser> botOwners = context.Client.CurrentApplication.Owners;
             ulong guildId = context.Guild.Id;
             DiscordMember member = context.Member;
 
-            bool adminServer = botOwners.Any(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermissions.Administrator) && guildId == _settings.ServerId);
+            bool adminServer = botOwners.Any(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermission.Administrator) && guildId == _settings.ServerId);
             bool approvedDebug = guildId == _settings.ServerId;
             List<DiscordEmbed> embeds = new(10);
             if (string.IsNullOrWhiteSpace(command))
@@ -113,9 +111,9 @@ public sealed class CoreCommands
         }
 
         [Command("stats"), InteractionLocalizer<CommandLocalizer>]
-        public sealed class CoreStats(AppStatsRecord stats, ILogger<CoreStats> logger)
+        public sealed class CoreStats(IOptions<AppStats> stats, ILogger<CoreStats> logger)
         {
-            private readonly AppStatsRecord _stats = stats;
+            private readonly AppStats _stats = stats.Value;
             private readonly ILogger<CoreStats> _logger = logger;
 
             [Command("hardware"), Description("Shows information about the hardware side of the bot."), InteractionLocalizer<CommandLocalizer>]
@@ -125,8 +123,6 @@ public sealed class CoreCommands
                 ArgumentNullException.ThrowIfNull(context.Guild);
 
                 _logger.CommandRequested(nameof(HardwareStatsAsync), context.User.GlobalName);
-
-                await context.DeferResponseAsync();
 
                 Uri avaUrl = new(context.Client.CurrentUser.AvatarUrl);
                 DiscordEmbed embed = await EmbedBuilder.BuildAzzyHardwareStatsEmbedAsync(avaUrl, context.Client.GetConnectionLatency(context.Guild.Id).Milliseconds);
@@ -140,8 +136,6 @@ public sealed class CoreCommands
                 ArgumentNullException.ThrowIfNull(context);
 
                 _logger.CommandRequested(nameof(InfoStatsAsync), context.User.GlobalName);
-
-                await context.DeferResponseAsync();
 
                 Uri avaUrl = new(context.Client.CurrentUser.AvatarUrl);
                 string dspVersion = context.Client.VersionString.Split('+')[0];

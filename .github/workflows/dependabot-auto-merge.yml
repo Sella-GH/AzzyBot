@@ -1,5 +1,11 @@
 name: Dependabot Auto-Merge
-on: pull_request_target
+
+on:
+  pull_request_target:
+    types: [assigned, opened, synchronize, reopened, ready_for_review]
+    branches:
+      - dependabot/**
+  
 
 permissions:
   contents: write
@@ -7,12 +13,12 @@ permissions:
     
 jobs:
   dependabot:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
       - name: Dependabot metadata
         id: metadata
-        uses: dependabot/fetch-metadata@v2
+        uses: dependabot/fetch-metadata@dbb049abf0d677abbd7f7eee0375145b417fdd34
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           
