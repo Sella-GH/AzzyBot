@@ -65,62 +65,6 @@ jobs:
          echo "version=v$VERSION" >> "$GITHUB_OUTPUT"
          echo "clean_version=$VERSION" >> "$GITHUB_OUTPUT"
 
-  # build:
-  #   name: Build RELEASE for ${{ matrix.os }} - ${{ matrix.arch }}
-  #   needs: [check_for_tag, extract_meta]
-  #   if: ${{ needs.check_for_tag.outputs.tag_created == 'true' && contains(github.event.head_commit.message, '[release]') }}
-  #   runs-on: ubuntu-24.04
-  #   strategy:
-  #     matrix:
-  #       include:
-  #         - os: linux
-  #           arch: x64
-  #         - os: linux
-  #           arch: arm64
-  #         - os: win
-  #           arch: x64
-  #         - os: win
-  #           arch: arm64
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      
-  #     - name: Setup .NET 9
-  #       uses: actions/setup-dotnet@3e891b0cb619bf60e2c25674b222b8940e2c1c25
-  #       with:
-  #         dotnet-version: '9'
-
-  #     - name: Install GitHub CLI
-  #       run: sudo apt-get update && sudo apt-get install -y gh
-      
-  #     - name: Restore, Build And Publish
-  #       run: |
-  #         dotnet restore /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.config --force --no-cache --ucr
-  #         dotnet build /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Release --no-incremental --no-restore --no-self-contained --ucr
-  #         dotnet publish /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Release --no-build --no-restore --no-self-contained --ucr
-          
-  #     #- name: Download and extract Lavalink
-  #     #  run: |
-  #     #    mkdir -p ./artifacts/publish/AzzyBot/release/Modules/MusicStreaming/Files/plugins
-  #     #    gh release download 4.0.4 --dir './artifacts/publish/AzzyBot/release/Modules/MusicStreaming/Files' --pattern 'Lavalink.jar' --repo lavalink-devs/Lavalink
-  #     #    wget -qO ./artifacts/publish/AzzyBot/release/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
-  #     #  env:
-  #     #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  #     - name: Add some basic information
-  #       run: |
-  #         sed -i 's\Commit not found\${{ github.sha }}\g' ./artifacts/publish/AzzyBot.Bot/release/Modules/Core/Files/AppStats.json
-  #         sed -i 's\Compilation date not found\${{ needs.extract_meta.outputs.datetime }}\g' ./artifacts/publish/AzzyBot.Bot/release/Modules/Core/Files/AppStats.json
-  #         sed -i 's\Lines of source code not found\${{ needs.extract_meta.outputs.loc_cs }}\g' ./artifacts/publish/AzzyBot.Bot/release/Modules/Core/Files/AppStats.json
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
-  #     - name: Archive Bot Build Artifact
-  #       uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b
-  #       with:
-  #         name: release-bot-${{ matrix.os }}-${{ matrix.arch }}
-  #         path: ./artifacts/publish/AzzyBot.Bot/release
-
   build-docker:
     name: Build docker .zip file
     needs: extract_meta
@@ -144,7 +88,6 @@ jobs:
           mkdir -p ./docker-zip/AzzyBot/Modules/AzuraCast/Files
           mkdir -p ./docker-zip/AzzyBot/Modules/MusicStreaming/Files
           mv ./src/AzzyBot.Bot/Modules/MusicStreaming/Files/application.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/application.yml
-          #mv ./src/AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/docker-compose.yml
           #wget -qO ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
           mkdir -p ./docker-zip/AzzyBot/Settings
           mv ./src/AzzyBot.Bot/Settings/AzzyBotSettings-Docker.json ./docker-zip/AzzyBot/Settings/AzzyBotSettings-Docker.json
