@@ -22,6 +22,8 @@ on:
     - "**.props"
     - "**.sln"
     - "**/codeql.yml"
+  schedule:
+  - cron: '2 0 * * *' # every day at 02:00 UTC
   workflow_dispatch:
 
 jobs:
