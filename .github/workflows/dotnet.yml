@@ -19,7 +19,7 @@ on:
 jobs:
   extract_meta:
     name: Extract metadata for use
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       loc_cs: ${{ steps.loc_cs.outputs.total_lines }}
       datetime: ${{ steps.dateTime.outputs.time }}
@@ -46,7 +46,7 @@ jobs:
   build-amd:
     name: Build DEBUG for ${{ matrix.os }} - ${{ matrix.arch }}
     needs: extract_meta
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         include:

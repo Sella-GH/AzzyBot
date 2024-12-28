@@ -18,7 +18,7 @@ jobs:
   extract_meta:
     name: Extract metadata for use
     if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       loc_cs: ${{ steps.loc_cs.outputs.total_lines }}
       changelog: ${{ steps.changelog.outputs.changelog }}
@@ -64,7 +64,7 @@ jobs:
   #   name: Build RELEASE for ${{ matrix.os }} - ${{ matrix.arch }}
   #   needs: [check_for_tag, extract_meta]
   #   if: ${{ needs.check_for_tag.outputs.tag_created == 'true' && contains(github.event.head_commit.message, '[release]') }}
-  #   runs-on: ubuntu-latest
+  #   runs-on: ubuntu-24.04
   #   strategy:
   #     matrix:
   #       include:
@@ -120,7 +120,7 @@ jobs:
     name: Build docker .zip file
     needs: extract_meta
     if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -153,7 +153,7 @@ jobs:
   create_release:
     name: Create GitHub Release
     needs: [extract_meta, build-docker]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       release_version: ${{ steps.set_output.outputs.release_version }}
     steps:
@@ -195,7 +195,7 @@ jobs:
   upload_assets:
     name: Upload GitHub Release Assets
     needs: [build-docker, create_release]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Install GitHub CLI
         run: sudo apt-get update && sudo apt-get install -y gh

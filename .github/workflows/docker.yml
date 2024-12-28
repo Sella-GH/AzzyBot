@@ -22,7 +22,7 @@ jobs:
   extract_meta:
     name: Extract metadata for use
     if: ${{ github.actor != 'dependabot[bot]' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       clean_version: ${{ steps.get-version.outputs.clean_version }}
       version: ${{ steps.get-version.outputs.version }}
@@ -93,7 +93,7 @@ jobs:
   docker-build-amd:
     name: Build Docker Image For ${{ matrix.os }} - ${{ matrix.arch }}
     needs: [extract_meta]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         include:
@@ -167,7 +167,7 @@ jobs:
   docker-build-alpine-amd:
     name: Build Docker Alpine Image For ${{ matrix.os }} - ${{ matrix.arch }}
     needs: [extract_meta]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         include:
@@ -430,7 +430,7 @@ jobs:
 
   merge:
     name: Creating Docker Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [extract_meta, docker-build-amd, docker-build-alpine-amd, docker-build-arm, docker-build-alpine-arm]
     steps:
       - name: Download digests
@@ -465,7 +465,7 @@ jobs:
 
   merge-alpine:
     name: Creating Docker Alpine Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [extract_meta, docker-build-amd, docker-build-alpine-amd, docker-build-arm, docker-build-alpine-arm]
     steps:
       - name: Download digests
