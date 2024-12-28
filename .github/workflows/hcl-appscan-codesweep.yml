@@ -2,7 +2,11 @@ name: "HCL AppScan CodeSweep"
 on:
   pull_request:
     types: [opened,synchronize]
-    
+
+permissions:
+  actions: write
+  contents: read
+
 jobs:
   scan:
     runs-on: ubuntu-24.04

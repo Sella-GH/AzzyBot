@@ -18,6 +18,10 @@ on:
       - "**/docker.yml"
   workflow_dispatch:
 
+permissions:
+  actions: write
+  contents: read
+
 jobs:
   extract_meta:
     name: Extract metadata for use

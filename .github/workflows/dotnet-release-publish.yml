@@ -9,6 +9,10 @@ on:
     - "**"
   workflow_dispatch:
 
+permissions:
+  actions: write
+  contents: write
+
 jobs:
   check_for_tag:
     name: Check if tag has to be created

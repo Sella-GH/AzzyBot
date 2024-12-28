@@ -16,6 +16,10 @@ on:
       - "**/dotnet.yml"
   workflow_dispatch:
 
+permissions:
+  actions: write
+  contents: write
+
 jobs:
   extract_meta:
     name: Extract metadata for use

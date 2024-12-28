@@ -38,16 +38,7 @@ jobs:
     runs-on: ${{ (matrix.language == 'swift' && 'macos-14') || 'ubuntu-24.04' }}
     timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
     permissions:
-      # required for all workflows
-      security-events: write
-
-      # required to fetch internal or private CodeQL packs
-      packages: read
-
-      # only required for workflows in private repositories
-      actions: read
-      contents: read
-
+      security-events: write # required for all workflows
     strategy:
       fail-fast: false
       matrix:
