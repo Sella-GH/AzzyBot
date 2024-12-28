@@ -1,7 +1,8 @@
 name: "AzzyBot CodeQL config"
 
 queries:
-  - uses: security-and-quality
+  csharp:
+    - uses: security-and-quality
 
 packs:
   csharp:
