@@ -1,7 +1,76 @@
-## 2.1.0
+## 2.2.0 - 2024-12-23
+### BREAKING CHANGES
+- The settings file structure changed and will require a migration!
+
+### General
+- Upon invitation the bot will now require acceptance of the Privacy Policy and Terms Of Service
+
 ### Dependencies
-- Added [NReco.Logging.File](https://github.com/nreco/logging) in version 1.2.1
-- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02394
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02439
+- Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.12.10
+- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.4.0.108396
+
+### Additions
+#### New parameters
+- `player play` and `player play-mount` gained an additional optional parameter `volume` which allows to set the volume of the player at startup
+  - The volume can be set between 0 and 100
+  - The default volume is 100
+  - This value is only respected if the player is not playing anything
+
+#### New commands
+- `admin reset-legals` command added
+  - This command is only for administrators of the bot (the main server)
+  - It resets the accepted legals for every guild and requires them to reaccept
+- `dj add-internal-song-request` command added
+  - This command allows you to add a song quietly into the AutoDj queue
+  - These kind of song requests are not logged inside AzuraCast and should be used with caution!
+  - The bot however logs these kind of requests
+- `legals accept-legals` command added
+  - This command allows you to accept our legal terms and policies
+
+### Improvements
+- Server info embed for admins was slightly improved and fixed
+- `config reset-settings` now shows a confirmation message before resetting the settings
+- The exception embed was slightly improved with more details
+- Improvements regarding information security
+- The bot respects in all cases now when the user decides to disable local file caching
+  - This means that it's not possible to retrieve information about uploaded files when the whole instance is offline
+- The hardware embed now includes the amount of memory which the bot uses
+- The stats embed was restructured and now includes the legal stuff (License, Privacy Policy, Terms Of Service)
+- Updated the invite link so the bot now needs the "Embed Links" permission too
+
+### Fixes
+- The 15 minute cron job won't error anymore when the instance is offline
+- The settings embed now gets created again when the instance is offline
+
+### Development
+- Refactored the code to use `System.Text.Json` source generator and removed `System.Reflection` calls
+- Refactored the settings code to use the Options Pattern with source generation validation
+- Debug code was excluded from compiling in release mode
+- `.editorconfig` now default to warnings
+
+## 2.1.2 - 2024-12-15
+### Dependencies
+- Updated [Npgsql](https://github.com/npgsql/npgsql) to version 9.0.2
+- Updated [Npgsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg) to version 9.0.2
+
+### Fixes
+- `music get-song-history` works again
+- The initial online check after creating an instance works again
+
+## 2.1.1 - 2024-11-23
+### Improvements
+- The AzuraCast updater works fine now if a rolling release instance is expected to update to a stable release
+
+## 2.1.0 - 2024-11-22
+### General
+- Updated to .NET 9 including all dependencies
+- Dockerfile improvements to improve image size
+
+### Dependencies
+- Added [NCronJob](https://github.com/NCronJob-Dev/NCronJob) in version 3.3.8
+- Added [NReco.Logging.File](https://github.com/nreco/logging) in version 1.2.2
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02423
 - Updated [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET) to version 4.0.26-preview.4
 
 ### Additions
@@ -9,12 +78,33 @@
   - This only works in dev mode
 - Added a new environment variable "LOG_RETENTION_DAYS" to docker-compose which defines how many days the logs should be kept
   - Default is 7 days
+- `config get-settings` now shows an additional value in the "station" section which shows how many times songs were requqested through the bot
 
 ### Improvements
 - Exception embeds now produce json output instead of a stacktrace.log file
+- Startup logging now shows the .NET version too
 - Reworked the whole file logging system
 - `admin send-bot-wide-message` now allows linebreaks using `\n` and includes a message if it's sent directly to the server owner
 - QuickJit for loops was activated to improve performance of the bot
+- Reworked background tasks to use NCronJob instead of a custom implementation
+- `azuracast force-cache-refresh` parameter `station` is now optional
+  - If there is no value given it will refresh the cache of all configured stations
+- `azuracast stop-station` now sends a message to the connected voice channels if it's playing and was stopped
+- Various enhancements were made while displaying mounts inside the autocomplete
+
+### Fixes
+- The AzuraCast station cache refresh works again
+- `music now-playing` now shows the streamer artwork if a streamer is playing
+
+## 2.0.13 - 2024-11-14
+### Dependencies
+- Updated [Microsoft.Extensions.Caching.Memory](https://github.com/dotnet/runtime) to version 9.0.0
+- Updated [Microsoft.Extensions.Hosting](https://github.com/dotnet/runtime) to version 9.0.0
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 8.0.11
+- Updated [System.Text.Json](https://github.com/dotnet/runtime) to version 9.0.0
+
+### Improvements
+- Sets the Service Lifetime of database services to `Singleton` again with the exception of the `AzzyBotDbContext` which is now `Scoped`
 
 ## 2.0.12 - 2024-11-12
 ### Improvements

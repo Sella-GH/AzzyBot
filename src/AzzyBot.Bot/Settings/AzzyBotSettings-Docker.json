@@ -1,22 +1,24 @@
 {
-  "BotToken": null,
-  "ServerId": 0,
-  "ErrorChannelId": 0,
-  "NotificationChannelId": 0,
-  "Database": {
+  "AzzyBotSettings": {
+    "BotToken": null,
+    "ServerId": 0,
+    "ErrorChannelId": 0,
+    "NotificationChannelId": 0
+  },
+  "DatabaseSettings": {
     "EncryptionKey": null,
     "NewEncryptionKey": null
   },
-  "DiscordStatus": {
+  "DiscordStatusSettings": {
     "Activity": 2,
     "Doing": "Music",
     "Status": 1,
     "StreamUrl": null
   },
-  "MusicStreaming": {
+  "MusicStreamingSettings": {
     "LavalinkPassword": "AzzyB0TMus1cStr3am!ng"
   },
-  "Updater": {
+  "CoreUpdaterSettings": {
     "DisplayChangelog": true,
     "DisplayInstructions": true
   }

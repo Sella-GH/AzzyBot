@@ -7,6 +7,7 @@ using AzzyBot.Bot.Extensions;
 using AzzyBot.Core.Extensions;
 using AzzyBot.Core.Utilities;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot;
 
@@ -38,15 +39,33 @@ public static class Startup
 
         #region Add logging
 
-        appBuilder.Logging.AzzyBotLogging(logDays, isDev, forceDebug, forceTrace);
+        appBuilder.Logging.AzzyBotLogging(isDev, forceDebug, forceTrace);
 
         #endregion Add logging
 
+        #region Add configuration
+
+        string settingsFilePath = Path.Combine("Settings", GetAppSettingsPath(isDev, isDocker));
+
+        appBuilder.Configuration.AddAppConfiguration(isDev, settingsFilePath);
+
+        #endregion Add configuration
+
         #region Add services
 
-        appBuilder.Services.AzzyBotSettings(isDev, isDocker);
-        appBuilder.Services.AzzyBotStats(isDev && !isDocker);
-        appBuilder.Services.AzzyBotServices(isDev, isDocker);
+        try
+        {
+            appBuilder.Services.AddAppSettings(settingsFilePath);
+            appBuilder.Services.AzzyBotServices(isDev, isDocker, logDays);
+        }
+        catch (OptionsValidationException ex)
+        {
+            Console.WriteLine(ex.Message);
+            if (!HardwareStats.CheckIfLinuxOs)
+                Console.ReadKey();
+
+            return;
+        }
 
         #endregion Add services
 
@@ -54,5 +73,19 @@ public static class Startup
         app.ApplyDbMigrations();
         await app.StartAsync();
         await app.WaitForShutdownAsync();
+    }
+
+    private static string GetAppSettingsPath(bool isDev, bool isDocker)
+    {
+        if (isDev)
+        {
+            return "AzzyBotSettings-Dev.json";
+        }
+        else if (isDocker)
+        {
+            return "AzzyBotSettings-Docker.json";
+        }
+
+        return "AzzyBotSettings.json";
     }
 }

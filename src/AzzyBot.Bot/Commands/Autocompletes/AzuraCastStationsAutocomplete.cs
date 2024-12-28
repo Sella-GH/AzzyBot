@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.Modules;
@@ -9,8 +10,8 @@ using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Core.Utilities.Enums;
-using AzzyBot.Data;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Services;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
@@ -18,10 +19,11 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutocomplete> logger, AzuraCastApiService azuraCastApi, DbActions dbActions, DiscordBotService botService) : IAutoCompleteProvider
+public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutocomplete> logger, AzuraCastApiService azuraCastApi, AzuraCastPingService azuraCastPing, DbActions dbActions, DiscordBotService botService) : IAutoCompleteProvider
 {
     private readonly ILogger<AzuraCastStationsAutocomplete> _logger = logger;
     private readonly AzuraCastApiService _azuraCast = azuraCastApi;
+    private readonly AzuraCastPingService _azuraCastPing = azuraCastPing;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
 
@@ -30,10 +32,14 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(context.Guild);
 
-        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true);
+        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true, loadGuild: true);
         if (azuraCast is null)
         {
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+            return [];
+        }
+        else if (!azuraCast.IsOnline)
+        {
             return [];
         }
 
@@ -50,10 +56,19 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
             if (results.Count is 25)
                 break;
 
-            AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(baseUrl, station);
-            if (azuraStation is null)
+            AzuraStationRecord? azuraStation;
+            try
             {
-                await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                azuraStation = await _azuraCast.GetStationAsync(baseUrl, station);
+                if (azuraStation is null)
+                {
+                    await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                    return results;
+                }
+            }
+            catch (HttpRequestException)
+            {
+                await _azuraCastPing.PingInstanceAsync(azuraCast);
                 return results;
             }
 

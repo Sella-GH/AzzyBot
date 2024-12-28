@@ -1,5 +1,6 @@
 using System.Text;
 using AzzyBot.Core.Utilities.Encryption;
+using AzzyBot.Data.Services;
 using EntityFramework.Exceptions.PostgreSQL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,8 +17,8 @@ public static class IServiceCollectionExtensions
 
         string connectionString = GetConnectionString(host, port, user, password, database);
         services.AddDbContext<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor().EnableSensitiveDataLogging(isDev), ServiceLifetime.Transient);
-        services.AddTransient<DbActions>();
-        services.AddTransient<DbMaintenance>();
+        services.AddSingleton<DbActions>();
+        services.AddSingleton<DbMaintenance>();
     }
 
     private static string GetConnectionString(string host, int port, string user, string password, string database)
@@ -26,7 +27,6 @@ public static class IServiceCollectionExtensions
         builder.Host = host;
         builder.Port = port;
         builder.Username = user;
-        builder.ConnectionIdleLifetime = 1200; // 20 minutes
         builder.Password = password;
         builder.Database = database;
 

@@ -5,7 +5,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -14,16 +13,11 @@ namespace AzzyBot.Core.Utilities;
 
 public static class FileOperations
 {
-    public static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        WriteIndented = true
-    };
-
     public static async Task<string> CreateCsvFileAsync<T>(IEnumerable<T> content, string? path = null)
     {
         ArgumentNullException.ThrowIfNull(content);
 
-        string filePath = (!string.IsNullOrWhiteSpace(path)) ? Path.Combine(Path.GetTempPath(), path) : Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        string filePath = (!string.IsNullOrEmpty(path)) ? Path.Combine(Path.GetTempPath(), path) : Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         await using StreamWriter writer = new(filePath);
         CsvConfiguration config = new(CultureInfo.InvariantCulture)
         {
@@ -41,7 +35,7 @@ public static class FileOperations
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(content);
 
-        string tempFilePath = (!string.IsNullOrWhiteSpace(fileName)) ? Path.Combine(Path.GetTempPath(), fileName) : Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        string tempFilePath = (!string.IsNullOrEmpty(fileName)) ? Path.Combine(Path.GetTempPath(), fileName) : Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         await File.WriteAllTextAsync(tempFilePath, content);
 
         return tempFilePath;
@@ -56,7 +50,7 @@ public static class FileOperations
         string zipPath = Path.Combine(zipFileDir, zipFileName);
         await using FileStream stream = new(zipPath, FileMode.Create);
         using ZipArchive zipFile = new(stream, ZipArchiveMode.Create, false, Encoding.UTF8);
-        foreach (string file in Directory.GetFiles(filesDir))
+        foreach (string file in Directory.EnumerateFiles(filesDir))
         {
             string fileName = Path.GetFileName(file);
             zipFile.CreateEntryFromFile(file, fileName, CompressionLevel.SmallestSize);
@@ -88,7 +82,7 @@ public static class FileOperations
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
         ArgumentException.ThrowIfNullOrWhiteSpace(startingName);
 
-        foreach (string file in Directory.GetFiles(path, $"{startingName}*"))
+        foreach (string file in Directory.EnumerateFiles(path, $"{startingName}*"))
         {
             File.Delete(file);
         }
@@ -112,7 +106,7 @@ public static class FileOperations
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
 
-        return (!latest) ? Directory.GetFiles(path) : Directory.GetFiles(path).OrderDescending();
+        return (!latest) ? Directory.EnumerateFiles(path) : Directory.EnumerateFiles(path).OrderDescending();
     }
 
     public static async Task WriteToFileAsync(string path, string content)
@@ -121,26 +115,5 @@ public static class FileOperations
         ArgumentException.ThrowIfNullOrWhiteSpace(content);
 
         await File.WriteAllTextAsync(path, content);
-    }
-
-    public static async Task WriteToFilesAsync(string directoryPath, IReadOnlyDictionary<string, string> files)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(directoryPath);
-        ArgumentNullException.ThrowIfNull(files);
-
-        foreach (KeyValuePair<string, string> file in files)
-        {
-            string filePath = Path.Combine(directoryPath, file.Key);
-            await File.WriteAllTextAsync(filePath, file.Value);
-        }
-    }
-
-    public static async Task WriteToJsonFileAsync<T>(string path, T content)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(path);
-        ArgumentNullException.ThrowIfNull(content);
-
-        string json = JsonSerializer.Serialize(content, JsonOptions);
-        await File.WriteAllTextAsync(path, json);
     }
 }

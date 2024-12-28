@@ -9,8 +9,8 @@ using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
-using AzzyBot.Data;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Services;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
@@ -50,7 +50,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
         }
 
         string? search = context.UserInput;
-        string apiKey = (string.IsNullOrWhiteSpace(station.ApiKey)) ? Crypto.Decrypt(station.AzuraCast.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
+        string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.AzuraCast.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
         string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
         StringBuilder songResult = new();
         List<DiscordAutoCompleteChoice> results = new(25);
@@ -68,40 +68,45 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
                 string artist = string.Empty;
                 string uniqueId = string.Empty;
                 int requestId = 0;
-                if (song is AzuraRequestRecord request)
+                switch (song)
                 {
-                    title = request.Song.Title ?? string.Empty;
-                    artist = request.Song.Artist ?? string.Empty;
-                    uniqueId = request.Song.SongId ?? string.Empty;
-                }
-                else if (song is AzuraFilesRecord file)
-                {
-                    title = file.Title ?? string.Empty;
-                    artist = file.Artist ?? string.Empty;
-                    uniqueId = file.UniqueId ?? string.Empty;
-                }
-                else if (song is AzuraRequestQueueItemRecord requestQueueItem)
-                {
-                    title = requestQueueItem.Track.Title ?? string.Empty;
-                    artist = requestQueueItem.Track.Artist ?? string.Empty;
-                    requestId = requestQueueItem.Id;
+                    case AzuraRequestRecord request:
+                        title = request.Song.Title ?? string.Empty;
+                        artist = request.Song.Artist ?? string.Empty;
+                        uniqueId = request.Song.SongId ?? string.Empty;
+                        break;
+
+                    case AzuraFilesRecord file:
+                        title = file.Title ?? string.Empty;
+                        artist = file.Artist ?? string.Empty;
+                        uniqueId = file.SongId ?? string.Empty;
+                        break;
+
+                    case AzuraRequestQueueItemRecord requestQueueItem:
+                        title = requestQueueItem.Track.Title ?? string.Empty;
+                        artist = requestQueueItem.Track.Artist ?? string.Empty;
+                        requestId = requestQueueItem.Id;
+                        break;
+
+                    default:
+                        continue;
                 }
 
                 if (!string.IsNullOrWhiteSpace(search) && (!title.Contains(search, StringComparison.OrdinalIgnoreCase) && !artist.Contains(search, StringComparison.OrdinalIgnoreCase)))
                     continue;
 
-                songResult.Append(CultureInfo.InvariantCulture, $"{title}");
-                if (!string.IsNullOrWhiteSpace(artist))
+                songResult.Append(title);
+                if (!string.IsNullOrEmpty(artist))
                     songResult.Append(CultureInfo.InvariantCulture, $" - {artist}");
 
-                results.Add(new(songResult.ToString(), (string.IsNullOrWhiteSpace(uniqueId)) ? requestId.ToString(CultureInfo.InvariantCulture) : uniqueId));
+                results.Add(new(songResult.ToString(), (string.IsNullOrEmpty(uniqueId)) ? requestId.ToString(CultureInfo.InvariantCulture) : uniqueId));
                 songResult.Clear();
             }
         }
 
         if (station.AzuraCast.IsOnline && context.Command.Name is "delete-song-request")
         {
-            IEnumerable<AzuraRequestQueueItemRecord>? requests = await _azuraCast.GetStationRequestItemsAsync(new(baseUrl), apiKey, stationId, false);
+            IEnumerable<AzuraRequestQueueItemRecord>? requests = await _azuraCast.GetStationRequestItemsAsync(new(baseUrl), apiKey, stationId, history: false);
             if (requests is null)
             {
                 await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **requests** endpoint on station ({stationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
@@ -149,12 +154,16 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
                     return results;
                 }
 
+                // Get all files that are in the playlists that have requests enabled
                 IEnumerable<AzuraFilesRecord> fileRequests = filesOnline.Where(f => f.Playlists.Any(p => playlists.Any(pl => pl.Id == p.Id)));
                 AddResultsFromSong(fileRequests);
             }
 
             return results;
         }
+
+        if (!station.Checks.FileChanges)
+            return results;
 
         IEnumerable<AzuraFilesRecord> filesLocal = await _azuraCast.GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCast.Id, station.Id, station.StationId);
         AddResultsFromSong(filesLocal);

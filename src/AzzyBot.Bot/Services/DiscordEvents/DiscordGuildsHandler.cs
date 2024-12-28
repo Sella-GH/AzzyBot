@@ -4,24 +4,24 @@ using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
+using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
-using AzzyBot.Data;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Services;
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services.DiscordEvents;
 
-public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, AzzyBotSettingsRecord settings, DiscordBotService botService, DbActions dbActions) : IEventHandler<GuildCreatedEventArgs>, IEventHandler<GuildDeletedEventArgs>, IEventHandler<GuildDownloadCompletedEventArgs>
+public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, IOptions<AzzyBotSettings> settings, DiscordBotService botService, DbActions dbActions) : IEventHandler<GuildCreatedEventArgs>, IEventHandler<GuildDeletedEventArgs>, IEventHandler<GuildDownloadCompletedEventArgs>
 {
     private readonly ILogger<DiscordGuildsHandler> _logger = logger;
-    private readonly AzzyBotSettingsRecord _settings = settings;
+    private readonly AzzyBotSettings _settings = settings.Value;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
-
-    private const string NewGuildText = "Thank you for adding me to your server **%GUILD%**! Before you can make good use of me, you have to set my settings first.\n\nPlease use the command `config modify-core` for this.\nOnly administrators are able to execute this command right now.";
 
     public async Task HandleEventAsync(DiscordClient sender, GuildCreatedEventArgs eventArgs)
     {
@@ -75,22 +75,20 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, A
 
         IEnumerable<DiscordGuild> addedGuilds = await _dbActions.AddGuildsAsync(eventArgs.Guilds);
         if (addedGuilds.Any())
-        {
             await GuildCreatedHelperAsync(addedGuilds);
-        }
 
         DiscordEmbed embed;
         IEnumerable<ulong> removedGuilds = await _dbActions.DeleteGuildsAsync(eventArgs.Guilds);
         if (removedGuilds.Any())
         {
-            foreach (ulong guild in removedGuilds)
+            foreach (ulong removedGuild in removedGuilds)
             {
-                embed = EmbedBuilder.BuildGuildRemovedEmbed(guild);
+                embed = EmbedBuilder.BuildGuildRemovedEmbed(removedGuild);
                 await _botService.SendMessageAsync(_settings.NotificationChannelId, embeds: [embed]);
             }
         }
 
-        IAsyncEnumerable<GuildEntity> guilds = _dbActions.GetGuildsAsync(loadEverything: true);
+        IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
         await _botService.CheckPermissionsAsync(guilds);
     }
 
@@ -103,7 +101,7 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, A
         foreach (DiscordGuild guild in guilds)
         {
             owner = await guild.GetGuildOwnerAsync();
-            await owner.SendMessageAsync(NewGuildText.Replace("%GUILD%", guild.Name, StringComparison.OrdinalIgnoreCase));
+            await owner.SendMessageAsync(GeneralStrings.LegalsRequired.Replace("%GUILD%", guild.Name, StringComparison.OrdinalIgnoreCase));
             embed = await EmbedBuilder.BuildGuildAddedEmbedAsync(guild);
             await _botService.SendMessageAsync(_settings.NotificationChannelId, embeds: [embed]);
         }

@@ -1,11 +1,13 @@
 {
   "profiles": {
     "AzzyBot.Bot": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "hotReloadEnabled": false
     },
     "Trace logs": {
       "commandName": "Project",
-      "commandLineArgs": "-forceTrace"
+      "commandLineArgs": "-forceTrace",
+      "hotReloadEnabled": false
     }
   }
 }

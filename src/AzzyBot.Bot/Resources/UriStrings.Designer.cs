@@ -61,11 +61,65 @@ namespace AzzyBot.Bot.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://raw.githubusercontent.com/AzuraCast/AzuraCast/main/resources/icon.png.
+        /// </summary>
+        internal static string AzuraCastPic {
+            get {
+                return ResourceManager.GetString("AzuraCastPic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://github.com/AzuraCast/AzuraCast/commits/main.
+        /// </summary>
+        internal static string AzuraCastRollingUrl {
+            get {
+                return ResourceManager.GetString("AzuraCastRollingUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://raw.githubusercontent.com/AzuraCast/AzuraCast/refs/heads/stable/CHANGELOG.md.
+        /// </summary>
+        internal static string AzuraCastStableRawUrl {
+            get {
+                return ResourceManager.GetString("AzuraCastStableRawUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://github.com/AzuraCast/AzuraCast/blob/stable/CHANGELOG.md.
+        /// </summary>
+        internal static string AzuraCastStableUrl {
+            get {
+                return ResourceManager.GetString("AzuraCastStableUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&amp;labels=bug&amp;projects=&amp;template=bug_report.yml&amp;title=%5BBUG%5D.
         /// </summary>
         internal static string BugReportUri {
             get {
                 return ResourceManager.GetString("BugReportUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://api.ipify.org.
+        /// </summary>
+        internal static string GetIpv4Uri {
+            get {
+                return ResourceManager.GetString("GetIpv4Uri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://api6.ipify.org.
+        /// </summary>
+        internal static string GetIpv6Uri {
+            get {
+                return ResourceManager.GetString("GetIpv6Uri", resourceCulture);
             }
         }
         
@@ -97,6 +151,33 @@ namespace AzzyBot.Bot.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://github.com/Sella-GH/AzzyBot/blob/main/LICENSE.
+        /// </summary>
+        internal static string GitHubRepoLicenseUrl {
+            get {
+                return ResourceManager.GetString("GitHubRepoLicenseUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://github.com/Sella-GH/AzzyBot/blob/main/legal/Privacy-Policy.md.
+        /// </summary>
+        internal static string GitHubRepoPrivacyPolicyUrl {
+            get {
+                return ResourceManager.GetString("GitHubRepoPrivacyPolicyUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://github.com/Sella-GH/AzzyBot/blob/main/legal/Terms-Of-Service.md.
+        /// </summary>
+        internal static string GitHubRepoTosUrl {
+            get {
+                return ResourceManager.GetString("GitHubRepoTosUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://github.com/Sella-GH/AzzyBot.
         /// </summary>
         internal static string GitHubRepoUri {
@@ -111,6 +192,15 @@ namespace AzzyBot.Bot.Resources {
         internal static string GitHubUri {
             get {
                 return ResourceManager.GetString("GitHubUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://github.com/Sella-GH/AzzyBot/wiki/Setup-instructions.
+        /// </summary>
+        internal static string SetupInstructions {
+            get {
+                return ResourceManager.GetString("SetupInstructions", resourceCulture);
             }
         }
     }

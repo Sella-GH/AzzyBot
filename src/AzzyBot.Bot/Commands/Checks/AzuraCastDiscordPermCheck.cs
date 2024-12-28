@@ -6,8 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Core.Logging;
-using AzzyBot.Data;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Services;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
@@ -43,8 +43,11 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
         bool fillStation;
         switch (context.Command.FullName)
         {
-            case "azuracast export-playlists":
             case "azuracast force-cache-refresh":
+                fillStation = stationId is not 0;
+                break;
+
+            case "azuracast export-playlists":
             case "azuracast start-station":
             case "azuracast stop-station":
             case "azuracast toggle-song-requests":
@@ -109,6 +112,11 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
             case "dj skip-song":
             case "dj switch-playlist":
                 isStationDj = userRoles.Contains(guildRoles.FirstOrDefault(r => r.Id == station.Preferences.StationDjRoleId));
+                break;
+
+            // This is only needed to suppress unnecessary warnings.
+            // Will only be extended as needed.
+            case "azuracast force-update-check":
                 break;
 
             default:

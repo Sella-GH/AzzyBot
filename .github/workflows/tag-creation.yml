@@ -8,17 +8,20 @@ on:
         value: ${{ jobs.create_tag.outputs.tag_was_created }}
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   check_csproj:
     name: Check the project version
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
     outputs:
       create_tag_needed: ${{ steps.compare.outputs.create_tag }}
       tag_version: ${{ steps.compare.outputs.set_tag_version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
 
@@ -42,18 +45,18 @@ jobs:
     name: Create the tag if needed
     needs: check_csproj
     if: ${{ needs.check_csproj.outputs.create_tag_needed == 'true' &&  needs.check_csproj.outputs.tag_version != '' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       tag_was_created: ${{ steps.create-tag.outputs.created-tag }}
     steps:          
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
           fetch-depth: 0
 
       - name: Create tag and set output
         id: create-tag
-        uses: actions/github-script@v7
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
         with:
           script: |
             const tagName = `${process.env.TAG_VERSION}`;

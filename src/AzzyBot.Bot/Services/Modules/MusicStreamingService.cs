@@ -63,7 +63,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
                 _logger.DiscordItemNotFound(nameof(DiscordMember), context.Guild.Id);
                 notConnecting = true;
             }
-            else if (!await _botService.CheckChannelPermissionsAsync(bot, channelId, DiscordPermissions.AccessChannels | DiscordPermissions.UseVoice))
+            else if (!await _botService.CheckChannelPermissionsAsync(bot, channelId, [DiscordPermission.Speak, DiscordPermission.ViewChannel]))
             {
                 notConnecting = true;
             }
@@ -258,7 +258,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         return true;
     }
 
-    public async Task<string?> PlayMusicAsync(SlashCommandContext context, string query, TrackSearchMode searchMode)
+    public async Task<string?> PlayMusicAsync(SlashCommandContext context, string query, TrackSearchMode searchMode, float volume)
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentException.ThrowIfNullOrWhiteSpace(query);
@@ -280,6 +280,9 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
             return null;
         }
 
+        if (player.CurrentTrack is null)
+            await player.SetVolumeAsync(volume / 100f);
+
         foreach (LavalinkTrack track in tracks.Tracks)
         {
             await player.PlayAsync(track, true);
@@ -288,7 +291,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         return (tracks.Tracks.Length > 2) ? $"I queued the playlist **{tracks.Playlist?.Name}** with **{tracks.Tracks.Length}** tracks." : $"I queued **{tracks.Track.Title}** by **{tracks.Track.Author}**";
     }
 
-    public async Task<bool> PlayMountMusicAsync(SlashCommandContext context, string mountPoint)
+    public async Task<bool> PlayMountMusicAsync(SlashCommandContext context, string mountPoint, float volume)
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentException.ThrowIfNullOrWhiteSpace(mountPoint);
@@ -310,6 +313,9 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
             await context.EditResponseAsync("An error occurred while trying to load the track.");
             return false;
         }
+
+        if (player.CurrentTrack is null)
+            await player.SetVolumeAsync(volume / 100f);
 
         await player.PlayAsync(track);
 

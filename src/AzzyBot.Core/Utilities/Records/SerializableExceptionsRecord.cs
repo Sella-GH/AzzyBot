@@ -5,23 +5,44 @@ using System.Text.Json.Serialization;
 
 namespace AzzyBot.Core.Utilities.Records;
 
+/// <summary>
+/// Represents a serializable exception record.
+/// </summary>
 public sealed record SerializableExceptionsRecord
 {
+    /// <summary>
+    /// The source of the exception.
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Source { get; init; }
 
+    /// <summary>
+    /// The type of the exception.
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Type { get; init; }
 
+    /// <summary>
+    /// The message of the exception.
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Message { get; init; }
 
+    /// <summary>
+    /// The additional information of the exception.
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? AdditionalInfo { get; init; }
 
+    /// <summary>
+    /// The stack trace of the exception.
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public IReadOnlyList<string>? StackTrace { get; init; }
 
+    /// <summary>
+    /// The inner exception of the exception.
+    /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public SerializableExceptionsRecord? InnerException { get; init; }
 

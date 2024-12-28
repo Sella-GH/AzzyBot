@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# 17
+# Visual Studio Version 17
 VisualStudioVersion = 17.7.34202.233
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AzzyBot.Bot", "src\AzzyBot.Bot\AzzyBot.Bot.csproj", "{6B05D8A4-AC04-4EA3-B625-C69DFE68761E}"

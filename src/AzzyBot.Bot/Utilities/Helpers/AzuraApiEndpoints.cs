@@ -3,12 +3,17 @@ namespace AzzyBot.Bot.Utilities.Helpers;
 public static class AzuraApiEndpoints
 {
     public const string Admin = "admin";
+    public const string Art = "art";
     public const string Backend = "backend";
+    public const string Batch = "batch";
     public const string Clear = "clear";
     public const string Files = "files";
     public const string History = "history";
+    public const string HlsStreams = "hls_streams";
+    public const string Listeners = "listeners";
     public const string Log = "log";
     public const string Logs = "logs";
+    public const string Mounts = "mounts";
     public const string NowPlaying = "nowplaying";
     public const string Playlist = "playlist";
     public const string Playlists = "playlists";

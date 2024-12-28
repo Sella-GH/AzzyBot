@@ -15,8 +15,8 @@ using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
-using AzzyBot.Data;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Services;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
@@ -31,7 +31,7 @@ namespace AzzyBot.Bot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class MusicStreamingCommands
 {
-    [Command("player"), RequireGuild, RequirePermissions(DiscordPermissions.Speak | DiscordPermissions.UseVoice, DiscordPermissions.UseVoice)]
+    [Command("player"), RequireGuild, RequirePermissions(BotPermissions = [DiscordPermission.Connect, DiscordPermission.Speak], UserPermissions = [DiscordPermission.Connect]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
     public sealed class PlayerGroup(ILogger<PlayerGroup> logger, AzuraCastApiService azuraCast, DbActions dbActions, MusicStreamingService musicStreaming)
     {
         private readonly ILogger<PlayerGroup> _logger = logger;
@@ -56,8 +56,6 @@ public sealed class MusicStreamingCommands
                 return;
             }
 
-            await context.DeferResponseAsync();
-
             if (!await _musicStreaming.SetVolumeAsync(context, volume))
                 return;
 
@@ -70,8 +68,6 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(HistoryAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
 
             IEnumerable<ITrackQueueItem>? history = await _musicStreaming.HistoryAsync(context);
             if (history?.Any() is not true)
@@ -93,8 +89,6 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context.Member.VoiceState);
 
             _logger.CommandRequested(nameof(JoinAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
 
             if (context.Member.VoiceState.Channel is null)
             {
@@ -121,8 +115,6 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(LeaveAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
             if (!await _musicStreaming.StopMusicAsync(context, true))
                 return;
 
@@ -135,8 +127,6 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(NowPlayingAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
 
             LavalinkTrack? track = await _musicStreaming.NowPlayingAsync(context);
             TimeSpan? pos = await _musicStreaming.GetCurrentPositionAsync(context);
@@ -163,8 +153,6 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(PauseAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
             LavalinkTrack? track = await _musicStreaming.NowPlayingAsync(context);
             if (track is null)
             {
@@ -188,34 +176,46 @@ public sealed class MusicStreamingCommands
         (
             SlashCommandContext context,
             [Description("The provider you want to search for."), SlashChoiceProvider<MusicStreamingPlatformProvider>] string provider,
-            [Description("The url of the track you want to play.")] string track
+            [Description("The url of the track you want to play.")] string track,
+            [Description("The volume which should be set. This is only respected when no music is being played.")] int volume = 100
         )
         {
             ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(PlayAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
+            if (volume is < 0 or > 100)
+            {
+                await context.RespondAsync(GeneralStrings.VolumeInvalid, true);
+                return;
+            }
 
-            string? text = await _musicStreaming.PlayMusicAsync(context, track, new(provider));
-            if (string.IsNullOrWhiteSpace(text))
+            string? text = await _musicStreaming.PlayMusicAsync(context, track, new(provider), volume);
+            if (string.IsNullOrEmpty(text))
                 return;
 
             await context.EditResponseAsync(text);
         }
 
-        [Command("play-mount"), Description("Choose a mount point of the station to play it."), ModuleActivatedCheck(AzzyModules.AzuraCast), AzuraCastOnlineCheck]
+        [Command("play-mount"), Description("Choose a mount point of the station to play it."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastOnlineCheck]
         public async ValueTask PlayMountAsync
         (
             SlashCommandContext context,
             [Description("The station you want play."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
-            [Description("The mount point of the station."), SlashAutoCompleteProvider<AzuraCastMountAutocomplete>] int mountPoint
+            [Description("The mount point of the station."), SlashAutoCompleteProvider<AzuraCastMountAutocomplete>] int mountPoint,
+            [Description("The volume which should be set. This is only respected when no music is being played.")] int volume = 100
         )
         {
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
             _logger.CommandRequested(nameof(PlayMountAsync), context.User.GlobalName);
+
+            if (volume is < 0 or > 100)
+            {
+                await context.RespondAsync(GeneralStrings.VolumeInvalid, true);
+                return;
+            }
 
             AzuraCastEntity? azura = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
             if (azura is null)
@@ -246,7 +246,7 @@ public sealed class MusicStreamingCommands
                 return;
             }
 
-            if (!await _musicStreaming.PlayMountMusicAsync(context, mount))
+            if (!await _musicStreaming.PlayMountMusicAsync(context, mount, volume))
                 return;
 
             await context.EditResponseAsync(GeneralStrings.VoicePlayMount.Replace("%station%", nowPlaying.Station.Name, StringComparison.OrdinalIgnoreCase));
@@ -258,8 +258,6 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(QueueAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
 
             IEnumerable<ITrackQueueItem>? history = await _musicStreaming.HistoryAsync(context, true);
             if (history?.Any() is not true)
@@ -283,8 +281,6 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(QueueClearAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
             if (!await _musicStreaming.ClearQueueAsync(context, songNumber))
                 return;
 
@@ -297,8 +293,6 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(ResumeAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
 
             LavalinkTrack? track = await _musicStreaming.NowPlayingAsync(context);
             if (track is null)
@@ -329,8 +323,6 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(SkipAsync), context.User.GlobalName);
 
-            await context.DeferResponseAsync();
-
             LavalinkTrack? track = await _musicStreaming.NowPlayingAsync(context);
             if (track is null)
             {
@@ -359,8 +351,6 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context);
 
             _logger.CommandRequested(nameof(StopAsync), context.User.GlobalName);
-
-            await context.DeferResponseAsync();
 
             bool leaving = leave is 1;
             if (!await _musicStreaming.StopMusicAsync(context, leaving))
