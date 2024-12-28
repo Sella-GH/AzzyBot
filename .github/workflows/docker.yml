@@ -20,6 +20,7 @@ on:
 
 permissions:
   actions: write
+  checks: write
   contents: read
 
 jobs:
