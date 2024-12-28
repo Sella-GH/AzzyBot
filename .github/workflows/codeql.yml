@@ -22,6 +22,9 @@ on:
     - "**.props"
     - "**.sln"
     - "**/codeql.yml"
+    - "**/codeql-config.yml"
+  schedule:
+  - cron: '2 0 * * *' # every day at 02:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -32,19 +35,10 @@ jobs:
     #   - https://gh.io/supported-runners-and-hardware-resources
     #   - https://gh.io/using-larger-runners (GitHub.com only)
     # Consider using larger runners or machines with greater resources for possible analysis time improvements.
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    runs-on: ${{ (matrix.language == 'swift' && 'macos-14') || 'ubuntu-24.04' }}
     timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
     permissions:
-      # required for all workflows
-      security-events: write
-
-      # required to fetch internal or private CodeQL packs
-      packages: read
-
-      # only required for workflows in private repositories
-      actions: read
-      contents: read
-
+      security-events: write # required for all workflows
     strategy:
       fail-fast: false
       matrix:
@@ -64,11 +58,11 @@ jobs:
         # your codebase is analyzed, see https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/codeql-code-scanning-for-compiled-languages
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
+      uses: github/codeql-action/init@48ab28a6f5dbc2a99bf1e0131198dd8f1df78169
       with:
         config-file: ./.github/codeql/codeql-config.yml
         languages: ${{ matrix.language }}
@@ -88,7 +82,7 @@ jobs:
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
     - if: matrix.build-mode == 'manual'
       name: Setup .NET 9
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@3e891b0cb619bf60e2c25674b222b8940e2c1c25
       with:
         dotnet-version: '9'
 
@@ -100,13 +94,13 @@ jobs:
 
     - if: matrix.language == 'actions'
       name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@48ab28a6f5dbc2a99bf1e0131198dd8f1df78169
       with:
         category: "/language:${{matrix.language}}"
     
     - if: matrix.language == 'csharp'
       name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+      uses: github/codeql-action/analyze@48ab28a6f5dbc2a99bf1e0131198dd8f1df78169
       with:
         category: "/language:${{matrix.language}}"
         output: sarif-results
@@ -114,7 +108,7 @@ jobs:
 
     - if: matrix.language == 'csharp'
       name: Filter Sarif Results
-      uses: advanced-security/filter-sarif@v1
+      uses: advanced-security/filter-sarif@f3b8118a9349d88f7b1c0c488476411145b6270d
       with:
         patterns: |
           -**/obj/**
@@ -124,13 +118,13 @@ jobs:
 
     - if: matrix.language == 'csharp'
       name: Upload Sarif
-      uses: github/codeql-action/upload-sarif@v3
+      uses: github/codeql-action/upload-sarif@48ab28a6f5dbc2a99bf1e0131198dd8f1df78169
       with:
         sarif_file: sarif-results/csharp.sarif
 
     - if: matrix.language == 'csharp'
       name: Upload loc as a build artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b
       with:
         name: sarif-results
         path: sarif-results
