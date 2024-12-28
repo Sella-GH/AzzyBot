@@ -20,9 +20,9 @@ on:
     - "**.csproj"
     - "**.json"
     - "**.props"
-    - "AzzyBot.sln"
-    - "./github/workflows/codeql.yml"
-    - "./github/codeql/codeql-config.yml"
+    - "**.sln"
+    - "**/codeql.yml"
+    - "**/codeql-config.yml"
   schedule:
   - cron: '2 0 * * *' # every day at 02:00 UTC
   workflow_dispatch:
