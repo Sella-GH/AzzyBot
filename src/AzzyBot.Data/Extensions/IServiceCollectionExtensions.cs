@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Services;
 using EntityFramework.Exceptions.PostgreSQL;
