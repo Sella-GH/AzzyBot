@@ -1,3 +1,7 @@
+## 2.3.0
+### Dependencies
+- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.0.2
+
 ## 2.2.0 - 2024-12-23
 ### BREAKING CHANGES
 - The settings file structure changed and will require a migration!
