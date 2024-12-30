@@ -170,10 +170,9 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         ArgumentNullException.ThrowIfNull(guilds);
 
         IEnumerable<GuildEntity> existingGuilds = _dbContext.Guilds;
-        IEnumerable<GuildEntity> newGuilds = guilds.Keys
+        IEnumerable<GuildEntity> newGuilds = [.. guilds.Keys
             .Where(guild => !existingGuilds.Select(static g => g.UniqueId).Contains(guild))
-            .Select(static guild => new GuildEntity() { UniqueId = guild })
-            .ToList();
+            .Select(static guild => new GuildEntity() { UniqueId = guild })];
 
         if (!newGuilds.Any())
             return [];
@@ -212,9 +211,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         ArgumentNullException.ThrowIfNull(guilds);
 
         IEnumerable<GuildEntity> existingGuilds = _dbContext.Guilds;
-        IEnumerable<GuildEntity> guildsToDelete = existingGuilds
-            .Where(guild => !guilds.Keys.Contains(guild.UniqueId))
-            .ToList();
+        IEnumerable<GuildEntity> guildsToDelete = [.. existingGuilds.Where(guild => !guilds.Keys.Contains(guild.UniqueId))];
 
         if (!guildsToDelete.Any())
             return [];
