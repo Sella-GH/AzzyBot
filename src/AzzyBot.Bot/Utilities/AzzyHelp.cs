@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using AzzyBot.Bot.Utilities.Records;
+
 using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
 

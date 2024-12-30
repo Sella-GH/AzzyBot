@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
@@ -12,7 +13,9 @@ using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Core.Utilities.Enums;
 using AzzyBot.Core.Utilities.Records;
 using AzzyBot.Data.Entities;
+
 using DSharpPlus.Entities;
+
 using Lavalink4NET.Players;
 using Lavalink4NET.Tracks;
 

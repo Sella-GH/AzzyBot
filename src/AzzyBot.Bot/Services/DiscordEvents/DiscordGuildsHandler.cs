@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
+
 using DSharpPlus;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+
 using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
@@ -13,9 +14,11 @@ using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Core.Utilities.Enums;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
+
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
+
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;

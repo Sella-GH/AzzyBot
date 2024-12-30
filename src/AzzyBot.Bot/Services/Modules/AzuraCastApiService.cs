@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
@@ -14,7 +15,9 @@ using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
+
 using DSharpPlus.Commands.Processors.SlashCommands;
+
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;

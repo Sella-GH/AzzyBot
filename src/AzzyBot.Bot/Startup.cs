@@ -3,9 +3,11 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
 using AzzyBot.Bot.Extensions;
 using AzzyBot.Core.Extensions;
 using AzzyBot.Core.Utilities;
+
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 

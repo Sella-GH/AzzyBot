@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
+
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
+
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Entities;
+
 using Lavalink4NET;
 using Lavalink4NET.Clients;
 using Lavalink4NET.Players;
@@ -14,6 +17,7 @@ using Lavalink4NET.Players.Queued;
 using Lavalink4NET.Rest.Entities;
 using Lavalink4NET.Rest.Entities.Tracks;
 using Lavalink4NET.Tracks;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 

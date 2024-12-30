@@ -87,6 +87,7 @@ dotnet_naming_style.camel_case_underscore_style.capitalization = camel_case
 # Code style defaults
 csharp_using_directive_placement = outside_namespace:warning
 dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = true
 csharp_prefer_braces = when_multiline:warning
 csharp_preserve_single_line_blocks = true:warning
 csharp_preserve_single_line_statements = false:warning
@@ -199,7 +200,6 @@ roslynator_blank_line_after_file_scoped_namespace_declaration = true
 roslynator_blank_line_between_closing_brace_and_switch_section = true
 roslynator_blank_line_between_single_line_accessors = false
 roslynator_blank_line_between_switch_sections = include
-roslynator_blank_line_between_using_directives = never
 roslynator_block_braces_style = single_line_when_empty
 roslynator_body_style = expression
 roslynator_conditional_operator_condition_parentheses_style = include
@@ -265,7 +265,7 @@ dotnet_diagnostic.rcs0012.severity = none
 dotnet_diagnostic.rcs0013.severity = none
 
 ## Add/remove blank line between using directives
-dotnet_diagnostic.rcs0015.severity = warning
+dotnet_diagnostic.rcs0015.severity = none
 
 ## Put attribute list on its own line
 dotnet_diagnostic.rcs0016.severity = warning

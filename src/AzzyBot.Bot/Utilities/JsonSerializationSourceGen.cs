@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Utilities.Records;

@@ -7,6 +7,7 @@ using System.Security;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Settings;
@@ -17,6 +18,7 @@ using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Helpers;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
+
 using DSharpPlus;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Exceptions;
@@ -24,6 +26,7 @@ using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
