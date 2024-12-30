@@ -84,7 +84,7 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
         IEnumerable<DiscordRole> userRoles = context.Member.Roles;
         foreach (AzuraCastDiscordPerm perm in attribute.Perms)
         {
-            result = CheckPermission(perm, guildRoles, azuraCast, station, userRoles.ToList(), context.Command.FullName);
+            result = CheckPermission(perm, guildRoles, azuraCast, station, [.. userRoles], context.Command.FullName);
             if (result is not null)
                 break;
         }

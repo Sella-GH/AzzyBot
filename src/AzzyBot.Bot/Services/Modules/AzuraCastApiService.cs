@@ -592,7 +592,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         if (lastSlash is -1)
             throw new InvalidOperationException($"Invalid song path: {songPath}");
 
-        AzuraInternalRequestRecord songRequest = new(songPath.Substring(0, lastSlash), AzuraApiEndpoints.Queue, [songPath]);
+        AzuraInternalRequestRecord songRequest = new(songPath[..lastSlash], AzuraApiEndpoints.Queue, [songPath]);
 
         await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(songRequest, JsonSerializationSourceGen.Default.AzuraInternalRequestRecord), CreateHeader(apiKey));
     }
