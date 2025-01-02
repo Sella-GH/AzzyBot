@@ -2,8 +2,10 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
+
 using NReco.Logging.File;
 
 namespace AzzyBot.Core.Extensions;

@@ -1,9 +1,13 @@
 ﻿using System.Text;
+
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Services;
+
 using EntityFramework.Exceptions.PostgreSQL;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+
 using Npgsql;
 
 namespace AzzyBot.Data.Extensions;

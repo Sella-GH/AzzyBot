@@ -1,9 +1,12 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
+
 using AzzyBot.Bot.Settings;
 using AzzyBot.Core.Logging;
+
 using DSharpPlus;
 using DSharpPlus.Entities;
+
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

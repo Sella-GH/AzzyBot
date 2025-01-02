@@ -1,4 +1,5 @@
 using System;
+
 using AzzyBot.Bot.Commands;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Converters;
@@ -11,6 +12,7 @@ using AzzyBot.Bot.Settings.Validators;
 using AzzyBot.Core.Utilities.Records;
 using AzzyBot.Data.Extensions;
 using AzzyBot.Data.Settings;
+
 using DSharpPlus;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.Processors.SlashCommands;
@@ -19,9 +21,12 @@ using DSharpPlus.Extensions;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
+
 using Lavalink4NET.Extensions;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+
 using NCronJob;
 
 namespace AzzyBot.Bot.Extensions;

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
+
 using AzzyBot.Core.Logging;
+
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.EventArgs;
 using DSharpPlus.Commands.Exceptions;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Exceptions;
+
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.DiscordEvents;

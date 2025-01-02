@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+
 using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
+
 using DSharpPlus.Entities;
 
 namespace AzzyBot.Bot.Services.Modules;

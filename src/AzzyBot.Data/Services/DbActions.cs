@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Extensions;
+
 using DSharpPlus.Entities;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
@@ -49,7 +52,6 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return ExecuteDbActionAsync(async context =>
         {
             GuildEntity? guild = await context.Guilds
-                .OrderBy(static g => g.Id)
                 .FirstOrDefaultAsync(g => g.UniqueId == guildId);
 
             if (guild is null)
@@ -90,7 +92,6 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return ExecuteDbActionAsync(async context =>
         {
             AzuraCastEntity? azura = await context.AzuraCast
-                .OrderBy(static a => a.Id)
                 .FirstOrDefaultAsync(a => a.Guild.UniqueId == guildId);
 
             if (azura is null)
@@ -136,7 +137,6 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return ExecuteDbActionAsync(async context =>
         {
             AzuraCastStationEntity? station = await context.AzuraCastStations
-                .OrderBy(static s => s.Id)
                 .FirstOrDefaultAsync(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == stationId);
 
             if (station is null)
@@ -169,13 +169,10 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
     {
         ArgumentNullException.ThrowIfNull(guilds);
 
-        IEnumerable<GuildEntity> existingGuilds = _dbContext.Guilds
-            .OrderBy(static g => g.Id);
-
-        IEnumerable<GuildEntity> newGuilds = guilds.Keys
+        IEnumerable<GuildEntity> existingGuilds = _dbContext.Guilds;
+        IEnumerable<GuildEntity> newGuilds = [.. guilds.Keys
             .Where(guild => !existingGuilds.Select(static g => g.UniqueId).Contains(guild))
-            .Select(static guild => new GuildEntity() { UniqueId = guild })
-            .ToList();
+            .Select(static guild => new GuildEntity() { UniqueId = guild })];
 
         if (!newGuilds.Any())
             return [];
@@ -213,12 +210,8 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
     {
         ArgumentNullException.ThrowIfNull(guilds);
 
-        IEnumerable<GuildEntity> existingGuilds = _dbContext.Guilds
-            .OrderBy(static g => g.Id);
-
-        IEnumerable<GuildEntity> guildsToDelete = existingGuilds
-            .Where(guild => !guilds.Keys.Contains(guild.UniqueId))
-            .ToList();
+        IEnumerable<GuildEntity> existingGuilds = _dbContext.Guilds;
+        IEnumerable<GuildEntity> guildsToDelete = [.. existingGuilds.Where(guild => !guilds.Keys.Contains(guild.UniqueId))];
 
         if (!guildsToDelete.Any())
             return [];
@@ -241,7 +234,6 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return _dbContext.AzuraCast
             .AsNoTracking()
             .Where(a => a.Guild.UniqueId == guildId)
-            .OrderBy(static a => a.Id)
             .IncludeIf(loadChecks, static q => q.Include(static a => a.Checks))
             .IncludeIf(loadPrefs, static q => q.Include(static a => a.Preferences))
             .IncludeIf(loadStations, static q => q.Include(static a => a.Stations))
@@ -256,7 +248,6 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return _dbContext.AzuraCastStations
             .AsNoTracking()
             .Where(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == stationId)
-            .OrderBy(static s => s.Id)
             .IncludeIf(loadChecks, static q => q.Include(static s => s.Checks))
             .IncludeIf(loadPrefs, static q => q.Include(static s => s.Preferences))
             .IncludeIf(loadRequests, static q => q.Include(static s => s.Requests))
@@ -270,7 +261,6 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return _dbContext.AzuraCastStationPreferences
             .AsNoTracking()
             .Where(p => p.Station.AzuraCast.Guild.UniqueId == guildId && p.Station.StationId == stationId)
-            .OrderBy(static p => p.Id)
             .IncludeIf(loadStation, static q => q.Include(static p => p.Station))
             .FirstOrDefaultAsync();
     }
@@ -288,7 +278,6 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return _dbContext.Guilds
             .AsNoTracking()
             .Where(g => g.UniqueId == guildId)
-            .OrderBy(static g => g.Id)
             .IncludeIf(loadEverything, static q => q.Include(static g => g.Preferences))
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast).Include(static g => g.AzuraCast!.Checks).Include(static g => g.AzuraCast!.Preferences))
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Checks))
@@ -300,7 +289,6 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
     {
         return await _dbContext.Guilds
             .AsNoTracking()
-            .OrderBy(static g => g.Id)
             .IncludeIf(loadGuildPrefs || loadEverything, static q => q.Include(static g => g.Preferences))
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast).Include(static g => g.AzuraCast!.Checks).Include(static g => g.AzuraCast!.Preferences))
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Checks))
@@ -313,7 +301,6 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return _dbContext.Guilds
             .AsNoTracking()
             .Where(g => g.UniqueId == guildId)
-            .OrderBy(static g => g.Id)
             .Select(static g => g.Preferences)
             .FirstOrDefaultAsync();
     }
@@ -324,7 +311,6 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             AzuraCastEntity? azuraCast = await context.AzuraCast
                 .Where(a => a.Guild.UniqueId == guildId)
-                .OrderBy(static a => a.Id)
                 .FirstOrDefaultAsync();
 
             if (azuraCast is null)
@@ -352,7 +338,6 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             AzuraCastChecksEntity? checks = await context.AzuraCastChecks
                 .Where(c => c.AzuraCast.Guild.UniqueId == guildId)
-                .OrderBy(static c => c.Id)
                 .FirstOrDefaultAsync();
 
             if (checks is null)
@@ -389,7 +374,6 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             AzuraCastPreferencesEntity? preferences = await context.AzuraCastPreferences
                 .Where(p => p.AzuraCast.Guild.UniqueId == guildId)
-                .OrderBy(static p => p.Id)
                 .FirstOrDefaultAsync();
 
             if (preferences is null)
@@ -417,7 +401,6 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             AzuraCastStationEntity? azuraStation = await context.AzuraCastStations
                 .Where(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == station)
-                .OrderBy(static s => s.Id)
                 .FirstOrDefaultAsync();
 
             if (azuraStation is null)
@@ -448,7 +431,6 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             AzuraCastStationChecksEntity? checks = await context.AzuraCastStationChecks
                 .Where(c => c.Station.AzuraCast.Guild.UniqueId == guildId && c.Station.StationId == stationId)
-                .OrderBy(static c => c.Id)
                 .FirstOrDefaultAsync();
 
             if (checks is null)
@@ -473,7 +455,6 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             AzuraCastStationPreferencesEntity? preferences = await context.AzuraCastStationPreferences
                 .Where(p => p.Station.AzuraCast.Guild.UniqueId == guildId && p.Station.StationId == stationId)
-                .OrderBy(static p => p.Id)
                 .FirstOrDefaultAsync();
 
             if (preferences is null)
@@ -510,7 +491,6 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             GuildEntity? guild = await context.Guilds
                 .Where(g => g.UniqueId == guildId)
-                .OrderBy(static g => g.Id)
                 .FirstOrDefaultAsync();
 
             if (guild is null)
@@ -539,7 +519,6 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             GuildPreferencesEntity? preferences = await context.GuildPreferences
                 .Where(p => p.Guild.UniqueId == guildId)
                 .Include(static p => p.Guild)
-                .OrderBy(static p => p.Id)
                 .FirstOrDefaultAsync();
 
             if (preferences is null)

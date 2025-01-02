@@ -1,4 +1,5 @@
 ﻿using AzzyBot.Data.Entities;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace AzzyBot.Data.Services;
