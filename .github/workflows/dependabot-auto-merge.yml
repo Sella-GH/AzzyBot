@@ -3,8 +3,6 @@ name: Dependabot Auto-Merge
 on:
   pull_request_target:
     types: [assigned, opened, synchronize, reopened, ready_for_review]
-    branches:
-      - dependabot/**
   
 
 permissions:
