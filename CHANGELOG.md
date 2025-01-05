@@ -1,3 +1,8 @@
+## 2.2.1 - 2025-01-05
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02445
+- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.1.0
+
 ## 2.2.0 - 2024-12-23
 ### BREAKING CHANGES
 - The settings file structure changed and will require a migration!
