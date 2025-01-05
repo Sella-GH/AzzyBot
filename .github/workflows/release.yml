@@ -2,13 +2,12 @@ name: Automated .NET Release
 
 on:
   push:
-    paths-ignore:
-    - "**.yml"
     branches:
     - "main"
     - "rel/**"
-    tags:
-    - "**"
+    paths:
+    - "Directory.Build.props"
+    - "**/release.yml"
   workflow_dispatch:
 
 permissions:
