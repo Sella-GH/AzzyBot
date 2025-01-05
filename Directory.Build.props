@@ -40,7 +40,7 @@
   <!-- File Properties -->
   <PropertyGroup>
     <Authors>Sella-GH, AzzyBot Contributors</Authors>
-    <Copyright>© 2024 - $(Authors)</Copyright>
+    <Copyright>© 2025 - $(Authors)</Copyright>
     <Description>Kind of music bot for discord, written in C# and with DSharpPlus. This bot is dedicated for the use with AzuraCast and does not work at it's fully glory without it.</Description>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <NeutralLanguage>en</NeutralLanguage>
