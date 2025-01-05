@@ -46,7 +46,6 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
 
         if (utcNow - _lastAzzyUpdateCheck >= TimeSpan.FromHours(6))
         {
-            _logger.GlobalTimerCheckForUpdates();
             await _updater.CheckForAzzyUpdatesAsync();
             _lastAzzyUpdateCheck = utcNow;
         }

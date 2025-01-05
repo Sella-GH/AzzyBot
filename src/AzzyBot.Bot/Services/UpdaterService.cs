@@ -39,6 +39,8 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
 
     public async Task CheckForAzzyUpdatesAsync()
     {
+        _logger.GlobalTimerCheckForUpdates();
+
         string localVersion = SoftwareStats.GetAppVersion;
         bool isPreview = localVersion.Contains("-preview", StringComparison.OrdinalIgnoreCase);
 
