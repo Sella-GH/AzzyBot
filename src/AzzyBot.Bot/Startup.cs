@@ -73,8 +73,7 @@ public static class Startup
 
         using IHost app = appBuilder.Build();
         app.ApplyDbMigrations();
-        await app.StartAsync();
-        await app.WaitForShutdownAsync();
+        await app.RunAsync();
     }
 
     private static string GetAppSettingsPath(bool isDev, bool isDocker)
