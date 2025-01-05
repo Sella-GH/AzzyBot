@@ -1,6 +1,6 @@
 ## 2.3.0
 ### Dependencies
-- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02443
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02445
 - Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.1.0
 
 ## 2.2.0 - 2024-12-23
