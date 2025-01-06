@@ -23,7 +23,7 @@ using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<AzzyBotSettings> azzySettings, IOptions<CoreUpdaterSettings> updaterSettings, IOptions<DatabaseSettings> dbSettings, IOptions<DiscordStatusSettings> discordSettings, IOptions<MusicStreamingSettings> musicStreamingSettings, AzzyDbContext dbContext) : IHostedService
+public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<AzzyBotSettings> azzySettings, IOptions<DatabaseSettings> dbSettings, IOptions<DiscordStatusSettings> discordSettings, IOptions<MusicStreamingSettings> musicStreamingSettings, IOptions<CoreUpdaterSettings> updaterSettings, AzzyDbContext dbContext) : IHostedService
 {
     private readonly ILogger<CoreServiceHost> _logger = logger;
     private readonly AzzyBotSettings _azzySettings = azzySettings.Value;
@@ -46,6 +46,8 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
 
         if (!string.IsNullOrWhiteSpace(_dbSettings.NewEncryptionKey) && (_dbSettings.NewEncryptionKey != _dbSettings.EncryptionKey))
             await ReencryptDatabaseAsync();
+
+        await EnsureAzzyBotDbTableIsCreatedAsync();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -53,6 +55,27 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
         _logger.BotStopping();
 
         return _completed;
+    }
+
+    private async Task EnsureAzzyBotDbTableIsCreatedAsync()
+    {
+        if (await _dbContext.AzzyBot.AnyAsync())
+            return;
+
+        await using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync();
+
+        try
+        {
+            await _dbContext.AzzyBot.AddAsync(new AzzyBotEntity());
+
+            await _dbContext.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch (Exception ex) when (ex is DbUpdateConcurrencyException or DbUpdateException)
+        {
+            await transaction.RollbackAsync();
+            throw new InvalidOperationException("An error occured while creating the AzzyBot table", ex);
+        }
     }
 
     private async Task ReencryptDatabaseAsync()

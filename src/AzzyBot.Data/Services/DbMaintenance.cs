@@ -20,6 +20,7 @@ public sealed class DbMaintenance(ILogger<DbMaintenance> logger, DbActions dbAct
         _logger.DatabaseCleanupStart();
 
         IEnumerable<ulong> removedGuilds = await _dbActions.DeleteGuildsAsync(guilds);
+        await _dbActions.UpdateAzzyBotAsync(lastDatabaseCleanup: true);
 
         _logger.DatabaseCleanupComplete(removedGuilds.Count());
     }

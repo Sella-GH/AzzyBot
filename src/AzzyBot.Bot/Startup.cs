@@ -17,7 +17,14 @@ public static class Startup
 {
     public static async Task Main(string[] args)
     {
+        // Since we're lazy and it makes no sense to fight against EntityFramework
+        // we're just gonna pin point the debug versions to development.
+        // This let's us create Migrations without further issues (hopefully)
+#if DEBUG || DOCKER_DEBUG
+        string environment = Environments.Development;
+#else
         string environment = SoftwareStats.GetAppEnvironment;
+#endif
         bool isDev = environment == Environments.Development;
         bool isDocker = HardwareStats.CheckIfDocker;
         bool forceDebug = (isDocker) ? (Environment.GetEnvironmentVariable("FORCE_DEBUG") is "true") : (args?.Length > 0 && args.Contains("-forceDebug"));
