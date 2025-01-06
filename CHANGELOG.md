@@ -1,3 +1,9 @@
+## 2.3.0
+### Fixes
+- There won't be any update checks or database cleanups any 15 minutes anymore
+- The GitHub update url to the new version now really points to the release and not the API
+- File logging now shows the EventId properly instead of the event name to align with the console logging
+
 ## 2.2.1 - 2025-01-05
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02445

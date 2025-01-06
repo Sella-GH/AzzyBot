@@ -283,6 +283,13 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .CountAsync();
     }
 
+    public Task<AzzyBotEntity?> GetAzzyBotAsync()
+    {
+        return _dbContext.AzzyBot
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
+    }
+
     public Task<GuildEntity?> GetGuildAsync(ulong guildId, bool loadEverything = false)
     {
         return _dbContext.Guilds
@@ -501,6 +508,27 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
                 preferences.ShowPlaylistInNowPlaying = playlist.Value;
 
             context.AzuraCastStationPreferences.Update(preferences);
+        });
+    }
+
+    public Task<bool> UpdateAzzyBotAsync(bool? lastDatabaseCleanup = null, bool? lastUpdateCheck = null)
+    {
+        return ExecuteDbActionAsync(async context =>
+        {
+            AzzyBotEntity? azzyBot = await context.AzzyBot.FirstOrDefaultAsync();
+            if (azzyBot is null)
+            {
+                _logger.DatabaseAzzyBotNotFound();
+                return;
+            }
+
+            if (lastDatabaseCleanup.HasValue)
+                azzyBot.LastDatabaseCleanup = DateTimeOffset.UtcNow;
+
+            if (lastUpdateCheck.HasValue)
+                azzyBot.LastUpdateCheck = DateTimeOffset.UtcNow;
+
+            context.AzzyBot.Update(azzyBot);
         });
     }
 
