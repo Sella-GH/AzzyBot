@@ -9,7 +9,7 @@ using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
-
+using AzzyBot.Data.Services;
 using DSharpPlus.Entities;
 
 using Microsoft.Extensions.Logging;
@@ -17,18 +17,20 @@ using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<AzzyBotSettings> botSettings, IOptions<CoreUpdaterSettings> updaterSettings, DiscordBotService botService, WebRequestService webService)
+public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<AzzyBotSettings> botSettings, IOptions<CoreUpdaterSettings> updaterSettings, DbActions dbActions, DiscordBotService botService, WebRequestService webService)
 {
     private readonly ILogger<UpdaterService> _logger = logger;
     private readonly AzzyBotSettings _botSettings = botSettings.Value;
     private readonly CoreUpdaterSettings _updaterSettings = updaterSettings.Value;
+    private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
     private readonly WebRequestService _webService = webService;
     private DateTimeOffset _lastAzzyUpdateNotificationTime = DateTimeOffset.MinValue;
     private string _lastOnlineVersion = string.Empty;
     private int _azzyNotifyCounter;
-    private readonly Uri _latestUrl = new("https://api.github.com/repos/Sella-GH/AzzyBot/releases/latest");
-    private readonly Uri _previewUrl = new("https://api.github.com/repos/Sella-GH/AzzyBot/releases");
+    private readonly Uri _latestUrl = new("https://github.com/Sella-GH/AzzyBot/releases/latest");
+    private readonly Uri _latestApiUrl = new("https://api.github.com/repos/Sella-GH/AzzyBot/releases/latest");
+    private readonly Uri _previewApiUrl = new("https://api.github.com/repos/Sella-GH/AzzyBot/releases");
 
     private readonly Dictionary<string, string> _headers = new(1)
     {
@@ -44,7 +46,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
         string localVersion = SoftwareStats.GetAppVersion;
         bool isPreview = localVersion.Contains("-preview", StringComparison.OrdinalIgnoreCase);
 
-        string? body = await _webService.GetWebAsync((isPreview) ? _previewUrl : _latestUrl, _headers, true);
+        string? body = await _webService.GetWebAsync((isPreview) ? _previewApiUrl : _latestApiUrl, _headers, true);
         if (string.IsNullOrEmpty(body))
         {
             _logger.OnlineVersionEmpty();
@@ -57,6 +59,8 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
             _logger.OnlineVersionUnserializable();
             return;
         }
+
+        await _dbActions.UpdateAzzyBotAsync(lastUpdateCheck: true);
 
         string onlineVersion = updaterRecord.Name;
         if (localVersion == onlineVersion)

@@ -29,26 +29,19 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
     private readonly DiscordBotService _botService = botService;
     private readonly DiscordClient _discordClient = discordClient;
     private readonly UpdaterService _updater = updater;
-    private DateTimeOffset _lastAzzyUpdateCheck = DateTimeOffset.MinValue;
-    private DateTimeOffset _lastDatabaseCleanup = DateTimeOffset.MinValue;
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
     {
         _logger.GlobalTimerTick();
+        AzzyBotEntity azzyBot = await _dbActions.GetAzzyBotAsync() ?? throw new InvalidOperationException("AzzyBot entity is missing from the database.");
         IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
         DateTimeOffset utcNow = DateTimeOffset.UtcNow;
 
-        if (utcNow - _lastDatabaseCleanup >= TimeSpan.FromHours(24))
-        {
+        if (utcNow - azzyBot.LastDatabaseCleanup >= TimeSpan.FromHours(24))
             await _dbMaintenance.CleanupLeftoverGuildsAsync(_discordClient.Guilds);
-            _lastDatabaseCleanup = utcNow;
-        }
 
-        if (utcNow - _lastAzzyUpdateCheck >= TimeSpan.FromHours(6))
-        {
+        if (utcNow - azzyBot.LastUpdateCheck >= TimeSpan.FromHours(6))
             await _updater.CheckForAzzyUpdatesAsync();
-            _lastAzzyUpdateCheck = utcNow;
-        }
 
         List<GuildEntity> guildsWorkingSet = [.. guilds.Where(g => utcNow - g.LastPermissionCheck >= TimeSpan.FromHours(12))];
         _logger.GlobalTimerCheckForChannelPermissions(guildsWorkingSet.Count);
