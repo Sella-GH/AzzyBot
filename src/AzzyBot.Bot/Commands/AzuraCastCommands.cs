@@ -186,7 +186,7 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync("I initiated the permission check.\nThere won't be another message if your permissions are set correctly.");
         }
 
-        [Command("force-cache-refresh"), Description("Force the bot to refresh it's local song cache for a specific station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
+        [Command("force-cache-refresh"), Description("Force the bot to refresh its local song cache for a specific station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
         public async ValueTask ForceCacheRefreshAsync
         (
             SlashCommandContext context,
