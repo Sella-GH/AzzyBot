@@ -1,4 +1,4 @@
-## 2.2.2. - 2025-01-07
+## 2.2.2 - 2025-01-07
 ### Fixes
 - There won't be any update checks or database cleanups any 15 minutes anymore
 - The GitHub update url to the new version now really points to the release and not the API
