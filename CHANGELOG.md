@@ -3,7 +3,7 @@
 - There won't be any update checks or database cleanups any 15 minutes anymore
 - The GitHub update url to the new version now really points to the release and not the API
 - File logging now shows the EventId properly instead of the event name to align with the console logging
-- You can force the check if AzuraCast is offline, when it's really offline, again and it executes correctly
+- You can now correctly force the check to determine if AzuraCast is offline
 
 ## 2.2.1 - 2025-01-05
 ### Dependencies
