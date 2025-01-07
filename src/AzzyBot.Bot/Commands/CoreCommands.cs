@@ -128,7 +128,7 @@ public sealed class CoreCommands
                 await context.EditResponseAsync(embed);
             }
 
-            [Command("info"), Description("Shows information about the bot and it's components.")]
+            [Command("info"), Description("Shows information about the bot and its components.")]
             public async ValueTask InfoStatsAsync(SlashCommandContext context)
             {
                 ArgumentNullException.ThrowIfNull(context);
