@@ -1,4 +1,7 @@
 ## 2.2.2 - 2025-01-07
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02445
+
 ### Fixes
 - There won't be any update checks or database cleanups any 15 minutes anymore
 - The GitHub update url to the new version now really points to the release and not the API
