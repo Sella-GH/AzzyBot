@@ -5,6 +5,7 @@
 - File logging now shows the EventId properly instead of the event name to align with the console logging
 - You can now correctly force the check to determine if AzuraCast is offline
 - Some spelling mistakes were corrected
+- Automatic checks getting executed correctly now when their time has come
 
 ## 2.2.1 - 2025-01-05
 ### Dependencies
