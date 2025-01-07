@@ -4,6 +4,7 @@
 - The GitHub update url to the new version now really points to the release and not the API
 - File logging now shows the EventId properly instead of the event name to align with the console logging
 - You can now correctly force the check to determine if AzuraCast is offline
+- Some spelling mistakes were corrected
 
 ## 2.2.1 - 2025-01-05
 ### Dependencies
