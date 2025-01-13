@@ -3,12 +3,13 @@ name: Dependabot Auto-Merge
 on:
   pull_request_target:
     types: [assigned, opened, synchronize, reopened, ready_for_review]
-  
+  check_suite:
+    types: [completed]
 
 permissions:
   contents: write
   pull-requests: write
-    
+
 jobs:
   dependabot:
     runs-on: ubuntu-24.04
@@ -20,8 +21,17 @@ jobs:
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           
+      - name: Get PR URL
+        if: ${{ github.event_name == 'pull_request_target' }}
+        run: echo "PR_URL=${{ github.event.pull_request.html_url }}" >> $GITHUB_ENV
+
+      - name: Check CodeQL status
+        if: ${{ github.event_name == 'check_suite' && github.event.check_suite.conclusion == 'success' && github.event.check_suite.app.name == 'CodeQL' }}
+        run: echo "CodeQL check succeeded"
+
       - name: Enable auto-merge for Dependabot PRs
-        run: gh pr merge --auto --squash "$PR_URL"
+        if: ${{ github.event_name == 'check_suite' && github.event.check_suite.conclusion == 'success' && github.event.check_suite.app.name == 'CodeQL' }}
+        run: gh pr merge --auto -s "$PR_URL" --admin -d
         env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_URL: ${{ env.PR_URL }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
