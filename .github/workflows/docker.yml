@@ -301,7 +301,7 @@ jobs:
           retention-days: 1
 
       - name: Cleanup Runner
-        if: always()
+        if: ${{ always() && runner.name != 'GHA-Runner-02' }}
         run: |
           cd /home/runner/actions-runner/_work
           rm -rf /tmp/digests
@@ -389,7 +389,7 @@ jobs:
           retention-days: 1
 
       - name: Cleanup Runner
-        if: always()
+        if: ${{ always() && runner.name != 'GHA-Runner-02' }}
         run: |
           cd /home/runner/actions-runner/_work
           rm -rf /tmp/digests
