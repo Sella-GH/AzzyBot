@@ -27,7 +27,6 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       loc_cs: ${{ steps.loc_cs.outputs.total_lines }}
-      changelog: ${{ steps.changelog.outputs.changelog }}
       datetime: ${{ steps.dateTime.outputs.time }}
       clean_version: ${{ steps.get-version.outputs.clean_version }}
       version: ${{ steps.get-version.outputs.version }}
@@ -37,15 +36,6 @@ jobs:
        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
        with:
          fetch-depth: 0
-
-     - name: Get correct changelog
-       id: changelog
-       run: |
-        if ${{ contains(github.event.head_commit.message, '[pre-release]') }}; then
-          echo "changelog=CHANGELOG.previews.md" >> "$GITHUB_OUTPUT"
-        else
-          echo "changelog=CHANGELOG.md" >> "$GITHUB_OUTPUT"
-        fi
 
      - name: Get Date and Time
        id: dateTime
@@ -80,7 +70,7 @@ jobs:
       - name: Getting all files together
         run: |
           mkdir docker-zip
-          mv ./${{ needs.extract_meta.outputs.changelog }} ./docker-zip/CHANGELOG.md
+          mv ./CHANGELOG.md ./docker-zip/CHANGELOG.md
           mv ./docker-compose.yml ./docker-zip/docker-compose.yml
           mv ./LICENSE ./docker-zip/LICENSE
           mv ./README.md ./docker-zip/README.md
@@ -113,7 +103,7 @@ jobs:
         id: extract_changelog
         run: |
           # Extract the latest changelog entry from the changelog file
-          latest_entry=$(awk 'BEGIN {found=0} /^## / {if (found) exit; found=1} {if (found) print}' ${{ needs.extract_meta.outputs.changelog }})
+          latest_entry=$(awk 'BEGIN {found=0} /^## / {if (found) exit; found=1} {if (found) print}' CHANGELOG.md)
           echo "$latest_entry" > latest_changelog.md
 
           # Extract title for release
