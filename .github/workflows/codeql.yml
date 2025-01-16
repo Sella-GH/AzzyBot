@@ -55,13 +55,14 @@ jobs:
         # see https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/customizing-your-advanced-setup-for-code-scanning.
         # If you are analyzing a compiled language, you can modify the 'build-mode' for that language to customize how
         # your codebase is analyzed, see https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/codeql-code-scanning-for-compiled-languages
+
     steps:
     - name: Checkout repository
-      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@48ab28a6f5dbc2a99bf1e0131198dd8f1df78169
+      uses: github/codeql-action/init@b6a472f63d85b9c78a3ac5e89422239fc15e9b3c # v3.28.1
       with:
         config-file: ./.github/codeql/codeql-config.yml
         languages: ${{ matrix.language }}
@@ -82,7 +83,7 @@ jobs:
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
     - if: matrix.build-mode == 'manual'
       name: Setup .NET 9
-      uses: actions/setup-dotnet@3e891b0cb619bf60e2c25674b222b8940e2c1c25
+      uses: actions/setup-dotnet@87b7050bc53ea08284295505d98d2aa94301e852 # v4.2.0
       with:
         dotnet-version: '9'
 
@@ -94,13 +95,13 @@ jobs:
 
     - if: matrix.language == 'actions'
       name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@48ab28a6f5dbc2a99bf1e0131198dd8f1df78169
+      uses: github/codeql-action/analyze@b6a472f63d85b9c78a3ac5e89422239fc15e9b3c # v3.28.1
       with:
         category: "/language:${{matrix.language}}"
-    
+
     - if: matrix.language == 'csharp'
       name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@48ab28a6f5dbc2a99bf1e0131198dd8f1df78169
+      uses: github/codeql-action/analyze@b6a472f63d85b9c78a3ac5e89422239fc15e9b3c # v3.28.1
       with:
         category: "/language:${{matrix.language}}"
         output: sarif-results
@@ -108,7 +109,7 @@ jobs:
 
     - if: matrix.language == 'csharp'
       name: Filter Sarif Results
-      uses: advanced-security/filter-sarif@f3b8118a9349d88f7b1c0c488476411145b6270d
+      uses: advanced-security/filter-sarif@f3b8118a9349d88f7b1c0c488476411145b6270d # v1.0.1
       with:
         patterns: |
           -**/obj/**
@@ -118,13 +119,13 @@ jobs:
 
     - if: matrix.language == 'csharp'
       name: Upload Sarif
-      uses: github/codeql-action/upload-sarif@48ab28a6f5dbc2a99bf1e0131198dd8f1df78169
+      uses: github/codeql-action/upload-sarif@b6a472f63d85b9c78a3ac5e89422239fc15e9b3c # v3.28.1
       with:
         sarif_file: sarif-results/csharp.sarif
 
     - if: matrix.language == 'csharp'
       name: Upload loc as a build artifact
-      uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b
+      uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
       with:
         name: sarif-results
         path: sarif-results
