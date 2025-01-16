@@ -257,7 +257,7 @@ jobs:
   docker-build-arm:
     name: Build Docker Image For ${{ matrix.os }} - ${{ matrix.arch }}
     needs: [extract_meta]
-    runs-on: self-hosted
+    runs-on: ubuntu-24.04-arm
     strategy:
       matrix:
         include:
@@ -328,19 +328,10 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-      - name: Cleanup Runner
-        if: ${{ always() && runner.name != 'GHA-Runner-02' }}
-        run: |
-          cd /home/runner/actions-runner/_work
-          rm -rf /tmp/digests
-      #    docker stop $(docker ps -a -q)
-      #    docker system prune -a -f --volumes
-      #    docker volume prune -a -f
-
   docker-build-alpine-arm:
     name: Build Docker Alpine Image For ${{ matrix.os }} - ${{ matrix.arch }}
     needs: [extract_meta]
-    runs-on: self-hosted
+    runs-on: ubuntu-24.04-arm
     strategy:
       matrix:
         include:
@@ -422,15 +413,6 @@ jobs:
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
-
-      - name: Cleanup Runner
-        if: ${{ always() && runner.name != 'GHA-Runner-02' }}
-        run: |
-          cd /home/runner/actions-runner/_work
-          rm -rf /tmp/digests
-      #    docker stop $(docker ps -a -q)
-      #    docker system prune -a -f --volumes
-      #    docker volume prune -a -f
 
   merge:
     name: Creating Docker Release
