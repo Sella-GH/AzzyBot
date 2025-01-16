@@ -17,7 +17,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run AppScan CodeSweep
-        uses: HCL-TECH-SOFTWARE/appscan-codesweep-action@main
+        uses: HCL-TECH-SOFTWARE/appscan-codesweep-action@c9d5958469145a0aaf3ac41eaa0190e7757e4eba # v2.1
         with:
           status: action_required
 
