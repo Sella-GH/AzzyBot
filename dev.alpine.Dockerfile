@@ -39,7 +39,7 @@ RUN sed -i "s\Commit not found\\$COMMIT\g" /app/Modules/Core/Files/AppStats.json
 # Add new user
 RUN adduser -D -H azzy && chown -R azzy:azzy /app && chmod 0755 -R /app
 USER azzy
-RUN export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib && source ~/.profile
+RUN export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
 # Start the app
 WORKDIR /app

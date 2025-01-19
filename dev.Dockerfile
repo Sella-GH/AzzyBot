@@ -42,7 +42,7 @@ RUN touch /etc/ssl/certs/azzybot.crt
 # Add new user
 RUN useradd -M -U azzy && chown -R azzy:azzy /app && chmod 0755 -R /app
 USER azzy
-RUN export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib && source ~/.bashrc
+RUN export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 
 # Start the app
 WORKDIR /app
