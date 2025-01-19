@@ -36,6 +36,9 @@ RUN sed -i "s\Commit not found\\$COMMIT\g" /app/Modules/Core/Files/AppStats.json
 	&& sed -i "s\Compilation date not found\\$TIMESTAMP\g" /app/Modules/Core/Files/AppStats.json \
 	&& sed -i "s\Lines of source code not found\\$LOC_CS\g" /app/Modules/Core/Files/AppStats.json
 
+# Dev Build only: Add empty certificate for local testing
+RUN touch /etc/ssl/certs/azzybot.crt
+
 # Add new user
 RUN useradd -M -U azzy && chown -R azzy:azzy /app && chmod 0755 -R /app
 USER azzy
