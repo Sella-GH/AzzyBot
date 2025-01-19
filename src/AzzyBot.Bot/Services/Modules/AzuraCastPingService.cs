@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using System.Security.Authentication;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
@@ -29,12 +30,21 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, A
         {
             status = await _azuraCast.GetInstanceStatusAsync(uri);
         }
-        catch (HttpRequestException)
+        catch (HttpRequestException ex)
         {
-            _logger.BackgroundServiceInstanceStatus(azuraCast.GuildId, azuraCast.Id, "offline");
+            string message = $"AzuraCast instance **{uri}** is **down**!";
+            if (ex.InnerException is AuthenticationException)
+            {
+                _logger.BackgroundServiceInstanceStatus(azuraCast.GuildId, azuraCast.Id, "invalid because of a self-signed certificate");
+                message = $"The certificate for AzuraCast instance **{uri}** is self-signed and therefore not valid!";
+            }
+            else
+            {
+                _logger.BackgroundServiceInstanceStatus(azuraCast.GuildId, azuraCast.Id, "offline");
+            }
 
             await _dbActions.UpdateAzuraCastAsync(azuraCast.Guild.UniqueId, isOnline: false);
-            await _botService.SendMessageAsync(azuraCast.Preferences.OutagesChannelId, $"AzuraCast instance **{uri}** is **down**!");
+            await _botService.SendMessageAsync(azuraCast.Preferences.OutagesChannelId, message);
         }
 
         if (status is not null)
