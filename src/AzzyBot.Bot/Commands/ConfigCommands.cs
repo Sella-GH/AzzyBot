@@ -111,7 +111,6 @@ public sealed class ConfigCommands
             AzuraCastEntity? dAzuraCast = guild.AzuraCast;
             if (dAzuraCast is not null)
             {
-                _logger.DatabaseAzuraCastNotFound(guildId);
                 await context.DeleteResponseAsync();
                 await context.FollowupAsync(GeneralStrings.ConfigInstanceAlreadyExists);
                 return;
@@ -587,50 +586,53 @@ public sealed class ConfigCommands
             await using DiscordMessageBuilder messageBuilder = new();
             messageBuilder.AddEmbeds([guildEmbed]);
 
-            if (guild.AzuraCast?.IsOnline is true)
+            if (guild.AzuraCast is not null)
             {
                 AzuraCastEntity ac = guild.AzuraCast;
-                Dictionary<ulong, string> stationRoles = new(ac.Stations.Count);
-                Dictionary<int, string> stationNames = new(ac.Stations.Count);
-                Dictionary<int, int> stationRequests = new(ac.Stations.Count);
-                foreach (AzuraCastStationEntity station in ac.Stations)
-                {
-                    DiscordRole? stationAdminRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationAdminRoleId);
-                    DiscordRole? stationDjRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationDjRoleId);
-                    stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? "Name not found");
-                    stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found");
-
-                    AzuraStationRecord? stationRecord = null;
-                    try
-                    {
-                        stationRecord = await _azuraCastApi.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), station.StationId);
-                    }
-                    catch (HttpRequestException)
-                    {
-                        await _azuraCastPing.PingInstanceAsync(ac);
-                        break;
-                    }
-
-                    if (stationRecord is null)
-                    {
-                        await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
-                        continue;
-                    }
-
-                    stationNames.Add(station.Id, stationRecord.Name);
-
-                    int stationBotRequests = await _dbActions.GetAzuraCastStationRequestsCountAsync(guildId, station.StationId);
-                    stationRequests.Add(station.Id, stationBotRequests);
-                }
-
                 DiscordRole? instanceAdminRole = roles.FirstOrDefault(r => r.Id == ac.Preferences.InstanceAdminRoleId);
-                IEnumerable<DiscordEmbed> azuraEmbed = EmbedBuilder.BuildGetSettingsAzuraEmbed(ac, $"{instanceAdminRole?.Name} ({instanceAdminRole?.Id})", stationRoles, stationNames, stationRequests);
+                DiscordEmbed azuraCastEmbed = EmbedBuilder.BuildGetSettingsAzuraInstanceEmbed(ac, $"{instanceAdminRole?.Name} ({instanceAdminRole?.Id})");
 
-                messageBuilder.AddEmbeds(azuraEmbed);
-            }
-            else if (guild.AzuraCast is not null)
-            {
-                messageBuilder.WithContent("Apparently you have an AzuraCast instance configured, but it's not online.");
+                messageBuilder.AddEmbed(azuraCastEmbed);
+
+                if (ac.IsOnline)
+                {
+                    Dictionary<ulong, string> stationRoles = new(ac.Stations.Count);
+                    Dictionary<int, string> stationNames = new(ac.Stations.Count);
+                    Dictionary<int, int> stationRequests = new(ac.Stations.Count);
+                    foreach (AzuraCastStationEntity station in ac.Stations)
+                    {
+                        DiscordRole? stationAdminRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationAdminRoleId);
+                        DiscordRole? stationDjRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationDjRoleId);
+                        stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? "Name not found");
+                        stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found");
+
+                        AzuraStationRecord? stationRecord = null;
+                        try
+                        {
+                            stationRecord = await _azuraCastApi.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), station.StationId);
+                        }
+                        catch (HttpRequestException)
+                        {
+                            await _azuraCastPing.PingInstanceAsync(ac);
+                            break;
+                        }
+
+                        if (stationRecord is null)
+                        {
+                            await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                            continue;
+                        }
+
+                        stationNames.Add(station.Id, stationRecord.Name);
+
+                        int stationBotRequests = await _dbActions.GetAzuraCastStationRequestsCountAsync(guildId, station.StationId);
+                        stationRequests.Add(station.Id, stationBotRequests);
+                    }
+
+                    IEnumerable<DiscordEmbed> azuraCastStationsEmbed = EmbedBuilder.BuildGetSettingsAzuraStationsEmbed(ac, stationRoles, stationNames, stationRequests);
+
+                    messageBuilder.AddEmbeds(azuraCastStationsEmbed);
+                }
             }
 
             await member.SendMessageAsync(messageBuilder);

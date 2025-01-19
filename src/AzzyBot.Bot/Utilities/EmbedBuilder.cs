@@ -538,12 +538,11 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.White, fields: fields);
     }
 
-    public static IEnumerable<DiscordEmbed> BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast, string instanceRole, IReadOnlyDictionary<ulong, string> stationRoles, IReadOnlyDictionary<int, string> stationNames, IReadOnlyDictionary<int, int> stationRequests)
+    public static DiscordEmbed BuildGetSettingsAzuraInstanceEmbed(AzuraCastEntity azuraCast, string instanceRole)
     {
         ArgumentNullException.ThrowIfNull(azuraCast);
 
         const string title = "AzuraCast Settings";
-        List<DiscordEmbed> embeds = new(1 + azuraCast.Stations.Count);
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(6)
         {
             ["Base Url"] = new($"||{((!string.IsNullOrEmpty(azuraCast.BaseUrl)) ? Crypto.Decrypt(azuraCast.BaseUrl) : "Not set")}||"),
@@ -554,9 +553,15 @@ public static class EmbedBuilder
             ["Automatic Checks"] = new($"- Server Status: {Misc.GetReadableBool(azuraCast.Checks.ServerStatus, ReadableBool.EnabledDisabled)}\n- Updates: {Misc.GetReadableBool(azuraCast.Checks.Updates, ReadableBool.EnabledDisabled)}\n- Updates Changelog: {Misc.GetReadableBool(azuraCast.Checks.UpdatesShowChangelog, ReadableBool.EnabledDisabled)}")
         };
 
-        embeds.Add(CreateBasicEmbed(title, color: DiscordColor.White, fields: fields));
+        return CreateBasicEmbed(title, color: DiscordColor.White, fields: fields);
+    }
+
+    public static IEnumerable<DiscordEmbed> BuildGetSettingsAzuraStationsEmbed(AzuraCastEntity azuraCast, IReadOnlyDictionary<ulong, string> stationRoles, IReadOnlyDictionary<int, string> stationNames, IReadOnlyDictionary<int, int> stationRequests)
+    {
+        ArgumentNullException.ThrowIfNull(azuraCast);
 
         const string stationTitle = "AzuraCast Stations";
+        List<DiscordEmbed> embeds = new(azuraCast.Stations.Count);
         foreach (AzuraCastStationEntity station in azuraCast.Stations)
         {
             string stationName = stationNames.FirstOrDefault(x => x.Key == station.Id).Value;
@@ -593,7 +598,7 @@ public static class EmbedBuilder
             string showPlaylist = Misc.GetReadableBool(station.Preferences.ShowPlaylistInNowPlaying, ReadableBool.EnabledDisabled);
             string fileChanges = Misc.GetReadableBool(station.Checks.FileChanges, ReadableBool.EnabledDisabled);
 
-            fields = new(11)
+            Dictionary<string, AzzyDiscordEmbedRecord> fields = new(11)
             {
                 ["Station Name"] = new(stationName),
                 ["Station ID"] = new(stationId),

@@ -3,6 +3,12 @@
 - We're now using the new ARM64 GitHub Actions runner for the Docker images
   - This results in a faster build time and more compact actions workflow
 
+### Improvements
+- Removed some unneded and wrong placed logging messages
+- The AzuraCast Settings embed is now shown even when the instance is offline
+  - The AzuraCast Stations embed however continues to be not shown
+- When the AzuraCast instance has a self-signed SSL certificate Azzy will now warn about it
+
 ## 2.2.3 - 2025-01-15
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02448
