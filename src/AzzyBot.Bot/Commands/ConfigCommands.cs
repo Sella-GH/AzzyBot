@@ -111,7 +111,6 @@ public sealed class ConfigCommands
             AzuraCastEntity? dAzuraCast = guild.AzuraCast;
             if (dAzuraCast is not null)
             {
-                _logger.DatabaseAzuraCastNotFound(guildId);
                 await context.DeleteResponseAsync();
                 await context.FollowupAsync(GeneralStrings.ConfigInstanceAlreadyExists);
                 return;
