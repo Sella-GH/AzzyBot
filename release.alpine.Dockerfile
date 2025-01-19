@@ -37,7 +37,7 @@ RUN sed -i "s\Commit not found\\$COMMIT\g" /app/Modules/Core/Files/AppStats.json
 	&& sed -i "s\Lines of source code not found\\$LOC_CS\g" /app/Modules/Core/Files/AppStats.json
 
 # Add new user
-RUN addgroup azzy && adduser -D -G azzy azzy && chown -R azzy:azzy /app && chmod 0755 -R /app
+RUN adduser -D -H azzy && chown -R azzy:azzy /app && chmod 0755 -R /app
 USER azzy
 
 # Start the app

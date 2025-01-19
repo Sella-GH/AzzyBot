@@ -75,7 +75,10 @@ jobs:
           mv ./LICENSE ./docker-zip/LICENSE
           mv ./README.md ./docker-zip/README.md
           mv ./SECURITY.md ./docker-zip/SECURITY.md
+          mkdir -p ./docker-zip/AzzyBot/Backups
+          touch ./docker-zip/AzzyBot/Backups/.keep
           mkdir -p ./docker-zip/AzzyBot/Logs
+          touch ./docker-zip/AzzyBot/Backups/.keep
           mkdir -p ./docker-zip/AzzyBot/Modules/AzuraCast/Files
           mkdir -p ./docker-zip/AzzyBot/Modules/MusicStreaming/Files
           mv ./src/AzzyBot.Bot/Modules/MusicStreaming/Files/application.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/application.yml

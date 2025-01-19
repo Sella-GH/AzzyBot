@@ -1,3 +1,8 @@
+## 2.3.0
+### General
+- We're now using the new ARM64 GitHub Actions runner for the Docker images
+  - This results in a faster build time and more compact actions workflow
+
 ## 2.2.3 - 2025-01-15
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02448
