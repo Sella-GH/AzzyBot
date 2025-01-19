@@ -5,6 +5,8 @@
 
 ### Improvements
 - Removed some unneded and wrong placed logging messages
+- The AzuraCast Settings embed is now shown even when the instance is offline
+  - The AzuraCast Stations embed however continues to be not shown
 
 ## 2.2.3 - 2025-01-15
 ### Dependencies
