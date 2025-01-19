@@ -22,7 +22,7 @@ ENV LC_ALL=en.US.UTF-8
 ENV LANG=en.US.UTF-8
 
 # Upgrade internal tools and packages first
-RUN apt update && apt upgrade -y && apt autoremove -y && apt clean -y && apt install -y --no-install-recommends iputils-ping libzstd1
+RUN apt update && apt upgrade -y && apt autoremove -y && apt clean -y && apt install -y --no-install-recommends iputils-ping libzstd1 && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib && source ~/.bashrc
 
 # Copy the built app
 WORKDIR /app
@@ -42,6 +42,7 @@ RUN touch /etc/ssl/certs/azzybot.crt
 # Add new user
 RUN useradd -M -U azzy && chown -R azzy:azzy /app && chmod 0755 -R /app
 USER azzy
+RUN export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib && source ~/.bashrc
 
 # Start the app
 WORKDIR /app

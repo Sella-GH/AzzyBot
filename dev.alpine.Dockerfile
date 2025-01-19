@@ -22,7 +22,7 @@ ENV LC_ALL=en.US.UTF-8
 ENV LANG=en.US.UTF-8
 
 # Upgrade internal tools and packages first
-RUN apk update && apk upgrade && apk cache sync	&& apk add --no-cache icu-data-full icu-libs iputils-ping sed tzdata zstd-libs
+RUN apk update && apk upgrade && apk cache sync	&& apk add --no-cache icu-data-full icu-libs iputils-ping sed tzdata zstd-libs && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib && source ~/.profile
 
 # Copy the built app
 WORKDIR /app
@@ -39,6 +39,7 @@ RUN sed -i "s\Commit not found\\$COMMIT\g" /app/Modules/Core/Files/AppStats.json
 # Add new user
 RUN adduser -D -H azzy && chown -R azzy:azzy /app && chmod 0755 -R /app
 USER azzy
+RUN export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib && source ~/.profile
 
 # Start the app
 WORKDIR /app
