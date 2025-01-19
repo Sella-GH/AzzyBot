@@ -22,7 +22,7 @@ ENV LC_ALL=en.US.UTF-8
 ENV LANG=en.US.UTF-8
 
 # Upgrade internal tools and packages first
-RUN apt update && apt upgrade -y && apt autoremove -y && apt clean -y && apt install -y --no-install-recommends iputils-ping zstd
+RUN apt update && apt upgrade -y && apt autoremove -y && apt clean -y && apt install -y --no-install-recommends iputils-ping libzstd1
 
 # Copy the built app
 WORKDIR /app
