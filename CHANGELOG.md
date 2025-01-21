@@ -1,3 +1,9 @@
+## 2.2.4 - 2025-01-21
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02450
+- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.2.0
+- Updated [Npgsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg) to version 9.0.3
+
 ## 2.2.3 - 2025-01-15
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02448
