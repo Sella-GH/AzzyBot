@@ -19,11 +19,11 @@ jobs:
         run: echo "PR_URL=${{ github.event.pull_request.html_url }}" >> $GITHUB_ENV
 
       - name: Check CodeQL status
-        if: ${{ github.event_name == 'check_suite' && github.event.check_suite.conclusion == 'neutral' && github.event.check_suite.app.name == 'CodeQL' }}
+        if: ${{ github.event_name == 'check_suite' && github.event.check_suite.conclusion == ('neutral' || 'success') && github.event.check_suite.app.name == 'GitHub Advanced Security' }}
         run: echo "CodeQL check succeeded"
 
       - name: Enable auto-merge for Dependabot PRs
-        if: ${{ github.event_name == 'check_suite' && github.event.check_suite.conclusion == 'neutral' && github.event.check_suite.app.name == 'CodeQL' }}
+        if: ${{ github.event_name == 'check_suite' && github.event.check_suite.conclusion == ('neutral' || 'success') && github.event.check_suite.app.name == 'GitHub Advanced Security' }}
         run: gh pr merge --auto -s "$PR_URL" --admin -d
         env:
           PR_URL: ${{ env.PR_URL }}
