@@ -24,7 +24,8 @@ on:
     - "**/codeql-csharp.yml"
     - "**/codeql-config.yml"
   schedule:
-  - cron: '0 2 * * *' # every day at 02:00 UTC
+  # Once a day at 05:00 UTC
+  - cron: '0 5 * * *'
   workflow_dispatch:
 
 jobs:
@@ -116,3 +117,10 @@ jobs:
         name: sarif-results
         path: sarif-results
         retention-days: 1
+
+  cleanup:
+    name: Cleanup Runs
+    if: ${{ github.event_name == 'schedule' }}
+    uses: dotnet/arcade/.github/workflows/scheduled-action-cleanup-base.yml@main
+    with:
+      repository_owners: ${{ github.repository_owner }}

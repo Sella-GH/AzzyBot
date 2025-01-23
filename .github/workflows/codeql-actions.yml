@@ -18,7 +18,8 @@ on:
     paths:
     - "**yml"
   schedule:
-  - cron: '0 2 * * *' # every day at 02:00 UTC
+  # once a day at 04:00 UTC
+  - cron: '0 4 * * *'
   workflow_dispatch:
 
 jobs:
@@ -77,3 +78,10 @@ jobs:
       uses: github/codeql-action/analyze@dd196fa9ce80b6bacc74ca1c32bd5b0ba22efca7 # v3.28.3
       with:
         category: "/language:${{matrix.language}}"
+
+  cleanup:
+    name: Cleanup Runs
+    if: ${{ github.event_name == 'schedule' }}
+    uses: dotnet/arcade/.github/workflows/scheduled-action-cleanup-base.yml@main
+    with:
+      repository_owners: ${{ github.repository_owner }}
