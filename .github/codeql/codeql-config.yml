@@ -1,9 +1,9 @@
 name: "AzzyBot CodeQL config"
 
-packs:
-  csharp:
-    - githubsecuritylab/codeql-csharp-queries
-    - githubsecuritylab/codeql-csharp-extensions
-    - githubsecuritylab/codeql-csharp-library-sources
+#packs:
+#  csharp:
+#    - githubsecuritylab/codeql-csharp-queries
+#    - githubsecuritylab/codeql-csharp-extensions
+#    - githubsecuritylab/codeql-csharp-library-sources
 
 threat-models: [ local ]
