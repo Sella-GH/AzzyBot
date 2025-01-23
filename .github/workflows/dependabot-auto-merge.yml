@@ -16,7 +16,6 @@ jobs:
     if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
       - name: Get PR URL
-        if: ${{ github.event_name == 'pull_request_target' }}
         run: echo "PR_URL=${{ github.event.pull_request.html_url }}" >> $GITHUB_ENV
 
       - name: Check CodeQL status
