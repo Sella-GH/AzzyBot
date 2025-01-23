@@ -18,6 +18,10 @@ jobs:
       - name: Get PR URL
         run: echo "PR_URL=${{ github.event.pull_request.html_url }}" >> $GITHUB_ENV
 
+      - name: Show all properties of github.event.check_suite
+        if: ${{ github.event_name == 'check_suite' }}
+        run: echo "${{ toJson(github.event.check_suite) }}"
+
       - name: Check CodeQL status
         if: ${{ github.event_name == 'check_suite' && github.event.check_suite.conclusion == ('neutral' || 'success') && github.event.check_suite.app.name == 'GitHub Advanced Security' }}
         run: echo "CodeQL check succeeded"
