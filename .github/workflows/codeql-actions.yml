@@ -9,18 +9,13 @@
 # the `language` matrix defined below to confirm you have the correct set of
 # supported CodeQL languages.
 #
-name: "CodeQL"
+name: "CodeQL GitHub Actions"
 
 on:
   push:
     branches-ignore:
       - rel/**
     paths:
-    - "**.cs"
-    - "**.csproj"
-    - "**.json"
-    - "**.props"
-    - "**.sln"
     - "**yml"
   schedule:
   - cron: '0 2 * * *' # every day at 02:00 UTC
@@ -34,8 +29,8 @@ jobs:
     #   - https://gh.io/supported-runners-and-hardware-resources
     #   - https://gh.io/using-larger-runners (GitHub.com only)
     # Consider using larger runners or machines with greater resources for possible analysis time improvements.
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-14') || 'ubuntu-24.04' }}
-    timeout-minutes: ${{ (matrix.language == 'swift' && 120) || 360 }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
     permissions:
       security-events: write # required for all workflows
     strategy:
@@ -44,8 +39,6 @@ jobs:
         include:
         - language: actions
           build-mode: none
-        - language: csharp
-          build-mode: manual
         # CodeQL supports the following values keywords for 'language': 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift'
         # Use `c-cpp` to analyze code written in C, C++ or both
         # Use 'java-kotlin' to analyze code written in Java, Kotlin or both
@@ -66,7 +59,6 @@ jobs:
         config-file: ./.github/codeql/codeql-config.yml
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
-        queries: ${{ matrix.language == 'csharp' && 'security-and-quality' || '' }}
         # If you wish to specify custom queries, you can do so here or in a config file.
         # By default, queries listed here will override any specified in a config file.
         # Prefix the list here with "+" to use these queries and those in the config file.
@@ -80,52 +72,8 @@ jobs:
     # to build your code.
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
-    - if: matrix.build-mode == 'manual'
-      name: Setup .NET 9
-      uses: actions/setup-dotnet@87b7050bc53ea08284295505d98d2aa94301e852 # v4.2.0
-      with:
-        dotnet-version: '9'
-
-    - if: matrix.build-mode == 'manual'
-      name: Restore And Build
-      run: |
-        dotnet restore /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.config --force --no-cache --ucr
-        dotnet build /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Debug --no-incremental --no-restore --no-self-contained --ucr
-
     - if: matrix.language == 'actions'
       name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@b6a472f63d85b9c78a3ac5e89422239fc15e9b3c # v3.28.1
       with:
         category: "/language:${{matrix.language}}"
-
-    - if: matrix.language == 'csharp'
-      name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@b6a472f63d85b9c78a3ac5e89422239fc15e9b3c # v3.28.1
-      with:
-        category: "/language:${{matrix.language}}"
-        output: sarif-results
-        upload: failure-only
-
-    - if: matrix.language == 'csharp'
-      name: Filter Sarif Results
-      uses: advanced-security/filter-sarif@f3b8118a9349d88f7b1c0c488476411145b6270d # v1.0.1
-      with:
-        patterns: |
-          -**/obj/**
-          -**/*.g.cs
-        input: sarif-results/csharp.sarif
-        output: sarif-results/csharp.sarif
-
-    - if: matrix.language == 'csharp'
-      name: Upload Sarif
-      uses: github/codeql-action/upload-sarif@b6a472f63d85b9c78a3ac5e89422239fc15e9b3c # v3.28.1
-      with:
-        sarif_file: sarif-results/csharp.sarif
-
-    - if: matrix.language == 'csharp'
-      name: Upload loc as a build artifact
-      uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
-      with:
-        name: sarif-results
-        path: sarif-results
-        retention-days: 1
