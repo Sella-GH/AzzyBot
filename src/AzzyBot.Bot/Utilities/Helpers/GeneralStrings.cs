@@ -26,6 +26,7 @@ public static class GeneralStrings
     public const string ConfigStationModifiedChecks = "Your station was modified successfully.";
     public const string ConfigStationRequestChannelMissing = "You have to select a request channel first!";
     public const string DateFormatInvalid = "The date format is invalid. Please use the format: YYYY-MM-DD.";
+    public const string FileNotFound = "Are you sure you uploaded a file with your command?";
     public const string FileTooBig = "The file is too big. Please upload a file smaller than 50MB.";
     public const string GuildIdInvalid = "This server ID is invalid.";
     public const string GuildNotFound = "This server does not exist in the database.";
