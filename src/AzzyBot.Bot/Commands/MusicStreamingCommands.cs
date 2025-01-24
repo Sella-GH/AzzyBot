@@ -86,7 +86,6 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
             ArgumentNullException.ThrowIfNull(context.Member);
-            ArgumentNullException.ThrowIfNull(context.Member.VoiceState);
 
             _logger.CommandRequested(nameof(JoinAsync), context.User.GlobalName);
 
@@ -177,7 +176,7 @@ public sealed class MusicStreamingCommands
             SlashCommandContext context,
             [Description("The provider you want to search for."), SlashChoiceProvider<MusicStreamingPlatformProvider>] string provider,
             [Description("The url of the track you want to play.")] string track,
-            [Description("The volume which should be set. This is only respected when no music is being played.")] int volume = 100
+            [Description("The volume which should be set. This is only respected when no music is being played.")] int volume = 50
         )
         {
             ArgumentNullException.ThrowIfNull(context);
