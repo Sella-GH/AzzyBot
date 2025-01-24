@@ -89,7 +89,7 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(JoinAsync), context.User.GlobalName);
 
-            if (context.Member.VoiceState.Channel is null)
+            if (context.Member.VoiceState?.Channel is null)
             {
                 await context.EditResponseAsync(GeneralStrings.VoiceNoUser);
                 return;
