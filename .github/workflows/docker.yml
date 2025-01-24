@@ -173,7 +173,7 @@ jobs:
   merge:
     name: Creating Docker Release
     runs-on: ubuntu-24.04
-    needs: [docker-build]
+    needs: [extract_meta, docker-build]
     strategy:
       matrix:
         os: [debian, alpine]
