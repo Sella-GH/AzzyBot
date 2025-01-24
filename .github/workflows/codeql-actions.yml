@@ -82,6 +82,8 @@ jobs:
   cleanup:
     name: Cleanup Runs
     if: ${{ github.event_name == 'schedule' }}
+    permissions:
+      actions: write
     uses: dotnet/arcade/.github/workflows/scheduled-action-cleanup-base.yml@main
     with:
       repository_owners: ${{ github.repository_owner }}
