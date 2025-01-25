@@ -2,8 +2,6 @@ using System;
 using System.Diagnostics;
 using System.IO;
 
-using Microsoft.Extensions.Hosting;
-
 namespace AzzyBot.Core.Utilities;
 
 public static class SoftwareStats
@@ -15,9 +13,6 @@ public static class SoftwareStats
 
     public static string GetAppDotNetVersion
         => Environment.Version.ToString() ?? ".NET version not found";
-
-    public static string GetAppEnvironment
-        => (GetAppName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase)) ? Environments.Development : Environments.Production;
 
     public static string GetAppName
         => FileVersionInfo.GetVersionInfo(AppFilePath).ProductName?.Split('.')[0] ?? "Bot name not found";

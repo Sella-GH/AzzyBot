@@ -27,6 +27,7 @@ using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
 
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -669,7 +670,11 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         builder.AddField("OS", os);
         builder.AddField("Arch", arch);
         builder.WithAuthor(botName, UriStrings.BugReportUri, botIconUrl);
-        builder.WithFooter($"Version: {botVersion} / {SoftwareStats.GetAppEnvironment.ToUpperInvariant()}");
+#if DEBUG || DOCKER_DEBUG
+        builder.WithFooter($"Version: {botVersion} / {Environments.Development.ToUpperInvariant()}");
+#else
+        builder.WithFooter($"Version: {botVersion} / {Environments.Production.ToUpperInvariant()}");
+#endif
 
         return builder;
     }
