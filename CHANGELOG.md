@@ -1,7 +1,9 @@
 ## 2.3.0
 ### General
-- We're now using the new ARM64 GitHub Actions runner for the Docker images
-  - This results in a faster build time and more compact actions workflow
+- A new docker compose variable "LOG_LEVEL"
+  - This variable allows you to set the log level of the bot
+  - FORCE_DEBUG and FORCE_TRACE are now deprecated
+  - Please adjust your docker-compose file accordingly
 
 ### Improvements
 - Removed some unneded and wrong placed logging messages
@@ -12,6 +14,12 @@
 
 ### Fixes
 - The dm addition if the global bot message was sent to a user directly is now displayed correctly
+
+### Development
+- We're now using the new ARM64 GitHub provided runners for Docker images
+  - This results in a faster build time and more compact actions workflow
+- Removed all manually checked references if the environment is dev/docker
+  - The bot is now conditionally compiled based on preprocessor directives
 
 ## 2.2.5 - 2025-01-25
 ### Dependencies
