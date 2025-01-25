@@ -3,8 +3,8 @@
 public static class GeneralStrings
 {
     public const string AdminBotWideMessageEmpty = "You have to provide a message first!";
-    public const string BotStatusChanged = "Bot status has been updated!";
-    public const string BotStatusReset = "Bot status has been reset!";
+    public const string BotStatusChanged = "The bot status has been updated.";
+    public const string BotStatusReset = "The bot status has been reset.";
     public const string CanNotLeaveServer = "You can't make me leave my own home server!";
     public const string CoreSettingsMissing = "You have to set the core settings first!";
     public const string CoreSettingsModified = "Core settings have been modified successfully.";
@@ -26,18 +26,19 @@ public static class GeneralStrings
     public const string ConfigStationModifiedChecks = "Your station was modified successfully.";
     public const string ConfigStationRequestChannelMissing = "You have to select a request channel first!";
     public const string DateFormatInvalid = "The date format is invalid. Please use the format: YYYY-MM-DD.";
+    public const string FileNotFound = "Are you sure you uploaded a file with your command?";
     public const string FileTooBig = "The file is too big. Please upload a file smaller than 50MB.";
     public const string GuildIdInvalid = "This server ID is invalid.";
-    public const string GuildNotFound = "This server does not exist in the database.";
+    public const string GuildJoinLegals = "Before you're able to use me, you have to accept my legal conditions.\n\nPlease use the command `/legal accept-legals` for this.\nAfter this the whole functionality will be unlocked.\n\nIf you need more help about setting me up, please consult the following help page:";
+    public const string GuildNotFound = "This server does not exist in the database yet.";
     public const string HlsNotAvailable = "This station does not support HLS streaming.";
     public const string InstanceNotFound = "AzuraCast is not set up for this server.";
     public const string InstanceUpdateError = "An error occurred while checking for AzuraCast updates.";
     public const string InstanceUpToDate = "AzuraCast is already up to date.";
     public const string LegalsAlreadyAccepted = "You already accepted the legals! No more action required.";
     public const string LegalsAccepted = "Thank you for accepting the terms! Now you have to set my settings through `/config modify-core`.\nBe aware that only administrators are able to execute this command right now.";
-    public const string LegalsInformation = "Please accept the following three legal agreements to use me in your server:\n\n1. **[Privacy Policy](%PP%)**\n2. **[Terms Of Service](%TOS%)**";
+    public const string LegalsInformation = "Please accept the following two legal agreements to use me in your server:\n\n1. **[Privacy Policy](%PP%)**\n2. **[Terms Of Service](%TOS%)**";
     public const string LegalsNotAccepted = "You have to accept the legal conditions first before you're able to use me!";
-    public const string LegalsRequired = "Thank you for adding me to your server **%GUILD%**! Before you're able to use me, you have to accept my legal conditions.\n\nPlease use the command `/legal accept-legals` for this.\nAfter the whole functionality will be unlocked.";
     public const string LegalsReset = "Attention!\n\nThe associated legal agreements (Privacy Policy & Terms Of Service) have changed. Please accept them again if you wish to continue your usage of the bot. Use the command `/legal accept-legals` for this.\n\nIf you do not accept you're unable to use the bot in your server anymore.";
     public const string MessageSentToAll = "Your message has been sent to all servers.";
     public const string MountPointNotFound = "This mount point does not exist.";
@@ -59,13 +60,13 @@ public static class GeneralStrings
     public const string VoiceJoined = "I'm here now.";
     public const string VoiceLeft = "I'm gone now.";
     public const string VoiceNotConnected = "You are not connected to a voice channel.";
-    public const string VoiceNoUser = "Discord didn't told me you're in a voice channel, please rejoin.";
+    public const string VoiceNoUser = "Discord didn't tell me you're in a voice channel, please rejoin.";
     public const string VoiceNothingPlaying = "There is nothing playing right now.";
     public const string VoicePlayingAzuraCast = "The current played song is from an AzuraCast station. Please use `music now-playing` to get the information.";
     public const string VoicePlayMount = "I'm starting to play **%station%** now.";
     public const string VoicePlaySong = "I'm starting to play **%track%** by **%artist%** now.";
-    public const string VoiceStationStopped = "The station has been stopped, I am stopping to play music.";
+    public const string VoiceStationStopped = "The station has been stopped, I'm stopping the music now.";
     public const string VoiceStop = "I'm stopping the music now.";
-    public const string VoiceStopLeft = "I'm stopping the music and leaving now.";
+    public const string VoiceStopLeft = "I'm stopping the music and leave now.";
     public const string VolumeInvalid = "Please use a value between 0 and 100.";
 }

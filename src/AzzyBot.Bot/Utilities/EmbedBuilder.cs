@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AzzyBot.Bot.Resources;
+using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Utilities;
@@ -312,6 +313,19 @@ public static class EmbedBuilder
         fields.Add("File Size", new($"{Math.Round(fileSize / (1024.0 * 1024.0), 2)} MB"));
 
         return CreateBasicEmbed(title, description, DiscordColor.SpringGreen, new(stationArt), fields: fields);
+    }
+
+    public static DiscordEmbed BuildAzzyAddedEmbed()
+    {
+        const string title = "Thanks For Adding Me To Your Server!";
+        const string description = GeneralStrings.GuildJoinLegals;
+
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(1)
+        {
+            ["Setup Instructions"] = new($"[GitHub Wiki]({SetupInstructions})")
+        };
+
+        return CreateBasicEmbed(title, description, DiscordColor.SpringGreen, fields: fields);
     }
 
     public static async Task<DiscordEmbed> BuildAzzyHardwareStatsEmbedAsync(Uri avaUrl, int ping)

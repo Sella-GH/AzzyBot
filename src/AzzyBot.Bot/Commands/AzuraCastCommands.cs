@@ -1176,13 +1176,15 @@ public sealed class AzuraCastCommands
         {
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
-            ArgumentNullException.ThrowIfNull(file);
-            ArgumentException.ThrowIfNullOrWhiteSpace(file.FileName);
-            ArgumentException.ThrowIfNullOrWhiteSpace(file.Url);
 
             _logger.CommandRequested(nameof(UploadFilesAsync), context.User.GlobalName);
 
-            if (file.FileSize > FileSizes.AzuraFileSize)
+            if (file is null || string.IsNullOrWhiteSpace(file.FileName) || string.IsNullOrWhiteSpace(file.Url))
+            {
+                await context.EditResponseAsync(GeneralStrings.FileNotFound);
+                return;
+            }
+            else if (file.FileSize > FileSizes.AzuraFileSize)
             {
                 await context.EditResponseAsync(GeneralStrings.FileTooBig);
                 return;
