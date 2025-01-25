@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace AzzyBot.Data.Entities;
 
@@ -29,6 +30,12 @@ public sealed class AzuraCastStationRequestEntity
     /// Whether this request was made internally to the AutoDj.
     /// </summary>
     public bool IsInternal { get; set; }
+
+    /// <summary>
+    /// The concurrency token for optimistic concurrency checks.
+    /// </summary>
+    [Timestamp]
+    public uint Version { get; set; }
 
     /// <summary>
     /// The database id of the parenting <see cref="AzuraCastStationEntity"/> database item.

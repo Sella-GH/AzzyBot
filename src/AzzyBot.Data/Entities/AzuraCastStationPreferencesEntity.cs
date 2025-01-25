@@ -1,4 +1,6 @@
-﻿using DSharpPlus.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+using DSharpPlus.Entities;
 
 namespace AzzyBot.Data.Entities;
 
@@ -41,6 +43,12 @@ public sealed class AzuraCastStationPreferencesEntity
     /// The <see cref="DiscordRole"/> id of the <see cref="DiscordRole"/> with djing permissions on the station.
     /// </summary>
     public ulong StationDjRoleId { get; set; }
+
+    /// <summary>
+    /// The concurrency token for optimistic concurrency checks.
+    /// </summary>
+    [Timestamp]
+    public uint Version { get; set; }
 
     /// <summary>
     /// The database id of the parenting <see cref="AzuraCastStationEntity"/> database item.

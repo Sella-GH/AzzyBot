@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace AzzyBot.Data.Entities;
 
@@ -30,4 +31,10 @@ public sealed class AzzyBotEntity
     /// Always use <see cref="DateTimeOffset.UtcNow"/> to set this value.
     /// </remarks>
     public DateTimeOffset LastUpdateCheck { get; set; } = DateTimeOffset.MinValue;
+
+    /// <summary>
+    /// The concurrency token for optimistic concurrency checks.
+    /// </summary>
+    [Timestamp]
+    public uint Version { get; set; }
 }
