@@ -1,3 +1,13 @@
+## 2.2.5 - 2025-01-25
+### Dependencies
+- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.3.1
+
+### Improvements
+- The initial welcome message is now an embed with more info
+
+### Fixes
+- Null reference exception when the bot should join a voice channel but the requesting user isn't in one
+
 ## 2.2.4 - 2025-01-21
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02450
