@@ -102,6 +102,9 @@ public static partial class LoggerActions
     [LoggerMessage(112, LogLevel.Information, "The following guild is unavailable due to an outage: {guild}")]
     public static partial void GuildUnavailable(this ILogger logger, string guild);
 
+    [LoggerMessage(113, LogLevel.Information, "Sent the bot-wide info message to {count} guilds")]
+    public static partial void BotWideMessageSent(this ILogger logger, int count);
+
     [LoggerMessage(198, LogLevel.Information, "An update for Azzy is available! Please update now to version: {version} to get the latest fixes and improvements.")]
     public static partial void UpdateAvailable(this ILogger logger, string version);
 

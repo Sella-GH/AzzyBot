@@ -283,6 +283,8 @@ public sealed class AdminCommands
                     await owner.SendMessageAsync(ownerMessage);
                 }
             }
+
+            _logger.BotWideMessageSent(guilds.Count);
         }
     }
 }

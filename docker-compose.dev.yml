@@ -6,7 +6,7 @@ services:
     restart: unless-stopped
     user: ${CURRENT_UID}
     environment:
-      - FORCE_DEBUG=false
+      - LOG_LEVEL=Debug
       - LOG_RETENTION_DAYS=7
       - SKIP_WAITING=false
       - TZ=Europe/Berlin

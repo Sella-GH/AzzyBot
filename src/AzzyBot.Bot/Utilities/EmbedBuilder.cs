@@ -20,6 +20,8 @@ using DSharpPlus.Entities;
 using Lavalink4NET.Players;
 using Lavalink4NET.Tracks;
 
+using Microsoft.Extensions.Hosting;
+
 namespace AzzyBot.Bot.Utilities;
 
 public static class EmbedBuilder
@@ -337,14 +339,17 @@ public static class EmbedBuilder
         const string notLinux = "To display more information you need to have a linux os.";
         string os = HardwareStats.GetSystemOs;
         string osArch = HardwareStats.GetSystemOsArch;
-        bool isDocker = HardwareStats.CheckIfDocker;
         long uptime = Converter.ConvertToUnixTime(HardwareStats.GetSystemUptime);
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(25)
         {
             ["Operating System"] = new(os, true),
             ["Architecture"] = new(osArch, true),
-            ["Dockerized?"] = new(Misc.GetReadableBool(isDocker, ReadableBool.YesNo), true),
+#if DOCKER || DOCKER_DEBUG
+            ["Dockerized?"] = new(Misc.GetReadableBool(true, ReadableBool.YesNo), true),
+#else
+            ["Dockerized?"] = new(Misc.GetReadableBool(false, ReadableBool.YesNo), true),
+#endif
             ["System Uptime"] = new($"<t:{uptime}>", true),
             ["Bot Memory"] = new($"{SoftwareStats.GetAppMemoryUsage()} GB", true)
         };
@@ -477,7 +482,12 @@ public static class EmbedBuilder
         {
             ["Authors"] = new(formattedAuthors, true),
             ["Repository"] = new($"[GitHub]({UriStrings.GitHubRepoUri})", true),
-            ["Environment"] = new(SoftwareStats.GetAppEnvironment, true),
+#if DEBUG || DOCKER_DEBUG
+            ["Environment"] = new(Environments.Development, true),
+#else
+            ["Environment"] = new(Environments.Production, true),
+#endif
+            ["Bot Name"] = new(SoftwareStats.GetAppName, true),
             ["Bot Version"] = new(SoftwareStats.GetAppVersion, true),
             [".NET Version"] = new(SoftwareStats.GetAppDotNetVersion, true),
             ["D#+ Version"] = new(dspVersion, true),
