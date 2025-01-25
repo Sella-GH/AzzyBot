@@ -10,6 +10,9 @@
 - When the AzuraCast instance has a self-signed SSL certificate Azzy will now warn about it
 - Logfile cleaning gets triggered at startup now and works again
 
+### Fixes
+- The dm addition if the global bot message was sent to a user directly is now displayed correctly
+
 ## 2.2.5 - 2025-01-25
 ### Dependencies
 - Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.3.1
