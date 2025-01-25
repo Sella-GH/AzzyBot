@@ -3,7 +3,9 @@
 using System.Globalization;
 #endif
 using System.IO;
+#if DEBUG || RELEASE
 using System.Linq;
+#endif
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Extensions;
