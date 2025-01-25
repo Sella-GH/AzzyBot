@@ -12,6 +12,7 @@
   - The AzuraCast Stations embed however continues to be not shown
 - When the AzuraCast instance has a self-signed SSL certificate Azzy will now warn about it
 - Logfile cleaning gets triggered at startup now and works again
+- Speed up `core stats info` by about 44 times by using a faster approach
 
 ### Fixes
 - The dm addition if the global bot message was sent to a user directly is now displayed correctly
