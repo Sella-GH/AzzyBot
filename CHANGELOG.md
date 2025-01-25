@@ -6,7 +6,8 @@
   - Please adjust your docker-compose file accordingly
 
 ### Improvements
-- Removed some unneded and wrong placed logging messages
+- Added some more logging messages
+- Removed some unneeded and wrong placed logging messages
 - The AzuraCast Settings embed is now shown even when the instance is offline
   - The AzuraCast Stations embed however continues to be not shown
 - When the AzuraCast instance has a self-signed SSL certificate Azzy will now warn about it
