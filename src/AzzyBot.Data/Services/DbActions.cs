@@ -52,7 +52,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return ExecuteDbActionAsync(async context =>
         {
             GuildEntity? guild = await context.Guilds
-                .FirstOrDefaultAsync(g => g.UniqueId == guildId);
+                .SingleOrDefaultAsync(g => g.UniqueId == guildId);
 
             if (guild is null)
             {
@@ -92,7 +92,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return ExecuteDbActionAsync(async context =>
         {
             AzuraCastEntity? azura = await context.AzuraCast
-                .FirstOrDefaultAsync(a => a.Guild.UniqueId == guildId);
+                .SingleOrDefaultAsync(a => a.Guild.UniqueId == guildId);
 
             if (azura is null)
             {
@@ -137,7 +137,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         return ExecuteDbActionAsync(async context =>
         {
             AzuraCastStationEntity? station = await context.AzuraCastStations
-                .FirstOrDefaultAsync(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == stationId);
+                .SingleOrDefaultAsync(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == stationId);
 
             if (station is null)
             {
@@ -240,7 +240,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .IncludeIf(loadStations && loadStationChecks, static q => q.Include(static a => a.Stations).ThenInclude(static s => s.Checks))
             .IncludeIf(loadStations && loadStationPrefs, static q => q.Include(static a => a.Stations).ThenInclude(static s => s.Preferences))
             .IncludeIf(loadGuild, static q => q.Include(static a => a.Guild))
-            .FirstOrDefaultAsync();
+            .SingleOrDefaultAsync();
     }
 
     public Task<AzuraCastStationEntity?> GetAzuraCastStationAsync(ulong guildId, int stationId, bool loadChecks = false, bool loadPrefs = false, bool loadRequests = false, bool loadAzuraCast = false, bool loadAzuraCastPrefs = false)
@@ -253,7 +253,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .IncludeIf(loadRequests, static q => q.Include(static s => s.Requests))
             .IncludeIf(loadAzuraCast, static q => q.Include(static s => s.AzuraCast))
             .IncludeIf(loadAzuraCastPrefs, static q => q.Include(static s => s.AzuraCast.Preferences))
-            .FirstOrDefaultAsync();
+            .SingleOrDefaultAsync();
     }
 
     public Task<AzuraCastStationPreferencesEntity?> GetAzuraCastStationPreferencesAsync(ulong guildId, int stationId, bool loadStation = false)
@@ -262,7 +262,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .AsNoTracking()
             .Where(p => p.Station.AzuraCast.Guild.UniqueId == guildId && p.Station.StationId == stationId)
             .IncludeIf(loadStation, static q => q.Include(static p => p.Station))
-            .FirstOrDefaultAsync();
+            .SingleOrDefaultAsync();
     }
 
     public Task<int> GetAzuraCastStationRequestsCountAsync(ulong guildId, int stationId)
@@ -277,7 +277,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
     {
         return _dbContext.AzzyBot
             .AsNoTracking()
-            .FirstOrDefaultAsync();
+            .SingleOrDefaultAsync();
     }
 
     public Task<GuildEntity?> GetGuildAsync(ulong guildId, bool loadEverything = false)
@@ -289,7 +289,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast).Include(static g => g.AzuraCast!.Checks).Include(static g => g.AzuraCast!.Preferences))
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Checks))
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Preferences))
-            .FirstOrDefaultAsync();
+            .SingleOrDefaultAsync();
     }
 
     public async Task<IReadOnlyList<GuildEntity>> GetGuildsAsync(bool loadGuildPrefs = false, bool loadEverything = false)
@@ -309,7 +309,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .AsNoTracking()
             .Where(g => g.UniqueId == guildId)
             .Select(static g => g.Preferences)
-            .FirstOrDefaultAsync();
+            .SingleOrDefaultAsync();
     }
 
     public Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl = null, string? apiKey = null, bool? isOnline = null)
@@ -318,7 +318,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             AzuraCastEntity? azuraCast = await context.AzuraCast
                 .Where(a => a.Guild.UniqueId == guildId)
-                .FirstOrDefaultAsync();
+                .SingleOrDefaultAsync();
 
             if (azuraCast is null)
             {
@@ -345,7 +345,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             AzuraCastChecksEntity? checks = await context.AzuraCastChecks
                 .Where(c => c.AzuraCast.Guild.UniqueId == guildId)
-                .FirstOrDefaultAsync();
+                .SingleOrDefaultAsync();
 
             if (checks is null)
             {
@@ -381,7 +381,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             AzuraCastPreferencesEntity? preferences = await context.AzuraCastPreferences
                 .Where(p => p.AzuraCast.Guild.UniqueId == guildId)
-                .FirstOrDefaultAsync();
+                .SingleOrDefaultAsync();
 
             if (preferences is null)
             {
@@ -408,7 +408,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             AzuraCastStationEntity? azuraStation = await context.AzuraCastStations
                 .Where(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == station)
-                .FirstOrDefaultAsync();
+                .SingleOrDefaultAsync();
 
             if (azuraStation is null)
             {
@@ -438,7 +438,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             AzuraCastStationChecksEntity? checks = await context.AzuraCastStationChecks
                 .Where(c => c.Station.AzuraCast.Guild.UniqueId == guildId && c.Station.StationId == stationId)
-                .FirstOrDefaultAsync();
+                .SingleOrDefaultAsync();
 
             if (checks is null)
             {
@@ -462,7 +462,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             AzuraCastStationPreferencesEntity? preferences = await context.AzuraCastStationPreferences
                 .Where(p => p.Station.AzuraCast.Guild.UniqueId == guildId && p.Station.StationId == stationId)
-                .FirstOrDefaultAsync();
+                .SingleOrDefaultAsync();
 
             if (preferences is null)
             {
@@ -496,7 +496,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
     {
         return ExecuteDbActionAsync(async context =>
         {
-            AzzyBotEntity? azzyBot = await context.AzzyBot.FirstOrDefaultAsync();
+            AzzyBotEntity? azzyBot = await context.AzzyBot.SingleOrDefaultAsync();
             if (azzyBot is null)
             {
                 _logger.DatabaseAzzyBotNotFound();
@@ -519,7 +519,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         {
             GuildEntity? guild = await context.Guilds
                 .Where(g => g.UniqueId == guildId)
-                .FirstOrDefaultAsync();
+                .SingleOrDefaultAsync();
 
             if (guild is null)
             {
@@ -547,7 +547,7 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             GuildPreferencesEntity? preferences = await context.GuildPreferences
                 .Where(p => p.Guild.UniqueId == guildId)
                 .Include(static p => p.Guild)
-                .FirstOrDefaultAsync();
+                .SingleOrDefaultAsync();
 
             if (preferences is null)
             {
