@@ -28,7 +28,7 @@ public static class Startup
         #region Parse arguments
 
 #if DEBUG || RELEASE
-        string? logLevelArg = args?.FirstOrDefault(static a => a.StartsWith("-LogLevel", StringComparison.OrdinalIgnoreCase));
+        string? logLevelArg = args?.FirstOrDefault(static a => a.StartsWith("-LogLevel", StringComparison.OrdinalIgnoreCase))?.Split('=')[1];
 #endif
 
 #if DEBUG
@@ -48,7 +48,7 @@ public static class Startup
         if (!skipWaiting)
             await Task.Delay(TimeSpan.FromSeconds(30));
 #endif
-        #endregion Parse arguments
+#endregion Parse arguments
 #pragma warning restore RCS0005 // Add blank line before #endregion
 
         #region Create host builder
