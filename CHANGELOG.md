@@ -8,6 +8,7 @@
 - The AzuraCast Settings embed is now shown even when the instance is offline
   - The AzuraCast Stations embed however continues to be not shown
 - When the AzuraCast instance has a self-signed SSL certificate Azzy will now warn about it
+- Logfile cleaning gets triggered at startup now and works again
 
 ## 2.2.5 - 2025-01-25
 ### Dependencies

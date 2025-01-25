@@ -11,6 +11,8 @@ using AzzyBot.Core.Utilities;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
+using NCronJob;
+
 namespace AzzyBot.Bot;
 
 public static class Startup
@@ -80,6 +82,7 @@ public static class Startup
 
         using IHost app = appBuilder.Build();
         app.ApplyDbMigrations();
+        await app.UseNCronJobAsync();
         await app.RunAsync();
     }
 
