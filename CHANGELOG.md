@@ -13,6 +13,7 @@
 - When the AzuraCast instance has a self-signed SSL certificate Azzy will now warn about it
 - Logfile cleaning gets triggered at startup now and works again
 - Speed up `core stats info` by about 44 times by using a faster approach
+- The connection to the database is now more resilient against issues with the data
 
 ### Fixes
 - The dm addition if the global bot message was sent to a user directly is now displayed correctly
@@ -22,6 +23,8 @@
   - This results in a faster build time and more compact actions workflow
 - Removed all manually checked references if the environment is dev/docker
   - The bot is now conditionally compiled based on preprocessor directives
+- Refactored DbContext stuff to use the new `PooledDbContextFactory` pattern
+  - This should finally fix the concurrency issues and make it work as intended
 
 ## 2.2.5 - 2025-01-25
 ### Dependencies
