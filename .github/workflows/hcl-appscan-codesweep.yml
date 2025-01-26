@@ -1,25 +1,36 @@
 name: "HCL AppScan CodeSweep"
 on:
   pull_request:
-    types: [opened,synchronize]
+    types: [opened, synchronize, reopened]
+  schedule:
+  # once a day at 03:00 UTC to cleanup old runs
+    - cron: '0 3 * * *'
 
 permissions:
   actions: write
   contents: read
 
 jobs:
+  cleanup:
+    name: Cleanup Runs
+    if: ${{ github.event_name == 'schedule' }}
+    uses: dotnet/arcade/.github/workflows/scheduled-action-cleanup-base.yml@main
+    with:
+      repository_owners: ${{ github.repository_owner }}
+
   scan:
+    if: ${{ github.event_name != 'schedule' }}
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
-      
+
       - name: Run AppScan CodeSweep
-        uses: HCL-TECH-SOFTWARE/appscan-codesweep-action@c9d5958469145a0aaf3ac41eaa0190e7757e4eba
+        uses: HCL-TECH-SOFTWARE/appscan-codesweep-action@c9d5958469145a0aaf3ac41eaa0190e7757e4eba # v2.1
         with:
           status: action_required
-          
-    env: 
+
+    env:
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Resources;
+using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Utilities;
@@ -18,6 +19,8 @@ using DSharpPlus.Entities;
 
 using Lavalink4NET.Players;
 using Lavalink4NET.Tracks;
+
+using Microsoft.Extensions.Hosting;
 
 namespace AzzyBot.Bot.Utilities;
 
@@ -317,20 +320,36 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.SpringGreen, new(stationArt), fields: fields);
     }
 
+    public static DiscordEmbed BuildAzzyAddedEmbed()
+    {
+        const string title = "Thanks For Adding Me To Your Server!";
+        const string description = GeneralStrings.GuildJoinLegals;
+
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(1)
+        {
+            ["Setup Instructions"] = new($"[GitHub Wiki]({SetupInstructions})")
+        };
+
+        return CreateBasicEmbed(title, description, DiscordColor.SpringGreen, fields: fields);
+    }
+
     public static async Task<DiscordEmbed> BuildAzzyHardwareStatsEmbedAsync(Uri avaUrl, int ping)
     {
         const string title = "AzzyBot Hardware Stats";
         const string notLinux = "To display more information you need to have a linux os.";
         string os = HardwareStats.GetSystemOs;
         string osArch = HardwareStats.GetSystemOsArch;
-        bool isDocker = HardwareStats.CheckIfDocker;
         long uptime = Converter.ConvertToUnixTime(HardwareStats.GetSystemUptime);
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(25)
         {
             ["Operating System"] = new(os, true),
             ["Architecture"] = new(osArch, true),
-            ["Dockerized?"] = new(Misc.GetReadableBool(isDocker, ReadableBool.YesNo), true),
+#if DOCKER || DOCKER_DEBUG
+            ["Dockerized?"] = new(Misc.GetReadableBool(true, ReadableBool.YesNo), true),
+#else
+            ["Dockerized?"] = new(Misc.GetReadableBool(false, ReadableBool.YesNo), true),
+#endif
             ["System Uptime"] = new($"<t:{uptime}>", true),
             ["Bot Memory"] = new($"{SoftwareStats.GetAppMemoryUsage()} GB", true)
         };
@@ -463,7 +482,12 @@ public static class EmbedBuilder
         {
             ["Authors"] = new(formattedAuthors, true),
             ["Repository"] = new($"[GitHub]({UriStrings.GitHubRepoUri})", true),
-            ["Environment"] = new(SoftwareStats.GetAppEnvironment, true),
+#if DEBUG || DOCKER_DEBUG
+            ["Environment"] = new(Environments.Development, true),
+#else
+            ["Environment"] = new(Environments.Production, true),
+#endif
+            ["Bot Name"] = new(SoftwareStats.GetAppName, true),
             ["Bot Version"] = new(SoftwareStats.GetAppVersion, true),
             [".NET Version"] = new(SoftwareStats.GetAppDotNetVersion, true),
             ["D#+ Version"] = new(dspVersion, true),
@@ -531,19 +555,17 @@ public static class EmbedBuilder
             ["Server ID"] = new(guild.UniqueId.ToString(CultureInfo.InvariantCulture)),
             ["Admin Role"] = new((!string.IsNullOrEmpty(adminRole?.Trim()) && adminRole.Trim() is not "()") ? adminRole.Trim() : "Not set"),
             ["Admin Notify Channel"] = new((guild.Preferences.AdminNotifyChannelId > 0) ? $"<#{guild.Preferences.AdminNotifyChannelId}>" : "Not set"),
-            ["Error Channel"] = new((guild.Preferences.ErrorChannelId > 0) ? $"<#{guild.Preferences.ErrorChannelId}>" : "Not set"),
             ["Configuration Complete"] = new(Misc.GetReadableBool(guild.ConfigSet, ReadableBool.YesNo))
         };
 
         return CreateBasicEmbed(title, description, DiscordColor.White, fields: fields);
     }
 
-    public static IEnumerable<DiscordEmbed> BuildGetSettingsAzuraEmbed(AzuraCastEntity azuraCast, string instanceRole, IReadOnlyDictionary<ulong, string> stationRoles, IReadOnlyDictionary<int, string> stationNames, IReadOnlyDictionary<int, int> stationRequests)
+    public static DiscordEmbed BuildGetSettingsAzuraInstanceEmbed(AzuraCastEntity azuraCast, string instanceRole)
     {
         ArgumentNullException.ThrowIfNull(azuraCast);
 
         const string title = "AzuraCast Settings";
-        List<DiscordEmbed> embeds = new(1 + azuraCast.Stations.Count);
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(6)
         {
             ["Base Url"] = new($"||{((!string.IsNullOrEmpty(azuraCast.BaseUrl)) ? Crypto.Decrypt(azuraCast.BaseUrl) : "Not set")}||"),
@@ -554,9 +576,15 @@ public static class EmbedBuilder
             ["Automatic Checks"] = new($"- Server Status: {Misc.GetReadableBool(azuraCast.Checks.ServerStatus, ReadableBool.EnabledDisabled)}\n- Updates: {Misc.GetReadableBool(azuraCast.Checks.Updates, ReadableBool.EnabledDisabled)}\n- Updates Changelog: {Misc.GetReadableBool(azuraCast.Checks.UpdatesShowChangelog, ReadableBool.EnabledDisabled)}")
         };
 
-        embeds.Add(CreateBasicEmbed(title, color: DiscordColor.White, fields: fields));
+        return CreateBasicEmbed(title, color: DiscordColor.White, fields: fields);
+    }
+
+    public static IEnumerable<DiscordEmbed> BuildGetSettingsAzuraStationsEmbed(AzuraCastEntity azuraCast, IReadOnlyDictionary<ulong, string> stationRoles, IReadOnlyDictionary<int, string> stationNames, IReadOnlyDictionary<int, int> stationRequests)
+    {
+        ArgumentNullException.ThrowIfNull(azuraCast);
 
         const string stationTitle = "AzuraCast Stations";
+        List<DiscordEmbed> embeds = new(azuraCast.Stations.Count);
         foreach (AzuraCastStationEntity station in azuraCast.Stations)
         {
             string stationName = stationNames.FirstOrDefault(x => x.Key == station.Id).Value;
@@ -593,7 +621,7 @@ public static class EmbedBuilder
             string showPlaylist = Misc.GetReadableBool(station.Preferences.ShowPlaylistInNowPlaying, ReadableBool.EnabledDisabled);
             string fileChanges = Misc.GetReadableBool(station.Checks.FileChanges, ReadableBool.EnabledDisabled);
 
-            fields = new(11)
+            Dictionary<string, AzzyDiscordEmbedRecord> fields = new(11)
             {
                 ["Station Name"] = new(stationName),
                 ["Station ID"] = new(stationId),

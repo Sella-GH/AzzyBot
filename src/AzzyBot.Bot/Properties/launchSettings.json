@@ -6,7 +6,7 @@
     },
     "Trace logs": {
       "commandName": "Project",
-      "commandLineArgs": "-forceTrace",
+      "commandLineArgs": "-LogLevel=Trace",
       "hotReloadEnabled": false
     }
   }

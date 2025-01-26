@@ -1,6 +1,71 @@
 ## 2.3.0
+### General
+- A new docker compose variable "LOG_LEVEL"
+  - This variable allows you to set the log level of the bot
+  - FORCE_DEBUG and FORCE_TRACE are now deprecated
+  - Please adjust your docker-compose file accordingly
+
+### Improvements
+- Added some more logging messages
+- Removed some unneeded and wrongly placed logging messages
+- The AzuraCast Settings embed is now shown even when the instance is offline
+  - The AzuraCast Stations embed however continues to be not shown
+- When the AzuraCast instance has a self-signed SSL certificate Azzy will now warn about it
+- Logfile cleaning gets triggered at startup now and works again
+- Speed up `core stats info` by about 44 times by using a faster approach
+- The connection to the database is now more resilient against issues with the data
+- Centralized the notification of exceptions to the main server
+
+### Fixes
+- The dm addition if the global bot message was sent to a user directly is now displayed correctly
+
+### Development
+- We're now using the new ARM64 GitHub provided runners for Docker images
+  - This results in a faster build time and more compact actions workflow
+- Removed all manually checked references if the environment is dev/docker
+  - The bot is now conditionally compiled based on preprocessor directives
+- Refactored DbContext stuff to use the new `PooledDbContextFactory` pattern
+  - This should finally fix the concurrency issues and make it work as intended
+- Posting files to discord works now while they're being in use on other platforms than linux
+
+## 2.2.5 - 2025-01-25
 ### Dependencies
-- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.0.2
+- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.3.1
+
+### Improvements
+- The initial welcome message is now an embed with more info
+
+### Fixes
+- Null reference exception when the bot should join a voice channel but the requesting user isn't in one
+
+## 2.2.4 - 2025-01-21
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02450
+- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.2.0
+- Updated [Npgsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg) to version 9.0.3
+
+## 2.2.3 - 2025-01-15
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02448
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 9.0.1
+- Updated [Microsoft.Extensions.Hosting](https://github.com/dotnet/runtime) to version 9.0.1
+
+## 2.2.2 - 2025-01-07
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02445
+
+### Fixes
+- There won't be any update checks or database cleanups any 15 minutes anymore
+- The GitHub update url to the new version now really points to the release and not the API
+- File logging now shows the EventId properly instead of the event name to align with the console logging
+- You can now correctly force the check to determine if AzuraCast is offline
+- Some spelling mistakes were corrected
+- Automatic checks getting executed correctly now when their time has come
+
+## 2.2.1 - 2025-01-05
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02445
+- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.1.0
 
 ## 2.2.0 - 2024-12-23
 ### BREAKING CHANGES

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 using DSharpPlus.Entities;
 
@@ -36,6 +37,12 @@ public sealed class GuildEntity
     /// Always use <see cref="DateTimeOffset.UtcNow"/> to set this value.
     /// </remarks>
     public DateTimeOffset LastPermissionCheck { get; set; }
+
+    /// <summary>
+    /// The concurrency token for optimistic concurrency checks.
+    /// </summary>
+    [Timestamp]
+    public uint Version { get; set; }
 
     /// <summary>
     /// The user-defined preferences of the <see cref="GuildEntity"/> object.

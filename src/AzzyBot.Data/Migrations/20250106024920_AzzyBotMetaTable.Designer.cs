@@ -3,6 +3,7 @@ using System;
 using AzzyBot.Data.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,13 +12,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AzzyBot.Data.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    partial class AzzyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250106024920_AzzyBotMetaTable")]
+    partial class AzzyBotMetaTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.1")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -51,12 +54,6 @@ namespace AzzyBot.Data.Migrations
                     b.Property<bool>("UpdatesShowChangelog")
                         .HasColumnType("boolean");
 
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AzuraCastId")
@@ -87,12 +84,6 @@ namespace AzzyBot.Data.Migrations
                     b.Property<bool>("IsOnline")
                         .HasColumnType("boolean");
 
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
                     b.HasKey("Id");
 
                     b.HasIndex("GuildId")
@@ -121,12 +112,6 @@ namespace AzzyBot.Data.Migrations
                     b.Property<decimal>("OutagesChannelId")
                         .HasColumnType("numeric(20,0)");
 
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AzuraCastId")
@@ -151,12 +136,6 @@ namespace AzzyBot.Data.Migrations
 
                     b.Property<int>("StationId")
                         .HasColumnType("integer");
-
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
@@ -189,12 +168,6 @@ namespace AzzyBot.Data.Migrations
 
                     b.Property<int>("StationId")
                         .HasColumnType("integer");
-
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
@@ -233,12 +206,6 @@ namespace AzzyBot.Data.Migrations
                     b.Property<int>("StationId")
                         .HasColumnType("integer");
 
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
                     b.HasKey("Id");
 
                     b.HasIndex("StationId")
@@ -268,12 +235,6 @@ namespace AzzyBot.Data.Migrations
                     b.Property<DateTimeOffset>("Timestamp")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
                     b.HasKey("Id");
 
                     b.HasIndex("StationId");
@@ -294,12 +255,6 @@ namespace AzzyBot.Data.Migrations
 
                     b.Property<DateTimeOffset>("LastUpdateCheck")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
@@ -326,12 +281,6 @@ namespace AzzyBot.Data.Migrations
                     b.Property<decimal>("UniqueId")
                         .HasColumnType("numeric(20,0)");
 
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
                     b.HasKey("Id");
 
                     b.ToTable("Guilds");
@@ -351,14 +300,11 @@ namespace AzzyBot.Data.Migrations
                     b.Property<decimal>("AdminRoleId")
                         .HasColumnType("numeric(20,0)");
 
+                    b.Property<decimal>("ErrorChannelId")
+                        .HasColumnType("numeric(20,0)");
+
                     b.Property<int>("GuildId")
                         .HasColumnType("integer");
-
-                    b.Property<uint>("Version")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 

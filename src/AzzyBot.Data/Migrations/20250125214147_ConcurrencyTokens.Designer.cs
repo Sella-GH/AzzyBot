@@ -3,6 +3,7 @@ using System;
 using AzzyBot.Data.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AzzyBot.Data.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    partial class AzzyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250125214147_ConcurrencyTokens")]
+    partial class ConcurrencyTokens
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -349,6 +352,9 @@ namespace AzzyBot.Data.Migrations
                         .HasColumnType("numeric(20,0)");
 
                     b.Property<decimal>("AdminRoleId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<decimal>("ErrorChannelId")
                         .HasColumnType("numeric(20,0)");
 
                     b.Property<int>("GuildId")

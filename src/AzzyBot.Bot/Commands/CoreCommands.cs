@@ -133,7 +133,7 @@ public sealed class CoreCommands
                 await context.EditResponseAsync(embed);
             }
 
-            [Command("info"), Description("Shows information about the bot and it's components."), InteractionLocalizer<CommandLocalizer>]
+            [Command("info"), Description("Shows information about the bot and its components."), InteractionLocalizer<CommandLocalizer>]
             public async ValueTask InfoStatsAsync(SlashCommandContext context)
             {
                 ArgumentNullException.ThrowIfNull(context);

@@ -29,34 +29,27 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
     private readonly DiscordBotService _botService = botService;
     private readonly DiscordClient _discordClient = discordClient;
     private readonly UpdaterService _updater = updater;
-    private DateTimeOffset _lastAzzyUpdateCheck = DateTimeOffset.MinValue;
-    private DateTimeOffset _lastDatabaseCleanup = DateTimeOffset.MinValue;
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
     {
         _logger.GlobalTimerTick();
+
+        AzzyBotEntity azzyBot = await _dbActions.GetAzzyBotAsync() ?? throw new InvalidOperationException("AzzyBot entity is missing from the database.");
         IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
         DateTimeOffset utcNow = DateTimeOffset.UtcNow;
 
-        if (utcNow - _lastDatabaseCleanup >= TimeSpan.FromHours(24))
-        {
+        if (utcNow - azzyBot.LastDatabaseCleanup >= TimeSpan.FromHours(23.85))
             await _dbMaintenance.CleanupLeftoverGuildsAsync(_discordClient.Guilds);
-            _lastDatabaseCleanup = utcNow;
-        }
 
-        if (utcNow - _lastAzzyUpdateCheck >= TimeSpan.FromHours(6))
-        {
-            _logger.GlobalTimerCheckForUpdates();
+        if (utcNow - azzyBot.LastUpdateCheck >= TimeSpan.FromHours(5.85))
             await _updater.CheckForAzzyUpdatesAsync();
-            _lastAzzyUpdateCheck = utcNow;
-        }
 
-        List<GuildEntity> guildsWorkingSet = [.. guilds.Where(g => utcNow - g.LastPermissionCheck >= TimeSpan.FromHours(12))];
+        List<GuildEntity> guildsWorkingSet = [.. guilds.Where(g => utcNow - g.LastPermissionCheck >= TimeSpan.FromHours(11.85))];
         _logger.GlobalTimerCheckForChannelPermissions(guildsWorkingSet.Count);
         if (guildsWorkingSet.Count is not 0)
             await _botService.CheckPermissionsAsync(guildsWorkingSet);
 
-        guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.Checks.ServerStatus is true && utcNow - g.AzuraCast.Checks.LastServerStatusCheck >= TimeSpan.FromMinutes(15))];
+        guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.Checks.ServerStatus is true)];
         _logger.GlobalTimerCheckForAzuraCastStatus(guildsWorkingSet.Count);
         if (guildsWorkingSet.Count is not 0)
         {
@@ -68,7 +61,7 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
 
         // Get it just one more time to check if the instance is offline
         guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
-        guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.IsOnline is true && utcNow - g.AzuraCast.Checks.LastServerStatusCheck >= TimeSpan.FromHours(12))];
+        guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.IsOnline is true && utcNow - g.AzuraCast.Checks.LastServerStatusCheck >= TimeSpan.FromHours(11.85))];
         _logger.GlobalTimerCheckForAzuraCastApi(guildsWorkingSet.Count);
         if (guildsWorkingSet.Count is not 0)
         {
@@ -78,20 +71,20 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
             }
         }
 
-        guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.IsOnline is true && g.AzuraCast.Stations.Any(s => s.Checks.FileChanges && utcNow - s.Checks.LastFileChangesCheck >= TimeSpan.FromHours(1)))];
+        guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.IsOnline is true && g.AzuraCast.Stations.Any(s => s.Checks.FileChanges && utcNow - s.Checks.LastFileChangesCheck >= TimeSpan.FromHours(0.85)))];
         _logger.GlobalTimerCheckForAzuraCastFiles(guildsWorkingSet.Count);
         if (guildsWorkingSet.Count is not 0)
         {
             foreach (GuildEntity guild in guildsWorkingSet)
             {
-                foreach (AzuraCastStationEntity station in guild.AzuraCast!.Stations.Where(s => s.Checks.FileChanges && utcNow - s.Checks.LastFileChangesCheck >= TimeSpan.FromHours(1)))
+                foreach (AzuraCastStationEntity station in guild.AzuraCast!.Stations.Where(s => s.Checks.FileChanges && utcNow - s.Checks.LastFileChangesCheck >= TimeSpan.FromHours(0.85)))
                 {
                     await _azuraFileService.CheckForFileChangesAsync(station);
                 }
             }
         }
 
-        guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.IsOnline is true && g.AzuraCast.Checks.Updates && utcNow - g.AzuraCast.Checks.LastUpdateCheck >= TimeSpan.FromHours(6))];
+        guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.IsOnline is true && g.AzuraCast.Checks.Updates && utcNow - g.AzuraCast.Checks.LastUpdateCheck >= TimeSpan.FromHours(5.85))];
         _logger.GlobalTimerCheckForAzuraCastUpdates(guildsWorkingSet.Count);
         if (guildsWorkingSet.Count is not 0)
         {

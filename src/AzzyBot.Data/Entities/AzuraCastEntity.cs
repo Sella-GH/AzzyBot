@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 
 namespace AzzyBot.Data.Entities;
@@ -50,6 +51,12 @@ public sealed class AzuraCastEntity
     /// A <see cref="ICollection"/> of the associated <see cref="AzuraCastStationEntity"/> database items.
     /// </summary>
     public ICollection<AzuraCastStationEntity> Stations { get; } = [];
+
+    /// <summary>
+    /// The concurrency token for optimistic concurrency checks.
+    /// </summary>
+    [Timestamp]
+    public uint Version { get; set; }
 
     /// <summary>
     /// The database id of the parenting <see cref="GuildEntity"/> database item.

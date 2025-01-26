@@ -14,13 +14,17 @@ namespace AzzyBot.Data.Extensions;
 
 public static class IServiceCollectionExtensions
 {
-    public static void AzzyBotDataServices(this IServiceCollection services, bool isDev, string encryptionKey, string host, int port, string user, string password, string database)
+    public static void AzzyBotDataServices(this IServiceCollection services, string encryptionKey, string host, int port, string user, string password, string database)
     {
         // Set the encryption key
         Crypto.EncryptionKey = Encoding.UTF8.GetBytes(encryptionKey);
 
         string connectionString = GetConnectionString(host, port, user, password, database);
-        services.AddDbContext<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor().EnableSensitiveDataLogging(isDev), ServiceLifetime.Transient);
+#if DEBUG || DOCKER_DEBUG
+        services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor().EnableSensitiveDataLogging(true));
+#else
+        services.AddDbContext<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor());
+#endif
         services.AddSingleton<DbActions>();
         services.AddSingleton<DbMaintenance>();
     }
