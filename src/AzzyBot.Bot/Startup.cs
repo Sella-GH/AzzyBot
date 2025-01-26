@@ -48,7 +48,7 @@ public static class Startup
         if (!skipWaiting)
             await Task.Delay(TimeSpan.FromSeconds(30));
 #endif
-#endregion Parse arguments
+        #endregion Parse arguments
 #pragma warning restore RCS0005 // Add blank line before #endregion
 
         #region Create host builder
@@ -86,7 +86,7 @@ public static class Startup
 
         appBuilder.Configuration.AddAppConfiguration(settingsFilePath);
 
-#endregion Add configuration
+        #endregion Add configuration
 
         #region Add services
 
