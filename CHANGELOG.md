@@ -1,4 +1,4 @@
-## 2.3.0
+## 2.3.0 - 2025-01-26
 ### General
 - A new docker compose variable "LOG_LEVEL"
   - This variable allows you to set the log level of the bot

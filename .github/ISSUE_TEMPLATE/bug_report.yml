@@ -17,6 +17,7 @@ body :
       label : "Version"
       description : "Which version of Azzy are you using? Ensure you're using the latest minor version of your line!"
       options :
+        - "2.3.x"
         - "2.2.x"
         - "2.1.x"
         - "2.0.x"
