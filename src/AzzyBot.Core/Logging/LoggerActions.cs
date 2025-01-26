@@ -69,6 +69,18 @@ public static partial class LoggerActions
     [LoggerMessage(50, LogLevel.Debug, "Expected failure of a {type} request to {uri} with exception name {ex}")]
     public static partial void WebRequestExpectedFailure(this ILogger logger, HttpMethod type, Uri uri, string ex);
 
+    [LoggerMessage(60, LogLevel.Debug, "Entering DbConcurrency handler")]
+    public static partial void DatabaseConcurrencyHandlerEnter(this ILogger logger);
+
+    [LoggerMessage(61, LogLevel.Debug, "Current entry: {entry}")]
+    public static partial void DatabaseConcurrencyEntry(this ILogger logger, string entry);
+
+    [LoggerMessage(62, LogLevel.Debug, "Property: {property}, ClientValue: {clientValue}, DatabaseValue: {dbValue}")]
+    public static partial void DatabaseConcurrencyValues(this ILogger logger, string property, object? clientValue, object? dbValue);
+
+    [LoggerMessage(63, LogLevel.Debug, "Exiting DbConcurrency handler")]
+    public static partial void DatabaseConcurrencyHandlerExit(this ILogger logger);
+
     [LoggerMessage(100, LogLevel.Information, "Starting {name} in version {version} on {os}-{arch} using .NET {dotnet}")]
     public static partial void BotStarting(this ILogger logger, string name, string version, string os, string arch, string dotnet);
 
@@ -104,6 +116,9 @@ public static partial class LoggerActions
 
     [LoggerMessage(113, LogLevel.Information, "Sent the bot-wide info message to {count} guilds")]
     public static partial void BotWideMessageSent(this ILogger logger, int count);
+
+    [LoggerMessage(120, LogLevel.Information, "Database concurrency situation resolved.")]
+    public static partial void DatabaseConcurrencyResolved(this ILogger logger);
 
     [LoggerMessage(198, LogLevel.Information, "An update for Azzy is available! Please update now to version: {version} to get the latest fixes and improvements.")]
     public static partial void UpdateAvailable(this ILogger logger, string version);
@@ -155,6 +170,9 @@ public static partial class LoggerActions
 
     [LoggerMessage(230, LogLevel.Warning, "Bot is ratelimited on uri: {uri} retrying in {time} seconds")]
     public static partial void BotRatelimited(this ILogger logger, Uri uri, int time);
+
+    [LoggerMessage(240, LogLevel.Warning, "Database concurrency exception occured: ")]
+    public static partial void DatabaseConcurrencyException(this ILogger logger, Exception ex);
 
     [LoggerMessage(290, LogLevel.Warning, "Latest online version of the bot is empty")]
     public static partial void OnlineVersionEmpty(this ILogger logger);

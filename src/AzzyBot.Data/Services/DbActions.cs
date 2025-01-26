@@ -11,6 +11,8 @@ using AzzyBot.Data.Extensions;
 using DSharpPlus.Entities;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Data.Services;
@@ -19,6 +21,38 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
 {
     private readonly ILogger<DbActions> _logger = logger;
     private readonly AzzyDbContext _dbContext = dbContext;
+
+    private async Task HandleConcurrencyExceptionAsync(IReadOnlyList<EntityEntry> entries)
+    {
+        _logger.DatabaseConcurrencyHandlerEnter();
+
+        foreach (EntityEntry entry in entries)
+        {
+            _logger.DatabaseConcurrencyEntry(entry.Entity.GetType().Name);
+
+            PropertyValues proposedValues = entry.CurrentValues;
+            PropertyValues? databaseValues = await entry.GetDatabaseValuesAsync();
+            if (databaseValues is null)
+                continue;
+
+            foreach (IProperty property in proposedValues.Properties)
+            {
+                object? proposedValue = proposedValues[property];
+                object? databaseValue = databaseValues[property];
+                _logger.DatabaseConcurrencyValues(property.Name, proposedValue, databaseValue);
+
+                if (proposedValue == databaseValue)
+                    continue;
+
+                // Be safe and update the proposed value to the database value
+                proposedValues[property] = databaseValue;
+            }
+
+            entry.OriginalValues.SetValues(databaseValues);
+        }
+
+        _logger.DatabaseConcurrencyHandlerExit();
+    }
 
     public async Task AddAzuraCastAsync(ulong guildId, Uri baseUrl, string apiKey, ulong instanceAdminGroup, ulong notificationId, ulong outagesId, bool serverStatus, bool updates, bool changelog)
     {
@@ -291,7 +325,20 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             azuraCast.IsOnline = isOnline.Value;
 
         _dbContext.AzuraCast.Update(azuraCast);
-        await _dbContext.SaveChangesAsync();
+
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            _logger.DatabaseConcurrencyException(ex);
+
+            await HandleConcurrencyExceptionAsync(ex.Entries);
+            await _dbContext.SaveChangesAsync();
+
+            _logger.DatabaseConcurrencyResolved();
+        }
     }
 
     public async Task UpdateAzuraCastChecksAsync(ulong guildId, bool? serverStatus = null, bool? updates = null, bool? changelog = null, int? updateNotificationCounter = null, bool? lastUpdateCheck = null, bool? lastServerStatusCheck = null)
@@ -325,7 +372,20 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             checks.LastServerStatusCheck = DateTimeOffset.UtcNow;
 
         _dbContext.AzuraCastChecks.Update(checks);
-        await _dbContext.SaveChangesAsync();
+
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            _logger.DatabaseConcurrencyException(ex);
+
+            await HandleConcurrencyExceptionAsync(ex.Entries);
+            await _dbContext.SaveChangesAsync();
+
+            _logger.DatabaseConcurrencyResolved();
+        }
     }
 
     public async Task UpdateAzuraCastPreferencesAsync(ulong guildId, ulong? instanceAdminGroup = null, ulong? notificationId = null, ulong? outagesId = null)
@@ -350,7 +410,20 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             preferences.OutagesChannelId = outagesId.Value;
 
         _dbContext.AzuraCastPreferences.Update(preferences);
-        await _dbContext.SaveChangesAsync();
+
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            _logger.DatabaseConcurrencyException(ex);
+
+            await HandleConcurrencyExceptionAsync(ex.Entries);
+            await _dbContext.SaveChangesAsync();
+
+            _logger.DatabaseConcurrencyResolved();
+        }
     }
 
     public async Task UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? apiKey = null, bool? lastSkipTime = null, bool? lastRequestTime = null)
@@ -378,6 +451,20 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             azuraStation.LastRequestTime = DateTimeOffset.UtcNow.AddSeconds(16);
 
         _dbContext.AzuraCastStations.Update(azuraStation);
+
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            _logger.DatabaseConcurrencyException(ex);
+
+            await HandleConcurrencyExceptionAsync(ex.Entries);
+            await _dbContext.SaveChangesAsync();
+
+            _logger.DatabaseConcurrencyResolved();
+        }
     }
 
     public async Task UpdateAzuraCastStationChecksAsync(ulong guildId, int stationId, bool? fileChanges = null, bool? lastFileChangesCheck = null)
@@ -399,7 +486,20 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             checks.LastFileChangesCheck = DateTimeOffset.UtcNow;
 
         _dbContext.AzuraCastStationChecks.Update(checks);
-        await _dbContext.SaveChangesAsync();
+
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            _logger.DatabaseConcurrencyException(ex);
+
+            await HandleConcurrencyExceptionAsync(ex.Entries);
+            await _dbContext.SaveChangesAsync();
+
+            _logger.DatabaseConcurrencyResolved();
+        }
     }
 
     public async Task UpdateAzuraCastStationPreferencesAsync(ulong guildId, int stationId, ulong? stationAdminGroup = null, ulong? stationDjGroup = null, ulong? fileUploadId = null, ulong? requestId = null, string? fileUploadPath = null, bool? playlist = null)
@@ -433,7 +533,20 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             preferences.ShowPlaylistInNowPlaying = playlist.Value;
 
         _dbContext.AzuraCastStationPreferences.Update(preferences);
-        await _dbContext.SaveChangesAsync();
+
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            _logger.DatabaseConcurrencyException(ex);
+
+            await HandleConcurrencyExceptionAsync(ex.Entries);
+            await _dbContext.SaveChangesAsync();
+
+            _logger.DatabaseConcurrencyResolved();
+        }
     }
 
     public async Task UpdateAzzyBotAsync(bool? lastDatabaseCleanup = null, bool? lastUpdateCheck = null)
@@ -452,7 +565,20 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             azzyBot.LastUpdateCheck = DateTimeOffset.UtcNow;
 
         _dbContext.AzzyBot.Update(azzyBot);
-        await _dbContext.SaveChangesAsync();
+
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            _logger.DatabaseConcurrencyException(ex);
+
+            await HandleConcurrencyExceptionAsync(ex.Entries);
+            await _dbContext.SaveChangesAsync();
+
+            _logger.DatabaseConcurrencyResolved();
+        }
     }
 
     public async Task UpdateGuildAsync(ulong guildId, bool? lastPermissionCheck = null, bool? legalsAccepted = null)
@@ -474,7 +600,20 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             guild.LegalsAccepted = legalsAccepted.Value;
 
         _dbContext.Guilds.Update(guild);
-        await _dbContext.SaveChangesAsync();
+
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            _logger.DatabaseConcurrencyException(ex);
+
+            await HandleConcurrencyExceptionAsync(ex.Entries);
+            await _dbContext.SaveChangesAsync();
+
+            _logger.DatabaseConcurrencyResolved();
+        }
     }
 
     public async Task UpdateGuildLegalsAsync()
@@ -507,6 +646,19 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
 
         _dbContext.GuildPreferences.Update(preferences);
         _dbContext.Guilds.Update(preferences.Guild);
-        await _dbContext.SaveChangesAsync();
+
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            _logger.DatabaseConcurrencyException(ex);
+
+            await HandleConcurrencyExceptionAsync(ex.Entries);
+            await _dbContext.SaveChangesAsync();
+
+            _logger.DatabaseConcurrencyResolved();
+        }
     }
 }
