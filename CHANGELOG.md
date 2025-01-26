@@ -14,6 +14,7 @@
 - Logfile cleaning gets triggered at startup now and works again
 - Speed up `core stats info` by about 44 times by using a faster approach
 - The connection to the database is now more resilient against issues with the data
+- Centralized the notification of exceptions to the main server
 
 ### Fixes
 - The dm addition if the global bot message was sent to a user directly is now displayed correctly
