@@ -237,6 +237,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         _logger.ExceptionOccured(ex);
 
         // Handle the special case when it's a command exception
+        string timestampString = timestamp.ToString("yyyy-MM-dd HH:mm:ss:fffffff", CultureInfo.InvariantCulture);
         DiscordEmbed embed;
         if (ctx is not null)
         {
@@ -248,17 +249,17 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             Dictionary<string, string> commandOptions = new(ctx.Command.Parameters.Count);
             ProcessOptions(ctx.Arguments, commandOptions);
 
-            embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture), info, guild, message, discordUser, commandName, commandOptions);
+            embed = CreateExceptionEmbed(ex, timestampString, info, guild, message, discordUser, commandName, commandOptions);
         }
         else
         {
-            embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture), info);
+            embed = CreateExceptionEmbed(ex, timestampString, info);
         }
 
         try
         {
             string jsonDump = JsonSerializer.Serialize(new(ex, info), JsonSerializationSourceGen.Default.SerializableExceptionsRecord);
-            string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss-fffffff", CultureInfo.InvariantCulture);
+            timestampString = timestampString.Replace(" ", "_", StringComparison.OrdinalIgnoreCase).Replace(":", "-", StringComparison.OrdinalIgnoreCase);
             string fileName = $"AzzyBotException_{timestampString}.json";
             string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, fileName);
 
