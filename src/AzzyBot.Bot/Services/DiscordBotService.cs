@@ -128,9 +128,6 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             if (guild.Preferences.AdminNotifyChannelId is not 0)
                 channels.Add(guild.Preferences.AdminNotifyChannelId);
 
-            if (guild.Preferences.ErrorChannelId is not 0)
-                channels.Add(guild.Preferences.ErrorChannelId);
-
             if (guild.AzuraCast is not null)
             {
                 if (guild.AzuraCast.Preferences.NotificationChannelId is not 0)

@@ -523,8 +523,7 @@ public sealed class ConfigCommands
         (
             SlashCommandContext context,
             [Description("Select the role that has administrative permissions on the bot.")] DiscordRole? adminRole = null,
-            [Description("Select a channel to get administrative notifications about the bot."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? adminChannel = null,
-            [Description("Select a channel to get notifications when the bot runs into an issue."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? errorChannel = null
+            [Description("Select a channel to get administrative notifications about the bot."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? adminChannel = null
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -532,31 +531,18 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(UpdateCoreAsync), context.User.GlobalName);
 
-            if (adminRole is null && adminChannel is null && errorChannel is null)
+            if (adminRole is null && adminChannel is null)
             {
                 await context.EditResponseAsync(GeneralStrings.ConfigParameterMissing);
                 return;
             }
 
-            await _dbActions.UpdateGuildPreferencesAsync(context.Guild.Id, adminRole?.Id, adminChannel?.Id, errorChannel?.Id);
+            await _dbActions.UpdateGuildPreferencesAsync(context.Guild.Id, adminRole?.Id, adminChannel?.Id);
 
             await context.EditResponseAsync(GeneralStrings.CoreSettingsModified);
 
-            ulong[] channels = new ulong[2];
             if (adminChannel is not null)
-                channels[0] = adminChannel.Id;
-
-            if (errorChannel is not null && channels.Length > 1)
-            {
-                channels[1] = errorChannel.Id;
-            }
-            else if (errorChannel is not null)
-            {
-                channels[0] = errorChannel.Id;
-            }
-
-            if (channels.Length is not 0)
-                await _botService.CheckPermissionsAsync(context.Guild, channels);
+                await _botService.CheckPermissionsAsync(context.Guild, [adminChannel.Id]);
         }
 
         [Command("get-settings"), Description("Get all configured settings in a direct message.")]

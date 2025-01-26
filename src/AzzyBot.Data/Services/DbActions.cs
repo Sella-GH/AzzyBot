@@ -739,7 +739,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         }
     }
 
-    public async Task UpdateGuildPreferencesAsync(ulong guildId, ulong? adminRoleId = null, ulong? adminNotifiyChannelId = null, ulong? errorChannelId = null)
+    public async Task UpdateGuildPreferencesAsync(ulong guildId, ulong? adminRoleId = null, ulong? adminNotifiyChannelId = null)
     {
         await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
 
@@ -760,10 +760,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         if (adminNotifiyChannelId.HasValue)
             preferences.AdminNotifyChannelId = adminNotifiyChannelId.Value;
 
-        if (errorChannelId.HasValue)
-            preferences.ErrorChannelId = errorChannelId.Value;
-
-        if (preferences.AdminRoleId is not 0 && preferences.AdminNotifyChannelId is not 0 && preferences.ErrorChannelId is not 0)
+        if (preferences.AdminRoleId is not 0 && preferences.AdminNotifyChannelId is not 0)
             preferences.Guild.ConfigSet = true;
 
         dbContext.GuildPreferences.Update(preferences);
@@ -778,7 +775,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await UpdateGuildPreferencesAsync(guildId, adminRoleId, adminNotifiyChannelId, errorChannelId);
+            await UpdateGuildPreferencesAsync(guildId, adminRoleId, adminNotifiyChannelId);
 
             _logger.DatabaseConcurrencyResolved();
         }

@@ -555,7 +555,6 @@ public static class EmbedBuilder
             ["Server ID"] = new(guild.UniqueId.ToString(CultureInfo.InvariantCulture)),
             ["Admin Role"] = new((!string.IsNullOrEmpty(adminRole?.Trim()) && adminRole.Trim() is not "()") ? adminRole.Trim() : "Not set"),
             ["Admin Notify Channel"] = new((guild.Preferences.AdminNotifyChannelId > 0) ? $"<#{guild.Preferences.AdminNotifyChannelId}>" : "Not set"),
-            ["Error Channel"] = new((guild.Preferences.ErrorChannelId > 0) ? $"<#{guild.Preferences.ErrorChannelId}>" : "Not set"),
             ["Configuration Complete"] = new(Misc.GetReadableBool(guild.ConfigSet, ReadableBool.YesNo))
         };
 
