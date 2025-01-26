@@ -11,7 +11,6 @@ using AzzyBot.Data.Extensions;
 using DSharpPlus.Entities;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Data.Services;
@@ -21,144 +20,111 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
     private readonly ILogger<DbActions> _logger = logger;
     private readonly AzzyDbContext _dbContext = dbContext;
 
-    private async Task<bool> ExecuteDbActionAsync(Func<AzzyDbContext, Task> action)
-    {
-        ArgumentNullException.ThrowIfNull(action);
-
-        await using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync();
-
-        try
-        {
-            await action(_dbContext);
-
-            await _dbContext.SaveChangesAsync();
-            await transaction.CommitAsync();
-
-            return true;
-        }
-        catch (Exception ex) when (ex is DbUpdateConcurrencyException or DbUpdateException)
-        {
-            _logger.DatabaseTransactionFailed(ex);
-            await transaction.RollbackAsync();
-
-            throw;
-        }
-    }
-
-    public Task<bool> AddAzuraCastAsync(ulong guildId, Uri baseUrl, string apiKey, ulong instanceAdminGroup, ulong notificationId, ulong outagesId, bool serverStatus, bool updates, bool changelog)
+    public async Task AddAzuraCastAsync(ulong guildId, Uri baseUrl, string apiKey, ulong instanceAdminGroup, ulong notificationId, ulong outagesId, bool serverStatus, bool updates, bool changelog)
     {
         ArgumentNullException.ThrowIfNull(baseUrl);
 
-        return ExecuteDbActionAsync(async context =>
+        GuildEntity? guild = await _dbContext.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
+        if (guild is null)
         {
-            GuildEntity? guild = await context.Guilds
-                .SingleOrDefaultAsync(g => g.UniqueId == guildId);
+            _logger.DatabaseGuildNotFound(guildId);
+            return;
+        }
 
-            if (guild is null)
-            {
-                _logger.DatabaseGuildNotFound(guildId);
-                return;
-            }
+        AzuraCastEntity azuraCast = new()
+        {
+            BaseUrl = Crypto.Encrypt(baseUrl.OriginalString),
+            AdminApiKey = Crypto.Encrypt(apiKey),
+            GuildId = guild.Id
+        };
 
-            AzuraCastEntity azuraCast = new()
-            {
-                BaseUrl = Crypto.Encrypt(baseUrl.OriginalString),
-                AdminApiKey = Crypto.Encrypt(apiKey),
-                GuildId = guild.Id
-            };
+        azuraCast.Checks = new()
+        {
+            ServerStatus = serverStatus,
+            Updates = updates,
+            UpdatesShowChangelog = changelog,
+            AzuraCastId = azuraCast.Id
+        };
 
-            azuraCast.Checks = new()
-            {
-                ServerStatus = serverStatus,
-                Updates = updates,
-                UpdatesShowChangelog = changelog,
-                AzuraCastId = azuraCast.Id
-            };
+        azuraCast.Preferences = new()
+        {
+            InstanceAdminRoleId = instanceAdminGroup,
+            NotificationChannelId = notificationId,
+            OutagesChannelId = outagesId,
+            AzuraCastId = azuraCast.Id
+        };
 
-            azuraCast.Preferences = new()
-            {
-                InstanceAdminRoleId = instanceAdminGroup,
-                NotificationChannelId = notificationId,
-                OutagesChannelId = outagesId,
-                AzuraCastId = azuraCast.Id
-            };
-
-            await context.AzuraCast.AddAsync(azuraCast);
-        });
+        await _dbContext.AzuraCast.AddAsync(azuraCast);
+        await _dbContext.SaveChangesAsync();
     }
 
-    public Task<bool> AddAzuraCastStationAsync(ulong guildId, int stationId, ulong stationAdminGroup, ulong requestsId, bool showPlaylist, bool fileChanges, ulong? fileUploadId = null, string? fileUploadPath = null, string? apiKey = null, ulong? stationDjGroup = null)
+    public async Task AddAzuraCastStationAsync(ulong guildId, int stationId, ulong stationAdminGroup, ulong requestsId, bool showPlaylist, bool fileChanges, ulong? fileUploadId = null, string? fileUploadPath = null, string? apiKey = null, ulong? stationDjGroup = null)
     {
-        return ExecuteDbActionAsync(async context =>
+        AzuraCastEntity? azura = await _dbContext.AzuraCast.SingleOrDefaultAsync(a => a.Guild.UniqueId == guildId);
+        if (azura is null)
         {
-            AzuraCastEntity? azura = await context.AzuraCast
-                .SingleOrDefaultAsync(a => a.Guild.UniqueId == guildId);
+            _logger.DatabaseAzuraCastNotFound(guildId);
+            return;
+        }
 
-            if (azura is null)
-            {
-                _logger.DatabaseAzuraCastNotFound(guildId);
-                return;
-            }
+        AzuraCastStationEntity station = new()
+        {
+            StationId = stationId,
+            ApiKey = (string.IsNullOrEmpty(apiKey)) ? string.Empty : Crypto.Encrypt(apiKey),
+            LastSkipTime = DateTimeOffset.MinValue,
+            LastRequestTime = DateTimeOffset.MinValue,
+            AzuraCastId = azura.Id
+        };
 
-            AzuraCastStationEntity station = new()
-            {
-                StationId = stationId,
-                ApiKey = (string.IsNullOrEmpty(apiKey)) ? string.Empty : Crypto.Encrypt(apiKey),
-                LastSkipTime = DateTimeOffset.MinValue,
-                LastRequestTime = DateTimeOffset.MinValue,
-                AzuraCastId = azura.Id
-            };
+        station.Checks = new()
+        {
+            FileChanges = fileChanges,
+            StationId = station.Id
+        };
 
-            station.Checks = new()
-            {
-                FileChanges = fileChanges,
-                StationId = station.Id
-            };
+        station.Preferences = new()
+        {
+            FileUploadChannelId = fileUploadId ?? 0,
+            FileUploadPath = fileUploadPath ?? string.Empty,
+            RequestsChannelId = requestsId,
+            ShowPlaylistInNowPlaying = showPlaylist,
+            StationAdminRoleId = stationAdminGroup,
+            StationDjRoleId = stationDjGroup ?? 0,
+            StationId = station.Id
+        };
 
-            station.Preferences = new()
-            {
-                FileUploadChannelId = fileUploadId ?? 0,
-                FileUploadPath = fileUploadPath ?? string.Empty,
-                RequestsChannelId = requestsId,
-                ShowPlaylistInNowPlaying = showPlaylist,
-                StationAdminRoleId = stationAdminGroup,
-                StationDjRoleId = stationDjGroup ?? 0,
-                StationId = station.Id
-            };
-
-            await context.AzuraCastStations.AddAsync(station);
-        });
+        await _dbContext.AzuraCastStations.AddAsync(station);
+        await _dbContext.SaveChangesAsync();
     }
 
-    public Task<bool> AddAzuraCastStationRequestAsync(ulong guildId, int stationId, string songId, bool isInternal = false)
+    public async Task AddAzuraCastStationRequestAsync(ulong guildId, int stationId, string songId, bool isInternal = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(songId);
 
-        return ExecuteDbActionAsync(async context =>
+        AzuraCastStationEntity? station = await _dbContext.AzuraCastStations.SingleOrDefaultAsync(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == stationId);
+        if (station is null)
         {
-            AzuraCastStationEntity? station = await context.AzuraCastStations
-                .SingleOrDefaultAsync(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == stationId);
+            _logger.DatabaseAzuraCastStationNotFound(guildId, 0, stationId);
+            return;
+        }
 
-            if (station is null)
-            {
-                _logger.DatabaseAzuraCastStationNotFound(guildId, 0, stationId);
-                return;
-            }
+        AzuraCastStationRequestEntity request = new()
+        {
+            SongId = songId,
+            StationId = station.Id,
+            Timestamp = DateTimeOffset.UtcNow,
+            IsInternal = isInternal
+        };
 
-            AzuraCastStationRequestEntity request = new()
-            {
-                SongId = songId,
-                StationId = station.Id,
-                Timestamp = DateTimeOffset.UtcNow,
-                IsInternal = isInternal
-            };
-
-            await context.AzuraCastStationRequests.AddAsync(request);
-        });
+        await _dbContext.AzuraCastStationRequests.AddAsync(request);
+        await _dbContext.SaveChangesAsync();
     }
 
-    public Task<bool> AddGuildAsync(ulong guildId)
-        => ExecuteDbActionAsync(async context => await context.Guilds.AddAsync(new() { UniqueId = guildId }));
+    public async Task AddGuildAsync(ulong guildId)
+    {
+        await _dbContext.Guilds.AddAsync(new() { UniqueId = guildId });
+        await _dbContext.SaveChangesAsync();
+    }
 
     /// <summary>
     /// Checks and adds <see cref="DiscordGuild"/> to the database in which the bot is a member of.
@@ -177,28 +143,24 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         if (!newGuilds.Any())
             return [];
 
-        bool success = await ExecuteDbActionAsync(async context => await context.Guilds.AddRangeAsync(newGuilds));
+        await _dbContext.Guilds.AddRangeAsync(newGuilds);
+        await _dbContext.SaveChangesAsync();
 
-        IEnumerable<DiscordGuild> addedGuilds = newGuilds
+        return newGuilds
             .Where(guild => guilds.ContainsKey(guild.UniqueId))
             .Select(guild => guilds[guild.UniqueId]);
-
-        return (success) ? addedGuilds : [];
     }
 
-    public Task<bool> DeleteAzuraCastAsync(ulong guildId)
-        => ExecuteDbActionAsync(async context => await context.AzuraCast.Where(a => a.Guild.UniqueId == guildId).ExecuteDeleteAsync());
+    public async Task DeleteAzuraCastAsync(ulong guildId)
+        => await _dbContext.AzuraCast.Where(a => a.Guild.UniqueId == guildId).ExecuteDeleteAsync();
 
-    public Task<bool> DeleteAzuraCastStationAsync(int stationId)
-        => ExecuteDbActionAsync(async context => await context.AzuraCastStations.Where(s => s.StationId == stationId).ExecuteDeleteAsync());
+    public async Task DeleteAzuraCastStationAsync(int stationId)
+        => await _dbContext.AzuraCastStations.Where(s => s.StationId == stationId).ExecuteDeleteAsync();
 
-    public Task<bool> DeleteGuildAsync(ulong guildId)
+    public async Task DeleteGuildAsync(ulong guildId)
     {
-        return ExecuteDbActionAsync(async context =>
-        {
-            await context.AzuraCast.Where(a => a.Guild.UniqueId == guildId).ExecuteDeleteAsync();
-            await context.Guilds.Where(g => g.UniqueId == guildId).ExecuteDeleteAsync();
-        });
+        await _dbContext.AzuraCast.Where(a => a.Guild.UniqueId == guildId).ExecuteDeleteAsync();
+        await _dbContext.Guilds.Where(g => g.UniqueId == guildId).ExecuteDeleteAsync();
     }
 
     /// <summary>
@@ -216,17 +178,12 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         if (!guildsToDelete.Any())
             return [];
 
-        bool success = await ExecuteDbActionAsync(async context =>
-        {
-            await context.AzuraCast.Where(a => guildsToDelete.Select(static g => g.UniqueId).Contains(a.Guild.UniqueId)).ExecuteDeleteAsync();
-            await context.Guilds.Where(g => guildsToDelete.Select(static g => g.UniqueId).Contains(g.UniqueId)).ExecuteDeleteAsync();
-        });
+        await _dbContext.AzuraCast.Where(a => guildsToDelete.Select(static g => g.UniqueId).Contains(a.Guild.UniqueId)).ExecuteDeleteAsync();
+        await _dbContext.Guilds.Where(g => guildsToDelete.Select(static g => g.UniqueId).Contains(g.UniqueId)).ExecuteDeleteAsync();
 
-        IEnumerable<ulong> deletedGuilds = guildsToDelete
+        return guildsToDelete
             .Where(guild => !guilds.ContainsKey(guild.UniqueId))
             .Select(static guld => guld.UniqueId);
-
-        return (success) ? deletedGuilds : [];
     }
 
     public Task<AzuraCastEntity?> GetAzuraCastAsync(ulong guildId, bool loadChecks = false, bool loadPrefs = false, bool loadStations = false, bool loadStationChecks = false, bool loadStationPrefs = false, bool loadGuild = false)
@@ -312,263 +269,244 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .SingleOrDefaultAsync();
     }
 
-    public Task<bool> UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl = null, string? apiKey = null, bool? isOnline = null)
+    public async Task UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl = null, string? apiKey = null, bool? isOnline = null)
     {
-        return ExecuteDbActionAsync(async context =>
+        AzuraCastEntity? azuraCast = await _dbContext.AzuraCast
+            .Where(a => a.Guild.UniqueId == guildId)
+            .SingleOrDefaultAsync();
+
+        if (azuraCast is null)
         {
-            AzuraCastEntity? azuraCast = await context.AzuraCast
-                .Where(a => a.Guild.UniqueId == guildId)
-                .SingleOrDefaultAsync();
+            _logger.DatabaseAzuraCastNotFound(guildId);
+            return;
+        }
 
-            if (azuraCast is null)
-            {
-                _logger.DatabaseAzuraCastNotFound(guildId);
-                return;
-            }
+        if (baseUrl is not null)
+            azuraCast.BaseUrl = Crypto.Encrypt(baseUrl.OriginalString);
 
-            if (baseUrl is not null)
-                azuraCast.BaseUrl = Crypto.Encrypt(baseUrl.OriginalString);
+        if (!string.IsNullOrEmpty(apiKey))
+            azuraCast.AdminApiKey = Crypto.Encrypt(apiKey);
 
-            if (!string.IsNullOrEmpty(apiKey))
-                azuraCast.AdminApiKey = Crypto.Encrypt(apiKey);
+        if (isOnline.HasValue)
+            azuraCast.IsOnline = isOnline.Value;
 
-            if (isOnline.HasValue)
-                azuraCast.IsOnline = isOnline.Value;
-
-            context.AzuraCast.Update(azuraCast);
-        });
+        _dbContext.AzuraCast.Update(azuraCast);
+        await _dbContext.SaveChangesAsync();
     }
 
-    public Task<bool> UpdateAzuraCastChecksAsync(ulong guildId, bool? serverStatus = null, bool? updates = null, bool? changelog = null, int? updateNotificationCounter = null, bool? lastUpdateCheck = null, bool? lastServerStatusCheck = null)
+    public async Task UpdateAzuraCastChecksAsync(ulong guildId, bool? serverStatus = null, bool? updates = null, bool? changelog = null, int? updateNotificationCounter = null, bool? lastUpdateCheck = null, bool? lastServerStatusCheck = null)
     {
-        return ExecuteDbActionAsync(async context =>
+        AzuraCastChecksEntity? checks = await _dbContext.AzuraCastChecks
+            .Where(c => c.AzuraCast.Guild.UniqueId == guildId)
+            .SingleOrDefaultAsync();
+
+        if (checks is null)
         {
-            AzuraCastChecksEntity? checks = await context.AzuraCastChecks
-                .Where(c => c.AzuraCast.Guild.UniqueId == guildId)
-                .SingleOrDefaultAsync();
+            _logger.DatabaseAzuraCastChecksNotFound(guildId, 0);
+            return;
+        }
 
-            if (checks is null)
-            {
-                _logger.DatabaseAzuraCastChecksNotFound(guildId, 0);
-                return;
-            }
+        if (serverStatus.HasValue)
+            checks.ServerStatus = serverStatus.Value;
 
-            if (serverStatus.HasValue)
-                checks.ServerStatus = serverStatus.Value;
+        if (updates.HasValue)
+            checks.Updates = updates.Value;
 
-            if (updates.HasValue)
-                checks.Updates = updates.Value;
+        if (changelog.HasValue)
+            checks.UpdatesShowChangelog = changelog.Value;
 
-            if (changelog.HasValue)
-                checks.UpdatesShowChangelog = changelog.Value;
+        if (updateNotificationCounter.HasValue)
+            checks.UpdateNotificationCounter = updateNotificationCounter.Value;
 
-            if (updateNotificationCounter.HasValue)
-                checks.UpdateNotificationCounter = updateNotificationCounter.Value;
+        if (lastUpdateCheck.HasValue)
+            checks.LastUpdateCheck = DateTimeOffset.UtcNow;
 
-            if (lastUpdateCheck.HasValue)
-                checks.LastUpdateCheck = DateTimeOffset.UtcNow;
+        if (lastServerStatusCheck.HasValue)
+            checks.LastServerStatusCheck = DateTimeOffset.UtcNow;
 
-            if (lastServerStatusCheck.HasValue)
-                checks.LastServerStatusCheck = DateTimeOffset.UtcNow;
-
-            context.AzuraCastChecks.Update(checks);
-        });
+        _dbContext.AzuraCastChecks.Update(checks);
+        await _dbContext.SaveChangesAsync();
     }
 
-    public Task<bool> UpdateAzuraCastPreferencesAsync(ulong guildId, ulong? instanceAdminGroup = null, ulong? notificationId = null, ulong? outagesId = null)
+    public async Task UpdateAzuraCastPreferencesAsync(ulong guildId, ulong? instanceAdminGroup = null, ulong? notificationId = null, ulong? outagesId = null)
     {
-        return ExecuteDbActionAsync(async context =>
+        AzuraCastPreferencesEntity? preferences = await _dbContext.AzuraCastPreferences
+            .Where(p => p.AzuraCast.Guild.UniqueId == guildId)
+            .SingleOrDefaultAsync();
+
+        if (preferences is null)
         {
-            AzuraCastPreferencesEntity? preferences = await context.AzuraCastPreferences
-                .Where(p => p.AzuraCast.Guild.UniqueId == guildId)
-                .SingleOrDefaultAsync();
+            _logger.DatabaseAzuraCastPreferencesNotFound(guildId, 0);
+            return;
+        }
 
-            if (preferences is null)
-            {
-                _logger.DatabaseAzuraCastPreferencesNotFound(guildId, 0);
-                return;
-            }
+        if (instanceAdminGroup.HasValue)
+            preferences.InstanceAdminRoleId = instanceAdminGroup.Value;
 
-            if (instanceAdminGroup.HasValue)
-                preferences.InstanceAdminRoleId = instanceAdminGroup.Value;
+        if (notificationId.HasValue)
+            preferences.NotificationChannelId = notificationId.Value;
 
-            if (notificationId.HasValue)
-                preferences.NotificationChannelId = notificationId.Value;
+        if (outagesId.HasValue)
+            preferences.OutagesChannelId = outagesId.Value;
 
-            if (outagesId.HasValue)
-                preferences.OutagesChannelId = outagesId.Value;
-
-            context.AzuraCastPreferences.Update(preferences);
-        });
+        _dbContext.AzuraCastPreferences.Update(preferences);
+        await _dbContext.SaveChangesAsync();
     }
 
-    public Task<bool> UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? apiKey = null, bool? lastSkipTime = null, bool? lastRequestTime = null)
+    public async Task UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? apiKey = null, bool? lastSkipTime = null, bool? lastRequestTime = null)
     {
-        return ExecuteDbActionAsync(async context =>
+        AzuraCastStationEntity? azuraStation = await _dbContext.AzuraCastStations
+            .Where(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == station)
+            .SingleOrDefaultAsync();
+
+        if (azuraStation is null)
         {
-            AzuraCastStationEntity? azuraStation = await context.AzuraCastStations
-                .Where(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == station)
-                .SingleOrDefaultAsync();
+            _logger.DatabaseAzuraCastStationNotFound(guildId, 0, station);
+            return;
+        }
 
-            if (azuraStation is null)
-            {
-                _logger.DatabaseAzuraCastStationNotFound(guildId, 0, station);
-                return;
-            }
+        if (stationId.HasValue)
+            azuraStation.StationId = stationId.Value;
 
-            if (stationId.HasValue)
-                azuraStation.StationId = stationId.Value;
+        if (!string.IsNullOrEmpty(apiKey))
+            azuraStation.ApiKey = Crypto.Encrypt(apiKey);
 
-            if (!string.IsNullOrEmpty(apiKey))
-                azuraStation.ApiKey = Crypto.Encrypt(apiKey);
+        if (lastSkipTime.HasValue)
+            azuraStation.LastSkipTime = DateTimeOffset.UtcNow;
 
-            if (lastSkipTime.HasValue)
-                azuraStation.LastSkipTime = DateTimeOffset.UtcNow;
+        if (lastRequestTime.HasValue)
+            azuraStation.LastRequestTime = DateTimeOffset.UtcNow.AddSeconds(16);
 
-            if (lastRequestTime.HasValue)
-                azuraStation.LastRequestTime = DateTimeOffset.UtcNow.AddSeconds(16);
-
-            context.AzuraCastStations.Update(azuraStation);
-        });
+        _dbContext.AzuraCastStations.Update(azuraStation);
     }
 
-    public Task<bool> UpdateAzuraCastStationChecksAsync(ulong guildId, int stationId, bool? fileChanges = null, bool? lastFileChangesCheck = null)
+    public async Task UpdateAzuraCastStationChecksAsync(ulong guildId, int stationId, bool? fileChanges = null, bool? lastFileChangesCheck = null)
     {
-        return ExecuteDbActionAsync(async context =>
+        AzuraCastStationChecksEntity? checks = await _dbContext.AzuraCastStationChecks
+            .Where(c => c.Station.AzuraCast.Guild.UniqueId == guildId && c.Station.StationId == stationId)
+            .SingleOrDefaultAsync();
+
+        if (checks is null)
         {
-            AzuraCastStationChecksEntity? checks = await context.AzuraCastStationChecks
-                .Where(c => c.Station.AzuraCast.Guild.UniqueId == guildId && c.Station.StationId == stationId)
-                .SingleOrDefaultAsync();
+            _logger.DatabaseAzuraCastStationChecksNotFound(guildId, 0, stationId);
+            return;
+        }
 
-            if (checks is null)
-            {
-                _logger.DatabaseAzuraCastStationChecksNotFound(guildId, 0, stationId);
-                return;
-            }
+        if (fileChanges.HasValue)
+            checks.FileChanges = fileChanges.Value;
 
-            if (fileChanges.HasValue)
-                checks.FileChanges = fileChanges.Value;
+        if (lastFileChangesCheck.HasValue)
+            checks.LastFileChangesCheck = DateTimeOffset.UtcNow;
 
-            if (lastFileChangesCheck.HasValue)
-                checks.LastFileChangesCheck = DateTimeOffset.UtcNow;
-
-            context.AzuraCastStationChecks.Update(checks);
-        });
+        _dbContext.AzuraCastStationChecks.Update(checks);
+        await _dbContext.SaveChangesAsync();
     }
 
-    public Task<bool> UpdateAzuraCastStationPreferencesAsync(ulong guildId, int stationId, ulong? stationAdminGroup = null, ulong? stationDjGroup = null, ulong? fileUploadId = null, ulong? requestId = null, string? fileUploadPath = null, bool? playlist = null)
+    public async Task UpdateAzuraCastStationPreferencesAsync(ulong guildId, int stationId, ulong? stationAdminGroup = null, ulong? stationDjGroup = null, ulong? fileUploadId = null, ulong? requestId = null, string? fileUploadPath = null, bool? playlist = null)
     {
-        return ExecuteDbActionAsync(async context =>
+        AzuraCastStationPreferencesEntity? preferences = await _dbContext.AzuraCastStationPreferences
+            .Where(p => p.Station.AzuraCast.Guild.UniqueId == guildId && p.Station.StationId == stationId)
+            .SingleOrDefaultAsync();
+
+        if (preferences is null)
         {
-            AzuraCastStationPreferencesEntity? preferences = await context.AzuraCastStationPreferences
-                .Where(p => p.Station.AzuraCast.Guild.UniqueId == guildId && p.Station.StationId == stationId)
-                .SingleOrDefaultAsync();
+            _logger.DatabaseAzuraCastStationPreferencesNotFound(guildId, 0, stationId);
+            return;
+        }
 
-            if (preferences is null)
-            {
-                _logger.DatabaseAzuraCastStationPreferencesNotFound(guildId, 0, stationId);
-                return;
-            }
+        if (stationAdminGroup.HasValue)
+            preferences.StationAdminRoleId = stationAdminGroup.Value;
 
-            if (stationAdminGroup.HasValue)
-                preferences.StationAdminRoleId = stationAdminGroup.Value;
+        if (stationDjGroup.HasValue)
+            preferences.StationDjRoleId = stationDjGroup.Value;
 
-            if (stationDjGroup.HasValue)
-                preferences.StationDjRoleId = stationDjGroup.Value;
+        if (fileUploadId.HasValue)
+            preferences.FileUploadChannelId = fileUploadId.Value;
 
-            if (fileUploadId.HasValue)
-                preferences.FileUploadChannelId = fileUploadId.Value;
+        if (requestId.HasValue)
+            preferences.RequestsChannelId = requestId.Value;
 
-            if (requestId.HasValue)
-                preferences.RequestsChannelId = requestId.Value;
+        if (!string.IsNullOrEmpty(fileUploadPath))
+            preferences.FileUploadPath = fileUploadPath;
 
-            if (!string.IsNullOrEmpty(fileUploadPath))
-                preferences.FileUploadPath = fileUploadPath;
+        if (playlist.HasValue)
+            preferences.ShowPlaylistInNowPlaying = playlist.Value;
 
-            if (playlist.HasValue)
-                preferences.ShowPlaylistInNowPlaying = playlist.Value;
-
-            context.AzuraCastStationPreferences.Update(preferences);
-        });
+        _dbContext.AzuraCastStationPreferences.Update(preferences);
+        await _dbContext.SaveChangesAsync();
     }
 
-    public Task<bool> UpdateAzzyBotAsync(bool? lastDatabaseCleanup = null, bool? lastUpdateCheck = null)
+    public async Task UpdateAzzyBotAsync(bool? lastDatabaseCleanup = null, bool? lastUpdateCheck = null)
     {
-        return ExecuteDbActionAsync(async context =>
+        AzzyBotEntity? azzyBot = await _dbContext.AzzyBot.SingleOrDefaultAsync();
+        if (azzyBot is null)
         {
-            AzzyBotEntity? azzyBot = await context.AzzyBot.SingleOrDefaultAsync();
-            if (azzyBot is null)
-            {
-                _logger.DatabaseAzzyBotNotFound();
-                return;
-            }
+            _logger.DatabaseAzzyBotNotFound();
+            return;
+        }
 
-            if (lastDatabaseCleanup.HasValue)
-                azzyBot.LastDatabaseCleanup = DateTimeOffset.UtcNow;
+        if (lastDatabaseCleanup.HasValue)
+            azzyBot.LastDatabaseCleanup = DateTimeOffset.UtcNow;
 
-            if (lastUpdateCheck.HasValue)
-                azzyBot.LastUpdateCheck = DateTimeOffset.UtcNow;
+        if (lastUpdateCheck.HasValue)
+            azzyBot.LastUpdateCheck = DateTimeOffset.UtcNow;
 
-            context.AzzyBot.Update(azzyBot);
-        });
+        _dbContext.AzzyBot.Update(azzyBot);
+        await _dbContext.SaveChangesAsync();
     }
 
-    public Task<bool> UpdateGuildAsync(ulong guildId, bool? lastPermissionCheck = null, bool? legalsAccepted = null)
+    public async Task UpdateGuildAsync(ulong guildId, bool? lastPermissionCheck = null, bool? legalsAccepted = null)
     {
-        return ExecuteDbActionAsync(async context =>
+        GuildEntity? guild = await _dbContext.Guilds
+            .Where(g => g.UniqueId == guildId)
+            .SingleOrDefaultAsync();
+
+        if (guild is null)
         {
-            GuildEntity? guild = await context.Guilds
-                .Where(g => g.UniqueId == guildId)
-                .SingleOrDefaultAsync();
+            _logger.DatabaseGuildNotFound(guildId);
+            return;
+        }
 
-            if (guild is null)
-            {
-                _logger.DatabaseGuildNotFound(guildId);
-                return;
-            }
+        if (lastPermissionCheck.HasValue)
+            guild.LastPermissionCheck = DateTimeOffset.UtcNow;
 
-            if (lastPermissionCheck.HasValue)
-                guild.LastPermissionCheck = DateTimeOffset.UtcNow;
+        if (legalsAccepted.HasValue)
+            guild.LegalsAccepted = legalsAccepted.Value;
 
-            if (legalsAccepted.HasValue)
-                guild.LegalsAccepted = legalsAccepted.Value;
-
-            context.Guilds.Update(guild);
-        });
+        _dbContext.Guilds.Update(guild);
+        await _dbContext.SaveChangesAsync();
     }
 
-    public Task<bool> UpdateGuildLegalsAsync()
-        => ExecuteDbActionAsync(static async context => await context.Guilds.ExecuteUpdateAsync(g => g.SetProperty(p => p.LegalsAccepted, false)));
+    public async Task UpdateGuildLegalsAsync()
+        => await _dbContext.Guilds.ExecuteUpdateAsync(g => g.SetProperty(p => p.LegalsAccepted, false));
 
-    public Task<bool> UpdateGuildPreferencesAsync(ulong guildId, ulong? adminRoleId = null, ulong? adminNotifiyChannelId = null, ulong? errorChannelId = null)
+    public async Task UpdateGuildPreferencesAsync(ulong guildId, ulong? adminRoleId = null, ulong? adminNotifiyChannelId = null, ulong? errorChannelId = null)
     {
-        return ExecuteDbActionAsync(async context =>
+        GuildPreferencesEntity? preferences = await _dbContext.GuildPreferences
+            .Where(p => p.Guild.UniqueId == guildId)
+            .Include(static p => p.Guild)
+            .SingleOrDefaultAsync();
+
+        if (preferences is null)
         {
-            GuildPreferencesEntity? preferences = await context.GuildPreferences
-                .Where(p => p.Guild.UniqueId == guildId)
-                .Include(static p => p.Guild)
-                .SingleOrDefaultAsync();
+            _logger.DatabaseGuildPreferencesNotFound(guildId);
+            return;
+        }
 
-            if (preferences is null)
-            {
-                _logger.DatabaseGuildPreferencesNotFound(guildId);
-                return;
-            }
+        if (adminRoleId.HasValue)
+            preferences.AdminRoleId = adminRoleId.Value;
 
-            if (adminRoleId.HasValue)
-                preferences.AdminRoleId = adminRoleId.Value;
+        if (adminNotifiyChannelId.HasValue)
+            preferences.AdminNotifyChannelId = adminNotifiyChannelId.Value;
 
-            if (adminNotifiyChannelId.HasValue)
-                preferences.AdminNotifyChannelId = adminNotifiyChannelId.Value;
+        if (errorChannelId.HasValue)
+            preferences.ErrorChannelId = errorChannelId.Value;
 
-            if (errorChannelId.HasValue)
-                preferences.ErrorChannelId = errorChannelId.Value;
+        if (preferences.AdminRoleId is not 0 && preferences.AdminNotifyChannelId is not 0 && preferences.ErrorChannelId is not 0)
+            preferences.Guild.ConfigSet = true;
 
-            if (preferences.AdminRoleId is not 0 && preferences.AdminNotifyChannelId is not 0 && preferences.ErrorChannelId is not 0)
-                preferences.Guild.ConfigSet = true;
-
-            context.GuildPreferences.Update(preferences);
-            context.Guilds.Update(preferences.Guild);
-        });
+        _dbContext.GuildPreferences.Update(preferences);
+        _dbContext.Guilds.Update(preferences.Guild);
+        await _dbContext.SaveChangesAsync();
     }
 }
