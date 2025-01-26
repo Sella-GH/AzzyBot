@@ -41,9 +41,6 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
                 object? databaseValue = databaseValues[property];
                 _logger.DatabaseConcurrencyValues(property.Name, proposedValue, databaseValue);
 
-                if (proposedValue == databaseValue)
-                    continue;
-
                 // Be safe and update the proposed value to the database value
                 proposedValues[property] = databaseValue;
             }
