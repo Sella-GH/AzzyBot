@@ -25,11 +25,6 @@ public sealed class GuildPreferencesEntity
     public ulong AdminNotifyChannelId { get; set; }
 
     /// <summary>
-    /// The <see cref="DiscordChannel"/> id of the <see cref="DiscordChannel"/> where errors are posted.
-    /// </summary>
-    public ulong ErrorChannelId { get; set; }
-
-    /// <summary>
     /// The concurrency token for optimistic concurrency checks.
     /// </summary>
     [Timestamp]
