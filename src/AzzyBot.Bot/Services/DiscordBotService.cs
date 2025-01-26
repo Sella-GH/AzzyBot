@@ -241,12 +241,14 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         if (ctx is not null)
         {
             DiscordMessage? discordMessage = await AcknowledgeExceptionAsync(ctx);
-            DiscordUser discordUser = ctx.User;
+            string? message = discordMessage?.JumpLink.ToString();
+            string guild = $"{ctx.Guild?.Name} ({ctx.Guild?.Id})";
+            string discordUser = $"{ctx.User.GlobalName} ({ctx.User.Id})";
             string commandName = ctx.Command.FullName;
             Dictionary<string, string> commandOptions = new(ctx.Command.Parameters.Count);
             ProcessOptions(ctx.Arguments, commandOptions);
 
-            embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture), info, discordMessage, discordUser, commandName, commandOptions);
+            embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture), info, guild, message, discordUser, commandName, commandOptions);
         }
         else
         {
@@ -542,7 +544,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         }
     }
 
-    private DiscordEmbedBuilder CreateExceptionEmbed(Exception ex, string timestamp, string? jsonMessage = null, DiscordMessage? message = null, DiscordUser? user = null, string? commandName = null, Dictionary<string, string>? commandOptions = null)
+    private DiscordEmbedBuilder CreateExceptionEmbed(Exception ex, string timestamp, string? jsonMessage = null, string? guild = null, string? message = null, string? userMention = null, string? commandName = null, Dictionary<string, string>? commandOptions = null)
     {
         ArgumentNullException.ThrowIfNull(ex);
         ArgumentNullException.ThrowIfNull(timestamp);
@@ -568,24 +570,27 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         if (!string.IsNullOrEmpty(ex.Source))
             builder.AddField("Source", ex.Source);
 
-        if (message is not null)
-            builder.AddField("Message", message.JumpLink.ToString());
+        if (guild is not null)
+            builder.AddField("Guild", guild);
 
-        if (user is not null)
-            builder.AddField("User", user.Mention);
+        if (message is not null)
+            builder.AddField("Message", message);
+
+        if (userMention is not null)
+            builder.AddField("User", userMention);
 
         if (!string.IsNullOrEmpty(commandName))
             builder.AddField("Command", commandName);
 
         if (commandOptions?.Count > 0)
         {
-            StringBuilder stringBuilder = new();
+            StringBuilder sb = new();
             foreach (KeyValuePair<string, string> kvp in commandOptions)
             {
-                stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"**{kvp.Key}**: {kvp.Value}");
+                sb.AppendLine(CultureInfo.InvariantCulture, $"**{kvp.Key}**: {kvp.Value}");
             }
 
-            builder.AddField("Options", stringBuilder.ToString());
+            builder.AddField("Options", sb.ToString());
         }
 
         builder.AddField("OS", os);
