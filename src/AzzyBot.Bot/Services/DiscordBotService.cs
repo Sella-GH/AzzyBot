@@ -39,8 +39,6 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
     private readonly AzzyBotSettings _settings = settings.Value;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordClient _client = client;
-    private const string BugReportMessage = "Send a [bug report]([BugReportUri]) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
-    private const string ErrorChannelNotConfigured = $"**If you're seeing this message then I am not configured correctly!**\nTell your server admin to run */config modify-core*\n\n{BugReportMessage}";
 
     private bool CheckIfClientIsConnected
         => _client.AllShardsConnected;
@@ -235,7 +233,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         return member;
     }
 
-    public async Task<bool> LogExceptionAsync(Exception ex, DateTimeOffset timestamp, SlashCommandContext? ctx = null, ulong guildId = 0, string? info = null)
+    public async Task<bool> LogExceptionAsync(Exception ex, DateTimeOffset timestamp, SlashCommandContext? ctx = null, string? info = null)
     {
         ArgumentNullException.ThrowIfNull(ex);
 
@@ -243,41 +241,6 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
 
         string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss-fffffff", CultureInfo.InvariantCulture);
         ulong errorChannelId = _settings.ErrorChannelId;
-        bool errorChannelConfigured = true;
-
-        //
-        // Checks if the guild is the main guild
-        // If not look if the guild has an error channel set
-        // Otherwise it will use the first channel it can see
-        // However if nothing is present, send to debug server
-        // If there's no guild, take the current channel
-        //
-
-        if (guildId != _settings.ServerId && guildId is not 0)
-        {
-            GuildPreferencesEntity? guildPrefs = await _dbActions.GetGuildPreferencesAsync(guildId);
-            if (guildPrefs is null)
-            {
-                _logger.DatabaseGuildPreferencesNotFound(guildId);
-                return false;
-            }
-
-            if (guildPrefs.ErrorChannelId is not 0)
-                errorChannelId = guildPrefs.ErrorChannelId;
-
-            if (errorChannelId == _settings.ErrorChannelId)
-            {
-                DiscordChannel? dChannel = await GetFirstDiscordChannelAsync(guildId);
-                if (dChannel is null)
-                {
-                    _logger.DiscordItemNotFound(nameof(DiscordChannel), guildId);
-                    return false;
-                }
-
-                errorChannelId = dChannel.Id;
-                errorChannelConfigured = false;
-            }
-        }
 
         // Handle the special case when it's a command exception
         DiscordEmbed embed;
@@ -302,7 +265,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             string fileName = $"AzzyBotException_{timestampString}.json";
             string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, fileName);
 
-            bool messageSent = await SendMessageAsync(errorChannelId, (errorChannelConfigured) ? BugReportMessage.Replace("[BugReportUri]", UriStrings.BugReportUri, StringComparison.InvariantCultureIgnoreCase) : ErrorChannelNotConfigured, [embed], [tempFilePath]);
+            bool messageSent = await SendMessageAsync(errorChannelId, embeds: [embed], filePaths: [tempFilePath]);
             if (!messageSent)
                 _logger.UnableToSendMessage("Error message was not sent");
 
@@ -585,26 +548,6 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             default:
                 throw new InvalidOperationException("Unknown response state");
         }
-    }
-
-    private async Task<DiscordChannel?> GetFirstDiscordChannelAsync(ulong guildId)
-    {
-        DiscordGuild? guild = await _client.GetGuildsAsync().FirstOrDefaultAsync(g => g.Id == guildId);
-        DiscordMember? member = await GetDiscordMemberAsync(guildId);
-
-        if (guild is null)
-        {
-            _logger.DiscordItemNotFound(nameof(DiscordGuild), guildId);
-            return null;
-        }
-
-        if (member is null)
-        {
-            _logger.DiscordItemNotFound(nameof(DiscordMember), _client.CurrentUser.Id);
-            return null;
-        }
-
-        return guild.Channels.FirstOrDefault(c => c.Value.Type is DiscordChannelType.Text && c.Value.PermissionsFor(member).HasAllPermissions(DiscordPermission.SendMessages, DiscordPermission.ViewChannel)).Value;
     }
 
     private static void ProcessOptions(IReadOnlyDictionary<CommandParameter, object?> paramaters, Dictionary<string, string> commandParameters)
