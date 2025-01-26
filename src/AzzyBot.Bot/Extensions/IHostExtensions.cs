@@ -19,7 +19,8 @@ public static class IHostExtensions
         ArgumentNullException.ThrowIfNull(app);
 
         using IServiceScope scope = app.Services.CreateScope();
-        AzzyDbContext db = scope.ServiceProvider.GetRequiredService<AzzyDbContext>();
+        IDbContextFactory<AzzyDbContext> factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AzzyDbContext>>();
+        using AzzyDbContext db = factory.CreateDbContext();
 
         bool isOnline = false;
         while (!isOnline)

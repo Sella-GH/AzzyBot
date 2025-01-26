@@ -23,7 +23,7 @@ using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<AzzyBotSettings> azzySettings, IOptions<DatabaseSettings> dbSettings, IOptions<DiscordStatusSettings> discordSettings, IOptions<MusicStreamingSettings> musicStreamingSettings, IOptions<CoreUpdaterSettings> updaterSettings, AzzyDbContext dbContext) : IHostedService
+public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<AzzyBotSettings> azzySettings, IOptions<DatabaseSettings> dbSettings, IOptions<DiscordStatusSettings> discordSettings, IOptions<MusicStreamingSettings> musicStreamingSettings, IOptions<CoreUpdaterSettings> updaterSettings, IDbContextFactory<AzzyDbContext> dbContextFactory) : IHostedService
 {
     private readonly ILogger<CoreServiceHost> _logger = logger;
     private readonly AzzyBotSettings _azzySettings = azzySettings.Value;
@@ -31,7 +31,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
     private readonly DatabaseSettings _dbSettings = dbSettings.Value;
     private readonly DiscordStatusSettings _discordSettings = discordSettings.Value;
     private readonly MusicStreamingSettings _musicStreamingSettings = musicStreamingSettings.Value;
-    private readonly AzzyDbContext _dbContext = dbContext;
+    private readonly IDbContextFactory<AzzyDbContext> _dbContextFactory = dbContextFactory;
     private readonly Task _completed = Task.CompletedTask;
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -59,16 +59,18 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
 
     private async Task EnsureAzzyBotDbTableIsCreatedAsync()
     {
-        if (await _dbContext.AzzyBot.AnyAsync())
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        if (await dbContext.AzzyBot.AnyAsync())
             return;
 
-        await using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync();
+        await using IDbContextTransaction transaction = await dbContext.Database.BeginTransactionAsync();
 
         try
         {
-            await _dbContext.AzzyBot.AddAsync(new AzzyBotEntity());
+            await dbContext.AzzyBot.AddAsync(new AzzyBotEntity());
 
-            await _dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
         }
         catch (Exception ex) when (ex is DbUpdateConcurrencyException or DbUpdateException)
@@ -88,10 +90,11 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
 
         byte[] newEncryptionKey = Encoding.UTF8.GetBytes(_dbSettings.NewEncryptionKey);
 
-        await using IDbContextTransaction transaction = await _dbContext.Database.BeginTransactionAsync();
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+        await using IDbContextTransaction transaction = await dbContext.Database.BeginTransactionAsync();
 
-        List<AzuraCastEntity> azuraCast = await _dbContext.AzuraCast.ToListAsync();
-        List<AzuraCastStationEntity> azuraCastStations = await _dbContext.AzuraCastStations.ToListAsync();
+        List<AzuraCastEntity> azuraCast = await dbContext.AzuraCast.ToListAsync();
+        List<AzuraCastStationEntity> azuraCastStations = await dbContext.AzuraCastStations.ToListAsync();
 
         try
         {
@@ -110,7 +113,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
                 entity.ApiKey = Crypto.Encrypt(entity.ApiKey, newEncryptionKey);
             }
 
-            await _dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
         }
         catch (Exception ex) when (ex is DbUpdateConcurrencyException or DbUpdateException)

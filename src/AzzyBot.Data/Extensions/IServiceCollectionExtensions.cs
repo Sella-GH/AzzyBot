@@ -21,9 +21,9 @@ public static class IServiceCollectionExtensions
 
         string connectionString = GetConnectionString(host, port, user, password, database);
 #if DEBUG || DOCKER_DEBUG
-        services.AddDbContext<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor().EnableSensitiveDataLogging(true), ServiceLifetime.Transient);
+        services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor().EnableSensitiveDataLogging(true));
 #else
-        services.AddDbContext<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor(), ServiceLifetime.Transient);
+        services.AddDbContext<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor());
 #endif
         services.AddSingleton<DbActions>();
         services.AddSingleton<DbMaintenance>();

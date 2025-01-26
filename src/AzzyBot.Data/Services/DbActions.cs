@@ -17,10 +17,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Data.Services;
 
-public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext)
+public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyDbContext> dbContextFactory)
 {
     private readonly ILogger<DbActions> _logger = logger;
-    private readonly AzzyDbContext _dbContext = dbContext;
+    private readonly IDbContextFactory<AzzyDbContext> _dbContextFactory = dbContextFactory;
 
     private async Task HandleConcurrencyExceptionAsync(IReadOnlyList<EntityEntry> entries)
     {
@@ -58,12 +58,17 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
     {
         ArgumentNullException.ThrowIfNull(baseUrl);
 
-        GuildEntity? guild = await _dbContext.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        GuildEntity? guild = await dbContext.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
         if (guild is null)
         {
             _logger.DatabaseGuildNotFound(guildId);
             return;
         }
+
+        if (await dbContext.AzuraCast.AnyAsync(a => a.Guild.UniqueId == guildId))
+            return;
 
         AzuraCastEntity azuraCast = new()
         {
@@ -88,18 +93,23 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             AzuraCastId = azuraCast.Id
         };
 
-        await _dbContext.AzuraCast.AddAsync(azuraCast);
-        await _dbContext.SaveChangesAsync();
+        await dbContext.AzuraCast.AddAsync(azuraCast);
+        await dbContext.SaveChangesAsync();
     }
 
     public async Task AddAzuraCastStationAsync(ulong guildId, int stationId, ulong stationAdminGroup, ulong requestsId, bool showPlaylist, bool fileChanges, ulong? fileUploadId = null, string? fileUploadPath = null, string? apiKey = null, ulong? stationDjGroup = null)
     {
-        AzuraCastEntity? azura = await _dbContext.AzuraCast.SingleOrDefaultAsync(a => a.Guild.UniqueId == guildId);
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        AzuraCastEntity? azura = await dbContext.AzuraCast.SingleOrDefaultAsync(a => a.Guild.UniqueId == guildId);
         if (azura is null)
         {
             _logger.DatabaseAzuraCastNotFound(guildId);
             return;
         }
+
+        if (await dbContext.AzuraCastStations.AnyAsync(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == stationId))
+            return;
 
         AzuraCastStationEntity station = new()
         {
@@ -127,15 +137,17 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             StationId = station.Id
         };
 
-        await _dbContext.AzuraCastStations.AddAsync(station);
-        await _dbContext.SaveChangesAsync();
+        await dbContext.AzuraCastStations.AddAsync(station);
+        await dbContext.SaveChangesAsync();
     }
 
     public async Task AddAzuraCastStationRequestAsync(ulong guildId, int stationId, string songId, bool isInternal = false)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(songId);
 
-        AzuraCastStationEntity? station = await _dbContext.AzuraCastStations.SingleOrDefaultAsync(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == stationId);
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        AzuraCastStationEntity? station = await dbContext.AzuraCastStations.SingleOrDefaultAsync(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == stationId);
         if (station is null)
         {
             _logger.DatabaseAzuraCastStationNotFound(guildId, 0, stationId);
@@ -150,14 +162,19 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             IsInternal = isInternal
         };
 
-        await _dbContext.AzuraCastStationRequests.AddAsync(request);
-        await _dbContext.SaveChangesAsync();
+        await dbContext.AzuraCastStationRequests.AddAsync(request);
+        await dbContext.SaveChangesAsync();
     }
 
     public async Task AddGuildAsync(ulong guildId)
     {
-        await _dbContext.Guilds.AddAsync(new() { UniqueId = guildId });
-        await _dbContext.SaveChangesAsync();
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        if (await dbContext.Guilds.AnyAsync(g => g.UniqueId == guildId))
+            return;
+
+        await dbContext.Guilds.AddAsync(new() { UniqueId = guildId });
+        await dbContext.SaveChangesAsync();
     }
 
     /// <summary>
@@ -169,7 +186,9 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
     {
         ArgumentNullException.ThrowIfNull(guilds);
 
-        IEnumerable<GuildEntity> existingGuilds = _dbContext.Guilds;
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        IEnumerable<GuildEntity> existingGuilds = dbContext.Guilds;
         IEnumerable<GuildEntity> newGuilds = [.. guilds.Keys
             .Where(guild => !existingGuilds.Select(static g => g.UniqueId).Contains(guild))
             .Select(static guild => new GuildEntity() { UniqueId = guild })];
@@ -177,8 +196,8 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         if (!newGuilds.Any())
             return [];
 
-        await _dbContext.Guilds.AddRangeAsync(newGuilds);
-        await _dbContext.SaveChangesAsync();
+        await dbContext.Guilds.AddRangeAsync(newGuilds);
+        await dbContext.SaveChangesAsync();
 
         return newGuilds
             .Where(guild => guilds.ContainsKey(guild.UniqueId))
@@ -186,15 +205,58 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
     }
 
     public async Task DeleteAzuraCastAsync(ulong guildId)
-        => await _dbContext.AzuraCast.Where(a => a.Guild.UniqueId == guildId).ExecuteDeleteAsync();
+    {
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        try
+        {
+            await dbContext.AzuraCast.Where(a => a.Guild.UniqueId == guildId).ExecuteDeleteAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            _logger.DatabaseConcurrencyException(ex);
+
+            await HandleConcurrencyExceptionAsync(ex.Entries);
+
+            await DeleteAzuraCastAsync(guildId);
+        }
+    }
 
     public async Task DeleteAzuraCastStationAsync(int stationId)
-        => await _dbContext.AzuraCastStations.Where(s => s.StationId == stationId).ExecuteDeleteAsync();
+    {
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        try
+        {
+            await dbContext.AzuraCastStations.Where(s => s.StationId == stationId).ExecuteDeleteAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            _logger.DatabaseConcurrencyException(ex);
+
+            await HandleConcurrencyExceptionAsync(ex.Entries);
+
+            await DeleteAzuraCastStationAsync(stationId);
+        }
+    }
 
     public async Task DeleteGuildAsync(ulong guildId)
     {
-        await _dbContext.AzuraCast.Where(a => a.Guild.UniqueId == guildId).ExecuteDeleteAsync();
-        await _dbContext.Guilds.Where(g => g.UniqueId == guildId).ExecuteDeleteAsync();
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        try
+        {
+            await dbContext.AzuraCast.Where(a => a.Guild.UniqueId == guildId).ExecuteDeleteAsync();
+            await dbContext.Guilds.Where(g => g.UniqueId == guildId).ExecuteDeleteAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            _logger.DatabaseConcurrencyException(ex);
+
+            await HandleConcurrencyExceptionAsync(ex.Entries);
+
+            await DeleteGuildAsync(guildId);
+        }
     }
 
     /// <summary>
@@ -206,23 +268,38 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
     {
         ArgumentNullException.ThrowIfNull(guilds);
 
-        IEnumerable<GuildEntity> existingGuilds = _dbContext.Guilds;
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        IEnumerable<GuildEntity> existingGuilds = dbContext.Guilds;
         IEnumerable<GuildEntity> guildsToDelete = [.. existingGuilds.Where(guild => !guilds.Keys.Contains(guild.UniqueId))];
 
         if (!guildsToDelete.Any())
             return [];
 
-        await _dbContext.AzuraCast.Where(a => guildsToDelete.Select(static g => g.UniqueId).Contains(a.Guild.UniqueId)).ExecuteDeleteAsync();
-        await _dbContext.Guilds.Where(g => guildsToDelete.Select(static g => g.UniqueId).Contains(g.UniqueId)).ExecuteDeleteAsync();
+        try
+        {
+            await dbContext.AzuraCast.Where(a => guildsToDelete.Select(static g => g.UniqueId).Contains(a.Guild.UniqueId)).ExecuteDeleteAsync();
+            await dbContext.Guilds.Where(g => guildsToDelete.Select(static g => g.UniqueId).Contains(g.UniqueId)).ExecuteDeleteAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            _logger.DatabaseConcurrencyException(ex);
+
+            await HandleConcurrencyExceptionAsync(ex.Entries);
+
+            return await DeleteGuildsAsync(guilds);
+        }
 
         return guildsToDelete
             .Where(guild => !guilds.ContainsKey(guild.UniqueId))
             .Select(static guld => guld.UniqueId);
     }
 
-    public Task<AzuraCastEntity?> GetAzuraCastAsync(ulong guildId, bool loadChecks = false, bool loadPrefs = false, bool loadStations = false, bool loadStationChecks = false, bool loadStationPrefs = false, bool loadGuild = false)
+    public async Task<AzuraCastEntity?> GetAzuraCastAsync(ulong guildId, bool loadChecks = false, bool loadPrefs = false, bool loadStations = false, bool loadStationChecks = false, bool loadStationPrefs = false, bool loadGuild = false)
     {
-        return _dbContext.AzuraCast
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        return await dbContext.AzuraCast
             .AsNoTracking()
             .Where(a => a.Guild.UniqueId == guildId)
             .IncludeIf(loadChecks, static q => q.Include(static a => a.Checks))
@@ -234,9 +311,11 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .SingleOrDefaultAsync();
     }
 
-    public Task<AzuraCastStationEntity?> GetAzuraCastStationAsync(ulong guildId, int stationId, bool loadChecks = false, bool loadPrefs = false, bool loadRequests = false, bool loadAzuraCast = false, bool loadAzuraCastPrefs = false)
+    public async Task<AzuraCastStationEntity?> GetAzuraCastStationAsync(ulong guildId, int stationId, bool loadChecks = false, bool loadPrefs = false, bool loadRequests = false, bool loadAzuraCast = false, bool loadAzuraCastPrefs = false)
     {
-        return _dbContext.AzuraCastStations
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        return await dbContext.AzuraCastStations
             .AsNoTracking()
             .Where(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == stationId)
             .IncludeIf(loadChecks, static q => q.Include(static s => s.Checks))
@@ -247,33 +326,41 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .SingleOrDefaultAsync();
     }
 
-    public Task<AzuraCastStationPreferencesEntity?> GetAzuraCastStationPreferencesAsync(ulong guildId, int stationId, bool loadStation = false)
+    public async Task<AzuraCastStationPreferencesEntity?> GetAzuraCastStationPreferencesAsync(ulong guildId, int stationId, bool loadStation = false)
     {
-        return _dbContext.AzuraCastStationPreferences
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        return await dbContext.AzuraCastStationPreferences
             .AsNoTracking()
             .Where(p => p.Station.AzuraCast.Guild.UniqueId == guildId && p.Station.StationId == stationId)
             .IncludeIf(loadStation, static q => q.Include(static p => p.Station))
             .SingleOrDefaultAsync();
     }
 
-    public Task<int> GetAzuraCastStationRequestsCountAsync(ulong guildId, int stationId)
+    public async Task<int> GetAzuraCastStationRequestsCountAsync(ulong guildId, int stationId)
     {
-        return _dbContext.AzuraCastStationRequests
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        return await dbContext.AzuraCastStationRequests
             .AsNoTracking()
             .Where(r => r.Station.AzuraCast.Guild.UniqueId == guildId && r.Station.StationId == stationId)
             .CountAsync();
     }
 
-    public Task<AzzyBotEntity?> GetAzzyBotAsync()
+    public async Task<AzzyBotEntity?> GetAzzyBotAsync()
     {
-        return _dbContext.AzzyBot
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        return await dbContext.AzzyBot
             .AsNoTracking()
             .SingleOrDefaultAsync();
     }
 
-    public Task<GuildEntity?> GetGuildAsync(ulong guildId, bool loadEverything = false)
+    public async Task<GuildEntity?> GetGuildAsync(ulong guildId, bool loadEverything = false)
     {
-        return _dbContext.Guilds
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        return await dbContext.Guilds
             .AsNoTracking()
             .Where(g => g.UniqueId == guildId)
             .IncludeIf(loadEverything, static q => q.Include(static g => g.Preferences))
@@ -285,7 +372,9 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
 
     public async Task<IReadOnlyList<GuildEntity>> GetGuildsAsync(bool loadGuildPrefs = false, bool loadEverything = false)
     {
-        return await _dbContext.Guilds
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        return await dbContext.Guilds
             .AsNoTracking()
             .IncludeIf(loadGuildPrefs || loadEverything, static q => q.Include(static g => g.Preferences))
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast).Include(static g => g.AzuraCast!.Checks).Include(static g => g.AzuraCast!.Preferences))
@@ -294,9 +383,11 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
             .ToListAsync();
     }
 
-    public Task<GuildPreferencesEntity?> GetGuildPreferencesAsync(ulong guildId)
+    public async Task<GuildPreferencesEntity?> GetGuildPreferencesAsync(ulong guildId)
     {
-        return _dbContext.Guilds
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        return await dbContext.Guilds
             .AsNoTracking()
             .Where(g => g.UniqueId == guildId)
             .Select(static g => g.Preferences)
@@ -305,7 +396,9 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
 
     public async Task UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl = null, string? apiKey = null, bool? isOnline = null)
     {
-        AzuraCastEntity? azuraCast = await _dbContext.AzuraCast
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        AzuraCastEntity? azuraCast = await dbContext.AzuraCast
             .Where(a => a.Guild.UniqueId == guildId)
             .SingleOrDefaultAsync();
 
@@ -324,18 +417,18 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         if (isOnline.HasValue)
             azuraCast.IsOnline = isOnline.Value;
 
-        _dbContext.AzuraCast.Update(azuraCast);
+        dbContext.AzuraCast.Update(azuraCast);
 
         try
         {
-            await _dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await _dbContext.SaveChangesAsync();
+            await UpdateAzuraCastAsync(guildId, baseUrl, apiKey, isOnline);
 
             _logger.DatabaseConcurrencyResolved();
         }
@@ -343,7 +436,9 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
 
     public async Task UpdateAzuraCastChecksAsync(ulong guildId, bool? serverStatus = null, bool? updates = null, bool? changelog = null, int? updateNotificationCounter = null, bool? lastUpdateCheck = null, bool? lastServerStatusCheck = null)
     {
-        AzuraCastChecksEntity? checks = await _dbContext.AzuraCastChecks
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        AzuraCastChecksEntity? checks = await dbContext.AzuraCastChecks
             .Where(c => c.AzuraCast.Guild.UniqueId == guildId)
             .SingleOrDefaultAsync();
 
@@ -371,18 +466,18 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         if (lastServerStatusCheck.HasValue)
             checks.LastServerStatusCheck = DateTimeOffset.UtcNow;
 
-        _dbContext.AzuraCastChecks.Update(checks);
+        dbContext.AzuraCastChecks.Update(checks);
 
         try
         {
-            await _dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await _dbContext.SaveChangesAsync();
+            await UpdateAzuraCastChecksAsync(guildId, serverStatus, updates, changelog, updateNotificationCounter, lastUpdateCheck, lastServerStatusCheck);
 
             _logger.DatabaseConcurrencyResolved();
         }
@@ -390,7 +485,9 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
 
     public async Task UpdateAzuraCastPreferencesAsync(ulong guildId, ulong? instanceAdminGroup = null, ulong? notificationId = null, ulong? outagesId = null)
     {
-        AzuraCastPreferencesEntity? preferences = await _dbContext.AzuraCastPreferences
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        AzuraCastPreferencesEntity? preferences = await dbContext.AzuraCastPreferences
             .Where(p => p.AzuraCast.Guild.UniqueId == guildId)
             .SingleOrDefaultAsync();
 
@@ -409,18 +506,18 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         if (outagesId.HasValue)
             preferences.OutagesChannelId = outagesId.Value;
 
-        _dbContext.AzuraCastPreferences.Update(preferences);
+        dbContext.AzuraCastPreferences.Update(preferences);
 
         try
         {
-            await _dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await _dbContext.SaveChangesAsync();
+            await UpdateAzuraCastPreferencesAsync(guildId, instanceAdminGroup, notificationId, outagesId);
 
             _logger.DatabaseConcurrencyResolved();
         }
@@ -428,7 +525,9 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
 
     public async Task UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? apiKey = null, bool? lastSkipTime = null, bool? lastRequestTime = null)
     {
-        AzuraCastStationEntity? azuraStation = await _dbContext.AzuraCastStations
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        AzuraCastStationEntity? azuraStation = await dbContext.AzuraCastStations
             .Where(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == station)
             .SingleOrDefaultAsync();
 
@@ -450,18 +549,18 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         if (lastRequestTime.HasValue)
             azuraStation.LastRequestTime = DateTimeOffset.UtcNow.AddSeconds(16);
 
-        _dbContext.AzuraCastStations.Update(azuraStation);
+        dbContext.AzuraCastStations.Update(azuraStation);
 
         try
         {
-            await _dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await _dbContext.SaveChangesAsync();
+            await UpdateAzuraCastStationAsync(guildId, station, stationId, apiKey, lastSkipTime, lastRequestTime);
 
             _logger.DatabaseConcurrencyResolved();
         }
@@ -469,7 +568,9 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
 
     public async Task UpdateAzuraCastStationChecksAsync(ulong guildId, int stationId, bool? fileChanges = null, bool? lastFileChangesCheck = null)
     {
-        AzuraCastStationChecksEntity? checks = await _dbContext.AzuraCastStationChecks
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        AzuraCastStationChecksEntity? checks = await dbContext.AzuraCastStationChecks
             .Where(c => c.Station.AzuraCast.Guild.UniqueId == guildId && c.Station.StationId == stationId)
             .SingleOrDefaultAsync();
 
@@ -485,18 +586,18 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         if (lastFileChangesCheck.HasValue)
             checks.LastFileChangesCheck = DateTimeOffset.UtcNow;
 
-        _dbContext.AzuraCastStationChecks.Update(checks);
+        dbContext.AzuraCastStationChecks.Update(checks);
 
         try
         {
-            await _dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await _dbContext.SaveChangesAsync();
+            await UpdateAzuraCastStationChecksAsync(guildId, stationId, fileChanges, lastFileChangesCheck);
 
             _logger.DatabaseConcurrencyResolved();
         }
@@ -504,7 +605,9 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
 
     public async Task UpdateAzuraCastStationPreferencesAsync(ulong guildId, int stationId, ulong? stationAdminGroup = null, ulong? stationDjGroup = null, ulong? fileUploadId = null, ulong? requestId = null, string? fileUploadPath = null, bool? playlist = null)
     {
-        AzuraCastStationPreferencesEntity? preferences = await _dbContext.AzuraCastStationPreferences
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        AzuraCastStationPreferencesEntity? preferences = await dbContext.AzuraCastStationPreferences
             .Where(p => p.Station.AzuraCast.Guild.UniqueId == guildId && p.Station.StationId == stationId)
             .SingleOrDefaultAsync();
 
@@ -532,18 +635,18 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         if (playlist.HasValue)
             preferences.ShowPlaylistInNowPlaying = playlist.Value;
 
-        _dbContext.AzuraCastStationPreferences.Update(preferences);
+        dbContext.AzuraCastStationPreferences.Update(preferences);
 
         try
         {
-            await _dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await _dbContext.SaveChangesAsync();
+            await UpdateAzuraCastStationPreferencesAsync(guildId, stationId, stationAdminGroup, stationDjGroup, fileUploadId, requestId, fileUploadPath, playlist);
 
             _logger.DatabaseConcurrencyResolved();
         }
@@ -551,7 +654,9 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
 
     public async Task UpdateAzzyBotAsync(bool? lastDatabaseCleanup = null, bool? lastUpdateCheck = null)
     {
-        AzzyBotEntity? azzyBot = await _dbContext.AzzyBot.SingleOrDefaultAsync();
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        AzzyBotEntity? azzyBot = await dbContext.AzzyBot.SingleOrDefaultAsync();
         if (azzyBot is null)
         {
             _logger.DatabaseAzzyBotNotFound();
@@ -564,18 +669,18 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         if (lastUpdateCheck.HasValue)
             azzyBot.LastUpdateCheck = DateTimeOffset.UtcNow;
 
-        _dbContext.AzzyBot.Update(azzyBot);
+        dbContext.AzzyBot.Update(azzyBot);
 
         try
         {
-            await _dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await _dbContext.SaveChangesAsync();
+            await UpdateAzzyBotAsync(lastDatabaseCleanup, lastUpdateCheck);
 
             _logger.DatabaseConcurrencyResolved();
         }
@@ -583,7 +688,9 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
 
     public async Task UpdateGuildAsync(ulong guildId, bool? lastPermissionCheck = null, bool? legalsAccepted = null)
     {
-        GuildEntity? guild = await _dbContext.Guilds
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        GuildEntity? guild = await dbContext.Guilds
             .Where(g => g.UniqueId == guildId)
             .SingleOrDefaultAsync();
 
@@ -599,29 +706,47 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         if (legalsAccepted.HasValue)
             guild.LegalsAccepted = legalsAccepted.Value;
 
-        _dbContext.Guilds.Update(guild);
+        dbContext.Guilds.Update(guild);
 
         try
         {
-            await _dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await _dbContext.SaveChangesAsync();
+            await UpdateGuildAsync(guildId, lastPermissionCheck, legalsAccepted);
 
             _logger.DatabaseConcurrencyResolved();
         }
     }
 
     public async Task UpdateGuildLegalsAsync()
-        => await _dbContext.Guilds.ExecuteUpdateAsync(g => g.SetProperty(p => p.LegalsAccepted, false));
+    {
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        try
+        {
+            await dbContext.Guilds.ExecuteUpdateAsync(g => g.SetProperty(p => p.LegalsAccepted, false));
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            _logger.DatabaseConcurrencyException(ex);
+
+            await HandleConcurrencyExceptionAsync(ex.Entries);
+            await UpdateGuildLegalsAsync();
+
+            _logger.DatabaseConcurrencyResolved();
+        }
+    }
 
     public async Task UpdateGuildPreferencesAsync(ulong guildId, ulong? adminRoleId = null, ulong? adminNotifiyChannelId = null, ulong? errorChannelId = null)
     {
-        GuildPreferencesEntity? preferences = await _dbContext.GuildPreferences
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        GuildPreferencesEntity? preferences = await dbContext.GuildPreferences
             .Where(p => p.Guild.UniqueId == guildId)
             .Include(static p => p.Guild)
             .SingleOrDefaultAsync();
@@ -644,19 +769,19 @@ public sealed class DbActions(ILogger<DbActions> logger, AzzyDbContext dbContext
         if (preferences.AdminRoleId is not 0 && preferences.AdminNotifyChannelId is not 0 && preferences.ErrorChannelId is not 0)
             preferences.Guild.ConfigSet = true;
 
-        _dbContext.GuildPreferences.Update(preferences);
-        _dbContext.Guilds.Update(preferences.Guild);
+        dbContext.GuildPreferences.Update(preferences);
+        dbContext.Guilds.Update(preferences.Guild);
 
         try
         {
-            await _dbContext.SaveChangesAsync();
+            await dbContext.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException ex)
         {
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await _dbContext.SaveChangesAsync();
+            await UpdateGuildPreferencesAsync(guildId, adminRoleId, adminNotifiyChannelId, errorChannelId);
 
             _logger.DatabaseConcurrencyResolved();
         }
