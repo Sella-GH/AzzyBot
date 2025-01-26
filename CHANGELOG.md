@@ -25,6 +25,7 @@
   - The bot is now conditionally compiled based on preprocessor directives
 - Refactored DbContext stuff to use the new `PooledDbContextFactory` pattern
   - This should finally fix the concurrency issues and make it work as intended
+- Posting files to discord works now while they're being in use on other platforms than linux
 
 ## 2.2.5 - 2025-01-25
 ### Dependencies

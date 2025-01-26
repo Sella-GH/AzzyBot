@@ -129,7 +129,7 @@ public sealed class AzuraCastCommands
             await FileOperations.CreateZipFileAsync(zFileName, _azuraCastApi.FilePath, tempDir);
             filePaths.Add(Path.Combine(_azuraCastApi.FilePath, zFileName));
 
-            await using FileStream fileStream = new(Path.Combine(_azuraCastApi.FilePath, zFileName), FileMode.Open, FileAccess.Read);
+            await using FileStream fileStream = new(Path.Combine(_azuraCastApi.FilePath, zFileName), FileMode.Open, FileAccess.Read, FileShare.None);
             await using DiscordMessageBuilder builder = new();
             AzuraStationRecord? azuraStation = await _azuraCastApi.GetStationAsync(new(baseUrl), station);
             if (azuraStation is null)
@@ -300,7 +300,7 @@ public sealed class AzuraCastCommands
 
             string fileName = $"{ac.Id}_{logName}_{DateTimeOffset.Now:yyyy-MM-dd_hh-mm-ss-fffffff}.log";
             string filePath = await FileOperations.CreateTempFileAsync(systemLog.Content, fileName);
-            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
+            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             await using DiscordMessageBuilder builder = new();
             builder.WithContent($"Here is the requested system log ({logName}).");
             builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
@@ -878,7 +878,7 @@ public sealed class AzuraCastCommands
             IEnumerable<AzuraStationHistoryExportRecord> exportHistory = [.. history.Select(h => new AzuraStationHistoryExportRecord() { Date = dateString, PlayedAt = Converter.ConvertFromUnixTime(h.PlayedAt), Song = h.Song, SongRequest = h.IsRequest, Streamer = h.Streamer, Playlist = h.Playlist }).Reverse()];
             string fileName = $"{ac.GuildId}-{ac.Id}-{acStation.Id}-{acStation.StationId}_SongHistory_{dateStringFile}.csv";
             string filePath = await FileOperations.CreateCsvFileAsync(exportHistory, fileName);
-            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
+            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             await using DiscordMessageBuilder builder = new();
             builder.WithContent($"Here is the song history for station **{azuraStation.Name}** on **{dateString}**.");
             builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
@@ -952,7 +952,7 @@ public sealed class AzuraCastCommands
 
             string fileName = $"{ac.GuildId}-{ac.Id}-{acStation.Id}-{acStation.StationId}_PlaylistSongs_{playlist.ShortName}.csv";
             string filePath = await FileOperations.CreateCsvFileAsync(songs, fileName);
-            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
+            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             await using DiscordMessageBuilder builder = new();
             builder.WithContent($"Here are the songs in playlist **{playlist.Name}**.");
             builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);

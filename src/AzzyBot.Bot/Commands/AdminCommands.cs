@@ -246,7 +246,7 @@ public sealed class AdminCommands
                 logfile = FileOperations.GetFilesInDirectory("Logs", true).First();
             }
 
-            await using FileStream fileStream = new(logfile, FileMode.Open, FileAccess.Read);
+            await using FileStream fileStream = new(logfile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             await using DiscordMessageBuilder builder = new();
             builder.WithContent($"Here are the logs from **{dateTime}**.");
             builder.AddFile($"{dateTime}.log", fileStream);

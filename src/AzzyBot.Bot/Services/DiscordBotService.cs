@@ -471,7 +471,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
 
                 allFileSize += fileInfo.Length;
 
-                FileStream stream = new(path, FileMode.Open, FileAccess.Read);
+                FileStream stream = new(path, FileMode.Open, FileAccess.Read, FileShare.None);
                 streams.Add(stream);
                 builder.AddFile(Path.GetFileName(path), stream);
             }
