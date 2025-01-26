@@ -511,7 +511,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
     {
         await using DiscordMessageBuilder builder = new()
         {
-            Content = $"Ooops something crazy went wrong!\nDon't worry we're already informed and start fixing the bug.\n\nIf you want to help us fixing it, you can join the support server:\n{UriStrings.DiscordSupportServer}"
+            Content = $"An unexpected error occurred. Our team has been notified and is working on a fix.\nJoin our support server for more information: {UriStrings.DiscordSupportServer}"
         };
 
         switch (ctx.Interaction.ResponseState)
