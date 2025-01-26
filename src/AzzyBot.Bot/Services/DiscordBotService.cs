@@ -236,9 +236,6 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
 
         _logger.ExceptionOccured(ex);
 
-        string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss-fffffff", CultureInfo.InvariantCulture);
-        ulong errorChannelId = _settings.ErrorChannelId;
-
         // Handle the special case when it's a command exception
         DiscordEmbed embed;
         if (ctx is not null)
@@ -259,10 +256,11 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         try
         {
             string jsonDump = JsonSerializer.Serialize(new(ex, info), JsonSerializationSourceGen.Default.SerializableExceptionsRecord);
+            string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss-fffffff", CultureInfo.InvariantCulture);
             string fileName = $"AzzyBotException_{timestampString}.json";
             string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, fileName);
 
-            bool messageSent = await SendMessageAsync(errorChannelId, embeds: [embed], filePaths: [tempFilePath]);
+            bool messageSent = await SendMessageAsync(_settings.ErrorChannelId, embeds: [embed], filePaths: [tempFilePath]);
             if (!messageSent)
                 _logger.UnableToSendMessage("Error message was not sent");
 
@@ -506,29 +504,12 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
     public static DiscordUserStatus SetBotStatusUserStatus(int status)
         => (Enum.IsDefined(typeof(DiscordUserStatus), status)) ? (DiscordUserStatus)status : DiscordUserStatus.Online;
 
-    private async Task<DiscordMessage?> AcknowledgeExceptionAsync(SlashCommandContext ctx)
+    private static async Task<DiscordMessage?> AcknowledgeExceptionAsync(SlashCommandContext ctx)
     {
-        DiscordGuild? guild = ctx.Guild;
-        DiscordMember? owner = null;
-        if (guild is null)
-        {
-            _logger.DiscordItemNotFound(nameof(DiscordGuild), 0);
-        }
-        else
-        {
-            owner = await guild.GetGuildOwnerAsync();
-        }
-
-        string errorMessage = "Ooops something went wrong!\n\nPlease inform the owner of this server.";
-        if (owner is not null)
-            errorMessage = errorMessage.Replace("the owner of this server", owner.Mention, StringComparison.OrdinalIgnoreCase);
-
         await using DiscordMessageBuilder builder = new()
         {
-            Content = errorMessage
+            Content = $"Ooops something crazy went wrong!\nDon't worry we're already informed and start fixing the bug.\n\nIf you want to help us fixing it, you can join the support server:\n{UriStrings.DiscordSupportServer}"
         };
-
-        builder.WithAllowedMention(UserMention.All);
 
         switch (ctx.Interaction.ResponseState)
         {

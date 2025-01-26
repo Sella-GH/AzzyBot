@@ -165,4 +165,7 @@
   <data name="GitHubRepoPrivacyPolicyUrl" xml:space="preserve">
     <value>https://github.com/Sella-GH/AzzyBot/blob/main/legal/Privacy-Policy.md</value>
   </data>
+  <data name="DiscordSupportServer" xml:space="preserve">
+    <value>https://discord.gg/8j6kRAJ5AY</value>
+  </data>
 </root>
