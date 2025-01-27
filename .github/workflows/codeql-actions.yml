@@ -14,7 +14,7 @@ name: "CodeQL GitHub Actions"
 on:
   push:
     branches-ignore:
-      - rel/**
+    - rel/**
     paths:
     - "**yml"
   schedule:
