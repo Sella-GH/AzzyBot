@@ -14,15 +14,14 @@ name: "CodeQL C#"
 on:
   push:
     branches-ignore:
-      - rel/**
+    - rel/**
     paths:
     - "**.cs"
     - "**.csproj"
     - "**.json"
     - "**.props"
     - "**.sln"
-    - "**/codeql-csharp.yml"
-    - "**/codeql-config.yml"
+    - "**.yml"
   schedule:
   # Once a day at 05:00 UTC
   - cron: '0 5 * * *'
