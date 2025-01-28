@@ -16,13 +16,14 @@ RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.con
 FROM mcr.microsoft.com/dotnet/runtime:9.0-bookworm-slim AS runner
 USER root
 
+# Upgrade internal tools and packages first
+RUN apt update && apt upgrade -y && apt install -y --no-install-recommends iputils-ping libzstd1 && apt autoremove --purge -y && apt clean -y && rm -rf /var/lib/apt/lists/*
+
 # Add environment variables
+ENV PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/libzstd/bin"
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 ENV LC_ALL=en.US.UTF-8
 ENV LANG=en.US.UTF-8
-
-# Upgrade internal tools and packages first
-RUN apt update && apt upgrade -y && apt autoremove -y && apt clean -y && apt install -y --no-install-recommends iputils-ping
 
 # Copy the built app
 WORKDIR /app
