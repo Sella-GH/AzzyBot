@@ -17,7 +17,7 @@ FROM mcr.microsoft.com/dotnet/runtime:9.0-alpine AS runner
 USER root
 
 # Upgrade internal tools and packages first
-RUN apk update && apk upgrade && apk cache sync	&& apk add --no-cache icu-data-full icu-libs iputils-ping sed tzdata libzstd
+RUN apk update && apk upgrade && apk cache sync	&& apk add --no-cache icu-data-full icu-libs iputils-ping sed tzdata zstd-libs
 
 # Add environment variables
 ENV PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/libzstd/bin"
