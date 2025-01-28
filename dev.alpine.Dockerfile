@@ -20,7 +20,7 @@ USER root
 RUN apk update && apk upgrade && apk cache sync	&& apk add --no-cache icu-data-full icu-libs iputils-ping sed tzdata zstd-libs
 
 # Add environment variables
-ENV PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/libzstd/bin"
+ENV PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/zstd/bin"
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 ENV LC_ALL=en.US.UTF-8
 ENV LANG=en.US.UTF-8

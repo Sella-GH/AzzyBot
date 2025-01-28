@@ -101,7 +101,7 @@ jobs:
     runs-on: ubuntu-24.04${{ matrix.arch == 'arm64' && '-arm' || '' }}
     strategy:
       matrix:
-        os: [debian, alpine]
+        os: [debian]
         arch: [amd64, arm64]
 
     steps:
@@ -176,7 +176,7 @@ jobs:
     needs: [extract_meta, docker-build]
     strategy:
       matrix:
-        os: [debian, alpine]
+        os: [debian]
 
     steps:
       - name: Download digests
