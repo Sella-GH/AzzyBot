@@ -16,7 +16,8 @@ on:
     branches-ignore:
     - rel/**
     paths:
-    - "**yml"
+    - "**.props"
+    - "**.yml"
   schedule:
   # once a day at 04:00 UTC
   - cron: '0 4 * * *'
