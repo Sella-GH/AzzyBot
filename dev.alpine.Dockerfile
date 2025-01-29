@@ -17,10 +17,10 @@ FROM mcr.microsoft.com/dotnet/runtime:9.0-alpine AS runner
 USER root
 
 # Upgrade internal tools and packages first
-RUN apk update && apk upgrade && apk cache sync	&& apk add --no-cache icu-data-full icu-libs iputils-ping sed tzdata zstd-libs
+RUN apk update && apk upgrade && apk add --no-cache icu-data-full icu-libs iputils-ping sed tzdata zstd-devs && apk cache sync && rm -rf /var/cache/apk/*
 
 # Add environment variables
-ENV PATH="/usr/local/bin:/usr/bin:/bin:/usr/local/zstd/bin"
+ENV PATH="/usr/local/zstd:${PATH}"
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 ENV LC_ALL=en.US.UTF-8
 ENV LANG=en.US.UTF-8
