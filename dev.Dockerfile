@@ -30,6 +30,7 @@ WORKDIR /app
 COPY --exclude=*.xml --from=build /build/out .
 
 # Add commit, timestamp and lines of code
+RUN cat /app/Modules/Core/Files/AppStats.json
 #ARG COMMIT
 #ARG TIMESTAMP
 #ARG LOC_CS
