@@ -1,3 +1,11 @@
+## 2.4.0
+### General
+- Reduced the size of the Dockerfiles
+
+### Development
+- Moved some stuff out of dockerfiles to github workflow
+- Docker dev versions show stats again
+
 ## 2.3.0 - 2025-01-26
 ### General
 - A new docker compose variable "LOG_LEVEL"
