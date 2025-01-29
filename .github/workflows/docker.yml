@@ -112,6 +112,7 @@ jobs:
 
       - name: Replace values in files
         run: |
+          ls ./
           sed -i "s\Commit not found\\${{ github.sha }}\g" ./AzzyBot/Modules/Core/Files/AppStats.json
           sed -i "s\Compilation date not found\\${{ needs.extract_meta.outputs.datetime }}\g" ./AzzyBot/Modules/Core/Files/AppStats.json
           sed -i "s\Lines of source code not found\\${{ needs.extract_meta.outputs.loc_cs}}\g" ./AzzyBot/Modules/Core/Files/AppStats.json
