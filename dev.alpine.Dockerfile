@@ -17,7 +17,7 @@ FROM mcr.microsoft.com/dotnet/runtime:9.0-alpine AS runner
 USER root
 
 # Upgrade internal tools and packages first
-RUN apk update && apk upgrade && apk add --no-cache icu-data-full icu-libs iputils-ping sed tzdata zstd-dev && apk cache sync && rm -rf /var/cache/apk/*
+RUN apk update && apk upgrade && apk add --no-cache icu-data-full icu-libs iputils-ping tzdata zstd-dev && apk cache sync && rm -rf /var/cache/apk/*
 
 # Add environment variables
 ENV PATH="/usr/local/zstd:${PATH}"
@@ -28,14 +28,6 @@ ENV LANG=en.US.UTF-8
 # Copy the built app
 WORKDIR /app
 COPY --exclude=*.xml --from=build /build/out .
-
-# Add commit, timestamp and lines of code
-ARG COMMIT
-ARG TIMESTAMP
-ARG LOC_CS
-RUN sed -i "s\Commit not found\\$COMMIT\g" /app/Modules/Core/Files/AppStats.json \
-	&& sed -i "s\Compilation date not found\\$TIMESTAMP\g" /app/Modules/Core/Files/AppStats.json \
-	&& sed -i "s\Lines of source code not found\\$LOC_CS\g" /app/Modules/Core/Files/AppStats.json
 
 # Add new user
 RUN adduser -D -H azzy && chown -R azzy:azzy /app && chmod 0755 -R /app
