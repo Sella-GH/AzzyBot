@@ -30,12 +30,12 @@ WORKDIR /app
 COPY --exclude=*.xml --from=build /build/out .
 
 # Add commit, timestamp and lines of code
-ARG COMMIT
-ARG TIMESTAMP
-ARG LOC_CS
-RUN sed -i "s\Commit not found\\$COMMIT\g" /app/Modules/Core/Files/AppStats.json \
-	&& sed -i "s\Compilation date not found\\$TIMESTAMP\g" /app/Modules/Core/Files/AppStats.json \
-	&& sed -i "s\Lines of source code not found\\$LOC_CS\g" /app/Modules/Core/Files/AppStats.json
+#ARG COMMIT
+#ARG TIMESTAMP
+#ARG LOC_CS
+#RUN sed -i "s\Commit not found\\$COMMIT\g" /app/Modules/Core/Files/AppStats.json \
+#	&& sed -i "s\Compilation date not found\\$TIMESTAMP\g" /app/Modules/Core/Files/AppStats.json \
+#	&& sed -i "s\Lines of source code not found\\$LOC_CS\g" /app/Modules/Core/Files/AppStats.json
 
 # Dev Build only: Add empty certificate for local testing
 RUN touch /etc/ssl/certs/azzybot.crt
