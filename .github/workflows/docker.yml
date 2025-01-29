@@ -110,6 +110,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Replace values in files
+        run: |
+          sed -i "s\Commit not found\\${{ github.sha }}\g" ./AzzyBot/AzzyBot/Modules/Core/Files/AppStats.json
+          sed -i "s\Compilation date not found\\${{ needs.extract_meta.outputs.datetime }}\g" ./AzzyBot/AzzyBot/Modules/Core/Files/AppStats.json
+          sed -i "s\Lines of source code not found\\${{ needs.extract_meta.outputs.loc_cs}}\g" /app/Modules/Core/Files/AppStats.json
+
       - name: Log in to Docker Hub
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
         with:
@@ -147,9 +153,6 @@ jobs:
         with:
           build-args: |
             CONFIG=${{ needs.extract_meta.outputs.config }}
-            COMMIT=${{ github.sha }}
-            TIMESTAMP=${{ needs.extract_meta.outputs.datetime }}
-            LOC_CS=${{ needs.extract_meta.outputs.loc_cs }}
           context: .
           file: ${{ matrix.os == 'debian' && needs.extract_meta.outputs.dockerfile || needs.extract_meta.outputs.dockerfile_alpine }}
           labels: ${{ steps.meta.outputs.labels }}
