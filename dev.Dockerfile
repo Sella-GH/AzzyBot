@@ -17,7 +17,7 @@ FROM mcr.microsoft.com/dotnet/runtime:9.0-bookworm-slim AS runner
 USER root
 
 # Upgrade internal tools and packages first
-RUN apt update && apt upgrade -y && apt install -y --no-install-recommends iputils-ping libzstd-dev && apt autoremove --purge -y && apt clean -y && rm -rf /var/lib/apt/lists/*
+RUN apt update && apt upgrade -y && apt install -y --no-install-recommends iputils-ping libzstd1 && apt autoremove --purge -y && apt clean -y && rm -rf /var/lib/apt/lists/*
 
 # Add environment variables
 ENV PATH="/usr/local/zstd:${PATH}"
