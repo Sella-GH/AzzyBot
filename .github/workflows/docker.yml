@@ -115,8 +115,6 @@ jobs:
           sed -i "s\Commit not found\\${{ github.sha }}\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
           sed -i "s\Compilation date not found\\${{ needs.extract_meta.outputs.datetime }}\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
           sed -i "s\Lines of source code not found\\${{ needs.extract_meta.outputs.loc_cs}}\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
-          cat ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
-          chmod 0777 ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
 
       - name: Log in to Docker Hub
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
