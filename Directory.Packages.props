@@ -20,7 +20,7 @@
     <PackageVersion Include="Roslynator.CodeFixes" Version="4.12.11" />
     <PackageVersion Include="Roslynator.Formatting.Analyzers" Version="4.12.11" />
     <PackageVersion Include="Roslynator.Refactorings" Version="4.12.11" />
-    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.5.0.109200" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.6.0.109712" />
     <PackageVersion Include="System.Linq.Async" Version="6.0.1" />
     <PackageVersion Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
