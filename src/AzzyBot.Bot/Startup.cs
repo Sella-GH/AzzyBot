@@ -24,7 +24,6 @@ public static class Startup
 {
     public static async Task Main(string[] args)
     {
-#pragma warning disable RCS0005 // Add blank line before #endregion
         #region Parse arguments
 
 #if DEBUG || RELEASE
@@ -48,8 +47,8 @@ public static class Startup
         if (!skipWaiting)
             await Task.Delay(TimeSpan.FromSeconds(30));
 #endif
+
         #endregion Parse arguments
-#pragma warning restore RCS0005 // Add blank line before #endregion
 
         #region Create host builder
 
