@@ -2,6 +2,14 @@
 ### General
 - Reduced the size of the Dockerfiles
 
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02454
+- Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.13.0
+- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.6.0.109712
+
+### Improvements
+- We now use Zstd compression for DSharpPlus resulting in better compression, performance and less memory usage
+
 ### Development
 - Moved some stuff out of dockerfiles to github workflow
 - Docker dev versions show stats again
