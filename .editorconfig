@@ -395,6 +395,12 @@ dotnet_diagnostic.rcs0060.severity = warning
 ## Add/remove blank line between switch sections
 dotnet_diagnostic.rcs0061.severity = warning
 
+## Put expression body on its own line
+dotnet_diagnostic.rcs0062.severity = warning
+
+## Remove unnecessary blank line
+dotnet_diagnostic.rcs0063.severity = warning
+
 ## Add braces (when expression spans over multiple lines)
 dotnet_diagnostic.rcs1001.severity = warning
 
@@ -453,9 +459,6 @@ dotnet_diagnostic.rcs1033.severity = warning
 
 ## Remove redundant 'sealed' modifier
 dotnet_diagnostic.rcs1034.severity = warning
-
-## Remove unnecessary blank line
-dotnet_diagnostic.rcs1036.severity = warning
 
 ## Remove trailing white-space
 dotnet_diagnostic.rcs1037.severity = warning

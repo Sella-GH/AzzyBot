@@ -37,7 +37,8 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
         ["User-Agent"] = SoftwareStats.GetAppName
     };
 
-    public IReadOnlyDictionary<string, string> GitHubHeaders => _headers;
+    public IReadOnlyDictionary<string, string> GitHubHeaders
+        => _headers;
 
     public async Task CheckForAzzyUpdatesAsync()
     {
