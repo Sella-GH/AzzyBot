@@ -1122,7 +1122,7 @@ public sealed class AzuraCastCommands
                 }
 
                 long threshold = Converter.ConvertToUnixTime(DateTimeOffset.UtcNow.AddMinutes(-stationConfig.RequestThreshold));
-                isPlayed = requestsPlayed.Any(r => (r.Track.SongId == songRequest.Song.SongId || r.Track.UniqueId == songRequest.Song.UniqueId) && r.Timestamp >= threshold);
+                isPlayed = requestsPlayed.Any(r => (r.Track.SongId == songRequest.Song.SongId || r.Track.UniqueId == songRequest.Song.UniqueId) && Converter.ConvertToUnixTime(r.Timestamp) >= threshold);
             }
 
             IEnumerable<AzuraStationQueueItemDetailedRecord>? stationQueue = await _azuraCast.GetStationQueueAsync(baseUrl, apiKey, station);

@@ -1,4 +1,7 @@
 ## 2.4.0
+### Breaking Changes
+- This version is only compatible with the current AzuraCast dev version!
+
 ### General
 - Reduced the size of the Dockerfiles
 
@@ -9,6 +12,7 @@
 
 ### Improvements
 - We now use Zstd compression for DSharpPlus resulting in better compression, performance and less memory usage
+- Adjusted to API changes made in AzuraCast Commit PR [7713](https://github.com/AzuraCast/AzuraCast/pull/7713)
 
 ### Development
 - Moved some stuff out of dockerfiles to github workflow
