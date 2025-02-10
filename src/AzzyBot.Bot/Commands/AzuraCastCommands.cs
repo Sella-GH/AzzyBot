@@ -341,6 +341,82 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync(embed);
         }
 
+        [Command("instance-metrics"), Description("Shows some metrics about the AzuraCast instance."), RequireGuild, ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastOnlineCheck]
+        public async ValueTask GetInstanceMetricsAsync(SlashCommandContext context)
+        {
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
+
+            _logger.CommandRequested(nameof(GetInstanceMetricsAsync), context.User.GlobalName);
+
+            AzuraCastEntity? ac = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
+            if (ac is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
+                return;
+            }
+
+            string apiKey = Crypto.Decrypt(ac.AdminApiKey);
+            string baseUrl = Crypto.Decrypt(ac.BaseUrl);
+        }
+
+        [Command("station-metrics"), Description("Shows some metrics about the selected station."), RequireGuild, ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastOnlineCheck, AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        public async ValueTask GetStationMetricsAsync
+        (
+            SlashCommandContext context,
+            [Description("The station you want to see the metrics of."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
+
+            _logger.CommandRequested(nameof(GetStationMetricsAsync), context.User.GlobalName);
+
+            AzuraCastStationEntity? acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station, loadAzuraCast: true);
+            if (acStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, station);
+                await context.EditResponseAsync(GeneralStrings.StationNotFound);
+                return;
+            }
+
+            string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(acStation.AzuraCast.AdminApiKey);
+            string baseUrl = Crypto.Decrypt(acStation.AzuraCast.BaseUrl);
+
+            AzuraAdminStationConfigRecord? azuraAdminStation = await _azuraCastApi.GetStationAdminConfigAsync(new(baseUrl), apiKey, station);
+            if (azuraAdminStation is null)
+            {
+                await context.EditResponseAsync(GeneralStrings.PermissionIssue);
+                await _botService.SendMessageAsync(acStation.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                return;
+            }
+
+            AzuraStationRecord? azuraStation = await _azuraCastApi.GetStationAsync(new(baseUrl), station);
+            if (azuraStation is null)
+            {
+                await context.EditResponseAsync(GeneralStrings.PermissionIssue);
+                await _botService.SendMessageAsync(acStation.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                return;
+            }
+
+            IEnumerable<AzuraFilesRecord>? files = await _azuraCastApi.GetFilesOnlineAsync<AzuraFilesRecord>(new(baseUrl), apiKey, station);
+            if (files is null)
+            {
+                await context.EditResponseAsync(GeneralStrings.PermissionIssue);
+                await _botService.SendMessageAsync(acStation.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                return;
+            }
+
+            IEnumerable<AzuraPlaylistRecord>? playlists = await _azuraCastApi.GetPlaylistsAsync(new(baseUrl), apiKey, station);
+            if (playlists is null)
+            {
+                await context.EditResponseAsync(GeneralStrings.PermissionIssue);
+                await _botService.SendMessageAsync(acStation.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                return;
+            }
+        }
+
         [Command("start-station"), Description("Start the selected station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
         public async ValueTask StartStationAsync
         (
