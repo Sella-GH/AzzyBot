@@ -104,7 +104,7 @@ public sealed record AzuraTrackRecord
     public required string UniqueId { get; init; }
 
     /// <summary>
-    /// The song's 32-character unique identifier hash
+    /// The request id of the song.
     /// </summary>
     [JsonPropertyName("song_id")]
     public required string SongId { get; init; }
