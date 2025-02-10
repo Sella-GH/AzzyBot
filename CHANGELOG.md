@@ -10,6 +10,9 @@
 ### Improvements
 - We now use Zstd compression for DSharpPlus resulting in better compression, performance and less memory usage
 
+### Fixes
+- Checking if a song was requested already now works exactly as wanted
+
 ### Development
 - Moved some stuff out of dockerfiles to github workflow
 - Docker dev versions show stats again
