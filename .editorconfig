@@ -206,7 +206,7 @@ dotnet_diagnostic.IDE0047.severity = none
 dotnet_diagnostic.IDE0058.severity = none
 
 ## IDE0320: Make anonymous function static
-dotnet_diagnostic.IDE0320.severity = warning
+dotnet_diagnostic.IDE0320.severity = suggestion
 
 # Roslynator
 dotnet_analyzer_diagnostic.category-roslynator.severity = default
@@ -459,6 +459,9 @@ dotnet_diagnostic.rcs1033.severity = warning
 
 ## Remove redundant 'sealed' modifier
 dotnet_diagnostic.rcs1034.severity = warning
+
+## Remove unnecessary blank line
+dotnet_diagnostic.rcs1036.severity = none
 
 ## Remove trailing white-space
 dotnet_diagnostic.rcs1037.severity = warning
