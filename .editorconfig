@@ -206,7 +206,7 @@ dotnet_diagnostic.IDE0047.severity = none
 dotnet_diagnostic.IDE0058.severity = none
 
 ## IDE0320: Make anonymous function static
-dotnet_diagnostic.IDE0320.severity = warning
+dotnet_diagnostic.IDE0320.severity = suggestion
 
 # Roslynator
 dotnet_analyzer_diagnostic.category-roslynator.severity = default
@@ -395,6 +395,12 @@ dotnet_diagnostic.rcs0060.severity = warning
 ## Add/remove blank line between switch sections
 dotnet_diagnostic.rcs0061.severity = warning
 
+## Put expression body on its own line
+dotnet_diagnostic.rcs0062.severity = warning
+
+## Remove unnecessary blank line
+dotnet_diagnostic.rcs0063.severity = warning
+
 ## Add braces (when expression spans over multiple lines)
 dotnet_diagnostic.rcs1001.severity = warning
 
@@ -455,7 +461,7 @@ dotnet_diagnostic.rcs1033.severity = warning
 dotnet_diagnostic.rcs1034.severity = warning
 
 ## Remove unnecessary blank line
-dotnet_diagnostic.rcs1036.severity = warning
+dotnet_diagnostic.rcs1036.severity = none
 
 ## Remove trailing white-space
 dotnet_diagnostic.rcs1037.severity = warning

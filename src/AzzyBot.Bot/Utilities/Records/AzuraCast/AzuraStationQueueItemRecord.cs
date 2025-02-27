@@ -17,7 +17,7 @@ public record AzuraStationQueueItemRecord
     /// Duration of the song in seconds
     /// </summary>
     [JsonPropertyName("duration")]
-    public required int Duration { get; init; }
+    public required double Duration { get; init; }
 
     /// <summary>
     /// Indicates the playlist that the song was played from, if available, or empty string if not.

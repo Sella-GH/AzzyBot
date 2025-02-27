@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 
 using Microsoft.Extensions.Configuration;
 
@@ -9,7 +9,7 @@ public static class IConfigurationManagerExtensions
     public static void AddAppConfiguration(this IConfigurationManager configurationManager, string settingsFile)
     {
         configurationManager.AddJsonFile(settingsFile);
-#if DOCKER || RELEASE
+#if DOCKER_DEBUG || DOCKER || RELEASE
         settingsFile = Path.Combine("Modules", "Core", "Files", "AppStats.json");
 
         configurationManager.AddJsonFile(settingsFile);

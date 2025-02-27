@@ -1,4 +1,28 @@
-## 2.3.0
+## 2.4.0
+### Breaking Changes
+- This version is only compatible with the current AzuraCast dev version!
+
+### General
+- Reduced the size of the Dockerfiles
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02459
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 9.0.2
+- Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.13.0
+- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.6.0.109712
+
+### Improvements
+- We now use Zstd compression for DSharpPlus resulting in better compression, performance and less memory usage
+- Adjusted to API changes made in AzuraCast Commit PR [#7713](https://github.com/AzuraCast/AzuraCast/pull/7713)
+
+### Fixes
+- Checking if a song was requested already now works exactly as wanted
+
+### Development
+- Moved some stuff out of dockerfiles to github workflow
+- Docker dev versions show stats again
+
+## 2.3.0 - 2025-01-26
 ### General
 - A new docker compose variable "LOG_LEVEL"
   - This variable allows you to set the log level of the bot
