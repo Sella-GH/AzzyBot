@@ -1,17 +1,27 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Text;
 using System.Threading.Tasks;
+
+using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Choices;
 using AzzyBot.Bot.Services;
+using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
+using AzzyBot.Data.Entities;
+using AzzyBot.Data.Services;
+
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ArgumentModifiers;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
+
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands;
@@ -20,9 +30,10 @@ namespace AzzyBot.Bot.Commands;
 public sealed class DebugCommands
 {
     [Command("debug"), RequireGuild, RequirePermissions(UserPermissions = [DiscordPermission.Administrator])]
-    public sealed class DebugGroup(WebRequestService webRequestService, ILogger<DebugGroup> logger)
+    public sealed class DebugGroup(ILogger<DebugGroup> logger, DbActions dbActions, WebRequestService webRequestService)
     {
         private readonly ILogger<DebugGroup> _logger = logger;
+        private readonly DbActions _dbActions = dbActions;
         private readonly WebRequestService _webRequestService = webRequestService;
 
         [Command("cluster-logging"), Description("Test the logging file rotation feature of the bot.")]
@@ -43,6 +54,73 @@ public sealed class DebugCommands
             }
 
             await context.EditResponseAsync("Cluster logging test was successful!");
+        }
+
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Debug test")]
+        [Command("database-concurrency"), Description("Test the database concurrency feature of the bot.")]
+        public async ValueTask DebugDatabaseConcurrencyAsync
+        (
+            SlashCommandContext context,
+            [Description("Select the Guild to test the concurrency."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context);
+
+            _logger.CommandRequested(nameof(DebugDatabaseConcurrencyAsync), context.User.GlobalName);
+
+            if (!ulong.TryParse(serverId, out ulong guildIdValue))
+            {
+                await context.RespondAsync(GeneralStrings.GuildIdInvalid);
+                return;
+            }
+
+            await context.DeferResponseAsync();
+
+            StringBuilder sb = new();
+            sb.AppendLine(CultureInfo.InvariantCulture, $"GuildId is {serverId}");
+            sb.AppendLine("Checking if guild exists.");
+
+            GuildEntity? guild = await _dbActions.GetGuildAsync(guildIdValue);
+            if (guild is null)
+            {
+                await context.EditResponseAsync(GeneralStrings.GuildNotFound);
+                return;
+            }
+
+            sb.AppendLine("Guild exists, setting up the test.");
+
+            async Task ChangeGuildValues(GuildEntity guildEntity, int value)
+            {
+                if (value is 1)
+                {
+                    await _dbActions.UpdateGuildAsync(guildEntity.UniqueId, lastPermissionCheck: true);
+                    sb.AppendLine("Changed LastPermissionCheck to true");
+                }
+                else if (value is 2)
+                {
+                    await _dbActions.UpdateGuildAsync(guildEntity.UniqueId, legalsAccepted: true);
+                    sb.AppendLine("Changed LegalsAccepted to true");
+                }
+            }
+
+            IReadOnlyList<Task> tasks = [
+                ChangeGuildValues(guild, 1),
+                ChangeGuildValues(guild, 2)
+            ];
+
+            sb.AppendLine("Starting the concurrency test");
+
+            try
+            {
+                await Task.WhenAll(tasks);
+                sb.AppendLine("Concurrency test was successful!");
+            }
+            catch (Exception ex)
+            {
+                sb.AppendLine(CultureInfo.InvariantCulture, $"Concurrency test failed with the following exception: {ex.Message}");
+            }
+
+            await context.EditResponseAsync(sb.ToString());
         }
 
         [Command("encrypt-decrypt"), Description("Test the encryption and decryption features of the bot.")]

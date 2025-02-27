@@ -1,19 +1,18 @@
-﻿using System.IO;
+using System.IO;
+
 using Microsoft.Extensions.Configuration;
 
 namespace AzzyBot.Bot.Extensions;
 
 public static class IConfigurationManagerExtensions
 {
-    public static void AddAppConfiguration(this IConfigurationManager configurationManager, bool isDev, string settingsFile)
+    public static void AddAppConfiguration(this IConfigurationManager configurationManager, string settingsFile)
     {
         configurationManager.AddJsonFile(settingsFile);
-
-        if (isDev)
-            return;
-
+#if DOCKER_DEBUG || DOCKER || RELEASE
         settingsFile = Path.Combine("Modules", "Core", "Files", "AppStats.json");
 
         configurationManager.AddJsonFile(settingsFile);
+#endif
     }
 }

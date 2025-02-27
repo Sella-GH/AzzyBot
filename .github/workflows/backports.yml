@@ -4,8 +4,8 @@ on:
   issue_comment:
     types: [created]
   schedule:
-    # once a day at 13:00 UTC to cleanup old runs
-    - cron: '0 13 * * *'
+    # once a day at 01:00 UTC to cleanup old runs
+    - cron: '0 1 * * *'
 
 permissions:
   actions: write
@@ -20,4 +20,4 @@ jobs:
       pr_title_template: '[Backport] #%source_pr_number% to %target_branch%'
       pr_description_template: |
         Backport of #%source_pr_number% to %target_branch%
-      repository_owners: Sella-GH
+      repository_owners: ${{ github.repository_owner }}

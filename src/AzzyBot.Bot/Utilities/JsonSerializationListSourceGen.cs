@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
+
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 
 namespace AzzyBot.Bot.Utilities;

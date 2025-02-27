@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+
 using AzzyBot.Data.Settings;
+
 using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Settings.Validators;

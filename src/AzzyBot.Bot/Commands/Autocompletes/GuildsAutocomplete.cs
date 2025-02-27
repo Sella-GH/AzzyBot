@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+
 using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Settings;
+
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
+
 using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;

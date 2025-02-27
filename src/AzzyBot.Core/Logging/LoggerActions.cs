@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net.Http;
+
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Core.Logging;
@@ -68,6 +69,18 @@ public static partial class LoggerActions
     [LoggerMessage(50, LogLevel.Debug, "Expected failure of a {type} request to {uri} with exception name {ex}")]
     public static partial void WebRequestExpectedFailure(this ILogger logger, HttpMethod type, Uri uri, string ex);
 
+    [LoggerMessage(60, LogLevel.Debug, "Entering DbConcurrency handler")]
+    public static partial void DatabaseConcurrencyHandlerEnter(this ILogger logger);
+
+    [LoggerMessage(61, LogLevel.Debug, "Current entry: {entry}")]
+    public static partial void DatabaseConcurrencyEntry(this ILogger logger, string entry);
+
+    [LoggerMessage(62, LogLevel.Debug, "Property: {property}, ClientValue: {clientValue}, DatabaseValue: {dbValue}")]
+    public static partial void DatabaseConcurrencyValues(this ILogger logger, string property, object? clientValue, object? dbValue);
+
+    [LoggerMessage(63, LogLevel.Debug, "Exiting DbConcurrency handler")]
+    public static partial void DatabaseConcurrencyHandlerExit(this ILogger logger);
+
     [LoggerMessage(100, LogLevel.Information, "Starting {name} in version {version} on {os}-{arch} using .NET {dotnet}")]
     public static partial void BotStarting(this ILogger logger, string name, string version, string os, string arch, string dotnet);
 
@@ -101,6 +114,12 @@ public static partial class LoggerActions
     [LoggerMessage(112, LogLevel.Information, "The following guild is unavailable due to an outage: {guild}")]
     public static partial void GuildUnavailable(this ILogger logger, string guild);
 
+    [LoggerMessage(113, LogLevel.Information, "Sent the bot-wide info message to {count} guilds")]
+    public static partial void BotWideMessageSent(this ILogger logger, int count);
+
+    [LoggerMessage(120, LogLevel.Information, "Database concurrency situation resolved.")]
+    public static partial void DatabaseConcurrencyResolved(this ILogger logger);
+
     [LoggerMessage(198, LogLevel.Information, "An update for Azzy is available! Please update now to version: {version} to get the latest fixes and improvements.")]
     public static partial void UpdateAvailable(this ILogger logger, string version);
 
@@ -116,28 +135,31 @@ public static partial class LoggerActions
     [LoggerMessage(202, LogLevel.Warning, "Could not fetch channel for id {id}")]
     public static partial void ChannelNotFound(this ILogger logger, ulong id);
 
-    [LoggerMessage(210, LogLevel.Warning, "Could not find Guild item for guild {guild}")]
+    [LoggerMessage(210, LogLevel.Warning, "Could not find AzzyBot item")]
+    public static partial void DatabaseAzzyBotNotFound(this ILogger logger);
+
+    [LoggerMessage(211, LogLevel.Warning, "Could not find Guild item for guild {guild}")]
     public static partial void DatabaseGuildNotFound(this ILogger logger, ulong guild);
 
-    [LoggerMessage(211, LogLevel.Warning, "Could not find Guild preferences for guild {guild}")]
+    [LoggerMessage(212, LogLevel.Warning, "Could not find Guild preferences for guild {guild}")]
     public static partial void DatabaseGuildPreferencesNotFound(this ILogger logger, ulong guild);
 
-    [LoggerMessage(212, LogLevel.Warning, "Could not find AzuraCast item for guild {guild}")]
+    [LoggerMessage(213, LogLevel.Warning, "Could not find AzuraCast item for guild {guild}")]
     public static partial void DatabaseAzuraCastNotFound(this ILogger logger, ulong guild);
 
-    [LoggerMessage(213, LogLevel.Warning, "Could not find AzuraCast checks for guild {guild} in instance {instance}")]
+    [LoggerMessage(214, LogLevel.Warning, "Could not find AzuraCast checks for guild {guild} in instance {instance}")]
     public static partial void DatabaseAzuraCastChecksNotFound(this ILogger logger, ulong guild, int instance);
 
-    [LoggerMessage(214, LogLevel.Warning, "Could not find AzuraCast preferences for guild {guildId} in instance {instance}")]
+    [LoggerMessage(215, LogLevel.Warning, "Could not find AzuraCast preferences for guild {guildId} in instance {instance}")]
     public static partial void DatabaseAzuraCastPreferencesNotFound(this ILogger logger, ulong guildId, int instance);
 
-    [LoggerMessage(215, LogLevel.Warning, "Could not find AzuraCast station {station} for guild {guild} in instance {instance}")]
+    [LoggerMessage(216, LogLevel.Warning, "Could not find AzuraCast station {station} for guild {guild} in instance {instance}")]
     public static partial void DatabaseAzuraCastStationNotFound(this ILogger logger, ulong guild, int instance, int station);
 
-    [LoggerMessage(216, LogLevel.Warning, "Could not find AzuraCast station checks for guild {guild} in instance {instance} at station {station}")]
+    [LoggerMessage(217, LogLevel.Warning, "Could not find AzuraCast station checks for guild {guild} in instance {instance} at station {station}")]
     public static partial void DatabaseAzuraCastStationChecksNotFound(this ILogger logger, ulong guild, int instance, int station);
 
-    [LoggerMessage(217, LogLevel.Warning, "Could not find AzuraCast station preferences for guild {guild} in instance {instance} at station {station}")]
+    [LoggerMessage(218, LogLevel.Warning, "Could not find AzuraCast station preferences for guild {guild} in instance {instance} at station {station}")]
     public static partial void DatabaseAzuraCastStationPreferencesNotFound(this ILogger logger, ulong guild, int instance, int station);
 
     [LoggerMessage(220, LogLevel.Warning, "Could not find discord item {item} for guild {guild}")]
@@ -148,6 +170,9 @@ public static partial class LoggerActions
 
     [LoggerMessage(230, LogLevel.Warning, "Bot is ratelimited on uri: {uri} retrying in {time} seconds")]
     public static partial void BotRatelimited(this ILogger logger, Uri uri, int time);
+
+    [LoggerMessage(240, LogLevel.Warning, "Database concurrency exception occured: ")]
+    public static partial void DatabaseConcurrencyException(this ILogger logger, Exception ex);
 
     [LoggerMessage(290, LogLevel.Warning, "Latest online version of the bot is empty")]
     public static partial void OnlineVersionEmpty(this ILogger logger);

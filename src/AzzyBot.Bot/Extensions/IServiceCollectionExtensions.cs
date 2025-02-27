@@ -1,4 +1,5 @@
 using System;
+
 using AzzyBot.Bot.Commands;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Converters;
@@ -11,6 +12,7 @@ using AzzyBot.Bot.Settings.Validators;
 using AzzyBot.Core.Utilities.Records;
 using AzzyBot.Data.Extensions;
 using AzzyBot.Data.Settings;
+
 using DSharpPlus;
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.Processors.SlashCommands;
@@ -19,16 +21,19 @@ using DSharpPlus.Extensions;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Enums;
 using DSharpPlus.Interactivity.Extensions;
+
 using Lavalink4NET.Extensions;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+
 using NCronJob;
 
 namespace AzzyBot.Bot.Extensions;
 
 public static class IServiceCollectionExtensions
 {
-    public static void AzzyBotServices(this IServiceCollection services, bool isDev, bool isDocker, int logDays = 7)
+    public static void AzzyBotServices(this IServiceCollection services, int logDays = 7)
     {
         IServiceProvider serviceProvider = services.BuildServiceProvider();
         DatabaseSettings dbSettings = serviceProvider.GetRequiredService<IOptions<DatabaseSettings>>().Value;
@@ -40,7 +45,7 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<CoreServiceHost>().AddHostedService(static s => s.GetRequiredService<CoreServiceHost>());
 
         // Register the database services
-        services.AzzyBotDataServices(isDev, dbSettings.EncryptionKey, dbSettings.Host, dbSettings.Port, dbSettings.User, dbSettings.Password, dbSettings.DatabaseName);
+        services.AzzyBotDataServices(dbSettings.EncryptionKey, dbSettings.Host, dbSettings.Port, dbSettings.User, dbSettings.Password, dbSettings.DatabaseName);
 
         services.DiscordClient(botSettings.BotToken);
         services.DiscordClientCommands(botSettings);
@@ -60,14 +65,18 @@ public static class IServiceCollectionExtensions
         {
             o.AddJob<AzuraRequestJob>();
             o.AddJob<AzzyBotGlobalChecksJob>(j => j.WithCronExpression("*/15 * * * *").WithName(nameof(AzzyBotGlobalChecksJob))); // Every 15 minutes
-            o.AddJob<LogfileCleaningJob>(j => j.WithCronExpression("0 0 */1 * *").WithName(nameof(LogfileCleaningJob)).WithParameter(logDays)); // Every day
+            o.AddJob<LogfileCleaningJob>(j => j.WithCronExpression("0 0 */1 * *").WithName(nameof(LogfileCleaningJob)).WithParameter(logDays)).RunAtStartup(); // Every day
         });
         services.AddSingleton<CronJobManager>();
 
         services.AddLavalink();
         services.ConfigureLavalink(config =>
         {
-            Uri baseAddress = (isDocker) ? new("http://AzzyBot-Ms:2333") : new("http://localhost:2333");
+#if DOCKER || DOCKER_DEBUG
+            Uri baseAddress = new("http://AzzyBot-Ms:2333");
+#else
+            Uri baseAddress = new("http://localhost:2333");
+#endif
             if (musicSettings is not null)
             {
                 if (!string.IsNullOrWhiteSpace(musicSettings.LavalinkHost) && musicSettings.LavalinkPort is not 0)
@@ -80,7 +89,11 @@ public static class IServiceCollectionExtensions
                 }
                 else if (string.IsNullOrWhiteSpace(musicSettings.LavalinkHost) && musicSettings.LavalinkPort is not 0)
                 {
-                    baseAddress = (isDocker) ? new($"http://AzzyBot-Ms:{musicSettings.LavalinkPort}") : new($"http://localhost:{musicSettings.LavalinkPort}");
+#if DOCKER || DOCKER_DEBUG
+                    baseAddress = new($"http://AzzyBot-Ms:{musicSettings.LavalinkPort}");
+#else
+                    baseAddress = new($"http://localhost:{musicSettings.LavalinkPort}");
+#endif
                 }
 
                 if (!string.IsNullOrWhiteSpace(musicSettings.LavalinkPassword))

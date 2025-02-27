@@ -4,15 +4,13 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+
 using AzzyBot.Core.Utilities.Records;
 
 namespace AzzyBot.Core.Utilities;
 
 public static class HardwareStats
 {
-    public static bool CheckIfDocker
-        => Environment.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER", EnvironmentVariableTarget.Process) is "true";
-
     public static bool CheckIfLinuxOs
         => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 

@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Choices;
@@ -17,13 +18,16 @@ using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
+
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
+
 using Lavalink4NET.Players;
 using Lavalink4NET.Tracks;
+
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands;
@@ -86,11 +90,10 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
             ArgumentNullException.ThrowIfNull(context.Member);
-            ArgumentNullException.ThrowIfNull(context.Member.VoiceState);
 
             _logger.CommandRequested(nameof(JoinAsync), context.User.GlobalName);
 
-            if (context.Member.VoiceState.Channel is null)
+            if (context.Member.VoiceState?.Channel is null)
             {
                 await context.EditResponseAsync(GeneralStrings.VoiceNoUser);
                 return;
@@ -177,7 +180,7 @@ public sealed class MusicStreamingCommands
             SlashCommandContext context,
             [Description("The provider you want to search for."), SlashChoiceProvider<MusicStreamingPlatformProvider>] string provider,
             [Description("The url of the track you want to play.")] string track,
-            [Description("The volume which should be set. This is only respected when no music is being played.")] int volume = 100
+            [Description("The volume which should be set. This is only respected when no music is being played.")] int volume = 50
         )
         {
             ArgumentNullException.ThrowIfNull(context);

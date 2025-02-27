@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace AzzyBot.Data.Entities;
 
@@ -50,6 +51,12 @@ public sealed class AzuraCastChecksEntity
     /// Always use <see cref="DateTimeOffset.UtcNow"/> to set this value.
     /// </remarks>
     public DateTimeOffset LastUpdateCheck { get; set; }
+
+    /// <summary>
+    /// The concurrency token for optimistic concurrency checks.
+    /// </summary>
+    [Timestamp]
+    public uint Version { get; set; }
 
     /// <summary>
     /// The database id of the parenting <see cref="AzuraCastEntity"/> database item.

@@ -106,6 +106,15 @@ namespace AzzyBot.Bot.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://discord.gg/8j6kRAJ5AY.
+        /// </summary>
+        internal static string DiscordSupportServer {
+            get {
+                return ResourceManager.GetString("DiscordSupportServer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://api.ipify.org.
         /// </summary>
         internal static string GetIpv4Uri {

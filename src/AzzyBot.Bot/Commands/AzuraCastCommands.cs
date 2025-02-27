@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Choices;
@@ -25,6 +26,7 @@ using AzzyBot.Core.Utilities.Enums;
 using AzzyBot.Core.Utilities.Helpers;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
+
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
@@ -33,6 +35,7 @@ using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Extensions;
+
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands;
@@ -40,7 +43,7 @@ namespace AzzyBot.Bot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class AzuraCastCommands
 {
-    [Command("azuracast"), RequireGuild, RequirePermissions(UserPermissions = [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast]), AzuraCastOnlineCheck]
+    [Command("azuracast"), RequireGuild, RequirePermissions(UserPermissions = [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast])]
     public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, DbActions dbActions, DiscordBotService botService, MusicStreamingService musicStreaming)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
@@ -52,13 +55,13 @@ public sealed class AzuraCastCommands
         private readonly DiscordBotService _botService = botService;
         private readonly MusicStreamingService _musicStreaming = musicStreaming;
 
-        [Command("export-playlists"), Description("Export all playlists from the selected AzuraCast station into a zip file."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("export-playlists"), Description("Export all playlists from the selected AzuraCast station into a zip file."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
         public async ValueTask ExportPlaylistsAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to export the playlists."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
-            [Description("Choose if you want to export the playlist in M3U or PLS format."), SlashChoiceProvider(typeof(AzuraExportPlaylistProvider))] string format,
-            [Description("Select the playlist you want to export."), SlashAutoCompleteProvider(typeof(AzuraCastPlaylistAutocomplete))] int? userPlaylist = null
+            [Description("The station of which you want to export the playlists."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("Choose if you want to export the playlist in M3U or PLS format."), SlashChoiceProvider<AzuraExportPlaylistProvider>] string format,
+            [Description("Select the playlist you want to export."), SlashAutoCompleteProvider<AzuraCastPlaylistAutocomplete>] int? userPlaylist = null
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -126,7 +129,7 @@ public sealed class AzuraCastCommands
             await FileOperations.CreateZipFileAsync(zFileName, _azuraCastApi.FilePath, tempDir);
             filePaths.Add(Path.Combine(_azuraCastApi.FilePath, zFileName));
 
-            await using FileStream fileStream = new(Path.Combine(_azuraCastApi.FilePath, zFileName), FileMode.Open, FileAccess.Read);
+            await using FileStream fileStream = new(Path.Combine(_azuraCastApi.FilePath, zFileName), FileMode.Open, FileAccess.Read, FileShare.None);
             await using DiscordMessageBuilder builder = new();
             AzuraStationRecord? azuraStation = await _azuraCastApi.GetStationAsync(new(baseUrl), station);
             if (azuraStation is null)
@@ -143,11 +146,11 @@ public sealed class AzuraCastCommands
             FileOperations.DeleteFiles(filePaths);
         }
 
-        [Command("force-api-permission-check"), Description("Force the bot to check if the entered api key has access to all required permissions."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("force-api-permission-check"), Description("Force the bot to check if the entered api key has access to all required permissions."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
         public async ValueTask ForceApiPermissionCheckAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to check the api key."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int? station = null
+            [Description("The station of which you want to check the api key."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int? station = null
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -183,11 +186,11 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync("I initiated the permission check.\nThere won't be another message if your permissions are set correctly.");
         }
 
-        [Command("force-cache-refresh"), Description("Force the bot to refresh it's local song cache for a specific station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("force-cache-refresh"), Description("Force the bot to refresh its local song cache for a specific station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
         public async ValueTask ForceCacheRefreshAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to refresh the cache."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int? station = null
+            [Description("The station of which you want to refresh the cache."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int? station = null
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -246,7 +249,7 @@ public sealed class AzuraCastCommands
             await _azuraCastPing.PingInstanceAsync(dAzuraCast);
         }
 
-        [Command("force-update-check"), Description("Force the bot to search for AzuraCast Updates."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("force-update-check"), Description("Force the bot to search for AzuraCast Updates."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
         public async ValueTask ForceUpdateCheckAsync(SlashCommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -266,11 +269,11 @@ public sealed class AzuraCastCommands
             await _azuraCastUpdate.CheckForAzuraCastUpdatesAsync(dAzuraCast, true);
         }
 
-        [Command("get-system-logs"), Description("Get the system logs of the AzuraCast instance."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("get-system-logs"), Description("Get the system logs of the AzuraCast instance."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
         public async ValueTask GetSystemLogsAsync
         (
             SlashCommandContext context,
-            [Description("The system log you want to see."), SlashAutoCompleteProvider(typeof(AzuraCastSystemLogAutocomplete))] string logName
+            [Description("The system log you want to see."), SlashAutoCompleteProvider<AzuraCastSystemLogAutocomplete>] string logName
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -297,7 +300,7 @@ public sealed class AzuraCastCommands
 
             string fileName = $"{ac.Id}_{logName}_{DateTimeOffset.Now:yyyy-MM-dd_hh-mm-ss-fffffff}.log";
             string filePath = await FileOperations.CreateTempFileAsync(systemLog.Content, fileName);
-            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
+            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             await using DiscordMessageBuilder builder = new();
             builder.WithContent($"Here is the requested system log ({logName}).");
             builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
@@ -338,11 +341,11 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync(embed);
         }
 
-        [Command("start-station"), Description("Start the selected station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("start-station"), Description("Start the selected station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
         public async ValueTask StartStationAsync
         (
             SlashCommandContext context,
-            [Description("The station you want to start."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station
+            [Description("The station you want to start."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -382,11 +385,11 @@ public sealed class AzuraCastCommands
             await context.FollowupAsync($"I started the station **{azuraStation.Name}**.");
         }
 
-        [Command("stop-station"), Description("Stop the selected station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("stop-station"), Description("Stop the selected station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
         public async ValueTask StopStationAsync
         (
             SlashCommandContext context,
-            [Description("The station you want to stop."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station
+            [Description("The station you want to stop."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -447,11 +450,11 @@ public sealed class AzuraCastCommands
             }
         }
 
-        [Command("toggle-song-requests"), Description("Enable or disable song requests for the selected station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("toggle-song-requests"), Description("Enable or disable song requests for the selected station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
         public async ValueTask ToggleSongRequestsAsync
         (
             SlashCommandContext context,
-            [Description("The station you want to toggle song requests for."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station
+            [Description("The station you want to toggle song requests for."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -492,7 +495,7 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync($"I {Misc.GetReadableBool(stationConfig.EnableRequests, ReadableBool.EnabledDisabled, true)} song requests for station **{stationConfig.Name}**.");
         }
 
-        [Command("update-instance"), Description("Update the AzuraCast instance to the latest version."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
+        [Command("update-instance"), Description("Update the AzuraCast instance to the latest version."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
         public async ValueTask UpdateInstanceAsync(SlashCommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -565,8 +568,8 @@ public sealed class AzuraCastCommands
         public async ValueTask AddInternalSongRequestAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to add the song request."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
-            [Description("The song you want to request."), SlashAutoCompleteProvider(typeof(AzuraCastRequestAutocomplete))] string song
+            [Description("The station of which you want to add the song request."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("The song you want to request."), SlashAutoCompleteProvider<AzuraCastRequestAutocomplete>] string song
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -640,8 +643,8 @@ public sealed class AzuraCastCommands
         public async ValueTask DeleteSongRequestAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to delete the song request."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
-            [Description("The request id of the song you want to delete."), SlashAutoCompleteProvider(typeof(AzuraCastRequestAutocomplete))] int requestId = 0
+            [Description("The station of which you want to delete the song request."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("The request id of the song you want to delete."), SlashAutoCompleteProvider<AzuraCastRequestAutocomplete>] int requestId = 0
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -683,7 +686,7 @@ public sealed class AzuraCastCommands
         public async ValueTask SkipSongAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to skip the song."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station
+            [Description("The station of which you want to skip the song."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -740,8 +743,8 @@ public sealed class AzuraCastCommands
         public async ValueTask SwitchPlaylistAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to switch the playlist."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
-            [Description("The playlist you want to switch to."), SlashAutoCompleteProvider(typeof(AzuraCastPlaylistAutocomplete))] int playlistId,
+            [Description("The station of which you want to switch the playlist."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("The playlist you want to switch to."), SlashAutoCompleteProvider<AzuraCastPlaylistAutocomplete>] int playlistId,
             [Description("Choose if you want to disable all other active playlists from the station. Defaults to Yes."), SlashChoiceProvider<BooleanYesNoStateProvider>] int removeOld = 0
         )
         {
@@ -809,7 +812,7 @@ public sealed class AzuraCastCommands
         public async ValueTask GetSongHistoryAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to see the song history."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
+            [Description("The station of which you want to see the song history."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
             [Description("The date of which you want to see the song history in the format YYYY-MM-DD.")] string? date = null
         )
         {
@@ -872,10 +875,10 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            IEnumerable<AzuraStationHistoryExportRecord> exportHistory = history.Select(h => new AzuraStationHistoryExportRecord() { Date = dateString, PlayedAt = Converter.ConvertFromUnixTime(h.PlayedAt), Song = h.Song, SongRequest = h.IsRequest, Streamer = h.Streamer, Playlist = h.Playlist }).Reverse().ToList();
+            IEnumerable<AzuraStationHistoryExportRecord> exportHistory = [.. history.Select(h => new AzuraStationHistoryExportRecord() { Date = dateString, PlayedAt = Converter.ConvertFromUnixTime(h.PlayedAt), Song = h.Song, SongRequest = h.IsRequest, Streamer = h.Streamer, Playlist = h.Playlist }).Reverse()];
             string fileName = $"{ac.GuildId}-{ac.Id}-{acStation.Id}-{acStation.StationId}_SongHistory_{dateStringFile}.csv";
             string filePath = await FileOperations.CreateCsvFileAsync(exportHistory, fileName);
-            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
+            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             await using DiscordMessageBuilder builder = new();
             builder.WithContent($"Here is the song history for station **{azuraStation.Name}** on **{dateString}**.");
             builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
@@ -888,8 +891,8 @@ public sealed class AzuraCastCommands
         public async ValueTask GetSongsInPlaylistAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to see the songs in the playlist."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
-            [Description("The playlist you want to see the songs from."), SlashAutoCompleteProvider(typeof(AzuraCastPlaylistAutocomplete))] int playlistId
+            [Description("The station of which you want to see the songs in the playlist."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("The playlist you want to see the songs from."), SlashAutoCompleteProvider<AzuraCastPlaylistAutocomplete>] int playlistId
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -949,7 +952,7 @@ public sealed class AzuraCastCommands
 
             string fileName = $"{ac.GuildId}-{ac.Id}-{acStation.Id}-{acStation.StationId}_PlaylistSongs_{playlist.ShortName}.csv";
             string filePath = await FileOperations.CreateCsvFileAsync(songs, fileName);
-            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read);
+            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             await using DiscordMessageBuilder builder = new();
             builder.WithContent($"Here are the songs in playlist **{playlist.Name}**.");
             builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
@@ -962,7 +965,7 @@ public sealed class AzuraCastCommands
         public async ValueTask GetNowPlayingAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to see what's played."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station
+            [Description("The station of which you want to see what's played."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -1025,8 +1028,8 @@ public sealed class AzuraCastCommands
         public async ValueTask SearchSongAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to search for a song."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
-            [Description("The song you want to search for."), SlashAutoCompleteProvider(typeof(AzuraCastRequestAutocomplete))] string song
+            [Description("The station of which you want to search for a song."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("The song you want to search for."), SlashAutoCompleteProvider<AzuraCastRequestAutocomplete>] string song
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -1119,7 +1122,7 @@ public sealed class AzuraCastCommands
                 }
 
                 long threshold = Converter.ConvertToUnixTime(DateTimeOffset.UtcNow.AddMinutes(-stationConfig.RequestThreshold));
-                isPlayed = requestsPlayed.Any(r => (r.Track.SongId == songRequest.Song.SongId || r.Track.UniqueId == songRequest.Song.UniqueId) && r.Timestamp >= threshold);
+                isPlayed = requestsPlayed.Any(r => (r.Track.SongId == songRequest.Song.SongId || r.Track.UniqueId == songRequest.Song.UniqueId) && Converter.ConvertToUnixTime(r.Timestamp) >= threshold);
             }
 
             IEnumerable<AzuraStationQueueItemDetailedRecord>? stationQueue = await _azuraCast.GetStationQueueAsync(baseUrl, apiKey, station);
@@ -1132,7 +1135,7 @@ public sealed class AzuraCastCommands
             }
 
             isQueued = stationQueue.Any(q => q.Song.SongId == songRequest.Song.SongId && q.Song.UniqueId == songRequest.Song.UniqueId);
-            isRequested = requestsPending.Any(r => r.Track.SongId == songRequest.Song.SongId && r.Track.UniqueId == songRequest.Song.UniqueId);
+            isRequested = requestsPending.Any(r => r.Track.SongId == songRequest.Song.SongId && r.Track.UniqueId == songRequest.RequestId); // Need to use RequestId because those are the same... dunno why
 
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicSearchSongEmbed(songRequest, isQueued || isRequested, isPlayed);
             if (!stationConfig.IsEnabled || !stationConfig.EnableRequests || isQueued || isRequested || isPlayed)
@@ -1170,19 +1173,21 @@ public sealed class AzuraCastCommands
         public async ValueTask UploadFilesAsync
         (
             SlashCommandContext context,
-            [Description("The station you want to upload the file to."), SlashAutoCompleteProvider(typeof(AzuraCastStationsAutocomplete))] int station,
+            [Description("The station you want to upload the file to."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
             [Description("The file you want to upload.")] DiscordAttachment file
         )
         {
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
-            ArgumentNullException.ThrowIfNull(file);
-            ArgumentException.ThrowIfNullOrWhiteSpace(file.FileName);
-            ArgumentException.ThrowIfNullOrWhiteSpace(file.Url);
 
             _logger.CommandRequested(nameof(UploadFilesAsync), context.User.GlobalName);
 
-            if (file.FileSize > FileSizes.AzuraFileSize)
+            if (file is null || string.IsNullOrWhiteSpace(file.FileName) || string.IsNullOrWhiteSpace(file.Url))
+            {
+                await context.EditResponseAsync(GeneralStrings.FileNotFound);
+                return;
+            }
+            else if (file.FileSize > FileSizes.AzuraFileSize)
             {
                 await context.EditResponseAsync(GeneralStrings.FileTooBig);
                 return;

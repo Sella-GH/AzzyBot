@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using AzzyBot.Bot.Utilities.Records;
+
 using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
 
@@ -53,7 +55,7 @@ public static class AzzyHelp
         foreach (string group in commandGroups)
         {
             Command command = commands[group];
-            List<AzzyHelpRecord> subCommands = GetCommands(command.Subcommands.Where(static c => c.Description is not "No description provided.").ToList(), command.Name, singleCommand);
+            List<AzzyHelpRecord> subCommands = GetCommands([.. command.Subcommands.Where(static c => c.Description is not "No description provided.")], command.Name, singleCommand);
             foreach (Command subCommand in command.Subcommands.Where(static c => c.Subcommands.Count > 0))
             {
                 subCommands.AddRange(GetCommands(subCommand.Subcommands, command.Name, singleCommand));

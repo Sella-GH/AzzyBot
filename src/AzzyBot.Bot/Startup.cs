@@ -1,13 +1,22 @@
 ﻿using System;
+#if DOCKER_DEBUG || DOCKER
 using System.Globalization;
+#endif
 using System.IO;
+#if DEBUG || RELEASE
 using System.Linq;
+#endif
 using System.Threading.Tasks;
+
 using AzzyBot.Bot.Extensions;
 using AzzyBot.Core.Extensions;
 using AzzyBot.Core.Utilities;
+
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+
+using NCronJob;
 
 namespace AzzyBot.Bot;
 
@@ -15,39 +24,66 @@ public static class Startup
 {
     public static async Task Main(string[] args)
     {
-        string environment = SoftwareStats.GetAppEnvironment;
-        bool isDev = environment == Environments.Development;
-        bool isDocker = HardwareStats.CheckIfDocker;
-        bool forceDebug = (isDocker) ? (Environment.GetEnvironmentVariable("FORCE_DEBUG") is "true") : (args?.Length > 0 && args.Contains("-forceDebug"));
-        bool forceTrace = (isDocker) ? (Environment.GetEnvironmentVariable("FORCE_TRACE") is "true") : (args?.Length > 0 && args.Contains("-forceTrace"));
-        bool SkipWaiting = (isDocker) ? (Environment.GetEnvironmentVariable("SKIP_WAITING") is "true") : (args?.Length > 0 && args.Contains("-skipWaiting"));
+        #region Parse arguments
+
+#if DEBUG || RELEASE
+        string? logLevelArg = args?.FirstOrDefault(static a => a.StartsWith("-LogLevel", StringComparison.OrdinalIgnoreCase))?.Split('=')[1];
+#endif
+
+#if DEBUG
+        LogLevel logLevel = Enum.Parse<LogLevel>(logLevelArg ?? "Debug", true);
+#elif RELEASE
+        LogLevel logLevel = Enum.Parse<LogLevel>(logLevelArg ?? "Information", true);
+#endif
+
+#if DEBUG || RELEASE
+        const int logDays = 7;
+#else
+        bool skipWaiting = Environment.GetEnvironmentVariable("SKIP_WAITING") is "true";
+        LogLevel logLevel = Enum.Parse<LogLevel>(Environment.GetEnvironmentVariable("LOG_LEVEL") ?? "Information", true);
         int logDays = int.Parse(Environment.GetEnvironmentVariable("LOG_RETENTION_DAYS") ?? "7", NumberStyles.Integer, CultureInfo.InvariantCulture);
 
-        if (isDocker && !SkipWaiting)
-        {
-            // Give the database time to start up
+        // Give the database time to start up
+        if (!skipWaiting)
             await Task.Delay(TimeSpan.FromSeconds(30));
-        }
+#endif
+
+        #endregion Parse arguments
+
+        #region Create host builder
 
         HostApplicationBuilderSettings appSettings = new()
         {
             ContentRootPath = Directory.GetCurrentDirectory(),
-            EnvironmentName = (isDev) ? Environments.Development : Environments.Production
+#if DEBUG || DOCKER_DEBUG
+            EnvironmentName = Environments.Development
+#else
+            EnvironmentName = Environments.Production
+#endif
         };
 
         HostApplicationBuilder appBuilder = Host.CreateEmptyApplicationBuilder(appSettings);
 
+        #endregion Create host builder
+
         #region Add logging
 
-        appBuilder.Logging.AzzyBotLogging(isDev, forceDebug, forceTrace);
+        appBuilder.Logging.AzzyBotLogging(logLevel);
 
         #endregion Add logging
 
         #region Add configuration
 
-        string settingsFilePath = Path.Combine("Settings", GetAppSettingsPath(isDev, isDocker));
+#if DEBUG || DOCKER_DEBUG
+        const string settingsFile = "AzzyBotSettings-Dev.json";
+#elif DOCKER
+        const string settingsFile = "AzzyBotSettings-Docker.json";
+#else
+        const string settingsFile = "AzzyBotSettings.json";
+#endif
+        string settingsFilePath = Path.Combine("Settings", settingsFile);
 
-        appBuilder.Configuration.AddAppConfiguration(isDev, settingsFilePath);
+        appBuilder.Configuration.AddAppConfiguration(settingsFilePath);
 
         #endregion Add configuration
 
@@ -56,7 +92,7 @@ public static class Startup
         try
         {
             appBuilder.Services.AddAppSettings(settingsFilePath);
-            appBuilder.Services.AzzyBotServices(isDev, isDocker, logDays);
+            appBuilder.Services.AzzyBotServices(logDays);
         }
         catch (OptionsValidationException ex)
         {
@@ -71,21 +107,7 @@ public static class Startup
 
         using IHost app = appBuilder.Build();
         app.ApplyDbMigrations();
-        await app.StartAsync();
-        await app.WaitForShutdownAsync();
-    }
-
-    private static string GetAppSettingsPath(bool isDev, bool isDocker)
-    {
-        if (isDev)
-        {
-            return "AzzyBotSettings-Dev.json";
-        }
-        else if (isDocker)
-        {
-            return "AzzyBotSettings-Docker.json";
-        }
-
-        return "AzzyBotSettings.json";
+        await app.UseNCronJobAsync();
+        await app.RunAsync();
     }
 }

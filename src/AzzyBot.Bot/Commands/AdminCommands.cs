@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Choices;
 using AzzyBot.Bot.Services;
@@ -17,12 +18,14 @@ using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
+
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ArgumentModifiers;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
+
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -243,7 +246,7 @@ public sealed class AdminCommands
                 logfile = FileOperations.GetFilesInDirectory("Logs", true).First();
             }
 
-            await using FileStream fileStream = new(logfile, FileMode.Open, FileAccess.Read);
+            await using FileStream fileStream = new(logfile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             await using DiscordMessageBuilder builder = new();
             builder.WithContent($"Here are the logs from **{dateTime}**.");
             builder.AddFile($"{dateTime}.log", fileStream);
@@ -252,7 +255,7 @@ public sealed class AdminCommands
 
         private async ValueTask SendMessageAsync(IReadOnlyDictionary<ulong, DiscordGuild> guilds, string message)
         {
-            const string dmAddition = "You receive this message directly because you haven't provided a notification channel in your server.";
+            const string dmAddition = "\n\nYou receive this message directly because you haven't provided a notification channel in your server.";
             string newMessage = message.Replace("\\n", Environment.NewLine, StringComparison.OrdinalIgnoreCase);
             IReadOnlyList<GuildEntity> dbGuilds = await _dbActions.GetGuildsAsync(loadGuildPrefs: true);
             foreach (DiscordGuild guild in guilds.Values)
@@ -264,6 +267,8 @@ public sealed class AdminCommands
                     continue;
                 }
 
+                // If there is a notification channel set we use that
+                // Otherwise we send a DM to the owner
                 if (guildEntity.ConfigSet && guildEntity.Preferences.AdminNotifyChannelId is not 0)
                 {
                     await _botService.SendMessageAsync(guildEntity.Preferences.AdminNotifyChannelId, newMessage);
@@ -273,13 +278,13 @@ public sealed class AdminCommands
                     DiscordMember owner = await guild.GetGuildOwnerAsync();
                     string ownerMessage = newMessage;
                     if (newMessage.Length < 2000 - dmAddition.Length)
-                    {
                         ownerMessage += dmAddition;
-                    }
 
                     await owner.SendMessageAsync(ownerMessage);
                 }
             }
+
+            _logger.BotWideMessageSent(guilds.Count);
         }
     }
 }

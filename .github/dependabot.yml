@@ -6,7 +6,7 @@
 version: 2
 updates:
   - package-ecosystem: "github-actions" # See documentation for possible values
-    directory: "/.github" # Location of package manifests
+    directory: "/.github/workflows" # Location of package manifests
     schedule:
       interval: "daily"
     assignees:
@@ -17,23 +17,6 @@ updates:
     labels:
       - "area-ci"
       - "area-dependencies"
-    groups:
-      GitHub:
-        applies-to: version-updates
-        patterns:
-        - "actions*"
-        update-types:
-        - "major"
-        - "minor"
-        - "patch"
-      Non-GitHub:
-        applies-to: version-updates
-        exclude-patterns:
-        - "actions*"
-        update-types:
-        - "major"
-        - "minor"
-        - "patch"
 
   - package-ecosystem: "nuget" # See documentation for possible values
     directory: "/" # Location of package manifests

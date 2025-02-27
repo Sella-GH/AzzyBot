@@ -7,6 +7,7 @@ using System.Security;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Settings;
@@ -17,6 +18,7 @@ using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Helpers;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
+
 using DSharpPlus;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Exceptions;
@@ -24,6 +26,8 @@ using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Trees;
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
+
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -35,8 +39,6 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
     private readonly AzzyBotSettings _settings = settings.Value;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordClient _client = client;
-    private const string BugReportMessage = "Send a [bug report]([BugReportUri]) to help us fixing this issue!\nPlease include a screenshot of this exception embed and the attached StackTrace file.\nYour Contribution is very welcome.";
-    private const string ErrorChannelNotConfigured = $"**If you're seeing this message then I am not configured correctly!**\nTell your server admin to run */config modify-core*\n\n{BugReportMessage}";
 
     private bool CheckIfClientIsConnected
         => _client.AllShardsConnected;
@@ -125,9 +127,6 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
 
             if (guild.Preferences.AdminNotifyChannelId is not 0)
                 channels.Add(guild.Preferences.AdminNotifyChannelId);
-
-            if (guild.Preferences.ErrorChannelId is not 0)
-                channels.Add(guild.Preferences.ErrorChannelId);
 
             if (guild.AzuraCast is not null)
             {
@@ -231,74 +230,40 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         return member;
     }
 
-    public async Task<bool> LogExceptionAsync(Exception ex, DateTimeOffset timestamp, SlashCommandContext? ctx = null, ulong guildId = 0, string? info = null)
+    public async Task<bool> LogExceptionAsync(Exception ex, DateTimeOffset timestamp, SlashCommandContext? ctx = null, string? info = null)
     {
         ArgumentNullException.ThrowIfNull(ex);
 
         _logger.ExceptionOccured(ex);
 
-        string timestampString = timestamp.ToString("yyyy-MM-dd_HH-mm-ss-fffffff", CultureInfo.InvariantCulture);
-        ulong errorChannelId = _settings.ErrorChannelId;
-        bool errorChannelConfigured = true;
-
-        //
-        // Checks if the guild is the main guild
-        // If not look if the guild has an error channel set
-        // Otherwise it will use the first channel it can see
-        // However if nothing is present, send to debug server
-        // If there's no guild, take the current channel
-        //
-
-        if (guildId != _settings.ServerId && guildId is not 0)
-        {
-            GuildPreferencesEntity? guildPrefs = await _dbActions.GetGuildPreferencesAsync(guildId);
-            if (guildPrefs is null)
-            {
-                _logger.DatabaseGuildPreferencesNotFound(guildId);
-                return false;
-            }
-
-            if (guildPrefs.ErrorChannelId is not 0)
-                errorChannelId = guildPrefs.ErrorChannelId;
-
-            if (errorChannelId == _settings.ErrorChannelId)
-            {
-                DiscordChannel? dChannel = await GetFirstDiscordChannelAsync(guildId);
-                if (dChannel is null)
-                {
-                    _logger.DiscordItemNotFound(nameof(DiscordChannel), guildId);
-                    return false;
-                }
-
-                errorChannelId = dChannel.Id;
-                errorChannelConfigured = false;
-            }
-        }
-
         // Handle the special case when it's a command exception
+        string timestampString = timestamp.ToString("yyyy-MM-dd HH:mm:ss:fffffff", CultureInfo.InvariantCulture);
         DiscordEmbed embed;
         if (ctx is not null)
         {
             DiscordMessage? discordMessage = await AcknowledgeExceptionAsync(ctx);
-            DiscordUser discordUser = ctx.User;
+            string? message = discordMessage?.JumpLink.ToString();
+            string guild = $"{ctx.Guild?.Name} ({ctx.Guild?.Id})";
+            string discordUser = $"{ctx.User.GlobalName} ({ctx.User.Id})";
             string commandName = ctx.Command.FullName;
             Dictionary<string, string> commandOptions = new(ctx.Command.Parameters.Count);
             ProcessOptions(ctx.Arguments, commandOptions);
 
-            embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture), info, discordMessage, discordUser, commandName, commandOptions);
+            embed = CreateExceptionEmbed(ex, timestampString, info, guild, message, discordUser, commandName, commandOptions);
         }
         else
         {
-            embed = CreateExceptionEmbed(ex, timestamp.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture), info);
+            embed = CreateExceptionEmbed(ex, timestampString, info);
         }
 
         try
         {
             string jsonDump = JsonSerializer.Serialize(new(ex, info), JsonSerializationSourceGen.Default.SerializableExceptionsRecord);
+            timestampString = timestampString.Replace(" ", "_", StringComparison.OrdinalIgnoreCase).Replace(":", "-", StringComparison.OrdinalIgnoreCase);
             string fileName = $"AzzyBotException_{timestampString}.json";
             string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, fileName);
 
-            bool messageSent = await SendMessageAsync(errorChannelId, (errorChannelConfigured) ? BugReportMessage.Replace("[BugReportUri]", UriStrings.BugReportUri, StringComparison.InvariantCultureIgnoreCase) : ErrorChannelNotConfigured, [embed], [tempFilePath]);
+            bool messageSent = await SendMessageAsync(_settings.ErrorChannelId, embeds: [embed], filePaths: [tempFilePath]);
             if (!messageSent)
                 _logger.UnableToSendMessage("Error message was not sent");
 
@@ -467,7 +432,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
 
                 allFileSize += fileInfo.Length;
 
-                FileStream stream = new(path, FileMode.Open, FileAccess.Read);
+                FileStream stream = new(path, FileMode.Open, FileAccess.Read, FileShare.None);
                 streams.Add(stream);
                 builder.AddFile(Path.GetFileName(path), stream);
             }
@@ -542,29 +507,12 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
     public static DiscordUserStatus SetBotStatusUserStatus(int status)
         => (Enum.IsDefined(typeof(DiscordUserStatus), status)) ? (DiscordUserStatus)status : DiscordUserStatus.Online;
 
-    private async Task<DiscordMessage?> AcknowledgeExceptionAsync(SlashCommandContext ctx)
+    private static async Task<DiscordMessage?> AcknowledgeExceptionAsync(SlashCommandContext ctx)
     {
-        DiscordGuild? guild = ctx.Guild;
-        DiscordMember? owner = null;
-        if (guild is null)
-        {
-            _logger.DiscordItemNotFound(nameof(DiscordGuild), 0);
-        }
-        else
-        {
-            owner = await guild.GetGuildOwnerAsync();
-        }
-
-        string errorMessage = "Ooops something went wrong!\n\nPlease inform the owner of this server.";
-        if (owner is not null)
-            errorMessage = errorMessage.Replace("the owner of this server", owner.Mention, StringComparison.OrdinalIgnoreCase);
-
         await using DiscordMessageBuilder builder = new()
         {
-            Content = errorMessage
+            Content = $"An unexpected error occurred. Our team has been notified and is working on a fix.\nJoin our support server for more information: {UriStrings.DiscordSupportServer}"
         };
-
-        builder.WithAllowedMention(UserMention.All);
 
         switch (ctx.Interaction.ResponseState)
         {
@@ -583,26 +531,6 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         }
     }
 
-    private async Task<DiscordChannel?> GetFirstDiscordChannelAsync(ulong guildId)
-    {
-        DiscordGuild? guild = await _client.GetGuildsAsync().FirstOrDefaultAsync(g => g.Id == guildId);
-        DiscordMember? member = await GetDiscordMemberAsync(guildId);
-
-        if (guild is null)
-        {
-            _logger.DiscordItemNotFound(nameof(DiscordGuild), guildId);
-            return null;
-        }
-
-        if (member is null)
-        {
-            _logger.DiscordItemNotFound(nameof(DiscordMember), _client.CurrentUser.Id);
-            return null;
-        }
-
-        return guild.Channels.FirstOrDefault(c => c.Value.Type is DiscordChannelType.Text && c.Value.PermissionsFor(member).HasAllPermissions(DiscordPermission.SendMessages, DiscordPermission.ViewChannel)).Value;
-    }
-
     private static void ProcessOptions(IReadOnlyDictionary<CommandParameter, object?> paramaters, Dictionary<string, string> commandParameters)
     {
         ArgumentNullException.ThrowIfNull(paramaters);
@@ -617,7 +545,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         }
     }
 
-    private DiscordEmbedBuilder CreateExceptionEmbed(Exception ex, string timestamp, string? jsonMessage = null, DiscordMessage? message = null, DiscordUser? user = null, string? commandName = null, Dictionary<string, string>? commandOptions = null)
+    private DiscordEmbedBuilder CreateExceptionEmbed(Exception ex, string timestamp, string? jsonMessage = null, string? guild = null, string? message = null, string? userMention = null, string? commandName = null, Dictionary<string, string>? commandOptions = null)
     {
         ArgumentNullException.ThrowIfNull(ex);
         ArgumentNullException.ThrowIfNull(timestamp);
@@ -643,30 +571,37 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         if (!string.IsNullOrEmpty(ex.Source))
             builder.AddField("Source", ex.Source);
 
-        if (message is not null)
-            builder.AddField("Message", message.JumpLink.ToString());
+        if (guild is not null)
+            builder.AddField("Guild", guild);
 
-        if (user is not null)
-            builder.AddField("User", user.Mention);
+        if (message is not null)
+            builder.AddField("Message", message);
+
+        if (userMention is not null)
+            builder.AddField("User", userMention);
 
         if (!string.IsNullOrEmpty(commandName))
             builder.AddField("Command", commandName);
 
         if (commandOptions?.Count > 0)
         {
-            StringBuilder stringBuilder = new();
+            StringBuilder sb = new();
             foreach (KeyValuePair<string, string> kvp in commandOptions)
             {
-                stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"**{kvp.Key}**: {kvp.Value}");
+                sb.AppendLine(CultureInfo.InvariantCulture, $"**{kvp.Key}**: {kvp.Value}");
             }
 
-            builder.AddField("Options", stringBuilder.ToString());
+            builder.AddField("Options", sb.ToString());
         }
 
         builder.AddField("OS", os);
         builder.AddField("Arch", arch);
         builder.WithAuthor(botName, UriStrings.BugReportUri, botIconUrl);
-        builder.WithFooter($"Version: {botVersion} / {SoftwareStats.GetAppEnvironment.ToUpperInvariant()}");
+#if DEBUG || DOCKER_DEBUG
+        builder.WithFooter($"Version: {botVersion} / {Environments.Development.ToUpperInvariant()}");
+#else
+        builder.WithFooter($"Version: {botVersion} / {Environments.Production.ToUpperInvariant()}");
+#endif
 
         return builder;
     }

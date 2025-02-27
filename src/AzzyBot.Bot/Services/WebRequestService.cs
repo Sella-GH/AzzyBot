@@ -12,11 +12,13 @@ using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+
 using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
+
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services;
@@ -139,7 +141,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             response.EnsureSuccessStatusCode();
 
             await using Stream contentStream = await response.Content.ReadAsStreamAsync();
-            await using FileStream fileStream = new(downloadPath, FileMode.Create, FileAccess.Write);
+            await using FileStream fileStream = new(downloadPath, FileMode.Create, FileAccess.Write, FileShare.None);
             await contentStream.CopyToAsync(fileStream);
         }
         catch (InvalidOperationException)

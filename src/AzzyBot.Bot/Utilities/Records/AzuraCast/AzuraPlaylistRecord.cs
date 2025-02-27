@@ -1,5 +1,6 @@
 using System;
 using System.Text.Json.Serialization;
+
 using AzzyBot.Bot.Resources;
 
 namespace AzzyBot.Bot.Utilities.Records.AzuraCast;

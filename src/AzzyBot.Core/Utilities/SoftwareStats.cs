@@ -1,28 +1,24 @@
 using System;
 using System.Diagnostics;
-using System.IO;
-using Microsoft.Extensions.Hosting;
+using System.Reflection;
 
 namespace AzzyBot.Core.Utilities;
 
 public static class SoftwareStats
 {
-    private static readonly string AppFilePath = $"{Path.Combine(AppContext.BaseDirectory, AppDomain.CurrentDomain.FriendlyName)}.dll";
+    private static readonly Assembly ExecutingAssembly = Assembly.GetExecutingAssembly();
 
     public static string GetAppAuthors
-        => FileVersionInfo.GetVersionInfo(AppFilePath).CompanyName ?? "Bot authors not found";
+        => ExecutingAssembly.GetCustomAttribute<AssemblyCompanyAttribute>()?.Company ?? "Bot authors not found";
 
     public static string GetAppDotNetVersion
         => Environment.Version.ToString() ?? ".NET version not found";
 
-    public static string GetAppEnvironment
-        => (GetAppName.EndsWith("Dev", StringComparison.OrdinalIgnoreCase)) ? Environments.Development : Environments.Production;
-
     public static string GetAppName
-        => FileVersionInfo.GetVersionInfo(AppFilePath).ProductName?.Split('.')[0] ?? "Bot name not found";
+        => ExecutingAssembly.GetCustomAttribute<AssemblyProductAttribute>()?.Product.Split('.')[0] ?? "Bot name not found";
 
     public static string GetAppVersion
-        => FileVersionInfo.GetVersionInfo(AppFilePath).ProductVersion ?? "Bot version not found";
+        => ExecutingAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "Bot version not found";
 
     public static double GetAppMemoryUsage()
     {

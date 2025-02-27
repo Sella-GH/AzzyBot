@@ -1,4 +1,6 @@
-﻿using DSharpPlus.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+using DSharpPlus.Entities;
 
 namespace AzzyBot.Data.Entities;
 
@@ -23,9 +25,10 @@ public sealed class GuildPreferencesEntity
     public ulong AdminNotifyChannelId { get; set; }
 
     /// <summary>
-    /// The <see cref="DiscordChannel"/> id of the <see cref="DiscordChannel"/> where errors are posted.
+    /// The concurrency token for optimistic concurrency checks.
     /// </summary>
-    public ulong ErrorChannelId { get; set; }
+    [Timestamp]
+    public uint Version { get; set; }
 
     /// <summary>
     /// The database id of the parenting <see cref="GuildEntity"/> database item.

@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
+
 using AzzyBot.Core.Logging;
+
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.EventArgs;
 using DSharpPlus.Commands.Exceptions;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Exceptions;
+
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.DiscordEvents;
@@ -25,13 +28,10 @@ public sealed class DiscordCommandsErrorHandler(ILogger<DiscordCommandsErrorHand
 
         Exception ex = e.Exception;
         DateTimeOffset now = DateTimeOffset.Now;
-        ulong guildId = 0;
-        if (e.Context.Guild is not null)
-            guildId = e.Context.Guild.Id;
 
         if (e.Context is not SlashCommandContext slashContext)
         {
-            await _botService.LogExceptionAsync(ex, now, guildId: guildId);
+            await _botService.LogExceptionAsync(ex, now);
             return;
         }
 
@@ -42,11 +42,11 @@ public sealed class DiscordCommandsErrorHandler(ILogger<DiscordCommandsErrorHand
                 break;
 
             case DiscordException:
-                await _botService.LogExceptionAsync(ex, now, slashContext, guildId, ((DiscordException)e.Exception).JsonMessage);
+                await _botService.LogExceptionAsync(ex, now, slashContext, ((DiscordException)e.Exception).JsonMessage);
                 break;
 
             default:
-                await _botService.LogExceptionAsync(ex, now, slashContext, guildId);
+                await _botService.LogExceptionAsync(ex, now, slashContext);
                 break;
         }
     }

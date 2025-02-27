@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace AzzyBot.Bot.Utilities.Records.AzuraCast;
@@ -67,7 +68,7 @@ public sealed record AzuraRequestQueueItemRecord
     /// The timestamp of when the song was requested.
     /// </summary>
     [JsonPropertyName("timestamp")]
-    public required int Timestamp { get; init; }
+    public required DateTimeOffset Timestamp { get; init; }
 
     /// <summary>
     /// The id of the request in the queue.

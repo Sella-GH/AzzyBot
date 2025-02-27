@@ -17,7 +17,7 @@ namespace AzzyBot.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.0")
+                .HasAnnotation("ProductVersion", "9.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -51,6 +51,12 @@ namespace AzzyBot.Data.Migrations
                     b.Property<bool>("UpdatesShowChangelog")
                         .HasColumnType("boolean");
 
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AzuraCastId")
@@ -81,6 +87,12 @@ namespace AzzyBot.Data.Migrations
                     b.Property<bool>("IsOnline")
                         .HasColumnType("boolean");
 
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.HasKey("Id");
 
                     b.HasIndex("GuildId")
@@ -109,6 +121,12 @@ namespace AzzyBot.Data.Migrations
                     b.Property<decimal>("OutagesChannelId")
                         .HasColumnType("numeric(20,0)");
 
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AzuraCastId")
@@ -133,6 +151,12 @@ namespace AzzyBot.Data.Migrations
 
                     b.Property<int>("StationId")
                         .HasColumnType("integer");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
@@ -165,6 +189,12 @@ namespace AzzyBot.Data.Migrations
 
                     b.Property<int>("StationId")
                         .HasColumnType("integer");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
@@ -203,6 +233,12 @@ namespace AzzyBot.Data.Migrations
                     b.Property<int>("StationId")
                         .HasColumnType("integer");
 
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.HasKey("Id");
 
                     b.HasIndex("StationId")
@@ -232,11 +268,42 @@ namespace AzzyBot.Data.Migrations
                     b.Property<DateTimeOffset>("Timestamp")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.HasKey("Id");
 
                     b.HasIndex("StationId");
 
                     b.ToTable("AzuraCastStationRequests");
+                });
+
+            modelBuilder.Entity("AzzyBot.Data.Entities.AzzyBotEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("LastDatabaseCleanup")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("LastUpdateCheck")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AzzyBot");
                 });
 
             modelBuilder.Entity("AzzyBot.Data.Entities.GuildEntity", b =>
@@ -259,6 +326,12 @@ namespace AzzyBot.Data.Migrations
                     b.Property<decimal>("UniqueId")
                         .HasColumnType("numeric(20,0)");
 
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.HasKey("Id");
 
                     b.ToTable("Guilds");
@@ -278,11 +351,14 @@ namespace AzzyBot.Data.Migrations
                     b.Property<decimal>("AdminRoleId")
                         .HasColumnType("numeric(20,0)");
 
-                    b.Property<decimal>("ErrorChannelId")
-                        .HasColumnType("numeric(20,0)");
-
                     b.Property<int>("GuildId")
                         .HasColumnType("integer");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+
 using AzzyBot.Data.Services;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
 using Npgsql;
 
 namespace AzzyBot.Bot.Extensions;
@@ -16,7 +19,8 @@ public static class IHostExtensions
         ArgumentNullException.ThrowIfNull(app);
 
         using IServiceScope scope = app.Services.CreateScope();
-        AzzyDbContext db = scope.ServiceProvider.GetRequiredService<AzzyDbContext>();
+        IDbContextFactory<AzzyDbContext> factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AzzyDbContext>>();
+        using AzzyDbContext db = factory.CreateDbContext();
 
         bool isOnline = false;
         while (!isOnline)

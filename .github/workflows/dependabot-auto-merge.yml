@@ -2,28 +2,33 @@ name: Dependabot Auto-Merge
 
 on:
   pull_request_target:
-    types: [assigned, opened, synchronize, reopened, ready_for_review]
-    branches:
-      - dependabot/**
-  
+    types: [opened, synchronize, reopened]
+  schedule:
+    # once a day at 00:00 UTC to cleanup old runs
+    - cron: '0 0 * * *'
 
 permissions:
+  actions: write
   contents: write
   pull-requests: write
-    
+
 jobs:
   dependabot:
     runs-on: ubuntu-24.04
     if: ${{ github.actor == 'dependabot[bot]' }}
     steps:
-      - name: Dependabot metadata
-        id: metadata
-        uses: dependabot/fetch-metadata@dbb049abf0d677abbd7f7eee0375145b417fdd34
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-          
+      - name: Get PR URL
+        run: echo "PR_URL=${{ github.event.pull_request.html_url }}" >> $GITHUB_ENV
+        
       - name: Enable auto-merge for Dependabot PRs
-        run: gh pr merge --auto --squash "$PR_URL"
+        run: gh pr merge --auto --delete-branch --squash "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  cleanup:
+    name: Cleanup Runs
+    if: ${{ github.event_name == 'schedule' }}
+    uses: dotnet/arcade/.github/workflows/scheduled-action-cleanup-base.yml@main
+    with:
+      repository_owners: ${{ github.repository_owner }}

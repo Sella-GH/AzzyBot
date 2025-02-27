@@ -2,13 +2,12 @@ name: Automated .NET Release
 
 on:
   push:
-    paths-ignore:
-    - "**.yml"
     branches:
     - "main"
     - "rel/**"
-    tags:
-    - "**"
+    paths:
+    - "Directory.Build.props"
+    - "**/release.yml"
   workflow_dispatch:
 
 permissions:
@@ -28,37 +27,27 @@ jobs:
     runs-on: ubuntu-24.04
     outputs:
       loc_cs: ${{ steps.loc_cs.outputs.total_lines }}
-      changelog: ${{ steps.changelog.outputs.changelog }}
       datetime: ${{ steps.dateTime.outputs.time }}
       clean_version: ${{ steps.get-version.outputs.clean_version }}
       version: ${{ steps.get-version.outputs.version }}
 
     steps:
      - name: Checkout
-       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+       uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
        with:
          fetch-depth: 0
 
-     - name: Calculate Lines of Source Code
-       id: loc_cs
-       uses: PavanMudigonda/lines-of-code-reporter@6c5507f592136d1c05cb1e8c30889dc4eb5561f5
-       with:
-         include_lang: "C#,MSBuild script"
-
-     - name: Get correct changelog
-       id: changelog
-       run: |
-        if ${{ contains(github.event.head_commit.message, '[pre-release]') }}; then
-          echo "changelog=CHANGELOG.previews.md" >> "$GITHUB_OUTPUT"
-        else
-          echo "changelog=CHANGELOG.md" >> "$GITHUB_OUTPUT"
-        fi
-          
      - name: Get Date and Time
        id: dateTime
-       uses: Kaven-Universe/github-action-current-date-time@f2c12d90cff9c3e7b1f50430886e632fe31fcee1
+       uses: Kaven-Universe/github-action-current-date-time@f2c12d90cff9c3e7b1f50430886e632fe31fcee1 # v1.4.0
        with:
          format: "YYYY-MM-DDTHH:mm:ss"
+
+     - name: Calculate Lines of Source Code
+       id: loc_cs
+       uses: PavanMudigonda/lines-of-code-reporter@6c5507f592136d1c05cb1e8c30889dc4eb5561f5 # v1.6
+       with:
+         include_lang: "C#,MSBuild script"
 
      - name: Get version from Directory.Build.props
        id: get-version
@@ -74,19 +63,22 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
 
       - name: Getting all files together
         run: |
           mkdir docker-zip
-          mv ./${{ needs.extract_meta.outputs.changelog }} ./docker-zip/CHANGELOG.md
+          mv ./CHANGELOG.md ./docker-zip/CHANGELOG.md
           mv ./docker-compose.yml ./docker-zip/docker-compose.yml
           mv ./LICENSE ./docker-zip/LICENSE
           mv ./README.md ./docker-zip/README.md
           mv ./SECURITY.md ./docker-zip/SECURITY.md
+          mkdir -p ./docker-zip/AzzyBot/Backups
+          touch ./docker-zip/AzzyBot/Backups/.keep
           mkdir -p ./docker-zip/AzzyBot/Logs
+          touch ./docker-zip/AzzyBot/Backups/.keep
           mkdir -p ./docker-zip/AzzyBot/Modules/AzuraCast/Files
           mkdir -p ./docker-zip/AzzyBot/Modules/MusicStreaming/Files
           mv ./src/AzzyBot.Bot/Modules/MusicStreaming/Files/application.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/application.yml
@@ -95,7 +87,7 @@ jobs:
           mv ./src/AzzyBot.Bot/Settings/AzzyBotSettings-Docker.json ./docker-zip/AzzyBot/Settings/AzzyBotSettings-Docker.json
 
       - name: Archive docker-zip artifact
-        uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b
+        uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
         with:
           name: ${{ needs.extract_meta.outputs.clean_version }}-docker
           path: ./docker-zip
@@ -108,18 +100,18 @@ jobs:
       release_version: ${{ steps.set_output.outputs.release_version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Extract Latest Changelog Entry
         id: extract_changelog
         run: |
           # Extract the latest changelog entry from the changelog file
-          latest_entry=$(awk 'BEGIN {found=0} /^## / {if (found) exit; found=1} {if (found) print}' ${{ needs.extract_meta.outputs.changelog }})
+          latest_entry=$(awk 'BEGIN {found=0} /^## / {if (found) exit; found=1} {if (found) print}' CHANGELOG.md)
           echo "$latest_entry" > latest_changelog.md
-          
+
           # Extract title for release
           release_title=$(echo "$latest_entry" | awk 'NR==2')
-          
+
           # Ensure safe output handling for multiline strings
           echo "latest_entry<<EOF" >> "$GITHUB_OUTPUT"
           echo "$latest_entry" >> "$GITHUB_OUTPUT"
@@ -128,7 +120,7 @@ jobs:
 
       - name: Create Release
         id: create_release_action
-        uses: softprops/action-gh-release@7b4da11513bf3f43f9999e90eabced41ab8bb048
+        uses: softprops/action-gh-release@c95fe1489396fe8a9eb87c0abf8aa5b2ef267fda # v2.2.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -136,12 +128,12 @@ jobs:
           name: ${{ needs.extract_meta.outputs.clean_version }}
           body_path: latest_changelog.md
           prerelease: ${{ contains(github.event.head_commit.message, '[pre-release]') }}
-          
+
       - name: Set Release Version Output
         id: set_output
         run: |
           echo "release_version=${{ needs.extract_meta.outputs.version }}" >> "$GITHUB_OUTPUT"
-          
+
   upload_assets:
     name: Upload GitHub Release Assets
     needs: [build-docker, create_release]
@@ -149,7 +141,7 @@ jobs:
     steps:
       - name: Install GitHub CLI
         run: sudo apt-get update && sudo apt-get install -y gh
-      
+
       - name: Download and Upload All Artifacts
         run: |
           # Fetch a list of all artifact details for the current workflow run
