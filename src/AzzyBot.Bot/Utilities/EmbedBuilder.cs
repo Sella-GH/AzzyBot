@@ -186,6 +186,7 @@ public static class EmbedBuilder
         if (isLive)
         {
             message = $"Currently served *live* by the one and only **{data.Live.StreamerName}**";
+            fields.Add("Streaming live since", new($"<t:{Converter.ConvertFromUnixTime(Convert.ToInt64(data.Live.BroadcastStart, CultureInfo.InvariantCulture))}>"));
         }
         else if (isIcecastLive)
         {
@@ -205,9 +206,6 @@ public static class EmbedBuilder
 
             fields.Add("Duration", new($"{progressBar} `[{songElapsed} / {songDuration}]`"));
         }
-
-        if (isLive || isIcecastLive)
-            fields.Add("Streaming live since", new($"<t:{Converter.ConvertFromUnixTime(Convert.ToInt64(data.Live.BroadcastStart, CultureInfo.InvariantCulture))}>"));
 
         return CreateBasicEmbed(title, message, DiscordColor.Aquamarine, new(thumbnailUrl), fields: fields);
     }
