@@ -6,10 +6,14 @@
 - Reduced the size of the Dockerfiles
 
 ### Dependencies
-- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02459
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02461
+- Updated [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET) to version 4.0.27
 - Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 9.0.2
-- Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.13.0
-- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.6.0.109712
+- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.3.4
+- Updated [Npgsql](https://github.com/npgsql/efcore.pg) to version 9.0.3
+- Updated [Npgsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg) to version 9.0.4
+- Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.13.1
+- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.7.0.110445
 
 ### Improvements
 - We now use Zstd compression for DSharpPlus resulting in better compression, performance and less memory usage

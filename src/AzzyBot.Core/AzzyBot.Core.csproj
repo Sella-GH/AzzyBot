@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <RootNamespace>AzzyBot.Core</RootNamespace>
@@ -30,7 +30,7 @@
     <PackageReference Include="CsvHelper" />
     <PackageReference Include="DSharpPlus" />
     <PackageReference Include="DSharpPlus.Commands" />
-	<PackageReference Include="DSharpPlus.Interactivity" />
+    <PackageReference Include="DSharpPlus.Interactivity" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="NReco.Logging.File" />
     <PackageReference Include="Roslynator.Analyzers">
