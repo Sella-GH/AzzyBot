@@ -2,6 +2,7 @@
 ### Fixes
 - Checking if a song was requested already now works exactly as wanted
 - Options validation now works correctly and doesn't throw exceptions anymore
+- `music nowplaying` works again when you stream over icecast instead of the integrated AzuraCast stream feature
 
 ## 2.3.0 - 2025-01-26
 ### General
