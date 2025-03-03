@@ -22,6 +22,7 @@
 ### Fixes
 - Checking if a song was requested already now works exactly as wanted
 - Options validation now works correctly and doesn't throw exceptions anymore
+- `music nowplaying` works again when you stream over icecast instead of the integrated AzuraCast stream feature
 
 ### Development
 - Moved some stuff out of dockerfiles to github workflow

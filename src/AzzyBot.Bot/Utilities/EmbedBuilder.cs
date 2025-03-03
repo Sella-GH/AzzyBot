@@ -168,9 +168,11 @@ public static class EmbedBuilder
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(8)
         {
             ["Station"] = new(data.Station.Name),
-            ["Title"] = new(data.NowPlaying.Song.Title, true),
-            ["By"] = new(data.NowPlaying.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true)
+            ["Title"] = new(data.NowPlaying.Song.Title, true)
         };
+
+        if (!string.IsNullOrEmpty(data.NowPlaying.Song.Artist))
+            fields.Add("By", new(data.NowPlaying.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true));
 
         if (!string.IsNullOrEmpty(data.NowPlaying.Song.Album))
             fields.Add("On", new(data.NowPlaying.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true));
@@ -178,10 +180,16 @@ public static class EmbedBuilder
         if (!string.IsNullOrEmpty(data.NowPlaying.Song.Genre))
             fields.Add("Genre", new(data.NowPlaying.Song.Genre, true));
 
-        if (data.Live.IsLive)
+        bool isLive = data.Live.IsLive;
+        bool isIcecastLive = data.NowPlaying.Duration is 0; // Fix for #305 because you can also stream over Icecast
+
+        if (isLive)
         {
             message = $"Currently served *live* by the one and only **{data.Live.StreamerName}**";
-            fields.Add("Streaming live since", new($"<t:{Converter.ConvertFromUnixTime(Convert.ToInt64(data.Live.BroadcastStart, CultureInfo.InvariantCulture))}>"));
+        }
+        else if (isIcecastLive)
+        {
+            message = "Currently served *live* by a great dj";
         }
         else
         {
@@ -197,6 +205,9 @@ public static class EmbedBuilder
 
             fields.Add("Duration", new($"{progressBar} `[{songElapsed} / {songDuration}]`"));
         }
+
+        if (isLive || isIcecastLive)
+            fields.Add("Streaming live since", new($"<t:{Converter.ConvertFromUnixTime(Convert.ToInt64(data.Live.BroadcastStart, CultureInfo.InvariantCulture))}>"));
 
         return CreateBasicEmbed(title, message, DiscordColor.Aquamarine, new(thumbnailUrl), fields: fields);
     }
