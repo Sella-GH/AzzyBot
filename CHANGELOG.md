@@ -1,3 +1,20 @@
+## 2.3.1 - 2025-03-03
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02461
+- Updated [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET) to version 4.0.27
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 9.0.2
+- Updated [Microsoft.Extensions.Hosting](https://github.com/dotnet/runtime) to version 9.0.2
+- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.3.4
+- Updated [Npgsql](https://github.com/npgsql/efcore.pg) to version 9.0.3
+- Updated [Npgsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg) to version 9.0.4
+- Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.13.1
+- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.7.0.110445
+
+### Fixes
+- Checking if a song was requested already now works exactly as wanted
+- Options validation now works correctly and doesn't throw exceptions anymore
+- `music nowplaying` works again when you stream over icecast instead of the integrated AzuraCast stream feature
+
 ## 2.3.0 - 2025-01-26
 ### General
 - A new docker compose variable "LOG_LEVEL"
