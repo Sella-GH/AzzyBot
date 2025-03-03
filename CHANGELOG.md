@@ -5,6 +5,15 @@
 ### General
 - Reduced the size of the Dockerfiles
 
+### Improvements
+- We now use Zstd compression for DSharpPlus resulting in better compression, performance and less memory usage
+- Adjusted to API changes made in AzuraCast Commit PR [#7713](https://github.com/AzuraCast/AzuraCast/pull/7713)
+
+### Development
+- Moved some stuff out of dockerfiles to github workflow
+- Docker dev versions show stats again
+
+## 2.3.1 - 2025-03-03
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02461
 - Updated [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET) to version 4.0.27
@@ -15,18 +24,10 @@
 - Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.13.1
 - Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.7.0.110445
 
-### Improvements
-- We now use Zstd compression for DSharpPlus resulting in better compression, performance and less memory usage
-- Adjusted to API changes made in AzuraCast Commit PR [#7713](https://github.com/AzuraCast/AzuraCast/pull/7713)
-
 ### Fixes
 - Checking if a song was requested already now works exactly as wanted
 - Options validation now works correctly and doesn't throw exceptions anymore
 - `music nowplaying` works again when you stream over icecast instead of the integrated AzuraCast stream feature
-
-### Development
-- Moved some stuff out of dockerfiles to github workflow
-- Docker dev versions show stats again
 
 ## 2.3.0 - 2025-01-26
 ### General
