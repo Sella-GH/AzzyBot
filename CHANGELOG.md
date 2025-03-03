@@ -17,6 +17,7 @@
 
 ### Fixes
 - Checking if a song was requested already now works exactly as wanted
+- Options validation now works correctly and doesn't throw exceptions anymore
 
 ### Development
 - Moved some stuff out of dockerfiles to github workflow
