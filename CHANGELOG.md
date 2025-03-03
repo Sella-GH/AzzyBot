@@ -1,6 +1,7 @@
 ## 2.3.1 - 2025-03-03
 ### Fixes
 - Checking if a song was requested already now works exactly as wanted
+- Options validation now works correctly and doesn't throw exceptions anymore
 
 ## 2.3.0 - 2025-01-26
 ### General

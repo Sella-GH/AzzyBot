@@ -119,6 +119,11 @@ public static class IServiceCollectionExtensions
             .AddOptionsWithValidateOnStart<DatabaseSettings>()
             .BindConfiguration(nameof(DatabaseSettings));
 
+        IServiceProvider sp = services.BuildServiceProvider();
+        DatabaseSettings dbSettings = sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
+        if (!string.IsNullOrWhiteSpace(dbSettings.NewEncryptionKey) && dbSettings.NewEncryptionKey.Length is not 32)
+            throw new ArgumentException($"The {nameof(DatabaseSettings.NewEncryptionKey)} must contain exactly 32 characters!");
+
         services.AddSingleton<IValidateOptions<DiscordStatusSettings>, DiscordStatusSettingsValidator>()
             .AddOptionsWithValidateOnStart<DiscordStatusSettings>()
             .BindConfiguration(nameof(DiscordStatusSettings));
