@@ -60,4 +60,6 @@ public static class ILoggingBuilderExtensions
             config.TimestampFormat = "[yyyy-MM-dd HH:mm:ss] ";
         });
     }
+
+    public static void AddAzzyBotWebFilters(this ILoggingBuilder logging) => logging.SetMinimumLevel(LogLevel.Information);
 }
