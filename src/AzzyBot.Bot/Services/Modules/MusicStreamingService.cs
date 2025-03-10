@@ -168,7 +168,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         if (player is null)
             return false;
 
-        // Player doesn't plays anything
+        // Player doesn't play anything
         Uri? playedUri = player.CurrentTrack?.Uri;
         if (playedUri is null)
             return false;
@@ -246,7 +246,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         }
         catch (InvalidOperationException)
         {
-            return new() { Author = "AzzyBot.Bot", Identifier = "AzzyBot.Bot", Title = "AzzyBot.Bot" };
+            return new() { Author = "AzzyBot", Identifier = "AzzyBot.Bot", Title = "50 shades of no track." };
         }
     }
 
