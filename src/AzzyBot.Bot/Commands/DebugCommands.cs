@@ -29,7 +29,7 @@ namespace AzzyBot.Bot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class DebugCommands
 {
-    [Command("debug"), RequireGuild, RequirePermissions(UserPermissions = [DiscordPermission.Administrator])]
+    [Command("debug"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator])]
     public sealed class DebugGroup(ILogger<DebugGroup> logger, DbActions dbActions, WebRequestService webRequestService)
     {
         private readonly ILogger<DebugGroup> _logger = logger;

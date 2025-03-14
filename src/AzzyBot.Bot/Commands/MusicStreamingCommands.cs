@@ -35,7 +35,7 @@ namespace AzzyBot.Bot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class MusicStreamingCommands
 {
-    [Command("player"), RequireGuild, RequirePermissions(BotPermissions = [DiscordPermission.Connect, DiscordPermission.Speak], UserPermissions = [DiscordPermission.Connect]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
+    [Command("player"), RequireGuild, RequirePermissions(botPermissions: [DiscordPermission.Connect, DiscordPermission.Speak], userPermissions: [DiscordPermission.Connect]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
     public sealed class PlayerGroup(ILogger<PlayerGroup> logger, AzuraCastApiService azuraCast, DbActions dbActions, MusicStreamingService musicStreaming)
     {
         private readonly ILogger<PlayerGroup> _logger = logger;
