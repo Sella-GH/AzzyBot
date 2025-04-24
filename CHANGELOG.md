@@ -10,7 +10,7 @@
 - Adjusted to API changes made in AzuraCast Commit PR [#7713](https://github.com/AzuraCast/AzuraCast/pull/7713)
 
 ### Development
-- Moved some stuff out of dockerfiles to github workflow
+- Moved some stuff out of dockerfiles to GitHub workflow
 - Docker dev versions show stats again
 
 ## 2.3.1 - 2025-03-03
@@ -27,7 +27,7 @@
 ### Fixes
 - Checking if a song was requested already now works exactly as wanted
 - Options validation now works correctly and doesn't throw exceptions anymore
-- `music nowplaying` works again when you stream over icecast instead of the integrated AzuraCast stream feature
+- `music nowplaying` works again when you stream over Icecast instead of the integrated AzuraCast stream feature
 
 ## 2.3.0 - 2025-01-26
 ### General
@@ -57,7 +57,7 @@
   - The bot is now conditionally compiled based on preprocessor directives
 - Refactored DbContext stuff to use the new `PooledDbContextFactory` pattern
   - This should finally fix the concurrency issues and make it work as intended
-- Posting files to discord works now while they're being in use on other platforms than linux
+- Posting files to discord works now while they're being in use on other platforms than Linux
 
 ## 2.2.5 - 2025-01-25
 ### Dependencies
@@ -178,13 +178,13 @@
   - This only works in dev mode
 - Added a new environment variable "LOG_RETENTION_DAYS" to docker-compose which defines how many days the logs should be kept
   - Default is 7 days
-- `config get-settings` now shows an additional value in the "station" section which shows how many times songs were requqested through the bot
+- `config get-settings` now shows an additional value in the "station" section which shows how many times songs were requested through the bot
 
 ### Improvements
-- Exception embeds now produce json output instead of a stacktrace.log file
+- Exception embeds now produce JSON output instead of a StackTrace.log file
 - Startup logging now shows the .NET version too
 - Reworked the whole file logging system
-- `admin send-bot-wide-message` now allows linebreaks using `\n` and includes a message if it's sent directly to the server owner
+- `admin send-bot-wide-message` now allows line breaks using `\n` and includes a message if it's sent directly to the server owner
 - QuickJit for loops was activated to improve performance of the bot
 - Reworked background tasks to use NCronJob instead of a custom implementation
 - `azuracast force-cache-refresh` parameter `station` is now optional
@@ -213,8 +213,8 @@
 
 ## 2.0.11 - 2024-11-09
 ### Improvements
-- Moved from `DateTime` to `DateTimeOffset` to prevent issues with timezones
-  - This should now hopefully fix all the issues occuring with the timer
+- Moved from `DateTime` to `DateTimeOffset` to prevent issues with time zones
+  - This should now hopefully fix all the issues occurring with the timer
 
 ## 2.0.10 - 2024-11-07
 ### Improvements
@@ -222,7 +222,7 @@
 
 ## 2.0.9 - 2024-11-03
 ### Fixes
-- The bot now only checks each 12h if the discord permissions are set to prevent hitting discord ratelimits
+- The bot now only checks each 12h if the discord permissions are set to prevent hitting discord rate limits
 
 ## 2.0.8 - 2024-10-27
 ### Dependencies
@@ -270,14 +270,14 @@
 
 ## 2.0.3 - 2024-09-10
 ### General
-- Recreation of docker images because of vulnerabilites
+- Recreation of docker images because of vulnerabilities
 
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02361
 
 ## 2.0.2 - 2024-09-03
 ### General
-- Recreation of docker images because of vulnerabilites
+- Recreation of docker images because of vulnerabilities
 
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02360
