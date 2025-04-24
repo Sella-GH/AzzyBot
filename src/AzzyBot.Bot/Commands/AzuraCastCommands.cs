@@ -1147,7 +1147,7 @@ public sealed class AzuraCastCommands
             DiscordButtonComponent button = new(DiscordButtonStyle.Success, $"request_song_{context.User.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Request Song");
             await using DiscordMessageBuilder builder = new();
             builder.AddEmbed(embed);
-            builder.AddComponents(button);
+            builder.AddActionRowComponent(button);
 
             DiscordMessage message = await context.EditResponseAsync(builder);
             InteractivityResult<ComponentInteractionCreatedEventArgs> result = await message.WaitForButtonAsync(context.User, TimeSpan.FromMinutes(1));

@@ -636,7 +636,7 @@ public sealed class ConfigCommands
 
             DiscordButtonComponent button = new(DiscordButtonStyle.Danger, $"reset_settings_{context.User.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Confirm reset.");
             await using DiscordMessageBuilder messageBuilder = new();
-            messageBuilder.AddComponents(button);
+            messageBuilder.AddActionRowComponent(button);
             messageBuilder.WithContent("Are you sure you want to reset all of your settings?");
 
             DiscordMessage message = await context.EditResponseAsync(messageBuilder);
@@ -686,7 +686,7 @@ public sealed class ConfigCommands
 
             DiscordButtonComponent button = new(DiscordButtonStyle.Primary, $"accept_legals_{context.Guild.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Accept Legals.");
             await using DiscordMessageBuilder messageBuilder = new();
-            messageBuilder.AddComponents(button);
+            messageBuilder.AddActionRowComponent(button);
             string content = GeneralStrings.LegalsInformation
                 .Replace("%PP%", UriStrings.GitHubRepoPrivacyPolicyUrl, StringComparison.OrdinalIgnoreCase)
                 .Replace("%TOS%", UriStrings.GitHubRepoTosUrl, StringComparison.OrdinalIgnoreCase)
