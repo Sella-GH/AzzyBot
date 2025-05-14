@@ -40,7 +40,7 @@ namespace AzzyBot.Bot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class ConfigCommands
 {
-    [Command("config"), RequireGuild, RequirePermissions(UserPermissions = [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
+    [Command("config"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
     public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, DbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<ConfigGroup> _logger = logger;
@@ -636,7 +636,7 @@ public sealed class ConfigCommands
 
             DiscordButtonComponent button = new(DiscordButtonStyle.Danger, $"reset_settings_{context.User.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Confirm reset.");
             await using DiscordMessageBuilder messageBuilder = new();
-            messageBuilder.AddComponents(button);
+            messageBuilder.AddActionRowComponent(button);
             messageBuilder.WithContent("Are you sure you want to reset all of your settings?");
 
             DiscordMessage message = await context.EditResponseAsync(messageBuilder);
@@ -654,7 +654,7 @@ public sealed class ConfigCommands
         }
     }
 
-    [Command("legals"), RequireGuild, RequirePermissions(UserPermissions = [DiscordPermission.Administrator])]
+    [Command("legals"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator])]
     public sealed class LegalsGroup(ILogger<LegalsGroup> logger, DbActions dbActions)
     {
         private readonly ILogger<LegalsGroup> _logger = logger;
@@ -686,7 +686,7 @@ public sealed class ConfigCommands
 
             DiscordButtonComponent button = new(DiscordButtonStyle.Primary, $"accept_legals_{context.Guild.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Accept Legals.");
             await using DiscordMessageBuilder messageBuilder = new();
-            messageBuilder.AddComponents(button);
+            messageBuilder.AddActionRowComponent(button);
             string content = GeneralStrings.LegalsInformation
                 .Replace("%PP%", UriStrings.GitHubRepoPrivacyPolicyUrl, StringComparison.OrdinalIgnoreCase)
                 .Replace("%TOS%", UriStrings.GitHubRepoTosUrl, StringComparison.OrdinalIgnoreCase)

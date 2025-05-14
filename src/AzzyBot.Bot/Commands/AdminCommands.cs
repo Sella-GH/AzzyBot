@@ -34,7 +34,7 @@ namespace AzzyBot.Bot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class AdminCommands
 {
-    [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(UserPermissions = [DiscordPermission.Administrator])]
+    [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator])]
     public sealed class AdminGroup(ILogger<AdminGroup> logger, IOptions<AzzyBotSettings> settings, DbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<AdminGroup> _logger = logger;

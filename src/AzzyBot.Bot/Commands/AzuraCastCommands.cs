@@ -43,7 +43,7 @@ namespace AzzyBot.Bot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class AzuraCastCommands
 {
-    [Command("azuracast"), RequireGuild, RequirePermissions(UserPermissions = [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast])]
+    [Command("azuracast"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast])]
     public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, DbActions dbActions, DiscordBotService botService, MusicStreamingService musicStreaming)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
@@ -430,8 +430,11 @@ public sealed class AzuraCastCommands
                 await _musicStreaming.StopMusicAsync(context);
 
                 DiscordMember? bot = await _botService.GetDiscordMemberAsync(context.Guild.Id);
-                if (bot?.VoiceState?.Channel is not null)
-                    await bot.VoiceState.Channel.SendMessageAsync(GeneralStrings.VoiceStationStopped);
+                if (bot?.VoiceState?.ChannelId is not null)
+                {
+                    DiscordChannel botChannel = await context.Guild.GetChannelAsync(bot.VoiceState.ChannelId.Value);
+                    await botChannel.SendMessageAsync(GeneralStrings.VoiceStationStopped);
+                }
 
                 await context.EditResponseAsync(GeneralStrings.StationUsersDisconnected);
                 await Task.Delay(TimeSpan.FromSeconds(30));
@@ -1147,7 +1150,7 @@ public sealed class AzuraCastCommands
             DiscordButtonComponent button = new(DiscordButtonStyle.Success, $"request_song_{context.User.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Request Song");
             await using DiscordMessageBuilder builder = new();
             builder.AddEmbed(embed);
-            builder.AddComponents(button);
+            builder.AddActionRowComponent(button);
 
             DiscordMessage message = await context.EditResponseAsync(builder);
             InteractivityResult<ComponentInteractionCreatedEventArgs> result = await message.WaitForButtonAsync(context.User, TimeSpan.FromMinutes(1));
@@ -1169,7 +1172,7 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync(embed);
         }
 
-        [Command("upload-files"), Description("Upload a file to the selected station."), RequirePermissions(UserPermissions = [DiscordPermission.AttachFiles]), FeatureAvailableCheck(AzuraCastFeatures.FileUploading), AzuraCastDiscordChannelCheck]
+        [Command("upload-files"), Description("Upload a file to the selected station."), RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.AttachFiles]), FeatureAvailableCheck(AzuraCastFeatures.FileUploading), AzuraCastDiscordChannelCheck]
         public async ValueTask UploadFilesAsync
         (
             SlashCommandContext context,

@@ -40,7 +40,7 @@ public sealed class CoreCommands
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
 
-        [Command("force-channel-permissions-check"), Description("Forces a check of the permissions for the bot in the necessary channel."), RequirePermissions(UserPermissions = [DiscordPermission.Administrator])]
+        [Command("force-channel-permissions-check"), Description("Forces a check of the permissions for the bot in the necessary channel."), RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator])]
         public async ValueTask ForceChannelPermissionsCheckAsync(SlashCommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
