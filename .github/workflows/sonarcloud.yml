@@ -1,0 +1,67 @@
+name: "SonarQube Cloud Scanner"
+
+on:
+  push:
+    branches-ignore:
+    - rel/**
+    paths:
+    - "**.cs"
+    - "**.csproj"
+    - "**.json"
+    - "**.props"
+    - "**.sln"
+    - "**.yml"
+  schedule:
+  # Once a day at 05:00 UTC
+  - cron: '0 5 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build And Analyze
+    runs-on: windows-latest
+    steps:
+      - name: Set up JDK 17
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Cache SonarQube Cloud Packages
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # 4.2.3
+        with:
+          path: ~\sonar\cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache SonarQube Cloud Scanner
+        id: cache-sonar-scanner
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # 4.2.3
+        with:
+          path: .\.sonar\scanner
+          key: ${{ runner.os }}-sonar-scanner
+          restore-keys: ${{ runner.os }}-sonar-scanner
+
+      - name: Install SonarQube Cloud Scanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        shell: powershell
+        run: |
+          New-Item -Path .\.sonar\scanner -ItemType Directory
+          dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
+
+      - name: Build And Analyze
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        shell: powershell
+        run: |
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"Sella-GH_AzzyBot" /o:"sella-gh" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+
+          dotnet restore .\src\AzzyBot.Bot\AzzyBot.Bot.csproj --configfile .\Nuget.config --force --no-cache --ucr
+          dotnet build .\src\AzzyBot.Bot\AzzyBot.Bot.csproj -c Release --no-incremental --no-restore --no-self-contained --ucr
+
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
