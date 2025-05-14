@@ -432,7 +432,7 @@ public sealed class AzuraCastCommands
                 DiscordMember? bot = await _botService.GetDiscordMemberAsync(context.Guild.Id);
                 if (bot?.VoiceState?.ChannelId is not null)
                 {
-                    DiscordChannel? botChannel = await context.Guild.GetChannelAsync(bot.VoiceState.ChannelId.Value);
+                    DiscordChannel botChannel = await context.Guild.GetChannelAsync(bot.VoiceState.ChannelId.Value);
                     await botChannel.SendMessageAsync(GeneralStrings.VoiceStationStopped);
                 }
 
