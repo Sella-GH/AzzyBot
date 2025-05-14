@@ -430,8 +430,11 @@ public sealed class AzuraCastCommands
                 await _musicStreaming.StopMusicAsync(context);
 
                 DiscordMember? bot = await _botService.GetDiscordMemberAsync(context.Guild.Id);
-                if (bot?.VoiceState?.Channel is not null)
-                    await bot.VoiceState.Channel.SendMessageAsync(GeneralStrings.VoiceStationStopped);
+                if (bot?.VoiceState?.ChannelId is not null)
+                {
+                    DiscordChannel? botChannel = await context.Guild.GetChannelAsync(bot.VoiceState.ChannelId.Value);
+                    await botChannel.SendMessageAsync(GeneralStrings.VoiceStationStopped);
+                }
 
                 await context.EditResponseAsync(GeneralStrings.StationUsersDisconnected);
                 await Task.Delay(TimeSpan.FromSeconds(30));

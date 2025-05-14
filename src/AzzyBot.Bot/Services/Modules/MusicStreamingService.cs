@@ -46,13 +46,12 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
                 return null;
         }
 
-        DiscordChannel? channel = context.Member.VoiceState?.Channel;
-        ulong channelId = (channel is null) ? 0 : channel.Id;
-        if (channel is null)
+        ulong? channelId = context.Member.VoiceState?.ChannelId;
+        if (channelId is null)
             _logger.UserNotConnectedSetChannelId();
 
         bool notConnecting = false;
-        if (channel is null)
+        if (channelId is null)
         {
             if (!suppressResponse)
                 await context.EditResponseAsync(GeneralStrings.VoiceNoUser);
@@ -67,7 +66,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
                 _logger.DiscordItemNotFound(nameof(DiscordMember), context.Guild.Id);
                 notConnecting = true;
             }
-            else if (!await _botService.CheckChannelPermissionsAsync(bot, channelId, [DiscordPermission.Speak, DiscordPermission.ViewChannel]))
+            else if (!await _botService.CheckChannelPermissionsAsync(bot, channelId.Value, [DiscordPermission.Speak, DiscordPermission.ViewChannel]))
             {
                 notConnecting = true;
             }
@@ -94,7 +93,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
                 SelfDeaf = true
             };
 
-            defaultPlayer = await GetLavalinkDefaultPlayerAsync(context.Guild.Id, channelId, defaultPlayerOptions, retrieveOptions);
+            defaultPlayer = await GetLavalinkDefaultPlayerAsync(context.Guild.Id, channelId.Value, defaultPlayerOptions, retrieveOptions);
             if (defaultPlayer.IsSuccess)
                 return defaultPlayer.Player;
 
@@ -116,7 +115,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
                 SelfDeaf = true
             };
 
-            queuedPlayer = await GetLavalinkQueuedPlayerAsync(context.Guild.Id, channelId, queuedPlayerOptions, retrieveOptions);
+            queuedPlayer = await GetLavalinkQueuedPlayerAsync(context.Guild.Id, channelId.Value, queuedPlayerOptions, retrieveOptions);
             if (queuedPlayer.IsSuccess)
                 return queuedPlayer.Player;
 
