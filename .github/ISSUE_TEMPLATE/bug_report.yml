@@ -12,9 +12,9 @@ body :
         If you want to suggest a feature, please use the [following form](https://github.com/Sella-GH/AzzyBot/issues/new?assignees=Sella-GH&labels=enhancement&projects=&template=feature_request.yml&title=%5BFEATURE%5D).
 
   - type : dropdown
-    id : version
+    id : azzy_version
     attributes :
-      label : "Version"
+      label : "Azzy Bot Version"
       description : "Which version of Azzy are you using? Ensure you're using the latest minor version of your line!"
       options :
         - "2.3.x"
@@ -27,7 +27,36 @@ body :
       required : true
 
   - type : dropdown
-    id : deploy-version
+    id : operating_system_arch
+    attributes :
+      label : "Architecture"
+      description : "Which architecture are you using?"
+      options :
+        - ARM64
+        - x64
+    validations :
+      required : true
+
+  - type : dropdown
+    id: azura_channel
+    attributes:
+      label: "AzuraCast Release Channel"
+      description : "Which release channel of AzuraCast are you using?"
+      options :
+        - Rolling Release Channel
+        - Stable Channel
+    validations:
+      required: true
+
+  - type : input
+    id : azura_version
+    attributes :
+      label : "AzuraCast Version"
+      description : "Which version of AzuraCast are you currently running? You can find this in the footer of most pages."
+      placeholder : "0.12.3 or Rolling Release #abcdefg (2020-01-01)"
+
+  - type : dropdown
+    id : deploy_version
     attributes :
       label : "Deployment Version"
       description : "Which deployment version are you using?"
@@ -38,7 +67,7 @@ body :
       required : true
 
   - type : dropdown
-    id : operating-system
+    id : operating_system
     attributes :
       label : "Operating System"
       description : "Which operating system are you using?"
@@ -50,7 +79,7 @@ body :
       required : true
 
   - type: input
-    id: operating-system-version
+    id: operating_system_version
     attributes:
       label: "Operating System Version"
       description: "Which version of the operating system are you using?"
@@ -58,19 +87,8 @@ body :
     validations:
       required: true
 
-  - type : dropdown
-    id : operating-system-arch
-    attributes :
-      label : "Architecture"
-      description : "Which architecture are you using?"
-      options :
-        - ARM64
-        - x64
-    validations :
-      required : true
-
   - type : input
-    id : bug-description
+    id : bug_description
     attributes :
       label : "Describe The Bug"
       description : "A clear and concise description of what the bug is.\nPlease make sure to provide as much information as possible."
@@ -79,7 +97,7 @@ body :
       required : true
 
   - type : textarea
-    id : bug-reproducing
+    id : bug_reproducing
     attributes :
       label : "Reproduction Steps"
       description : "Steps to reproduce the behavior.\nIf applicable, add screenshots to help explain your issue"
@@ -92,7 +110,7 @@ body :
       required : true
 
   - type : textarea
-    id : expected-behavior
+    id : expected_behavior
     attributes :
       label : "Expected Behavior"
       description : "A clear and concise description of what you expected to happen.\nPlease make sure to provide as much information as possible."
@@ -108,7 +126,7 @@ body :
       render : shell
 
   - type : textarea
-    id : more-info
+    id : more_info
     attributes :
       label : "Additional information"
       description : "Add additional information if you want to provide some."

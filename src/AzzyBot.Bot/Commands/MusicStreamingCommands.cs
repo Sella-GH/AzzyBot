@@ -35,7 +35,7 @@ namespace AzzyBot.Bot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class MusicStreamingCommands
 {
-    [Command("player"), RequireGuild, RequirePermissions(BotPermissions = [DiscordPermission.Connect, DiscordPermission.Speak], UserPermissions = [DiscordPermission.Connect]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
+    [Command("player"), RequireGuild, RequirePermissions(botPermissions: [DiscordPermission.Connect, DiscordPermission.Speak], userPermissions: [DiscordPermission.Connect]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
     public sealed class PlayerGroup(ILogger<PlayerGroup> logger, AzuraCastApiService azuraCast, DbActions dbActions, MusicStreamingService musicStreaming)
     {
         private readonly ILogger<PlayerGroup> _logger = logger;
@@ -93,13 +93,14 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(JoinAsync), context.User.GlobalName);
 
-            if (context.Member.VoiceState?.Channel is null)
+            if (context.Member.VoiceState?.ChannelId is null)
             {
                 await context.EditResponseAsync(GeneralStrings.VoiceNoUser);
                 return;
             }
 
-            if (context.Member.VoiceState.Channel.Users.Contains(await context.Guild.GetMemberAsync(context.Client.CurrentUser.Id)))
+            DiscordChannel channel = await context.Guild.GetChannelAsync(context.Member.VoiceState.ChannelId.Value);
+            if (channel.Users.Contains(await context.Guild.GetMemberAsync(context.Client.CurrentUser.Id)))
             {
                 await context.EditResponseAsync(GeneralStrings.VoiceAlreadyIn);
                 return;

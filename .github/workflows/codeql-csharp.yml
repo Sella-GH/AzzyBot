@@ -60,7 +60,7 @@ jobs:
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@b56ba49b26e50535fa1e7f7db0f4f7b4bf65d80d # v3.28.10
+      uses: github/codeql-action/init@60168efe1c415ce0f5521ea06d5c2062adbeed1b # v3.28.17
       with:
         config-file: ./.github/codeql/codeql-config.yml
         languages: ${{ matrix.language }}
@@ -80,17 +80,17 @@ jobs:
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
     - name: Setup .NET 9
-      uses: actions/setup-dotnet@3951f0dfe7a07e2313ec93c75700083e2005cbab # v4.3.0
+      uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
       with:
         dotnet-version: '9'
 
     - name: Restore And Build
       run: |
         dotnet restore /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.config --force --no-cache --ucr
-        dotnet build /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Debug --no-incremental --no-restore --no-self-contained --ucr
+        dotnet build /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Release --no-incremental --no-restore --no-self-contained --ucr
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@b56ba49b26e50535fa1e7f7db0f4f7b4bf65d80d # v3.28.10
+      uses: github/codeql-action/analyze@60168efe1c415ce0f5521ea06d5c2062adbeed1b # v3.28.17
       with:
         category: "/language:${{matrix.language}}"
         output: sarif-results
@@ -106,12 +106,12 @@ jobs:
         output: sarif-results/csharp.sarif
 
     - name: Upload Sarif
-      uses: github/codeql-action/upload-sarif@b56ba49b26e50535fa1e7f7db0f4f7b4bf65d80d # v3.28.10
+      uses: github/codeql-action/upload-sarif@60168efe1c415ce0f5521ea06d5c2062adbeed1b # v3.28.17
       with:
         sarif_file: sarif-results/csharp.sarif
 
     - name: Upload loc as a build artifact
-      uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         name: sarif-results
         path: sarif-results
