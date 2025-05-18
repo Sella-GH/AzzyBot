@@ -1,6 +1,6 @@
 ## 2.4.0
 ### Breaking Changes
-- This version is only compatible with the current AzuraCast dev version!
+- This version is only compatible with AzuraCast 0.21.0 and upwards!
 
 ### General
 - Reduced the size of the Dockerfiles
