@@ -21,4 +21,3 @@ jobs:
       pr_description_template: |
         Backport of #%source_pr_number% to %target_branch%
       repository_owners: ${{ github.repository_owner }}
-      token: ${{ secrets.GITHUB_TOKEN }}
