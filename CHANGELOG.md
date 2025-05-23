@@ -5,7 +5,7 @@
 ### General
 - Changed docker images to use Ubuntu 24.04 instead of Debian 12
   - This change was made based on refering that Ubuntu seems to be the [preferred](https://learn.microsoft.com/en-us/dotnet/core/compatibility/containers/10.0/default-images-use-ubuntu) container OS for .NET 
-  - Also we got a quite nice size improvement about up to 50%
+  - Also we got a quite nice size improvement about up to 15 MB
 
 ### Improvements
 - We now use Zstd compression for DSharpPlus resulting in better compression, performance and less memory usage
