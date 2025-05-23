@@ -43,7 +43,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
     private bool CheckIfClientIsConnected
         => _client.AllShardsConnected;
 
-    public async Task<bool> CheckChannelPermissionsAsync(DiscordMember member, ulong channelId, DiscordPermission[] permissions)
+    public async Task<bool> CheckChannelPermissionsAsync(DiscordMember member, ulong channelId, DiscordPermissions permissions)
     {
         ArgumentNullException.ThrowIfNull(member);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId);
@@ -162,7 +162,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
                     continue;
                 }
 
-                if (!channel.PermissionsFor(member).HasAllPermissions(DiscordPermission.SendMessages, DiscordPermission.ViewChannel))
+                if (!channel.PermissionsFor(member).HasAllPermissions([DiscordPermission.SendMessages, DiscordPermission.ViewChannel]))
                     channelNotAccessible.Add(channelId);
             }
 
@@ -449,7 +449,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
                 return false;
             }
 
-            if (!channel.PermissionsFor(dMember).HasAllPermissions(DiscordPermission.SendMessages, DiscordPermission.ViewChannel))
+            if (!channel.PermissionsFor(dMember).HasAllPermissions([DiscordPermission.SendMessages, DiscordPermission.ViewChannel]))
             {
                 _logger.UnableToSendMessage($"Bot has no permission to send messages in channel: {channel.Name} ({channel.Id})");
                 return false;
