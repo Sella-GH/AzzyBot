@@ -99,8 +99,8 @@ public sealed class MusicStreamingCommands
                 return;
             }
 
-            DiscordChannel channel = await context.Guild.GetChannelAsync(context.Member.VoiceState.ChannelId.Value);
-            if (channel.Users.Contains(await context.Guild.GetMemberAsync(context.Client.CurrentUser.Id)))
+            DiscordChannel? channel = await context.Member.VoiceState.GetChannelAsync();
+            if (channel?.Users.Contains(await context.Guild.GetMemberAsync(context.Client.CurrentUser.Id)) is true)
             {
                 await context.EditResponseAsync(GeneralStrings.VoiceAlreadyIn);
                 return;

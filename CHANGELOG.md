@@ -16,7 +16,7 @@
 - Docker dev versions show stats again
 
 ### Dependencies
-- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02512
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02513
 
 ## 2.3.1 - 2025-03-03
 ### Dependencies
