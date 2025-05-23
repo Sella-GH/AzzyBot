@@ -124,7 +124,7 @@ jobs:
           images: sellagh/azzybot
           tags: |
             type=raw,value=${{ matrix.os == 'debian' && needs.extract_meta.outputs.environment || needs.extract_meta.outputs.environment_alpine }}
-            ${{ (matrix.os == 'alpine' && contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) && 'type=raw,value=latest-alpine' || '' }}
+            ${{ matrix.os == 'alpine' && (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) && 'type=raw,value=latest-alpine' || '' }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@53851d14592bedcffcf25ea515637cff71ef929a # v3.3.0
