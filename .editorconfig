@@ -1040,6 +1040,31 @@ dotnet_diagnostic.rcs9011.severity = warning
 ## S1116: Empty statements should be removed
 dotnet_diagnostic.S1116.severity = none
 
+# DSharpPlus Analyzers
+## DSP0006: DiscordPermissions.HasPermission should always be preferred over bitwise operations.
+dotnet_diagnostic.DSP0006.severity = warning
+
+## DSP0007: Use ModifyAsync instead of multiple calls to AddOverwriteAsync.
+dotnet_diagnostic.DSP0007.severity = warning
+
+## DSP0008: Use a bulk-fetching method instead of fetching single entities inside of a loop.
+dotnet_diagnostic.DSP0008.severity = warning
+
+## DSP0009: Use DiscordPermissions and its operators instead of doing operations on DiscordPermission.
+dotnet_diagnostic.DSP0009.severity = warning
+
+## DSP0010: Use explicit methods on DiscordPermissions rather than bitwise operators.
+dotnet_diagnostic.DSP0010.severity = warning
+
+## DSP1001: A slash command explicitly registered to a guild should not be installable to users.
+dotnet_diagnostic.DSP1001.severity = warning
+
+## DSP1002: Do not explicitly register nested classes of elsewhere-registered classes to DSharpPlus.Commands.
+dotnet_diagnostic.DSP1002.severity = warning
+
+## DSP1003: A command taking a specific context type should not restrict itself to other processors.
+dotnet_diagnostic.DSP1003.severity = warning
+
 # Json files
 [*.{json,JSON}]
 indent_size = 2

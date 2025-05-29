@@ -1,0 +1,22 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Docker" />
+    <BuildType Name="Docker-debug" />
+    <BuildType Name="Release" />
+    <Platform Name="Any CPU" />
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="src/AzzyBot.Bot/AzzyBot.Bot.csproj">
+    <Platform Solution="Docker-debug|*" Project="Debug" />
+  </Project>
+  <Project Path="src/AzzyBot.Core/AzzyBot.Core.csproj">
+    <BuildType Solution="Docker-debug|*" Project="Debug" />
+    <BuildType Solution="Docker|*" Project="Debug" />
+  </Project>
+  <Project Path="src/AzzyBot.Data/AzzyBot.Data.csproj">
+    <BuildType Solution="Docker-debug|*" Project="Debug" />
+    <BuildType Solution="Docker|*" Project="Debug" />
+  </Project>
+</Solution>

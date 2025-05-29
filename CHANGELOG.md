@@ -1,9 +1,11 @@
 ## 2.4.0
 ### Breaking Changes
-- This version is only compatible with the current AzuraCast dev version!
+- This version is only compatible with AzuraCast 0.21.0 and upwards!
 
 ### General
-- Reduced the size of the Dockerfiles
+- Changed docker images to use Ubuntu 24.04 instead of Debian 12
+  - This change was made based on referring that Ubuntu seems to be the [preferred](https://learn.microsoft.com/en-us/dotnet/core/compatibility/containers/10.0/default-images-use-ubuntu) container OS for .NET 
+  - Also we got a quite nice size improvement about up to 15 MB
 
 ### Improvements
 - We now use Zstd compression for DSharpPlus resulting in better compression, performance and less memory usage
@@ -12,6 +14,9 @@
 ### Development
 - Moved some stuff out of dockerfiles to GitHub workflow
 - Docker dev versions show stats again
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02513
 
 ## 2.3.1 - 2025-03-03
 ### Dependencies

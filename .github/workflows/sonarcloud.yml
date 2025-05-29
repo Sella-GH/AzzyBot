@@ -67,3 +67,12 @@ jobs:
           dotnet build .\src\AzzyBot.Bot\AzzyBot.Bot.csproj -c Release --no-incremental --no-restore --no-self-contained --ucr
 
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+
+  cleanup:
+    name: Cleanup Runs
+    if: ${{ github.event_name == 'schedule' }}
+    permissions:
+      actions: write
+    uses: dotnet/arcade/.github/workflows/scheduled-action-cleanup-base.yml@main
+    with:
+      repository_owners: ${{ github.repository_owner }}

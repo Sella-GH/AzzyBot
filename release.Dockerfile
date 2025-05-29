@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:labs
 
 # BUILD IMAGE
-FROM mcr.microsoft.com/dotnet/sdk:9.0-bookworm-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:9.0-noble AS build
 USER root
 RUN apt update && apt upgrade -y && apt autoremove -y && apt clean -y
 WORKDIR /build
@@ -13,7 +13,7 @@ RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.con
 	&& dotnet publish ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c $CONFIG --no-build --no-restore --no-self-contained -o out --ucr
 
 # RUNNER IMAGE
-FROM mcr.microsoft.com/dotnet/runtime:9.0-bookworm-slim AS runner
+FROM mcr.microsoft.com/dotnet/runtime:9.0-noble AS runner
 USER root
 
 # Upgrade internal tools and packages first
