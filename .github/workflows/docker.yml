@@ -126,10 +126,10 @@ jobs:
         id: meta
         uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804 # v3.6.1
         with:
-          flavor: latest=${{ matrix.os == 'debian' && (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) || 'false' }}
+          flavor: latest=${{ matrix.os == 'ubuntu' && (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) || 'false' }}
           images: sellagh/azzybot
           tags: |
-            type=raw,value=${{ matrix.os == 'debian' && needs.extract_meta.outputs.environment || needs.extract_meta.outputs.environment_alpine }}
+            type=raw,value=${{ matrix.os == 'ubuntu' && needs.extract_meta.outputs.environment || needs.extract_meta.outputs.environment_alpine }}
             ${{ matrix.os == 'alpine' && (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) && 'type=raw,value=latest-alpine' || '' }}
 
       - name: Set up QEMU
@@ -154,7 +154,7 @@ jobs:
           build-args: |
             CONFIG=${{ needs.extract_meta.outputs.config }}
           context: .
-          file: ${{ matrix.os == 'debian' && needs.extract_meta.outputs.dockerfile || needs.extract_meta.outputs.dockerfile_alpine }}
+          file: ${{ matrix.os == 'ubuntu' && needs.extract_meta.outputs.dockerfile || needs.extract_meta.outputs.dockerfile_alpine }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/${{ matrix.arch }}
           outputs: type=image,name=sellagh/azzybot,push-by-digest=true,name-canonical=true,push=true
@@ -202,10 +202,10 @@ jobs:
         id: meta
         uses: docker/metadata-action@902fa8ec7d6ecbf8d84d538b9b233a880e428804 # v3.6.1
         with:
-          flavor: latest=${{ matrix.os == 'debian' && (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) || 'false' }}
+          flavor: latest=${{ matrix.os == 'ubuntu' && (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) || 'false' }}
           images: sellagh/azzybot
           tags: |
-            type=raw,value=${{ matrix.os == 'debian' && needs.extract_meta.outputs.environment || needs.extract_meta.outputs.environment_alpine }}
+            type=raw,value=${{ matrix.os == 'ubuntu' && needs.extract_meta.outputs.environment || needs.extract_meta.outputs.environment_alpine }}
             ${{ (matrix.os == 'alpine' && contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) && 'type=raw,value=latest-alpine' || '' }}
 
       - name: Create manifest list and push
