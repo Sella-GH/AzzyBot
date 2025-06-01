@@ -14,9 +14,13 @@
 ### Development
 - Moved some stuff out of dockerfiles to GitHub workflow
 - Docker dev versions show stats again
+- Fixed the latest-alpine docker tag
 
 ### Dependencies
-- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02513
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02516
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 9.0.5
+- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.4.1
+- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.10.0.116381
 
 ## 2.3.1 - 2025-03-03
 ### Dependencies

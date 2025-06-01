@@ -9,14 +9,18 @@
     <Platform Name="x64" />
   </Configurations>
   <Project Path="src/AzzyBot.Bot/AzzyBot.Bot.csproj">
-    <Platform Solution="Docker-debug|*" Project="Debug" />
+    <Platform Solution="*|Any CPU" Project="Any CPU" />
+    <Platform Solution="*|ARM64" Project="ARM64" />
+    <Platform Solution="*|x64" Project="x64" />
   </Project>
   <Project Path="src/AzzyBot.Core/AzzyBot.Core.csproj">
-    <BuildType Solution="Docker-debug|*" Project="Debug" />
-    <BuildType Solution="Docker|*" Project="Debug" />
+    <Platform Solution="*|Any CPU" Project="Any CPU" />
+    <Platform Solution="*|ARM64" Project="ARM64" />
+    <Platform Solution="*|x64" Project="x64" />
   </Project>
   <Project Path="src/AzzyBot.Data/AzzyBot.Data.csproj">
-    <BuildType Solution="Docker-debug|*" Project="Debug" />
-    <BuildType Solution="Docker|*" Project="Debug" />
+    <Platform Solution="*|Any CPU" Project="Any CPU" />
+    <Platform Solution="*|ARM64" Project="ARM64" />
+    <Platform Solution="*|x64" Project="x64" />
   </Project>
 </Solution>
