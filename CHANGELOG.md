@@ -1,4 +1,4 @@
-## 2.4.0
+## 2.4.0 - 2025-06-01
 ### Breaking Changes
 - This version is only compatible with AzuraCast 0.21.0 and upwards!
 
