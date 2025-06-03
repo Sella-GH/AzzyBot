@@ -3,7 +3,7 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="CsvHelper" Version="33.0.1" />
+    <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="DSharpPlus" Version="5.0.0-nightly-02516" />
     <PackageVersion Include="DSharpPlus.Commands" Version="5.0.0-nightly-02516" />
     <PackageVersion Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02516" />
