@@ -32,10 +32,10 @@
     <Configurations>Debug;Release;Docker;Docker-debug</Configurations>
     <EnableConfigurationBindingGenerator>true</EnableConfigurationBindingGenerator>
     <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile> <!-- Workaround for https://github.com/dotnet/roslyn/issues/41640 -->
     <ImplicitUsings>disable</ImplicitUsings>
     <IsPublishable>True</IsPublishable>
-    <JsonSerializerIsReflectionEnabledByDefault>False</JsonSerializerIsReflectionEnabledByDefault>
+    <JsonSerializerIsReflectionEnabledByDefault>False</JsonSerializerIsReflectionEnabledByDefault> <!-- JsonSourceGen -->
     <NoWarn>$(NoWarn);CA2007;S1135</NoWarn>
     <Nullable>enable</Nullable>
     <PathMap>$(MSBuildProjectDirectory)=./$(MSBuildProjectName)</PathMap>

@@ -1,6 +1,7 @@
 ## 2.4.1 - 2025-06-12
 ### Dependencies
 - Downgraded [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02499
+- Updated [CsvHelper](https://github.com/JoshClose/CsvHelper) to version 33.1.0
 
 ### Fixes
 - Fixed an issue where the bot is unable to join a voice channel due to implementation changes in DSharpPlus
