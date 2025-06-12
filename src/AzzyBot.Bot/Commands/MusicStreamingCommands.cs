@@ -93,14 +93,17 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(JoinAsync), context.User.GlobalName);
 
-            if (context.Member.VoiceState?.ChannelId is null)
+            // TODO: When updating DSP to > 24500, use `context.Member.VoiceState?.ChannelId`
+            if (context.Member.VoiceState?.Channel is null)
             {
                 await context.EditResponseAsync(GeneralStrings.VoiceNoUser);
                 return;
             }
 
-            DiscordChannel? channel = await context.Member.VoiceState.GetChannelAsync();
-            if (channel?.Users.Contains(await context.Guild.GetMemberAsync(context.Client.CurrentUser.Id)) is true)
+            // TODO: When updating DSP to > 24500, use:
+            // `DiscordChannel? channel = await context.Member.VoiceState.GetChannelAsync();`
+            // `if (channel?.Users.Contains(await context.Guild.GetMemberAsync(context.Client.CurrentUser.Id)) is true)`
+            if (context.Member.VoiceState.Channel.Users.Contains(await context.Guild.GetMemberAsync(context.Client.CurrentUser.Id)))
             {
                 await context.EditResponseAsync(GeneralStrings.VoiceAlreadyIn);
                 return;
