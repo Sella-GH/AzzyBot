@@ -36,7 +36,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <IsPublishable>True</IsPublishable>
     <JsonSerializerIsReflectionEnabledByDefault>False</JsonSerializerIsReflectionEnabledByDefault>
-    <NoWarn>$(NoWarn);CA2007</NoWarn>
+    <NoWarn>$(NoWarn);CA2007;S1135</NoWarn>
     <Nullable>enable</Nullable>
     <PathMap>$(MSBuildProjectDirectory)=./$(MSBuildProjectName)</PathMap>
     <Platforms>x64;ARM64;AnyCPU</Platforms>
@@ -50,7 +50,7 @@
   <!-- File Properties -->
   <PropertyGroup>
     <Authors>Sella-GH, AzzyBot Contributors</Authors>
-    <Copyright>© 2025 - $(Authors)</Copyright>
+    <Copyright>© $([System.DateTimeOffset]::Now.ToString('yyyy')) - $(Authors)</Copyright>
     <Description>Kind of music bot for discord, written in C# and with DSharpPlus. This bot is dedicated for the use with AzuraCast and does not work at it's fully glory without it.</Description>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <NeutralLanguage>en</NeutralLanguage>

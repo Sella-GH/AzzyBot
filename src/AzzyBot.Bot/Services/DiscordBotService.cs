@@ -43,7 +43,8 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
     private bool CheckIfClientIsConnected
         => _client.AllShardsConnected;
 
-    public async Task<bool> CheckChannelPermissionsAsync(DiscordMember member, ulong channelId, DiscordPermissions permissions)
+    // TODO: When updating DSP to > 24500 use DiscordPermissions permissions
+    public async Task<bool> CheckChannelPermissionsAsync(DiscordMember member, ulong channelId, DiscordPermission[] permissions)
     {
         ArgumentNullException.ThrowIfNull(member);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId);
@@ -162,7 +163,8 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
                     continue;
                 }
 
-                if (!channel.PermissionsFor(member).HasAllPermissions([DiscordPermission.SendMessages, DiscordPermission.ViewChannel]))
+                // TODO: When updating DSP to > 24500 use [DiscordPermission.SendMessages, DiscordPermission.ViewChannel]
+                if (!channel.PermissionsFor(member).HasAllPermissions(DiscordPermission.SendMessages, DiscordPermission.ViewChannel))
                     channelNotAccessible.Add(channelId);
             }
 
@@ -449,7 +451,8 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
                 return false;
             }
 
-            if (!channel.PermissionsFor(dMember).HasAllPermissions([DiscordPermission.SendMessages, DiscordPermission.ViewChannel]))
+            // TODO: When updating DSP to > 24500 use [DiscordPermission.SendMessages, DiscordPermission.ViewChannel]
+            if (!channel.PermissionsFor(dMember).HasAllPermissions(DiscordPermission.SendMessages, DiscordPermission.ViewChannel))
             {
                 _logger.UnableToSendMessage($"Bot has no permission to send messages in channel: {channel.Name} ({channel.Id})");
                 return false;
@@ -528,11 +531,11 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         }
     }
 
-    private static void ProcessOptions(IReadOnlyDictionary<CommandParameter, object?> paramaters, Dictionary<string, string> commandParameters)
+    private static void ProcessOptions(IReadOnlyDictionary<CommandParameter, object?> parameters, Dictionary<string, string> commandParameters)
     {
-        ArgumentNullException.ThrowIfNull(paramaters);
+        ArgumentNullException.ThrowIfNull(parameters);
 
-        foreach (KeyValuePair<CommandParameter, object?> kvp in paramaters)
+        foreach (KeyValuePair<CommandParameter, object?> kvp in parameters)
         {
             string name = kvp.Key.Name;
             string value = kvp.Value?.ToString() ?? "undefined";
