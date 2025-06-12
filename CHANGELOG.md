@@ -1,3 +1,10 @@
+## 2.4.1 - 2025-06-12
+### Dependencies
+- Downgraded [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02499
+
+### Fixes
+- Fixed an issue where the bot is unable to join a voice channel due to implementation changes in DSharpPlus
+
 ## 2.4.0 - 2025-06-01
 ### Breaking Changes
 - This version is only compatible with AzuraCast 0.21.0 and upwards!
