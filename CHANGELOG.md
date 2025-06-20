@@ -1,3 +1,7 @@
+## 2.5.0
+### General
+- Reduced the size of the docker image by a few MB (maybe unnoticeable)
+
 ## 2.4.1 - 2025-06-12
 ### Dependencies
 - Downgraded [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02499
