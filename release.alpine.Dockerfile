@@ -32,10 +32,9 @@ ENV LANG=en.US.UTF-8
 
 # Copy the built app
 WORKDIR /app
-COPY --exclude=*.xml --from=build /build/out .
+COPY --exclude=*.xml --from=build --chown=app:app --chmod=0755 /build/out .
 
 # Use built-in dotnet app user
-RUN chown -R app:app /app && chmod 0755 -R /app
 USER app
 
 # Start the app
