@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
+using Npgsql;
+
 namespace AzzyBot.Data.Settings;
 
 public sealed record DatabaseSettings
@@ -13,7 +15,7 @@ public sealed record DatabaseSettings
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public string Host { get; set; } = "AzzyBot-Db";
 
-    [Range(0, ushort.MaxValue, ErrorMessage = "The DatabasePort number is out of range. Please choose one between 0 and 65535."), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    [Range(0, ushort.MaxValue, ErrorMessage = "The database port is out of range. Please choose one between 0 and 65535."), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public int Port { get; set; } = 5432;
 
     [StringLength(63, MinimumLength = 1, ErrorMessage = "Your database username is not accepted. Please choose one between 1 and 63 characters."), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
@@ -24,4 +26,22 @@ public sealed record DatabaseSettings
 
     [StringLength(63, MinimumLength = 1, ErrorMessage = "Your database name is not accepted. Please choose one between 1 and 63 characters."), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public string DatabaseName { get; set; } = "azzybot";
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool UseSsl { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public SslMode SslMode { get; set; } = SslMode.Prefer;
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public SslNegotiation SslNegotiation { get; set; } = SslNegotiation.Postgres;
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public string? SslRootCert { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public string? SslCert { get; set; }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public string? SslPassword { get; set; }
 }

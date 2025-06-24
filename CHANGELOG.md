@@ -1,6 +1,8 @@
 ## 2.5.0
 ### General
 - Reduced the size of the docker image by a few MB (maybe unnoticeable)
+- You are now able to connect to your database via SSL
+  - Please read the [docs](https://github.com/Sella-GH/AzzyBot/wiki/) if you want to use this feature
 
 ## 2.4.1 - 2025-06-12
 ### Dependencies

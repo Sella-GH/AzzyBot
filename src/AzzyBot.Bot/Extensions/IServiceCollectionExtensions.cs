@@ -45,7 +45,7 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<CoreServiceHost>().AddHostedService(static s => s.GetRequiredService<CoreServiceHost>());
 
         // Register the database services
-        services.AzzyBotDataServices(dbSettings.EncryptionKey, dbSettings.Host, dbSettings.Port, dbSettings.User, dbSettings.Password, dbSettings.DatabaseName);
+        services.AzzyBotDataServices(dbSettings);
 
         services.DiscordClient(botSettings.BotToken);
         services.DiscordClientCommands(botSettings);
@@ -150,7 +150,7 @@ public static class IServiceCollectionExtensions
     private static void DiscordClientCommands(this IServiceCollection services, AzzyBotSettings settings)
     {
         services.AddSingleton<DiscordCommandsErrorHandler>();
-        services.AddCommandsExtension((IServiceProvider sp, CommandsExtension c) =>
+        services.AddCommandsExtension((sp, c) =>
         {
             DiscordCommandsErrorHandler handler = sp.GetRequiredService<DiscordCommandsErrorHandler>();
 
