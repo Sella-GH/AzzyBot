@@ -19,7 +19,7 @@ public static class IServiceCollectionExtensions
 {
     public static void AzzyBotDataServices(this IServiceCollection services, DatabaseSettings settings)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(settings?.EncryptionKey);
+        ArgumentNullException.ThrowIfNull(settings);
 
         // Set the encryption key
         Crypto.EncryptionKey = Encoding.UTF8.GetBytes(settings.EncryptionKey);
