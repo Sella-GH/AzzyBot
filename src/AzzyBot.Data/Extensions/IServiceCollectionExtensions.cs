@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 
 using AzzyBot.Core.Utilities.Encryption;
@@ -46,15 +47,16 @@ public static class IServiceCollectionExtensions
         {
             builder.SslMode = sslMode;
             builder.SslNegotiation = sslNegotiation;
+            const string certificatesDir = "Certificates";
 
             if (!string.IsNullOrWhiteSpace(sslRootCert))
-                builder.RootCertificate = sslRootCert;
+                builder.RootCertificate = Path.Combine(certificatesDir, sslRootCert);
 
             if (!string.IsNullOrWhiteSpace(sslClientCert))
-                builder.SslCertificate = sslClientCert;
+                builder.SslCertificate = Path.Combine(certificatesDir, sslClientCert);
 
             if (!string.IsNullOrWhiteSpace(sslClientPassword))
-                builder.SslPassword = sslClientPassword;
+                builder.SslPassword = Path.Combine(certificatesDir, sslClientPassword);
         }
 
         return builder.ConnectionString;

@@ -77,6 +77,8 @@ jobs:
           mv ./SECURITY.md ./docker-zip/SECURITY.md
           mkdir -p ./docker-zip/AzzyBot/Backups
           touch ./docker-zip/AzzyBot/Backups/.keep
+          mkdir -p ./docker-zip/AzzyBot/Certificates
+          touch ./docker-zip/AzzyBot/Certificates/.keep
           mkdir -p ./docker-zip/AzzyBot/Logs
           touch ./docker-zip/AzzyBot/Backups/.keep
           mkdir -p ./docker-zip/AzzyBot/Modules/AzuraCast/Files

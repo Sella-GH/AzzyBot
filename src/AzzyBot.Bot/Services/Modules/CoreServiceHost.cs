@@ -76,7 +76,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
         catch (Exception ex) when (ex is DbUpdateConcurrencyException or DbUpdateException)
         {
             await transaction.RollbackAsync();
-            throw new InvalidOperationException("An error occured while creating the AzzyBot table", ex);
+            throw new InvalidOperationException("An error occurred while creating the AzzyBot table", ex);
         }
     }
 
@@ -119,7 +119,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
         catch (Exception ex) when (ex is DbUpdateConcurrencyException or DbUpdateException)
         {
             await transaction.RollbackAsync();
-            throw new InvalidOperationException("An error occured while re-encrypting the database", ex);
+            throw new InvalidOperationException("An error occurred while re-encrypting the database", ex);
         }
 
         Crypto.EncryptionKey = newEncryptionKey;
