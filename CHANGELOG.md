@@ -4,6 +4,13 @@
 - You are now able to connect to your database via SSL
   - Please read the [docs](https://github.com/Sella-GH/AzzyBot/wiki/) if you want to use this feature
 
+### Dependencies
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 9.0.6
+- Updated [Microsoft.Extensions.Hosting](https://github.com/dotnet/runtime) to version 9.0.6
+- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.5.4
+- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.12.0.118525
+- Updated [System.Linq.Async](https://github.com/dotnet/reactive) to version 6.0.3
+
 ## 2.4.1 - 2025-06-12
 ### Dependencies
 - Downgraded [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02499
