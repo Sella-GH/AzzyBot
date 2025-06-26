@@ -36,7 +36,7 @@ public sealed class NowPlayingUpdateJob(ILogger<NowPlayingUpdateJob> logger, DbA
         try
         {
             IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
-            var guildsWithNowPlaying = guilds.Where(g => g.Preferences.NowPlayingChannelId != 0).ToList();
+            List<GuildEntity> guildsWithNowPlaying = guilds.Where(g => g.Preferences.NowPlayingChannelId != 0).ToList();
 
             _logger.LogDebug("Found {Count} guilds with now-playing channels configured", guildsWithNowPlaying.Count);
 
@@ -72,10 +72,14 @@ public sealed class NowPlayingUpdateJob(ILogger<NowPlayingUpdateJob> logger, DbA
             return;
         }
 
-        DiscordChannel? channel = guild.GetChannel(guildEntity.Preferences.NowPlayingChannelId);
-        if (channel is null)
+        DiscordChannel channel;
+        try
         {
-            _logger.LogWarning("Now-playing channel {ChannelId} not found in guild {GuildId}", 
+            channel = await _discordClient.GetChannelAsync(guildEntity.Preferences.NowPlayingChannelId);
+        }
+        catch (NotFoundException)
+        {
+            _logger.LogWarning("Now-playing channel {ChannelId} not found in guild {GuildId}",
                 guildEntity.Preferences.NowPlayingChannelId, guildEntity.UniqueId);
             return;
         }
@@ -83,8 +87,8 @@ public sealed class NowPlayingUpdateJob(ILogger<NowPlayingUpdateJob> logger, DbA
         try
         {
             // Get current playing track
-            LavalinkTrack? track = await _musicStreaming.GetCurrentTrackAsync(guild.Id);
-            TimeSpan? position = await _musicStreaming.GetCurrentTrackPositionAsync(guild.Id);
+            LavalinkTrack? track = await _musicStreaming.GetCurrentTrackAsync(guildEntity.UniqueId);
+            TimeSpan? position = await _musicStreaming.GetCurrentTrackPositionAsync(guildEntity.UniqueId);
 
             DiscordEmbed? embed = null;
             string? content = null;
@@ -132,11 +136,11 @@ public sealed class NowPlayingUpdateJob(ILogger<NowPlayingUpdateJob> logger, DbA
                     DiscordMessage existingMessage = await channel.GetMessageAsync(guildEntity.Preferences.NowPlayingMessageId);
                     if (embed is not null)
                     {
-                        await existingMessage.ModifyAsync(content: null, embed: embed);
+                        await existingMessage.ModifyAsync(content: string.Empty, embed: embed);
                     }
                     else
                     {
-                        await existingMessage.ModifyAsync(content: content, embed: null);
+                        await existingMessage.ModifyAsync(content: content ?? string.Empty, embed: null);
                     }
                     return;
                 }
@@ -164,7 +168,7 @@ public sealed class NowPlayingUpdateJob(ILogger<NowPlayingUpdateJob> logger, DbA
             }
             else
             {
-                newMessage = await channel.SendMessageAsync(content: content);
+                newMessage = await channel.SendMessageAsync(content: content ?? string.Empty);
             }
 
             // Update the message ID in database

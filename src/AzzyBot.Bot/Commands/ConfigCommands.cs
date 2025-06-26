@@ -570,7 +570,7 @@ public sealed class ConfigCommands
             {
                 try
                 {
-                    DiscordChannel? oldChannel = context.Guild.GetChannel(guild.Preferences.NowPlayingChannelId);
+                    DiscordChannel? oldChannel = await _botService.GetDiscordChannelAsync(guild.Preferences.NowPlayingChannelId);
                     if (oldChannel is not null)
                     {
                         DiscordMessage? oldMessage = await oldChannel.GetMessageAsync(guild.Preferences.NowPlayingMessageId);
@@ -596,7 +596,7 @@ public sealed class ConfigCommands
             else
             {
                 await context.EditResponseAsync($"Now-playing embed will be displayed in {nowPlayingChannel.Mention}.");
-                
+
                 // Check permissions for the new channel
                 await _botService.CheckPermissionsAsync(context.Guild, [nowPlayingChannel.Id]);
             }

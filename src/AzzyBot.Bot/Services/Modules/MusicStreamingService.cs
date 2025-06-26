@@ -400,7 +400,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     {
         try
         {
-            var player = await _audioService.Players.GetPlayerAsync<QueuedLavalinkPlayer>(guildId);
+            QueuedLavalinkPlayer? player = await _audioService.Players.GetPlayerAsync<QueuedLavalinkPlayer>(guildId);
             return player?.CurrentTrack;
         }
         catch (InvalidOperationException)
@@ -418,7 +418,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     {
         try
         {
-            var player = await _audioService.Players.GetPlayerAsync<QueuedLavalinkPlayer>(guildId);
+            QueuedLavalinkPlayer? player = await _audioService.Players.GetPlayerAsync<QueuedLavalinkPlayer>(guildId);
             return player?.Position?.Position;
         }
         catch (InvalidOperationException)
