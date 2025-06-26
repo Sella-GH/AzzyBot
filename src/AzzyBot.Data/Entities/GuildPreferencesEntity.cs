@@ -25,6 +25,16 @@ public sealed class GuildPreferencesEntity
     public ulong AdminNotifyChannelId { get; set; }
 
     /// <summary>
+    /// The <see cref="DiscordChannel"/> id where the now-playing embed should be displayed.
+    /// </summary>
+    public ulong NowPlayingChannelId { get; set; }
+
+    /// <summary>
+    /// The <see cref="DiscordMessage"/> id of the current now-playing embed message.
+    /// </summary>
+    public ulong NowPlayingMessageId { get; set; }
+
+    /// <summary>
     /// The concurrency token for optimistic concurrency checks.
     /// </summary>
     [Timestamp]

@@ -545,6 +545,63 @@ public sealed class ConfigCommands
                 await _botService.CheckPermissionsAsync(context.Guild, [adminChannel.Id]);
         }
 
+        [Command("set-now-playing"), Description("Set the channel where the now-playing embed should be displayed.")]
+        public async ValueTask SetNowPlayingAsync
+        (
+            SlashCommandContext context,
+            [Description("Select the channel where the now-playing embed should be displayed. Leave empty to disable."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel? nowPlayingChannel = null
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
+
+            _logger.CommandRequested(nameof(SetNowPlayingAsync), context.User.GlobalName);
+
+            GuildEntity? guild = await _dbActions.GetGuildAsync(context.Guild.Id, loadEverything: true);
+            if (guild is null)
+            {
+                _logger.DatabaseGuildNotFound(context.Guild.Id);
+                await context.EditResponseAsync(GeneralStrings.GuildNotFound);
+                return;
+            }
+
+            // Clear the existing message if changing channels or disabling
+            if (guild.Preferences.NowPlayingChannelId != 0 && guild.Preferences.NowPlayingMessageId != 0)
+            {
+                try
+                {
+                    DiscordChannel? oldChannel = context.Guild.GetChannel(guild.Preferences.NowPlayingChannelId);
+                    if (oldChannel is not null)
+                    {
+                        DiscordMessage? oldMessage = await oldChannel.GetMessageAsync(guild.Preferences.NowPlayingMessageId);
+                        if (oldMessage is not null)
+                            await oldMessage.DeleteAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to delete old now-playing message in guild {GuildId}", context.Guild.Id);
+                }
+            }
+
+            // Update the settings
+            guild.Preferences.NowPlayingChannelId = nowPlayingChannel?.Id ?? 0;
+            guild.Preferences.NowPlayingMessageId = 0; // Reset message ID
+            await _dbActions.UpdateGuildAsync(guild);
+
+            if (nowPlayingChannel is null)
+            {
+                await context.EditResponseAsync("Now-playing embed has been disabled for this server.");
+            }
+            else
+            {
+                await context.EditResponseAsync($"Now-playing embed will be displayed in {nowPlayingChannel.Mention}.");
+                
+                // Check permissions for the new channel
+                await _botService.CheckPermissionsAsync(context.Guild, [nowPlayingChannel.Id]);
+            }
+        }
+
         [Command("get-settings"), Description("Get all configured settings in a direct message.")]
         public async ValueTask GetSettingsAsync(SlashCommandContext context)
         {

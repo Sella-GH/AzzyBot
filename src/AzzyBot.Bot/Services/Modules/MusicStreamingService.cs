@@ -390,4 +390,40 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
         return true;
     }
+
+    /// <summary>
+    /// Gets the currently playing track for a specific guild.
+    /// </summary>
+    /// <param name="guildId">The guild ID to check.</param>
+    /// <returns>The currently playing track, or null if nothing is playing.</returns>
+    public async Task<LavalinkTrack?> GetCurrentTrackAsync(ulong guildId)
+    {
+        try
+        {
+            var player = await _audioService.Players.GetPlayerAsync<QueuedLavalinkPlayer>(guildId);
+            return player?.CurrentTrack;
+        }
+        catch (InvalidOperationException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Gets the current position of the playing track for a specific guild.
+    /// </summary>
+    /// <param name="guildId">The guild ID to check.</param>
+    /// <returns>The current position, or null if nothing is playing.</returns>
+    public async Task<TimeSpan?> GetCurrentTrackPositionAsync(ulong guildId)
+    {
+        try
+        {
+            var player = await _audioService.Players.GetPlayerAsync<QueuedLavalinkPlayer>(guildId);
+            return player?.Position?.Position;
+        }
+        catch (InvalidOperationException)
+        {
+            return null;
+        }
+    }
 }

@@ -559,11 +559,12 @@ public static class EmbedBuilder
         const string title = "Settings Overview";
         string description = $"Here are all settings which are currently set for **{serverName}**";
 
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(5)
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(6)
         {
             ["Server ID"] = new(guild.UniqueId.ToString(CultureInfo.InvariantCulture)),
             ["Admin Role"] = new((!string.IsNullOrEmpty(adminRole?.Trim()) && adminRole.Trim() is not "()") ? adminRole.Trim() : "Not set"),
             ["Admin Notify Channel"] = new((guild.Preferences.AdminNotifyChannelId > 0) ? $"<#{guild.Preferences.AdminNotifyChannelId}>" : "Not set"),
+            ["Now Playing Channel"] = new((guild.Preferences.NowPlayingChannelId > 0) ? $"<#{guild.Preferences.NowPlayingChannelId}>" : "Not set"),
             ["Configuration Complete"] = new(Misc.GetReadableBool(guild.ConfigSet, ReadableBool.YesNo))
         };
 
