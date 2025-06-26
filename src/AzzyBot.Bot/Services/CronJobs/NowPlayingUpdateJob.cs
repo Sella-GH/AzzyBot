@@ -103,8 +103,24 @@ public sealed class NowPlayingUpdateJob(ILogger<NowPlayingUpdateJob> logger, DbA
             }
             else
             {
-                // Nothing playing
-                content = "🔇 Nothing is currently playing";
+                // Nothing playing - delete the message if it exists and return
+                if (guildEntity.Preferences.NowPlayingMessageId != 0)
+                {
+                    try
+                    {
+                        DiscordMessage existingMessage = await channel.GetMessageAsync(guildEntity.Preferences.NowPlayingMessageId);
+                        await existingMessage.DeleteAsync();
+                        guildEntity.Preferences.NowPlayingMessageId = 0;
+                        await _dbActions.UpdateGuildAsync(guildEntity);
+                    }
+                    catch (DiscordException ex) when (ex.Response?.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    {
+                        // Message already deleted, just clear the ID
+                        guildEntity.Preferences.NowPlayingMessageId = 0;
+                        await _dbActions.UpdateGuildAsync(guildEntity);
+                    }
+                }
+                return;
             }
 
             // Update or create the message
@@ -129,6 +145,15 @@ public sealed class NowPlayingUpdateJob(ILogger<NowPlayingUpdateJob> logger, DbA
                     // Message doesn't exist anymore, create a new one
                     _logger.LogDebug("Now-playing message {MessageId} not found, creating new one", guildEntity.Preferences.NowPlayingMessageId);
                 }
+                catch (DiscordException ex) when (ex.Response?.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                {
+                    // No permission to edit message, disable feature for this guild
+                    _logger.LogWarning("No permission to edit now-playing message in guild {GuildId}, disabling feature", guildEntity.UniqueId);
+                    guildEntity.Preferences.NowPlayingChannelId = 0;
+                    guildEntity.Preferences.NowPlayingMessageId = 0;
+                    await _dbActions.UpdateGuildAsync(guildEntity);
+                    return;
+                }
             }
 
             // Create new message
@@ -148,7 +173,18 @@ public sealed class NowPlayingUpdateJob(ILogger<NowPlayingUpdateJob> logger, DbA
         }
         catch (DiscordException ex)
         {
-            _logger.LogError(ex, "Discord error updating now-playing for guild {GuildId}", guildEntity.UniqueId);
+            if (ex.Response?.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                // No permission to send messages, disable feature for this guild
+                _logger.LogWarning("No permission to send messages in now-playing channel for guild {GuildId}, disabling feature", guildEntity.UniqueId);
+                guildEntity.Preferences.NowPlayingChannelId = 0;
+                guildEntity.Preferences.NowPlayingMessageId = 0;
+                await _dbActions.UpdateGuildAsync(guildEntity);
+            }
+            else
+            {
+                _logger.LogError(ex, "Discord error updating now-playing for guild {GuildId}", guildEntity.UniqueId);
+            }
         }
     }
 }
