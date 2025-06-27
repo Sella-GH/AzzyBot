@@ -66,6 +66,7 @@ public static class IServiceCollectionExtensions
             o.AddJob<AzuraRequestJob>();
             o.AddJob<AzzyBotGlobalChecksJob>(j => j.WithCronExpression("*/15 * * * *").WithName(nameof(AzzyBotGlobalChecksJob))); // Every 15 minutes
             o.AddJob<LogfileCleaningJob>(j => j.WithCronExpression("0 0 */1 * *").WithName(nameof(LogfileCleaningJob)).WithParameter(logDays)).RunAtStartup(); // Every day
+            o.AddJob<NowPlayingUpdateJob>(j => j.WithCronExpression("*/45 * * * * *").WithName(nameof(NowPlayingUpdateJob))); // Every 45 seconds
         });
         services.AddSingleton<CronJobManager>();
 

@@ -354,6 +354,12 @@ namespace AzzyBot.Data.Migrations
                     b.Property<int>("GuildId")
                         .HasColumnType("integer");
 
+                    b.Property<decimal>("NowPlayingChannelId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<decimal>("NowPlayingMessageId")
+                        .HasColumnType("numeric(20,0)");
+
                     b.Property<uint>("Version")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
