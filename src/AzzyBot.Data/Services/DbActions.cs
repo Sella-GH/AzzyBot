@@ -261,14 +261,20 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
     /// </summary>
     /// <param name="guilds">The list of <see cref="DiscordGuild"/>s in which the bot is a member of.</param>
     /// <returns>An <see cref="IEnumerable{T}"/>with the deleted <see cref="DiscordGuild"/> ids as a <see langword="ulong"/>.</returns>
-    public async Task<IEnumerable<ulong>> DeleteGuildsAsync(IReadOnlyDictionary<ulong, DiscordGuild> guilds)
+    public async Task<IEnumerable<ulong>> DeleteGuildsAsync(IAsyncEnumerable<DiscordGuild> guilds)
     {
         ArgumentNullException.ThrowIfNull(guilds);
 
         await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
 
+        HashSet<ulong> currentGuildIds = [];
+        await foreach (DiscordGuild guild in guilds)
+        {
+            currentGuildIds.Add(guild.Id);
+        }
+
         IEnumerable<GuildEntity> existingGuilds = dbContext.Guilds;
-        IEnumerable<GuildEntity> guildsToDelete = [.. existingGuilds.Where(guild => !guilds.Keys.Contains(guild.UniqueId))];
+        IEnumerable<GuildEntity> guildsToDelete = [.. existingGuilds.Where(guild => !currentGuildIds.Contains(guild.UniqueId))];
 
         if (!guildsToDelete.Any())
             return [];
@@ -288,7 +294,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         }
 
         return guildsToDelete
-            .Where(guild => !guilds.ContainsKey(guild.UniqueId))
+            .Where(guild => !currentGuildIds.Contains(guild.UniqueId))
             .Select(static guild => guild.UniqueId);
     }
 

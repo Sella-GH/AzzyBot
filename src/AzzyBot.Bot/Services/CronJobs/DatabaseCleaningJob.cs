@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 using AzzyBot.Data.Services;
 
 using DSharpPlus;
+using DSharpPlus.Entities;
 
 using NCronJob;
 
@@ -20,7 +22,9 @@ public sealed class DatabaseCleaningJob(DbMaintenance dbMaintenance, DiscordBotS
     {
         try
         {
-            await _dbMaintenance.CleanupLeftoverGuildsAsync(_discordClient.Guilds);
+            IAsyncEnumerable<DiscordGuild> guilds = _discordClient.GetGuildsAsync(cancellationToken: token);
+
+            await _dbMaintenance.CleanupLeftoverGuildsAsync(guilds);
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
         {

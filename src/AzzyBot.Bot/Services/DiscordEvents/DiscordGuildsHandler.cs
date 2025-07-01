@@ -81,7 +81,7 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, I
             await GuildCreatedHelperAsync(addedGuilds);
 
         DiscordEmbed embed;
-        IEnumerable<ulong> removedGuilds = await _dbActions.DeleteGuildsAsync(eventArgs.Guilds);
+        IEnumerable<ulong> removedGuilds = await _dbActions.DeleteGuildsAsync(eventArgs.Guilds.Values.ToAsyncEnumerable());
         if (removedGuilds.Any())
         {
             foreach (ulong removedGuild in removedGuilds)
