@@ -22,13 +22,13 @@ public sealed class AzuraCheckUpdatesJob(AzuraCastUpdateService azuraUpdateServi
     {
         try
         {
-            IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
-            if (!guilds.Any())
+            IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.GetAzuraCastsAsync(loadChecks: true, loadPrefs: true, loadGuild: true);
+            if (!azuraCasts.Any())
                 return;
 
-            foreach (GuildEntity guild in guilds.Where(g => g.AzuraCast?.IsOnline is true && g.AzuraCast.Checks.Updates))
+            foreach (AzuraCastEntity azuraCast in azuraCasts.Where(a => a.IsOnline && a.Checks.Updates))
             {
-                await _azuraUpdateService.CheckForAzuraCastUpdatesAsync(guild.AzuraCast!);
+                await _azuraUpdateService.CheckForAzuraCastUpdatesAsync(azuraCast);
             }
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)

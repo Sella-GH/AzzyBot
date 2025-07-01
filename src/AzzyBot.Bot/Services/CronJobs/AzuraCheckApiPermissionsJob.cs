@@ -22,13 +22,14 @@ public sealed class AzuraCheckApiPermissionsJob(AzuraCastApiService apiService, 
     {
         try
         {
-            IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
-            if (!guilds.Any())
+            // AzuraCast preferences needed to send messages to the guilds channel
+            IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.GetAzuraCastsAsync(loadPrefs: true);
+            if (!azuraCasts.Any())
                 return;
 
-            foreach (GuildEntity guild in guilds.Where(g => g.AzuraCast?.IsOnline is true))
+            foreach (AzuraCastEntity azuraCast in azuraCasts.Where(a => a.IsOnline))
             {
-                await _apiService.CheckForApiPermissionsAsync(guild.AzuraCast!);
+                await _apiService.CheckForApiPermissionsAsync(azuraCast);
             }
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)

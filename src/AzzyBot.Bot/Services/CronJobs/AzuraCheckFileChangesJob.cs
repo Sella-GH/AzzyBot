@@ -22,13 +22,13 @@ public sealed class AzuraCheckFileChangesJob(AzuraCastFileService azuraFileServi
     {
         try
         {
-            IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
-            if (!guilds.Any())
+            IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.GetAzuraCastsAsync(loadPrefs: true, loadStations: true, loadStationChecks: true, loadGuild: true);
+            if (!azuraCasts.Any())
                 return;
 
-            foreach (GuildEntity guild in guilds.Where(g => g.AzuraCast is not null))
+            foreach (AzuraCastEntity azuraCast in azuraCasts)
             {
-                foreach (AzuraCastStationEntity station in guild.AzuraCast!.Stations.Where(s => s.Checks.FileChanges))
+                foreach (AzuraCastStationEntity station in azuraCast.Stations.Where(s => s.Checks.FileChanges))
                 {
                     await _azuraFileService.CheckForFileChangesAsync(station);
                 }

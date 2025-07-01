@@ -22,13 +22,13 @@ public sealed class AzuraStatusPingJob(AzuraCastPingService pingService, DbActio
     {
         try
         {
-            IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
-            if (!guilds.Any())
+            IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.GetAzuraCastsAsync(loadChecks: true, loadPrefs: true, loadGuild: true);
+            if (!azuraCasts.Any())
                 return;
 
-            foreach (GuildEntity guild in guilds.Where(guild => guild.AzuraCast?.Checks.ServerStatus is true))
+            foreach (AzuraCastEntity azuraCast in azuraCasts.Where(a => a.Checks.ServerStatus))
             {
-                await _pingService.PingInstanceAsync(guild.AzuraCast!);
+                await _pingService.PingInstanceAsync(azuraCast);
             }
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)

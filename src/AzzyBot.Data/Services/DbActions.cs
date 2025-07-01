@@ -314,6 +314,21 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             .SingleOrDefaultAsync();
     }
 
+    public async Task<IReadOnlyList<AzuraCastEntity>> GetAzuraCastsAsync(bool loadChecks = false, bool loadPrefs = false, bool loadStations = false, bool loadStationChecks = false, bool loadStationPrefs = false, bool loadGuild = false)
+    {
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        return await dbContext.AzuraCast
+            .AsNoTracking()
+            .IncludeIf(loadChecks, static q => q.Include(static a => a.Checks))
+            .IncludeIf(loadPrefs, static q => q.Include(static a => a.Preferences))
+            .IncludeIf(loadStations, static q => q.Include(static a => a.Stations))
+            .IncludeIf(loadStations && loadStationChecks, static q => q.Include(static a => a.Stations).ThenInclude(static s => s.Checks))
+            .IncludeIf(loadStations && loadStationPrefs, static q => q.Include(static a => a.Stations).ThenInclude(static s => s.Preferences))
+            .IncludeIf(loadGuild, static q => q.Include(static a => a.Guild))
+            .ToListAsync();
+    }
+
     public async Task<AzuraCastStationEntity?> GetAzuraCastStationAsync(ulong guildId, int stationId, bool loadChecks = false, bool loadPrefs = false, bool loadRequests = false, bool loadAzuraCast = false, bool loadAzuraCastPrefs = false)
     {
         await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
