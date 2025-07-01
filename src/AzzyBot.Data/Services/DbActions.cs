@@ -289,7 +289,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
 
         return guildsToDelete
             .Where(guild => !guilds.ContainsKey(guild.UniqueId))
-            .Select(static guld => guld.UniqueId);
+            .Select(static guild => guild.UniqueId);
     }
 
     public async Task<AzuraCastEntity?> GetAzuraCastAsync(ulong guildId, bool loadChecks = false, bool loadPrefs = false, bool loadStations = false, bool loadStationChecks = false, bool loadStationPrefs = false, bool loadGuild = false)
@@ -739,7 +739,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         }
     }
 
-    public async Task UpdateGuildPreferencesAsync(ulong guildId, ulong? adminRoleId = null, ulong? adminNotifiyChannelId = null)
+    public async Task UpdateGuildPreferencesAsync(ulong guildId, ulong? adminRoleId = null, ulong? adminNotifyChannelId = null)
     {
         await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
 
@@ -757,8 +757,8 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         if (adminRoleId.HasValue)
             preferences.AdminRoleId = adminRoleId.Value;
 
-        if (adminNotifiyChannelId.HasValue)
-            preferences.AdminNotifyChannelId = adminNotifiyChannelId.Value;
+        if (adminNotifyChannelId.HasValue)
+            preferences.AdminNotifyChannelId = adminNotifyChannelId.Value;
 
         if (preferences.AdminRoleId is not 0 && preferences.AdminNotifyChannelId is not 0)
             preferences.Guild.ConfigSet = true;
@@ -775,7 +775,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await UpdateGuildPreferencesAsync(guildId, adminRoleId, adminNotifiyChannelId);
+            await UpdateGuildPreferencesAsync(guildId, adminRoleId, adminNotifyChannelId);
 
             _logger.DatabaseConcurrencyResolved();
         }

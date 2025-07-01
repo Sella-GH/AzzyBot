@@ -17,7 +17,7 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logger, AzuraCastApiService azuraApiService, AzuraCastFileService azuraFileService, AzuraCastPingService azuraPingService, AzuraCastUpdateService azuraUpdateService, DbActions dbActions, DbMaintenance dbMaintenance, DiscordBotService botService, DiscordClient discordClient, UpdaterService updater) : IJob
+public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logger, AzuraCastApiService azuraApiService, AzuraCastFileService azuraFileService, AzuraCastPingService azuraPingService, AzuraCastUpdateService azuraUpdateService, DbActions dbActions, DiscordBotService botService, UpdaterService updater) : IJob
 {
     private readonly ILogger<AzzyBotGlobalChecksJob> _logger = logger;
     private readonly AzuraCastApiService _azuraApiService = azuraApiService;
@@ -25,9 +25,7 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
     private readonly AzuraCastPingService _azuraPingService = azuraPingService;
     private readonly AzuraCastUpdateService _azuraUpdateService = azuraUpdateService;
     private readonly DbActions _dbActions = dbActions;
-    private readonly DbMaintenance _dbMaintenance = dbMaintenance;
     private readonly DiscordBotService _botService = botService;
-    private readonly DiscordClient _discordClient = discordClient;
     private readonly UpdaterService _updater = updater;
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
@@ -37,9 +35,6 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
         AzzyBotEntity azzyBot = await _dbActions.GetAzzyBotAsync() ?? throw new InvalidOperationException("AzzyBot entity is missing from the database.");
         IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
         DateTimeOffset utcNow = DateTimeOffset.UtcNow;
-
-        if (utcNow - azzyBot.LastDatabaseCleanup >= TimeSpan.FromHours(23.85))
-            await _dbMaintenance.CleanupLeftoverGuildsAsync(_discordClient.Guilds);
 
         if (utcNow - azzyBot.LastUpdateCheck >= TimeSpan.FromHours(5.85))
             await _updater.CheckForAzzyUpdatesAsync();
