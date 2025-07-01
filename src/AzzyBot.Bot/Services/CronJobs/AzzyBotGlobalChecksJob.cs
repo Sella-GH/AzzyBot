@@ -9,15 +9,13 @@ using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
 
-using DSharpPlus;
-
 using Microsoft.Extensions.Logging;
 
 using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logger, AzuraCastApiService azuraApiService, AzuraCastFileService azuraFileService, AzuraCastPingService azuraPingService, AzuraCastUpdateService azuraUpdateService, DbActions dbActions, DiscordBotService botService, UpdaterService updater) : IJob
+public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logger, AzuraCastApiService azuraApiService, AzuraCastFileService azuraFileService, AzuraCastPingService azuraPingService, AzuraCastUpdateService azuraUpdateService, DbActions dbActions, DiscordBotService botService) : IJob
 {
     private readonly ILogger<AzzyBotGlobalChecksJob> _logger = logger;
     private readonly AzuraCastApiService _azuraApiService = azuraApiService;
@@ -26,18 +24,13 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
     private readonly AzuraCastUpdateService _azuraUpdateService = azuraUpdateService;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
-    private readonly UpdaterService _updater = updater;
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
     {
         _logger.GlobalTimerTick();
 
-        AzzyBotEntity azzyBot = await _dbActions.GetAzzyBotAsync() ?? throw new InvalidOperationException("AzzyBot entity is missing from the database.");
         IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
         DateTimeOffset utcNow = DateTimeOffset.UtcNow;
-
-        if (utcNow - azzyBot.LastUpdateCheck >= TimeSpan.FromHours(5.85))
-            await _updater.CheckForAzzyUpdatesAsync();
 
         List<GuildEntity> guildsWorkingSet = [.. guilds.Where(g => utcNow - g.LastPermissionCheck >= TimeSpan.FromHours(11.85))];
         _logger.GlobalTimerCheckForChannelPermissions(guildsWorkingSet.Count);
