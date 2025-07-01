@@ -63,15 +63,28 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<AzuraCastUpdateService>();
         services.AddNCronJob(o =>
         {
-            o.AddJob<AzuraCheckApiPermissionsJob>(j => j.WithCronExpression("0 */12 * * *").WithName(nameof(AzuraCheckApiPermissionsJob))); // Every 12 hours
-            o.AddJob<AzuraCheckFileChangesJob>(j => j.WithCronExpression("0 */1 * * *").WithName(nameof(AzuraCheckFileChangesJob))); // Every hour
-            o.AddJob<AzuraCheckUpdatesJob>(j => j.WithCronExpression("0 */6 * * *").WithName(nameof(AzuraCheckUpdatesJob))); // Every 6 hours
+#if DEBUG && !DOCKER_DEBUG
+            const string every15Minutes = "*/1 * * * *";
+            const string everyHour = "*/2 * * * *";
+            const string every6Hours = "*/3 * * * * ";
+            const string every12Hours = "*/4 * * * *";
+            const string everyDay = "*/5 * * * *";
+#else
+            const string every15Minutes = "*/15 * * * *";
+            const string everyHour = "0 */1 * * *";
+            const string every6Hours = "0 */6 * * *";
+            const string every12Hours = "0 */12 * * *";
+            const string everyDay = "0 0 */1 * *";
+#endif
+            o.AddJob<AzuraCheckApiPermissionsJob>(j => j.WithCronExpression(every12Hours).WithName(nameof(AzuraCheckApiPermissionsJob)));
+            o.AddJob<AzuraCheckFileChangesJob>(j => j.WithCronExpression(everyHour).WithName(nameof(AzuraCheckFileChangesJob)));
+            o.AddJob<AzuraCheckUpdatesJob>(j => j.WithCronExpression(every6Hours).WithName(nameof(AzuraCheckUpdatesJob)));
             o.AddJob<AzuraRequestJob>();
-            o.AddJob<AzuraStatusPingJob>(j => j.WithCronExpression("*/15 * * * *").WithName(nameof(AzuraStatusPingJob))); // Every 15 minutes
-            o.AddJob<AzzyBotCheckPermissionsJob>(j => j.WithCronExpression("0 0 */12 * *").WithName(nameof(AzzyBotCheckPermissionsJob))); // Every 12 hours
-            o.AddJob<AzzyBotUpdateCheckJob>(j => j.WithCronExpression("0 */6 * * *").WithName(nameof(AzzyBotUpdateCheckJob))); // Every 6 hours
-            o.AddJob<DatabaseCleaningJob>(j => j.WithCronExpression("0 0 */1 * *").WithName(nameof(DatabaseCleaningJob))); // Every day
-            o.AddJob<LogfileCleaningJob>(j => j.WithCronExpression("0 0 */1 * *").WithName(nameof(LogfileCleaningJob)).WithParameter(logDays)).RunAtStartup(); // Every day
+            o.AddJob<AzuraStatusPingJob>(j => j.WithCronExpression(every15Minutes).WithName(nameof(AzuraStatusPingJob)));
+            o.AddJob<AzzyBotCheckPermissionsJob>(j => j.WithCronExpression(every12Hours).WithName(nameof(AzzyBotCheckPermissionsJob)));
+            o.AddJob<AzzyBotUpdateCheckJob>(j => j.WithCronExpression(every6Hours).WithName(nameof(AzzyBotUpdateCheckJob)));
+            o.AddJob<DatabaseCleaningJob>(j => j.WithCronExpression(everyDay).WithName(nameof(DatabaseCleaningJob))).RunAtStartup();
+            o.AddJob<LogfileCleaningJob>(j => j.WithCronExpression(everyDay).WithName(nameof(LogfileCleaningJob)).WithParameter(logDays)).RunAtStartup();
         });
         services.AddSingleton<CronJobManager>();
 
