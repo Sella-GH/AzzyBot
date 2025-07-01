@@ -8,7 +8,7 @@ namespace AzzyBot.Core.Logging;
 public static partial class LoggerActions
 {
 #if DEBUG || DOCKER_DEBUG
-    [LoggerMessage(9, LogLevel.Debug, "Cluster logging test intervall {i}")]
+    [LoggerMessage(9, LogLevel.Debug, "Cluster logging test interval {i}")]
     public static partial void ClusterLoggingTest(this ILogger logger, int i);
 #endif
 
@@ -17,27 +17,6 @@ public static partial class LoggerActions
 
     [LoggerMessage(11, LogLevel.Debug, "Logfile cleanup completed, {count} logfiles deleted")]
     public static partial void LogfileCleanupComplete(this ILogger logger, int count);
-
-    [LoggerMessage(12, LogLevel.Debug, "Global timer ticked")]
-    public static partial void GlobalTimerTick(this ILogger logger);
-
-    [LoggerMessage(13, LogLevel.Debug, "Global timer checking for bot updates")]
-    public static partial void GlobalTimerCheckForUpdates(this ILogger logger);
-
-    [LoggerMessage(14, LogLevel.Debug, "Global timer checking {counter} guilds for channel permissions")]
-    public static partial void GlobalTimerCheckForChannelPermissions(this ILogger logger, int counter);
-
-    [LoggerMessage(15, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast files changes")]
-    public static partial void GlobalTimerCheckForAzuraCastFiles(this ILogger logger, int counter);
-
-    [LoggerMessage(16, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast updates")]
-    public static partial void GlobalTimerCheckForAzuraCastUpdates(this ILogger logger, int counter);
-
-    [LoggerMessage(17, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast instance status")]
-    public static partial void GlobalTimerCheckForAzuraCastStatus(this ILogger logger, int counter);
-
-    [LoggerMessage(18, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast api permissions")]
-    public static partial void GlobalTimerCheckForAzuraCastApi(this ILogger logger, int counter);
 
     [LoggerMessage(23, LogLevel.Debug, "Creating work items for: {item}")]
     public static partial void BackgroundServiceWorkItem(this ILogger logger, string item);
@@ -129,7 +108,7 @@ public static partial class LoggerActions
     [LoggerMessage(200, LogLevel.Warning, "AzzyBot is not connected to Discord!")]
     public static partial void BotNotConnected(this ILogger logger);
 
-    [LoggerMessage(201, LogLevel.Warning, "Commands error occured!")]
+    [LoggerMessage(201, LogLevel.Warning, "Commands error occurred!")]
     public static partial void CommandsError(this ILogger logger);
 
     [LoggerMessage(202, LogLevel.Warning, "Could not fetch channel for id {id}")]
@@ -171,7 +150,7 @@ public static partial class LoggerActions
     [LoggerMessage(230, LogLevel.Warning, "Bot is ratelimited on uri: {uri} retrying in {time} seconds")]
     public static partial void BotRatelimited(this ILogger logger, Uri uri, int time);
 
-    [LoggerMessage(240, LogLevel.Warning, "Database concurrency exception occured: ")]
+    [LoggerMessage(240, LogLevel.Warning, "Database concurrency exception occurred: ")]
     public static partial void DatabaseConcurrencyException(this ILogger logger, Exception ex);
 
     [LoggerMessage(290, LogLevel.Warning, "Latest online version of the bot is empty")]
@@ -180,10 +159,10 @@ public static partial class LoggerActions
     [LoggerMessage(291, LogLevel.Warning, "Body of online version could not be deserialized")]
     public static partial void OnlineVersionUnserializable(this ILogger logger);
 
-    [LoggerMessage(300, LogLevel.Error, "An error occured while logging the exception to discord: {ex}")]
+    [LoggerMessage(300, LogLevel.Error, "An error occurred while logging the exception to discord: {ex}")]
     public static partial void UnableToLogException(this ILogger logger, string ex);
 
-    [LoggerMessage(301, LogLevel.Error, "An error occured while sending a message to discord: {ex}")]
+    [LoggerMessage(301, LogLevel.Error, "An error occurred while sending a message to discord: {ex}")]
     public static partial void UnableToSendMessage(this ILogger logger, string ex);
 
     [LoggerMessage(302, LogLevel.Error, "The provided uri is invalid: {uri}")]
@@ -195,8 +174,8 @@ public static partial class LoggerActions
     [LoggerMessage(320, LogLevel.Error, "Database transaction failed with error: ")]
     public static partial void DatabaseTransactionFailed(this ILogger logger, Exception ex);
 
-    [LoggerMessage(400, LogLevel.Critical, "An exception occured: ")]
-    public static partial void ExceptionOccured(this ILogger logger, Exception ex);
+    [LoggerMessage(400, LogLevel.Critical, "An exception occurred: ")]
+    public static partial void ExceptionOccurred(this ILogger logger, Exception ex);
 
     [LoggerMessage(402, LogLevel.Critical, "I'm not inside the server with the id {id} - please invite me to my hometown or I won't start!")]
     public static partial void NotInHomeGuild(this ILogger logger, ulong id);

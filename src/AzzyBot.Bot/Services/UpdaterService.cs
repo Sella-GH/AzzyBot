@@ -10,6 +10,7 @@ using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Data.Services;
+
 using DSharpPlus.Entities;
 
 using Microsoft.Extensions.Logging;
@@ -42,8 +43,6 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
 
     public async Task CheckForAzzyUpdatesAsync()
     {
-        _logger.GlobalTimerCheckForUpdates();
-
         string localVersion = SoftwareStats.GetAppVersion;
         bool isPreview = localVersion.Contains("-preview", StringComparison.OrdinalIgnoreCase);
 

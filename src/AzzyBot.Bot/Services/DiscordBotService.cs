@@ -235,7 +235,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
     {
         ArgumentNullException.ThrowIfNull(ex);
 
-        _logger.ExceptionOccured(ex);
+        _logger.ExceptionOccurred(ex);
 
         // Handle the special case when it's a command exception
         string timestampString = timestamp.ToString("yyyy-MM-dd HH:mm:ss:fffffff", CultureInfo.InvariantCulture);
