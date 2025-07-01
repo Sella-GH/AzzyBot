@@ -66,7 +66,7 @@ public static class IServiceCollectionExtensions
 #if DEBUG && !DOCKER_DEBUG
             const string every15Minutes = "*/1 * * * *";
             const string everyHour = "*/2 * * * *";
-            const string every6Hours = "*/3 * * * * ";
+            const string every6Hours = "*/3 * * * *";
             const string every12Hours = "*/4 * * * *";
             const string everyDay = "*/5 * * * *";
 #else
