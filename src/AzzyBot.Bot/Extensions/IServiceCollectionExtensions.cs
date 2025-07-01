@@ -64,6 +64,7 @@ public static class IServiceCollectionExtensions
         services.AddNCronJob(o =>
         {
             o.AddJob<AzuraRequestJob>();
+            o.AddJob<AzuraStatusPingJob>(j => j.WithCronExpression("0 */15 * * * *").WithName(nameof(AzuraStatusPingJob))); // Every 15 minutes
             o.AddJob<AzzyBotGlobalChecksJob>(j => j.WithCronExpression("*/15 * * * *").WithName(nameof(AzzyBotGlobalChecksJob))); // Every 15 minutes
             o.AddJob<AzzyBotCheckPermissionsJob>(j => j.WithCronExpression("0 0 */12 * *").WithName(nameof(AzzyBotCheckPermissionsJob))); // Every 12 hours
             o.AddJob<AzzyBotUpdateCheckJob>(j => j.WithCronExpression("0 */6 * * *").WithName(nameof(AzzyBotUpdateCheckJob))); // Every 6 hours

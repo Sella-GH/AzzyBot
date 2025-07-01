@@ -15,12 +15,11 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logger, AzuraCastApiService azuraApiService, AzuraCastFileService azuraFileService, AzuraCastPingService azuraPingService, AzuraCastUpdateService azuraUpdateService, DbActions dbActions) : IJob
+public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logger, AzuraCastApiService azuraApiService, AzuraCastFileService azuraFileService, AzuraCastUpdateService azuraUpdateService, DbActions dbActions) : IJob
 {
     private readonly ILogger<AzzyBotGlobalChecksJob> _logger = logger;
     private readonly AzuraCastApiService _azuraApiService = azuraApiService;
     private readonly AzuraCastFileService _azuraFileService = azuraFileService;
-    private readonly AzuraCastPingService _azuraPingService = azuraPingService;
     private readonly AzuraCastUpdateService _azuraUpdateService = azuraUpdateService;
     private readonly DbActions _dbActions = dbActions;
 
@@ -31,19 +30,7 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
         IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
         DateTimeOffset utcNow = DateTimeOffset.UtcNow;
 
-        List<GuildEntity> guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.Checks.ServerStatus is true)];
-        _logger.GlobalTimerCheckForAzuraCastStatus(guildsWorkingSet.Count);
-        if (guildsWorkingSet.Count is not 0)
-        {
-            foreach (GuildEntity guild in guildsWorkingSet)
-            {
-                await _azuraPingService.PingInstanceAsync(guild.AzuraCast!);
-            }
-        }
-
-        // Get it just one more time to check if the instance is offline
-        guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
-        guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.IsOnline is true && utcNow - g.AzuraCast.Checks.LastServerStatusCheck >= TimeSpan.FromHours(11.85))];
+        IReadOnlyList<GuildEntity> guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.IsOnline is true && utcNow - g.AzuraCast.Checks.LastServerStatusCheck >= TimeSpan.FromHours(11.85))];
         _logger.GlobalTimerCheckForAzuraCastApi(guildsWorkingSet.Count);
         if (guildsWorkingSet.Count is not 0)
         {
