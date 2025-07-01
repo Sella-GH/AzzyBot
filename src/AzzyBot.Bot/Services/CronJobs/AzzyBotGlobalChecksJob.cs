@@ -15,10 +15,9 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logger, AzuraCastApiService azuraApiService, AzuraCastFileService azuraFileService, AzuraCastUpdateService azuraUpdateService, DbActions dbActions) : IJob
+public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logger, AzuraCastFileService azuraFileService, AzuraCastUpdateService azuraUpdateService, DbActions dbActions) : IJob
 {
     private readonly ILogger<AzzyBotGlobalChecksJob> _logger = logger;
-    private readonly AzuraCastApiService _azuraApiService = azuraApiService;
     private readonly AzuraCastFileService _azuraFileService = azuraFileService;
     private readonly AzuraCastUpdateService _azuraUpdateService = azuraUpdateService;
     private readonly DbActions _dbActions = dbActions;
@@ -30,17 +29,7 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
         IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
         DateTimeOffset utcNow = DateTimeOffset.UtcNow;
 
-        IReadOnlyList<GuildEntity> guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.IsOnline is true && utcNow - g.AzuraCast.Checks.LastServerStatusCheck >= TimeSpan.FromHours(11.85))];
-        _logger.GlobalTimerCheckForAzuraCastApi(guildsWorkingSet.Count);
-        if (guildsWorkingSet.Count is not 0)
-        {
-            foreach (GuildEntity guild in guildsWorkingSet)
-            {
-                await _azuraApiService.CheckForApiPermissionsAsync(guild.AzuraCast!);
-            }
-        }
-
-        guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.IsOnline is true && g.AzuraCast.Stations.Any(s => s.Checks.FileChanges && utcNow - s.Checks.LastFileChangesCheck >= TimeSpan.FromHours(0.85)))];
+        IReadOnlyList<GuildEntity> guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.IsOnline is true && g.AzuraCast.Stations.Any(s => s.Checks.FileChanges && utcNow - s.Checks.LastFileChangesCheck >= TimeSpan.FromHours(0.85)))];
         _logger.GlobalTimerCheckForAzuraCastFiles(guildsWorkingSet.Count);
         if (guildsWorkingSet.Count is not 0)
         {
