@@ -104,6 +104,8 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         await owner.SendMessageAsync(builder.ToString());
     }
 
+    // TODO: Refactor this so there's also a single guild version
+    // and this one only loops over the new method
     public async Task CheckPermissionsAsync(IReadOnlyList<GuildEntity> guilds)
     {
         ArgumentNullException.ThrowIfNull(guilds);

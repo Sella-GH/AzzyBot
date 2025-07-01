@@ -15,7 +15,7 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logger, AzuraCastApiService azuraApiService, AzuraCastFileService azuraFileService, AzuraCastPingService azuraPingService, AzuraCastUpdateService azuraUpdateService, DbActions dbActions, DiscordBotService botService) : IJob
+public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logger, AzuraCastApiService azuraApiService, AzuraCastFileService azuraFileService, AzuraCastPingService azuraPingService, AzuraCastUpdateService azuraUpdateService, DbActions dbActions) : IJob
 {
     private readonly ILogger<AzzyBotGlobalChecksJob> _logger = logger;
     private readonly AzuraCastApiService _azuraApiService = azuraApiService;
@@ -23,7 +23,6 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
     private readonly AzuraCastPingService _azuraPingService = azuraPingService;
     private readonly AzuraCastUpdateService _azuraUpdateService = azuraUpdateService;
     private readonly DbActions _dbActions = dbActions;
-    private readonly DiscordBotService _botService = botService;
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
     {
@@ -32,12 +31,7 @@ public sealed class AzzyBotGlobalChecksJob(ILogger<AzzyBotGlobalChecksJob> logge
         IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
         DateTimeOffset utcNow = DateTimeOffset.UtcNow;
 
-        List<GuildEntity> guildsWorkingSet = [.. guilds.Where(g => utcNow - g.LastPermissionCheck >= TimeSpan.FromHours(11.85))];
-        _logger.GlobalTimerCheckForChannelPermissions(guildsWorkingSet.Count);
-        if (guildsWorkingSet.Count is not 0)
-            await _botService.CheckPermissionsAsync(guildsWorkingSet);
-
-        guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.Checks.ServerStatus is true)];
+        List<GuildEntity> guildsWorkingSet = [.. guilds.Where(g => g.AzuraCast?.Checks.ServerStatus is true)];
         _logger.GlobalTimerCheckForAzuraCastStatus(guildsWorkingSet.Count);
         if (guildsWorkingSet.Count is not 0)
         {
