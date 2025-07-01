@@ -79,7 +79,7 @@ public static class IServiceCollectionExtensions
             o.AddJob<AzuraCheckApiPermissionsJob>(j => j.WithCronExpression(every12Hours).WithName(nameof(AzuraCheckApiPermissionsJob)));
             o.AddJob<AzuraCheckFileChangesJob>(j => j.WithCronExpression(everyHour).WithName(nameof(AzuraCheckFileChangesJob)));
             o.AddJob<AzuraCheckUpdatesJob>(j => j.WithCronExpression(every6Hours).WithName(nameof(AzuraCheckUpdatesJob)));
-            o.AddJob<AzuraRequestJob>();
+            o.AddJob<AzuraRequestJob>(); // This job is not intended to be run at a certain time, it will only be requested!
             o.AddJob<AzuraStatusPingJob>(j => j.WithCronExpression(every15Minutes).WithName(nameof(AzuraStatusPingJob)));
             o.AddJob<AzzyBotCheckPermissionsJob>(j => j.WithCronExpression(every12Hours).WithName(nameof(AzzyBotCheckPermissionsJob)));
             o.AddJob<AzzyBotUpdateCheckJob>(j => j.WithCronExpression(every6Hours).WithName(nameof(AzzyBotUpdateCheckJob)));
