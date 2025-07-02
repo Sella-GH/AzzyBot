@@ -72,36 +72,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             return;
         }
 
-        List<ulong> channels = new(channelIds.Length);
-        List<ulong> channelNotAccessible = new(channelIds.Length);
-        foreach (ulong channelId in channelIds)
-        {
-            channels.Add(channelId);
-            if (!await CheckChannelPermissionsAsync(member, channelId, [DiscordPermission.SendMessages, DiscordPermission.ViewChannel]))
-                channelNotAccessible.Add(channelId);
-        }
-
-        if (channelNotAccessible.Count is 0)
-            return;
-
-        StringBuilder builder = new();
-        builder.AppendLine(CultureInfo.InvariantCulture, $"I don't have the required permissions in server **{guild.Name}** to send messages in channel(s):");
-        foreach (ulong channelId in channelNotAccessible)
-        {
-            DiscordChannel? dChannel = await GetDiscordChannelAsync(channelId);
-            if (dChannel is null)
-            {
-                _logger.DiscordItemNotFound(nameof(DiscordChannel), channelId);
-                continue;
-            }
-
-            builder.AppendLine(CultureInfo.InvariantCulture, $"- {dChannel.Mention}");
-        }
-
-        builder.AppendLine("Please review your permission set.");
-
-        DiscordMember owner = await guild.GetGuildOwnerAsync();
-        await owner.SendMessageAsync(builder.ToString());
+        await CheckPermissionsCoreAsync(guild, member, channelIds);
     }
 
     public async Task CheckPermissionsAsync(GuildEntity guildEntity)
@@ -123,8 +94,6 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         }
 
         List<ulong> channels = [];
-        List<ulong> channelNotAccessible = [];
-
         if (guildEntity.UniqueId == _settings.ServerId)
         {
             channels.Add(_settings.ErrorChannelId);
@@ -152,43 +121,9 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             }
         }
 
-        foreach (ulong channelId in channels)
-        {
-            DiscordChannel? channel = await GetDiscordChannelAsync(channelId);
-            if (channel is null)
-            {
-                _logger.DiscordItemNotFound(nameof(DiscordChannel), channelId);
-                continue;
-            }
-
-            // TODO: When updating DSP to > 24500 use [DiscordPermission.SendMessages, DiscordPermission.ViewChannel]
-            if (!channel.PermissionsFor(member).HasAllPermissions(DiscordPermission.SendMessages, DiscordPermission.ViewChannel))
-                channelNotAccessible.Add(channelId);
-        }
-
         await _dbActions.UpdateGuildAsync(guildEntity.UniqueId, true);
 
-        if (channelNotAccessible.Count is 0)
-            return;
-
-        StringBuilder builder = new();
-        builder.AppendLine(CultureInfo.InvariantCulture, $"I don't have the required permissions in server **{guild.Name}** to send messages in channel(s):");
-        foreach (ulong channelId in channelNotAccessible)
-        {
-            DiscordChannel? dChannel = await GetDiscordChannelAsync(channelId);
-            if (dChannel is null)
-            {
-                _logger.DiscordItemNotFound(nameof(DiscordChannel), channelId);
-                continue;
-            }
-
-            builder.AppendLine(CultureInfo.InvariantCulture, $"- {dChannel.Mention}");
-        }
-
-        builder.AppendLine("Please review your permission set.");
-
-        DiscordMember owner = await guild.GetGuildOwnerAsync();
-        await owner.SendMessageAsync(builder.ToString());
+        await CheckPermissionsCoreAsync(guild, member, channels);
     }
 
     public async Task CheckPermissionsAsync(IReadOnlyList<GuildEntity> guilds)
@@ -554,6 +489,46 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             if (!string.IsNullOrEmpty(name) && value is not "0" or "undefined")
                 commandParameters.Add(name, value);
         }
+    }
+
+    private async Task CheckPermissionsCoreAsync(DiscordGuild guild, DiscordMember member, IEnumerable<ulong> channelIds)
+    {
+        List<ulong> channelNotAccessible = [];
+        foreach (ulong channelId in channelIds)
+        {
+            DiscordChannel? channel = await GetDiscordChannelAsync(channelId);
+            if (channel is null)
+            {
+                _logger.DiscordItemNotFound(nameof(DiscordChannel), channelId);
+                continue;
+            }
+
+            // TODO: When updating DSP to > 24500 use [DiscordPermission.SendMessages, DiscordPermission.ViewChannel]
+            if (!channel.PermissionsFor(member).HasAllPermissions(DiscordPermission.SendMessages, DiscordPermission.ViewChannel))
+                channelNotAccessible.Add(channelId);
+        }
+
+        if (channelNotAccessible.Count is 0)
+            return;
+
+        StringBuilder builder = new();
+        builder.AppendLine(CultureInfo.InvariantCulture, $"I don't have the required permissions in server **{guild.Name}** to send messages in channel(s):");
+        foreach (ulong channelId in channelNotAccessible)
+        {
+            DiscordChannel? dChannel = await GetDiscordChannelAsync(channelId);
+            if (dChannel is null)
+            {
+                _logger.DiscordItemNotFound(nameof(DiscordChannel), channelId);
+                continue;
+            }
+
+            builder.AppendLine(CultureInfo.InvariantCulture, $"- {dChannel.Mention}");
+        }
+
+        builder.AppendLine("Please review your permission set.");
+
+        DiscordMember owner = await guild.GetGuildOwnerAsync();
+        await owner.SendMessageAsync(builder.ToString());
     }
 
     private DiscordEmbedBuilder CreateExceptionEmbed(Exception ex, string timestamp, string? jsonMessage = null, string? guild = null, string? message = null, string? userMention = null, string? commandName = null, Dictionary<string, string>? commandOptions = null)
