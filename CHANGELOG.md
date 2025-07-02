@@ -2,6 +2,7 @@
 ### Improvements
 - Split up the maintenance jobs of the bot internals to make them more fail-safe
 - Optimized some discord related code to improve performance
+- Enabled HTTP/3 for the bot to improve webservice performance
 
 ### Fixes
 - Spelling mistakes were fixed
