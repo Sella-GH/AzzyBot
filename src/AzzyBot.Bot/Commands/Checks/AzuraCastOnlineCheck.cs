@@ -26,7 +26,7 @@ public sealed class AzuraCastOnlineCheck(ILogger<AzuraCastOnlineCheck> logger, D
         if (context is SlashCommandContext ctx && ctx.Interaction.ResponseState is DiscordInteractionResponseState.Unacknowledged)
             await context.DeferResponseAsync();
 
-        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
+        AzuraCastEntity? azuraCast = await _dbActions.ReadAzuraCastAsync(context.Guild.Id);
         if (azuraCast is null)
         {
             logger.DatabaseAzuraCastNotFound(context.Guild.Id);

@@ -39,7 +39,7 @@ public sealed class FeatureAvailableCheck(ILogger<FeatureAvailableCheck> logger,
         switch (attribute.Feature)
         {
             case AzuraCastFeatures.FileUploading:
-                AzuraCastStationPreferencesEntity? azuraCastStation = await _dbActions.GetAzuraCastStationPreferencesAsync(context.Guild.Id, stationId);
+                AzuraCastStationPreferencesEntity? azuraCastStation = await _dbActions.ReadAzuraCastStationPreferencesAsync(context.Guild.Id, stationId);
                 if (azuraCastStation is null)
                 {
                     _logger.DatabaseAzuraCastStationPreferencesNotFound(context.Guild.Id, 0, stationId);

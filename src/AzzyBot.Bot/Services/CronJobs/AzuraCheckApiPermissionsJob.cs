@@ -23,7 +23,7 @@ public sealed class AzuraCheckApiPermissionsJob(AzuraCastApiService apiService, 
         try
         {
             // AzuraCast preferences needed to send messages to the guilds channel
-            IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.GetAzuraCastsAsync(loadPrefs: true);
+            IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.ReadAzuraCastsAsync(loadPrefs: true);
             if (!azuraCasts.Any())
                 return;
 

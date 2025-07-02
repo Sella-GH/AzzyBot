@@ -20,7 +20,7 @@ public sealed class AzzyBotCheckPermissionsJob(DbActions dbActions, DiscordBotSe
     {
         try
         {
-            IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
+            IReadOnlyList<GuildEntity> guilds = await _dbActions.ReadGuildsAsync(loadEverything: true);
             if (!guilds.Any())
                 return;
 

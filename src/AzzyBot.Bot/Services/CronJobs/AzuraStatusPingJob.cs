@@ -22,7 +22,7 @@ public sealed class AzuraStatusPingJob(AzuraCastPingService pingService, DbActio
     {
         try
         {
-            IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.GetAzuraCastsAsync(loadChecks: true, loadPrefs: true, loadGuild: true);
+            IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.ReadAzuraCastsAsync(loadChecks: true, loadPrefs: true, loadGuild: true);
             if (!azuraCasts.Any())
                 return;
 

@@ -22,7 +22,7 @@ public sealed class AzuraCheckFileChangesJob(AzuraCastFileService azuraFileServi
     {
         try
         {
-            IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.GetAzuraCastsAsync(loadPrefs: true, loadStations: true, loadStationChecks: true, loadGuild: true);
+            IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.ReadAzuraCastsAsync(loadPrefs: true, loadStations: true, loadStationChecks: true, loadGuild: true);
             if (!azuraCasts.Any())
                 return;
 

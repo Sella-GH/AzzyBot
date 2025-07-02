@@ -36,7 +36,7 @@ public sealed class AzuraRequestJob(ILogger<AzuraRequestJob> logger, AzuraCastAp
             if (context.Parameter is not AzuraCustomQueueItemRecord record)
                 return;
 
-            AzuraCastStationEntity? station = await _dbActions.GetAzuraCastStationAsync(record.GuildId, record.StationId, loadAzuraCast: true);
+            AzuraCastStationEntity? station = await _dbActions.ReadAzuraCastStationAsync(record.GuildId, record.StationId, loadAzuraCast: true);
             if (station is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(record.GuildId, 0, record.StationId);
@@ -55,7 +55,7 @@ public sealed class AzuraRequestJob(ILogger<AzuraRequestJob> logger, AzuraCastAp
             {
                 await _apiService.RequestSongAsync(record.BaseUri, record.StationId, record.RequestId);
                 await _dbActions.UpdateAzuraCastStationAsync(record.GuildId, record.StationId, lastRequestTime: true);
-                await _dbActions.AddAzuraCastStationRequestAsync(record.GuildId, record.StationId, record.SongId);
+                await _dbActions.CreateAzuraCastStationRequestAsync(record.GuildId, record.StationId, record.SongId);
 
                 _logger.BackgroundServiceSongRequestFinished(record.RequestId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
             }
