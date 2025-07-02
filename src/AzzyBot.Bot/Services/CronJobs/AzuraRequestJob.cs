@@ -64,7 +64,7 @@ public sealed class AzuraRequestJob(ILogger<AzuraRequestJob> logger, AzuraCastAp
                 record.Timestamp = DateTimeOffset.UtcNow;
                 _cronJobManager.RunAzuraRequestJob(record);
 
-                _logger.BackgroundServiceSongRequestRequed(record.RequestId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
+                _logger.BackgroundServiceSongRequestRequeued(record.RequestId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
             }
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)

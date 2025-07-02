@@ -31,7 +31,7 @@ public static partial class LoggerActions
     public static partial void BackgroundServiceSongRequestWaiting(this ILogger logger, string rId, int gId, int iId, int dId, int sId, int time);
 
     [LoggerMessage(33, LogLevel.Debug, "Song request {rId} from {gId}-{iId}-{dId}-{sId} requeued")]
-    public static partial void BackgroundServiceSongRequestRequed(this ILogger logger, string rId, int gId, int iId, int dId, int sId);
+    public static partial void BackgroundServiceSongRequestRequeued(this ILogger logger, string rId, int gId, int iId, int dId, int sId);
 
     [LoggerMessage(34, LogLevel.Debug, "Song request {rId} from {gId}-{iId}-{dId}-{sId} finished")]
     public static partial void BackgroundServiceSongRequestFinished(this ILogger logger, string rId, int gId, int iId, int dId, int sId);
@@ -170,9 +170,6 @@ public static partial class LoggerActions
 
     [LoggerMessage(303, LogLevel.Error, "The {type} request to {uri} failed with error: {ex}")]
     public static partial void WebRequestFailed(this ILogger logger, HttpMethod type, string ex, Uri uri);
-
-    [LoggerMessage(320, LogLevel.Error, "Database transaction failed with error: ")]
-    public static partial void DatabaseTransactionFailed(this ILogger logger, Exception ex);
 
     [LoggerMessage(400, LogLevel.Critical, "An exception occurred: ")]
     public static partial void ExceptionOccurred(this ILogger logger, Exception ex);
