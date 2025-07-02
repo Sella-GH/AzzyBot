@@ -17,11 +17,13 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Docker'">
+    <DebugType>none</DebugType>
     <DefineConstants>DOCKER</DefineConstants>
     <Optimize>True</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DebugType>none</DebugType>
     <DefineConstants>RELEASE</DefineConstants>
     <Optimize>True</Optimize>
   </PropertyGroup>
