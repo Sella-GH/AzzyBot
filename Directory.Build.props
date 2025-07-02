@@ -60,6 +60,10 @@
   </PropertyGroup>
   
   <!-- Runtimeconfig settings -->
+  <ItemGroup>
+    <RuntimeHostConfigurationOption Value="true" Include="System.Net.SocketsHttpHandler.Http3Support" />
+  </ItemGroup>
+
   <PropertyGroup>
     <!-- JIT Settings -->
     <TieredCompilation>True</TieredCompilation>

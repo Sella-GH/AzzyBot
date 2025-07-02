@@ -224,7 +224,7 @@ public sealed class MusicStreamingCommands
                 return;
             }
 
-            AzuraCastEntity? azura = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
+            AzuraCastEntity? azura = await _dbActions.ReadAzuraCastAsync(context.Guild.Id);
             if (azura is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);

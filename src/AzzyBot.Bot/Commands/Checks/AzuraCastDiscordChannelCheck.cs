@@ -32,7 +32,7 @@ public sealed class AzuraCastDiscordChannelCheck(ILogger<AzuraCastDiscordChannel
             await context.DeferResponseAsync();
 
         int stationId = Convert.ToInt32(context.Arguments.SingleOrDefault(static o => o.Key.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
-        AzuraCastStationPreferencesEntity? prefs = await _dbActions.GetAzuraCastStationPreferencesAsync(context.Guild.Id, stationId);
+        AzuraCastStationPreferencesEntity? prefs = await _dbActions.ReadAzuraCastStationPreferencesAsync(context.Guild.Id, stationId);
         if (prefs is null)
         {
             _logger.DatabaseAzuraCastStationPreferencesNotFound(context.Guild.Id, 0, stationId);

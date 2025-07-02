@@ -41,7 +41,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
         if (stationId is 0)
             return [];
 
-        AzuraCastStationEntity? stationEntity = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, stationId, loadAzuraCast: true, loadAzuraCastPrefs: true);
+        AzuraCastStationEntity? stationEntity = await _dbActions.ReadAzuraCastStationAsync(context.Guild.Id, stationId, loadAzuraCast: true, loadAzuraCastPrefs: true);
         if (stationEntity is null)
         {
             _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, stationId);

@@ -80,7 +80,7 @@ public sealed class DebugCommands
             sb.AppendLine(CultureInfo.InvariantCulture, $"GuildId is {serverId}");
             sb.AppendLine("Checking if guild exists.");
 
-            GuildEntity? guild = await _dbActions.GetGuildAsync(guildIdValue);
+            GuildEntity? guild = await _dbActions.ReadGuildAsync(guildIdValue);
             if (guild is null)
             {
                 await context.EditResponseAsync(GeneralStrings.GuildNotFound);

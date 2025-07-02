@@ -33,7 +33,7 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, I
 
         _logger.GuildCreated(eventArgs.Guild.Name);
 
-        await _dbActions.AddGuildAsync(eventArgs.Guild.Id);
+        await _dbActions.CreateGuildAsync(eventArgs.Guild.Id);
         await GuildCreatedHelperAsync([eventArgs.Guild]);
     }
 
@@ -76,12 +76,12 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, I
             return;
         }
 
-        IEnumerable<DiscordGuild> addedGuilds = await _dbActions.AddGuildsAsync(eventArgs.Guilds);
+        IEnumerable<DiscordGuild> addedGuilds = await _dbActions.CreateGuildsAsync(eventArgs.Guilds);
         if (addedGuilds.Any())
             await GuildCreatedHelperAsync(addedGuilds);
 
         DiscordEmbed embed;
-        IEnumerable<ulong> removedGuilds = await _dbActions.DeleteGuildsAsync(eventArgs.Guilds);
+        IEnumerable<ulong> removedGuilds = await _dbActions.DeleteGuildsAsync(eventArgs.Guilds.Values.ToAsyncEnumerable());
         if (removedGuilds.Any())
         {
             foreach (ulong removedGuild in removedGuilds)
@@ -91,7 +91,7 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, I
             }
         }
 
-        IReadOnlyList<GuildEntity> guilds = await _dbActions.GetGuildsAsync(loadEverything: true);
+        IReadOnlyList<GuildEntity> guilds = await _dbActions.ReadGuildsAsync(loadEverything: true);
         await _botService.CheckPermissionsAsync(guilds);
     }
 

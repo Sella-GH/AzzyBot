@@ -1,3 +1,12 @@
+## 2.6.0
+### Improvements
+- Split up the maintenance jobs of the bot internals to make them more fail-safe
+- Optimized some discord related code to improve performance
+- Enabled HTTP/3 for the bot to improve webservice performance
+
+### Fixes
+- Spelling mistakes were fixed
+
 ## 2.5.0
 ### General
 - Reduced the size of the docker image by a few MB (maybe unnoticeable)
