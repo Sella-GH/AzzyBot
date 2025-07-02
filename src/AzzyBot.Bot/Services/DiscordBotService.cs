@@ -171,7 +171,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         return member;
     }
 
-    public async Task<bool> LogExceptionAsync(Exception ex, DateTimeOffset timestamp, SlashCommandContext? ctx = null, string? info = null)
+    public async Task LogExceptionAsync(Exception ex, DateTimeOffset timestamp, SlashCommandContext? ctx = null, string? info = null)
     {
         ArgumentNullException.ThrowIfNull(ex);
 
@@ -209,15 +209,11 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
                 _logger.UnableToSendMessage("Error message was not sent");
 
             FileOperations.DeleteFile(tempFilePath);
-
-            return true;
         }
         catch (Exception e) when (e is IOException or NotSupportedException or SecurityException or UnauthorizedAccessException)
         {
             _logger.UnableToLogException(e.ToString());
         }
-
-        return false;
     }
 
     public async Task RespondToChecksExceptionAsync(ChecksFailedException ex, SlashCommandContext context)
