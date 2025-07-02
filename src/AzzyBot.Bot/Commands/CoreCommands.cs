@@ -56,7 +56,7 @@ public sealed class CoreCommands
 
             await context.EditResponseAsync("I initiated a check of the permissions for the bot, please wait a little for the result.");
 
-            await _botService.CheckPermissionsAsync([guild]);
+            await _botService.CheckPermissionsAsync(guild);
         }
 
         [Command("help"), Description("Gives you an overview about all the available commands.")]
