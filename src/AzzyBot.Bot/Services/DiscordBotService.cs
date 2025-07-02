@@ -130,14 +130,10 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
     {
         ArgumentNullException.ThrowIfNull(guilds);
 
-        Task[] tasks = new Task[guilds.Count];
-        for (int i = 0; i < guilds.Count; i++)
+        foreach (GuildEntity guild in guilds)
         {
-            GuildEntity guildEntity = guilds[i];
-            tasks[i] = CheckPermissionsAsync(guildEntity);
+            await CheckPermissionsAsync(guild);
         }
-
-        await Task.WhenAll(tasks);
     }
 
     public async Task<DiscordChannel?> GetDiscordChannelAsync(ulong channelId)
