@@ -621,7 +621,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         }
     }
 
-    public async Task UpdateAzuraCastStationPreferencesAsync(ulong guildId, int stationId, ulong? stationAdminGroup = null, ulong? stationDjGroup = null, ulong? fileUploadId = null, ulong? requestId = null, string? fileUploadPath = null, bool? playlist = null)
+    public async Task UpdateAzuraCastStationPreferencesAsync(ulong guildId, int stationId, ulong? stationAdminGroup = null, ulong? stationDjGroup = null, ulong? fileUploadId = null, ulong? nowPlayingEmbedChannelId = null, ulong? nowPlayingEmbedMessageId = null, ulong? requestId = null, string? fileUploadPath = null, bool? playlist = null)
     {
         await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
 
@@ -644,6 +644,12 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         if (fileUploadId.HasValue)
             preferences.FileUploadChannelId = fileUploadId.Value;
 
+        if (nowPlayingEmbedChannelId.HasValue)
+            preferences.NowPlayingEmbedChannelId = nowPlayingEmbedChannelId.Value;
+
+        if (nowPlayingEmbedMessageId.HasValue)
+            preferences.NowPlayingEmbedMessageId = nowPlayingEmbedMessageId.Value;
+
         if (requestId.HasValue)
             preferences.RequestsChannelId = requestId.Value;
 
@@ -664,7 +670,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await UpdateAzuraCastStationPreferencesAsync(guildId, stationId, stationAdminGroup, stationDjGroup, fileUploadId, requestId, fileUploadPath, playlist);
+            await UpdateAzuraCastStationPreferencesAsync(guildId, stationId, stationAdminGroup, stationDjGroup, fileUploadId, nowPlayingEmbedChannelId, nowPlayingEmbedMessageId, requestId, fileUploadPath, playlist);
 
             _logger.DatabaseConcurrencyResolved();
         }

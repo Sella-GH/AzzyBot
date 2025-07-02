@@ -20,7 +20,7 @@ public sealed class GuildPreferencesEntity
     public ulong AdminRoleId { get; set; }
 
     /// <summary>
-    /// The <see cref="DiscordChannel"/> id of the adminstrative <see cref="DiscordChannel"/>.
+    /// The <see cref="DiscordChannel"/> id of the administrative <see cref="DiscordChannel"/>.
     /// </summary>
     public ulong AdminNotifyChannelId { get; set; }
 
