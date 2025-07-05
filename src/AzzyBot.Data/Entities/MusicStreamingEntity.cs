@@ -4,10 +4,7 @@ using DSharpPlus.Entities;
 
 namespace AzzyBot.Data.Entities;
 
-/// <summary>
-/// The user-defined preferences of the guild object.
-/// </summary>
-public sealed class GuildPreferencesEntity
+public sealed class MusicStreamingEntity
 {
     /// <summary>
     /// The database id.
@@ -15,14 +12,19 @@ public sealed class GuildPreferencesEntity
     public int Id { get; set; }
 
     /// <summary>
-    /// The <see cref="DiscordRole"/> id of the administrative <see cref="DiscordRole"/> of the <see cref="DiscordGuild"/>.
+    /// The <see cref="DiscordChannel"/> id of the <see cref="DiscordChannel"/> in which the persistent NowPlaying embed should be sent.
     /// </summary>
-    public ulong AdminRoleId { get; set; }
+    public ulong NowPlayingEmbedChannelId { get; set; }
 
     /// <summary>
-    /// The <see cref="DiscordChannel"/> id of the administrative <see cref="DiscordChannel"/>.
+    /// The <see cref="DiscordMessage"/> id of the persistent NowPlaying embed message.
     /// </summary>
-    public ulong AdminNotifyChannelId { get; set; }
+    public ulong NowPlayingEmbedMessageId { get; set; }
+
+    /// <summary>
+    /// The audio volume of the guild.
+    /// </summary>
+    public int Volume { get; set; }
 
     /// <summary>
     /// The concurrency token for optimistic concurrency checks.

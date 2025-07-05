@@ -141,6 +141,9 @@ public static partial class LoggerActions
     [LoggerMessage(218, LogLevel.Warning, "Could not find AzuraCast station preferences for guild {guild} in instance {instance} at station {station}")]
     public static partial void DatabaseAzuraCastStationPreferencesNotFound(this ILogger logger, ulong guild, int instance, int station);
 
+    [LoggerMessage(219, LogLevel.Warning, "Could not find MusicStreaming item for guild {guild}")]
+    public static partial void DatabaseMusicStreamingNotFound(this ILogger logger, ulong guild);
+
     [LoggerMessage(220, LogLevel.Warning, "Could not find discord item {item} for guild {guild}")]
     public static partial void DiscordItemNotFound(this ILogger logger, string item, ulong guild);
 

@@ -44,13 +44,14 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AzuraCastCommands
 {
     [Command("azuracast"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast])]
-    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, DbActions dbActions, DiscordBotService botService, MusicStreamingService musicStreaming)
+    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, CronJobManager cronJobManager, DbActions dbActions, DiscordBotService botService, MusicStreamingService musicStreaming)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCastApi = azuraCastApi;
         private readonly AzuraCastFileService _azuraCastFile = azuraCastFile;
         private readonly AzuraCastPingService _azuraCastPing = azuraCastPing;
         private readonly AzuraCastUpdateService _azuraCastUpdate = azuraCastUpdate;
+        private readonly CronJobManager _cronJobManager = cronJobManager;
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
         private readonly MusicStreamingService _musicStreaming = musicStreaming;
@@ -339,6 +340,45 @@ public sealed class AzuraCastCommands
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastHardwareStatsEmbed(hardwareStats);
 
             await context.EditResponseAsync(embed);
+        }
+
+        [Command("station-nowplaying-embed"), Description("Configure the channel where the now playing embed should be sent. Leave empty to remove it."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
+        public async ValueTask SetStationNowPlayingEmbedAsync
+        (
+            SlashCommandContext context,
+            [Description("The station you want to set the now playing embed for."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("The channel where the now playing embed should be sent.")] DiscordChannel? channel = null
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
+
+            _logger.CommandRequested(nameof(SetStationNowPlayingEmbedAsync), context.User.GlobalName);
+
+            AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadStations: true);
+            if (ac is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
+                return;
+            }
+
+            AzuraCastStationEntity? acStation = ac.Stations.FirstOrDefault(s => s.StationId == station);
+            if (acStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, ac.Id, station);
+                await context.EditResponseAsync(GeneralStrings.StationNotFound);
+                return;
+            }
+
+            await _dbActions.UpdateAzuraCastStationPreferencesAsync(ac.Guild.UniqueId, acStation.StationId, nowPlayingEmbedChannelId: channel?.Id ?? 0);
+            _cronJobManager.RunAzuraPersistentNowPlayingJob();
+
+            string message = (channel is null)
+                ? "I removed the now playing embed channel for this station. I will no longer update the embed."
+                : "I set the now playing embed channel for this station and will update it every minute.";
+
+            await context.EditResponseAsync(message);
         }
 
         [Command("start-station"), Description("Start the selected station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]

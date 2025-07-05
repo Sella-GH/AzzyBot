@@ -25,6 +25,16 @@ public sealed class AzuraCastStationPreferencesEntity
     public string FileUploadPath { get; set; } = string.Empty;
 
     /// <summary>
+    /// The <see cref="DiscordChannel"/> id of the <see cref="DiscordChannel"/> in which the persistent NowPlaying embed should be sent.
+    /// </summary>
+    public ulong NowPlayingEmbedChannelId { get; set; }
+
+    /// <summary>
+    /// The <see cref="DiscordMessage"/> id of the persistent NowPlaying embed message.
+    /// </summary>
+    public ulong NowPlayingEmbedMessageId { get; set; }
+
+    /// <summary>
     /// The <see cref="DiscordChannel"/> id of the <see cref="DiscordChannel"/> to which not-available music-requests should be sent.
     /// </summary>
     public ulong RequestsChannelId { get; set; }

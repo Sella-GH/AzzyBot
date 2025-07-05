@@ -561,10 +561,11 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(5)
         {
+            ["Configuration Complete"] = new(Misc.GetReadableBool(guild.ConfigSet, ReadableBool.YesNo)),
+            ["Legals Accepted"] = new(Misc.GetReadableBool(guild.LegalsAccepted, ReadableBool.YesNo)),
             ["Server ID"] = new(guild.UniqueId.ToString(CultureInfo.InvariantCulture)),
             ["Admin Role"] = new((!string.IsNullOrEmpty(adminRole?.Trim()) && adminRole.Trim() is not "()") ? adminRole.Trim() : "Not set"),
-            ["Admin Notify Channel"] = new((guild.Preferences.AdminNotifyChannelId > 0) ? $"<#{guild.Preferences.AdminNotifyChannelId}>" : "Not set"),
-            ["Configuration Complete"] = new(Misc.GetReadableBool(guild.ConfigSet, ReadableBool.YesNo))
+            ["Admin Notify Channel"] = new((guild.Preferences.AdminNotifyChannelId > 0) ? $"<#{guild.Preferences.AdminNotifyChannelId}>" : "Not set")
         };
 
         return CreateBasicEmbed(title, description, DiscordColor.White, fields: fields);
@@ -575,10 +576,11 @@ public static class EmbedBuilder
         ArgumentNullException.ThrowIfNull(azuraCast);
 
         const string title = "AzuraCast Settings";
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(6)
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(7)
         {
             ["Base Url"] = new($"||{((!string.IsNullOrEmpty(azuraCast.BaseUrl)) ? Crypto.Decrypt(azuraCast.BaseUrl) : "Not set")}||"),
             ["Admin Api Key"] = new($"||{((!string.IsNullOrEmpty(azuraCast.AdminApiKey)) ? Crypto.Decrypt(azuraCast.AdminApiKey) : "Not set")}||"),
+            ["Instance Online"] = new(Misc.GetReadableBool(azuraCast.IsOnline, ReadableBool.EnabledDisabled)),
             ["Instance Admin Role"] = new((!string.IsNullOrEmpty(instanceRole?.Trim()) && instanceRole.Trim() is not "()") ? instanceRole.Trim() : "Not set"),
             ["Notification Channel"] = new((azuraCast.Preferences.NotificationChannelId > 0) ? $"<#{azuraCast.Preferences.NotificationChannelId}>" : "Not set"),
             ["Outages Channel"] = new((azuraCast.Preferences.OutagesChannelId > 0) ? $"<#{azuraCast.Preferences.OutagesChannelId}>" : "Not set"),
@@ -624,24 +626,26 @@ public static class EmbedBuilder
             }
 
             string fileUploadChannel = (station.Preferences.FileUploadChannelId > 0) ? $"<#{station.Preferences.FileUploadChannelId}>" : "Not set";
+            string fileUploadPath = (!string.IsNullOrEmpty(station.Preferences.FileUploadPath)) ? station.Preferences.FileUploadPath : "Not set";
+            string nowPlayingChannel = (station.Preferences.NowPlayingEmbedChannelId > 0) ? $"<#{station.Preferences.NowPlayingEmbedChannelId}>" : "Not set";
             string requestsChannel = (station.Preferences.RequestsChannelId > 0) ? $"<#{station.Preferences.RequestsChannelId}>" : "Not set";
             int requestCount = stationRequests.FirstOrDefault(x => x.Key == station.Id).Value;
-            string fileUploadPath = (!string.IsNullOrEmpty(station.Preferences.FileUploadPath)) ? station.Preferences.FileUploadPath : "Not set";
             string showPlaylist = Misc.GetReadableBool(station.Preferences.ShowPlaylistInNowPlaying, ReadableBool.EnabledDisabled);
             string fileChanges = Misc.GetReadableBool(station.Checks.FileChanges, ReadableBool.EnabledDisabled);
 
-            Dictionary<string, AzzyDiscordEmbedRecord> fields = new(11)
+            Dictionary<string, AzzyDiscordEmbedRecord> fields = new(12)
             {
                 ["Station Name"] = new(stationName),
                 ["Station ID"] = new(stationId),
                 ["Station Api Key"] = new(stationApiKey),
+                ["File Upload Channel"] = new(fileUploadChannel),
+                ["File Upload Path"] = new(fileUploadPath),
+                ["Now Playing Channel"] = new(nowPlayingChannel),
+                ["Song Requests Channel"] = new(requestsChannel),
+                ["Song Request Count"] = new(requestCount.ToString(CultureInfo.InvariantCulture)),
+                ["Show Playlist In Now Playing"] = new(showPlaylist),
                 ["Station Admin Role"] = new(stationAdminRole),
                 ["Station DJ Role"] = new(stationDjRole),
-                ["File Upload Channel"] = new(fileUploadChannel),
-                ["Music Requests Channel"] = new(requestsChannel),
-                ["Song Request Count"] = new(requestCount.ToString(CultureInfo.InvariantCulture)),
-                ["File Upload Path"] = new(fileUploadPath),
-                ["Show Playlist In Now Playing"] = new(showPlaylist),
                 ["Automatic Checks"] = new($"- File Changes: {fileChanges}")
             };
 

@@ -53,7 +53,15 @@ public sealed class GuildEntity
     /// The possible <see cref="AzuraCastEntity"/> database item.
     /// </summary>
     /// <remarks>
-    /// This can be null if this <see cref="DiscordGuild"/> does not utilitize AzuraCast.
+    /// This can be null if this <see cref="DiscordGuild"/> does not utilize AzuraCast.
     /// </remarks>
     public AzuraCastEntity? AzuraCast { get; set; }
+
+    /// <summary>
+    /// The possible <see cref="MusicStreamingEntity"/> database item.
+    /// </summary>
+    /// <remarks>
+    /// This can be null if this <see cref="DiscordGuild"/> does not utilize the music streaming service.
+    /// </remarks>
+    public MusicStreamingEntity? MusicStreaming { get; set; }
 }
