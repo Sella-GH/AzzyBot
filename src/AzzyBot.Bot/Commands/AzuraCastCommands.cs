@@ -355,23 +355,7 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(SetStationNowPlayingEmbedAsync), context.User.GlobalName);
 
-            AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadStations: true);
-            if (ac is null)
-            {
-                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
-                return;
-            }
-
-            AzuraCastStationEntity? acStation = ac.Stations.FirstOrDefault(s => s.StationId == station);
-            if (acStation is null)
-            {
-                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, ac.Id, station);
-                await context.EditResponseAsync(GeneralStrings.StationNotFound);
-                return;
-            }
-
-            await _dbActions.UpdateAzuraCastStationPreferencesAsync(ac.Guild.UniqueId, acStation.StationId, nowPlayingEmbedChannelId: channel?.Id ?? 0);
+            await _dbActions.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, nowPlayingEmbedChannelId: channel?.Id ?? 0);
             _cronJobManager.RunAzuraPersistentNowPlayingJob();
 
             string message = (channel is null)

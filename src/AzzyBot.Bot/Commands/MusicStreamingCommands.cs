@@ -421,14 +421,6 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(StreamingNowPlayingEmbedAsync), context.User.GlobalName);
 
-            MusicStreamingEntity? ms = await _dbActions.ReadMusicStreamingAsync(context.Guild.Id);
-            if (ms is null)
-            {
-                _logger.DatabaseMusicStreamingNotFound(context.Guild.Id);
-                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
-                return;
-            }
-
             await _dbActions.UpdateMusicStreamingAsync(context.Guild.Id, nowPlayingEmbedChannelId: channel?.Id ?? 0);
             _cronJobManager.RunAzuraPersistentNowPlayingJob();
 
