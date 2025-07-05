@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AzzyBot.Data.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20250702214745_AddPersistentNowPlayingEmbed")]
+    [Migration("20250705231742_AddPersistentNowPlayingEmbed")]
     partial class AddPersistentNowPlayingEmbed
     {
         /// <inheritdoc />
@@ -377,6 +377,40 @@ namespace AzzyBot.Data.Migrations
                     b.ToTable("GuildPreferences");
                 });
 
+            modelBuilder.Entity("AzzyBot.Data.Entities.MusicStreamingEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GuildId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("NowPlayingEmbedChannelId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<decimal>("NowPlayingEmbedMessageId")
+                        .HasColumnType("numeric(20,0)");
+
+                    b.Property<uint>("Version")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<int>("Volume")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GuildId")
+                        .IsUnique();
+
+                    b.ToTable("MusicStreaming");
+                });
+
             modelBuilder.Entity("AzzyBot.Data.Entities.AzuraCastChecksEntity", b =>
                 {
                     b.HasOne("AzzyBot.Data.Entities.AzuraCastEntity", "AzuraCast")
@@ -465,6 +499,17 @@ namespace AzzyBot.Data.Migrations
                     b.Navigation("Guild");
                 });
 
+            modelBuilder.Entity("AzzyBot.Data.Entities.MusicStreamingEntity", b =>
+                {
+                    b.HasOne("AzzyBot.Data.Entities.GuildEntity", "Guild")
+                        .WithOne("MusicStreaming")
+                        .HasForeignKey("AzzyBot.Data.Entities.MusicStreamingEntity", "GuildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Guild");
+                });
+
             modelBuilder.Entity("AzzyBot.Data.Entities.AzuraCastEntity", b =>
                 {
                     b.Navigation("Checks")
@@ -490,6 +535,8 @@ namespace AzzyBot.Data.Migrations
             modelBuilder.Entity("AzzyBot.Data.Entities.GuildEntity", b =>
                 {
                     b.Navigation("AzuraCast");
+
+                    b.Navigation("MusicStreaming");
 
                     b.Navigation("Preferences")
                         .IsRequired();

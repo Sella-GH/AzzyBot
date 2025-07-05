@@ -88,6 +88,7 @@ public static class IServiceCollectionExtensions
             o.AddJob<AzzyBotUpdateCheckJob>(j => j.WithCronExpression(every6Hours).WithName(nameof(AzzyBotUpdateCheckJob)));
             o.AddJob<DatabaseCleaningJob>(j => j.WithCronExpression(everyDay).WithName(nameof(DatabaseCleaningJob))).RunAtStartup();
             o.AddJob<LogfileCleaningJob>(j => j.WithCronExpression(everyDay).WithName(nameof(LogfileCleaningJob)).WithParameter(logDays)).RunAtStartup();
+            o.AddJob<MusicStreamingPersistentNowPlayingJob>(j => j.WithCronExpression(everyMinute).WithName(nameof(MusicStreamingPersistentNowPlayingJob)));
         });
         services.AddSingleton<CronJobManager>();
 

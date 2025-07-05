@@ -201,6 +201,32 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             .Select(guild => guilds[guild.UniqueId]);
     }
 
+    public async Task CreateMusicStreamingAsync(ulong guildId, ulong nowPlayingEmbedChannelId = 0, ulong nowPlayingEmbedMessageId = 0, int volume = 50)
+    {
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        GuildEntity? guild = await dbContext.Guilds.SingleOrDefaultAsync(g => g.UniqueId == guildId);
+        if (guild is null)
+        {
+            _logger.DatabaseGuildNotFound(guildId);
+            return;
+        }
+
+        if (await dbContext.MusicStreaming.AnyAsync(m => m.Guild.UniqueId == guildId))
+            return;
+
+        MusicStreamingEntity musicStreaming = new()
+        {
+            NowPlayingEmbedChannelId = nowPlayingEmbedChannelId,
+            NowPlayingEmbedMessageId = nowPlayingEmbedMessageId,
+            Volume = volume,
+            GuildId = guild.Id
+        };
+
+        await dbContext.MusicStreaming.AddAsync(musicStreaming);
+        await dbContext.SaveChangesAsync();
+    }
+
     public async Task DeleteAzuraCastAsync(ulong guildId)
     {
         await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
@@ -243,6 +269,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
 
         try
         {
+            await dbContext.MusicStreaming.Where(m => m.Guild.UniqueId == guildId).ExecuteDeleteAsync();
             await dbContext.AzuraCast.Where(a => a.Guild.UniqueId == guildId).ExecuteDeleteAsync();
             await dbContext.Guilds.Where(g => g.UniqueId == guildId).ExecuteDeleteAsync();
         }
@@ -296,6 +323,24 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         return guildsToDelete
             .Where(guild => !currentGuildIds.Contains(guild.UniqueId))
             .Select(static guild => guild.UniqueId);
+    }
+
+    public async Task DeleteMusicStreamingAsync(ulong guildId)
+    {
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        try
+        {
+            await dbContext.MusicStreaming.Where(m => m.Guild.UniqueId == guildId).ExecuteDeleteAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            _logger.DatabaseConcurrencyException(ex);
+
+            await HandleConcurrencyExceptionAsync(ex.Entries);
+
+            await DeleteMusicStreamingAsync(guildId);
+        }
     }
 
     public async Task<AzuraCastEntity?> ReadAzuraCastAsync(ulong guildId, bool loadChecks = false, bool loadPrefs = false, bool loadStations = false, bool loadStationChecks = false, bool loadStationPrefs = false, bool loadGuild = false)
@@ -385,6 +430,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast).Include(static g => g.AzuraCast!.Checks).Include(static g => g.AzuraCast!.Preferences))
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Checks))
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Preferences))
+            .IncludeIf(loadEverything, static q => q.Include(static g => g.MusicStreaming))
             .SingleOrDefaultAsync();
     }
 
@@ -398,6 +444,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast).Include(static g => g.AzuraCast!.Checks).Include(static g => g.AzuraCast!.Preferences))
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Checks))
             .IncludeIf(loadEverything, static q => q.Include(static g => g.AzuraCast!.Stations).ThenInclude(static s => s.Preferences))
+            .IncludeIf(loadEverything, static q => q.Include(static g => g.MusicStreaming))
             .ToListAsync();
     }
 
@@ -410,6 +457,27 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             .Where(g => g.UniqueId == guildId)
             .Select(static g => g.Preferences)
             .SingleOrDefaultAsync();
+    }
+
+    public async Task<MusicStreamingEntity?> ReadMusicStreamingAsync(ulong guildId, bool loadGuild = false)
+    {
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        return await dbContext.MusicStreaming
+            .AsNoTracking()
+            .Where(m => m.Guild.UniqueId == guildId)
+            .IncludeIf(loadGuild, static q => q.Include(static m => m.Guild))
+            .SingleOrDefaultAsync();
+    }
+
+    public async Task<IReadOnlyList<MusicStreamingEntity>> ReadMusicStreamingAsync(bool loadGuild = false)
+    {
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        return await dbContext.MusicStreaming
+            .AsNoTracking()
+            .IncludeIf(loadGuild, static q => q.Include(static m => m.Guild))
+            .ToListAsync();
     }
 
     public async Task UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl = null, string? apiKey = null, bool? isOnline = null)
@@ -803,6 +871,46 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
             await UpdateGuildPreferencesAsync(guildId, adminRoleId, adminNotifyChannelId);
+
+            _logger.DatabaseConcurrencyResolved();
+        }
+    }
+
+    public async Task UpdateMusicStreamingAsync(ulong guildId, ulong? nowPlayingEmbedChannelId = null, ulong? NowPlayingEmbedMessageId = null, int? volume = null)
+    {
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        MusicStreamingEntity? musicStreaming = await dbContext.MusicStreaming
+            .Where(m => m.Guild.UniqueId == guildId)
+            .SingleOrDefaultAsync();
+
+        if (musicStreaming is null)
+        {
+            _logger.DatabaseMusicStreamingNotFound(guildId);
+            return;
+        }
+
+        if (nowPlayingEmbedChannelId.HasValue)
+            musicStreaming.NowPlayingEmbedChannelId = nowPlayingEmbedChannelId.Value;
+
+        if (NowPlayingEmbedMessageId.HasValue)
+            musicStreaming.NowPlayingEmbedMessageId = NowPlayingEmbedMessageId.Value;
+
+        if (volume.HasValue)
+            musicStreaming.Volume = volume.Value;
+
+        dbContext.MusicStreaming.Update(musicStreaming);
+
+        try
+        {
+            await dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            _logger.DatabaseConcurrencyException(ex);
+
+            await HandleConcurrencyExceptionAsync(ex.Entries);
+            await UpdateMusicStreamingAsync(guildId, nowPlayingEmbedChannelId, NowPlayingEmbedMessageId, volume);
 
             _logger.DatabaseConcurrencyResolved();
         }
