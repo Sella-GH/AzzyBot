@@ -19,9 +19,9 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzzyPersistentNowPlayingJob(ILogger<AzzyPersistentNowPlayingJob> logger, AzuraCastApiService apiService, DbActions dbActions, DiscordBotService botService) : IJob
+public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayingJob> logger, AzuraCastApiService apiService, DbActions dbActions, DiscordBotService botService) : IJob
 {
-    private readonly ILogger<AzzyPersistentNowPlayingJob> _logger = logger;
+    private readonly ILogger<AzuraPersistentNowPlayingJob> _logger = logger;
     private readonly AzuraCastApiService _apiService = apiService;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;

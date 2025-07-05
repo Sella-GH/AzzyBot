@@ -17,8 +17,8 @@ public sealed class CronJobManager(IInstantJobRegistry jobRegistry, DiscordBotSe
     public void RunAzuraRequestJob(AzuraCustomQueueItemRecord record)
         => _jobRegistry.RunInstantJob<AzuraRequestJob>(record);
 
-    public void RunAzzyPersistentNowPlayingJob()
-        => _jobRegistry.RunInstantJob<AzzyPersistentNowPlayingJob>();
+    public void RunAzuraPersistentNowPlayingJob()
+        => _jobRegistry.RunInstantJob<AzuraPersistentNowPlayingJob>();
 
     public async Task<bool> TryHandleAsync(IJobExecutionContext jobExecutionContext, Exception exception, CancellationToken cancellationToken)
     {

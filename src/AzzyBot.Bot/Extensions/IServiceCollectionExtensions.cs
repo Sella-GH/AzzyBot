@@ -81,11 +81,11 @@ public static class IServiceCollectionExtensions
             o.AddJob<AzuraCheckApiPermissionsJob>(j => j.WithCronExpression(every12Hours).WithName(nameof(AzuraCheckApiPermissionsJob)));
             o.AddJob<AzuraCheckFileChangesJob>(j => j.WithCronExpression(everyHour).WithName(nameof(AzuraCheckFileChangesJob)));
             o.AddJob<AzuraCheckUpdatesJob>(j => j.WithCronExpression(every6Hours).WithName(nameof(AzuraCheckUpdatesJob)));
+            o.AddJob<AzuraPersistentNowPlayingJob>(j => j.WithCronExpression(everyMinute).WithName(nameof(AzuraPersistentNowPlayingJob)));
             o.AddJob<AzuraRequestJob>(); // This job is not intended to be run at a certain time, it will only be requested!
             o.AddJob<AzuraStatusPingJob>(j => j.WithCronExpression(every15Minutes).WithName(nameof(AzuraStatusPingJob)));
             o.AddJob<AzzyBotCheckPermissionsJob>(j => j.WithCronExpression(every12Hours).WithName(nameof(AzzyBotCheckPermissionsJob)));
             o.AddJob<AzzyBotUpdateCheckJob>(j => j.WithCronExpression(every6Hours).WithName(nameof(AzzyBotUpdateCheckJob)));
-            o.AddJob<AzzyPersistentNowPlayingJob>(j => j.WithCronExpression(everyMinute).WithName(nameof(AzzyPersistentNowPlayingJob)));
             o.AddJob<DatabaseCleaningJob>(j => j.WithCronExpression(everyDay).WithName(nameof(DatabaseCleaningJob))).RunAtStartup();
             o.AddJob<LogfileCleaningJob>(j => j.WithCronExpression(everyDay).WithName(nameof(LogfileCleaningJob)).WithParameter(logDays)).RunAtStartup();
         });

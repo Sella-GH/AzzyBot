@@ -342,19 +342,19 @@ public sealed class AzuraCastCommands
             await context.EditResponseAsync(embed);
         }
 
-        [Command("set-station-nowplaying-embed"), Description("Set the channel where the now playing embed should be sent."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
+        [Command("station-nowplaying-embed"), Description("Configure the channel where the now playing embed should be sent. Leave empty to remove it."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
         public async ValueTask SetStationNowPlayingEmbedAsync
         (
             SlashCommandContext context,
             [Description("The station you want to set the now playing embed for."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
-            [Description("The channel where the now playing embed should be sent.")] DiscordChannel channel
+            [Description("The channel where the now playing embed should be sent.")] DiscordChannel? channel = null
         )
         {
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
-            ArgumentNullException.ThrowIfNull(channel);
 
             _logger.CommandRequested(nameof(SetStationNowPlayingEmbedAsync), context.User.GlobalName);
+
             AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadStations: true);
             if (ac is null)
             {
@@ -371,18 +371,14 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            AzuraStationRecord? azuraStation = await _azuraCastApi.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), station);
-            if (azuraStation is null)
-            {
-                await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
-                return;
-            }
+            await _dbActions.UpdateAzuraCastStationPreferencesAsync(ac.Guild.UniqueId, acStation.StationId, nowPlayingEmbedChannelId: channel?.Id ?? 0);
+            _cronJobManager.RunAzuraPersistentNowPlayingJob();
 
-            await _dbActions.UpdateAzuraCastStationPreferencesAsync(ac.Guild.UniqueId, acStation.StationId, nowPlayingEmbedChannelId: channel.Id);
-            _cronJobManager.RunAzzyPersistentNowPlayingJob();
+            string message = (channel is null)
+                ? "I removed the now playing embed channel for this station. I will no longer update the embed."
+                : "I set the now playing embed channel for this station and will update it every minute.";
 
-            await context.FollowupAsync($"I set the now playing embed channel for station **{azuraStation.Name}** to {channel.Mention} and update it every minute.");
+            await context.EditResponseAsync(message);
         }
 
         [Command("start-station"), Description("Start the selected station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
