@@ -25,9 +25,9 @@ USER root
 RUN apk update && apk upgrade && apk add --no-cache icu-data-full icu-libs iputils-ping tzdata zstd-dev && apk cache sync && rm -rf /var/cache/apk/*
 
 # Add environment variables
-ENV PATH="/usr/local/zstd:${PATH}"
-    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
-    LC_ALL=en.US.UTF-8
+ENV PATH="/usr/local/zstd:${PATH}" \
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false \
+    LC_ALL=en.US.UTF-8 \
     LANG=en.US.UTF-8
 
 # Copy the built app
