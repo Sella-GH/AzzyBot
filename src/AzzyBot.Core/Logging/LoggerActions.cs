@@ -114,6 +114,9 @@ public static partial class LoggerActions
     [LoggerMessage(202, LogLevel.Warning, "Could not fetch channel for id {id}")]
     public static partial void ChannelNotFound(this ILogger logger, ulong id);
 
+    [LoggerMessage(203, LogLevel.Warning, "Could not fetch message for id {id} in channel {cid} in guild {gid}")]
+    public static partial void MessageNotFound(this ILogger logger, ulong id, ulong cid, ulong gid);
+
     [LoggerMessage(210, LogLevel.Warning, "Could not find AzzyBot item")]
     public static partial void DatabaseAzzyBotNotFound(this ILogger logger);
 

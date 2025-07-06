@@ -65,6 +65,10 @@ public sealed class MusicStreamingPersistentNowPlayingJob(ILogger<MusicStreaming
         TimeSpan? trackPosition = _musicStreaming.GetCurrentPosition(stream.Guild.UniqueId);
         if (track is null)
         {
+            // Fail-fast: If there's no message to delete, we can skip directly to the end
+            if (stream.NowPlayingEmbedMessageId is <= 0)
+                return;
+
             DiscordMessage? delMsg = null;
             try
             {
@@ -72,7 +76,7 @@ public sealed class MusicStreamingPersistentNowPlayingJob(ILogger<MusicStreaming
             }
             catch (NotFoundException)
             {
-                _logger.DiscordItemNotFound(nameof(DiscordMessage), stream.Guild.UniqueId);
+                _logger.MessageNotFound(stream.NowPlayingEmbedMessageId, stream.NowPlayingEmbedChannelId, stream.Guild.UniqueId);
             }
 
             if (delMsg is not null)
@@ -93,7 +97,7 @@ public sealed class MusicStreamingPersistentNowPlayingJob(ILogger<MusicStreaming
             }
             catch (NotFoundException)
             {
-                _logger.DiscordItemNotFound(nameof(DiscordMessage), stream.NowPlayingEmbedMessageId);
+                _logger.MessageNotFound(stream.NowPlayingEmbedMessageId, stream.NowPlayingEmbedChannelId, stream.Guild.UniqueId);
             }
 
             if (edMsg is not null)

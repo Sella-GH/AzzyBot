@@ -68,6 +68,10 @@ public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayi
         AzuraNowPlayingDataRecord? nowPlaying = await _apiService.GetNowPlayingAsync(baseUri, station.StationId);
         if (nowPlaying?.IsOnline is not true)
         {
+            // Fail-fast: If there's no message to delete, we can skip directly to the end
+            if (station.Preferences.NowPlayingEmbedMessageId is <= 0)
+                return;
+
             DiscordMessage? delMsg = null;
             try
             {
@@ -75,7 +79,7 @@ public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayi
             }
             catch (NotFoundException)
             {
-                _logger.DiscordItemNotFound(nameof(DiscordMessage), station.Preferences.NowPlayingEmbedMessageId);
+                _logger.MessageNotFound(station.Preferences.NowPlayingEmbedMessageId, station.Preferences.NowPlayingEmbedChannelId, station.AzuraCast.Guild.UniqueId);
             }
 
             if (delMsg is not null)
@@ -96,7 +100,7 @@ public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayi
             }
             catch (NotFoundException)
             {
-                _logger.DiscordItemNotFound(nameof(DiscordMessage), station.Preferences.NowPlayingEmbedMessageId);
+                _logger.MessageNotFound(station.Preferences.NowPlayingEmbedMessageId, station.Preferences.NowPlayingEmbedChannelId, station.AzuraCast.Guild.UniqueId);
             }
 
             if (edMsg is not null)
