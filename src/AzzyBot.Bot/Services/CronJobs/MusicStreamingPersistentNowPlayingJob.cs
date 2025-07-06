@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
+using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
 
@@ -50,25 +51,19 @@ public sealed class MusicStreamingPersistentNowPlayingJob(ILogger<MusicStreaming
         ArgumentNullException.ThrowIfNull(stream);
 
         if (stream.NowPlayingEmbedChannelId is <= 0)
-        {
-            _logger.LogWarning("Stream {StreamId} does not have a valid Now Playing embed channel ID set.", stream.Id);
             return;
-        }
 
         DiscordChannel? channel = await _botService.GetDiscordChannelAsync(stream.NowPlayingEmbedChannelId);
         if (channel is null)
         {
-            _logger.LogWarning("Stream {StreamId} has an invalid Now Playing embed channel ID set: {ChannelId}", stream.Id, stream.NowPlayingEmbedChannelId);
+            _logger.DiscordItemNotFound(nameof(DiscordChannel), stream.Guild.UniqueId);
             return;
         }
 
         LavalinkTrack? track = _musicStreaming.NowPlaying(stream.Guild.UniqueId);
         TimeSpan? trackPosition = _musicStreaming.GetCurrentPosition(stream.Guild.UniqueId);
         if (track is null)
-        {
-            _logger.LogWarning("Stream {StreamId} has no track currently playing.", stream.Id);
             return;
-        }
 
         DiscordEmbed embed = EmbedBuilder.BuildMusicStreamingNowPlayingEmbed(track, trackPosition);
         if (stream.NowPlayingEmbedMessageId is > 0)
@@ -77,7 +72,6 @@ public sealed class MusicStreamingPersistentNowPlayingJob(ILogger<MusicStreaming
             if (message is not null)
             {
                 await message.ModifyAsync(embed: embed);
-                _logger.LogWarning("Updated NowPlaying embed message for stream {StreamId} in channel {ChannelId}.", stream.Id, channel.Id);
                 return;
             }
         }
@@ -85,7 +79,6 @@ public sealed class MusicStreamingPersistentNowPlayingJob(ILogger<MusicStreaming
         {
             DiscordMessage? message = await channel.SendMessageAsync(embed: embed);
             await _dbActions.UpdateMusicStreamingAsync(stream.Guild.UniqueId, NowPlayingEmbedMessageId: message.Id);
-            _logger.LogWarning("Created new NowPlaying embed message for stream {StreamId} in channel {ChannelId}.", stream.Id, channel.Id);
         }
     }
 }

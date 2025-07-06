@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
+using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
@@ -53,15 +54,12 @@ public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayi
         ArgumentNullException.ThrowIfNull(station);
 
         if (station.Preferences.NowPlayingEmbedChannelId is <= 0)
-        {
-            _logger.LogWarning("Station {StationId} does not have a valid Now Playing embed channel ID set.", station.StationId);
             return;
-        }
 
         DiscordChannel? channel = await _botService.GetDiscordChannelAsync(station.Preferences.NowPlayingEmbedChannelId);
         if (channel is null)
         {
-            _logger.LogWarning("Channel with ID {ChannelId} for station {StationId} not found.", station.Preferences.NowPlayingEmbedChannelId, station.StationId);
+            _logger.DiscordItemNotFound(nameof(DiscordChannel), station.AzuraCast.Guild.UniqueId);
             return;
         }
 
@@ -72,12 +70,9 @@ public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayi
             DiscordMessage? message = await channel.GetMessageAsync(station.Preferences.NowPlayingEmbedMessageId);
             if (message is not null)
             {
-                _logger.LogWarning("Station {StationId} is offline, deleting message.", station.StationId);
                 await message.DeleteAsync();
                 await _dbActions.UpdateAzuraCastStationPreferencesAsync(station.AzuraCast.Guild.UniqueId, station.StationId, nowPlayingEmbedMessageId: 0);
             }
-
-            _logger.LogWarning("Station {StationId} is offline, not updating message.", station.StationId);
 
             return;
         }
@@ -89,7 +84,6 @@ public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayi
             if (message is not null)
             {
                 await message.ModifyAsync(embed: embed);
-                _logger.LogWarning("Updated Now Playing embed for station {StationId} in channel {ChannelId}.", station.StationId, channel.Id);
                 return;
             }
         }
@@ -97,7 +91,6 @@ public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayi
         {
             DiscordMessage message = await channel.SendMessageAsync(embed: embed);
             await _dbActions.UpdateAzuraCastStationPreferencesAsync(station.AzuraCast.Guild.UniqueId, station.StationId, nowPlayingEmbedMessageId: message.Id);
-            _logger.LogWarning("Created new Now Playing embed for station {StationId} in channel {ChannelId}.", station.StationId, channel.Id);
         }
     }
 }
