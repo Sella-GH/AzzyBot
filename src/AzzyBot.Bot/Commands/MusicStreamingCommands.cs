@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Choices;
-using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Enums;
@@ -38,11 +37,10 @@ namespace AzzyBot.Bot.Commands;
 public sealed class MusicStreamingCommands
 {
     [Command("player"), RequireGuild, RequirePermissions(botPermissions: [DiscordPermission.Connect, DiscordPermission.Speak], userPermissions: [DiscordPermission.Connect]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
-    public sealed class PlayerGroup(ILogger<PlayerGroup> logger, AzuraCastApiService azuraCast, CronJobManager cronJobManager, DbActions dbActions, MusicStreamingService musicStreaming)
+    public sealed class PlayerGroup(ILogger<PlayerGroup> logger, AzuraCastApiService azuraCast, DbActions dbActions, MusicStreamingService musicStreaming)
     {
         private readonly ILogger<PlayerGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCast = azuraCast;
-        private readonly CronJobManager _cronJobManager = cronJobManager;
         private readonly DbActions _dbActions = dbActions;
         private readonly MusicStreamingService _musicStreaming = musicStreaming;
 
@@ -228,7 +226,6 @@ public sealed class MusicStreamingCommands
                 return;
 
             await context.EditResponseAsync(text);
-            _cronJobManager.RunAzuraPersistentNowPlayingJob();
         }
 
         [Command("play-mount"), Description("Choose a mount point of the station to play it."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastOnlineCheck]
@@ -297,7 +294,6 @@ public sealed class MusicStreamingCommands
                 return;
 
             await context.EditResponseAsync(GeneralStrings.VoicePlayMount.Replace("%station%", nowPlaying.Station.Name, StringComparison.OrdinalIgnoreCase));
-            _cronJobManager.RunAzuraPersistentNowPlayingJob();
         }
 
         [Command("queue"), Description("Shows the songs which will be played after this one.")]
@@ -422,7 +418,6 @@ public sealed class MusicStreamingCommands
             _logger.CommandRequested(nameof(StreamingNowPlayingEmbedAsync), context.User.GlobalName);
 
             await _dbActions.UpdateMusicStreamingAsync(context.Guild.Id, nowPlayingEmbedChannelId: channel?.Id ?? 0);
-            _cronJobManager.RunAzuraPersistentNowPlayingJob();
 
             string message = (channel is null)
                 ? "I removed the now playing embed channel for this station. I will no longer update the embed."
