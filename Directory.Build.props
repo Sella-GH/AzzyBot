@@ -63,7 +63,8 @@
   
   <!-- Runtimeconfig settings -->
   <ItemGroup>
-    <RuntimeHostConfigurationOption Value="true" Include="System.Net.SocketsHttpHandler.Http3Support" />
+     <!-- Exclude HTTP/3 on purpose, this is so broken and creates freaking errors nobody can fix -->
+    <RuntimeHostConfigurationOption Value="false" Include="System.Net.SocketsHttpHandler.Http3Support" />
   </ItemGroup>
 
   <PropertyGroup>

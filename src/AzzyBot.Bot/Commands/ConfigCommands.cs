@@ -415,7 +415,7 @@ public sealed class ConfigCommands
 
             if (adminGroup is not null || djGroup is not null || uploadChannel is not null || requestsChannel is not null || !string.IsNullOrWhiteSpace(uploadPath) || showPlaylistInEmbed is not null)
             {
-                await _dbActions.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, adminGroup?.Id, djGroup?.Id, uploadChannel?.Id, requestsChannel?.Id, uploadPath, showPlaylistInEmbed);
+                await _dbActions.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, adminGroup?.Id, djGroup?.Id, uploadChannel?.Id, null, null, requestsChannel?.Id, uploadPath, showPlaylistInEmbed);
 
                 ulong[] channels = [];
                 if (requestsChannel is not null && uploadChannel is null)

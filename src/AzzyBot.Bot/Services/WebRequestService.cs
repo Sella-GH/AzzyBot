@@ -396,7 +396,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             // Test if the host is reachable within 5 seconds
             using Socket socket = new(addressFamily, SocketType.Stream, ProtocolType.Tcp);
             using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
-            await socket.ConnectAsync(url.Host, 80, cts.Token);
+            await socket.ConnectAsync(url.Host, url.Port, cts.Token);
 
             return true;
         }

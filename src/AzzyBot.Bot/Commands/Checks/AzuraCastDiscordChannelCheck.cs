@@ -16,6 +16,14 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Checks;
 
+/// <summary>
+/// Represents a context check that validates whether a Discord command is executed in the correct channel based on
+/// the specified AzuraCast station preferences.
+/// </summary>
+/// <remarks>
+/// This check ensures that specific commands are executed in the appropriate Discord channel as defined in the AzuraCast
+/// station preferences. If the command is executed in an incorrect channel, the check returns the expected channel ID and fails.
+/// </remarks>
 public sealed class AzuraCastDiscordChannelCheck(ILogger<AzuraCastDiscordChannelCheck> logger, DbActions dbActions) : IContextCheck<AzuraCastDiscordChannelCheckAttribute>
 {
     private readonly ILogger<AzuraCastDiscordChannelCheck> _logger = logger;

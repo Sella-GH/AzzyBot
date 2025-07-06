@@ -15,6 +15,7 @@ using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
+using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
@@ -47,10 +48,12 @@ public sealed class MusicStreamingCommands
         public async ValueTask ChangeVolumeAsync
         (
             SlashCommandContext context,
-            [Description("The volume you want to set.")] int volume
+            [Description("The volume you want to set.")] int volume,
+            [Description("Whether the volume should be saved for future use."), SlashChoiceProvider<BooleanYesNoStateProvider>] int saveState = 0
         )
         {
             ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
 
             _logger.CommandRequested(nameof(ChangeVolumeAsync), context.User.GlobalName);
 
@@ -63,7 +66,23 @@ public sealed class MusicStreamingCommands
             if (!await _musicStreaming.SetVolumeAsync(context, volume))
                 return;
 
-            await context.EditResponseAsync($"I set the volume to {volume}%.");
+            string message = $"I set the volume to {volume}%.";
+            if (saveState is 1)
+            {
+                MusicStreamingEntity? ms = await _dbActions.ReadMusicStreamingAsync(context.Guild.Id);
+                if (ms is null)
+                {
+                    await _dbActions.CreateMusicStreamingAsync(context.Guild.Id, volume: volume);
+                }
+                else
+                {
+                    await _dbActions.UpdateMusicStreamingAsync(context.Guild.Id, volume: volume);
+                }
+
+                message += " I also saved this volume level for future use.";
+            }
+
+            await context.EditResponseAsync(message);
         }
 
         [Command("history"), Description("Show the already played song history for this server.")]
@@ -142,7 +161,7 @@ public sealed class MusicStreamingCommands
                 await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
                 return;
             }
-            else if ((track.Author is "AzzyBot.Bot" || track.Title is "AzzyBot.Bot" || track.Identifier is "AzzyBot.Bot") && pos == TimeSpan.MinValue)
+            else if ((track.Author == SoftwareStats.GetAppAuthors || track.Identifier == SoftwareStats.GetAppName) && pos == TimeSpan.MinValue)
             {
                 await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;
@@ -188,8 +207,22 @@ public sealed class MusicStreamingCommands
         )
         {
             ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
 
             _logger.CommandRequested(nameof(PlayAsync), context.User.GlobalName);
+
+            if (volume is not 50)
+            {
+                MusicStreamingEntity? ms = await _dbActions.ReadMusicStreamingAsync(context.Guild.Id);
+                if (ms is null)
+                {
+                    _logger.DatabaseMusicStreamingNotFound(context.Guild.Id);
+                    await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
+                    return;
+                }
+
+                volume = ms.Volume;
+            }
 
             if (volume is < 0 or > 100)
             {
@@ -210,13 +243,26 @@ public sealed class MusicStreamingCommands
             SlashCommandContext context,
             [Description("The station you want play."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
             [Description("The mount point of the station."), SlashAutoCompleteProvider<AzuraCastMountAutocomplete>] int mountPoint,
-            [Description("The volume which should be set. This is only respected when no music is being played.")] int volume = 100
+            [Description("The volume which should be set. This is only respected when no music is being played.")] int volume = 50
         )
         {
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
             _logger.CommandRequested(nameof(PlayMountAsync), context.User.GlobalName);
+
+            if (volume is not 50)
+            {
+                MusicStreamingEntity? ms = await _dbActions.ReadMusicStreamingAsync(context.Guild.Id);
+                if (ms is null)
+                {
+                    _logger.DatabaseMusicStreamingNotFound(context.Guild.Id);
+                    await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
+                    return;
+                }
+
+                volume = ms.Volume;
+            }
 
             if (volume is < 0 or > 100)
             {
@@ -366,6 +412,35 @@ public sealed class MusicStreamingCommands
             string response = (leaving) ? GeneralStrings.VoiceStopLeft : GeneralStrings.VoiceStop;
 
             await context.EditResponseAsync(response);
+        }
+
+        [Command("streaming-nowplaying-embed"), Description("Configure the channel where the now playing embed should be sent. Leave empty to remove it.")]
+        public async ValueTask StreamingNowPlayingEmbedAsync
+        (
+            SlashCommandContext context,
+            [Description("The channel where the now playing embed should be sent.")] DiscordChannel? channel = null
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
+
+            _logger.CommandRequested(nameof(StreamingNowPlayingEmbedAsync), context.User.GlobalName);
+
+            MusicStreamingEntity? ms = await _dbActions.ReadMusicStreamingAsync(context.Guild.Id);
+            if (ms is null)
+            {
+                await _dbActions.CreateMusicStreamingAsync(context.Guild.Id, nowPlayingEmbedChannelId: channel?.Id ?? 0);
+            }
+            else
+            {
+                await _dbActions.UpdateMusicStreamingAsync(context.Guild.Id, nowPlayingEmbedChannelId: channel?.Id ?? 0);
+            }
+
+            string message = (channel is null)
+                ? "I removed the now playing embed channel for this station. I will no longer update the embed."
+                : "I set the now playing embed channel for this station and will update it every minute.";
+
+            await context.EditResponseAsync(message);
         }
     }
 }

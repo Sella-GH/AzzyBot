@@ -1,11 +1,25 @@
 ## 2.6.0
+### Additions
+- Added a two commands `azuracast station-nowplaying-embed` and `player streaming-nowplaying-embed`
+  - These commands allow you to create a persistent embed which shows the current song playing on the AzuraCast station or the streaming player
+  - The embed will automatically update each minute
+  - If you leave the optional `channel` parameter empty OR the music/station stops playing the embed will be deleted
+
 ### Improvements
 - Split up the maintenance jobs of the bot internals to make them more fail-safe
 - Optimized some discord related code to improve performance
-- Enabled HTTP/3 for the bot to improve webservice performance
+- Reordered and added some more info to embeds to make them more readable
+- The volume parameter of the MusicStreaming commands now defaults to 50 and gets saved in the database so it's restored each reconnect
 
 ### Fixes
 - Spelling mistakes were fixed
+- Long running songs are now correctly shown in now playing embeds
+
+### Development
+- Deleted some (now) unused logging code
+- Deleted the unused `reset` Boolean parameter in MusicStreamingService.SetVolumeAsync
+- Added new non-async methods to some music streaming and AzuraCast api methods
+- Added a whole new database entity for MusicStreaming
 
 ## 2.5.0
 ### General
