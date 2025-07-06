@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -344,7 +343,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         client.DefaultRequestHeaders.Clear();
         client.DefaultRequestHeaders.UserAgent.Add(new(botName, botVersion));
         if (acceptJson)
-            client.DefaultRequestHeaders.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(MediaType));
+            client.DefaultRequestHeaders.Accept.Add(new(MediaType));
 
         if (noCache)
         {
