@@ -89,7 +89,16 @@ public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayi
         DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicNowPlayingEmbed(nowPlaying);
         if (station.Preferences.NowPlayingEmbedMessageId is > 0)
         {
-            DiscordMessage? edMsg = await channel.GetMessageAsync(station.Preferences.NowPlayingEmbedMessageId);
+            DiscordMessage? edMsg = null;
+            try
+            {
+                edMsg = await channel.GetMessageAsync(station.Preferences.NowPlayingEmbedMessageId);
+            }
+            catch (NotFoundException)
+            {
+                _logger.DiscordItemNotFound(nameof(DiscordMessage), station.Preferences.NowPlayingEmbedMessageId);
+            }
+
             if (edMsg is not null)
             {
                 await edMsg.ModifyAsync(embed: embed);

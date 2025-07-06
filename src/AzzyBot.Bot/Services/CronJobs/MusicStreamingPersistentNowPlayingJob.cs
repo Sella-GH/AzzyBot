@@ -86,7 +86,16 @@ public sealed class MusicStreamingPersistentNowPlayingJob(ILogger<MusicStreaming
         DiscordEmbed embed = EmbedBuilder.BuildMusicStreamingNowPlayingEmbed(track, trackPosition);
         if (stream.NowPlayingEmbedMessageId is > 0)
         {
-            DiscordMessage? edMsg = await channel.GetMessageAsync(stream.NowPlayingEmbedMessageId);
+            DiscordMessage? edMsg = null;
+            try
+            {
+                edMsg = await channel.GetMessageAsync(stream.NowPlayingEmbedMessageId);
+            }
+            catch (NotFoundException)
+            {
+                _logger.DiscordItemNotFound(nameof(DiscordMessage), stream.NowPlayingEmbedMessageId);
+            }
+
             if (edMsg is not null)
             {
                 await edMsg.ModifyAsync(embed: embed);
