@@ -13,6 +13,7 @@ using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
 
 using DSharpPlus.Entities;
+using DSharpPlus.Exceptions;
 
 using Microsoft.Extensions.Logging;
 
@@ -67,12 +68,20 @@ public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayi
         AzuraNowPlayingDataRecord? nowPlaying = await _apiService.GetNowPlayingAsync(baseUri, station.StationId);
         if (nowPlaying?.IsOnline is not true)
         {
-            DiscordMessage? delMsg = await channel.GetMessageAsync(station.Preferences.NowPlayingEmbedMessageId);
-            if (delMsg is not null)
+            DiscordMessage? delMsg = null;
+            try
             {
-                await delMsg.DeleteAsync();
-                await _dbActions.UpdateAzuraCastStationPreferencesAsync(station.AzuraCast.Guild.UniqueId, station.StationId, nowPlayingEmbedMessageId: 0);
+                delMsg = await channel.GetMessageAsync(station.Preferences.NowPlayingEmbedMessageId);
             }
+            catch (NotFoundException)
+            {
+                _logger.DiscordItemNotFound(nameof(DiscordMessage), station.Preferences.NowPlayingEmbedMessageId);
+            }
+
+            if (delMsg is not null)
+                await delMsg.DeleteAsync();
+
+            await _dbActions.UpdateAzuraCastStationPreferencesAsync(station.AzuraCast.Guild.UniqueId, station.StationId, nowPlayingEmbedMessageId: 0);
 
             return;
         }

@@ -11,6 +11,7 @@ using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
 
 using DSharpPlus.Entities;
+using DSharpPlus.Exceptions;
 
 using Lavalink4NET.Tracks;
 
@@ -64,12 +65,20 @@ public sealed class MusicStreamingPersistentNowPlayingJob(ILogger<MusicStreaming
         TimeSpan? trackPosition = _musicStreaming.GetCurrentPosition(stream.Guild.UniqueId);
         if (track is null)
         {
-            DiscordMessage? delMsg = await channel.GetMessageAsync(stream.NowPlayingEmbedMessageId);
-            if (delMsg is not null)
+            DiscordMessage? delMsg = null;
+            try
             {
-                await delMsg.DeleteAsync();
-                await _dbActions.UpdateMusicStreamingAsync(stream.Guild.UniqueId, nowPlayingEmbedMessageId: 0);
+                delMsg = await channel.GetMessageAsync(stream.NowPlayingEmbedMessageId);
             }
+            catch (NotFoundException)
+            {
+                _logger.DiscordItemNotFound(nameof(DiscordMessage), stream.Guild.UniqueId);
+            }
+
+            if (delMsg is not null)
+                await delMsg.DeleteAsync();
+
+            await _dbActions.UpdateMusicStreamingAsync(stream.Guild.UniqueId, nowPlayingEmbedMessageId: 0);
 
             return;
         }
