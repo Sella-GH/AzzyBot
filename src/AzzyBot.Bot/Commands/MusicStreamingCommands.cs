@@ -69,7 +69,16 @@ public sealed class MusicStreamingCommands
             string message = $"I set the volume to {volume}%.";
             if (saveState is 1)
             {
-                await _dbActions.UpdateMusicStreamingAsync(context.Guild.Id, volume: volume);
+                MusicStreamingEntity? ms = await _dbActions.ReadMusicStreamingAsync(context.Guild.Id);
+                if (ms is null)
+                {
+                    await _dbActions.CreateMusicStreamingAsync(context.Guild.Id, volume: volume);
+                }
+                else
+                {
+                    await _dbActions.UpdateMusicStreamingAsync(context.Guild.Id, volume: volume);
+                }
+
                 message += " I also saved this volume level for future use.";
             }
 
@@ -417,7 +426,15 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(StreamingNowPlayingEmbedAsync), context.User.GlobalName);
 
-            await _dbActions.UpdateMusicStreamingAsync(context.Guild.Id, nowPlayingEmbedChannelId: channel?.Id ?? 0);
+            MusicStreamingEntity? ms = await _dbActions.ReadMusicStreamingAsync(context.Guild.Id);
+            if (ms is null)
+            {
+                await _dbActions.CreateMusicStreamingAsync(context.Guild.Id, nowPlayingEmbedChannelId: channel?.Id ?? 0);
+            }
+            else
+            {
+                await _dbActions.UpdateMusicStreamingAsync(context.Guild.Id, nowPlayingEmbedChannelId: channel?.Id ?? 0);
+            }
 
             string message = (channel is null)
                 ? "I removed the now playing embed channel for this station. I will no longer update the embed."
