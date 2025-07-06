@@ -3,7 +3,7 @@
 - Added a two commands `azuracast station-nowplaying-embed` and `player streaming-nowplaying-embed`
   - These commands allow you to create a persistent embed which shows the current song playing on the AzuraCast station or the streaming player
   - The embed will automatically update each minute
-  - If you leave the optional `channel` parameter empty the embed will be deleted
+  - If you leave the optional `channel` parameter empty OR the music/station stops playing the embed will be deleted
 
 ### Improvements
 - Split up the maintenance jobs of the bot internals to make them more fail-safe

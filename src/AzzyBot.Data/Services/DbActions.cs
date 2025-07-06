@@ -876,7 +876,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         }
     }
 
-    public async Task UpdateMusicStreamingAsync(ulong guildId, ulong? nowPlayingEmbedChannelId = null, ulong? NowPlayingEmbedMessageId = null, int? volume = null)
+    public async Task UpdateMusicStreamingAsync(ulong guildId, ulong? nowPlayingEmbedChannelId = null, ulong? nowPlayingEmbedMessageId = null, int? volume = null)
     {
         await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
 
@@ -893,8 +893,8 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         if (nowPlayingEmbedChannelId.HasValue)
             musicStreaming.NowPlayingEmbedChannelId = nowPlayingEmbedChannelId.Value;
 
-        if (NowPlayingEmbedMessageId.HasValue)
-            musicStreaming.NowPlayingEmbedMessageId = NowPlayingEmbedMessageId.Value;
+        if (nowPlayingEmbedMessageId.HasValue)
+            musicStreaming.NowPlayingEmbedMessageId = nowPlayingEmbedMessageId.Value;
 
         if (volume.HasValue)
             musicStreaming.Volume = volume.Value;
@@ -910,7 +910,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await UpdateMusicStreamingAsync(guildId, nowPlayingEmbedChannelId, NowPlayingEmbedMessageId, volume);
+            await UpdateMusicStreamingAsync(guildId, nowPlayingEmbedChannelId, nowPlayingEmbedMessageId, volume);
 
             _logger.DatabaseConcurrencyResolved();
         }

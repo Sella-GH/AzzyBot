@@ -67,10 +67,10 @@ public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayi
         AzuraNowPlayingDataRecord? nowPlaying = await _apiService.GetNowPlayingAsync(baseUri, station.StationId);
         if (nowPlaying?.IsOnline is not true)
         {
-            DiscordMessage? message = await channel.GetMessageAsync(station.Preferences.NowPlayingEmbedMessageId);
-            if (message is not null)
+            DiscordMessage? delMsg = await channel.GetMessageAsync(station.Preferences.NowPlayingEmbedMessageId);
+            if (delMsg is not null)
             {
-                await message.DeleteAsync();
+                await delMsg.DeleteAsync();
                 await _dbActions.UpdateAzuraCastStationPreferencesAsync(station.AzuraCast.Guild.UniqueId, station.StationId, nowPlayingEmbedMessageId: 0);
             }
 
@@ -80,17 +80,16 @@ public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayi
         DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicNowPlayingEmbed(nowPlaying);
         if (station.Preferences.NowPlayingEmbedMessageId is > 0)
         {
-            DiscordMessage? message = await channel.GetMessageAsync(station.Preferences.NowPlayingEmbedMessageId);
-            if (message is not null)
+            DiscordMessage? edMsg = await channel.GetMessageAsync(station.Preferences.NowPlayingEmbedMessageId);
+            if (edMsg is not null)
             {
-                await message.ModifyAsync(embed: embed);
+                await edMsg.ModifyAsync(embed: embed);
                 return;
             }
         }
-        else
-        {
-            DiscordMessage message = await channel.SendMessageAsync(embed: embed);
-            await _dbActions.UpdateAzuraCastStationPreferencesAsync(station.AzuraCast.Guild.UniqueId, station.StationId, nowPlayingEmbedMessageId: message.Id);
-        }
+
+        // This should only be reached if the message does not exist
+        DiscordMessage sMsg = await channel.SendMessageAsync(embed: embed);
+        await _dbActions.UpdateAzuraCastStationPreferencesAsync(station.AzuraCast.Guild.UniqueId, station.StationId, nowPlayingEmbedMessageId: sMsg.Id);
     }
 }

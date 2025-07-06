@@ -63,22 +63,30 @@ public sealed class MusicStreamingPersistentNowPlayingJob(ILogger<MusicStreaming
         LavalinkTrack? track = _musicStreaming.NowPlaying(stream.Guild.UniqueId);
         TimeSpan? trackPosition = _musicStreaming.GetCurrentPosition(stream.Guild.UniqueId);
         if (track is null)
+        {
+            DiscordMessage? delMsg = await channel.GetMessageAsync(stream.NowPlayingEmbedMessageId);
+            if (delMsg is not null)
+            {
+                await delMsg.DeleteAsync();
+                await _dbActions.UpdateMusicStreamingAsync(stream.Guild.UniqueId, nowPlayingEmbedMessageId: 0);
+            }
+
             return;
+        }
 
         DiscordEmbed embed = EmbedBuilder.BuildMusicStreamingNowPlayingEmbed(track, trackPosition);
         if (stream.NowPlayingEmbedMessageId is > 0)
         {
-            DiscordMessage? message = await channel.GetMessageAsync(stream.NowPlayingEmbedMessageId);
-            if (message is not null)
+            DiscordMessage? edMsg = await channel.GetMessageAsync(stream.NowPlayingEmbedMessageId);
+            if (edMsg is not null)
             {
-                await message.ModifyAsync(embed: embed);
+                await edMsg.ModifyAsync(embed: embed);
                 return;
             }
         }
-        else
-        {
-            DiscordMessage? message = await channel.SendMessageAsync(embed: embed);
-            await _dbActions.UpdateMusicStreamingAsync(stream.Guild.UniqueId, NowPlayingEmbedMessageId: message.Id);
-        }
+
+        // This should only be reached if the message does not exist
+        DiscordMessage? sMsg = await channel.SendMessageAsync(embed: embed);
+        await _dbActions.UpdateMusicStreamingAsync(stream.Guild.UniqueId, nowPlayingEmbedMessageId: sMsg.Id);
     }
 }
