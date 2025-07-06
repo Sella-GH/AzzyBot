@@ -4,6 +4,9 @@
   - These commands allow you to create a persistent embed which shows the current song playing on the AzuraCast station or the streaming player
   - The embed will automatically update each minute
   - If you leave the optional `channel` parameter empty OR the music/station stops playing the embed will be deleted
+- You can now specify the used backend database version in the DatabaseSettings section of your .json file
+  - This can improve the translation of code to SQL specifically for your database version
+  - Be aware that this setting is hidden and if you decide to use it, enter the version like in the following example `"15.0"`
 
 ### Improvements
 - Split up the maintenance jobs of the bot internals to make them more fail-safe

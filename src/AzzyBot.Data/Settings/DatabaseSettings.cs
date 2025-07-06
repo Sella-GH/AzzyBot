@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -26,6 +27,9 @@ public sealed record DatabaseSettings
 
     [StringLength(63, MinimumLength = 1, ErrorMessage = "Your database name is not accepted. Please choose one between 1 and 63 characters."), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public string DatabaseName { get; set; } = "azzybot";
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public Version? DatabaseVersion { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
     public bool UseSsl { get; set; }

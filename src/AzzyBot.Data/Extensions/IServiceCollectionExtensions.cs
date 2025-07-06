@@ -26,9 +26,9 @@ public static class IServiceCollectionExtensions
 
         string connectionString = GetConnectionString(settings.Host, settings.Port, settings.User, settings.Password, settings.DatabaseName, settings.UseSsl, settings.SslMode, settings.SslNegotiation, settings.SslRootCert, settings.SslCert, settings.SslPassword);
 #if DEBUG || DOCKER_DEBUG
-        services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor().EnableSensitiveDataLogging(true));
+        services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseNpgsql(connectionString, o => o.SetPostgresVersion(settings.DatabaseVersion)).UseExceptionProcessor().EnableSensitiveDataLogging(true));
 #else
-        services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseNpgsql(connectionString).UseExceptionProcessor());
+        services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseNpgsql(connectionString, o => o.SetPostgresVersion(settings.DatabaseVersion)).UseExceptionProcessor());
 #endif
         services.AddSingleton<DbActions>();
         services.AddSingleton<DbMaintenance>();
