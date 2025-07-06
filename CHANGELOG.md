@@ -13,6 +13,7 @@
 - Optimized some discord related code to improve performance
 - Reordered and added some more info to embeds to make them more readable
 - The volume parameter of the MusicStreaming commands now defaults to 50 and gets saved in the database so it's restored each reconnect
+- Removed three layers of the dockerfile by combining ENV instructions
 
 ### Fixes
 - Spelling mistakes were fixed
