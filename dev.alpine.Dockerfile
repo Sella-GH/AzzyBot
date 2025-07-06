@@ -26,9 +26,9 @@ RUN apk update && apk upgrade && apk add --no-cache icu-data-full icu-libs iputi
 
 # Add environment variables
 ENV PATH="/usr/local/zstd:${PATH}"
-ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
-ENV LC_ALL=en.US.UTF-8
-ENV LANG=en.US.UTF-8
+    DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+    LC_ALL=en.US.UTF-8
+    LANG=en.US.UTF-8
 
 # Copy the built app
 WORKDIR /app
