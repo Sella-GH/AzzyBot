@@ -436,12 +436,12 @@ public sealed class AzuraCastCommands
                 }
             }
 
-            await _dbActions.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, nowPlayingEmbedChannelId: channel?.Id ?? 0);
+            await _dbActions.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, nowPlayingEmbedChannelId: channel?.Id ?? 0, nowPlayingEmbedMessageId: 0);
 
             if (string.IsNullOrEmpty(response))
             {
                 response = (channel is null)
-                    ? "I removed the now playing embed channel for this station."
+                    ? "I removed the now playing embed message and the configuration for the channel of this station."
                     : $"I set the now playing embed channel to **{channel.Mention}** for this station.";
             }
 

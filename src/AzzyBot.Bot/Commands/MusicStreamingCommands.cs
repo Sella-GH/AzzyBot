@@ -26,6 +26,7 @@ using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
+
 using Lavalink4NET.Players;
 using Lavalink4NET.Tracks;
 
@@ -427,6 +428,7 @@ public sealed class MusicStreamingCommands
             _logger.CommandRequested(nameof(StreamingNowPlayingEmbedAsync), context.User.GlobalName);
 
             string response = string.Empty;
+
             MusicStreamingEntity? ms = await _dbActions.ReadMusicStreamingAsync(context.Guild.Id);
             if (channel is null && ms is not null)
             {
@@ -439,7 +441,6 @@ public sealed class MusicStreamingCommands
                     DiscordChannel? oldChannel = await context.Guild.GetChannelAsync(ms.NowPlayingEmbedChannelId);
                     if (oldChannel is null)
                     {
-                        _logger.DatabaseMusicStreamingNotFound(context.Guild.Id);
                         response = "The currently set now playing embed channel does not exist anymore.";
                     }
                     else
@@ -462,17 +463,17 @@ public sealed class MusicStreamingCommands
 
             if (ms is null)
             {
-                await _dbActions.CreateMusicStreamingAsync(context.Guild.Id, nowPlayingEmbedChannelId: channel?.Id ?? 0);
+                await _dbActions.CreateMusicStreamingAsync(context.Guild.Id, nowPlayingEmbedChannelId: channel?.Id ?? 0, nowPlayingEmbedMessageId: 0);
             }
             else
             {
-                await _dbActions.UpdateMusicStreamingAsync(context.Guild.Id, nowPlayingEmbedChannelId: channel?.Id ?? 0);
+                await _dbActions.UpdateMusicStreamingAsync(context.Guild.Id, nowPlayingEmbedChannelId: channel?.Id ?? 0, nowPlayingEmbedMessageId: 0);
             }
 
             if (string.IsNullOrEmpty(response))
             {
                 response = (channel is null)
-                    ? "I removed the now playing embed channel for music streaming."
+                    ? "I removed the now playing embed message and the configuration for the channel of music streaming."
                     : $"I set the now playing embed channel to **{channel.Mention}** for music streaming.";
             }
 
