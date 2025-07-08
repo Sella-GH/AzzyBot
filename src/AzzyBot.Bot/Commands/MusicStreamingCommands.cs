@@ -25,7 +25,7 @@ using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
-
+using DSharpPlus.Exceptions;
 using Lavalink4NET.Players;
 using Lavalink4NET.Tracks;
 
@@ -426,7 +426,40 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(StreamingNowPlayingEmbedAsync), context.User.GlobalName);
 
+            string response = string.Empty;
             MusicStreamingEntity? ms = await _dbActions.ReadMusicStreamingAsync(context.Guild.Id);
+            if (channel is null && ms is not null)
+            {
+                if (ms.NowPlayingEmbedChannelId is 0)
+                {
+                    response = "There is no now playing embed channel set for music streaming.";
+                }
+                else
+                {
+                    DiscordChannel? oldChannel = await context.Guild.GetChannelAsync(ms.NowPlayingEmbedChannelId);
+                    if (oldChannel is null)
+                    {
+                        _logger.DatabaseMusicStreamingNotFound(context.Guild.Id);
+                        response = "The currently set now playing embed channel does not exist anymore.";
+                    }
+                    else
+                    {
+                        DiscordMessage? oldMessage = await oldChannel.GetMessageAsync(ms.NowPlayingEmbedMessageId);
+                        if (oldMessage is not null)
+                        {
+                            try
+                            {
+                                await oldMessage.DeleteAsync();
+                            }
+                            catch (NotFoundException)
+                            {
+                                response = "The currently set now playing embed message does not exist anymore.";
+                            }
+                        }
+                    }
+                }
+            }
+
             if (ms is null)
             {
                 await _dbActions.CreateMusicStreamingAsync(context.Guild.Id, nowPlayingEmbedChannelId: channel?.Id ?? 0);
@@ -436,11 +469,14 @@ public sealed class MusicStreamingCommands
                 await _dbActions.UpdateMusicStreamingAsync(context.Guild.Id, nowPlayingEmbedChannelId: channel?.Id ?? 0);
             }
 
-            string message = (channel is null)
-                ? "I removed the now playing embed channel for this station. I will no longer update the embed."
-                : "I set the now playing embed channel for this station and will update it every minute.";
+            if (string.IsNullOrEmpty(response))
+            {
+                response = (channel is null)
+                    ? "I removed the now playing embed channel for music streaming."
+                    : $"I set the now playing embed channel to **{channel.Mention}** for music streaming.";
+            }
 
-            await context.EditResponseAsync(message);
+            await context.EditResponseAsync(response);
         }
     }
 }

@@ -33,6 +33,7 @@ using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
+using DSharpPlus.Exceptions;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Extensions;
 
@@ -398,13 +399,53 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(SetStationNowPlayingEmbedAsync), context.User.GlobalName);
 
+            string response = string.Empty;
+            if (channel is null)
+            {
+                AzuraCastStationPreferencesEntity? preferences = await _dbActions.ReadAzuraCastStationPreferencesAsync(context.Guild.Id, station);
+                if (preferences is null)
+                {
+                    response = GeneralStrings.StationNotFound;
+                }
+                else if (preferences.NowPlayingEmbedChannelId is 0)
+                {
+                    response = "There is no now playing channel set for this station.";
+                }
+                else
+                {
+                    DiscordChannel? currChannel = await _botService.GetDiscordChannelAsync(preferences.NowPlayingEmbedChannelId);
+                    if (currChannel is null)
+                    {
+                        response = "The currently set now playing channel does not exist anymore.";
+                    }
+                    else
+                    {
+                        DiscordMessage? currMessage = await currChannel.GetMessageAsync(preferences.NowPlayingEmbedMessageId);
+                        if (currMessage is not null)
+                        {
+                            try
+                            {
+                                await currMessage.DeleteAsync();
+                            }
+                            catch (NotFoundException)
+                            {
+                                response = "The currently set now playing message for this station does not exist anymore.";
+                            }
+                        }
+                    }
+                }
+            }
+
             await _dbActions.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, nowPlayingEmbedChannelId: channel?.Id ?? 0);
 
-            string message = (channel is null)
-                ? "I removed the now playing embed channel for this station. I will no longer update the embed."
-                : "I set the now playing embed channel for this station and will update it every minute.";
+            if (string.IsNullOrEmpty(response))
+            {
+                response = (channel is null)
+                    ? "I removed the now playing embed channel for this station."
+                    : $"I set the now playing embed channel to **{channel.Mention}** for this station.";
+            }
 
-            await context.EditResponseAsync(message);
+            await context.EditResponseAsync(response);
         }
 
         [Command("stop-station"), Description("Stop the selected station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
