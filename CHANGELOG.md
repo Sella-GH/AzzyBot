@@ -25,6 +25,10 @@
 - Added new non-async methods to some music streaming and AzuraCast api methods
 - Added a whole new database entity for MusicStreaming
 
+- ### Dependencies
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 9.0.7
+- Updated [Microsoft.Extensions.Hosting](https://github.com/dotnet/runtime) to version 9.0.7
+
 ## 2.5.0
 ### General
 - Reduced the size of the docker image by a few MB (maybe unnoticeable)
