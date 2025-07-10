@@ -114,6 +114,7 @@ jobs:
         patterns: |
           -**/obj/**
           -**/*.g.cs
+          +**/src/**/*
         input: sarif-results/csharp.sarif
         output: sarif-results/csharp.sarif
 
