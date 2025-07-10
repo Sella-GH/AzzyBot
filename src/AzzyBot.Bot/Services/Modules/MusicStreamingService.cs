@@ -54,17 +54,12 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
                 return null;
         }
 
-        // TODO: When updating DSP to > 24500, use:
-        // `ulong? channelId = context.Member.VoiceState?.ChannelId;`
-        // if (channelId is null)
-        DiscordChannel? channel = context.Member.VoiceState?.Channel;
-        ulong channelId = channel?.Id ?? 0;
-        if (channel is null)
+        ulong? channelId = context.Member.VoiceState?.ChannelId;
+        if (channelId is null)
             _logger.UserNotConnectedSetChannelId();
 
         bool notConnecting = false;
-        // TODO: When updating DSP to > 24500, use `if (channelId is null)`
-        if (channel is null)
+        if (channelId is null)
         {
             if (!suppressResponse)
                 await context.EditResponseAsync(GeneralStrings.VoiceNoUser);
@@ -79,8 +74,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
                 _logger.DiscordItemNotFound(nameof(DiscordMember), context.Guild.Id);
                 notConnecting = true;
             }
-            // TODO: When updating DSP to > 24500, use `channelId.Value`
-            else if (!await _botService.CheckChannelPermissionsAsync(bot, channelId, [DiscordPermission.Speak, DiscordPermission.ViewChannel]))
+            else if (!await _botService.CheckChannelPermissionsAsync(bot, channelId.Value, [DiscordPermission.Speak, DiscordPermission.ViewChannel]))
             {
                 notConnecting = true;
             }
@@ -107,8 +101,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
                 SelfDeaf = true
             };
 
-            // TODO: When updating DSP to > 24500, use `channelId.Value`
-            defaultPlayer = await GetLavalinkDefaultPlayerAsync(context.Guild.Id, channelId, defaultPlayerOptions, retrieveOptions);
+            defaultPlayer = await GetLavalinkDefaultPlayerAsync(context.Guild.Id, channelId.Value, defaultPlayerOptions, retrieveOptions);
             if (defaultPlayer.IsSuccess)
                 return defaultPlayer.Player;
 
@@ -130,8 +123,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
                 SelfDeaf = true
             };
 
-            // TODO: When updating DSP to > 24500, use `channelId.Value`
-            queuedPlayer = await GetLavalinkQueuedPlayerAsync(context.Guild.Id, channelId, queuedPlayerOptions, retrieveOptions);
+            queuedPlayer = await GetLavalinkQueuedPlayerAsync(context.Guild.Id, channelId.Value, queuedPlayerOptions, retrieveOptions);
             if (queuedPlayer.IsSuccess)
                 return queuedPlayer.Player;
 
