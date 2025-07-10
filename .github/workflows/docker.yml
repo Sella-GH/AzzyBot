@@ -59,7 +59,7 @@ jobs:
           repository: Sella-GH/Lavalink4NET
           ref: azzy
           submodules: recursive
-          path: extern
+          path: extern/Lavalink4NET
 
       - name: Get build environment
         id: get-environment
@@ -128,7 +128,7 @@ jobs:
           repository: Sella-GH/Lavalink4NET
           ref: azzy
           submodules: recursive
-          path: extern
+          path: extern/Lavalink4NET
 
       - name: Replace values in files
         run: |

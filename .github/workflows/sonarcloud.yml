@@ -47,7 +47,7 @@ jobs:
           repository: Sella-GH/Lavalink4NET
           ref: azzy
           submodules: recursive
-          path: extern
+          path: extern/Lavalink4NET
 
       - name: Cache SonarQube Cloud Packages
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # 4.2.3

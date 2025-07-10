@@ -68,7 +68,7 @@ jobs:
         repository: Sella-GH/Lavalink4NET
         ref: azzy
         submodules: recursive
-        path: extern
+        path: extern/Lavalink4NET
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
