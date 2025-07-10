@@ -8,18 +8,77 @@
     <Platform Name="ARM64" />
     <Platform Name="x64" />
   </Configurations>
+  <Folder Name="/submodules/">
+    <Project Path="extern/Lavalink4NET/src/Lavalink4NET.Abstractions/Lavalink4NET.Abstractions.csproj">
+      <BuildType Solution="*|*" Project="Release" />
+	  <Platform Solution="*|*" Project="Any CPU" />
+    </Project>
+    <Project Path="extern/Lavalink4NET/src/Lavalink4NET.Artwork/Lavalink4NET.Artwork.csproj">
+      <BuildType Solution="*|*" Project="Release" />
+	  <Platform Solution="*|*" Project="Any CPU" />
+    </Project>
+    <Project Path="extern/Lavalink4NET/src/Lavalink4NET.Cluster/Lavalink4NET.Cluster.csproj">
+      <BuildType Solution="*|*" Project="Release" />
+	  <Platform Solution="*|*" Project="Any CPU" />
+    </Project>
+    <Project Path="extern/Lavalink4NET/src/Lavalink4NET.DSharpPlus.Nightly/Lavalink4NET.DSharpPlus.Nightly.csproj">
+      <BuildType Solution="*|*" Project="Release" />
+	  <Platform Solution="*|*" Project="Any CPU" />
+    </Project>
+    <Project Path="extern/Lavalink4NET/src/Lavalink4NET.InactivityTracking/Lavalink4NET.InactivityTracking.csproj">
+      <BuildType Solution="*|*" Project="Release" />
+	  <Platform Solution="*|*" Project="Any CPU" />
+    </Project>
+    <Project Path="extern/Lavalink4NET/src/Lavalink4NET.Integrations.ExtraFilters/Lavalink4NET.Integrations.ExtraFilters.csproj">
+      <BuildType Solution="*|*" Project="Release" />
+	  <Platform Solution="*|*" Project="Any CPU" />
+    </Project>
+    <Project Path="extern/Lavalink4NET/src/Lavalink4NET.Integrations.Lavasearch/Lavalink4NET.Integrations.Lavasearch.csproj">
+      <BuildType Solution="*|*" Project="Release" />
+	  <Platform Solution="*|*" Project="Any CPU" />
+    </Project>
+    <Project Path="extern/Lavalink4NET/src/Lavalink4NET.Integrations.Lavasrc/Lavalink4NET.Integrations.Lavasrc.csproj">
+      <BuildType Solution="*|*" Project="Release" />
+	  <Platform Solution="*|*" Project="Any CPU" />
+    </Project>
+    <Project Path="extern/Lavalink4NET/src/Lavalink4NET.Integrations.LyricsJava/Lavalink4NET.Integrations.LyricsJava.csproj">
+      <BuildType Solution="*|*" Project="Release" />
+	  <Platform Solution="*|*" Project="Any CPU" />
+    </Project>
+    <Project Path="extern/Lavalink4NET/src/Lavalink4NET.Integrations.SponsorBlock/Lavalink4NET.Integrations.SponsorBlock.csproj">
+      <BuildType Solution="*|*" Project="Release" />
+	  <Platform Solution="*|*" Project="Any CPU" />
+    </Project>
+    <Project Path="extern/Lavalink4NET/src/Lavalink4NET.Integrations.TextToSpeech/Lavalink4NET.Integrations.TextToSpeech.csproj">
+      <BuildType Solution="*|*" Project="Release" />
+	  <Platform Solution="*|*" Project="Any CPU" />
+    </Project>
+    <Project Path="extern/Lavalink4NET/src/Lavalink4NET.Lyrics/Lavalink4NET.Lyrics.csproj">
+      <BuildType Solution="*|*" Project="Release" />
+	  <Platform Solution="*|*" Project="Any CPU" />
+    </Project>
+    <Project Path="extern/Lavalink4NET/src/Lavalink4NET.Protocol/Lavalink4NET.Protocol.csproj">
+      <BuildType Solution="*|*" Project="Release" />
+	  <Platform Solution="*|*" Project="Any CPU" />
+    </Project>
+    <Project Path="extern/Lavalink4NET/src/Lavalink4NET.Rest/Lavalink4NET.Rest.csproj">
+      <BuildType Solution="*|*" Project="Release" />
+	  <Platform Solution="*|*" Project="Any CPU" />
+    </Project>
+    <Project Path="extern/Lavalink4NET/src/Lavalink4NET/Lavalink4NET.csproj">
+      <BuildType Solution="*|*" Project="Release" />
+	  <Platform Solution="*|*" Project="Any CPU" />
+    </Project>
+  </Folder>
   <Project Path="src/AzzyBot.Bot/AzzyBot.Bot.csproj">
-    <Platform Solution="*|Any CPU" Project="Any CPU" />
     <Platform Solution="*|ARM64" Project="ARM64" />
     <Platform Solution="*|x64" Project="x64" />
   </Project>
   <Project Path="src/AzzyBot.Core/AzzyBot.Core.csproj">
-    <Platform Solution="*|Any CPU" Project="Any CPU" />
     <Platform Solution="*|ARM64" Project="ARM64" />
     <Platform Solution="*|x64" Project="x64" />
   </Project>
   <Project Path="src/AzzyBot.Data/AzzyBot.Data.csproj">
-    <Platform Solution="*|Any CPU" Project="Any CPU" />
     <Platform Solution="*|ARM64" Project="ARM64" />
     <Platform Solution="*|x64" Project="x64" />
   </Project>
