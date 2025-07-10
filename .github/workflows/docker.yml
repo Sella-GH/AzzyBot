@@ -58,7 +58,7 @@ jobs:
           fetch-depth: 0
           repository: Sella-GH/Lavalink4NET
           submodules: recursive
-          path: external
+          path: extern
 
       - name: Get build environment
         id: get-environment
