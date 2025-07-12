@@ -1,4 +1,8 @@
 ## 2.6.0
+### General
+- For a short while we now use a custom version of Lavalink4NET which includes a fix so we're able to update DSharpPlus to the latest version
+  - This is a temporary solution until a PR with the fix gets merged
+
 ### Additions
 - Added two new commands `azuracast station-nowplaying-embed` and `player streaming-nowplaying-embed`
   - These commands allow you to create a persistent embed which shows the current song playing on the AzuraCast station or the streaming player
