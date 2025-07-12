@@ -30,6 +30,7 @@
 - Added a whole new database entity for MusicStreaming
 
 - ### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02531
 - Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 9.0.7
 - Updated [Microsoft.Extensions.Hosting](https://github.com/dotnet/runtime) to version 9.0.7
 
