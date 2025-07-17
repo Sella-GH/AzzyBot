@@ -247,25 +247,21 @@ public static class EmbedBuilder
         ArgumentNullException.ThrowIfNull(update);
 
         const string title = "AzuraCast Updates Available";
-        string description;
-        if (update.NeedsRollingUpdate)
+        string description = (update.NeedsRollingUpdate)
+            ? $"Your AzuraCast installation needs **{update.RollingUpdatesList.Count}** {((update.RollingUpdatesList.Count is 1) ? "update" : "updates")}."
+            : "A new release of AzuraCast is available. Update now to get the latest bug fixes, features and improvements!";
+
+        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(3);
+        if (!string.IsNullOrEmpty(update.CurrentRelease))
         {
-            description = $"Your AzuraCast installation needs **{update.RollingUpdatesList.Count}** updates.";
-            if (update.RollingUpdatesList.Count is 1)
-                description = "Your AzuraCast installation needs **1** update.";
+            fields.Add("Current Version", new(update.CurrentRelease));
+            if (!string.IsNullOrEmpty(update.LatestRelease) && ((update.CurrentRelease != update.LatestRelease) && update.NeedsReleaseUpdate))
+                fields.Add("Latest Version", new(update.LatestRelease));
         }
         else
         {
-            description = "A new release of AzuraCast is available. Update now to get the latest bug fixes, features and improvements!";
+            fields.Add("Current Version", new("Rolling Release"));
         }
-
-        Dictionary<string, AzzyDiscordEmbedRecord> fields = new(3)
-        {
-            ["Current Version"] = new(update.CurrentRelease)
-        };
-
-        if ((update.CurrentRelease != update.LatestRelease) && update.NeedsReleaseUpdate)
-            fields.Add("Latest Version", new(update.LatestRelease));
 
         if (update.CanSwitchToStable)
             fields.Add("Stable Switch Available?", new("Yes"));

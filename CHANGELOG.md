@@ -1,4 +1,11 @@
-## 2.6.0
+## 2.6.1 - 2025-07-17
+### Fixes
+- The AzuraCast Update Check is now able to work with the latest AzuraCast rolling release changes and does not throw a NullReferenceException anymore
+
+### Dependencies
+- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.14.0.120626
+
+## 2.6.0 - 2025-07-13
 ### General
 - For a short while we now use a custom version of Lavalink4NET which includes a fix so we're able to update DSharpPlus to the latest version
   - This is a temporary solution until a PR with the fix gets merged
@@ -34,7 +41,7 @@
 - Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 9.0.7
 - Updated [Microsoft.Extensions.Hosting](https://github.com/dotnet/runtime) to version 9.0.7
 
-## 2.5.0
+## 2.5.0 - 2025-05-25
 ### General
 - Reduced the size of the docker image by a few MB (maybe unnoticeable)
 - You are now able to connect to your database via SSL
