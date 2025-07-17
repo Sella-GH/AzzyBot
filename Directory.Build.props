@@ -58,7 +58,7 @@
     <NeutralLanguage>en</NeutralLanguage>
     <RepositoryType>Git</RepositoryType>
     <RepositoryUrl>https://github.com/Sella-GH/AzzyBot</RepositoryUrl>
-    <Version>2.6.0</Version>
+    <Version>2.6.1</Version>
   </PropertyGroup>
   
   <!-- Runtimeconfig settings -->
