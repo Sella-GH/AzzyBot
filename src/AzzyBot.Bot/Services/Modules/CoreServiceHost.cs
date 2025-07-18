@@ -63,7 +63,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
         await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
 
         List<AzuraCastEntity> azuraCast = await dbContext.AzuraCast.ToListAsync();
-        List<AzuraCastStationEntity> azuraCastStations = await dbContext.AzuraCastStations.ToListAsync();
+        List<AzuraCastStationEntity> azuraCastStations = await dbContext.AzuraCastStations.Where(static e => !string.IsNullOrEmpty(e.ApiKey)).ToListAsync();
 
         try
         {
@@ -76,7 +76,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
                     entity.AdminApiKey = Crypto.MigrateOldCipherToNew(entity.AdminApiKey);
             }
 
-            foreach (AzuraCastStationEntity entity in azuraCastStations.Where(static e => !string.IsNullOrEmpty(e.ApiKey) && !Crypto.CheckIfNewCipherIsUsed(e.ApiKey)))
+            foreach (AzuraCastStationEntity entity in azuraCastStations.Where(static e => !Crypto.CheckIfNewCipherIsUsed(e.ApiKey)))
             {
                 entity.ApiKey = Crypto.MigrateOldCipherToNew(entity.ApiKey);
             }
@@ -123,7 +123,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
         await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
 
         List<AzuraCastEntity> azuraCast = await dbContext.AzuraCast.ToListAsync();
-        List<AzuraCastStationEntity> azuraCastStations = await dbContext.AzuraCastStations.ToListAsync();
+        List<AzuraCastStationEntity> azuraCastStations = await dbContext.AzuraCastStations.Where(static e => !string.IsNullOrEmpty(e.ApiKey)).ToListAsync();
 
         try
         {
@@ -142,7 +142,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
                 }
             }
 
-            foreach (AzuraCastStationEntity entity in azuraCastStations.Where(static e => !string.IsNullOrEmpty(e.ApiKey)))
+            foreach (AzuraCastStationEntity entity in azuraCastStations)
             {
                 entity.ApiKey = Crypto.Decrypt(entity.ApiKey);
                 entity.ApiKey = Crypto.Encrypt(entity.ApiKey, newEncryptionKey);

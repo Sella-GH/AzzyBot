@@ -115,9 +115,5 @@ public static class Crypto
         {
             throw new InvalidOperationException("Failed to migrate old cipher to new format: Decryption failed.", ex);
         }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException("Failed to migrate old cipher to new format due to an unexpected error.", ex);
-        }
     }
 }
