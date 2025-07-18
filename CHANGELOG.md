@@ -1,3 +1,7 @@
+## 2.6.2 - 2025-07-18
+### Fixes
+- Another fix for the AzuraCast Update Check to make it work with the latest AzuraCast version
+
 ## 2.6.1 - 2025-07-17
 ### Fixes
 - The AzuraCast Update Check is now able to work with the latest AzuraCast rolling release changes and does not throw a NullReferenceException anymore
