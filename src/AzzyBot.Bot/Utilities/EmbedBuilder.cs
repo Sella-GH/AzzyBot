@@ -248,7 +248,7 @@ public static class EmbedBuilder
 
         const string title = "AzuraCast Updates Available";
         string description = (update.NeedsRollingUpdate)
-            ? $"Your AzuraCast installation needs **{update.RollingUpdatesList.Count}** {((update.RollingUpdatesList.Count is 1) ? "update" : "updates")}."
+            ? $"Your AzuraCast installation needs **{update.RollingUpdatesAvailable}** {((update.RollingUpdatesAvailable is 1) ? "update" : "updates")}."
             : "A new release of AzuraCast is available. Update now to get the latest bug fixes, features and improvements!";
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(3);
@@ -269,24 +269,13 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.White, AzuraCastPic, fields: fields);
     }
 
-    public static DiscordEmbed BuildAzuraCastUpdatesChangelogEmbed(IEnumerable<string> changelog, bool isRolling, string? onlineChangelog = null)
+    public static DiscordEmbed BuildAzuraCastUpdatesChangelogEmbed(bool isRolling, string? onlineChangelog = null)
     {
-        ArgumentNullException.ThrowIfNull(changelog);
-
         const string title = "AzuraCast Updates Changelog";
 
         StringBuilder body = new();
-        if (isRolling)
-        {
-            foreach (string line in changelog.Reverse())
-            {
-                body.AppendLine(CultureInfo.InvariantCulture, $"- {line}");
-            }
-        }
-        else if (!string.IsNullOrEmpty(onlineChangelog))
-        {
+        if (!string.IsNullOrEmpty(onlineChangelog))
             body.AppendLine(onlineChangelog);
-        }
 
         if (body.Length > 4096 || title.Length + body.Length > 6000)
             body = new($"The changelog is too big to display it in an Embed, you can view it [here]({((isRolling) ? AzuraCastRollingUrl : AzuraCastStableUrl)}).");

@@ -65,9 +65,9 @@ public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiServi
         await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: checks.UpdateNotificationCounter + 1, lastUpdateCheck: true);
 
         List<DiscordEmbed> embeds = new(2)
-            {
-                EmbedBuilder.BuildAzuraCastUpdatesAvailableEmbed(update)
-            };
+        {
+            EmbedBuilder.BuildAzuraCastUpdatesAvailableEmbed(update)
+        };
 
         if (azuraCast.Checks.UpdatesShowChangelog)
         {
@@ -79,7 +79,7 @@ public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiServi
                     onlineChangelog = onlineChangelog.Split("---")[1];
             }
 
-            embeds.Add(EmbedBuilder.BuildAzuraCastUpdatesChangelogEmbed(update.RollingUpdatesList, update.NeedsRollingUpdate, onlineChangelog));
+            embeds.Add(EmbedBuilder.BuildAzuraCastUpdatesChangelogEmbed(update.NeedsRollingUpdate, onlineChangelog));
         }
 
         await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, embeds: embeds);
