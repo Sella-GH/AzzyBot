@@ -1,3 +1,9 @@
+## 2.7.0
+### General
+- Reworked the Encryption strength of the critical data stored in the database
+  - We now use the AesGcm algorithm with a 256 bit key to be more future-proof since .NET 10 will deprecate AesCcm on some platforms
+  - Current stored data is automatically migrated to the new algorithm upon startup for a limited amount of releases
+
 ## 2.6.2 - 2025-07-18
 ### Fixes
 - Another fix for the AzuraCast Update Check to make it work with the latest AzuraCast version

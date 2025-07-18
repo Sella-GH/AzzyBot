@@ -22,7 +22,7 @@ public static class IServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(settings);
 
         // Set the encryption key
-        Crypto.EncryptionKey = Encoding.UTF8.GetBytes(settings.EncryptionKey);
+        Crypto.SetEncryptionKey(Encoding.UTF8.GetBytes(settings.EncryptionKey));
 
         string connectionString = GetConnectionString(settings.Host, settings.Port, settings.User, settings.Password, settings.DatabaseName, settings.UseSsl, settings.SslMode, settings.SslNegotiation, settings.SslRootCert, settings.SslCert, settings.SslPassword);
 #if DEBUG || DOCKER_DEBUG
