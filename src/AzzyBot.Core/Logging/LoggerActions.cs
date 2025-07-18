@@ -185,4 +185,10 @@ public static partial class LoggerActions
 
     [LoggerMessage(403, LogLevel.Critical, "You removed me from my hometown server with the id {id}! I'm going to shutdown now.")]
     public static partial void RemovedFromHomeGuild(this ILogger logger, ulong id);
+
+    [LoggerMessage(1000, LogLevel.Information, "Database migration to new encryption schema started")]
+    public static partial void DatabaseNewEncryptionStart(this ILogger logger);
+
+    [LoggerMessage(1001, LogLevel.Information, "Database migration to new encryption schema completed")]
+    public static partial void DatabaseNewEncryptionComplete(this ILogger logger);
 }
