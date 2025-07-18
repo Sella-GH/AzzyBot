@@ -27,7 +27,7 @@ public static class Crypto
     public static string Encrypt(string plain, byte[]? newKey = null)
     {
         byte[] key = newKey ?? EncryptionKey;
-        if (key is null or { Length: not 32 })
+        if (key.Length is not 32)
             throw new ArgumentException("Key must be a 32-byte array.", nameof(newKey));
 
         byte[] nonce = new byte[12]; // 96-bit nonce
@@ -68,7 +68,7 @@ public static class Crypto
         byte[] cipherBytes = Convert.FromBase64String(parts[1]);
         byte[] tagBytes = Convert.FromBase64String(parts[2]);
         byte[] key = newKey ?? EncryptionKey;
-        if (key is null or { Length: not 32 })
+        if (key.Length is not 32)
             throw new ArgumentException("Key must be a 32-byte array.", nameof(newKey));
 
         byte[] plainBytes = new byte[cipherBytes.Length];
@@ -100,17 +100,24 @@ public static class Crypto
         {
             AesGcmCipher gcmCipher = AesGcmCipher.FromBase64String(legacyCipher);
 
-            string plain;
             using AesCcm aes = new(EncryptionKey);
             byte[] plainBytes = new byte[gcmCipher.Cipher.Length];
             aes.Decrypt(gcmCipher.Nonce, gcmCipher.Cipher, gcmCipher.Tag, plainBytes);
-            plain = Encoding.UTF8.GetString(plainBytes);
+            string plain = Encoding.UTF8.GetString(plainBytes);
 
             return Encrypt(plain, EncryptionKey);
         }
-        catch
+        catch (FormatException ex)
         {
-            throw new InvalidOperationException("Failed to migrate old cipher to new format. Ensure the legacy cipher is valid and the key is set correctly.");
+            throw new InvalidOperationException("Failed to migrate old cipher to new format: Invalid base64 encoding.", ex);
+        }
+        catch (CryptographicException ex)
+        {
+            throw new InvalidOperationException("Failed to migrate old cipher to new format: Decryption failed.", ex);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Failed to migrate old cipher to new format due to an unexpected error.", ex);
         }
     }
 }
