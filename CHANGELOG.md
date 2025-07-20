@@ -3,6 +3,10 @@
 - Reworked the Encryption strength of the critical data stored in the database
   - We now use the AesGcm algorithm with a 256 bit key to be more future-proof since .NET 10 will deprecate AesCcm on some platforms
   - Current stored data is automatically migrated to the new algorithm upon startup for a limited amount of releases
+- We now use the native produced executable instead of the .dll in docker images
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02532
 
 ## 2.6.2 - 2025-07-18
 ### Fixes
