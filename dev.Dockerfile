@@ -43,4 +43,4 @@ USER app
 # Start the app
 WORKDIR /app
 
-ENTRYPOINT ["dotnet", "AzzyBot-Docker-Dev.dll"]
+ENTRYPOINT ["/bin/bash", "-c", "AzzyBot-Docker-Dev"]
