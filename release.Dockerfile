@@ -40,4 +40,4 @@ USER app
 # Start the app
 WORKDIR /app
 
-ENTRYPOINT ["/bin/bash", "-c", "AzzyBot-Docker"]
+ENTRYPOINT ["./AzzyBot-Docker"]
