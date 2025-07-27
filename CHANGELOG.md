@@ -7,6 +7,7 @@
 
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02535
+- Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.14.0
 - Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.15.0.120848
 
 ## 2.6.2 - 2025-07-18

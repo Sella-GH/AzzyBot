@@ -25,7 +25,7 @@ public static class AzzyHelp
             "dj" => true,
             "music" => true,
             "player" => true,
-            _ => false,
+            _ => false
         };
     }
 

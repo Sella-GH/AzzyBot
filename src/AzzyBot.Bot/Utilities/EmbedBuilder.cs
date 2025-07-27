@@ -247,8 +247,9 @@ public static class EmbedBuilder
         ArgumentNullException.ThrowIfNull(update);
 
         const string title = "AzuraCast Updates Available";
+        string updateDesc = (update.RollingUpdatesAvailable is 1) ? "update" : "updates";
         string description = (update.NeedsRollingUpdate)
-            ? $"Your AzuraCast installation needs **{update.RollingUpdatesAvailable}** {((update.RollingUpdatesAvailable is 1) ? "update" : "updates")}."
+            ? $"Your AzuraCast installation needs **{update.RollingUpdatesAvailable}** {updateDesc}."
             : "A new release of AzuraCast is available. Update now to get the latest bug fixes, features and improvements!";
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(3);

@@ -119,7 +119,7 @@ public static class HardwareStats
             string type = content switch
             {
                 string c when c.StartsWith("pch_", StringComparison.OrdinalIgnoreCase) => "Chipset",
-                _ => "CPU",
+                _ => "CPU"
             };
 
             string tempFilePath = Path.Combine(folder, "temp");

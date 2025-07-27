@@ -40,7 +40,7 @@ public static class Misc
             ReadableBool.EnabledDisabled => (value) ? "Enabled" : "Disabled",
             ReadableBool.StartedStopped => (value) ? "Started" : "Stopped",
             ReadableBool.YesNo => (value) ? "Yes" : "No",
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null),
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
 
         return (lower) ? result.ToLowerInvariant() : result;
