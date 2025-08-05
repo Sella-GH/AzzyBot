@@ -29,6 +29,10 @@ updates:
       include: "scope"
     labels:
       - "area-dependencies"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-major" # We only want minor and patch releases of the newest SDK(s)
 
   - package-ecosystem: "nuget" # See documentation for possible values
     directory: "/" # Location of package manifests
@@ -59,8 +63,10 @@ updates:
         patterns:
         - "EntityFrameworkCore.*"
         - "Microsoft.*"
+        - "Npgsql*"
         - "Npgsql.*"
         - "NReco.*"
+        - "System.*"
         update-types:
         - "minor"
         - "patch"
@@ -69,10 +75,12 @@ updates:
         exclude-patterns:
         - "EntityFrameworkCore.*"
         - "Microsoft.*"
+        - "Npgsql"
         - "Npgsql.*"
         - "NReco.*"
         - "Roslynator.*"
         - "SonarAnalyzer.*"
+        - "System.*"
         update-types:
         - "major"
         - "minor"
