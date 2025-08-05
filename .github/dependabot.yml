@@ -18,6 +18,18 @@ updates:
       - "area-ci"
       - "area-dependencies"
 
+  - package-ecosystem: "dotnet-sdk"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "Sella-GH"
+    commit-message:
+      prefix: "[.NET SDK]"
+      include: "scope"
+    labels:
+      - "area-dependencies"
+
   - package-ecosystem: "nuget" # See documentation for possible values
     directory: "/" # Location of package manifests
     schedule:
