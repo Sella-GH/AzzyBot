@@ -50,7 +50,7 @@ jobs:
           path: extern/Lavalink4NET
 
       - name: Cache SonarQube Cloud Packages
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # 4.2.3
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # 4.2.4
         with:
           path: ~\sonar\cache
           key: ${{ runner.os }}-sonar
@@ -58,7 +58,7 @@ jobs:
 
       - name: Cache SonarQube Cloud Scanner
         id: cache-sonar-scanner
-        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # 4.2.3
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # 4.2.4
         with:
           path: .\.sonar\scanner
           key: ${{ runner.os }}-sonar-scanner
