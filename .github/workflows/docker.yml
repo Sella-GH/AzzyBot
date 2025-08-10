@@ -24,6 +24,7 @@ permissions:
   actions: write
   checks: write
   contents: read
+  packages: write
 
 jobs:
   cleanup:
