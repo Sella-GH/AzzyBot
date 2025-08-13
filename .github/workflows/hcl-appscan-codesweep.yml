@@ -1,36 +1,36 @@
 name: "HCL AppScan CodeSweep"
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-  schedule:
-  # once a day at 03:00 UTC to cleanup old runs
-    - cron: '0 3 * * *'
+    pull_request:
+        types: [opened, synchronize, reopened]
+    schedule:
+    # once a day at 03:00 UTC to cleanup old runs
+        - cron: '0 3 * * *'
 
 permissions:
-  actions: write
-  contents: read
+    actions: write
+    contents: read
 
 jobs:
-  cleanup:
-    name: Cleanup Runs
-    if: ${{ github.event_name == 'schedule' }}
-    uses: dotnet/arcade/.github/workflows/scheduled-action-cleanup-base.yml@main
-    with:
-      repository_owners: ${{ github.repository_owner }}
-
-  scan:
-    if: ${{ github.event_name != 'schedule' }}
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+    cleanup:
+        name: Cleanup Runs
+        if: ${{ github.event_name == 'schedule' }}
+        uses: dotnet/arcade/.github/workflows/scheduled-action-cleanup-base.yml@main
         with:
-          fetch-depth: 0
+            repository_owners: ${{ github.repository_owner }}
 
-      - name: Run AppScan CodeSweep
-        uses: HCL-TECH-SOFTWARE/appscan-codesweep-action@c9d5958469145a0aaf3ac41eaa0190e7757e4eba # v2.1
-        with:
-          status: action_required
+    scan:
+        if: ${{ github.event_name != 'schedule' }}
+        runs-on: ubuntu-24.04
+        steps:
+            - name: Checkout
+                uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+                with:
+                    fetch-depth: 0
 
-    env:
-      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+            - name: Run AppScan CodeSweep
+                uses: HCL-TECH-SOFTWARE/appscan-codesweep-action@c9d5958469145a0aaf3ac41eaa0190e7757e4eba # v2.1
+                with:
+                    status: action_required
+
+        env:
+            GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}

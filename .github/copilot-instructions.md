@@ -119,14 +119,14 @@ The bot uses a modular architecture:
 ### CI/CD Process
 1. **Code Push** triggers workflows on paths: `**.cs`, `**.csproj`, `**.json`, `**.props`, `**.sln`
 2. **Build Process**:
-   ```bash
-   # Checkout with submodules
-   git submodule update --init --recursive
+        ```bash
+        # Checkout with submodules
+        git submodule update --init --recursive
    
-   # Build (Windows for SonarCloud, Ubuntu for CodeQL)
-   dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.config --force --no-cache --ucr
-   dotnet build ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Release --no-incremental --no-restore --no-self-contained --ucr
-   ```
+        # Build (Windows for SonarCloud, Ubuntu for CodeQL)
+        dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.config --force --no-cache --ucr
+        dotnet build ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Release --no-incremental --no-restore --no-self-contained --ucr
+        ```
 3. **Quality Checks**: SonarCloud analysis, CodeQL security scanning
 4. **Docker Builds**: Multi-platform images pushed to Docker Hub
 5. **Release Process**: Automated on version tags
