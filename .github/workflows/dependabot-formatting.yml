@@ -1,0 +1,111 @@
+name: Normalize Dependabot PR Formatting
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  normalize-formatting:
+    name: Normalize Line Endings and Formatting
+    runs-on: ubuntu-24.04
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Normalize line endings to CRLF
+        run: |
+          echo "Normalizing line endings to CRLF according to .gitattributes..."
+          
+          # Use git to normalize line endings based on .gitattributes
+          # This is more reliable than manual sed operations
+          git add --renormalize .
+          
+          # For files that might not be caught by git normalization, 
+          # specifically handle YAML files which are most affected by Dependabot
+          find .github/workflows -name "*.yml" -o -name "*.yaml" | while read -r file; do
+            if [ -f "$file" ]; then
+              echo "Checking line endings in: $file"
+              # Check if file has LF line endings (no CR characters)
+              if ! grep -q $'\r' "$file"; then
+                echo "Converting $file from LF to CRLF"
+                # Convert LF to CRLF: add \r before each \n
+                sed -i 's/$/\r/' "$file"
+              else
+                echo "$file already has CRLF line endings"
+              fi
+            fi
+          done
+          
+          echo "Line ending normalization completed"
+
+      - name: Fix indentation in src folder
+        run: |
+          echo "Fixing indentation in src folder..."
+          
+          # Find all C# files in src folder and fix indentation to 4 spaces
+          find ./src -name "*.cs" | while read -r file; do
+            if [ -f "$file" ]; then
+              echo "Processing indentation: $file"
+              # Convert tabs to 4 spaces
+              sed -i 's/\t/    /g' "$file"
+            fi
+          done
+          
+          # Find all project files and fix indentation to 2 spaces (standard for XML)
+          find ./src -name "*.csproj" | while read -r file; do
+            if [ -f "$file" ]; then
+              echo "Processing project file indentation: $file"
+              # Convert tabs to 2 spaces for project files
+              sed -i 's/\t/  /g' "$file"
+            fi
+          done
+
+      - name: Check for changes
+        id: check-changes
+        run: |
+          if git diff --quiet; then
+            echo "No formatting changes needed"
+            echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Formatting changes detected"
+            echo "changes=true" >> $GITHUB_OUTPUT
+            git diff --name-only
+          fi
+
+      - name: Commit and push formatting changes
+        if: steps.check-changes.outputs.changes == 'true'
+        run: |
+          git add .
+          git commit -m "Normalize line endings and formatting
+
+          - Convert line endings to CRLF as per repository standard
+          - Fix indentation in src folder (4 spaces for C#, 2 spaces for project files)
+          - Ensure consistency with .editorconfig and .gitattributes settings"
+          git push origin ${{ github.head_ref }}
+
+      - name: Add comment to PR
+        if: steps.check-changes.outputs.changes == 'true'
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🤖 **Formatting Normalization**\n\nI\'ve automatically normalized the line endings and formatting in this PR to match the repository standards:\n- ✅ Line endings converted to CRLF\n- ✅ Indentation fixed (4 spaces for C# files in src/, 2 spaces for project files)\n- ✅ Consistency with `.editorconfig` and `.gitattributes` settings\n\nThis ensures the PR only contains the actual dependency changes without formatting inconsistencies.'
+            })
