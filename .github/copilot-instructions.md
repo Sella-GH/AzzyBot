@@ -178,6 +178,13 @@ The project uses extensive static analysis:
 - **AnalysisLevel**: `latest-all` (maximum analysis coverage)
 - **TreatWarningsAsErrors**: Enabled for code quality enforcement
 
+### File Formatting Standards
+When creating or modifying files in the repository, ensure all files are saved with the following settings:
+- **Indentation**: 4 spaces (no tabs)
+- **Line Endings**: CRLF (Windows-style line endings)
+
+These standards ensure consistency across the codebase and prevent formatting conflicts in commits.
+
 ## Database & Entity Framework
 
 ### Database Setup
