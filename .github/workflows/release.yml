@@ -1,37 +1,37 @@
 name: Automated .NET Release
 
 on:
-    push:
-        branches:
-        - "main"
-        - "rel/**"
-        paths:
-        - "Directory.Build.props"
-        - "**/release.yml"
-    workflow_dispatch:
+  push:
+    branches:
+    - "main"
+    - "rel/**"
+    paths:
+    - "Directory.Build.props"
+    - "**/release.yml"
+  workflow_dispatch:
 
 permissions:
-    actions: write
-    checks: write
-    contents: write
+  actions: write
+  checks: write
+  contents: write
 
 jobs:
-    check_for_tag:
-        name: Check if tag has to be created
-        if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
-        uses: ./.github/workflows/tag-creation.yml
+  check_for_tag:
+    name: Check if tag has to be created
+    if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
+    uses: ./.github/workflows/tag-creation.yml
 
-    extract_meta:
-        name: Extract metadata for use
-        if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
-        runs-on: ubuntu-24.04
-        outputs:
-            loc_cs: ${{ steps.loc_cs.outputs.total_lines }}
-            datetime: ${{ steps.dateTime.outputs.time }}
-            clean_version: ${{ steps.get-version.outputs.clean_version }}
-            version: ${{ steps.get-version.outputs.version }}
+  extract_meta:
+    name: Extract metadata for use
+    if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
+    runs-on: ubuntu-24.04
+    outputs:
+      loc_cs: ${{ steps.loc_cs.outputs.total_lines }}
+      datetime: ${{ steps.dateTime.outputs.time }}
+      clean_version: ${{ steps.get-version.outputs.clean_version }}
+      version: ${{ steps.get-version.outputs.version }}
 
-        steps:
+    steps:
      - name: Checkout
        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
        with:
@@ -56,108 +56,108 @@ jobs:
          echo "version=v$VERSION" >> "$GITHUB_OUTPUT"
          echo "clean_version=$VERSION" >> "$GITHUB_OUTPUT"
 
-    build-docker:
-        name: Build docker .zip file
-        needs: extract_meta
-        if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
-        runs-on: ubuntu-24.04
-        steps:
-            - name: Checkout
-                uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-                with:
-                    fetch-depth: 0
+  build-docker:
+    name: Build docker .zip file
+    needs: extract_meta
+    if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
 
-            - name: Getting all files together
-                run: |
-                    mkdir docker-zip
-                    mv ./CHANGELOG.md ./docker-zip/CHANGELOG.md
-                    mv ./docker-compose.yml ./docker-zip/docker-compose.yml
-                    mv ./LICENSE ./docker-zip/LICENSE
-                    mv ./README.md ./docker-zip/README.md
-                    mv ./SECURITY.md ./docker-zip/SECURITY.md
-                    mkdir -p ./docker-zip/AzzyBot/Backups
-                    touch ./docker-zip/AzzyBot/Backups/.keep
-                    mkdir -p ./docker-zip/AzzyBot/Certificates
-                    touch ./docker-zip/AzzyBot/Certificates/.keep
-                    mkdir -p ./docker-zip/AzzyBot/Logs
-                    touch ./docker-zip/AzzyBot/Backups/.keep
-                    mkdir -p ./docker-zip/AzzyBot/Modules/AzuraCast/Files
-                    mkdir -p ./docker-zip/AzzyBot/Modules/MusicStreaming/Files
-                    mv ./src/AzzyBot.Bot/Modules/MusicStreaming/Files/application.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/application.yml
-                    #wget -qO ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
-                    mkdir -p ./docker-zip/AzzyBot/Settings
-                    mv ./src/AzzyBot.Bot/Settings/AzzyBotSettings-Docker.json ./docker-zip/AzzyBot/Settings/AzzyBotSettings-Docker.json
+      - name: Getting all files together
+        run: |
+          mkdir docker-zip
+          mv ./CHANGELOG.md ./docker-zip/CHANGELOG.md
+          mv ./docker-compose.yml ./docker-zip/docker-compose.yml
+          mv ./LICENSE ./docker-zip/LICENSE
+          mv ./README.md ./docker-zip/README.md
+          mv ./SECURITY.md ./docker-zip/SECURITY.md
+          mkdir -p ./docker-zip/AzzyBot/Backups
+          touch ./docker-zip/AzzyBot/Backups/.keep
+          mkdir -p ./docker-zip/AzzyBot/Certificates
+          touch ./docker-zip/AzzyBot/Certificates/.keep
+          mkdir -p ./docker-zip/AzzyBot/Logs
+          touch ./docker-zip/AzzyBot/Backups/.keep
+          mkdir -p ./docker-zip/AzzyBot/Modules/AzuraCast/Files
+          mkdir -p ./docker-zip/AzzyBot/Modules/MusicStreaming/Files
+          mv ./src/AzzyBot.Bot/Modules/MusicStreaming/Files/application.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/application.yml
+          #wget -qO ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
+          mkdir -p ./docker-zip/AzzyBot/Settings
+          mv ./src/AzzyBot.Bot/Settings/AzzyBotSettings-Docker.json ./docker-zip/AzzyBot/Settings/AzzyBotSettings-Docker.json
 
-            - name: Archive docker-zip artifact
-                uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-                with:
-                    name: ${{ needs.extract_meta.outputs.clean_version }}-docker
-                    path: ./docker-zip
+      - name: Archive docker-zip artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ${{ needs.extract_meta.outputs.clean_version }}-docker
+          path: ./docker-zip
 
-    create_release:
-        name: Create GitHub Release
-        needs: [extract_meta, build-docker]
-        runs-on: ubuntu-24.04
-        outputs:
-            release_version: ${{ steps.set_output.outputs.release_version }}
-        steps:
-            - name: Checkout
-                uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+  create_release:
+    name: Create GitHub Release
+    needs: [extract_meta, build-docker]
+    runs-on: ubuntu-24.04
+    outputs:
+      release_version: ${{ steps.set_output.outputs.release_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-            - name: Extract Latest Changelog Entry
-                id: extract_changelog
-                run: |
-                    # Extract the latest changelog entry from the changelog file
-                    latest_entry=$(awk 'BEGIN {found=0} /^## / {if (found) exit; found=1} {if (found) print}' CHANGELOG.md)
-                    echo "$latest_entry" > latest_changelog.md
+      - name: Extract Latest Changelog Entry
+        id: extract_changelog
+        run: |
+          # Extract the latest changelog entry from the changelog file
+          latest_entry=$(awk 'BEGIN {found=0} /^## / {if (found) exit; found=1} {if (found) print}' CHANGELOG.md)
+          echo "$latest_entry" > latest_changelog.md
 
-                    # Extract title for release
-                    release_title=$(echo "$latest_entry" | awk 'NR==2')
+          # Extract title for release
+          release_title=$(echo "$latest_entry" | awk 'NR==2')
 
-                    # Ensure safe output handling for multiline strings
-                    echo "latest_entry<<EOF" >> "$GITHUB_OUTPUT"
-                    echo "$latest_entry" >> "$GITHUB_OUTPUT"
-                    echo "EOF" >> "$GITHUB_OUTPUT"
-                    echo "release_title=$release_title" >> "$GITHUB_ENV"
+          # Ensure safe output handling for multiline strings
+          echo "latest_entry<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$latest_entry" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+          echo "release_title=$release_title" >> "$GITHUB_ENV"
 
-            - name: Create Release
-                id: create_release_action
-                uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 # v2.3.2
-                env:
-                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                with:
-                    tag_name: ${{ needs.extract_meta.outputs.version }}
-                    name: ${{ needs.extract_meta.outputs.clean_version }}
-                    body_path: latest_changelog.md
-                    prerelease: ${{ contains(github.event.head_commit.message, '[pre-release]') }}
+      - name: Create Release
+        id: create_release_action
+        uses: softprops/action-gh-release@72f2c25fcb47643c292f7107632f7a47c1df5cd8 # v2.3.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.extract_meta.outputs.version }}
+          name: ${{ needs.extract_meta.outputs.clean_version }}
+          body_path: latest_changelog.md
+          prerelease: ${{ contains(github.event.head_commit.message, '[pre-release]') }}
 
-            - name: Set Release Version Output
-                id: set_output
-                run: |
-                    echo "release_version=${{ needs.extract_meta.outputs.version }}" >> "$GITHUB_OUTPUT"
+      - name: Set Release Version Output
+        id: set_output
+        run: |
+          echo "release_version=${{ needs.extract_meta.outputs.version }}" >> "$GITHUB_OUTPUT"
 
-    upload_assets:
-        name: Upload GitHub Release Assets
-        needs: [build-docker, create_release]
-        runs-on: ubuntu-24.04
-        steps:
-            - name: Install GitHub CLI
-                run: sudo apt-get update && sudo apt-get install -y gh
+  upload_assets:
+    name: Upload GitHub Release Assets
+    needs: [build-docker, create_release]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install GitHub CLI
+        run: sudo apt-get update && sudo apt-get install -y gh
 
-            - name: Download and Upload All Artifacts
-                run: |
-                    # Fetch a list of all artifact details for the current workflow run
-                    ARTIFACTS_JSON=$(gh api /repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)
-                    # Ensure the command above is successful and returns valid JSON before proceeding
-                    # Iterate over each artifact to download and upload it
-                    echo "$ARTIFACTS_JSON" | jq -c '.artifacts[]' | while read -r artifact; do
-                        ARTIFACT_NAME=$(echo "$artifact" | jq -r '.name')
-                        ARTIFACT_DOWNLOAD_URL=$(echo "$artifact" | jq -r '.archive_download_url')
-                        # Download the artifact
-                        curl -L -o "${ARTIFACT_NAME}.zip" -H "Authorization: token $GITHUB_TOKEN" "$ARTIFACT_DOWNLOAD_URL"
-                        # Upload the artifact to the release
-                        gh release upload ${{ needs.create_release.outputs.release_version }} "${ARTIFACT_NAME}.zip" --clobber --repo ${{ github.repository }}
-                    done
+      - name: Download and Upload All Artifacts
+        run: |
+          # Fetch a list of all artifact details for the current workflow run
+          ARTIFACTS_JSON=$(gh api /repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)
+          # Ensure the command above is successful and returns valid JSON before proceeding
+          # Iterate over each artifact to download and upload it
+          echo "$ARTIFACTS_JSON" | jq -c '.artifacts[]' | while read -r artifact; do
+            ARTIFACT_NAME=$(echo "$artifact" | jq -r '.name')
+            ARTIFACT_DOWNLOAD_URL=$(echo "$artifact" | jq -r '.archive_download_url')
+            # Download the artifact
+            curl -L -o "${ARTIFACT_NAME}.zip" -H "Authorization: token $GITHUB_TOKEN" "$ARTIFACT_DOWNLOAD_URL"
+            # Upload the artifact to the release
+            gh release upload ${{ needs.create_release.outputs.release_version }} "${ARTIFACT_NAME}.zip" --clobber --repo ${{ github.repository }}
+          done
 
-                env:
-                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

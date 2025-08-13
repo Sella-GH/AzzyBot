@@ -1,93 +1,93 @@
 name: "SonarQube Cloud Scanner"
 
 on:
-    push:
-        branches-ignore:
-        - rel/**
-        paths:
-        - "**.cs"
-        - "**.csproj"
-        - "**.json"
-        - "**.props"
-        - "**.sln"
-        - "**.yml"
-    schedule:
-    # Once a day at 05:00 UTC
-    - cron: '0 5 * * *'
-    workflow_dispatch:
+  push:
+    branches-ignore:
+    - rel/**
+    paths:
+    - "**.cs"
+    - "**.csproj"
+    - "**.json"
+    - "**.props"
+    - "**.sln"
+    - "**.yml"
+  schedule:
+  # Once a day at 05:00 UTC
+  - cron: '0 5 * * *'
+  workflow_dispatch:
 
 jobs:
-    build:
-        name: Build And Analyze
-        runs-on: windows-latest
-        permissions:
-            contents: read
-        steps:
-            - name: Set up .NET SDK
-                uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
-                with:
-                    dotnet-version: 9
-
-            - name: Set up JDK 17
-                uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
-                with:
-                    java-version: 17
-                    distribution: temurin
-
-            - name: Checkout
-                uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-                with:
-                    fetch-depth: 0
-                    submodules: recursive
-
-            - name: Checkout submodules
-                uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-                with:
-                    fetch-depth: 0
-                    repository: Sella-GH/Lavalink4NET
-                    ref: azzy
-                    submodules: recursive
-                    path: extern/Lavalink4NET
-
-            - name: Cache SonarQube Cloud Packages
-                uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # 4.2.4
-                with:
-                    path: ~\sonar\cache
-                    key: ${{ runner.os }}-sonar
-                    restore-keys: ${{ runner.os }}-sonar
-
-            - name: Cache SonarQube Cloud Scanner
-                id: cache-sonar-scanner
-                uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # 4.2.4
-                with:
-                    path: .\.sonar\scanner
-                    key: ${{ runner.os }}-sonar-scanner
-                    restore-keys: ${{ runner.os }}-sonar-scanner
-
-            - name: Install SonarQube Cloud Scanner
-                if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
-                shell: powershell
-                run: |
-                    New-Item -Path .\.sonar\scanner -ItemType Directory
-                    dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
-
-            - name: Build And Analyze
-                env:
-                    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-                shell: powershell
-                run: |
-                    .\.sonar\scanner\dotnet-sonarscanner begin /k:"Sella-GH_AzzyBot" /o:"sella-gh" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
-
-                    dotnet restore .\src\AzzyBot.Bot\AzzyBot.Bot.csproj --configfile .\Nuget.config --force --no-cache --ucr
-                    dotnet build .\src\AzzyBot.Bot\AzzyBot.Bot.csproj -c Release --no-incremental --no-restore --no-self-contained --ucr
-
-                    .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-
-    cleanup:
-        name: Cleanup Runs
-        if: ${{ github.event_name == 'schedule' }}
-        permissions:
-            actions: write
-        uses: dotnet/arcade/.github/workflows/scheduled-action-cleanup-base.yml@main
+  build:
+    name: Build And Analyze
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
         with:
-            repository_owners: ${{ github.repository_owner }}
+          dotnet-version: 9
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4.7.1
+        with:
+          java-version: 17
+          distribution: temurin
+
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+          submodules: recursive
+
+      - name: Checkout submodules
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+          repository: Sella-GH/Lavalink4NET
+          ref: azzy
+          submodules: recursive
+          path: extern/Lavalink4NET
+
+      - name: Cache SonarQube Cloud Packages
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # 4.2.4
+        with:
+          path: ~\sonar\cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache SonarQube Cloud Scanner
+        id: cache-sonar-scanner
+        uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809 # 4.2.4
+        with:
+          path: .\.sonar\scanner
+          key: ${{ runner.os }}-sonar-scanner
+          restore-keys: ${{ runner.os }}-sonar-scanner
+
+      - name: Install SonarQube Cloud Scanner
+        if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        shell: powershell
+        run: |
+          New-Item -Path .\.sonar\scanner -ItemType Directory
+          dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
+
+      - name: Build And Analyze
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        shell: powershell
+        run: |
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"Sella-GH_AzzyBot" /o:"sella-gh" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+
+          dotnet restore .\src\AzzyBot.Bot\AzzyBot.Bot.csproj --configfile .\Nuget.config --force --no-cache --ucr
+          dotnet build .\src\AzzyBot.Bot\AzzyBot.Bot.csproj -c Release --no-incremental --no-restore --no-self-contained --ucr
+
+          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+
+  cleanup:
+    name: Cleanup Runs
+    if: ${{ github.event_name == 'schedule' }}
+    permissions:
+      actions: write
+    uses: dotnet/arcade/.github/workflows/scheduled-action-cleanup-base.yml@main
+    with:
+      repository_owners: ${{ github.repository_owner }}

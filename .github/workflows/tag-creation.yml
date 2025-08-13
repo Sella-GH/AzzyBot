@@ -1,71 +1,71 @@
 name: Check for new release version
 
 on:
-    workflow_call:
-        outputs:
-            tag_created:
-                description: "Tells if the tag was created"
-                value: ${{ jobs.create_tag.outputs.tag_was_created }}
-    workflow_dispatch:
+  workflow_call:
+    outputs:
+      tag_created:
+        description: "Tells if the tag was created"
+        value: ${{ jobs.create_tag.outputs.tag_was_created }}
+  workflow_dispatch:
 
 permissions:
-    contents: write
+  contents: write
 
 jobs:
-    check_csproj:
-        name: Check the project version
-        runs-on: ubuntu-24.04
-        if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
-        outputs:
-            create_tag_needed: ${{ steps.compare.outputs.create_tag }}
-            tag_version: ${{ steps.compare.outputs.set_tag_version }}
-        steps:
-            - name: Checkout
-                uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-                with:
-                    fetch-depth: 0
+  check_csproj:
+    name: Check the project version
+    runs-on: ubuntu-24.04
+    if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
+    outputs:
+      create_tag_needed: ${{ steps.compare.outputs.create_tag }}
+      tag_version: ${{ steps.compare.outputs.set_tag_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
 
-            - name: Get version from Directory.Build.props
-                id: get-version
-                run: |
-                    VERSION=$(grep -oP '(?<=<Version>).*?(?=</Version>)' Directory.Build.props)
-                    echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      - name: Get version from Directory.Build.props
+        id: get-version
+        run: |
+          VERSION=$(grep -oP '(?<=<Version>).*?(?=</Version>)' Directory.Build.props)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-            - name: Compare tags
-                id: compare
-                run: |
-                    if git rev-parse "v${{steps.get-version.outputs.version}}" >/dev/null 2>&1; then
-                        echo "create_tag=false" >> "$GITHUB_OUTPUT"
-                    else
-                        echo "create_tag=true" >> "$GITHUB_OUTPUT"
-                        echo "set_tag_version=v${{steps.get-version.outputs.version}}" >> "$GITHUB_OUTPUT"
-                    fi
+      - name: Compare tags
+        id: compare
+        run: |
+          if git rev-parse "v${{steps.get-version.outputs.version}}" >/dev/null 2>&1; then
+            echo "create_tag=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "create_tag=true" >> "$GITHUB_OUTPUT"
+            echo "set_tag_version=v${{steps.get-version.outputs.version}}" >> "$GITHUB_OUTPUT"
+          fi
 
-    create_tag:
-        name: Create the tag if needed
-        needs: check_csproj
-        if: ${{ needs.check_csproj.outputs.create_tag_needed == 'true' &&  needs.check_csproj.outputs.tag_version != '' }}
-        runs-on: ubuntu-24.04
-        outputs:
-            tag_was_created: ${{ steps.create-tag.outputs.created-tag }}
-        steps:
-            - name: Checkout
-                uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-                with:
-                    fetch-depth: 0
+  create_tag:
+    name: Create the tag if needed
+    needs: check_csproj
+    if: ${{ needs.check_csproj.outputs.create_tag_needed == 'true' &&  needs.check_csproj.outputs.tag_version != '' }}
+    runs-on: ubuntu-24.04
+    outputs:
+      tag_was_created: ${{ steps.create-tag.outputs.created-tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
 
-            - name: Create tag and set output
-                id: create-tag
-                uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
-                with:
-                    script: |
-                        const tagName = `${process.env.TAG_VERSION}`;
-                        await github.rest.git.createRef({
-                            owner: context.repo.owner,
-                            repo: context.repo.repo,
-                            ref: `refs/tags/${tagName}`,
-                            sha: context.sha
-                        });
-                        core.setOutput('created-tag', 'true');
-                env:
-                    TAG_VERSION: ${{ needs.check_csproj.outputs.tag_version }}
+      - name: Create tag and set output
+        id: create-tag
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
+        with:
+          script: |
+            const tagName = `${process.env.TAG_VERSION}`;
+            await github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/${tagName}`,
+              sha: context.sha
+            });
+            core.setOutput('created-tag', 'true');
+        env:
+          TAG_VERSION: ${{ needs.check_csproj.outputs.tag_version }}

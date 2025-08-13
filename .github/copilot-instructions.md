@@ -179,8 +179,8 @@ The project uses extensive static analysis:
 - **TreatWarningsAsErrors**: Enabled for code quality enforcement
 
 ### File Formatting Standards
-When creating or modifying files in the repository, ensure all files are saved with the following settings:
-- **Indentation**: 4 spaces (no tabs)
+When creating or modifying files in the repository, ensure files are saved with the following settings:
+- **Indentation**: 4 spaces (no tabs) for files in the `src` folder only
 - **Line Endings**: CRLF (Windows-style line endings)
 
 These standards ensure consistency across the codebase and prevent formatting conflicts in commits.
