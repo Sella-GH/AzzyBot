@@ -24,10 +24,9 @@ jobs:
   normalize:
     runs-on: ubuntu-24.04
     steps:
-      - name: Check out PR
+      - name: Checkout PR
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
       - name: Configure Git Client
