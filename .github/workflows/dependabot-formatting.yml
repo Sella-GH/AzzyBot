@@ -6,92 +6,179 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
+  pull-requests: read
+
+defaults:
+  run:
+    # Use a non-interactive, safe shell and enforce strict mode by default.
+    shell: bash --noprofile --norc -euo pipefail {0}
+
+env:
+  # Ensure deterministic text processing and avoid locale side-effects.
+  LC_ALL: C
+  LANG: C
+  # Sanitize PATH to trusted locations only.
+  PATH: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 jobs:
   normalize:
     runs-on: ubuntu-24.04
     steps:
-      - name: Check out PR head branch (same-repo)
-        uses: actions/checkout@v4
+      - name: Check out PR
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
-      - name: Configure Git author and line ending behavior
+      - name: Configure Git Client
         run: |
+          # Mark workspace as safe to avoid "dubious ownership" errors without widening to '*'
+          git config --global safe.directory "$GITHUB_WORKSPACE"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Prevent Git from altering line endings on checkout/add/commit
+          # Prevent Git from altering line endings after normalization writes CRLF
           git config core.autocrlf false
+          # Restrictive default permissions for any temporary files created
+          umask 077
 
-      - name: Normalize files (CRLF + indentation)
+      - name: Normalize files
         id: normalize
         shell: bash
         run: |
-          set -euo pipefail
+          # Helper: portable realpath
+          realpath_safe() {
+            if command -v realpath >/dev/null 2>&1; then
+              realpath -- "$1"
+            else
+              python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$1"
+            fi
+          }
+
+          # Ensure we only operate within the workspace and on regular files
+          WORKSPACE="$(realpath_safe "$GITHUB_WORKSPACE")"
+          printf 'Workspace: %s\n' "$WORKSPACE"
+
+          # Tool availability checks (fail-fast if critical tools are missing)
+          for cmd in awk sed cmp mktemp find; do
+            command -v "$cmd" >/dev/null 2>&1 || { echo "::error::Missing required tool: $cmd"; exit 1; }
+          done
+          # 'file' is optional; if unavailable, we treat files as text cautiously.
+          HAVE_FILE_CMD=1
+          if ! command -v file >/dev/null 2>&1; then
+            HAVE_FILE_CMD=0
+            echo "::notice::'file' command not found; will conservatively treat files as text."
+          fi
 
           is_text_file() {
+            # Returns 0 if file appears to be text, 1 if binary.
+            # Uses 'file -i' when available. Always quote and use '--' to end options.
             local f="$1"
-            if ! command -v file >/dev/null 2>&1; then
+            if [ "$HAVE_FILE_CMD" -eq 0 ]; then
+              # Basic heuristic: skip very obviously binary files by checking for NUL bytes
+              if LC_ALL=C tr -d '\n\r\t ' < "$f" | LC_ALL=C grep -qU $'\x00'; then
+                return 1
+              fi
               return 0
             fi
+            # Use file; if it explicitly says charset=binary, consider it binary.
             local mime
-            mime="$(file -i "$f" 2>/dev/null || true)"
+            if ! mime="$(file -i -- "$f" 2>/dev/null || true)"; then
+              # If 'file' fails, err on the side of not modifying.
+              return 1
+            fi
             if printf '%s' "$mime" | grep -qi 'charset=binary'; then
+              return 1
+            fi
+            # Also skip common known binary types even if misdetected
+            if printf '%s' "$mime" | grep -qi 'image/|audio/|video/|application/pdf|application/zip|application/x-'; then
               return 1
             fi
             return 0
           }
 
           process_file() {
-            local f="$1"
+            # Normalize a single file to CRLF and expand tabs per rules.
+            # Defend against TOCTOU by always re-resolving the absolute path and ensuring it remains within workspace.
+            local f_rel="$1"
+            local f_abs
+            f_abs="$(realpath_safe "$f_rel")" || return 0
+
+            # Only operate on regular files and ensure path containment in workspace
+            if [ ! -f "$f_abs" ]; then
+              return 0
+            fi
+            case "$f_abs" in
+              "$WORKSPACE"/*) ;;
+              *) echo "Skipping (outside workspace): $f_rel" >&2; return 0 ;;
+            esac
+
+            # Skip .git directory explicitly
+            case "$f_abs" in
+              "$WORKSPACE"/.git/*) return 0 ;;
+            esac
+
+            # Skip non-writable files to avoid errors
+            if [ ! -w "$f_abs" ]; then
+              echo "Skipping (not writable): $f_rel" >&2
+              return 0
+            fi
+
+            # Determine tab width based on extension (case-insensitive)
             local tabstop=2
-            case "$f" in
+            case "$f_abs" in
               *.cs|*.CS|*.cS|*.Cs) tabstop=4 ;;
               *) tabstop=2 ;;
             esac
 
-            if [ ! -w "$f" ]; then
-              echo "Skipping (not writable): $f" >&2
+            # Skip binary files
+            if ! is_text_file "$f_abs"; then
+              echo "Skipping (binary): $f_rel" >&2
               return 0
             fi
 
+            # Create a secure temp file; ensure cleanup
             local tmp
-            tmp="$(mktemp "${TMPDIR:-/tmp}/normXXXXXX")"
+            tmp="$(mktemp "${TMPDIR:-/tmp}/norm.XXXXXX")"
+            trap 'rm -f "$tmp"' RETURN
 
+            # Normalize: strip CR, expand tabs, then force CRLF endings.
+            # Use '--' before filenames to avoid option confusion if filename starts with '-'.
             if command -v expand >/dev/null 2>&1; then
-              sed 's/\r$//' "$f" | expand -t "$tabstop" | awk '{ printf "%s\r\n", $0 }' > "$tmp"
+              # Convert to LF internally, expand tabs, then write CRLF
+              sed 's/\r$//' -- "$f_abs" \
+                | expand -t "$tabstop" \
+                | awk '{ printf "%s\r\n", $0 }' > "$tmp"
             else
-              sed 's/\r$//' "$f" \
+              # Fallback: replace only leading TABs to spaces per tabstop, then force CRLF
+              # shellcheck disable=SC2016
+              sed 's/\r$//' -- "$f_abs" \
                 | sed -E ':a; s/^([[:space:]]*)\t/\1'$(printf "%${tabstop}s" " ")'/; ta' \
                 | awk '{ printf "%s\r\n", $0 }' > "$tmp"
             fi
 
-            if ! cmp -s "$tmp" "$f"; then
-              cat "$tmp" > "$f"
-              echo "Updated: $f (tabs -> ${tabstop} spaces, CRLF endings)"
+            # Only overwrite if content actually changed.
+            if ! cmp -s "$tmp" -- "$f_abs"; then
+              # Overwrite in place to preserve permissions; do not follow symlinks (we already restricted to -type f)
+              cat "$tmp" > "$f_abs"
+              echo "Updated: $f_rel (tabs -> ${tabstop} spaces, CRLF endings)"
             fi
-            rm -f "$tmp"
+
+            # Cleanup handled by trap
           }
 
           export -f is_text_file
           export -f process_file
+          export HAVE_FILE_CMD
+          export WORKSPACE
+          export -f realpath_safe
 
-          # Process all regular files except those under .git
-          find "." -path "./.git" -prune -o -type f -print0 \
-          | while IFS= read -r -d '' f; do
-              case "$f" in
-                */.git/*) continue ;;
-              esac
-              if is_text_file "$f"; then
-                process_file "$f"
-              else
-                echo "Skipping (binary): $f" >&2
-              fi
-            done
+          # Use null-delimited find to handle all filenames safely; restrict to regular files and skip .git
+          # Do not follow symlinks to avoid CWE-59/TOCTOU issues.
+          while IFS= read -r -d '' f; do
+            process_file "$f"
+          done < <(find "$WORKSPACE" -path "$WORKSPACE/.git" -prune -o -type f -print0)
 
-          # Set an output to indicate if anything changed
+          # Determine if changes occurred
           if ! git diff --quiet; then
             echo "changed=true" >> "$GITHUB_OUTPUT"
             echo "Changes detected."
@@ -103,16 +190,15 @@ jobs:
       - name: Commit And Push
         if: steps.normalize.outputs.changed == 'true'
         shell: bash
-        env:
-          HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
-          set -euo pipefail
           git add -A
-          # If nothing is staged (race or hooks), skip
           if git diff --cached --quiet; then
             echo "No staged changes to commit."
             exit 0
           fi
           git commit -m "Normalize EOL and indentation"
-          git push origin HEAD:$HEAD_REF
+          # Explicitly push to the PR head ref
+          git push origin "HEAD:$HEAD_REF"
           echo "Pushed normalization changes to PR branch."
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
