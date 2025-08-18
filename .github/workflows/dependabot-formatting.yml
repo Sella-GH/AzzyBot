@@ -1,4 +1,4 @@
-name: Normalize Dependabot PR Formatting
+name: Normalize PR Formatting
 
 on:
   pull_request:
@@ -9,103 +9,108 @@ permissions:
   pull-requests: write
 
 jobs:
-  normalize-formatting:
-    name: Normalize Line Endings and Formatting
+  normalize:
     runs-on: ubuntu-24.04
-    if: ${{ github.actor == 'dependabot[bot]' }}
-    
     steps:
-      - name: Checkout PR branch
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Check out PR head branch (same-repo)
+        uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ github.head_ref }}
+          ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
-      - name: Configure git
+      - name: Configure Git author and line ending behavior
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Prevent Git from altering line endings on checkout/add/commit
+          git config core.autocrlf false
 
-      - name: Normalize line endings to CRLF
+      - name: Normalize files (CRLF + indentation)
+        id: normalize
+        shell: bash
         run: |
-          echo "Normalizing line endings to CRLF according to .gitattributes..."
-          
-          # Use git to normalize line endings based on .gitattributes
-          # This is more reliable than manual sed operations
-          git add --renormalize .
-          
-          # For files that might not be caught by git normalization, 
-          # specifically handle YAML files which are most affected by Dependabot
-          find .github/workflows -name "*.yml" -o -name "*.yaml" | while read -r file; do
-            if [ -f "$file" ]; then
-              echo "Checking line endings in: $file"
-              # Check if file has LF line endings (no CR characters)
-              if ! grep -q $'\r' "$file"; then
-                echo "Converting $file from LF to CRLF"
-                # Convert LF to CRLF: add \r before each \n
-                sed -i 's/$/\r/' "$file"
+          set -euo pipefail
+
+          is_text_file() {
+            local f="$1"
+            if ! command -v file >/dev/null 2>&1; then
+              return 0
+            fi
+            local mime
+            mime="$(file -i "$f" 2>/dev/null || true)"
+            if printf '%s' "$mime" | grep -qi 'charset=binary'; then
+              return 1
+            fi
+            return 0
+          }
+
+          process_file() {
+            local f="$1"
+            local tabstop=2
+            case "$f" in
+              *.cs|*.CS|*.cS|*.Cs) tabstop=4 ;;
+              *) tabstop=2 ;;
+            esac
+
+            if [ ! -w "$f" ]; then
+              echo "Skipping (not writable): $f" >&2
+              return 0
+            fi
+
+            local tmp
+            tmp="$(mktemp "${TMPDIR:-/tmp}/normXXXXXX")"
+
+            if command -v expand >/dev/null 2>&1; then
+              sed 's/\r$//' "$f" | expand -t "$tabstop" | awk '{ printf "%s\r\n", $0 }' > "$tmp"
+            else
+              sed 's/\r$//' "$f" \
+                | sed -E ':a; s/^([[:space:]]*)\t/\1'$(printf "%${tabstop}s" " ")'/; ta' \
+                | awk '{ printf "%s\r\n", $0 }' > "$tmp"
+            fi
+
+            if ! cmp -s "$tmp" "$f"; then
+              cat "$tmp" > "$f"
+              echo "Updated: $f (tabs -> ${tabstop} spaces, CRLF endings)"
+            fi
+            rm -f "$tmp"
+          }
+
+          export -f is_text_file
+          export -f process_file
+
+          # Process all regular files except those under .git
+          find "." -path "./.git" -prune -o -type f -print0 \
+          | while IFS= read -r -d '' f; do
+              case "$f" in
+                */.git/*) continue ;;
+              esac
+              if is_text_file "$f"; then
+                process_file "$f"
               else
-                echo "$file already has CRLF line endings"
+                echo "Skipping (binary): $f" >&2
               fi
-            fi
-          done
-          
-          echo "Line ending normalization completed"
+            done
 
-      - name: Fix indentation in src folder
-        run: |
-          echo "Fixing indentation in src folder..."
-          
-          # Find all C# files in src folder and fix indentation to 4 spaces
-          find ./src -name "*.cs" | while read -r file; do
-            if [ -f "$file" ]; then
-              echo "Processing indentation: $file"
-              # Convert tabs to 4 spaces
-              sed -i 's/\t/    /g' "$file"
-            fi
-          done
-          
-          # Find all project files and fix indentation to 2 spaces (standard for XML)
-          find ./src -name "*.csproj" | while read -r file; do
-            if [ -f "$file" ]; then
-              echo "Processing project file indentation: $file"
-              # Convert tabs to 2 spaces for project files
-              sed -i 's/\t/  /g' "$file"
-            fi
-          done
-
-      - name: Check for changes
-        id: check-changes
-        run: |
-          if git diff --quiet; then
-            echo "No formatting changes needed"
-            echo "changes=false" >> $GITHUB_OUTPUT
+          # Set an output to indicate if anything changed
+          if ! git diff --quiet; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Changes detected."
           else
-            echo "Formatting changes detected"
-            echo "changes=true" >> $GITHUB_OUTPUT
-            git diff --name-only
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No changes detected."
           fi
 
-      - name: Commit and push formatting changes
-        if: steps.check-changes.outputs.changes == 'true'
+      - name: Commit And Push
+        if: steps.normalize.outputs.changed == 'true'
+        shell: bash
         run: |
-          git add .
-          git commit -m "Normalize line endings and formatting
-
-          - Convert line endings to CRLF as per repository standard
-          - Fix indentation in src folder (4 spaces for C#, 2 spaces for project files)
-          - Ensure consistency with .editorconfig and .gitattributes settings"
-          git push origin ${{ github.head_ref }}
-
-      - name: Add comment to PR
-        if: steps.check-changes.outputs.changes == 'true'
-        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: '🤖 **Formatting Normalization**\n\nI\'ve automatically normalized the line endings and formatting in this PR to match the repository standards:\n- ✅ Line endings converted to CRLF\n- ✅ Indentation fixed (4 spaces for C# files in src/, 2 spaces for project files)\n- ✅ Consistency with `.editorconfig` and `.gitattributes` settings\n\nThis ensures the PR only contains the actual dependency changes without formatting inconsistencies.'
-            })
+          set -euo pipefail
+          git add -A
+          # If nothing is staged (race or hooks), skip
+          if git diff --cached --quiet; then
+            echo "No staged changes to commit."
+            exit 0
+          fi
+          git commit -m "Normalize EOL and indentation"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          echo "Pushed normalization changes to PR branch."
