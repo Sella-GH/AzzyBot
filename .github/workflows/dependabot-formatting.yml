@@ -188,7 +188,7 @@ jobs:
           fi
 
       - name: Commit And Push
-        if: steps.normalize.outputs.changed == 'true'
+        if: steps.normalize.outputs.changed == 'true' && github.event.pull_request.head.repo.full_name == github.repository
         shell: bash
         run: |
           git add -A
