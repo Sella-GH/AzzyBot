@@ -103,6 +103,8 @@ jobs:
       - name: Commit And Push
         if: steps.normalize.outputs.changed == 'true'
         shell: bash
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
         run: |
           set -euo pipefail
           git add -A
@@ -112,5 +114,5 @@ jobs:
             exit 0
           fi
           git commit -m "Normalize EOL and indentation"
-          git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          git push origin HEAD:$HEAD_REF
           echo "Pushed normalization changes to PR branch."
