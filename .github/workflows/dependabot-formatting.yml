@@ -5,9 +5,9 @@ on:
     types: [opened, synchronize]
 
 permissions:
+  actions: write
   contents: write
   pull-requests: read
-  workflows: write
 
 defaults:
   run:
