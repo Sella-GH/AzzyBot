@@ -71,6 +71,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AzzyBot.Core\AzzyBot.Core.csproj" />
     <ProjectReference Include="..\AzzyBot.Data\AzzyBot.Data.csproj" />
+    <ProjectReference Include="..\AzzyBot.SourceGenerators\AzzyBot.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
