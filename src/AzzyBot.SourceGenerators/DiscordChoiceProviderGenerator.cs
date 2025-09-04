@@ -41,6 +41,9 @@ namespace AzzyBot.Bot.Utilities.Attributes
             // Add the attribute source to the compilation
             context.AddSource("DiscordChoiceProviderAttribute.g.cs", SourceText.From(AttributeSource, Encoding.UTF8));
 
+            // Add a debug file to see if the generator is running
+            context.AddSource("Debug.g.cs", SourceText.From("// Source Generator is running!", Encoding.UTF8));
+
             if (!(context.SyntaxReceiver is DiscordChoiceProviderSyntaxReceiver receiver))
                 return;
 
@@ -123,9 +126,9 @@ namespace AzzyBot.Bot.Utilities.Attributes
             code.AppendLine("{");
             code.AppendLine($"    public sealed class {providerName} : IChoiceProvider");
             code.AppendLine("    {");
-            code.AppendLine("        private static readonly IEnumerable<DiscordApplicationCommandOptionChoice> _choices = CreateChoices();");
+            code.AppendLine("        private static readonly List<DiscordApplicationCommandOptionChoice> _choices = CreateChoices();");
             code.AppendLine();
-            code.AppendLine("        private static IEnumerable<DiscordApplicationCommandOptionChoice> CreateChoices()");
+            code.AppendLine("        private static List<DiscordApplicationCommandOptionChoice> CreateChoices()");
             code.AppendLine("        {");
             code.AppendLine($"            var sourceChoices = {choicesClassName}.Choices;");
             code.AppendLine("            var choices = new List<DiscordApplicationCommandOptionChoice>();");
@@ -139,9 +142,7 @@ namespace AzzyBot.Bot.Utilities.Attributes
             code.AppendLine("        }");
             code.AppendLine();
             code.AppendLine("        public ValueTask<IEnumerable<DiscordApplicationCommandOptionChoice>> ProvideAsync(CommandParameter parameter)");
-            code.AppendLine("        {");
-            code.AppendLine("            return ValueTask.FromResult(_choices);");
-            code.AppendLine("        }");
+            code.AppendLine("            => ValueTask.FromResult<IEnumerable<DiscordApplicationCommandOptionChoice>>(_choices);");
             code.AppendLine("    }");
             code.AppendLine("}");
 
