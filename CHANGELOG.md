@@ -6,9 +6,9 @@
 - We now use the native produced executable instead of the .dll in docker images
 
 ### Dependencies
-- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02539
-- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 9.0.8
-- Updated [Microsoft.Extensions.Hosting](https://github.com/dotnet/runtime) to version 9.0.8
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02544
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 9.0.9
+- Updated [Microsoft.Extensions.Hosting](https://github.com/dotnet/runtime) to version 9.0.9
 - Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.14.0
 - Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.15.0.120848
 
