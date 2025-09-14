@@ -166,19 +166,21 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
 
     public async Task<string?> GetWebAsync(Uri url, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true, bool noLogging = false)
     {
-        HttpResponseMessage? response = null;
-
         try
         {
             using HttpClient client = _factory.CreateClient(HttpClientName);
+            HttpStatusCode status;
+            string? responseContent;
             using (HttpRequestMessage request = new(HttpMethod.Get, url))
             {
                 AddRequestHeaders(request, headers, acceptJson, noCache);
-                response = await client.SendAsync(request);
+                using HttpResponseMessage response = await client.SendAsync(request);
+                status = response.StatusCode;
+                responseContent = await response.Content.ReadAsStringAsync();
             }
 
             int retryCount = 0;
-            while (response.StatusCode is HttpStatusCode.TooManyRequests)
+            while (status is HttpStatusCode.TooManyRequests)
             {
                 _logger.BotRatelimited(url, retryCount);
 
@@ -188,10 +190,13 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
 
                 using HttpRequestMessage retryRequest = new(HttpMethod.Get, url);
                 AddRequestHeaders(retryRequest, headers, acceptJson, noCache);
-                response = await client.SendAsync(retryRequest);
+
+                using HttpResponseMessage response = await client.SendAsync(retryRequest);
+                status = response.StatusCode;
+                responseContent = await response.Content.ReadAsStringAsync();
             }
 
-            return (response.StatusCode is not HttpStatusCode.Forbidden) ? await response.Content.ReadAsStringAsync() : null;
+            return (status is not HttpStatusCode.Forbidden) ? responseContent : null;
         }
         catch (InvalidOperationException)
         {
@@ -211,10 +216,6 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
                 _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
 
             throw;
-        }
-        finally
-        {
-            response?.Dispose();
         }
     }
 
