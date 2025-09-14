@@ -293,10 +293,6 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
 
     private static void AddHeaders(HttpClient client, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
-        string botName = SoftwareStats.GetAppName.Replace("Bot", string.Empty, StringComparison.OrdinalIgnoreCase);
-        string botVersion = SoftwareStats.GetAppVersion;
-        client.DefaultRequestHeaders.Clear();
-        client.DefaultRequestHeaders.UserAgent.Add(new(botName, botVersion));
         if (acceptJson)
             client.DefaultRequestHeaders.Accept.Add(new(MediaType));
 
