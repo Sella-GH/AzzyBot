@@ -30,6 +30,8 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         ArgumentNullException.ThrowIfNull(urls);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(urls.Count);
 
+        using HttpClient client = _factory.CreateClient();
+
         List<bool> results = new(urls.Count);
         foreach (Uri url in urls)
         {
@@ -37,10 +39,10 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
 
             try
             {
-                using HttpClient client = _factory.CreateClient();
-                AddHeaders(client, headers, true, true);
+                using HttpRequestMessage request = new(HttpMethod.Get, url);
+                AddRequestHeaders(request, headers, true, true);
 
-                using HttpResponseMessage? response = await client.GetAsync(url);
+                using HttpResponseMessage? response = await client.SendAsync(request);
                 success = response.IsSuccessStatusCode;
             }
             catch (InvalidOperationException)
@@ -62,12 +64,14 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
 
     public async Task DeleteAsync(Uri uri, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
+        using HttpClient client = _factory.CreateClient();
+
         try
         {
-            using HttpClient client = _factory.CreateClient();
-            AddHeaders(client, headers, acceptJson, noCache);
+            using HttpRequestMessage request = new(HttpMethod.Delete, uri);
+            AddRequestHeaders(request, headers, acceptJson, noCache);
 
-            using HttpResponseMessage response = await client.DeleteAsync(uri);
+            using HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
                 return;
 
@@ -90,9 +94,10 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         try
         {
             using HttpClient client = _factory.CreateClient();
-            AddHeaders(client, headers, acceptJson, noCache);
+            using HttpRequestMessage request = new(HttpMethod.Get, url);
+            AddRequestHeaders(request, headers, acceptJson, noCache);
 
-            using HttpResponseMessage response = await client.GetAsync(url);
+            using HttpResponseMessage response = await client.SendAsync(request);
             response.EnsureSuccessStatusCode();
 
             await using Stream contentStream = await response.Content.ReadAsStreamAsync();
@@ -165,10 +170,11 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         try
         {
             using HttpClient client = _factory.CreateClient();
-            AddHeaders(client, headers, acceptJson, noCache);
+            using HttpRequestMessage request = new(HttpMethod.Get, url);
+            AddRequestHeaders(request, headers, acceptJson, noCache);
 
             int retryCount = 0;
-            response = await client.GetAsync(url);
+            response = await client.SendAsync(request);
             while (response.StatusCode is HttpStatusCode.TooManyRequests)
             {
                 _logger.BotRatelimited(url, retryCount);
@@ -177,7 +183,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
                 if (retryCount is not 7)
                     retryCount++;
 
-                response = await client.GetAsync(url);
+                response = await client.SendAsync(request);
             }
 
             return (response.StatusCode is not HttpStatusCode.Forbidden) ? await response.Content.ReadAsStringAsync() : null;
@@ -212,10 +218,14 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         try
         {
             using HttpClient client = _factory.CreateClient();
-            AddHeaders(client, headers, acceptJson, noCache);
+            using HttpRequestMessage request = new(HttpMethod.Post, url)
+            {
+                Content = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaType)
+            };
 
-            using HttpContent httpContent = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaType);
-            using HttpResponseMessage response = await client.PostAsync(url, httpContent);
+            AddRequestHeaders(request, headers, acceptJson, noCache);
+
+            using HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
                 return;
 
@@ -238,10 +248,14 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         try
         {
             using HttpClient client = _factory.CreateClient();
-            AddHeaders(client, headers, acceptJson, noCache);
+            using HttpRequestMessage request = new(HttpMethod.Put, url)
+            {
+                Content = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaType)
+            };
 
-            using HttpContent httpContent = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaType);
-            using HttpResponseMessage response = await client.PutAsync(url, httpContent);
+            AddRequestHeaders(request, headers, acceptJson, noCache);
+
+            using HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
                 return;
 
@@ -264,14 +278,18 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         try
         {
             using HttpClient client = _factory.CreateClient();
-            AddHeaders(client, headers, acceptJson, noCache);
 
             byte[] fileBytes = await FileOperations.GetBase64BytesFromFileAsync(file);
             string base64String = Convert.ToBase64String(fileBytes);
             string json = JsonSerializer.Serialize(new($"{filePath}/{fileName}", base64String), JsonSerializationSourceGen.Default.AzuraFileUploadRecord);
+            using HttpRequestMessage request = new(HttpMethod.Post, url)
+            {
+                Content = new StringContent(json, Encoding.UTF8, MediaType)
+            };
 
-            using HttpContent jsonPayload = new StringContent(json, Encoding.UTF8, MediaType);
-            using HttpResponseMessage response = await client.PostAsync(url, jsonPayload);
+            AddRequestHeaders(request, headers, acceptJson, noCache);
+
+            using HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
                 return await response.Content.ReadAsStringAsync();
 
@@ -291,15 +309,15 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         }
     }
 
-    private static void AddHeaders(HttpClient client, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    private static void AddRequestHeaders(HttpRequestMessage message, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         if (acceptJson)
-            client.DefaultRequestHeaders.Accept.Add(new(MediaType));
+            message.Headers.Accept.Add(new(MediaType));
 
         if (noCache)
         {
-            client.DefaultRequestHeaders.CacheControl = new() { NoCache = true };
-            client.DefaultRequestHeaders.Pragma.Add(new("no-cache"));
+            message.Headers.CacheControl = new() { NoCache = true };
+            message.Headers.Pragma.Add(new("no-cache"));
         }
 
         if (headers is null)
@@ -307,7 +325,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
 
         foreach (KeyValuePair<string, string> header in headers)
         {
-            client.DefaultRequestHeaders.Add(header.Key, header.Value);
+            message.Headers.Add(header.Key, header.Value);
         }
     }
 }
