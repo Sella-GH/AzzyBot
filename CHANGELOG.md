@@ -1,4 +1,4 @@
-## 2.7.0
+## 2.7.0 - 2025-09-14
 ### General
 - Reworked the Encryption strength of the critical data stored in the database
   - We now use the AesGcm algorithm with a 256 bit key to be more future-proof since .NET 10 will deprecate AesCcm on some platforms
@@ -8,6 +8,10 @@
 ### Improvements
 - Dropped the self-build HttpClient handling and adapted to Microsoft.Extensions.Http
   - This should improve the performance and reliability of all http requests
+
+### Fixes
+- Fixed an issue resulting in exceptions when there was a malformed uri in the database
+- Fixed a daily exception occurring when trying to check discord permissions
 
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02544

@@ -70,24 +70,31 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(AddAzuraCastAsync), context.User.GlobalName);
 
+            if (url is null)
+            {
+                await context.DeleteResponseAsync();
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceUrlMissing, ephemeral: true);
+                return;
+            }
+
             if (instanceAdminGroup is null)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync(GeneralStrings.ConfigInstanceAdminMissing, true);
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceAdminMissing, ephemeral: true);
                 return;
             }
 
             if (notificationChannel is null)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync(GeneralStrings.ConfigInstanceNotificationChannelMissing, true);
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceNotificationChannelMissing, ephemeral: true);
                 return;
             }
 
             if (outagesChannel is null)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync(GeneralStrings.ConfigInstanceOutageChannelMissing, true);
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceOutageChannelMissing, ephemeral: true);
                 return;
             }
 
@@ -97,14 +104,14 @@ public sealed class ConfigCommands
             {
                 _logger.DatabaseGuildNotFound(guildId);
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync(GeneralStrings.GuildNotFound);
+                await context.FollowupAsync(GeneralStrings.GuildNotFound, ephemeral: true);
                 return;
             }
 
             if (!guild.ConfigSet)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync(GeneralStrings.CoreSettingsMissing);
+                await context.FollowupAsync(GeneralStrings.CoreSettingsMissing, ephemeral: true);
                 return;
             }
 
@@ -112,11 +119,11 @@ public sealed class ConfigCommands
             if (dAzuraCast is not null)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync(GeneralStrings.ConfigInstanceAlreadyExists);
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceAlreadyExists, ephemeral: true);
                 return;
             }
 
-            await _dbActions.CreateAzuraCastAsync(guildId, url, apiKey, instanceAdminGroup.Id, notificationChannel.Id, outagesChannel.Id, serverStatus is 1, updates is 1, updatesChangelog is 1);
+            await _dbActions.CreateAzuraCastAsync(guildId, Misc.SanitizeUri(url), apiKey, instanceAdminGroup.Id, notificationChannel.Id, outagesChannel.Id, serverStatus is 1, updates is 1, updatesChangelog is 1);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync(GeneralStrings.ConfigInstanceAdded);
@@ -264,7 +271,12 @@ public sealed class ConfigCommands
 
             ulong guildId = context.Guild.Id;
             if (url is not null || !string.IsNullOrWhiteSpace(apiKey))
+            {
+                if (url is not null)
+                    url = Misc.SanitizeUri(url);
+
                 await _dbActions.UpdateAzuraCastAsync(guildId, url, apiKey);
+            }
 
             if (instanceAdminGroup is not null || notificationsChannel is not null || outagesChannel is not null)
                 await _dbActions.UpdateAzuraCastPreferencesAsync(guildId, instanceAdminGroup?.Id, notificationsChannel?.Id, outagesChannel?.Id);
