@@ -171,11 +171,13 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         try
         {
             using HttpClient client = _factory.CreateClient(HttpClientName);
-            using HttpRequestMessage request = new(HttpMethod.Get, url);
-            AddRequestHeaders(request, headers, acceptJson, noCache);
+            using (HttpRequestMessage request = new(HttpMethod.Get, url))
+            {
+                AddRequestHeaders(request, headers, acceptJson, noCache);
+                response = await client.SendAsync(request);
+            }
 
             int retryCount = 0;
-            response = await client.SendAsync(request);
             while (response.StatusCode is HttpStatusCode.TooManyRequests)
             {
                 _logger.BotRatelimited(url, retryCount);
