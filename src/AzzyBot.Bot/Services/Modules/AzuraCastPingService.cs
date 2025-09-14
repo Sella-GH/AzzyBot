@@ -19,7 +19,6 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, A
     private readonly AzuraCastApiService _azuraCast = azuraCast;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = discordBotService;
-    private const string ValidCertNeeded = "The certificate for AzuraCast instance **URI** is self-signed and therefore not valid!\nYou need a valid HTTPS certificate for your AzuraCast instance so AzzyBot can safely connect to it.";
 
     public async Task PingInstanceAsync(AzuraCastEntity azuraCast)
     {
@@ -37,7 +36,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, A
             if (ex.InnerException is AuthenticationException)
             {
                 _logger.BackgroundServiceInstanceStatus(azuraCast.GuildId, azuraCast.Id, "invalid because of a self-signed certificate");
-                message = ValidCertNeeded.Replace("**URI**", uri.ToString(), StringComparison.OrdinalIgnoreCase);
+                message = $"The certificate for AzuraCast instance **{uri}** is self-signed and therefore not valid!\nYou need a valid HTTPS certificate for your AzuraCast instance so I can safely connect to it.";
             }
             // Because somebody actually managed it to provide a malformed URL...
             else if (uri.OriginalString != uri.GetLeftPart(UriPartial.Authority))
