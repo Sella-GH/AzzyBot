@@ -5,10 +5,15 @@
   - Current stored data is automatically migrated to the new algorithm upon startup for a limited amount of releases
 - We now use the native produced executable instead of the .dll in docker images
 
+### Improvements
+- Dropped the self-build HttpClient handling and adapted to Microsoft.Extensions.Http
+  - This should improve the performance and reliability of all http requests
+
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02544
 - Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 9.0.9
-- Updated [Microsoft.Extensions.Hosting](https://github.com/dotnet/runtime) to version 9.0.9
+- Updated [Microsoft.Extensions.X](https://github.com/dotnet/runtime) libraries to version 9.0.9
+- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.6.0
 - Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.14.0
 - Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.15.0.120848
 

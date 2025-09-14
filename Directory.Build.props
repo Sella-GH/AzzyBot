@@ -36,7 +36,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <IsPublishable>True</IsPublishable>
     <JsonSerializerIsReflectionEnabledByDefault>False</JsonSerializerIsReflectionEnabledByDefault>
-    <NoWarn>$(NoWarn);CA2007;S1135</NoWarn>
+    <NoWarn>$(NoWarn);CA2007</NoWarn>
     <Nullable>enable</Nullable>
     <PathMap>$(MSBuildProjectDirectory)=./$(MSBuildProjectName)</PathMap>
     <Platforms>x64;ARM64;AnyCPU</Platforms>
