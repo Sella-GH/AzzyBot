@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Net.NetworkInformation;
-using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Resources;
@@ -22,48 +19,11 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisposable
+public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebRequestService> logger)
 {
+    private readonly IHttpClientFactory _factory = factory;
     private readonly ILogger _logger = logger;
     private const string MediaType = MediaTypeNames.Application.Json;
-
-    /// <summary>
-    /// Forcing this client to use IPv4, only TCP ports because HTTP and HTTPS are usually TCP.
-    /// </summary>
-    private readonly HttpClient _httpClientV4 = new(new SocketsHttpHandler()
-    {
-        ConnectCallback = static async (context, cancellationToken) =>
-        {
-            Socket socket = new(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            await socket.ConnectAsync(context.DnsEndPoint, cancellationToken);
-            return new NetworkStream(socket, true);
-        },
-        PooledConnectionLifetime = TimeSpan.FromMinutes(15)
-    })
-    {
-        DefaultRequestVersion = HttpVersion.Version11,
-        DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher,
-        Timeout = TimeSpan.FromSeconds(30)
-    };
-
-    /// <summary>
-    /// Default HttpClient which prefers IPv6.
-    /// </summary>
-    private readonly HttpClient _httpClient = new(new SocketsHttpHandler()
-    {
-        PooledConnectionLifetime = TimeSpan.FromMinutes(15)
-    })
-    {
-        DefaultRequestVersion = HttpVersion.Version11,
-        DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher,
-        Timeout = TimeSpan.FromSeconds(30)
-    };
-
-    public void Dispose()
-    {
-        _httpClientV4?.Dispose();
-        _httpClient?.Dispose();
-    }
 
     public async Task<IReadOnlyList<bool>> CheckForApiPermissionsAsync(IReadOnlyList<Uri> urls, IReadOnlyDictionary<string, string> headers)
     {
@@ -77,12 +37,10 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
             try
             {
-                HttpResponseMessage? response = null;
-                AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
-                AddHeaders(addressFamily, headers, true, true);
-                HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
+                using HttpClient client = _factory.CreateClient();
+                AddHeaders(client, headers, true, true);
 
-                response = await client.GetAsync(url);
+                using HttpResponseMessage? response = await client.GetAsync(url);
                 success = response.IsSuccessStatusCode;
             }
             catch (InvalidOperationException)
@@ -90,7 +48,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
                 _logger.WebInvalidUri(url);
                 success = false;
             }
-            catch (HttpRequestException ex)
+            catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
             {
                 _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
                 success = false;
@@ -104,12 +62,11 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
     public async Task DeleteAsync(Uri uri, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
-        AddressFamily addressFamily = await GetPreferredIpMethodAsync(uri);
-        AddHeaders(addressFamily, headers, acceptJson, noCache);
-        HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
-
         try
         {
+            using HttpClient client = _factory.CreateClient();
+            AddHeaders(client, headers, acceptJson, noCache);
+
             using HttpResponseMessage response = await client.DeleteAsync(uri);
             if (response.IsSuccessStatusCode)
                 return;
@@ -121,7 +78,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             _logger.WebInvalidUri(uri);
             throw;
         }
-        catch (HttpRequestException ex)
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
             _logger.WebRequestFailed(HttpMethod.Delete, ex.Message, uri);
             throw;
@@ -130,12 +87,11 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
     public async Task DownloadAsync(Uri url, string downloadPath, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
-        AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
-        AddHeaders(addressFamily, headers, acceptJson, noCache);
-        HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
-
         try
         {
+            using HttpClient client = _factory.CreateClient();
+            AddHeaders(client, headers, acceptJson, noCache);
+
             using HttpResponseMessage response = await client.GetAsync(url);
             response.EnsureSuccessStatusCode();
 
@@ -148,7 +104,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             _logger.WebInvalidUri(url);
             throw;
         }
-        catch (HttpRequestException ex)
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
             _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
             throw;
@@ -159,12 +115,15 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
     {
         string ipv4 = string.Empty;
         string ipv6 = string.Empty;
+
         try
         {
-            ipv4 = await _httpClientV4.GetStringAsync(new Uri(UriStrings.GetIpv4Uri));
-            ipv6 = await _httpClient.GetStringAsync(new Uri(UriStrings.GetIpv6Uri));
+            using HttpClient client = _factory.CreateClient();
+
+            ipv4 = await client.GetStringAsync(new Uri(UriStrings.GetIpv4Uri));
+            ipv6 = await client.GetStringAsync(new Uri(UriStrings.GetIpv6Uri));
         }
-        catch (HttpRequestException)
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
             if (string.IsNullOrEmpty(ipv4))
                 _logger.WebRequestFailed(HttpMethod.Get, "Failed to get IPv4 address", new(UriStrings.GetIpv4Uri));
@@ -192,7 +151,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             _logger.WebInvalidUri(uri);
             throw;
         }
-        catch (HttpRequestException ex)
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
             _logger.WebRequestFailed(HttpMethod.Get, ex.Message, uri);
             throw;
@@ -201,13 +160,13 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
     public async Task<string?> GetWebAsync(Uri url, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true, bool noLogging = false)
     {
-        AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
-        AddHeaders(addressFamily, headers, acceptJson, noCache);
-        HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
         HttpResponseMessage? response = null;
 
         try
         {
+            using HttpClient client = _factory.CreateClient();
+            AddHeaders(client, headers, acceptJson, noCache);
+
             int retryCount = 0;
             response = await client.GetAsync(url);
             while (response.StatusCode is HttpStatusCode.TooManyRequests)
@@ -228,7 +187,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             _logger.WebInvalidUri(url);
             throw;
         }
-        catch (HttpRequestException ex)
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
             if (!noLogging)
                 _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
@@ -250,12 +209,11 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
     public async Task PostWebAsync(Uri url, string? content = null, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
-        AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
-        AddHeaders(addressFamily, headers, acceptJson, noCache);
-        HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
-
         try
         {
+            using HttpClient client = _factory.CreateClient();
+            AddHeaders(client, headers, acceptJson, noCache);
+
             using HttpContent httpContent = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaType);
             using HttpResponseMessage response = await client.PostAsync(url, httpContent);
             if (response.IsSuccessStatusCode)
@@ -268,7 +226,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             _logger.WebInvalidUri(url);
             throw;
         }
-        catch (HttpRequestException ex)
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
             _logger.WebRequestFailed(HttpMethod.Post, ex.Message, url);
             throw;
@@ -277,12 +235,11 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
     public async Task PutWebAsync(Uri url, string? content = null, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
-        AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
-        AddHeaders(addressFamily, headers, acceptJson, noCache);
-        HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
-
         try
         {
+            using HttpClient client = _factory.CreateClient();
+            AddHeaders(client, headers, acceptJson, noCache);
+
             using HttpContent httpContent = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaType);
             using HttpResponseMessage response = await client.PutAsync(url, httpContent);
             if (response.IsSuccessStatusCode)
@@ -295,7 +252,7 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             _logger.WebInvalidUri(url);
             throw;
         }
-        catch (HttpRequestException ex)
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
             _logger.WebRequestFailed(HttpMethod.Put, ex.Message, url);
             throw;
@@ -304,12 +261,11 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
 
     public async Task<string?> UploadAsync(Uri url, string file, string fileName, string filePath, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
-        AddressFamily addressFamily = await GetPreferredIpMethodAsync(url);
-        AddHeaders(addressFamily, headers, acceptJson, noCache);
-        HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
-
         try
         {
+            using HttpClient client = _factory.CreateClient();
+            AddHeaders(client, headers, acceptJson, noCache);
+
             byte[] fileBytes = await FileOperations.GetBase64BytesFromFileAsync(file);
             string base64String = Convert.ToBase64String(fileBytes);
             string json = JsonSerializer.Serialize(new($"{filePath}/{fileName}", base64String), JsonSerializationSourceGen.Default.AzuraFileUploadRecord);
@@ -328,18 +284,17 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
             _logger.WebInvalidUri(url);
             throw;
         }
-        catch (HttpRequestException ex)
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
             _logger.WebRequestFailed(HttpMethod.Post, ex.Message, url);
             throw;
         }
     }
 
-    private void AddHeaders(AddressFamily addressFamily, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    private static void AddHeaders(HttpClient client, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         string botName = SoftwareStats.GetAppName.Replace("Bot", string.Empty, StringComparison.OrdinalIgnoreCase);
         string botVersion = SoftwareStats.GetAppVersion;
-        HttpClient client = (addressFamily is AddressFamily.InterNetworkV6) ? _httpClient : _httpClientV4;
         client.DefaultRequestHeaders.Clear();
         client.DefaultRequestHeaders.UserAgent.Add(new(botName, botVersion));
         if (acceptJson)
@@ -357,51 +312,6 @@ public sealed class WebRequestService(ILogger<WebRequestService> logger) : IDisp
         foreach (KeyValuePair<string, string> header in headers)
         {
             client.DefaultRequestHeaders.Add(header.Key, header.Value);
-        }
-    }
-
-    private static async Task<AddressFamily> GetPreferredIpMethodAsync(Uri url)
-    {
-        ArgumentNullException.ThrowIfNull(url);
-
-        // First check if the host is an IP address
-        bool isIpAddress = false;
-        if (IPAddress.TryParse(url.Host, out IPAddress? ipAddress))
-            isIpAddress = true;
-
-        // If it's an IP address, we can skip the DNS lookup
-        IPAddress[] iPAddresses = (isIpAddress) ? [ipAddress!] : await Dns.GetHostAddressesAsync(url.Host);
-
-        if (iPAddresses.Length is 1)
-            return iPAddresses[0].AddressFamily;
-
-        // If we have multiple addresses, we need to determine which one to use
-        // Prefer IPv6 over IPv4
-        foreach (IPAddress _ in iPAddresses.Where(static ip => ip.AddressFamily is AddressFamily.InterNetworkV6))
-        {
-            if (await TestIfPreferredMethodIsReachableAsync(url, AddressFamily.InterNetworkV6))
-                return AddressFamily.InterNetworkV6;
-        }
-
-        return AddressFamily.InterNetwork;
-    }
-
-    private static async Task<bool> TestIfPreferredMethodIsReachableAsync(Uri url, AddressFamily addressFamily)
-    {
-        ArgumentNullException.ThrowIfNull(url);
-
-        try
-        {
-            // Test if the host is reachable within 5 seconds
-            using Socket socket = new(addressFamily, SocketType.Stream, ProtocolType.Tcp);
-            using CancellationTokenSource cts = new(TimeSpan.FromSeconds(5));
-            await socket.ConnectAsync(url.Host, url.Port, cts.Token);
-
-            return true;
-        }
-        catch (Exception ex) when (ex is OperationCanceledException or SocketException)
-        {
-            return false;
         }
     }
 }
