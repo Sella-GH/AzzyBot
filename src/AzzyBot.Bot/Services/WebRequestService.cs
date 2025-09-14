@@ -184,7 +184,9 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
                 if (retryCount is not 7)
                     retryCount++;
 
-                response = await client.SendAsync(request);
+                using HttpRequestMessage retryRequest = new(HttpMethod.Get, url);
+                AddRequestHeaders(retryRequest, headers, acceptJson, noCache);
+                response = await client.SendAsync(retryRequest);
             }
 
             return (response.StatusCode is not HttpStatusCode.Forbidden) ? await response.Content.ReadAsStringAsync() : null;
@@ -219,9 +221,10 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         try
         {
             using HttpClient client = _factory.CreateClient(HttpClientName);
+            using HttpContent httpContent = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaType);
             using HttpRequestMessage request = new(HttpMethod.Post, url)
             {
-                Content = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaType)
+                Content = httpContent
             };
 
             AddRequestHeaders(request, headers, acceptJson, noCache);
@@ -249,9 +252,10 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         try
         {
             using HttpClient client = _factory.CreateClient(HttpClientName);
+            using HttpContent httpContent = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaType);
             using HttpRequestMessage request = new(HttpMethod.Put, url)
             {
-                Content = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaType)
+                Content = httpContent
             };
 
             AddRequestHeaders(request, headers, acceptJson, noCache);
@@ -278,14 +282,15 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
     {
         try
         {
-            using HttpClient client = _factory.CreateClient(HttpClientName);
-
             byte[] fileBytes = await FileOperations.GetBase64BytesFromFileAsync(file);
             string base64String = Convert.ToBase64String(fileBytes);
             string json = JsonSerializer.Serialize(new($"{filePath}/{fileName}", base64String), JsonSerializationSourceGen.Default.AzuraFileUploadRecord);
+
+            using HttpClient client = _factory.CreateClient(HttpClientName);
+            using HttpContent httpContent = new StringContent(json, Encoding.UTF8, MediaType);
             using HttpRequestMessage request = new(HttpMethod.Post, url)
             {
-                Content = new StringContent(json, Encoding.UTF8, MediaType)
+                Content = httpContent
             };
 
             AddRequestHeaders(request, headers, acceptJson, noCache);
