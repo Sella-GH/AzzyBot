@@ -45,4 +45,11 @@ public static class Misc
 
         return (lower) ? result.ToLowerInvariant() : result;
     }
+
+    public static Uri SanitizeUri(Uri uri)
+    {
+        ArgumentNullException.ThrowIfNull(uri);
+
+        return new(uri.GetLeftPart(UriPartial.Authority).TrimEnd('/'));
+    }
 }
