@@ -24,13 +24,14 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
     private readonly IHttpClientFactory _factory = factory;
     private readonly ILogger _logger = logger;
     private const string MediaType = MediaTypeNames.Application.Json;
+    private static readonly string HttpClientName = SoftwareStats.GetAppName;
 
     public async Task<IReadOnlyList<bool>> CheckForApiPermissionsAsync(IReadOnlyList<Uri> urls, IReadOnlyDictionary<string, string> headers)
     {
         ArgumentNullException.ThrowIfNull(urls);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(urls.Count);
 
-        using HttpClient client = _factory.CreateClient();
+        using HttpClient client = _factory.CreateClient(HttpClientName);
 
         List<bool> results = new(urls.Count);
         foreach (Uri url in urls)
@@ -64,7 +65,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
 
     public async Task DeleteAsync(Uri uri, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
-        using HttpClient client = _factory.CreateClient();
+        using HttpClient client = _factory.CreateClient(HttpClientName);
 
         try
         {
@@ -93,7 +94,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
     {
         try
         {
-            using HttpClient client = _factory.CreateClient();
+            using HttpClient client = _factory.CreateClient(HttpClientName);
             using HttpRequestMessage request = new(HttpMethod.Get, url);
             AddRequestHeaders(request, headers, acceptJson, noCache);
 
@@ -123,7 +124,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
 
         try
         {
-            using HttpClient client = _factory.CreateClient();
+            using HttpClient client = _factory.CreateClient(HttpClientName);
 
             ipv4 = await client.GetStringAsync(new Uri(UriStrings.GetIpv4Uri));
             ipv6 = await client.GetStringAsync(new Uri(UriStrings.GetIpv6Uri));
@@ -169,7 +170,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
 
         try
         {
-            using HttpClient client = _factory.CreateClient();
+            using HttpClient client = _factory.CreateClient(HttpClientName);
             using HttpRequestMessage request = new(HttpMethod.Get, url);
             AddRequestHeaders(request, headers, acceptJson, noCache);
 
@@ -217,7 +218,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
     {
         try
         {
-            using HttpClient client = _factory.CreateClient();
+            using HttpClient client = _factory.CreateClient(HttpClientName);
             using HttpRequestMessage request = new(HttpMethod.Post, url)
             {
                 Content = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaType)
@@ -247,7 +248,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
     {
         try
         {
-            using HttpClient client = _factory.CreateClient();
+            using HttpClient client = _factory.CreateClient(HttpClientName);
             using HttpRequestMessage request = new(HttpMethod.Put, url)
             {
                 Content = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaType)
@@ -277,7 +278,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
     {
         try
         {
-            using HttpClient client = _factory.CreateClient();
+            using HttpClient client = _factory.CreateClient(HttpClientName);
 
             byte[] fileBytes = await FileOperations.GetBase64BytesFromFileAsync(file);
             string base64String = Convert.ToBase64String(fileBytes);
