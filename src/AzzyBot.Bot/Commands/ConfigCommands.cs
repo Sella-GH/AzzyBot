@@ -80,21 +80,21 @@ public sealed class ConfigCommands
             if (instanceAdminGroup is null)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync(GeneralStrings.ConfigInstanceAdminMissing, true);
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceAdminMissing, ephemeral: true);
                 return;
             }
 
             if (notificationChannel is null)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync(GeneralStrings.ConfigInstanceNotificationChannelMissing, true);
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceNotificationChannelMissing, ephemeral: true);
                 return;
             }
 
             if (outagesChannel is null)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync(GeneralStrings.ConfigInstanceOutageChannelMissing, true);
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceOutageChannelMissing, ephemeral: true);
                 return;
             }
 
@@ -104,14 +104,14 @@ public sealed class ConfigCommands
             {
                 _logger.DatabaseGuildNotFound(guildId);
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync(GeneralStrings.GuildNotFound);
+                await context.FollowupAsync(GeneralStrings.GuildNotFound, ephemeral: true);
                 return;
             }
 
             if (!guild.ConfigSet)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync(GeneralStrings.CoreSettingsMissing);
+                await context.FollowupAsync(GeneralStrings.CoreSettingsMissing, ephemeral: true);
                 return;
             }
 
@@ -119,7 +119,7 @@ public sealed class ConfigCommands
             if (dAzuraCast is not null)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync(GeneralStrings.ConfigInstanceAlreadyExists);
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceAlreadyExists, ephemeral: true);
                 return;
             }
 

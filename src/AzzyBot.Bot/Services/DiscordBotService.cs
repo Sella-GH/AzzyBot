@@ -161,7 +161,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
 
     public async Task<DiscordMember?> GetDiscordMemberAsync(ulong guildId, ulong userId = 0)
     {
-        DiscordGuild? guild = await _client.GetGuildsAsync().FirstOrDefaultAsync(g => g.Id == guildId);
+        DiscordGuild? guild = await _client.GetGuildAsync(guildId);
         DiscordMember? member = null;
 
         if (guild is not null)

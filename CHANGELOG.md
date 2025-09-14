@@ -1,4 +1,9 @@
-## 2.7.0
+## 2.7.1 - 2025-09-14
+### Fixes
+- Fixed an issue resulting in exceptions when there was a malformed uri in the database
+- Fixed a daily exception occurring when trying to check discord permissions
+
+## 2.7.0 - 2025-09-14
 ### General
 - Reworked the Encryption strength of the critical data stored in the database
   - We now use the AesGcm algorithm with a 256 bit key to be more future-proof since .NET 10 will deprecate AesCcm on some platforms
