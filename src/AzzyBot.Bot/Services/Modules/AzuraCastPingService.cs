@@ -31,13 +31,19 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, A
         {
             status = await _azuraCast.GetInstanceStatusAsync(uri);
         }
-        catch (HttpRequestException ex)
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
             string message = $"AzuraCast instance **{uri}** is **down**!";
             if (ex.InnerException is AuthenticationException)
             {
                 _logger.BackgroundServiceInstanceStatus(azuraCast.GuildId, azuraCast.Id, "invalid because of a self-signed certificate");
                 message = ValidCertNeeded.Replace("**URI**", uri.ToString(), StringComparison.OrdinalIgnoreCase);
+            }
+            // Because somebody actually managed it to provide a malformed URL...
+            else if (uri.OriginalString != uri.GetLeftPart(UriPartial.Authority))
+            {
+                _logger.BackgroundServiceInstanceStatus(azuraCast.GuildId, azuraCast.Id, "invalid because of malformed url");
+                message = $"I am **unable to establish a connection** to your AzuraCast instance **{uri}**! Make sure you only provide the URL to your instance (e.g. https://demo.azuracast.com) without anything behind!";
             }
             else
             {
