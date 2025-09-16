@@ -42,7 +42,7 @@
     <Platforms>x64;ARM64;AnyCPU</Platforms>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <UseArtifactsOutput>true</UseArtifactsOutput>
     <WarningsAsErrors>nullable</WarningsAsErrors>
   </PropertyGroup>
