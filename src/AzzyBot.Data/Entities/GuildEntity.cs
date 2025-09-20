@@ -31,6 +31,11 @@ public sealed class GuildEntity
     public bool LegalsAccepted { get; set; }
 
     /// <summary>
+    /// The <see cref="DateTimeOffset"/> timestamp when the first reminder was sent to the guild.
+    /// </summary>
+    public DateTimeOffset RemindersStart { get; set; }
+
+    /// <summary>
     /// The last saved <see cref="DateTimeOffset"/> timestamp when the <see cref="DiscordGuild"/> was checked for correct channel permissions.
     /// </summary>
     /// <remarks>

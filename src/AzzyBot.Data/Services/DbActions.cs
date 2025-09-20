@@ -778,7 +778,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         }
     }
 
-    public async Task UpdateGuildAsync(ulong guildId, bool? lastPermissionCheck = null, bool? legalsAccepted = null)
+    public async Task UpdateGuildAsync(ulong guildId, bool? lastPermissionCheck = null, bool? lastReminder = null, bool? legalsAccepted = null)
     {
         await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
 
@@ -792,8 +792,13 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             return;
         }
 
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+
         if (lastPermissionCheck.HasValue)
-            guild.LastPermissionCheck = DateTimeOffset.UtcNow;
+            guild.LastPermissionCheck = now;
+
+        if (lastReminder.HasValue)
+            guild.RemindersStart = now;
 
         if (legalsAccepted.HasValue)
             guild.LegalsAccepted = legalsAccepted.Value;
@@ -809,7 +814,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await UpdateGuildAsync(guildId, lastPermissionCheck, legalsAccepted);
+            await UpdateGuildAsync(guildId, lastPermissionCheck, lastReminder, legalsAccepted);
 
             _logger.DatabaseConcurrencyResolved();
         }

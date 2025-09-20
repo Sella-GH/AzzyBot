@@ -47,6 +47,13 @@ public static class GeneralStrings
     public const string PlaylistEmpty = "This playlist is empty.";
     public const string PlaylistNotFound = "This playlist does not exist.";
     public const string PermissionIssue = "I don't have the required permissions to do this.";
+    public const string ReminderBegin = "This is a reminder that you still miss the following things to make me work properly:";
+    public const string ReminderConfig = "- Core settings have not been set up.";
+    public const string ReminderConfigFix = "Please use the command `/config modify-core` for this.";
+    public const string ReminderLegals = "- Legal conditions have not been accepted.";
+    public const string ReminderLegalsFix = "Please use the command `/legal accept-legals` for this.";
+    public const string ReminderForceLeaveAnnouncement = "I will leave this server now because the following conditions have not been met:";
+    public const string ReminderForceLeaveThreat = "If you do not comply with this request within the next {%TIMEFRAME%} days I will be forced to leave your server.";
     public const string SkipAlmostOver = "This song is almost over. Please wait!";
     public const string SkipToFast = "You can only skip a song every 30 seconds.";
     public const string SongRequestNotFound = "This song does not exist.";

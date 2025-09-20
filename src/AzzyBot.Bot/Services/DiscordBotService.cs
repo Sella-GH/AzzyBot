@@ -413,6 +413,81 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         return true;
     }
 
+    public async Task<bool> SendMessageToOwnerAsync(ulong guildId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, IMention[]? mentions = null)
+    {
+        if (!CheckIfClientIsConnected)
+        {
+            _logger.BotNotConnected();
+            return false;
+        }
+
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId);
+
+        await using DiscordMessageBuilder builder = new();
+
+        if (!string.IsNullOrWhiteSpace(content))
+            builder.WithContent(content);
+
+        if (embeds?.Count > 0 && embeds.Count <= 10)
+            builder.AddEmbeds(embeds);
+
+        if (mentions is not null)
+            builder.WithAllowedMentions(mentions);
+
+        List<FileStream> streams = new(10);
+        if (filePaths?.Count > 0 && filePaths.Count <= 10)
+        {
+            const int maxFileSize = FileSizes.DiscordFileSize;
+            long allFileSize = 0;
+
+            foreach (string path in filePaths)
+            {
+                FileInfo fileInfo = new(path);
+                if (fileInfo.Length > maxFileSize || allFileSize > maxFileSize)
+                    break;
+
+                allFileSize += fileInfo.Length;
+
+                FileStream stream = new(path, FileMode.Open, FileAccess.Read, FileShare.None);
+                streams.Add(stream);
+                builder.AddFile(Path.GetFileName(path), stream);
+            }
+        }
+
+        DiscordGuild? guild = GetDiscordGuild(guildId);
+        if (guild is null)
+        {
+            _logger.UnableToSendMessage($"{nameof(guildId)} is null");
+        }
+        else
+        {
+            DiscordMember? dMember = await GetDiscordMemberAsync(guildId);
+            if (dMember is null)
+            {
+                _logger.UnableToSendMessage($"Bot is not a member of server: {guild.Name} ({guildId})");
+                return false;
+            }
+
+            DiscordUser owner = await guild.GetGuildOwnerAsync();
+            await owner.SendMessageAsync(builder);
+        }
+
+        if (streams.Count > 0)
+        {
+            foreach (FileStream stream in streams)
+            {
+                await stream.DisposeAsync();
+            }
+
+            foreach (string path in filePaths!)
+            {
+                FileOperations.DeleteFile(path);
+            }
+        }
+
+        return true;
+    }
+
     public async Task SetBotStatusAsync(int status, int type, string doing, Uri? url = null, bool reset = false)
     {
         if (reset)
