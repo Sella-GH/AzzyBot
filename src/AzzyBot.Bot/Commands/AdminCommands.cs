@@ -91,14 +91,33 @@ public sealed class AdminCommands
                 return;
             }
 
-            // If a server id is provided, show the information of that server.
-            if (!ulong.TryParse(serverId, out ulong guildIdValue))
+            if (string.IsNullOrWhiteSpace(serverId))
             {
+                // If no server id is provided, show all servers the bot is in.
+                const string tooManyServers = "... and more!";
+                StringBuilder stringBuilder = new();
+                stringBuilder.AppendLine("I am in the following servers:");
+                foreach (DiscordGuild guild in guilds.Values)
+                {
+                    if (stringBuilder.Length + tooManyServers.Length > 2000)
+                    {
+                        stringBuilder.AppendLine(tooManyServers);
+                        break;
+                    }
+
+                    stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"- {guild.Name} ({guild.Id})");
+                }
+
+                await context.EditResponseAsync(stringBuilder.ToString());
+            }
+            else if (!ulong.TryParse(serverId, out ulong guildIdValue))
+            {
+                // If an invalid server id is provided error out
                 await context.EditResponseAsync(GeneralStrings.GuildIdInvalid);
-                return;
             }
             else if (guildIdValue is not 0)
             {
+                // If a valid server id is provided, show detailed information about that server
                 if (!guilds.TryGetValue(guildIdValue, out DiscordGuild? guild))
                 {
                     _logger.DiscordItemNotFound(nameof(DiscordGuild), guildIdValue);
@@ -108,26 +127,7 @@ public sealed class AdminCommands
 
                 DiscordEmbed embed = await EmbedBuilder.BuildGuildAddedEmbedAsync(guild, true);
                 await context.EditResponseAsync(embed);
-
-                return;
             }
-
-            // If no server id is provided, show all servers the bot is in.
-            const string tooManyServers = "... and more!";
-            StringBuilder stringBuilder = new();
-            stringBuilder.AppendLine("I am in the following servers:");
-            foreach (DiscordGuild guild in guilds.Values)
-            {
-                if (stringBuilder.Length + tooManyServers.Length > 2000)
-                {
-                    stringBuilder.AppendLine(tooManyServers);
-                    break;
-                }
-
-                stringBuilder.AppendLine(CultureInfo.InvariantCulture, $"- {guild.Name} ({guild.Id})");
-            }
-
-            await context.EditResponseAsync(stringBuilder.ToString());
         }
 
         [Command("remove-joined-server"), Description("Removes the bot from a server.")]
