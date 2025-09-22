@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-using AzzyBot.Bot.Utilities.Helpers;
+using AzzyBot.Bot.Utilities;
+using AzzyBot.Bot.Utilities.Structs;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
+
+using DSharpPlus.Entities;
 
 using Microsoft.Extensions.Logging;
 
@@ -19,7 +20,7 @@ public sealed class CoreService(ILogger<CoreService> logger, DbActions dbActions
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
 
-    public async Task<Dictionary<GuildEntity, string>> CheckUnusedGuildsAsync()
+    public async Task<Dictionary<GuildEntity, AzzyInactiveGuildStruct>> CheckUnusedGuildsAsync()
     {
         IEnumerable<GuildEntity> guilds = await _dbActions.ReadGuildsAsync(loadGuildPrefs: true);
         if (!guilds.Any())
@@ -29,56 +30,35 @@ public sealed class CoreService(ILogger<CoreService> logger, DbActions dbActions
         HashSet<GuildEntity> noConfig = [.. guilds.Where(g => !g.ConfigSet)];
         HashSet<GuildEntity> allCombined = [.. noConfig.Union(noLegals)];
 
-        const int legalThresholdDays = 3;
-        const int configThresholdDays = 7;
-        Dictionary<GuildEntity, string> victims = [];
-        StringBuilder sb = new();
+        Dictionary<GuildEntity, AzzyInactiveGuildStruct> victims = [];
         foreach (GuildEntity guild in allCombined)
         {
-            int timeframeDays = 0;
-            sb.AppendLine(GeneralStrings.ReminderBegin);
+            DiscordGuild? dGuild = _botService.GetDiscordGuild(guild.UniqueId);
+            if (dGuild is null)
+                continue;
 
-            if (noLegals.Contains(guild))
-            {
-                timeframeDays = legalThresholdDays;
-                sb.Append(GeneralStrings.ReminderLegals);
-                sb.Append(' ');
-                sb.AppendLine(GeneralStrings.ReminderLegalsFix);
-            }
-
-            if (noConfig.Contains(guild))
-            {
-                // Legals have priority
-                if (timeframeDays is 0)
-                    timeframeDays = configThresholdDays;
-
-                sb.Append(GeneralStrings.ReminderConfig);
-                sb.Append(' ');
-                sb.AppendLine(GeneralStrings.ReminderConfigFix);
-            }
-
-            sb.AppendLine(GeneralStrings.ReminderForceLeaveThreat.Replace("{%TIMEFRAME%}", timeframeDays.ToString(CultureInfo.InvariantCulture), StringComparison.InvariantCulture));
-
-            victims.Add(guild, sb.ToString());
-            sb.Clear();
+            AzzyInactiveGuildStruct guildStruct = new(guild: dGuild, config: noConfig.Contains(guild), legals: noLegals.Contains(guild));
+            victims.Add(guild, guildStruct);
         }
 
         return victims;
     }
 
-    public async Task NotifyUnusedGuildsAsync(Dictionary<GuildEntity, string> guilds)
+    public async Task NotifyUnusedGuildsAsync(Dictionary<GuildEntity, AzzyInactiveGuildStruct> guilds)
     {
         ArgumentNullException.ThrowIfNull(guilds);
         ArgumentOutOfRangeException.ThrowIfLessThan(guilds.Count, 1);
 
-        foreach (KeyValuePair<GuildEntity, string> guild in guilds)
+        foreach (KeyValuePair<GuildEntity, AzzyInactiveGuildStruct> guild in guilds)
         {
+            DiscordEmbed embed = EmbedBuilder.BuildAzzyInactiveGuildEmbed(guild.Value.NoConfig, guild.Value.NoLegals, guild.Value.Guild);
+
             bool result = false;
             if (guild.Key.Preferences.AdminNotifyChannelId is not 0)
-                result = await _botService.SendMessageAsync(guild.Key.Preferences.AdminNotifyChannelId, guild.Value);
+                result = await _botService.SendMessageAsync(guild.Key.Preferences.AdminNotifyChannelId, embeds: [embed]);
 
             if (!result)
-                result = await _botService.SendMessageToOwnerAsync(guild.Key.UniqueId, guild.Value);
+                result = await _botService.SendMessageToOwnerAsync(guild.Key.UniqueId, embeds: [embed]);
 
             if (!result)
             {
@@ -87,7 +67,7 @@ public sealed class CoreService(ILogger<CoreService> logger, DbActions dbActions
             }
 
             await _dbActions.UpdateGuildAsync(guild.Key.UniqueId, lastReminder: true);
-            _logger.LogWarning($"Notified guild {guild.Key.UniqueId} of being unused with message \"{guild.Value}\"");
+            _logger.LogWarning($"Notified guild {guild.Key.UniqueId} of being unused.");
         }
     }
 }

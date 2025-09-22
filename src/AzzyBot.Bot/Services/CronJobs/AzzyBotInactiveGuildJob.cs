@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Services.Modules;
+using AzzyBot.Bot.Utilities.Structs;
 using AzzyBot.Data.Entities;
 
 using NCronJob;
@@ -19,7 +20,7 @@ public sealed class AzzyBotInactiveGuildJob(CoreService coreService, DiscordBotS
     {
         try
         {
-            Dictionary<GuildEntity, string> unusedGuilds = await _coreService.CheckUnusedGuildsAsync();
+            Dictionary<GuildEntity, AzzyInactiveGuildStruct> unusedGuilds = await _coreService.CheckUnusedGuildsAsync();
             if (unusedGuilds.Count is 0)
                 return;
 

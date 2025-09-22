@@ -9,6 +9,7 @@ using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
+using AzzyBot.Bot.Utilities.Structs;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Core.Utilities.Enums;
@@ -31,7 +32,7 @@ public static class EmbedBuilder
     private static readonly Uri AzuraCastStableUrl = new(UriStrings.AzuraCastStableUrl);
     private static readonly Uri SetupInstructions = new(UriStrings.SetupInstructions);
 
-    private static DiscordEmbedBuilder CreateBasicEmbed(string title, string? description = null, DiscordColor? color = null, Uri? thumbnailUrl = null, string? footerText = null, Uri? url = null, Dictionary<string, AzzyDiscordEmbedRecord>? fields = null)
+    private static DiscordEmbedBuilder CreateBasicEmbed(string title, string? description = null, DiscordColor? color = null, EmbedAuthorStruct? author = null, Uri? thumbnailUrl = null, string? footerText = null, Uri? url = null, Dictionary<string, AzzyDiscordEmbedRecord>? fields = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
 
@@ -48,6 +49,9 @@ public static class EmbedBuilder
 
         if (thumbnailUrl is not null)
             builder.WithThumbnail(thumbnailUrl);
+
+        if (author is not null)
+            builder.WithAuthor(author.Value.Name, author.Value.Url, author.Value.IconUrl);
 
         if (!string.IsNullOrWhiteSpace(footerText))
             builder.WithFooter(footerText);
@@ -207,7 +211,7 @@ public static class EmbedBuilder
             fields.Add("Duration", new($"{progressBar} `[{songElapsed} / {songDuration}]`"));
         }
 
-        return CreateBasicEmbed(title, message, DiscordColor.Aquamarine, new(thumbnailUrl), fields: fields);
+        return CreateBasicEmbed(title, message, DiscordColor.Aquamarine, thumbnailUrl: new(thumbnailUrl), fields: fields);
     }
 
     public static DiscordEmbed BuildAzuraCastMusicSearchSongEmbed(AzuraRequestRecord song, bool isQueued, bool isPlayed)
@@ -239,7 +243,7 @@ public static class EmbedBuilder
         if (isPlayed)
             footerText = "This song was played in the last couple of minutes. Give it a break!";
 
-        return CreateBasicEmbed(title, description, DiscordColor.Aquamarine, new(song.Song.Art), footerText, fields: fields);
+        return CreateBasicEmbed(title, description, DiscordColor.Aquamarine, thumbnailUrl: new(song.Song.Art), footerText: footerText, fields: fields);
     }
 
     public static DiscordEmbed BuildAzuraCastUpdatesAvailableEmbed(AzuraUpdateRecord update)
@@ -267,7 +271,7 @@ public static class EmbedBuilder
         if (update.CanSwitchToStable)
             fields.Add("Stable Switch Available?", new("Yes"));
 
-        return CreateBasicEmbed(title, description, DiscordColor.White, AzuraCastPic, fields: fields);
+        return CreateBasicEmbed(title, description, DiscordColor.White, thumbnailUrl: AzuraCastPic, fields: fields);
     }
 
     public static DiscordEmbed BuildAzuraCastUpdatesChangelogEmbed(bool isRolling, string? onlineChangelog = null)
@@ -312,7 +316,7 @@ public static class EmbedBuilder
 
         fields.Add("File Size", new($"{Math.Round(fileSize / (1024.0 * 1024.0), 2)} MB"));
 
-        return CreateBasicEmbed(title, description, DiscordColor.SpringGreen, new(stationArt), fields: fields);
+        return CreateBasicEmbed(title, description, DiscordColor.SpringGreen, thumbnailUrl: new(stationArt), fields: fields);
     }
 
     public static DiscordEmbed BuildAzzyAddedEmbed()
@@ -326,6 +330,36 @@ public static class EmbedBuilder
         };
 
         return CreateBasicEmbed(title, description, DiscordColor.SpringGreen, fields: fields);
+    }
+
+    public static DiscordEmbed BuildAzzyInactiveGuildEmbed(bool config, bool legals, DiscordGuild guild)
+    {
+        ArgumentNullException.ThrowIfNull(guild);
+
+        const string title = "Configuration Reminder";
+        long timestamp = (legals) ? DateTimeOffset.UtcNow.AddDays(3).ToUnixTimeSeconds() : DateTimeOffset.UtcNow.AddDays(7).ToUnixTimeSeconds();
+
+        StringBuilder message = new();
+        message.AppendLine(GeneralStrings.ReminderBegin);
+        if (legals)
+        {
+            message.Append(GeneralStrings.ReminderLegals);
+            message.Append(' ');
+            message.AppendLine(GeneralStrings.ReminderLegalsFix);
+        }
+
+        if (config)
+        {
+            message.Append(GeneralStrings.ReminderConfig);
+            message.Append(' ');
+            message.AppendLine(GeneralStrings.ReminderConfigFix);
+        }
+
+        message.AppendLine(GeneralStrings.ReminderForceLeaveThreat.Replace("{%TIMEFRAME%}", $"<t:{timestamp}:R>", StringComparison.InvariantCulture));
+
+        EmbedAuthorStruct author = new(guild.Name, null, guild.IconUrl);
+
+        return CreateBasicEmbed(title, message.ToString(), DiscordColor.Orange, author: author);
     }
 
     public static async Task<DiscordEmbed> BuildAzzyHardwareStatsEmbedAsync(Uri avaUrl, int ping)
@@ -661,7 +695,7 @@ public static class EmbedBuilder
         if (guild.IconUrl is not null)
             iconUrl = new(guild.IconUrl);
 
-        return CreateBasicEmbed(title, description, DiscordColor.Gold, iconUrl, fields: fields);
+        return CreateBasicEmbed(title, description, DiscordColor.Gold, thumbnailUrl: iconUrl, fields: fields);
     }
 
     public static DiscordEmbed BuildGuildRemovedEmbed(ulong guildId, DiscordGuild? guild = null)
