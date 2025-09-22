@@ -53,6 +53,7 @@ public static class GeneralStrings
     public const string ReminderLegals = "- Legal conditions have not been accepted.";
     public const string ReminderLegalsFix = "Please use the command `/legal accept-legals` for this.";
     public const string ReminderForceLeaveAnnouncement = "I will leave this server now because the following conditions have not been met:";
+    public const string ReminderForceLeaveEnd = "If you want to use me in the future, you have to add me to your server and then set me up correctly.";
     public const string ReminderForceLeaveThreat = "If you do not comply with this request within {%TIMEFRAME%} I will be forced to leave your server.";
     public const string SkipAlmostOver = "This song is almost over. Please wait!";
     public const string SkipToFast = "You can only skip a song every 30 seconds.";

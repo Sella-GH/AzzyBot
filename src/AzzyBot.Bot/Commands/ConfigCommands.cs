@@ -696,7 +696,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            DiscordButtonComponent button = new(DiscordButtonStyle.Primary, $"accept_legals_{context.Guild.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Accept Legals.");
+            DiscordButtonComponent button = new(DiscordButtonStyle.Success, $"accept_legals_{context.Guild.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Accept Legals.");
             await using DiscordMessageBuilder messageBuilder = new();
             messageBuilder.AddActionRowComponent(button);
             string content = GeneralStrings.LegalsInformation

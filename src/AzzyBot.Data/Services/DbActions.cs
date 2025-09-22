@@ -776,13 +776,13 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await UpdateAzzyBotAsync(lastDatabaseCleanup, lastUpdateCheck);
+            await UpdateAzzyBotAsync(lastDatabaseCleanup, lastGuildReminder, lastUpdateCheck);
 
             _logger.DatabaseConcurrencyResolved();
         }
     }
 
-    public async Task UpdateGuildAsync(ulong guildId, bool? lastPermissionCheck = null, bool? lastReminder = null, bool? legalsAccepted = null)
+    public async Task UpdateGuildAsync(ulong guildId, bool? lastPermissionCheck = null, DateTimeOffset? reminderLeaveDate = null, bool? legalsAccepted = null)
     {
         await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
 
@@ -797,15 +797,14 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         }
 
         DateTimeOffset now = DateTimeOffset.UtcNow;
-
         if (lastPermissionCheck.HasValue)
             guild.LastPermissionCheck = now;
 
-        if (lastReminder.HasValue)
+        if (reminderLeaveDate.HasValue)
         {
-            guild.ReminderLeaveDate = now;
+            guild.ReminderLeaveDate = reminderLeaveDate.Value;
         }
-        // Reset the reminder start if the guild has accepted the legals and configured the bot
+        // Reset the leave date if the guild has accepted the legals and configured the bot
         else if (guild.ReminderLeaveDate != DateTimeOffset.MinValue && (guild.LegalsAccepted && guild.ConfigSet))
         {
             guild.ReminderLeaveDate = DateTimeOffset.MinValue;
@@ -825,7 +824,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await UpdateGuildAsync(guildId, lastPermissionCheck, lastReminder, legalsAccepted);
+            await UpdateGuildAsync(guildId, lastPermissionCheck, reminderLeaveDate, legalsAccepted);
 
             _logger.DatabaseConcurrencyResolved();
         }

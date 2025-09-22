@@ -96,7 +96,11 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, I
         await _botService.CheckPermissionsAsync(guilds);
 
         AzzyBotEntity? azzy = await _dbActions.ReadAzzyBotAsync();
+#if DEBUG || DOCKER_DEBUG
+        if (azzy is null)
+#else
         if (azzy is null || azzy.LastGuildReminderCheck.AddDays(0.98) > DateTimeOffset.UtcNow)
+#endif
             return;
 
         // Start the Guild Reminder Check
