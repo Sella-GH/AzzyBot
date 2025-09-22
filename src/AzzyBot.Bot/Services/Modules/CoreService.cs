@@ -71,19 +71,23 @@ public sealed class CoreService(ILogger<CoreService> logger, DbActions dbActions
         ArgumentNullException.ThrowIfNull(guilds);
         ArgumentOutOfRangeException.ThrowIfLessThan(guilds.Count, 1);
 
-        foreach ((GuildEntity guild, string message) in guilds)
+        foreach (KeyValuePair<GuildEntity, string> guild in guilds)
         {
-            bool result = await _botService.SendMessageAsync(guild.Preferences.AdminNotifyChannelId, message);
+            bool result = false;
+            if (guild.Key.Preferences.AdminNotifyChannelId is not 0)
+                result = await _botService.SendMessageAsync(guild.Key.Preferences.AdminNotifyChannelId, guild.Value);
+
             if (!result)
-                result = await _botService.SendMessageToOwnerAsync(guild.UniqueId, message);
+                result = await _botService.SendMessageToOwnerAsync(guild.Key.UniqueId, guild.Value);
 
             if (!result)
             {
-                _logger.LogError($"Unable to notify admins or owner of unused guild {guild.UniqueId}");
+                _logger.LogError($"Unable to notify admins or owner of unused guild {guild.Key.UniqueId}");
                 continue;
             }
 
-            await _dbActions.UpdateGuildAsync(guild.UniqueId, lastReminder: true);
+            await _dbActions.UpdateGuildAsync(guild.Key.UniqueId, lastReminder: true);
+            _logger.LogWarning($"Notified guild {guild.Key.UniqueId} of being unused with message \"{guild.Value}\"");
         }
     }
 }

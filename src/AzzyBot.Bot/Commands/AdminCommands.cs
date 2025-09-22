@@ -177,7 +177,7 @@ public sealed class AdminCommands
 
             await context.DeferResponseAsync();
 
-            await _dbActions.UpdateGuildLegalsAsync();
+            await _dbActions.UpdateGuildsLegalsAsync();
 
             IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
             if (guilds.Count is 0)

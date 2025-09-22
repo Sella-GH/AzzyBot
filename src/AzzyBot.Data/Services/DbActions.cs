@@ -744,7 +744,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         }
     }
 
-    public async Task UpdateAzzyBotAsync(bool? lastDatabaseCleanup = null, bool? lastUpdateCheck = null)
+    public async Task UpdateAzzyBotAsync(bool? lastDatabaseCleanup = null, bool? lastGuildReminder = null, bool? lastUpdateCheck = null)
     {
         await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
 
@@ -755,11 +755,15 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             return;
         }
 
+        DateTimeOffset now = DateTimeOffset.UtcNow;
         if (lastDatabaseCleanup.HasValue)
-            azzyBot.LastDatabaseCleanup = DateTimeOffset.UtcNow;
+            azzyBot.LastDatabaseCleanup = now;
+
+        if (lastGuildReminder.HasValue)
+            azzyBot.LastGuildReminderCheck = now;
 
         if (lastUpdateCheck.HasValue)
-            azzyBot.LastUpdateCheck = DateTimeOffset.UtcNow;
+            azzyBot.LastUpdateCheck = now;
 
         dbContext.AzzyBot.Update(azzyBot);
 
@@ -798,7 +802,14 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             guild.LastPermissionCheck = now;
 
         if (lastReminder.HasValue)
+        {
             guild.RemindersStart = now;
+        }
+        // Reset the reminder start if the guild has accepted the legals and configured the bot
+        else if (guild.RemindersStart != DateTimeOffset.MinValue && (guild.LegalsAccepted && guild.ConfigSet))
+        {
+            guild.RemindersStart = DateTimeOffset.MinValue;
+        }
 
         if (legalsAccepted.HasValue)
             guild.LegalsAccepted = legalsAccepted.Value;
@@ -820,7 +831,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         }
     }
 
-    public async Task UpdateGuildLegalsAsync()
+    public async Task UpdateGuildsLegalsAsync()
     {
         await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
 
@@ -833,7 +844,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await UpdateGuildLegalsAsync();
+            await UpdateGuildsLegalsAsync();
 
             _logger.DatabaseConcurrencyResolved();
         }

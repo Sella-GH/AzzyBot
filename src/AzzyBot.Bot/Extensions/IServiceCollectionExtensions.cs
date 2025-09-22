@@ -56,6 +56,7 @@ public static class IServiceCollectionExtensions
 
         services.AddSingleton<DiscordBotService>();
         services.AddSingleton<DiscordBotServiceHost>().AddHostedService(static s => s.GetRequiredService<DiscordBotServiceHost>());
+        services.AddSingleton<CoreService>();
 
         services.AddHttpClient(SoftwareStats.GetAppName, static c =>
         {
@@ -95,6 +96,7 @@ public static class IServiceCollectionExtensions
             o.AddJob<AzuraRequestJob>(j => j.WithName(nameof(AzuraRequestJob))); // This job is not intended to be run at a certain time, it will only be requested!
             o.AddJob<AzuraStatusPingJob>(j => j.WithName(nameof(AzuraStatusPingJob)).WithCronExpression(every15Minutes));
             o.AddJob<AzzyBotCheckPermissionsJob>(j => j.WithName(nameof(AzzyBotCheckPermissionsJob)).WithCronExpression(every12Hours));
+            o.AddJob<AzzyBotInactiveGuildJob>(j => j.WithName(nameof(AzzyBotInactiveGuildJob)).WithCronExpression(everyDay));
             o.AddJob<AzzyBotUpdateCheckJob>(j => j.WithName(nameof(AzzyBotUpdateCheckJob)).WithCronExpression(every6Hours));
             o.AddJob<DatabaseCleaningJob>(j => j.WithName(nameof(DatabaseCleaningJob)).WithCronExpression(everyDay).RunAtStartup());
             o.AddJob<LogfileCleaningJob>(j => j.WithName(nameof(LogfileCleaningJob)).WithCronExpression(everyDay).WithParameter(logDays).RunAtStartup());

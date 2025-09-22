@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
-using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
@@ -19,10 +18,12 @@ using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services.DiscordEvents;
 
-public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, IOptions<AzzyBotSettings> settings, DiscordBotService botService, DbActions dbActions) : IEventHandler<GuildCreatedEventArgs>, IEventHandler<GuildDeletedEventArgs>, IEventHandler<GuildDownloadCompletedEventArgs>
+public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, IOptions<AzzyBotSettings> settings, CronJobManager cron, DbActions dbActions, DiscordBotService botService)
+    : IEventHandler<GuildCreatedEventArgs>, IEventHandler<GuildDeletedEventArgs>, IEventHandler<GuildDownloadCompletedEventArgs>
 {
     private readonly ILogger<DiscordGuildsHandler> _logger = logger;
     private readonly AzzyBotSettings _settings = settings.Value;
+    private readonly CronJobManager _cron = cron;
     private readonly DbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
 
@@ -93,6 +94,15 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, I
 
         IReadOnlyList<GuildEntity> guilds = await _dbActions.ReadGuildsAsync(loadEverything: true);
         await _botService.CheckPermissionsAsync(guilds);
+
+        AzzyBotEntity? azzy = await _dbActions.ReadAzzyBotAsync();
+        if (azzy is null || azzy.LastGuildReminderCheck.AddDays(0.98) > DateTimeOffset.UtcNow)
+            return;
+
+        // Start the Guild Reminder Check
+        _cron.RunAzzyBotInactiveGuildJob();
+        azzy.LastGuildReminderCheck = DateTimeOffset.UtcNow;
+        await _dbActions.UpdateAzzyBotAsync(lastGuildReminder: true);
     }
 
     private async Task GuildCreatedHelperAsync(IEnumerable<DiscordGuild> guilds)
