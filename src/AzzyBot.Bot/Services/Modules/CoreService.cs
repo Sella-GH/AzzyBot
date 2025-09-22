@@ -69,9 +69,7 @@ public sealed class CoreService(ILogger<CoreService> logger, DbActions dbActions
     public async Task NotifyUnusedGuildsAsync(Dictionary<GuildEntity, string> guilds)
     {
         ArgumentNullException.ThrowIfNull(guilds);
-
-        if (guilds.Count is 0)
-            return;
+        ArgumentOutOfRangeException.ThrowIfLessThan(guilds.Count, 1);
 
         foreach ((GuildEntity guild, string message) in guilds)
         {
