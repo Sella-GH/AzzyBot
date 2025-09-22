@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AzzyBot.Data.Migrations
 {
     [DbContext(typeof(AzzyDbContext))]
-    [Migration("20250922061106_UnusedGuildsRemoval")]
+    [Migration("20250922095050_UnusedGuildsRemoval")]
     partial class UnusedGuildsRemoval
     {
         /// <inheritdoc />
@@ -335,7 +335,7 @@ namespace AzzyBot.Data.Migrations
                     b.Property<bool>("LegalsAccepted")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTimeOffset>("RemindersStart")
+                    b.Property<DateTimeOffset>("ReminderLeaveDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("UniqueId")

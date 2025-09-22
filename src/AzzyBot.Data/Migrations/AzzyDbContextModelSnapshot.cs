@@ -332,7 +332,7 @@ namespace AzzyBot.Data.Migrations
                     b.Property<bool>("LegalsAccepted")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTimeOffset>("RemindersStart")
+                    b.Property<DateTimeOffset>("ReminderLeaveDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal>("UniqueId")

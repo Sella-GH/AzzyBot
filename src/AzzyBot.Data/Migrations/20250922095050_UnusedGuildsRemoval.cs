@@ -12,7 +12,7 @@ namespace AzzyBot.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<DateTimeOffset>(
-                name: "RemindersStart",
+                name: "ReminderLeaveDate",
                 table: "Guilds",
                 type: "timestamp with time zone",
                 nullable: false,
@@ -30,7 +30,7 @@ namespace AzzyBot.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "RemindersStart",
+                name: "ReminderLeaveDate",
                 table: "Guilds");
 
             migrationBuilder.DropColumn(

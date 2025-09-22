@@ -31,9 +31,12 @@ public sealed class GuildEntity
     public bool LegalsAccepted { get; set; }
 
     /// <summary>
-    /// The <see cref="DateTimeOffset"/> timestamp when the first reminder was sent to the guild.
+    /// The <see cref="DateTimeOffset"/> timestamp when the bot will leave the guild if they don't complete the setup process.
     /// </summary>
-    public DateTimeOffset RemindersStart { get; set; }
+    /// <remarks>
+    /// Always use <see cref="DateTimeOffset.UtcNow"/> to set this value.
+    /// </remarks>
+    public DateTimeOffset ReminderLeaveDate { get; set; }
 
     /// <summary>
     /// The last saved <see cref="DateTimeOffset"/> timestamp when the <see cref="DiscordGuild"/> was checked for correct channel permissions.

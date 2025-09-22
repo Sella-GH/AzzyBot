@@ -803,12 +803,12 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
 
         if (lastReminder.HasValue)
         {
-            guild.RemindersStart = now;
+            guild.ReminderLeaveDate = now;
         }
         // Reset the reminder start if the guild has accepted the legals and configured the bot
-        else if (guild.RemindersStart != DateTimeOffset.MinValue && (guild.LegalsAccepted && guild.ConfigSet))
+        else if (guild.ReminderLeaveDate != DateTimeOffset.MinValue && (guild.LegalsAccepted && guild.ConfigSet))
         {
-            guild.RemindersStart = DateTimeOffset.MinValue;
+            guild.ReminderLeaveDate = DateTimeOffset.MinValue;
         }
 
         if (legalsAccepted.HasValue)
