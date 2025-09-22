@@ -236,19 +236,19 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             string reply = string.Empty;
             switch (moduleActivatedCheck.ErrorMessage)
             {
-                case CheckMessages.AzuraCastIsNull:
+                case ModuleCheckMessages.AzuraCastIsNull:
                     reply = "The AzuraCast module is not activated, you are unable to use commands from it.";
                     break;
 
-                case CheckMessages.GuildIsNull:
+                case ModuleCheckMessages.GuildIsNull:
                     reply = "Your server is not registered within the bot.";
                     break;
 
-                case CheckMessages.LegalsNotAccepted:
+                case ModuleCheckMessages.LegalsNotAccepted:
                     reply = GeneralStrings.LegalsNotAccepted;
                     break;
 
-                case CheckMessages.ModuleNotFound:
+                case ModuleCheckMessages.ModuleNotFound:
                     reply = "The requested module was not found, what have you done?";
                     break;
             }

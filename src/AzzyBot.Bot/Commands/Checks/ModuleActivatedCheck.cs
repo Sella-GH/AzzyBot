@@ -39,7 +39,7 @@ public sealed class ModuleActivatedCheck(ILogger<ModuleActivatedCheck> logger, D
                     if (azuraCast is null)
                     {
                         _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                        return CheckMessages.AzuraCastIsNull;
+                        return ModuleCheckMessages.AzuraCastIsNull;
                     }
 
                     return null;
@@ -49,17 +49,17 @@ public sealed class ModuleActivatedCheck(ILogger<ModuleActivatedCheck> logger, D
                     if (guild is null)
                     {
                         _logger.DatabaseGuildNotFound(context.Guild.Id);
-                        return CheckMessages.GuildIsNull;
+                        return ModuleCheckMessages.GuildIsNull;
                     }
                     else if (!guild.LegalsAccepted)
                     {
-                        return CheckMessages.LegalsNotAccepted;
+                        return ModuleCheckMessages.LegalsNotAccepted;
                     }
 
                     return null;
 
                 default:
-                    return CheckMessages.ModuleNotFound;
+                    return ModuleCheckMessages.ModuleNotFound;
             }
         }
 
