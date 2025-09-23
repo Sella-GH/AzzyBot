@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -108,6 +109,7 @@ public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSet
         }
     }
 
+    [SuppressMessage("Style", "IDE0045:Convert to conditional expression", Justification = "We do not nest ternary expressions.")]
     public async Task NotifyUnusedGuildsAsync(IReadOnlyDictionary<GuildEntity, AzzyInactiveGuildStruct> guilds)
     {
         ArgumentNullException.ThrowIfNull(guilds);
@@ -115,7 +117,17 @@ public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSet
 
         foreach (KeyValuePair<GuildEntity, AzzyInactiveGuildStruct> guild in guilds)
         {
-            DiscordEmbed embed = EmbedBuilder.BuildAzzyInactiveGuildEmbed(guild.Value.NoConfig, guild.Value.NoLegals, guild.Value.Guild, guild.Key.ReminderLeaveDate);
+            DateTimeOffset leaveDate;
+            if (guild.Key.ReminderLeaveDate != DateTimeOffset.MinValue)
+            {
+                leaveDate = guild.Key.ReminderLeaveDate;
+            }
+            else
+            {
+                leaveDate = (guild.Value.NoLegals) ? DateTimeOffset.UtcNow.AddDays(3) : DateTimeOffset.UtcNow.AddDays(7);
+            }
+
+            DiscordEmbed embed = EmbedBuilder.BuildAzzyInactiveGuildEmbed(guild.Value.NoConfig, guild.Value.NoLegals, guild.Value.Guild, leaveDate);
 
             bool result = false;
             if (guild.Key.Preferences.AdminNotifyChannelId is not 0)
@@ -136,7 +148,7 @@ public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSet
                 continue;
             }
 
-            await _dbActions.UpdateGuildAsync(guild.Key.UniqueId, reminderLeaveDate: (guild.Value.NoLegals) ? DateTimeOffset.UtcNow.AddDays(3) : DateTimeOffset.UtcNow.AddDays(7));
+            await _dbActions.UpdateGuildAsync(guild.Key.UniqueId, reminderLeaveDate: leaveDate);
             _logger.LogWarning($"Notified guild {guild.Key.UniqueId} of being unused.");
         }
     }
