@@ -115,7 +115,7 @@ public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSet
 
         foreach (KeyValuePair<GuildEntity, AzzyInactiveGuildStruct> guild in guilds)
         {
-            DiscordEmbed embed = EmbedBuilder.BuildAzzyInactiveGuildEmbed(guild.Value.NoConfig, guild.Value.NoLegals, guild.Value.Guild);
+            DiscordEmbed embed = EmbedBuilder.BuildAzzyInactiveGuildEmbed(guild.Value.NoConfig, guild.Value.NoLegals, guild.Value.Guild, guild.Key.ReminderLeaveDate);
 
             bool result = false;
             if (guild.Key.Preferences.AdminNotifyChannelId is not 0)

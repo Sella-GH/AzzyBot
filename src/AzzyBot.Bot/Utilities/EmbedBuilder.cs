@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -332,12 +333,21 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, description, DiscordColor.SpringGreen, fields: fields);
     }
 
-    public static DiscordEmbed BuildAzzyInactiveGuildEmbed(bool config, bool legals, DiscordGuild guild)
+    [SuppressMessage("Style", "IDE0045:Convert to conditional expression", Justification = "We do not nest ternary expressions.")]
+    public static DiscordEmbed BuildAzzyInactiveGuildEmbed(bool config, bool legals, DiscordGuild guild, in DateTimeOffset leaveDate)
     {
         ArgumentNullException.ThrowIfNull(guild);
 
         const string title = "Configuration Reminder";
-        long timestamp = (legals) ? DateTimeOffset.UtcNow.AddDays(3).ToUnixTimeSeconds() : DateTimeOffset.UtcNow.AddDays(7).ToUnixTimeSeconds();
+        long timestamp;
+        if (leaveDate != DateTimeOffset.MinValue)
+        {
+            timestamp = leaveDate.ToUnixTimeSeconds();
+        }
+        else
+        {
+            timestamp = (legals) ? DateTimeOffset.UtcNow.AddDays(3).ToUnixTimeSeconds() : DateTimeOffset.UtcNow.AddDays(7).ToUnixTimeSeconds();
+        }
 
         StringBuilder message = new();
         message.AppendLine(GeneralStrings.ReminderBegin);

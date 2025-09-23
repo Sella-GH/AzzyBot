@@ -84,10 +84,10 @@ public static class IServiceCollectionExtensions
 #else
             const string everyMinute = "* * * * *";
             const string every15Minutes = "*/15 * * * *";
-            const string everyHour = "0 */1 * * *";
+            const string everyHour = "0 * * * *";
             const string every6Hours = "0 */6 * * *";
             const string every12Hours = "0 */12 * * *";
-            const string everyDay = "0 0 */1 * *";
+            const string everyDay = "0 0 * * *";
 #endif
             o.AddJob<AzuraCheckApiPermissionsJob>(j => j.WithName(nameof(AzuraCheckApiPermissionsJob)).WithCronExpression(every12Hours));
             o.AddJob<AzuraCheckFileChangesJob>(j => j.WithName(nameof(AzuraCheckFileChangesJob)).WithCronExpression(everyHour));
