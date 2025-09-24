@@ -20,6 +20,7 @@
     <Platforms>x64;ARM64;AnyCPU</Platforms>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch> <!-- Resolves MSBUILD3270 -->
     <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
     <TargetFramework>net10.0</TargetFramework>
     <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch> <!-- https://learn.microsoft.com/en-us/dotnet/core/deploying/runtime-patch-selection#how-to-avoid-restore-during-publish -->

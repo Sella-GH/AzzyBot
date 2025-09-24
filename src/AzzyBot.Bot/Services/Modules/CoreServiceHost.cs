@@ -56,6 +56,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
         return Task.CompletedTask;
     }
 
+    // TODO: Remove this method in a future release after enough time has passed since the encryption schema change.
     private async Task MigrateDatabaseEncryptionSchemaAsync()
     {
         _logger.DatabaseNewEncryptionStart();

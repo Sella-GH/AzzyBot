@@ -8,6 +8,22 @@
     <Platform Name="ARM64" />
     <Platform Name="x64" />
   </Configurations>
+  <Folder Name="/actions/">
+    <File Path=".github/copilot-instructions.md" />
+    <File Path=".github/dependabot.yml" />
+    <File Path=".github/ISSUE_TEMPLATE/bug_report.yml" />
+    <File Path=".github/ISSUE_TEMPLATE/feature_request.yml" />
+    <File Path=".github/workflows/backports.yml" />
+    <File Path=".github/workflows/codeql-actions.yml" />
+    <File Path=".github/workflows/codeql-csharp.yml" />
+    <File Path=".github/workflows/dependabot-auto-merge.yml" />
+    <File Path=".github/workflows/dependabot-formatting.yml" />
+    <File Path=".github/workflows/docker.yml" />
+    <File Path=".github/workflows/hcl-appscan-codesweep.yml" />
+    <File Path=".github/workflows/release.yml" />
+    <File Path=".github/workflows/sonarcloud.yml" />
+    <File Path=".github/workflows/tag-creation.yml" />
+  </Folder>
   <Folder Name="/global/">
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />

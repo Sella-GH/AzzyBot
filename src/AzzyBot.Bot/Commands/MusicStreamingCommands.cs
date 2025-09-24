@@ -44,6 +44,7 @@ public sealed class MusicStreamingCommands
         private readonly AzuraCastApiService _azuraCast = azuraCast;
         private readonly DbActions _dbActions = dbActions;
         private readonly MusicStreamingService _musicStreaming = musicStreaming;
+        private static readonly string AppName = SoftwareStats.GetAppName;
 
         [Command("change-volume"), Description("Change the volume of the played music.")]
         public async ValueTask ChangeVolumeAsync
@@ -183,7 +184,7 @@ public sealed class MusicStreamingCommands
                 await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
                 return;
             }
-            else if (track.Author is "AzzyBot.Bot" && track.Title is "AzzyBot.Bot" && track.Identifier is "AzzyBot.Bot")
+            else if (track.Author == AppName && track.Title == AppName && track.Identifier == AppName)
             {
                 await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;
@@ -351,7 +352,7 @@ public sealed class MusicStreamingCommands
                 await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
                 return;
             }
-            else if (track.Author is "AzzyBot.Bot" && track.Title is "AzzyBot.Bot" && track.Identifier is "AzzyBot.Bot")
+            else if (track.Author == AppName && track.Title == AppName && track.Identifier == AppName)
             {
                 await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;
@@ -380,7 +381,7 @@ public sealed class MusicStreamingCommands
                 await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
                 return;
             }
-            else if (track.Author is "AzzyBot.Bot" && track.Title is "AzzyBot.Bot" && track.Identifier is "AzzyBot.Bot")
+            else if (track.Author == AppName && track.Title == AppName && track.Identifier == AppName)
             {
                 await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;

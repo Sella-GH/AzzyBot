@@ -603,11 +603,12 @@ public sealed class ConfigCommands
                         DiscordRole? stationDjRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationDjRoleId);
                         stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? "Name not found");
                         stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found");
+                        string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(ac.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
 
                         AzuraStationRecord? stationRecord = null;
                         try
                         {
-                            stationRecord = await _azuraCastApi.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), station.StationId);
+                            stationRecord = await _azuraCastApi.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), apiKey, station.StationId);
                         }
                         catch (HttpRequestException)
                         {
@@ -696,7 +697,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            DiscordButtonComponent button = new(DiscordButtonStyle.Primary, $"accept_legals_{context.Guild.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Accept Legals.");
+            DiscordButtonComponent button = new(DiscordButtonStyle.Success, $"accept_legals_{context.Guild.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Accept Legals.");
             await using DiscordMessageBuilder messageBuilder = new();
             messageBuilder.AddActionRowComponent(button);
             string content = GeneralStrings.LegalsInformation

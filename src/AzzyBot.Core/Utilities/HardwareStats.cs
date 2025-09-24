@@ -11,6 +11,12 @@ namespace AzzyBot.Core.Utilities;
 
 public static class HardwareStats
 {
+    #region Constants
+
+    private const string ProcDir = "/proc";
+
+    #endregion Constants
+
     public static bool CheckIfLinuxOs
         => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 
@@ -56,7 +62,7 @@ public static class HardwareStats
 
         static async Task<Dictionary<int, long[]>> ReadCpuTimesAsync()
         {
-            string[] statLines = await File.ReadAllLinesAsync(Path.Combine("/proc", "stat"));
+            string[] statLines = await File.ReadAllLinesAsync(Path.Combine(ProcDir, "stat"));
             Dictionary<int, long[]> cpuTimes = new()
             {
                 // Index 0 is the aggregate of all cores
@@ -136,7 +142,7 @@ public static class HardwareStats
 
     public static async Task<AppCpuLoadRecord> GetSystemCpuLoadAsync()
     {
-        string loadInfoLines = await File.ReadAllTextAsync(Path.Combine("/proc", "loadavg"));
+        string loadInfoLines = await File.ReadAllTextAsync(Path.Combine(ProcDir, "loadavg"));
         string[] loadInfoParts = loadInfoLines.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         double oneMin = double.Parse(loadInfoParts[0], CultureInfo.InvariantCulture);
         double fiveMin = double.Parse(loadInfoParts[1], CultureInfo.InvariantCulture);
@@ -157,7 +163,7 @@ public static class HardwareStats
 
     public static async Task<AppMemoryUsageRecord> GetSystemMemoryUsageAsync()
     {
-        string[] memoryInfoLines = await File.ReadAllLinesAsync(Path.Combine("/proc", "meminfo"));
+        string[] memoryInfoLines = await File.ReadAllLinesAsync(Path.Combine(ProcDir, "meminfo"));
         long memTotalKb = 0;
         long memFreeKb = 0;
 
@@ -199,7 +205,7 @@ public static class HardwareStats
 
         static async Task<Dictionary<string, AppNetworkStatsRecord>> ReadNetworkStatsAsync()
         {
-            string[] lines = await File.ReadAllLinesAsync(Path.Combine("/proc", "net", "dev"));
+            string[] lines = await File.ReadAllLinesAsync(Path.Combine(ProcDir, "net", "dev"));
             Dictionary<string, AppNetworkStatsRecord> networkStats = [];
 
             for (int i = 2; i < lines.Length; i++)

@@ -58,11 +58,11 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
         bool needState = context.Command.Name is "switch-playlist";
         string? search = context.UserInput;
         string apiKey = (!string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(station.AzuraCast.AdminApiKey);
-        string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
+        Uri baseUrl = new(Crypto.Decrypt(station.AzuraCast.BaseUrl));
         IEnumerable<AzuraPlaylistRecord>? playlists;
         try
         {
-            playlists = await _azuraCast.GetPlaylistsAsync(new(baseUrl), apiKey, stationId);
+            playlists = await _azuraCast.GetPlaylistsAsync(baseUrl, apiKey, stationId);
             if (playlists is null)
             {
                 await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station ({stationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
