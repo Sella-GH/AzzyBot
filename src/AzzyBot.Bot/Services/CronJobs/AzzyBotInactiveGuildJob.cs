@@ -28,7 +28,7 @@ public sealed class AzzyBotInactiveGuildJob(CoreService coreService, DiscordBotS
             // Check whether the guilds are due for deletion
             // A guild is due for deletion if the ReminderLeaveDate is set and in the past but only if it is not DateTimeOffset.MinValue
             Dictionary<GuildEntity, AzzyInactiveGuildStruct> deletionGuilds = unusedGuilds
-                .Where(static g => g.Key.ReminderLeaveDate != DateTimeOffset.MinValue && g.Key.ReminderLeaveDate <= DateTimeOffset.Now)
+                .Where(static g => g.Key.ReminderLeaveDate != DateTimeOffset.MinValue && g.Key.ReminderLeaveDate <= DateTimeOffset.UtcNow)
                 .ToDictionary(static kv => kv.Key, static kv => kv.Value);
 
             if (deletionGuilds.Count is not 0)
