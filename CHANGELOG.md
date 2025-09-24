@@ -6,7 +6,11 @@
 
 ### Improvements
 - Added support for https://github.com/AzuraCast/AzuraCast/pull/8150
+- Discord Uri protocols now default to https instead of http if no protocol is specified
 - Refactored internal code with some micro optimizations
+
+### Development
+- Miscellaneous action improvements
 
 ## 2.7.0 - 2025-09-14
 ### General
