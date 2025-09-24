@@ -59,7 +59,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     private async Task CheckForAdminApiPermissionsAsync(AzuraCastEntity azuraCast)
     {
-        string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
+        Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
         string apiUrl = $"{baseUrl}/api";
         List<Uri> apis = new(4)
         {
@@ -89,10 +89,10 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     private async Task CheckForStationApiPermissionsAsync(AzuraCastStationEntity station)
     {
-        string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
+        Uri baseUrl = new(Crypto.Decrypt(station.AzuraCast.BaseUrl));
         string apiUrl = $"{baseUrl}/api";
         int stationId = station.StationId;
-        AzuraAdminStationConfigRecord? config = await GetStationAdminConfigAsync(new(baseUrl), Crypto.Decrypt(station.AzuraCast.AdminApiKey), stationId);
+        AzuraAdminStationConfigRecord? config = await GetStationAdminConfigAsync(baseUrl, Crypto.Decrypt(station.AzuraCast.AdminApiKey), stationId);
         if (config is null)
             return;
 

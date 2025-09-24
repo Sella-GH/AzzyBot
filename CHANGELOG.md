@@ -4,6 +4,10 @@
   - This check was added to reduce database clutter and to ensure that the bot is only used in actively managed servers
   - Maybe server counts of the public bot will go down after this but this is negligible
 
+### Improvements
+- Added support for https://github.com/AzuraCast/AzuraCast/pull/8150
+- Refactored internal code with some micro optimizations
+
 ## 2.7.0 - 2025-09-14
 ### General
 - Reworked the Encryption strength of the critical data stored in the database
