@@ -76,7 +76,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"Sella-GH_AzzyBot" /o:"sella-gh" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="https://sonarcloud.io"
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"Sella-GH_AzzyBot" /o:"sella-gh" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.exclusions="extern/**/*, src/AzzyBot.Data/Migrations/**/*"
 
           dotnet restore .\src\AzzyBot.Bot\AzzyBot.Bot.csproj --configfile .\Nuget.config --force --no-cache --ucr
           dotnet build .\src\AzzyBot.Bot\AzzyBot.Bot.csproj -c Release --no-incremental --no-restore --no-self-contained --ucr
