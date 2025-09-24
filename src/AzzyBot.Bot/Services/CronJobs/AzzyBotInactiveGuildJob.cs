@@ -36,7 +36,7 @@ public sealed class AzzyBotInactiveGuildJob(CoreService coreService, DiscordBotS
 
             Dictionary<GuildEntity, AzzyInactiveGuildStruct> reminderGuilds = unusedGuilds.Except(deletionGuilds).ToDictionary(static kv => kv.Key, static kv => kv.Value);
             if (reminderGuilds.Count is not 0)
-                await _coreService.NotifyUnusedGuildsAsync(unusedGuilds);
+                await _coreService.NotifyUnusedGuildsAsync(reminderGuilds);
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
         {
