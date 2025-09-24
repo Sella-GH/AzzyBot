@@ -41,36 +41,37 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
         if (stationId is 0)
             return [];
 
-        AzuraCastStationEntity? stationEntity = await _dbActions.ReadAzuraCastStationAsync(context.Guild.Id, stationId, loadAzuraCast: true, loadAzuraCastPrefs: true);
-        if (stationEntity is null)
+        AzuraCastStationEntity? station = await _dbActions.ReadAzuraCastStationAsync(context.Guild.Id, stationId, loadAzuraCast: true, loadAzuraCastPrefs: true);
+        if (station is null)
         {
             _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, stationId);
             return [];
         }
-        else if (!stationEntity.AzuraCast.IsOnline)
+        else if (!station.AzuraCast.IsOnline)
         {
             return [];
         }
 
-        Uri baseUrl = new(Crypto.Decrypt(stationEntity.AzuraCast.BaseUrl));
+        Uri baseUrl = new(Crypto.Decrypt(station.AzuraCast.BaseUrl));
+        string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.AzuraCast.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
+
         AzuraStationRecord? record = null;
         try
         {
-            record = await _azuraCast.GetStationAsync(baseUrl, stationId);
+            record = await _azuraCast.GetStationAsync(baseUrl, apiKey, stationId);
             if (record is null)
             {
-                await _botService.SendMessageAsync(stationEntity.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({stationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({stationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
                 return [];
             }
         }
         catch (Exception e) when (e is HttpRequestException or InvalidOperationException)
         {
-            await _azuraCastPing.PingInstanceAsync(stationEntity.AzuraCast);
+            await _azuraCastPing.PingInstanceAsync(station.AzuraCast);
             return [];
         }
 
         // Try to detect if the bot is already listening to the station
-        string apiKey = (string.IsNullOrEmpty(stationEntity.ApiKey)) ? Crypto.Decrypt(stationEntity.AzuraCast.AdminApiKey) : Crypto.Decrypt(stationEntity.ApiKey);
         IEnumerable<AzuraStationListenerRecord>? listeners = await _azuraCast.GetStationListenersAsync(baseUrl, apiKey, stationId);
         AzzyIpAddressRecord ipAddresses = await _webRequest.GetIpAddressesAsync();
         string? playingMountPoint = listeners?.FirstOrDefault(l => l.Ip == ipAddresses.Ipv4 || l.Ip == ipAddresses.Ipv6)?.MountName;

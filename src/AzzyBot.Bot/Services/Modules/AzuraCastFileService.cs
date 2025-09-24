@@ -37,7 +37,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, A
         string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
         string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.AzuraCast.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
 
-        AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station.StationId);
+        AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), apiKey, station.StationId);
         if (azuraStation is null)
         {
             await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station ID: {station.StationId}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");

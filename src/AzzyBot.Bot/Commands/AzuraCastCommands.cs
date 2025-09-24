@@ -132,7 +132,7 @@ public sealed class AzuraCastCommands
 
             await using FileStream fileStream = new(Path.Combine(_azuraCastApi.FilePath, zFileName), FileMode.Open, FileAccess.Read, FileShare.None);
             await using DiscordMessageBuilder builder = new();
-            AzuraStationRecord? azuraStation = await _azuraCastApi.GetStationAsync(new(baseUrl), station);
+            AzuraStationRecord? azuraStation = await _azuraCastApi.GetStationAsync(new(baseUrl), apiKey, station);
             if (azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
@@ -375,7 +375,7 @@ public sealed class AzuraCastCommands
 
             await _azuraCastApi.StartStationAsync(new(baseUrl), apiKey, station, context);
 
-            AzuraStationRecord? azuraStation = await _azuraCastApi.GetStationAsync(new(baseUrl), station);
+            AzuraStationRecord? azuraStation = await _azuraCastApi.GetStationAsync(new(baseUrl), apiKey, station);
             if (azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
@@ -478,7 +478,7 @@ public sealed class AzuraCastCommands
 
             string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
-            AzuraStationRecord? azuraStation = await _azuraCastApi.GetStationAsync(new(baseUrl), station);
+            AzuraStationRecord? azuraStation = await _azuraCastApi.GetStationAsync(new(baseUrl), apiKey, station);
             if (azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
@@ -834,7 +834,7 @@ public sealed class AzuraCastCommands
 
             string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             string baseUrl = Crypto.Decrypt(ac.BaseUrl);
-            AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
+            AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), apiKey, station);
             if (azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
@@ -930,7 +930,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
+            AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), apiKey, station);
             if (azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
@@ -1304,7 +1304,7 @@ public sealed class AzuraCastCommands
             string uploadPath = (string.IsNullOrEmpty(acStation.Preferences.FileUploadPath)) ? "/" : acStation.Preferences.FileUploadPath;
 
             AzuraFilesDetailedRecord? uploadedFile = await _azuraCast.UploadFileAsync<AzuraFilesDetailedRecord>(new(baseUrl), apiKey, station, filePath, file.FileName, uploadPath);
-            AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), station);
+            AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(new(baseUrl), apiKey, station);
             if (uploadedFile is null || azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);

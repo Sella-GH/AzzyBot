@@ -98,6 +98,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         List<Uri> apis = new(7)
         {
+            new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}"),
             new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}"),
             new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlists}"),
             new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}"),
@@ -463,13 +464,13 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         };
     }
 
-    public Task<AzuraStationRecord?> GetStationAsync(Uri baseUrl, int stationId)
+    public Task<AzuraStationRecord?> GetStationAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}";
 
-        return GetFromApiAsync<AzuraStationRecord>(baseUrl, endpoint);
+        return GetFromApiAsync<AzuraStationRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
     public Task<AzuraAdminStationConfigRecord?> GetStationAdminConfigAsync(Uri baseUrl, string apiKey, int stationId)

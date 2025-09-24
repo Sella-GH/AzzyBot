@@ -52,20 +52,22 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
 
         string? search = context.UserInput;
         Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
-        string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
+        string adminApiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
         List<DiscordAutoCompleteChoice> results = new(25);
-        foreach (int station in stationsInDb.Select(s => s.StationId))
+        foreach (AzuraCastStationEntity station in stationsInDb)
         {
             if (results.Count is 25)
                 break;
 
+            string stationApiKey = (string.IsNullOrEmpty(station.ApiKey)) ? adminApiKey : Crypto.Decrypt(station.ApiKey);
+
             AzuraStationRecord? azuraStation;
             try
             {
-                azuraStation = await _azuraCast.GetStationAsync(baseUrl, station);
+                azuraStation = await _azuraCast.GetStationAsync(baseUrl, stationApiKey, station.StationId);
                 if (azuraStation is null)
                 {
-                    await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                    await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** (ID: {station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
                     return results;
                 }
             }
@@ -78,7 +80,7 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
             if (!string.IsNullOrWhiteSpace(search) && azuraStation.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            AzuraAdminStationConfigRecord? config = await _azuraCast.GetStationAdminConfigAsync(baseUrl, apiKey, station);
+            AzuraAdminStationConfigRecord? config = await _azuraCast.GetStationAdminConfigAsync(baseUrl, adminApiKey, station.StationId);
             if (config is null)
             {
                 await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
