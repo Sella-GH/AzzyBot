@@ -59,7 +59,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     private async Task CheckForAdminApiPermissionsAsync(AzuraCastEntity azuraCast)
     {
-        string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
+        Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
         string apiUrl = $"{baseUrl}/api";
         List<Uri> apis = new(4)
         {
@@ -89,15 +89,16 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     private async Task CheckForStationApiPermissionsAsync(AzuraCastStationEntity station)
     {
-        string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
+        Uri baseUrl = new(Crypto.Decrypt(station.AzuraCast.BaseUrl));
         string apiUrl = $"{baseUrl}/api";
         int stationId = station.StationId;
-        AzuraAdminStationConfigRecord? config = await GetStationAdminConfigAsync(new(baseUrl), Crypto.Decrypt(station.AzuraCast.AdminApiKey), stationId);
+        AzuraAdminStationConfigRecord? config = await GetStationAdminConfigAsync(baseUrl, Crypto.Decrypt(station.AzuraCast.AdminApiKey), stationId);
         if (config is null)
             return;
 
         List<Uri> apis = new(7)
         {
+            new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}"),
             new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}"),
             new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlists}"),
             new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}"),
@@ -463,13 +464,13 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         };
     }
 
-    public Task<AzuraStationRecord?> GetStationAsync(Uri baseUrl, int stationId)
+    public Task<AzuraStationRecord?> GetStationAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}";
 
-        return GetFromApiAsync<AzuraStationRecord>(baseUrl, endpoint);
+        return GetFromApiAsync<AzuraStationRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
     public Task<AzuraAdminStationConfigRecord?> GetStationAdminConfigAsync(Uri baseUrl, string apiKey, int stationId)

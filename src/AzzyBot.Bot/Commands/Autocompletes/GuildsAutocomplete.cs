@@ -43,7 +43,7 @@ public sealed class GuildsAutocomplete(IOptions<AzzyBotSettings> settings, Disco
             if (guild.Id == _settings.ServerId && commandName is not "get-joined-server")
                 continue;
 
-            results.Add(new(guild.Name, guild.Id.ToString(CultureInfo.InvariantCulture)));
+            results.Add(new($"{guild.Name} ({guild.Id})", guild.Id.ToString(CultureInfo.InvariantCulture)));
         }
 
         return ValueTask.FromResult(results.AsEnumerable());

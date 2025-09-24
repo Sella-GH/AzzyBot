@@ -117,6 +117,9 @@ public static partial class LoggerActions
     [LoggerMessage(203, LogLevel.Warning, "Could not fetch message for id {id} in channel {cid} in guild {gid}")]
     public static partial void MessageNotFound(this ILogger logger, ulong id, ulong cid, ulong gid);
 
+    [LoggerMessage(204, LogLevel.Warning, "Too many Embeds for SendMessageAsync action. Expected only 10 but got {embeds}. Only the first 10 are added and the others discarded!")]
+    public static partial void TooManyEmbeds(this ILogger logger, int embeds);
+
     [LoggerMessage(210, LogLevel.Warning, "Could not find AzzyBot item")]
     public static partial void DatabaseAzzyBotNotFound(this ILogger logger);
 

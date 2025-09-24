@@ -3,6 +3,7 @@
   <PropertyGroup>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <DebugType>embedded</DebugType>
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch> <!-- Resolves MSBUILD3270 -->
     <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
   </PropertyGroup>
 

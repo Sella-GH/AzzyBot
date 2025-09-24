@@ -79,6 +79,7 @@ public static class Crypto
         return Encoding.UTF8.GetString(plainBytes);
     }
 
+    // TODO: Remove this method in a future release after enough time has passed since the encryption schema change.
     public static bool CheckIfNewCipherIsUsed(string cipher)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(cipher);
@@ -94,6 +95,7 @@ public static class Crypto
     /// <param name="legacyCipher">The base64-encoded string representing the legacy cipher to be migrated.</param>
     /// <returns>A string containing the newly encrypted cipher in the updated format.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the migration process fails, typically due to an invalid legacy cipher or incorrect encryption key.</exception>
+    // TODO: Remove this method in a future release after enough time has passed since the encryption schema change.
     public static string MigrateOldCipherToNew(string legacyCipher)
     {
         try
