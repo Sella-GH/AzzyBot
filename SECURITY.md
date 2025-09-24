@@ -35,7 +35,7 @@ You can report any vulnerabilities directly to us if they relate to the core Azz
 
 AzzyBot is not responsible for the development or maintenance of several pieces of "upstream" software that we incorporate into our own product. This list of software includes, but is not limited to:
 * [AzuraCast](https://github.com/AzuraCast/AzuraCast)
-* [.NET 9](https://github.com/dotnet/runtime/)
+* [.NET 10](https://github.com/dotnet/runtime/)
 * [CsvHelper](https://github.com/JoshClose/CsvHelper)
 * [Docker](https://docker.com/)
 * [Docker Compose](https://docker.com/)
