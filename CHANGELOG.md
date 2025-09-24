@@ -12,6 +12,9 @@
 ### Development
 - Miscellaneous action improvements
 
+### Fixes
+- Fixed an issue where the bot failed to run the AzuraCastUpdateJobs if an exception occurred
+
 ## 2.7.0 - 2025-09-14
 ### General
 - Reworked the Encryption strength of the critical data stored in the database

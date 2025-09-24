@@ -27,10 +27,27 @@ public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiServi
         ArgumentNullException.ThrowIfNull(azuraCast);
 
         string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
-        string? body = await _azuraCastApiService.GetUpdatesAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), apiKey);
-        if (string.IsNullOrEmpty(body))
+        Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
+
+        string? body;
+        try
         {
-            await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative updates** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+            body = await _azuraCastApiService.GetUpdatesAsync(baseUrl, apiKey);
+            if (string.IsNullOrEmpty(body))
+            {
+                await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative updates** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                return;
+            }
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
+        {
+            // The server is probably down or something, check if user has uptime monitoring enabled
+            // If yes then just exit silently
+            if (azuraCast.Checks.ServerStatus)
+                return;
+
+            // If no we notify the user that something went wrong
+            await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"Failed to check for updates: {ex.Message}");
             return;
         }
 
