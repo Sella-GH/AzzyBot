@@ -3,6 +3,7 @@
   <PropertyGroup>
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
     <DebugType>embedded</DebugType>
+    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch> <!-- Resolves MSBUILD3270 -->
     <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
   </PropertyGroup>
 
@@ -36,7 +37,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <IsPublishable>True</IsPublishable>
     <JsonSerializerIsReflectionEnabledByDefault>False</JsonSerializerIsReflectionEnabledByDefault>
-    <NoWarn>$(NoWarn);CA2007;MSB3270</NoWarn>
+    <NoWarn>$(NoWarn);CA2007</NoWarn>
     <Nullable>enable</Nullable>
     <PathMap>$(MSBuildProjectDirectory)=./$(MSBuildProjectName)</PathMap>
     <Platforms>x64;ARM64;AnyCPU</Platforms>
