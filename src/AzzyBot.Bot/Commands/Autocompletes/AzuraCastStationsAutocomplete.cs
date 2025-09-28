@@ -91,7 +91,7 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
             {
                 case "play-mount":
                     if (config.IsEnabled)
-                        results.Add(new(azuraStation.Name, station));
+                        results.Add(new(azuraStation.Name, station.StationId));
 
                     break;
 
@@ -101,15 +101,15 @@ public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutoc
 
                 case "start-station" when !config.IsEnabled:
                 case "stop-station" when config.IsEnabled:
-                    results.Add(new($"{azuraStation.Name} ({Misc.GetReadableBool(config.IsEnabled, ReadableBool.StartedStopped, true)})", station));
+                    results.Add(new($"{azuraStation.Name} ({Misc.GetReadableBool(config.IsEnabled, ReadableBool.StartedStopped, true)})", station.StationId));
                     break;
 
                 case "toggle-song-requests":
-                    results.Add(new($"{azuraStation.Name} ({Misc.GetReadableBool(config.EnableRequests, ReadableBool.EnabledDisabled, true)})", station));
+                    results.Add(new($"{azuraStation.Name} ({Misc.GetReadableBool(config.EnableRequests, ReadableBool.EnabledDisabled, true)})", station.StationId));
                     break;
 
                 default:
-                    results.Add(new(azuraStation.Name, station));
+                    results.Add(new(azuraStation.Name, station.StationId));
                     break;
             }
         }
