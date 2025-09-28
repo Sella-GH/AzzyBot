@@ -287,7 +287,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         {
             byte[] fileBytes = await FileOperations.GetBase64BytesFromFileAsync(file);
             string base64String = Convert.ToBase64String(fileBytes);
-            string json = JsonSerializer.Serialize(new($"{filePath}/{fileName}", base64String), JsonSerializationSourceGen.Default.AzuraFileUploadRecord);
+            string json = JsonSerializer.Serialize(new($"{filePath}/{fileName}", base64String), JsonSourceGen.Default.AzuraFileUploadRecord);
 
             using HttpClient client = _factory.CreateClient(HttpClientName);
             using HttpContent httpContent = new StringContent(json, Encoding.UTF8, MediaType);

@@ -192,7 +192,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            return (T)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.GetTypeInfo(typeof(T))!)!;
+            return (T)JsonSerializer.Deserialize(body, JsonSourceGen.Default.GetTypeInfo(typeof(T))!)!;
         }
         catch (JsonException jsonEx)
         {
@@ -200,7 +200,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
             try
             {
                 // See if we can catch an error message
-                error = JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.AzuraErrorRecord);
+                error = JsonSerializer.Deserialize(body, JsonSourceGen.Default.AzuraErrorRecord);
                 if (error is not null)
                 {
                     await _botService.LogExceptionAsync(new InvalidOperationException($"API returned an error: {error.Message}"), DateTimeOffset.Now);
@@ -226,7 +226,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            return (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonDeserializationListSourceGen.Default.GetTypeInfo(typeof(IEnumerable<T>))!)!;
+            return (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonSourceGen.Default.GetTypeInfo(typeof(IEnumerable<T>))!)!;
         }
         catch (JsonException jsonEx)
         {
@@ -234,7 +234,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
             try
             {
                 // See if we can catch an error message
-                error = JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.AzuraErrorRecord);
+                error = JsonSerializer.Deserialize(body, JsonSourceGen.Default.AzuraErrorRecord);
                 if (error is not null)
                 {
                     await _botService.LogExceptionAsync(new InvalidOperationException($"API returned an error: {error.Message}"), DateTimeOffset.Now);
@@ -352,7 +352,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            return JsonSerializer.Deserialize(content, JsonDeserializationListSourceGen.Default.IEnumerableAzuraFilesRecord) ?? throw new InvalidOperationException($"Could not deserialize content: {content}");
+            return JsonSerializer.Deserialize(content, JsonSourceGen.Default.IEnumerableAzuraFilesRecord) ?? throw new InvalidOperationException($"Could not deserialize content: {content}");
         }
         catch (JsonException ex)
         {
@@ -610,7 +610,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}";
 
-        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, JsonSerializationSourceGen.Default.AzuraAdminStationConfigRecord), CreateHeader(apiKey));
+        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, JsonSourceGen.Default.AzuraAdminStationConfigRecord), CreateHeader(apiKey));
     }
 
     public async Task RequestInternalSongAsync(Uri baseUrl, string apiKey, int stationId, string songPath)
@@ -627,7 +627,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         AzuraInternalRequestRecord songRequest = new(songPath[..lastSlash], AzuraApiEndpoints.Queue, [songPath]);
 
-        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(songRequest, JsonSerializationSourceGen.Default.AzuraInternalRequestRecord), CreateHeader(apiKey));
+        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(songRequest, JsonSourceGen.Default.AzuraInternalRequestRecord), CreateHeader(apiKey));
     }
 
     public async Task RequestSongAsync(Uri baseUrl, int stationId, string requestId)
@@ -816,7 +816,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            return (T)JsonSerializer.Deserialize(result, JsonDeserializationSourceGen.Default.GetTypeInfo(typeof(T))!)!;
+            return (T)JsonSerializer.Deserialize(result, JsonSourceGen.Default.GetTypeInfo(typeof(T))!)!;
         }
         catch (JsonException ex)
         {

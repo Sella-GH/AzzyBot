@@ -169,7 +169,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
             CoreUpdaterSettings = _updaterSettings
         };
 
-        string json = JsonSerializer.Serialize(appSettings, JsonSerializationSourceGen.Default.AppSettingsRecord);
+        string json = JsonSerializer.Serialize(appSettings, JsonSourceGen.Default.AppSettingsRecord);
         await FileOperations.WriteToFileAsync(_azzySettings.SettingsFile, json);
 
         _logger.DatabaseReencryptionComplete();

@@ -11,6 +11,7 @@
 
 ### Development
 - Miscellaneous action improvements
+- Simplified Json Source Generation
 
 ### Fixes
 - Fixed an issue where the bot failed to run the AzuraCastUpdateJobs if an exception occurred
