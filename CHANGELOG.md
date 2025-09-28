@@ -10,12 +10,13 @@
 - Refactored internal code with some micro optimizations and hardenings around errors
 
 ### Development
+- Deleted unnecessary code which is native in .NET
 - Miscellaneous action improvements
 - Simplified Json Source Generation
 
 ### Fixes
 - Fixed an issue where the bot failed to run the AzuraCastUpdateJobs if an exception occurred
-- 
+
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02551
 
