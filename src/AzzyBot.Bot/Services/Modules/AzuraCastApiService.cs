@@ -194,9 +194,25 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         {
             return (T)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.GetTypeInfo(typeof(T))!)!;
         }
-        catch (JsonException ex)
+        catch (JsonException jsonEx)
         {
-            throw new InvalidOperationException($"Failed to deserialize body: {body}", ex);
+            AzuraErrorRecord? error;
+            try
+            {
+                // See if we can catch an error message
+                error = JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.AzuraErrorRecord);
+                if (error is not null)
+                {
+                    await _botService.LogExceptionAsync(new InvalidOperationException($"API returned an error: {error.Message}"), DateTimeOffset.Now);
+                    return default;
+                }
+            }
+            catch (JsonException errorEx)
+            {
+                throw new InvalidOperationException($"Failed to deserialize body: {body}", errorEx);
+            }
+
+            throw new InvalidOperationException($"Failed to deserialize body: {body}", jsonEx);
         }
     }
 
@@ -212,9 +228,25 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         {
             return (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonDeserializationListSourceGen.Default.GetTypeInfo(typeof(IEnumerable<T>))!)!;
         }
-        catch (JsonException ex)
+        catch (JsonException jsonEx)
         {
-            throw new InvalidOperationException($"Failed to deserialize body: {body}", ex);
+            AzuraErrorRecord? error;
+            try
+            {
+                // See if we can catch an error message
+                error = JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.AzuraErrorRecord);
+                if (error is not null)
+                {
+                    await _botService.LogExceptionAsync(new InvalidOperationException($"API returned an error: {error.Message}"), DateTimeOffset.Now);
+                    return default;
+                }
+            }
+            catch (JsonException errorEx)
+            {
+                throw new InvalidOperationException($"Failed to deserialize body: {body}", errorEx);
+            }
+
+            throw new InvalidOperationException($"Failed to deserialize body: {body}", jsonEx);
         }
     }
 

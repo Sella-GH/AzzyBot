@@ -10,6 +10,7 @@ namespace AzzyBot.Bot.Utilities;
 [SuppressMessage("Roslynator", "RCS1251:Remove unnecessary braces from record declaration", Justification = "Class has to be empty.")]
 [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
 [JsonSerializable(typeof(AzuraAdminStationConfigRecord))] // Generic
+[JsonSerializable(typeof(AzuraErrorRecord))] // Generic
 [JsonSerializable(typeof(AzuraFilesRecord))]
 [JsonSerializable(typeof(AzuraFilesDetailedRecord))] // Generic
 [JsonSerializable(typeof(AzuraHardwareStatsRecord))] // Generic
