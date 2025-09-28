@@ -10,7 +10,7 @@
 - Refactored internal code with some micro optimizations and hardenings around errors
 
 ### Development
-- Deleted unecessary code which is native in .NET
+- Deleted unnecessary code which is native in .NET
 - Miscellaneous action improvements
 - Simplified Json Source Generation
 

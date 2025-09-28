@@ -215,10 +215,10 @@ public static class EmbedBuilder
                 ? DateTimeOffset.FromUnixTimeSeconds(data.Live.BroadcastStart.Value)
                 : DateTimeOffset.Now;
 
-            TimeSpan streamingTime = DateTimeOffset.Now - streamStart;
+            DateTimeOffset streamingTime = DateTimeOffset.Now.AddTicks(-streamStart.Ticks);
 
             message = $"Currently served *live* by the one and only **{data.Live.StreamerName}**";
-            fields.Add("Streaming live since", new($"<t:{streamingTime}>"));
+            fields.Add("Streaming live since", new($"<t:{streamingTime.ToUnixTimeSeconds()}>"));
         }
         else if (isIcecastLive)
         {
