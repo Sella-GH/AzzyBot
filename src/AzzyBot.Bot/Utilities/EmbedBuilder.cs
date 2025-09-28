@@ -732,7 +732,7 @@ public static class EmbedBuilder
         {
             fields.Add("Guild ID", new(guild.Id.ToString(CultureInfo.InvariantCulture)));
             fields.Add("Removal Date", new($"<t:{Converter.ConvertToUnixTime(DateTimeOffset.Now)}>"));
-            fields.Add("Owner", new($"<@!{guild.OwnerId}>"));
+            fields.Add("Owner", new(guild.OwnerId.ToString(CultureInfo.InvariantCulture)));
         }
 
         return CreateBasicEmbed(title, description, DiscordColor.Gold, fields: fields);
