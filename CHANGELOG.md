@@ -14,6 +14,9 @@
 
 ### Fixes
 - Fixed an issue where the bot failed to run the AzuraCastUpdateJobs if an exception occurred
+- 
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02551
 
 ## 2.7.0 - 2025-09-14
 ### General
