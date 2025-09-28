@@ -189,10 +189,18 @@ public static class EmbedBuilder
         };
 
         if (!string.IsNullOrEmpty(data.NowPlaying.Song.Artist))
-            fields.Add(ArtistString, new(data.NowPlaying.Song.Artist.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true));
+        {
+            fields.Add(ArtistString, new(data.NowPlaying.Song.Artist
+                .Replace(",", " &", StringComparison.OrdinalIgnoreCase)
+                .Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true));
+        }
 
         if (!string.IsNullOrEmpty(data.NowPlaying.Song.Album))
-            fields.Add(AlbumString, new(data.NowPlaying.Song.Album.Replace(",", " &", StringComparison.OrdinalIgnoreCase).Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true));
+        {
+            fields.Add(AlbumString, new(data.NowPlaying.Song.Album
+                .Replace(",", " &", StringComparison.OrdinalIgnoreCase)
+                .Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true));
+        }
 
         if (!string.IsNullOrEmpty(data.NowPlaying.Song.Genre))
             fields.Add(GenreString, new(data.NowPlaying.Song.Genre, true));
@@ -202,8 +210,15 @@ public static class EmbedBuilder
 
         if (isLive)
         {
+            // Calculate the streaming time before we use it
+            DateTimeOffset streamStart = (data.Live.BroadcastStart is not null)
+                ? DateTimeOffset.FromUnixTimeSeconds(data.Live.BroadcastStart.Value)
+                : DateTimeOffset.Now;
+
+            TimeSpan streamingTime = DateTimeOffset.Now - streamStart;
+
             message = $"Currently served *live* by the one and only **{data.Live.StreamerName}**";
-            fields.Add("Streaming live since", new($"<t:{Converter.ConvertFromUnixTime(Convert.ToInt64(data.Live.BroadcastStart, CultureInfo.InvariantCulture))}>"));
+            fields.Add("Streaming live since", new($"<t:{streamingTime}>"));
         }
         else if (isIcecastLive)
         {
@@ -390,7 +405,7 @@ public static class EmbedBuilder
         const string notLinux = "To display more information you need to have a linux os.";
         string os = HardwareStats.GetSystemOs;
         string osArch = HardwareStats.GetSystemOsArch;
-        long uptime = Converter.ConvertToUnixTime(HardwareStats.GetSystemUptime);
+        long uptime = HardwareStats.GetSystemUptime.ToUnixTimeSeconds();
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(25)
         {
@@ -543,9 +558,9 @@ public static class EmbedBuilder
             [".NET Version"] = new(SoftwareStats.GetAppDotNetVersion, true),
             ["D#+ Version"] = new(dspVersion, true),
             ["Source Code"] = new(sourceCode, true),
-            ["Compilation Date"] = new($"<t:{Converter.ConvertToUnixTime(compileDate.ToLocalTime())}>", true),
+            ["Compilation Date"] = new($"<t:{compileDate.ToLocalTime().ToUnixTimeSeconds()}>", true),
             ["AzzyBot GitHub Commit"] = new(formattedCommit),
-            ["Uptime"] = new($"<t:{Converter.ConvertToUnixTime(SoftwareStats.GetAppUptime().ToLocalTime())}>"),
+            ["Uptime"] = new($"<t:{SoftwareStats.GetAppUptime().ToLocalTime().ToUnixTimeSeconds()}>"),
             ["License"] = new($"[AGPL-3.0]({UriStrings.GitHubRepoLicenseUrl})", true),
             ["Terms Of Service"] = new($"[Terms Of Service]({UriStrings.GitHubRepoTosUrl})", true),
             ["Privacy Policy"] = new($"[Privacy Policy]({UriStrings.GitHubRepoPrivacyPolicyUrl})", true)
@@ -564,7 +579,7 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(3)
         {
-            ["Release Date"] = new($"<t:{Converter.ConvertToUnixTime(updateDate.ToLocalTime())}>"),
+            ["Release Date"] = new($"<t:{updateDate.ToLocalTime().ToUnixTimeSeconds()}>"),
             ["Your Version"] = new(yourVersion),
             ["New Version"] = new(version)
         };
@@ -708,7 +723,7 @@ public static class EmbedBuilder
         Dictionary<string, AzzyDiscordEmbedRecord> fields = new(4)
         {
             ["Guild ID"] = new(guild.Id.ToString(CultureInfo.InvariantCulture)),
-            ["Creation Date"] = new($"<t:{Converter.ConvertToUnixTime(guild.CreationTimestamp.Date)}>"),
+            ["Creation Date"] = new($"<t:{guild.CreationTimestamp.ToUnixTimeSeconds()}>"),
             ["Owner"] = new($"{owner.DisplayName} ({owner.Id})", true),
             ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture), true)
         };
@@ -731,7 +746,7 @@ public static class EmbedBuilder
         if (guild is not null)
         {
             fields.Add("Guild ID", new(guild.Id.ToString(CultureInfo.InvariantCulture)));
-            fields.Add("Removal Date", new($"<t:{Converter.ConvertToUnixTime(DateTimeOffset.Now)}>"));
+            fields.Add("Removal Date", new($"<t:{DateTimeOffset.Now.ToUnixTimeSeconds()}>"));
             fields.Add("Owner", new(guild.OwnerId.ToString(CultureInfo.InvariantCulture)));
         }
 

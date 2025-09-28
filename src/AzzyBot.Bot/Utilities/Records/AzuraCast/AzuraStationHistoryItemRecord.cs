@@ -46,7 +46,7 @@ public sealed record AzuraStationHistoryExportRecord
     /// <summary>
     /// The time the song was played.
     /// </summary>
-    public TimeSpan PlayedAt { get; set; } = TimeSpan.Zero;
+    public DateTimeOffset PlayedAt { get; set; }
 
     /// <summary>
     /// The basic data for the song that was played.
