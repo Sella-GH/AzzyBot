@@ -1,4 +1,4 @@
-## 2.8.0
+## 2.8.0 - 2025-09-29
 ### General
 - A new daily check added which notifies unused/unconfigured instances and forces the bot to leave these servers after 3 or 7 days
   - This check was added to reduce database clutter and to ensure that the bot is only used in actively managed servers
