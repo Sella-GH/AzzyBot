@@ -391,13 +391,13 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         return GetFromApiAsync<AzuraStatusRecord>(baseUrl, endpoint, noLogging: true);
     }
 
-    public Task<AzuraNowPlayingDataRecord?> GetNowPlayingAsync(Uri baseUrl, int stationId, bool noLogging = false)
+    public Task<AzuraNowPlayingDataRecord?> GetNowPlayingAsync(Uri baseUrl, string apiKey, int stationId, bool noLogging = false)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = $"{AzuraApiEndpoints.NowPlaying}/{stationId}";
 
-        return GetFromApiAsync<AzuraNowPlayingDataRecord>(baseUrl, endpoint, noLogging: noLogging);
+        return GetFromApiAsync<AzuraNowPlayingDataRecord>(baseUrl, endpoint, CreateHeader(apiKey), noLogging);
     }
 
     public Task<AzuraPlaylistRecord?> GetPlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId)
@@ -687,7 +687,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         {
             try
             {
-                nowPlaying = await GetNowPlayingAsync(baseUrl, stationId, true);
+                nowPlaying = await GetNowPlayingAsync(baseUrl, apiKey, stationId, noLogging: true);
             }
             catch (Exception e) when (e is HttpRequestException or InvalidOperationException or JsonException)
             {

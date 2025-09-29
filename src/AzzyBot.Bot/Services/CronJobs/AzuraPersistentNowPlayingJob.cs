@@ -64,8 +64,10 @@ public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayi
             return;
         }
 
-        Uri baseUri = new(Crypto.Decrypt(station.AzuraCast.BaseUrl));
-        AzuraNowPlayingDataRecord? nowPlaying = await _apiService.GetNowPlayingAsync(baseUri, station.StationId);
+        string apiKey = (!string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(station.AzuraCast.AdminApiKey);
+        Uri baseUrl = new(Crypto.Decrypt(station.AzuraCast.BaseUrl));
+
+        AzuraNowPlayingDataRecord? nowPlaying = await _apiService.GetNowPlayingAsync(baseUrl, apiKey, station.StationId);
         if (nowPlaying?.IsOnline is not true)
         {
             // Fail-fast: If there's no message to delete, we can skip directly to the end

@@ -785,7 +785,7 @@ public sealed class AzuraCastCommands
             AzuraNowPlayingDataRecord? nowPlaying;
             try
             {
-                nowPlaying = await _azuraCast.GetNowPlayingAsync(baseUrl, station);
+                nowPlaying = await _azuraCast.GetNowPlayingAsync(baseUrl, apiKey, station);
                 if (nowPlaying is null)
                     throw new HttpRequestException("NowPlaying is null");
             }
@@ -1055,12 +1055,13 @@ public sealed class AzuraCastCommands
                 return;
             }
 
+            string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             Uri baseUrl = new(Crypto.Decrypt(ac.BaseUrl));
 
             AzuraNowPlayingDataRecord? nowPlaying;
             try
             {
-                nowPlaying = await _azuraCast.GetNowPlayingAsync(baseUrl, station);
+                nowPlaying = await _azuraCast.GetNowPlayingAsync(baseUrl, apiKey, station);
                 if (nowPlaying is null)
                     throw new HttpRequestException("NowPlaying is null");
             }
@@ -1073,7 +1074,6 @@ public sealed class AzuraCastCommands
             string? playlistName = null;
             if (acStation.Preferences.ShowPlaylistInNowPlaying)
             {
-                string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
                 IEnumerable<AzuraPlaylistRecord>? playlist = await _azuraCast.GetPlaylistsAsync(baseUrl, apiKey, station);
                 if (playlist is null)
                 {
