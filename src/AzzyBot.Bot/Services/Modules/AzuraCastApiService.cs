@@ -61,6 +61,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
     {
         Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
         string apiUrl = $"{baseUrl}/api";
+        string adminApiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
         List<Uri> apis = new(4)
         {
             new($"{apiUrl}/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Logs}"),
@@ -71,7 +72,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         if (azuraCast.Checks.Updates)
             apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Updates}"));
 
-        IEnumerable<string> missing = await ExecuteApiPermissionCheckAsync(apis, Crypto.Decrypt(azuraCast.AdminApiKey));
+        IEnumerable<string> missing = await ExecuteApiPermissionCheckAsync(apis, adminApiKey);
         if (!missing.Any())
             return;
 
@@ -92,7 +93,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         Uri baseUrl = new(Crypto.Decrypt(station.AzuraCast.BaseUrl));
         string apiUrl = $"{baseUrl}/api";
         int stationId = station.StationId;
-        AzuraAdminStationConfigRecord? config = await GetStationAdminConfigAsync(baseUrl, Crypto.Decrypt(station.AzuraCast.AdminApiKey), stationId);
+        string adminApiKey = Crypto.Decrypt(station.AzuraCast.AdminApiKey);
+        AzuraAdminStationConfigRecord? config = await GetStationAdminConfigAsync(baseUrl, adminApiKey, stationId);
         if (config is null)
             return;
 
@@ -111,8 +113,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         if (station.Checks.FileChanges)
             apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}"));
 
-        string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? station.AzuraCast.AdminApiKey : station.ApiKey;
-        IEnumerable<string> missing = await ExecuteApiPermissionCheckAsync(apis, Crypto.Decrypt(apiKey));
+        string apiKey = (!string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : adminApiKey;
+        IEnumerable<string> missing = await ExecuteApiPermissionCheckAsync(apis, apiKey);
         if (!missing.Any())
             return;
 
