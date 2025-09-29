@@ -163,15 +163,15 @@ public static class EmbedBuilder
         cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"15-Min: **{Math.Round(stats.Cpu.Load[2], 2)}**");
         fields.Add("CPU Load", new(cpuLoads.ToString(), true));
 
-        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Memory.Readable.Total}**");
-        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Used: **{stats.Memory.Readable.Used}**");
-        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Cached: **{stats.Memory.Readable.Cached}**");
-        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Free: **{stats.Memory.Readable.Free}**");
+        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Memory.Total}**");
+        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Used: **{stats.Memory.Used}**");
+        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Cached: **{stats.Memory.Cached}**");
+        memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Free: **{stats.Memory.Free}**");
         fields.Add("Memory Usage", new(memoryUsage.ToString(), true));
 
-        diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Disk.Readable.Total}**");
-        diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Used: **{stats.Disk.Readable.Used}**");
-        diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Free: **{stats.Disk.Readable.Free}**");
+        diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Disk.Total}**");
+        diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Used: **{stats.Disk.Used}**");
+        diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Free: **{stats.Disk.Free}**");
         fields.Add("Disk Usage", new(diskUsage.ToString(), true));
 
         foreach (AzuraNetworkData network in stats.Network)
@@ -179,7 +179,7 @@ public static class EmbedBuilder
             if (fields.Count is 25)
                 break;
 
-            fields.Add($"Interface: {network.InterfaceName}", new($"Received: **{network.Received.Speed.Readable}**\nTransmitted: **{network.Transmitted.Speed.Readable}**", true));
+            fields.Add($"Interface: {network.InterfaceName}", new($"Received: **{network.Received.Speed}**\nTransmitted: **{network.Transmitted.Speed}**", true));
         }
 
         return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: AzuraCastPic.OriginalString, fields: fields);
