@@ -70,7 +70,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         try
         {
             using HttpRequestMessage request = new(HttpMethod.Delete, uri);
-            AddRequestHeaders(request, headers, acceptJson, noCache);
+            AddRequestHeaders(request, headers, acceptJson: acceptJson, noCache: noCache);
 
             using HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
@@ -96,7 +96,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         {
             using HttpClient client = _factory.CreateClient(HttpClientName);
             using HttpRequestMessage request = new(HttpMethod.Get, url);
-            AddRequestHeaders(request, headers, acceptJson, acceptImage, noCache);
+            AddRequestHeaders(request, headers, acceptJson: acceptJson, acceptImage: acceptImage, noCache: noCache);
 
             using HttpResponseMessage response = await client.SendAsync(request);
             response.EnsureSuccessStatusCode();
@@ -190,7 +190,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
             string? responseContent;
             using (HttpRequestMessage request = new(HttpMethod.Get, url))
             {
-                AddRequestHeaders(request, headers, acceptJson, noCache);
+                AddRequestHeaders(request, headers, acceptJson: acceptJson, noCache: noCache);
                 using HttpResponseMessage response = await client.SendAsync(request);
                 status = response.StatusCode;
                 responseContent = await response.Content.ReadAsStringAsync();
@@ -206,7 +206,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
                     retryCount++;
 
                 using HttpRequestMessage retryRequest = new(HttpMethod.Get, url);
-                AddRequestHeaders(retryRequest, headers, acceptJson, noCache);
+                AddRequestHeaders(retryRequest, headers, acceptJson: acceptJson, noCache: noCache);
 
                 using HttpResponseMessage response = await client.SendAsync(retryRequest);
                 status = response.StatusCode;
@@ -247,7 +247,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
                 Content = httpContent
             };
 
-            AddRequestHeaders(request, headers, acceptJson, noCache);
+            AddRequestHeaders(request, headers, acceptJson: acceptJson, noCache: noCache);
 
             using HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
@@ -278,7 +278,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
                 Content = httpContent
             };
 
-            AddRequestHeaders(request, headers, acceptJson, noCache);
+            AddRequestHeaders(request, headers, acceptJson: acceptJson, noCache: noCache);
 
             using HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
@@ -313,7 +313,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
                 Content = httpContent
             };
 
-            AddRequestHeaders(request, headers, acceptJson, noCache);
+            AddRequestHeaders(request, headers, acceptJson: acceptJson, noCache: noCache);
 
             using HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
