@@ -4,6 +4,11 @@
   - This check was added to reduce database clutter and to ensure that the bot is only used in actively managed servers
   - Maybe server counts of the public bot will go down after this but this is negligible
 
+### Additions
+- A new setting was added to specify a channel id where the bot will send a copy of its `admin send-bot-wide-message` message to
+  - This setting is optional and does not break your existing setup, therefore it's not shown in the default settings.json
+  - If you want to use it take a look in the [Wiki](https://github.com/Sella-GH/AzzyBot/wiki/Azzy-2.0.0-AzzyBot-Settings)
+
 ### Improvements
 - Added support for https://github.com/AzuraCast/AzuraCast/pull/8150
 - Discord Uri protocols now default to https instead of http if no protocol is specified
