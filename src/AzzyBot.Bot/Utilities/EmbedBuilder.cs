@@ -45,7 +45,8 @@ public static class EmbedBuilder
 
     #endregion Constants
 
-    private static DiscordEmbedBuilder CreateBasicEmbed(string title, string? description = null, DiscordColor? color = null, EmbedAuthorStruct? author = null, Uri? thumbnailUrl = null, string? footerText = null, Uri? url = null, Dictionary<string, AzzyDiscordEmbedRecord>? fields = null)
+    [SuppressMessage("Usage", "CA2234:Pass system uri objects instead of strings", Justification = "To attach local discord files and not an Uri.")]
+    private static DiscordEmbedBuilder CreateBasicEmbed(string title, string? description = null, DiscordColor? color = null, EmbedAuthorStruct? author = null, string? thumbnailUrl = null, string? footerText = null, Uri? url = null, Dictionary<string, AzzyDiscordEmbedRecord>? fields = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(title);
 
@@ -61,7 +62,17 @@ public static class EmbedBuilder
             builder.Color = color.Value;
 
         if (thumbnailUrl is not null)
-            builder.WithThumbnail(thumbnailUrl);
+        {
+            if (thumbnailUrl.StartsWith("attachment://", StringComparison.OrdinalIgnoreCase))
+            {
+                builder.WithThumbnail(thumbnailUrl);
+            }
+            else
+            {
+                Uri thumbnailUri = new(thumbnailUrl);
+                builder.WithThumbnail(thumbnailUri);
+            }
+        }
 
         if (author is not null)
             builder.WithAuthor(author.Value.Name, author.Value.Url, author.Value.IconUrl);
@@ -171,7 +182,7 @@ public static class EmbedBuilder
             fields.Add($"Interface: {network.InterfaceName}", new($"Received: **{network.Received.Speed.Readable}**\nTransmitted: **{network.Transmitted.Speed.Readable}**", true));
         }
 
-        return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: AzuraCastPic, fields: fields);
+        return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: AzuraCastPic.OriginalString, fields: fields);
     }
 
     public static DiscordEmbed BuildAzuraCastMusicNowPlayingEmbed(AzuraNowPlayingDataRecord data, string? playlistName = null)
@@ -299,7 +310,7 @@ public static class EmbedBuilder
         if (update.CanSwitchToStable)
             fields.Add("Stable Switch Available?", new("Yes"));
 
-        return CreateBasicEmbed(title, description, DiscordColor.White, thumbnailUrl: AzuraCastPic, fields: fields);
+        return CreateBasicEmbed(title, description, DiscordColor.White, thumbnailUrl: AzuraCastPic.OriginalString, fields: fields);
     }
 
     public static DiscordEmbed BuildAzuraCastUpdatesChangelogEmbed(bool isRolling, string? onlineChangelog = null)
@@ -401,6 +412,8 @@ public static class EmbedBuilder
 
     public static async Task<DiscordEmbed> BuildAzzyHardwareStatsEmbedAsync(Uri avaUrl, int ping)
     {
+        ArgumentNullException.ThrowIfNull(avaUrl);
+
         const string title = "AzzyBot Hardware Stats";
         const string notLinux = "To display more information you need to have a linux os.";
         string os = HardwareStats.GetSystemOs;
@@ -424,7 +437,7 @@ public static class EmbedBuilder
             fields.Add("Discord Ping", new($"{ping} ms", true));
 
         if (!HardwareStats.CheckIfLinuxOs)
-            return CreateBasicEmbed(title, color: DiscordColor.Orange, footerText: notLinux, fields: fields);
+            return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl.OriginalString, footerText: notLinux, fields: fields);
 
         Dictionary<int, double> cpuUsage = await HardwareStats.GetSystemCpuAsync();
         Dictionary<string, double> cpuTemp = await HardwareStats.GetSystemCpuTempAsync();
@@ -492,7 +505,7 @@ public static class EmbedBuilder
             }
         }
 
-        return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl, fields: fields);
+        return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl.OriginalString, fields: fields);
     }
 
     public static DiscordEmbed BuildAzzyHelpEmbed(AzzyHelpRecord command)
@@ -566,7 +579,7 @@ public static class EmbedBuilder
             ["Privacy Policy"] = new($"[Privacy Policy]({UriStrings.GitHubRepoPrivacyPolicyUrl})", true)
         };
 
-        return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl, fields: fields);
+        return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl.OriginalString, fields: fields);
     }
 
     public static DiscordEmbed BuildAzzyUpdatesAvailableEmbed(string version, in DateTimeOffset updateDate, Uri url)
@@ -728,11 +741,7 @@ public static class EmbedBuilder
             ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture), true)
         };
 
-        Uri? iconUrl = null;
-        if (guild.IconUrl is not null)
-            iconUrl = new(guild.IconUrl);
-
-        return CreateBasicEmbed(title, description, DiscordColor.Gold, thumbnailUrl: iconUrl, fields: fields);
+        return CreateBasicEmbed(title, description, DiscordColor.Gold, thumbnailUrl: guild.IconUrl, fields: fields);
     }
 
     public static DiscordEmbed BuildGuildRemovedEmbed(ulong guildId, DiscordGuild? guild = null)
@@ -802,6 +811,6 @@ public static class EmbedBuilder
 
         fields.Add("Duration", new($"{progressBar} `[{songElapsed} / {songDuration}]`"));
 
-        return CreateBasicEmbed(title, color: DiscordColor.Aquamarine, thumbnailUrl: track.ArtworkUri, url: track.Uri, fields: fields);
+        return CreateBasicEmbed(title, color: DiscordColor.Aquamarine, thumbnailUrl: track.ArtworkUri?.OriginalString ?? string.Empty, url: track.Uri, fields: fields);
     }
 }

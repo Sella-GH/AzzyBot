@@ -1106,13 +1106,16 @@ public sealed class AzuraCastCommands
             string filePath = Path.Combine(Path.GetTempPath(), $"{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{ac.GuildId}-{ac.Id}-{acStation.Id}_{artId}");
             filePath = await _azuraCast.DownloadSongArtworkAsync(new(artUri), apiKey, filePath);
 
-            FileStream artStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
-            builder.AddFile(artId, artStream);
-
-            // Get the file type from the path and set it to the embed
+            // Get the file type from the path
             int filePos = filePath.LastIndexOf('.') + 1;
             string fileType = filePath[filePos..];
-            nowPlaying.NowPlaying.Song.Art = $"attachement://{artId}.{fileType}";
+            string fileName = $"{artId}.{fileType}";
+
+            FileStream artStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
+            builder.AddFile(fileName, artStream);
+
+            // Also replace it in the embed to get the right file name
+            nowPlaying.NowPlaying.Song.Art = $"attachment://{fileName}";
             embed = EmbedBuilder.BuildAzuraCastMusicNowPlayingEmbed(nowPlaying, playlistName);
             builder.AddEmbed(embed);
 
