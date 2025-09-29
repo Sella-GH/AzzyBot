@@ -338,6 +338,14 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         await _webService.DownloadAsync(url, downloadPath, CreateHeader(apiKey), acceptJson: true);
     }
 
+    public Task<string> DownloadSongArtworkAsync(Uri url, string apiKey, string downloadPath)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentException.ThrowIfNullOrWhiteSpace(downloadPath);
+
+        return _webService.DownloadAsync(url, downloadPath, CreateHeader(apiKey), acceptImage: true);
+    }
+
     public async Task<IEnumerable<AzuraFilesRecord>> GetFilesLocalAsync(int guildId, int azuraCastId, int databaseId, int stationId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(azuraCastId);

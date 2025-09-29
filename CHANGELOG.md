@@ -11,6 +11,7 @@
 
 ### Improvements
 - Added support for https://github.com/AzuraCast/AzuraCast/pull/8150
+  - For `music now-playing` this means we now download the song artwork temporarily so we can deliver it to you
 - Discord Uri protocols now default to https instead of http if no protocol is specified
 - Refactored internal code with some micro optimizations and hardenings around errors
 

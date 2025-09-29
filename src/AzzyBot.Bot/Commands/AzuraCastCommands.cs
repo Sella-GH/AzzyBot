@@ -1085,9 +1085,41 @@ public sealed class AzuraCastCommands
                 playlistName = playlist.Where(p => p.Name == nowPlaying.NowPlaying.Playlist).Select(static p => p.Name).FirstOrDefault();
             }
 
-            DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicNowPlayingEmbed(nowPlaying, playlistName);
+            await using DiscordMessageBuilder builder = new();
+            DiscordEmbed embed;
+            if (nowPlaying.Station.IsPublic)
+            {
+                // This is the easy way because we just grab and smack it
+                embed = EmbedBuilder.BuildAzuraCastMusicNowPlayingEmbed(nowPlaying, playlistName);
+                builder.AddEmbed(embed);
+                await context.EditResponseAsync(builder);
 
-            await context.EditResponseAsync(embed);
+                return;
+            }
+
+            // Calculate the position of the artwork id
+            string artUri = nowPlaying.NowPlaying.Song.Art;
+            int artPos = artUri.LastIndexOf('/') + 1;
+            string artId = artUri[artPos..];
+
+            // Create and then replace the file path, because we don't know if it's only .jpg or else
+            string filePath = Path.Combine(Path.GetTempPath(), $"{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{ac.GuildId}-{ac.Id}-{acStation.Id}_{artId}");
+            filePath = await _azuraCast.DownloadSongArtworkAsync(new(artUri), apiKey, filePath);
+
+            FileStream artStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
+            builder.AddFile(artId, artStream);
+
+            // Get the file type from the path and set it to the embed
+            int filePos = filePath.LastIndexOf('.') + 1;
+            string fileType = filePath[filePos..];
+            nowPlaying.NowPlaying.Song.Art = $"attachement://{artId}.{fileType}";
+            embed = EmbedBuilder.BuildAzuraCastMusicNowPlayingEmbed(nowPlaying, playlistName);
+            builder.AddEmbed(embed);
+
+            await context.EditResponseAsync(builder);
+
+            await artStream.DisposeAsync();
+            FileOperations.DeleteFile(filePath);
         }
 
         [Command("search-song"), Description("Search for a song on the selected station."), AzuraCastDiscordChannelCheck]

@@ -29,6 +29,12 @@ public sealed record AzuraStationRecord
     public required string Shortcode { get; init; }
 
     /// <summary>
+    /// If the station is public (i.e. should be shown in listings of all stations)
+    /// </summary>
+    [JsonPropertyName("is_public")]
+    public required bool IsPublic { get; init; }
+
+    /// <summary>
     /// A list of all the station's mounts
     /// </summary>
     [JsonPropertyName("mounts")]

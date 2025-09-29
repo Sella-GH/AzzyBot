@@ -23,7 +23,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
 {
     private readonly IHttpClientFactory _factory = factory;
     private readonly ILogger _logger = logger;
-    private const string MediaType = MediaTypeNames.Application.Json;
+    private const string MediaTypeJson = MediaTypeNames.Application.Json;
     private static readonly string HttpClientName = SoftwareStats.GetAppName;
 
     public async Task<IReadOnlyList<bool>> CheckForApiPermissionsAsync(IReadOnlyList<Uri> urls, IReadOnlyDictionary<string, string> headers)
@@ -41,7 +41,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
             try
             {
                 using HttpRequestMessage request = new(HttpMethod.Get, url);
-                AddRequestHeaders(request, headers, true, true);
+                AddRequestHeaders(request, headers, acceptJson: true, noCache: true);
 
                 using HttpResponseMessage? response = await client.SendAsync(request);
                 success = response.IsSuccessStatusCode;
@@ -90,20 +90,37 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         }
     }
 
-    public async Task DownloadAsync(Uri url, string downloadPath, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    public async Task<string> DownloadAsync(Uri url, string downloadPath, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool acceptImage = false, bool noCache = true)
     {
         try
         {
             using HttpClient client = _factory.CreateClient(HttpClientName);
             using HttpRequestMessage request = new(HttpMethod.Get, url);
-            AddRequestHeaders(request, headers, acceptJson, noCache);
+            AddRequestHeaders(request, headers, acceptJson, acceptImage, noCache);
 
             using HttpResponseMessage response = await client.SendAsync(request);
             response.EnsureSuccessStatusCode();
 
+            string contentType = response.Content.Headers.ContentType?.MediaType ?? string.Empty;
+            if (acceptImage)
+            {
+                downloadPath += contentType switch
+                {
+                    "image/jpeg" or "image/jpg" => ".jpg",
+                    "image/png" => ".png",
+                    "image/gif" => ".gif",
+                    "image/bmp" => ".bmp",
+                    "image/tiff" => ".tiff",
+                    "image/webp" => ".webp",
+                    _ => string.Empty
+                };
+            }
+
             await using Stream contentStream = await response.Content.ReadAsStreamAsync();
             await using FileStream fileStream = new(downloadPath, FileMode.Create, FileAccess.Write, FileShare.None);
             await contentStream.CopyToAsync(fileStream);
+
+            return downloadPath;
         }
         catch (InvalidOperationException)
         {
@@ -224,7 +241,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         try
         {
             using HttpClient client = _factory.CreateClient(HttpClientName);
-            using HttpContent httpContent = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaType);
+            using HttpContent httpContent = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaTypeJson);
             using HttpRequestMessage request = new(HttpMethod.Post, url)
             {
                 Content = httpContent
@@ -255,7 +272,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         try
         {
             using HttpClient client = _factory.CreateClient(HttpClientName);
-            using HttpContent httpContent = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaType);
+            using HttpContent httpContent = new StringContent(content ?? string.Empty, Encoding.UTF8, MediaTypeJson);
             using HttpRequestMessage request = new(HttpMethod.Put, url)
             {
                 Content = httpContent
@@ -290,7 +307,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
             string json = JsonSerializer.Serialize(new($"{filePath}/{fileName}", base64String), JsonSourceGen.Default.AzuraFileUploadRecord);
 
             using HttpClient client = _factory.CreateClient(HttpClientName);
-            using HttpContent httpContent = new StringContent(json, Encoding.UTF8, MediaType);
+            using HttpContent httpContent = new StringContent(json, Encoding.UTF8, MediaTypeJson);
             using HttpRequestMessage request = new(HttpMethod.Post, url)
             {
                 Content = httpContent
@@ -318,10 +335,16 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         }
     }
 
-    private static void AddRequestHeaders(HttpRequestMessage message, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
+    private static void AddRequestHeaders(HttpRequestMessage message, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool acceptImage = false, bool noCache = true)
     {
+        if (acceptImage && acceptJson)
+            throw new ArgumentException("Cannot accept both image and JSON content types.");
+
+        if (acceptImage)
+            message.Headers.Accept.Add(new("image/*")); // Manual to allow all image types
+
         if (acceptJson)
-            message.Headers.Accept.Add(new(MediaType));
+            message.Headers.Accept.Add(new(MediaTypeJson));
 
         if (noCache)
         {
