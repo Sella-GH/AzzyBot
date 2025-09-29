@@ -25,7 +25,8 @@ using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
 using DSharpPlus.Entities;
-
+using DSharpPlus.EventArgs;
+using DSharpPlus.Interactivity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -199,8 +200,25 @@ public sealed class AdminCommands
         )
         {
             ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
 
             _logger.CommandRequested(nameof(SendBotWideMessageAsync), context.User.GlobalName);
+
+            DiscordTextInputComponent textInput = new($"textInput_{nameof(SendBotWideMessageAsync)}_{context.Guild.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}")
+            {
+                Placeholder = "Your ad could be here!",
+                MaximumLength = 2000,
+                MinimumLength = 1,
+                Required = true,
+                Style = DiscordTextInputStyle.Paragraph
+            };
+
+            DiscordModalBuilder modal = new();
+            modal.WithTitle("Send Bot Wide Message");
+            modal.WithCustomId($"modal_{nameof(SendBotWideMessageAsync)}_{context.Guild.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}");
+            modal.AddTextInput(textInput, "Your Message");
+
+            await context.RespondWithModalAsync(modal);
 
             if (string.IsNullOrWhiteSpace(message))
             {
