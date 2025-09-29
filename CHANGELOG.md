@@ -21,6 +21,8 @@
 
 ### Fixes
 - Fixed an issue where the bot failed to run the AzuraCastUpdateJobs if an exception occurred
+- Fixed an issue which prevented the command `azuracast force-api-permission-check` from running
+- Fixed an issue which let the api permissions check run only on admin nodes
 
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02551

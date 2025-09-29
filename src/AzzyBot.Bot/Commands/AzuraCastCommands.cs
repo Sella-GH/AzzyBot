@@ -159,7 +159,7 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceApiPermissionCheckAsync), context.User.GlobalName);
 
-            AzuraCastEntity? dAzuraCast = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadStations: true, loadStationChecks: true);
+            AzuraCastEntity? dAzuraCast = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true, loadStationChecks: true);
             if (dAzuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
