@@ -9,6 +9,7 @@ using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Structs;
+using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
 
@@ -28,12 +29,9 @@ public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSet
 
     public async Task<IReadOnlyDictionary<GuildEntity, AzzyInactiveGuildStruct>> CheckUnusedGuildsAsync()
     {
-        _logger.LogWarning("Checking for unused guilds...");
-
         IEnumerable<GuildEntity> guilds = await _dbActions.ReadGuildsAsync(loadGuildPrefs: true);
         if (!guilds.Any())
         {
-            _logger.LogError("No guilds found in database.");
             return new Dictionary<GuildEntity, AzzyInactiveGuildStruct>();
         }
 
@@ -41,24 +39,17 @@ public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSet
         HashSet<GuildEntity> noConfig = [.. guilds.Where(g => !g.ConfigSet && g.UniqueId != _settings.ServerId)];
         HashSet<GuildEntity> allCombined = [.. noConfig.Union(noLegals)];
 
-        _logger.LogWarning($"Found {noLegals.Count} guilds without legals accepted.");
-        _logger.LogWarning($"Found {noConfig.Count} guilds without config set.");
-        _logger.LogWarning($"Found {allCombined.Count} guilds without legals or config.");
-
         Dictionary<GuildEntity, AzzyInactiveGuildStruct> victims = [];
         foreach (GuildEntity guild in allCombined)
         {
             DiscordGuild? dGuild = _botService.GetDiscordGuild(guild.UniqueId);
             if (dGuild is null)
             {
-                _logger.LogError($"Guild {guild.UniqueId} not found in Discord client. Skipping...");
                 continue;
             }
 
             AzzyInactiveGuildStruct guildStruct = new(guild: dGuild, config: noConfig.Contains(guild), legals: noLegals.Contains(guild));
             victims.Add(guild, guildStruct);
-
-            _logger.LogWarning($"Guild {guild.UniqueId} marked as victim (NoConfig: {guildStruct.NoConfig}, NoLegals: {guildStruct.NoLegals})");
         }
 
         await _dbActions.UpdateAzzyBotAsync(lastGuildReminder: true);
@@ -66,12 +57,13 @@ public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSet
         return victims;
     }
 
-    public async Task DeleteUnusedGuildsAsync(IReadOnlyDictionary<GuildEntity, AzzyInactiveGuildStruct> guilds)
+    public async Task<int> DeleteUnusedGuildsAsync(IReadOnlyDictionary<GuildEntity, AzzyInactiveGuildStruct> guilds)
     {
         ArgumentNullException.ThrowIfNull(guilds);
         ArgumentOutOfRangeException.ThrowIfLessThan(guilds.Count, 1);
 
         StringBuilder sb = new();
+        int count = 0;
         foreach (KeyValuePair<GuildEntity, AzzyInactiveGuildStruct> guild in guilds)
         {
             sb.AppendLine(GeneralStrings.ReminderForceLeaveAnnouncement);
@@ -87,34 +79,36 @@ public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSet
             if (guild.Key.Preferences.AdminNotifyChannelId is not 0)
             {
                 result = await _botService.SendMessageAsync(guild.Key.Preferences.AdminNotifyChannelId, content: sb.ToString());
-                _logger.LogWarning($"Sent unused guild deletion notification to admin channel {guild.Key.Preferences.AdminNotifyChannelId} in guild {guild.Key.UniqueId}.");
+                _logger.BackgroundServiceGuildDeletionNotified(guild.Key.Preferences.AdminNotifyChannelId, guild.Key.UniqueId);
             }
 
             if (!result)
             {
                 result = await _botService.SendMessageToOwnerAsync(guild.Key.UniqueId, content: sb.ToString());
-                _logger.LogWarning($"Sent unused guild deletion notification to owner of guild {guild.Key.UniqueId}.");
+                _logger.BackgroundServiceGuildDeletionNotifiedOwner(guild.Key.UniqueId);
             }
 
             if (!result)
             {
-                _logger.LogError($"Unable to notify admins or owner of unused guild about leaving: {guild.Value.Guild.Name} ({guild.Value.Guild.Id})");
+                _logger.UnableToNotifyUnusedGuildDeleted(guild.Value.Guild.Name, guild.Key.UniqueId);
                 continue;
             }
 
             await guild.Value.Guild.LeaveAsync();
             sb.Clear();
-
-            _logger.LogWarning($"Deleted unused guild {guild.Value.Guild.Name} ({guild.Value.Guild.Id}) from database.");
+            count++;
         }
+
+        return count;
     }
 
     [SuppressMessage("Style", "IDE0045:Convert to conditional expression", Justification = "We do not nest ternary expressions.")]
-    public async Task NotifyUnusedGuildsAsync(IReadOnlyDictionary<GuildEntity, AzzyInactiveGuildStruct> guilds)
+    public async Task<int> NotifyUnusedGuildsAsync(IReadOnlyDictionary<GuildEntity, AzzyInactiveGuildStruct> guilds)
     {
         ArgumentNullException.ThrowIfNull(guilds);
         ArgumentOutOfRangeException.ThrowIfLessThan(guilds.Count, 1);
 
+        int count = 0;
         foreach (KeyValuePair<GuildEntity, AzzyInactiveGuildStruct> guild in guilds)
         {
             DateTimeOffset leaveDate;
@@ -133,23 +127,25 @@ public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSet
             if (guild.Key.Preferences.AdminNotifyChannelId is not 0)
             {
                 result = await _botService.SendMessageAsync(guild.Key.Preferences.AdminNotifyChannelId, embeds: [embed]);
-                _logger.LogWarning($"Sent unused guild notification to admin channel {guild.Key.Preferences.AdminNotifyChannelId} in guild {guild.Key.UniqueId}.");
+                _logger.BackgroundServiceGuildUnusedNotified(guild.Key.Preferences.AdminNotifyChannelId, guild.Key.UniqueId);
             }
 
             if (!result)
             {
                 result = await _botService.SendMessageToOwnerAsync(guild.Key.UniqueId, embeds: [embed]);
-                _logger.LogWarning($"Sent unused guild notification to owner of guild {guild.Key.UniqueId}.");
+                _logger.BackgroundServiceGuildUnusedNotifiedOwner(guild.Key.UniqueId);
             }
 
             if (!result)
             {
-                _logger.LogError($"Unable to notify admins or owner of unused guild {guild.Key.UniqueId}");
+                _logger.UnableToNotifyUnusedGuildUnused(guild.Value.Guild.Name, guild.Key.UniqueId);
                 continue;
             }
 
             await _dbActions.UpdateGuildAsync(guild.Key.UniqueId, reminderLeaveDate: leaveDate);
-            _logger.LogWarning($"Notified guild {guild.Key.UniqueId} of being unused.");
+            count++;
         }
+
+        return count;
     }
 }
