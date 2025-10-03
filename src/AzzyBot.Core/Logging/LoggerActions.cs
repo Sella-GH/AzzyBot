@@ -18,6 +18,18 @@ public static partial class LoggerActions
     [LoggerMessage(11, LogLevel.Debug, "Logfile cleanup completed, {count} logfiles deleted")]
     public static partial void LogfileCleanupComplete(this ILogger logger, int count);
 
+    [LoggerMessage(12, LogLevel.Debug, "Notified guild {guildId} in channel {channelId} about deletion")]
+    public static partial void BackgroundServiceGuildDeletionNotified(this ILogger logger, ulong guildId, ulong channelId);
+
+    [LoggerMessage(13, LogLevel.Debug, "Notified owner of guild {guildId} about deletion")]
+    public static partial void BackgroundServiceGuildDeletionNotifiedOwner(this ILogger logger, ulong guildId);
+
+    [LoggerMessage(14, LogLevel.Debug, "Notified guild {guildId} in channel {channelId} about unused guild")]
+    public static partial void BackgroundServiceGuildUnusedNotified(this ILogger logger, ulong guildId, ulong channelId);
+
+    [LoggerMessage(15, LogLevel.Debug, "Notified owner of guild {guildId} about unused guild")]
+    public static partial void BackgroundServiceGuildUnusedNotifiedOwner(this ILogger logger, ulong guildId);
+
     [LoggerMessage(23, LogLevel.Debug, "Creating work items for: {item}")]
     public static partial void BackgroundServiceWorkItem(this ILogger logger, string item);
 
@@ -78,11 +90,17 @@ public static partial class LoggerActions
     [LoggerMessage(105, LogLevel.Information, "Database Reencryption completed")]
     public static partial void DatabaseReencryptionComplete(this ILogger logger);
 
-    [LoggerMessage(106, LogLevel.Information, "Starting database cleanup of guilds.")]
-    public static partial void DatabaseCleanupStart(this ILogger logger);
+    [LoggerMessage(106, LogLevel.Information, "Starting database cleanup of orphaned guilds.")]
+    public static partial void DatabaseOrphanedGuildsStart(this ILogger logger);
 
-    [LoggerMessage(107, LogLevel.Information, "Database cleanup of guilds completed, {count} guilds were deleted.")]
-    public static partial void DatabaseCleanupComplete(this ILogger logger, int count);
+    [LoggerMessage(107, LogLevel.Information, "Database cleanup of orphaned guilds completed, {count} guilds were deleted.")]
+    public static partial void DatabaseOrphanedGuildsComplete(this ILogger logger, int count);
+
+    [LoggerMessage(108, LogLevel.Information, "Starting database cleanup of unused guilds.")]
+    public static partial void DatabaseUnusedGuildsStart(this ILogger logger);
+
+    [LoggerMessage(109, LogLevel.Information, "Database cleanup of unused guilds completed, {notified} guilds were notified, {deleted} were deleted.")]
+    public static partial void DatabaseUnusedGuildsComplete(this ILogger logger, int notified, int deleted);
 
     [LoggerMessage(110, LogLevel.Information, "AzzyBot joined the following Guild: {guild}")]
     public static partial void GuildCreated(this ILogger logger, string guild);
@@ -161,6 +179,12 @@ public static partial class LoggerActions
 
     [LoggerMessage(240, LogLevel.Warning, "Database concurrency exception occurred: ")]
     public static partial void DatabaseConcurrencyException(this ILogger logger, Exception ex);
+
+    [LoggerMessage(250, LogLevel.Warning, "Unable to notify admins or owner of guild {guildName} ({guildId}) about leaving")]
+    public static partial void UnableToNotifyUnusedGuildDeleted(this ILogger logger, string guildName, ulong guildId);
+
+    [LoggerMessage(251, LogLevel.Warning, "Unable to notify admins or owner of guild {guildName} ({guildId}) about being unused")]
+    public static partial void UnableToNotifyUnusedGuildUnused(this ILogger logger, string guildName, ulong guildId);
 
     [LoggerMessage(290, LogLevel.Warning, "Latest online version of the bot is empty")]
     public static partial void OnlineVersionEmpty(this ILogger logger);

@@ -6,19 +6,25 @@ using System.Threading.Tasks;
 
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities.Structs;
+using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
+
+using Microsoft.Extensions.Logging;
 
 using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzzyBotInactiveGuildJob(CoreService coreService, DiscordBotService botService) : IJob
+public sealed class AzzyBotInactiveGuildJob(ILogger<AzzyBotInactiveGuildJob> logger, CoreService coreService, DiscordBotService botService) : IJob
 {
+    private readonly ILogger<AzzyBotInactiveGuildJob> _logger = logger;
     private readonly CoreService _coreService = coreService;
     private readonly DiscordBotService _botService = botService;
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
     {
+        _logger.DatabaseUnusedGuildsStart();
+
         try
         {
             IReadOnlyDictionary<GuildEntity, AzzyInactiveGuildStruct> unusedGuilds = await _coreService.CheckUnusedGuildsAsync();

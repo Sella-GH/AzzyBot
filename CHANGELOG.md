@@ -1,19 +1,33 @@
-## 2.8.0
+## 2.8.0 - 2025-09-29
 ### General
 - A new daily check added which notifies unused/unconfigured instances and forces the bot to leave these servers after 3 or 7 days
   - This check was added to reduce database clutter and to ensure that the bot is only used in actively managed servers
   - Maybe server counts of the public bot will go down after this but this is negligible
 
+### Additions
+- A new setting was added to specify a channel id where the bot will send a copy of its `admin send-bot-wide-message` message to
+  - This setting is optional and does not break your existing setup, therefore it's not shown in the default settings.json
+  - If you want to use it take a look in the [Wiki](https://github.com/Sella-GH/AzzyBot/wiki/Azzy-2.0.0-AzzyBot-Settings)
+
 ### Improvements
 - Added support for https://github.com/AzuraCast/AzuraCast/pull/8150
+  - For `music now-playing` this means we now download the song artwork temporarily so we can deliver it to you
 - Discord Uri protocols now default to https instead of http if no protocol is specified
-- Refactored internal code with some micro optimizations
+- Refactored internal code with some micro optimizations and hardenings around errors
 
 ### Development
+- Deleted unnecessary code which is native in .NET
 - Miscellaneous action improvements
+- Simplified Json Source Generation
 
 ### Fixes
 - Fixed an issue where the bot failed to run the AzuraCastUpdateJobs if an exception occurred
+- Fixed an issue which prevented the command `azuracast force-api-permission-check` from running
+- Fixed an issue which let the api permissions check run only on admin nodes
+- Fixed an issue which broke the `azuracast hardware-stats` command
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02551
 
 ## 2.7.0 - 2025-09-14
 ### General

@@ -284,7 +284,15 @@ public sealed class AdminCommands
                 }
             }
 
-            _logger.BotWideMessageSent(guilds.Count);
+            if (_settings.BotAnnouncementChannelId is not 0)
+            {
+                await _botService.SendMessageAsync(_settings.BotAnnouncementChannelId, newMessage);
+                _logger.BotWideMessageSent(guilds.Count + 1);
+            }
+            else
+            {
+                _logger.BotWideMessageSent(guilds.Count);
+            }
         }
     }
 }

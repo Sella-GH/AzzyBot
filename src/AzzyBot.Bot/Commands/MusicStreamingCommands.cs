@@ -269,18 +269,29 @@ public sealed class MusicStreamingCommands
                 return;
             }
 
-            AzuraCastEntity? azura = await _dbActions.ReadAzuraCastAsync(context.Guild.Id);
-            if (azura is null)
+            AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadStations: true);
+            if (ac is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
                 await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
                 return;
             }
 
+            AzuraCastStationEntity? acStation = ac.Stations.FirstOrDefault(s => s.StationId == station);
+            if (acStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, ac.Id, station);
+                await context.EditResponseAsync(GeneralStrings.StationNotFound);
+                return;
+            }
+
+            string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
+            Uri baseUrl = new(Crypto.Decrypt(ac.BaseUrl));
+
             AzuraNowPlayingDataRecord? nowPlaying;
             try
             {
-                nowPlaying = await _azuraCast.GetNowPlayingAsync(new(Crypto.Decrypt(azura.BaseUrl)), station);
+                nowPlaying = await _azuraCast.GetNowPlayingAsync(baseUrl,apiKey, station);
                 if (nowPlaying is null)
                     throw new HttpRequestException("NowPlaying is null.");
             }

@@ -6,7 +6,8 @@ We expect that all users of the software, if they are interested in taking advan
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 2.7.x | :white_check_mark: |
+| 2.8.x | :white_check_mark: |
+| 2.7.x | :x: |
 | 2.6.x | :x: |
 | 2.5.x | :x: |
 | 2.4.x | :x: |

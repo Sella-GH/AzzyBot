@@ -77,7 +77,7 @@ public sealed record AzuraNowPlayingLiveRecord
     /// The start timestamp of the current broadcast, if one is available.
     /// </summary>
     [JsonPropertyName("broadcast_start")]
-    public int? BroadcastStart { get; init; }
+    public long? BroadcastStart { get; init; }
 
     /// <summary>
     /// URL to the streamer artwork (if available).

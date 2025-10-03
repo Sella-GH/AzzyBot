@@ -615,14 +615,18 @@ public sealed class ConfigCommands
                             await _azuraCastPing.PingInstanceAsync(ac);
                             break;
                         }
-
-                        if (stationRecord is null)
+                        catch (InvalidOperationException)
                         {
-                            await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                            // This can happen when the permissions are not sufficient to access the station
+                            await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I can't access the **station** ({station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}. Maybe also check if the API key is valid.");
                             continue;
                         }
 
-                        stationNames.Add(station.Id, stationRecord.Name);
+                        string stationName = stationRecord?.Name ?? "Station unaccessible.";
+                        if (stationRecord is null)
+                            await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+
+                        stationNames.Add(station.Id, stationName);
 
                         int stationBotRequests = await _dbActions.ReadAzuraCastStationRequestsCountAsync(guildId, station.StationId);
                         stationRequests.Add(station.Id, stationBotRequests);

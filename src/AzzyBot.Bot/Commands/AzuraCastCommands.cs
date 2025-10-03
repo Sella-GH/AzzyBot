@@ -159,7 +159,7 @@ public sealed class AzuraCastCommands
 
             _logger.CommandRequested(nameof(ForceApiPermissionCheckAsync), context.User.GlobalName);
 
-            AzuraCastEntity? dAzuraCast = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadStations: true, loadStationChecks: true);
+            AzuraCastEntity? dAzuraCast = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true, loadStationChecks: true);
             if (dAzuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
@@ -588,11 +588,11 @@ public sealed class AzuraCastCommands
             AzuraUpdateRecord? update = null;
             try
             {
-                update = JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.AzuraUpdateRecord);
+                update = JsonSerializer.Deserialize(body, JsonSourceGen.Default.AzuraUpdateRecord);
             }
             catch (JsonException ex)
             {
-                AzuraUpdateErrorRecord? errorRecord = JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.AzuraUpdateErrorRecord) ?? throw new InvalidOperationException($"Failed to deserialize body: {body}", ex);
+                AzuraUpdateErrorRecord? errorRecord = JsonSerializer.Deserialize(body, JsonSourceGen.Default.AzuraUpdateErrorRecord) ?? throw new InvalidOperationException($"Failed to deserialize body: {body}", ex);
                 await context.EditResponseAsync(GeneralStrings.InstanceUpdateError);
                 await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"Failed to check for updates: {errorRecord.FormattedMessage}");
                 return;
@@ -785,7 +785,7 @@ public sealed class AzuraCastCommands
             AzuraNowPlayingDataRecord? nowPlaying;
             try
             {
-                nowPlaying = await _azuraCast.GetNowPlayingAsync(baseUrl, station);
+                nowPlaying = await _azuraCast.GetNowPlayingAsync(baseUrl, apiKey, station);
                 if (nowPlaying is null)
                     throw new HttpRequestException("NowPlaying is null");
             }
@@ -938,7 +938,10 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            IEnumerable<AzuraStationHistoryExportRecord> exportHistory = [.. history.Select(h => new AzuraStationHistoryExportRecord() { Date = dateString, PlayedAt = Converter.ConvertFromUnixTime(h.PlayedAt), Song = h.Song, SongRequest = h.IsRequest, Streamer = h.Streamer, Playlist = h.Playlist }).Reverse()];
+            IEnumerable<AzuraStationHistoryExportRecord> exportHistory = [.. history
+                .Select(h => new AzuraStationHistoryExportRecord() { Date = dateString, PlayedAt = DateTimeOffset.FromUnixTimeSeconds(h.PlayedAt), Song = h.Song, SongRequest = h.IsRequest, Streamer = h.Streamer, Playlist = h.Playlist })
+                .Reverse()];
+
             string fileName = $"{ac.GuildId}-{ac.Id}-{acStation.Id}-{acStation.StationId}_SongHistory_{dateStringFile}.csv";
             string filePath = await FileOperations.CreateCsvFileAsync(exportHistory, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
@@ -1052,12 +1055,13 @@ public sealed class AzuraCastCommands
                 return;
             }
 
+            string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             Uri baseUrl = new(Crypto.Decrypt(ac.BaseUrl));
 
             AzuraNowPlayingDataRecord? nowPlaying;
             try
             {
-                nowPlaying = await _azuraCast.GetNowPlayingAsync(baseUrl, station);
+                nowPlaying = await _azuraCast.GetNowPlayingAsync(baseUrl, apiKey, station);
                 if (nowPlaying is null)
                     throw new HttpRequestException("NowPlaying is null");
             }
@@ -1070,7 +1074,6 @@ public sealed class AzuraCastCommands
             string? playlistName = null;
             if (acStation.Preferences.ShowPlaylistInNowPlaying)
             {
-                string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
                 IEnumerable<AzuraPlaylistRecord>? playlist = await _azuraCast.GetPlaylistsAsync(baseUrl, apiKey, station);
                 if (playlist is null)
                 {
@@ -1082,9 +1085,44 @@ public sealed class AzuraCastCommands
                 playlistName = playlist.Where(p => p.Name == nowPlaying.NowPlaying.Playlist).Select(static p => p.Name).FirstOrDefault();
             }
 
-            DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicNowPlayingEmbed(nowPlaying, playlistName);
+            await using DiscordMessageBuilder builder = new();
+            DiscordEmbed embed;
+            if (nowPlaying.Station.IsPublic)
+            {
+                // This is the easy way because we just grab and smack it
+                embed = EmbedBuilder.BuildAzuraCastMusicNowPlayingEmbed(nowPlaying, playlistName);
+                builder.AddEmbed(embed);
+                await context.EditResponseAsync(builder);
 
-            await context.EditResponseAsync(embed);
+                return;
+            }
+
+            // Calculate the position of the artwork id
+            string artUri = nowPlaying.NowPlaying.Song.Art;
+            int artPos = artUri.LastIndexOf('/') + 1;
+            string artId = artUri[artPos..];
+
+            // Create and then replace the file path, because we don't know if it's only .jpg or else
+            string filePath = Path.Combine(Path.GetTempPath(), $"{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{ac.GuildId}-{ac.Id}-{acStation.Id}_{artId}");
+            filePath = await _azuraCast.DownloadSongArtworkAsync(new(artUri), apiKey, filePath);
+
+            // Get the file type from the path
+            int filePos = filePath.LastIndexOf('.') + 1;
+            string fileType = filePath[filePos..];
+            string fileName = $"{artId}.{fileType}";
+
+            FileStream artStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
+            builder.AddFile(fileName, artStream);
+
+            // Also replace it in the embed to get the right file name
+            nowPlaying.NowPlaying.Song.Art = $"attachment://{fileName}";
+            embed = EmbedBuilder.BuildAzuraCastMusicNowPlayingEmbed(nowPlaying, playlistName);
+            builder.AddEmbed(embed);
+
+            await context.EditResponseAsync(builder);
+
+            await artStream.DisposeAsync();
+            FileOperations.DeleteFile(filePath);
         }
 
         [Command("search-song"), Description("Search for a song on the selected station."), AzuraCastDiscordChannelCheck]
@@ -1184,8 +1222,8 @@ public sealed class AzuraCastCommands
                     return;
                 }
 
-                long threshold = Converter.ConvertToUnixTime(DateTimeOffset.UtcNow.AddMinutes(-stationConfig.RequestThreshold));
-                isPlayed = requestsPlayed.Any(r => (r.Track.SongId == songRequest.Song.SongId || r.Track.UniqueId == songRequest.Song.UniqueId) && Converter.ConvertToUnixTime(r.Timestamp) >= threshold);
+                long threshold = DateTimeOffset.UtcNow.AddMinutes(-stationConfig.RequestThreshold).ToUnixTimeSeconds();
+                isPlayed = requestsPlayed.Any(r => (r.Track.SongId == songRequest.Song.SongId || r.Track.UniqueId == songRequest.Song.UniqueId) && r.Timestamp.ToUnixTimeSeconds() >= threshold);
             }
 
             IEnumerable<AzuraStationQueueItemDetailedRecord>? stationQueue = await _azuraCast.GetStationQueueAsync(baseUrl, apiKey, station);

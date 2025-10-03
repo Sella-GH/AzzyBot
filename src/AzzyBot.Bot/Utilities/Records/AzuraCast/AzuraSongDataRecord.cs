@@ -53,7 +53,7 @@ public record AzuraSongAdvancedDataRecord : AzuraSongBasicDataRecord
     /// URL to the album artwork (if available).
     /// </summary>
     [JsonPropertyName("art")]
-    public required string Art { get; init; } = string.Empty;
+    public required string Art { get; set; } = string.Empty;
 }
 
 /// <summary>

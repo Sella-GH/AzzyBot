@@ -198,7 +198,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
 
         try
         {
-            string jsonDump = JsonSerializer.Serialize(new(ex, info), JsonSerializationSourceGen.Default.SerializableExceptionsRecord);
+            string jsonDump = JsonSerializer.Serialize(new(ex, info), JsonSourceGen.Default.SerializableExceptionsRecord);
             timestampString = timestampString.Replace(" ", "_", StringComparison.OrdinalIgnoreCase).Replace(":", "-", StringComparison.OrdinalIgnoreCase);
             string fileName = $"AzzyBotException_{timestampString}.json";
             string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, fileName);
