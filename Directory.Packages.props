@@ -12,7 +12,7 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.9" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.9" />
     <PackageVersion Include="NCronJob" Version="4.6.0" />
-    <PackageVersion Include="Npgsql" Version="9.0.3" />
+    <PackageVersion Include="Npgsql" Version="9.0.4" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageVersion Include="NReco.Logging.File" Version="1.2.2" />
     <PackageVersion Include="Roslynator.Analyzers" Version="4.14.1" />
