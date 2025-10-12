@@ -98,9 +98,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         if (config is null)
             return;
 
-        List<Uri> apis = new(7)
+        List<Uri> apis = new(6)
         {
-            new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}"),
             new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}"),
             new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlists}"),
             new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}"),
