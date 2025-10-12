@@ -1,6 +1,7 @@
 ## 2.8.1 - 2025-10-12
 ### Fixes
 - Removed the check for `/api/station/{id}` since it was making more issues than it gave value
+- Some minor fixes regarding NullExceptions coming up in rare cases
 
 ## 2.8.0 - 2025-09-29
 ### General
