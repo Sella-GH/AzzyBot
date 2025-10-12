@@ -113,7 +113,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
             EmbedBuilder.BuildAzzyUpdatesAvailableEmbed(updateVersion, releaseDate, _latestUrl)
         };
 
-        if (_updaterSettings.DisplayChangelog)
+        if (_updaterSettings.DisplayChangelog && !string.IsNullOrEmpty(changelog))
             embeds.Add(EmbedBuilder.BuildAzzyUpdatesChangelogEmbed(changelog, _latestUrl));
 
         if (_updaterSettings.DisplayInstructions)
