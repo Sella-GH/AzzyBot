@@ -1,3 +1,7 @@
+## 2.8.1 - 2025-10-12
+### Fixes
+- Removed the check for `/api/station/{id}` since it was making more issues than it gave value
+
 ## 2.8.0 - 2025-09-29
 ### General
 - A new daily check added which notifies unused/unconfigured instances and forces the bot to leave these servers after 3 or 7 days
