@@ -67,7 +67,7 @@ Follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wi
 ## Built With
 ### Software
 * [AzuraCast](https://github.com/AzuraCast/AzuraCast)
-* [.NET 9](https://github.com/dotnet/runtime)
+* [.NET 10](https://github.com/dotnet/runtime)
 * [Docker](https://docker.com/)
 * [Docker Compose](https://docker.com/)
 * [Lavalink](https://github.com/lavalink-devs/Lavalink)
@@ -87,7 +87,6 @@ Follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wi
 * [NReco.Logging.File](https://github.com/NReco/Logging)
 * [Roslynator](https://github.com/dotnet/roslynator)
 * [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet)
-* [System.Linq.Async](https://github.com/dotnet/reactive)
 * [TagLibSharp](https://github.com/mono/taglib-sharp)
 
 ## Contributing
