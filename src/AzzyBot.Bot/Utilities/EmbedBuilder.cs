@@ -412,8 +412,6 @@ public static class EmbedBuilder
 
     public static async Task<DiscordEmbed> BuildAzzyHardwareStatsEmbedAsync(Uri avaUrl, int ping)
     {
-        ArgumentNullException.ThrowIfNull(avaUrl);
-
         const string title = "AzzyBot Hardware Stats";
         const string notLinux = "To display more information you need to have a linux os.";
         string os = HardwareStats.GetSystemOs;
@@ -437,7 +435,7 @@ public static class EmbedBuilder
             fields.Add("Discord Ping", new($"{ping} ms", true));
 
         if (!HardwareStats.CheckIfLinuxOs)
-            return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl.OriginalString, footerText: notLinux, fields: fields);
+            return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl?.OriginalString, footerText: notLinux, fields: fields);
 
         Dictionary<int, double> cpuUsage = await HardwareStats.GetSystemCpuAsync();
         Dictionary<string, double> cpuTemp = await HardwareStats.GetSystemCpuTempAsync();
@@ -505,7 +503,7 @@ public static class EmbedBuilder
             }
         }
 
-        return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl.OriginalString, fields: fields);
+        return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl?.OriginalString, fields: fields);
     }
 
     public static DiscordEmbed BuildAzzyHelpEmbed(AzzyHelpRecord command)
@@ -579,7 +577,7 @@ public static class EmbedBuilder
             ["Privacy Policy"] = new($"[Privacy Policy]({UriStrings.GitHubRepoPrivacyPolicyUrl})", true)
         };
 
-        return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl.OriginalString, fields: fields);
+        return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl?.OriginalString, fields: fields);
     }
 
     public static DiscordEmbed BuildAzzyUpdatesAvailableEmbed(string version, in DateTimeOffset updateDate, Uri url)
@@ -602,7 +600,8 @@ public static class EmbedBuilder
 
     public static DiscordEmbed BuildAzzyUpdatesChangelogEmbed(string changelog, Uri url)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(changelog);
+        // This should never be null or empty but to satisfy the analyzer
+        ArgumentException.ThrowIfNullOrEmpty(changelog);
 
         const string title = "Changelog";
         string description = changelog;
@@ -790,7 +789,7 @@ public static class EmbedBuilder
     public static DiscordEmbed BuildMusicStreamingNowPlayingEmbed(LavalinkTrack track, TimeSpan? elapsed)
     {
         ArgumentNullException.ThrowIfNull(track);
-        if (elapsed is null)
+        if (!elapsed.HasValue)
             throw new ArgumentNullException(nameof(elapsed), "Elapsed time cannot be null.");
 
         const string title = "Now Playing";
