@@ -1,3 +1,12 @@
+## 2.8.2 - 2025-10-19
+### Improvements
+- We now check before a new AzuraCast instance is created if the provided API URL is reachable to prevent misconfigurations
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02554
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 9.0.10
+- Updated [Microsoft.Extensions.X](https://github.com/dotnet/runtime) libraries to version 9.0.10
+
 ## 2.8.1 - 2025-10-12
 ### Fixes
 - Removed the check for `/api/station/{id}` since it was making more issues than it gave value

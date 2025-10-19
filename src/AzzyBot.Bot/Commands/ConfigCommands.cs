@@ -51,6 +51,7 @@ public sealed class ConfigCommands
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
 
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "This is just a hard check.")]
         [Command("add-azuracast"), Description("Add an AzuraCast instance to your server. This is a requirement to use the features.")]
         public async ValueTask AddAzuraCastAsync
         (
@@ -123,7 +124,26 @@ public sealed class ConfigCommands
                 return;
             }
 
-            await _dbActions.CreateAzuraCastAsync(guildId, Misc.SanitizeUri(url), apiKey, instanceAdminGroup.Id, notificationChannel.Id, outagesChannel.Id, serverStatus is 1, updates is 1, updatesChangelog is 1);
+            Uri sanitizedUri = Misc.SanitizeUri(url);
+            AzuraStatusRecord? status = null;
+            try
+            {
+                status = await _azuraCastApi.GetInstanceStatusAsync(sanitizedUri);
+            }
+            catch (Exception ex)
+            {
+                // Only log the exceptions here, we want to check if the instance is reachable
+                _logger.WebRequestExpectedFailure(HttpMethod.Get, sanitizedUri, ex.Message);
+            }
+
+            if (status is null)
+            {
+                await context.DeleteResponseAsync();
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceUnreachable.Replace("{URL}", sanitizedUri.OriginalString, StringComparison.OrdinalIgnoreCase), ephemeral: true);
+                return;
+            }
+
+            await _dbActions.CreateAzuraCastAsync(guildId, sanitizedUri, apiKey, instanceAdminGroup.Id, notificationChannel.Id, outagesChannel.Id, serverStatus is 1, updates is 1, updatesChangelog is 1);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync(GeneralStrings.ConfigInstanceAdded);

@@ -18,6 +18,7 @@ public static class GeneralStrings
     public const string ConfigInstanceModifiedChecks = "Your AzuraCast installation was modified successfully.";
     public const string ConfigInstanceNotificationChannelMissing = "You have to select a notification channel first!";
     public const string ConfigInstanceOutageChannelMissing = "You have to select an outage channel first!";
+    public const string ConfigInstanceUnreachable = "The provided AzuraCast instance is unreachable. Please check that the API Endpoint `/api/status` does exist and is reachable.\nCheck for this URL as its that what I am trying to reach: {URL}api/status";
     public const string ConfigInstanceUrlMissing = "You have to provide an url to the instance first!";
     public const string ConfigParameterMissing = "You have to provide at least one parameter first!";
     public const string ConfigStationAdded = "Your station was added successfully and private data has been encrypted.";
