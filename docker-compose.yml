@@ -26,7 +26,7 @@ services:
 # If you use an external database, you can comment out the AzzyBot-Db service
   AzzyBot-Db:
     container_name: AzzyBot-Db
-    image: postgres:16-alpine
+    image: postgres:17-alpine
     pull_policy: always
     restart: unless-stopped
     environment:
