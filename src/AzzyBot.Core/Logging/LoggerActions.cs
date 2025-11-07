@@ -8,7 +8,7 @@ namespace AzzyBot.Core.Logging;
 public static partial class LoggerActions
 {
 #if DEBUG || DOCKER_DEBUG
-    [LoggerMessage(9, LogLevel.Debug, "Cluster logging test intervall {i}")]
+    [LoggerMessage(9, LogLevel.Debug, "Cluster logging test interval {i}")]
     public static partial void ClusterLoggingTest(this ILogger logger, int i);
 #endif
 
@@ -18,26 +18,17 @@ public static partial class LoggerActions
     [LoggerMessage(11, LogLevel.Debug, "Logfile cleanup completed, {count} logfiles deleted")]
     public static partial void LogfileCleanupComplete(this ILogger logger, int count);
 
-    [LoggerMessage(12, LogLevel.Debug, "Global timer ticked")]
-    public static partial void GlobalTimerTick(this ILogger logger);
+    [LoggerMessage(12, LogLevel.Debug, "Notified guild {guildId} in channel {channelId} about deletion")]
+    public static partial void BackgroundServiceGuildDeletionNotified(this ILogger logger, ulong guildId, ulong channelId);
 
-    [LoggerMessage(13, LogLevel.Debug, "Global timer checking for bot updates")]
-    public static partial void GlobalTimerCheckForUpdates(this ILogger logger);
+    [LoggerMessage(13, LogLevel.Debug, "Notified owner of guild {guildId} about deletion")]
+    public static partial void BackgroundServiceGuildDeletionNotifiedOwner(this ILogger logger, ulong guildId);
 
-    [LoggerMessage(14, LogLevel.Debug, "Global timer checking {counter} guilds for channel permissions")]
-    public static partial void GlobalTimerCheckForChannelPermissions(this ILogger logger, int counter);
+    [LoggerMessage(14, LogLevel.Debug, "Notified guild {guildId} in channel {channelId} about unused guild")]
+    public static partial void BackgroundServiceGuildUnusedNotified(this ILogger logger, ulong guildId, ulong channelId);
 
-    [LoggerMessage(15, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast files changes")]
-    public static partial void GlobalTimerCheckForAzuraCastFiles(this ILogger logger, int counter);
-
-    [LoggerMessage(16, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast updates")]
-    public static partial void GlobalTimerCheckForAzuraCastUpdates(this ILogger logger, int counter);
-
-    [LoggerMessage(17, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast instance status")]
-    public static partial void GlobalTimerCheckForAzuraCastStatus(this ILogger logger, int counter);
-
-    [LoggerMessage(18, LogLevel.Debug, "Global timer checking {counter} guilds for AzuraCast api permissions")]
-    public static partial void GlobalTimerCheckForAzuraCastApi(this ILogger logger, int counter);
+    [LoggerMessage(15, LogLevel.Debug, "Notified owner of guild {guildId} about unused guild")]
+    public static partial void BackgroundServiceGuildUnusedNotifiedOwner(this ILogger logger, ulong guildId);
 
     [LoggerMessage(23, LogLevel.Debug, "Creating work items for: {item}")]
     public static partial void BackgroundServiceWorkItem(this ILogger logger, string item);
@@ -52,7 +43,7 @@ public static partial class LoggerActions
     public static partial void BackgroundServiceSongRequestWaiting(this ILogger logger, string rId, int gId, int iId, int dId, int sId, int time);
 
     [LoggerMessage(33, LogLevel.Debug, "Song request {rId} from {gId}-{iId}-{dId}-{sId} requeued")]
-    public static partial void BackgroundServiceSongRequestRequed(this ILogger logger, string rId, int gId, int iId, int dId, int sId);
+    public static partial void BackgroundServiceSongRequestRequeued(this ILogger logger, string rId, int gId, int iId, int dId, int sId);
 
     [LoggerMessage(34, LogLevel.Debug, "Song request {rId} from {gId}-{iId}-{dId}-{sId} finished")]
     public static partial void BackgroundServiceSongRequestFinished(this ILogger logger, string rId, int gId, int iId, int dId, int sId);
@@ -99,11 +90,17 @@ public static partial class LoggerActions
     [LoggerMessage(105, LogLevel.Information, "Database Reencryption completed")]
     public static partial void DatabaseReencryptionComplete(this ILogger logger);
 
-    [LoggerMessage(106, LogLevel.Information, "Starting database cleanup of guilds.")]
-    public static partial void DatabaseCleanupStart(this ILogger logger);
+    [LoggerMessage(106, LogLevel.Information, "Starting database cleanup of orphaned guilds.")]
+    public static partial void DatabaseOrphanedGuildsStart(this ILogger logger);
 
-    [LoggerMessage(107, LogLevel.Information, "Database cleanup of guilds completed, {count} guilds were deleted.")]
-    public static partial void DatabaseCleanupComplete(this ILogger logger, int count);
+    [LoggerMessage(107, LogLevel.Information, "Database cleanup of orphaned guilds completed, {count} guilds were deleted.")]
+    public static partial void DatabaseOrphanedGuildsComplete(this ILogger logger, int count);
+
+    [LoggerMessage(108, LogLevel.Information, "Starting database cleanup of unused guilds.")]
+    public static partial void DatabaseUnusedGuildsStart(this ILogger logger);
+
+    [LoggerMessage(109, LogLevel.Information, "Database cleanup of unused guilds completed, {notified} guilds were notified, {deleted} were deleted.")]
+    public static partial void DatabaseUnusedGuildsComplete(this ILogger logger, int notified, int deleted);
 
     [LoggerMessage(110, LogLevel.Information, "AzzyBot joined the following Guild: {guild}")]
     public static partial void GuildCreated(this ILogger logger, string guild);
@@ -129,11 +126,17 @@ public static partial class LoggerActions
     [LoggerMessage(200, LogLevel.Warning, "AzzyBot is not connected to Discord!")]
     public static partial void BotNotConnected(this ILogger logger);
 
-    [LoggerMessage(201, LogLevel.Warning, "Commands error occured!")]
+    [LoggerMessage(201, LogLevel.Warning, "Commands error occurred!")]
     public static partial void CommandsError(this ILogger logger);
 
     [LoggerMessage(202, LogLevel.Warning, "Could not fetch channel for id {id}")]
     public static partial void ChannelNotFound(this ILogger logger, ulong id);
+
+    [LoggerMessage(203, LogLevel.Warning, "Could not fetch message for id {id} in channel {cid} in guild {gid}")]
+    public static partial void MessageNotFound(this ILogger logger, ulong id, ulong cid, ulong gid);
+
+    [LoggerMessage(204, LogLevel.Warning, "Too many Embeds for SendMessageAsync action. Expected only 10 but got {embeds}. Only the first 10 are added and the others discarded!")]
+    public static partial void TooManyEmbeds(this ILogger logger, int embeds);
 
     [LoggerMessage(210, LogLevel.Warning, "Could not find AzzyBot item")]
     public static partial void DatabaseAzzyBotNotFound(this ILogger logger);
@@ -162,6 +165,9 @@ public static partial class LoggerActions
     [LoggerMessage(218, LogLevel.Warning, "Could not find AzuraCast station preferences for guild {guild} in instance {instance} at station {station}")]
     public static partial void DatabaseAzuraCastStationPreferencesNotFound(this ILogger logger, ulong guild, int instance, int station);
 
+    [LoggerMessage(219, LogLevel.Warning, "Could not find MusicStreaming item for guild {guild}")]
+    public static partial void DatabaseMusicStreamingNotFound(this ILogger logger, ulong guild);
+
     [LoggerMessage(220, LogLevel.Warning, "Could not find discord item {item} for guild {guild}")]
     public static partial void DiscordItemNotFound(this ILogger logger, string item, ulong guild);
 
@@ -171,8 +177,14 @@ public static partial class LoggerActions
     [LoggerMessage(230, LogLevel.Warning, "Bot is ratelimited on uri: {uri} retrying in {time} seconds")]
     public static partial void BotRatelimited(this ILogger logger, Uri uri, int time);
 
-    [LoggerMessage(240, LogLevel.Warning, "Database concurrency exception occured: ")]
+    [LoggerMessage(240, LogLevel.Warning, "Database concurrency exception occurred: ")]
     public static partial void DatabaseConcurrencyException(this ILogger logger, Exception ex);
+
+    [LoggerMessage(250, LogLevel.Warning, "Unable to notify admins or owner of guild {guildName} ({guildId}) about leaving")]
+    public static partial void UnableToNotifyUnusedGuildDeleted(this ILogger logger, string guildName, ulong guildId);
+
+    [LoggerMessage(251, LogLevel.Warning, "Unable to notify admins or owner of guild {guildName} ({guildId}) about being unused")]
+    public static partial void UnableToNotifyUnusedGuildUnused(this ILogger logger, string guildName, ulong guildId);
 
     [LoggerMessage(290, LogLevel.Warning, "Latest online version of the bot is empty")]
     public static partial void OnlineVersionEmpty(this ILogger logger);
@@ -180,10 +192,10 @@ public static partial class LoggerActions
     [LoggerMessage(291, LogLevel.Warning, "Body of online version could not be deserialized")]
     public static partial void OnlineVersionUnserializable(this ILogger logger);
 
-    [LoggerMessage(300, LogLevel.Error, "An error occured while logging the exception to discord: {ex}")]
+    [LoggerMessage(300, LogLevel.Error, "An error occurred while logging the exception to discord: {ex}")]
     public static partial void UnableToLogException(this ILogger logger, string ex);
 
-    [LoggerMessage(301, LogLevel.Error, "An error occured while sending a message to discord: {ex}")]
+    [LoggerMessage(301, LogLevel.Error, "An error occurred while sending a message to discord: {ex}")]
     public static partial void UnableToSendMessage(this ILogger logger, string ex);
 
     [LoggerMessage(302, LogLevel.Error, "The provided uri is invalid: {uri}")]
@@ -192,15 +204,18 @@ public static partial class LoggerActions
     [LoggerMessage(303, LogLevel.Error, "The {type} request to {uri} failed with error: {ex}")]
     public static partial void WebRequestFailed(this ILogger logger, HttpMethod type, string ex, Uri uri);
 
-    [LoggerMessage(320, LogLevel.Error, "Database transaction failed with error: ")]
-    public static partial void DatabaseTransactionFailed(this ILogger logger, Exception ex);
-
-    [LoggerMessage(400, LogLevel.Critical, "An exception occured: ")]
-    public static partial void ExceptionOccured(this ILogger logger, Exception ex);
+    [LoggerMessage(400, LogLevel.Critical, "An exception occurred: ")]
+    public static partial void ExceptionOccurred(this ILogger logger, Exception ex);
 
     [LoggerMessage(402, LogLevel.Critical, "I'm not inside the server with the id {id} - please invite me to my hometown or I won't start!")]
     public static partial void NotInHomeGuild(this ILogger logger, ulong id);
 
     [LoggerMessage(403, LogLevel.Critical, "You removed me from my hometown server with the id {id}! I'm going to shutdown now.")]
     public static partial void RemovedFromHomeGuild(this ILogger logger, ulong id);
+
+    [LoggerMessage(1000, LogLevel.Information, "Database migration to new encryption schema started")]
+    public static partial void DatabaseNewEncryptionStart(this ILogger logger);
+
+    [LoggerMessage(1001, LogLevel.Information, "Database migration to new encryption schema completed")]
+    public static partial void DatabaseNewEncryptionComplete(this ILogger logger);
 }

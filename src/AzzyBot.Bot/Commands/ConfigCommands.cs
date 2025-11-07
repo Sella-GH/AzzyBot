@@ -51,6 +51,7 @@ public sealed class ConfigCommands
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
 
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "This is just a hard check.")]
         [Command("add-azuracast"), Description("Add an AzuraCast instance to your server. This is a requirement to use the features.")]
         public async ValueTask AddAzuraCastAsync
         (
@@ -70,41 +71,48 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(AddAzuraCastAsync), context.User.GlobalName);
 
+            if (url is null)
+            {
+                await context.DeleteResponseAsync();
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceUrlMissing, ephemeral: true);
+                return;
+            }
+
             if (instanceAdminGroup is null)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync(GeneralStrings.ConfigInstanceAdminMissing, true);
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceAdminMissing, ephemeral: true);
                 return;
             }
 
             if (notificationChannel is null)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync(GeneralStrings.ConfigInstanceNotificationChannelMissing, true);
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceNotificationChannelMissing, ephemeral: true);
                 return;
             }
 
             if (outagesChannel is null)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync(GeneralStrings.ConfigInstanceOutageChannelMissing, true);
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceOutageChannelMissing, ephemeral: true);
                 return;
             }
 
             ulong guildId = context.Guild.Id;
-            GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true);
+            GuildEntity? guild = await _dbActions.ReadGuildAsync(guildId, loadEverything: true);
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync(GeneralStrings.GuildNotFound);
+                await context.FollowupAsync(GeneralStrings.GuildNotFound, ephemeral: true);
                 return;
             }
 
             if (!guild.ConfigSet)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync(GeneralStrings.CoreSettingsMissing);
+                await context.FollowupAsync(GeneralStrings.CoreSettingsMissing, ephemeral: true);
                 return;
             }
 
@@ -112,16 +120,35 @@ public sealed class ConfigCommands
             if (dAzuraCast is not null)
             {
                 await context.DeleteResponseAsync();
-                await context.FollowupAsync(GeneralStrings.ConfigInstanceAlreadyExists);
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceAlreadyExists, ephemeral: true);
                 return;
             }
 
-            await _dbActions.AddAzuraCastAsync(guildId, url, apiKey, instanceAdminGroup.Id, notificationChannel.Id, outagesChannel.Id, serverStatus is 1, updates is 1, updatesChangelog is 1);
+            Uri sanitizedUri = Misc.SanitizeUri(url);
+            AzuraStatusRecord? status = null;
+            try
+            {
+                status = await _azuraCastApi.GetInstanceStatusAsync(sanitizedUri);
+            }
+            catch (Exception ex)
+            {
+                // Only log the exceptions here, we want to check if the instance is reachable
+                _logger.WebRequestExpectedFailure(HttpMethod.Get, sanitizedUri, ex.Message);
+            }
+
+            if (status is null)
+            {
+                await context.DeleteResponseAsync();
+                await context.FollowupAsync(GeneralStrings.ConfigInstanceUnreachable.Replace("{URL}", sanitizedUri.OriginalString, StringComparison.OrdinalIgnoreCase), ephemeral: true);
+                return;
+            }
+
+            await _dbActions.CreateAzuraCastAsync(guildId, sanitizedUri, apiKey, instanceAdminGroup.Id, notificationChannel.Id, outagesChannel.Id, serverStatus is 1, updates is 1, updatesChangelog is 1);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync(GeneralStrings.ConfigInstanceAdded);
 
-            dAzuraCast = await _dbActions.GetAzuraCastAsync(guildId, loadChecks: true, loadPrefs: true, loadGuild: true);
+            dAzuraCast = await _dbActions.ReadAzuraCastAsync(guildId, loadChecks: true, loadPrefs: true, loadGuild: true);
             if (dAzuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(guildId);
@@ -169,12 +196,12 @@ public sealed class ConfigCommands
 
             ulong guildId = context.Guild.Id;
 
-            await _dbActions.AddAzuraCastStationAsync(context.Guild.Id, station, adminGroup.Id, requestsChannel.Id, showPlaylist is 1, fileChanges is 1, uploadChannel?.Id, uploadPath, apiKey, djGroup?.Id);
+            await _dbActions.CreateAzuraCastStationAsync(context.Guild.Id, station, adminGroup.Id, requestsChannel.Id, showPlaylist is 1, fileChanges is 1, uploadChannel?.Id, uploadPath, apiKey, djGroup?.Id);
 
             await context.DeleteResponseAsync();
             await context.FollowupAsync(GeneralStrings.ConfigStationAdded);
 
-            AzuraCastEntity? dAzuraCast = await _dbActions.GetAzuraCastAsync(guildId, loadPrefs: true, loadStations: true, loadGuild: true);
+            AzuraCastEntity? dAzuraCast = await _dbActions.ReadAzuraCastAsync(guildId, loadPrefs: true, loadStations: true, loadGuild: true);
             if (dAzuraCast is null)
             {
                 _logger.DatabaseAzuraCastNotFound(guildId);
@@ -200,7 +227,7 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(DeleteAzuraCastAsync), context.User.GlobalName);
 
-            AzuraCastEntity? ac = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
+            AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id);
             if (ac is null)
             {
                 _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
@@ -226,7 +253,7 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(DeleteAzuraCastStationAsync), context.User.GlobalName);
 
-            AzuraCastStationEntity? acStation = await _dbActions.GetAzuraCastStationAsync(context.Guild.Id, station, loadAzuraCast: true);
+            AzuraCastStationEntity? acStation = await _dbActions.ReadAzuraCastStationAsync(context.Guild.Id, station, loadAzuraCast: true);
             if (acStation is null)
             {
                 _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, station);
@@ -264,7 +291,12 @@ public sealed class ConfigCommands
 
             ulong guildId = context.Guild.Id;
             if (url is not null || !string.IsNullOrWhiteSpace(apiKey))
+            {
+                if (url is not null)
+                    url = Misc.SanitizeUri(url);
+
                 await _dbActions.UpdateAzuraCastAsync(guildId, url, apiKey);
+            }
 
             if (instanceAdminGroup is not null || notificationsChannel is not null || outagesChannel is not null)
                 await _dbActions.UpdateAzuraCastPreferencesAsync(guildId, instanceAdminGroup?.Id, notificationsChannel?.Id, outagesChannel?.Id);
@@ -292,7 +324,7 @@ public sealed class ConfigCommands
 
             if (url is not null)
             {
-                AzuraCastEntity? dAzuraCast = await _dbActions.GetAzuraCastAsync(guildId, loadPrefs: true, loadGuild: true);
+                AzuraCastEntity? dAzuraCast = await _dbActions.ReadAzuraCastAsync(guildId, loadPrefs: true, loadGuild: true);
                 if (dAzuraCast is null)
                 {
                     _logger.DatabaseAzuraCastNotFound(guildId);
@@ -362,7 +394,7 @@ public sealed class ConfigCommands
 
             if (serverStatus is 1 || updates is 1)
             {
-                AzuraCastEntity? dAzuraCast = await _dbActions.GetAzuraCastAsync(guildId, loadChecks: true, loadPrefs: true, loadGuild: true);
+                AzuraCastEntity? dAzuraCast = await _dbActions.ReadAzuraCastAsync(guildId, loadChecks: true, loadPrefs: true, loadGuild: true);
                 if (dAzuraCast is null)
                 {
                     _logger.DatabaseAzuraCastNotFound(guildId);
@@ -415,7 +447,7 @@ public sealed class ConfigCommands
 
             if (adminGroup is not null || djGroup is not null || uploadChannel is not null || requestsChannel is not null || !string.IsNullOrWhiteSpace(uploadPath) || showPlaylistInEmbed is not null)
             {
-                await _dbActions.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, adminGroup?.Id, djGroup?.Id, uploadChannel?.Id, requestsChannel?.Id, uploadPath, showPlaylistInEmbed);
+                await _dbActions.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, adminGroup?.Id, djGroup?.Id, uploadChannel?.Id, null, null, requestsChannel?.Id, uploadPath, showPlaylistInEmbed);
 
                 ulong[] channels = [];
                 if (requestsChannel is not null && uploadChannel is null)
@@ -441,7 +473,7 @@ public sealed class ConfigCommands
 
                 ulong guildId = context.Guild.Id;
 
-                AzuraCastEntity? dAzuraCast = await _dbActions.GetAzuraCastAsync(guildId, loadPrefs: true, loadStations: true, loadGuild: true);
+                AzuraCastEntity? dAzuraCast = await _dbActions.ReadAzuraCastAsync(guildId, loadPrefs: true, loadStations: true, loadGuild: true);
                 if (dAzuraCast is null)
                 {
                     _logger.DatabaseAzuraCastNotFound(guildId);
@@ -499,7 +531,7 @@ public sealed class ConfigCommands
             if (fileChanges is 1)
             {
                 ulong guildId = context.Guild.Id;
-                AzuraCastEntity? dAzuraCast = await _dbActions.GetAzuraCastAsync(guildId, loadPrefs: true, loadStations: true, loadGuild: true);
+                AzuraCastEntity? dAzuraCast = await _dbActions.ReadAzuraCastAsync(guildId, loadPrefs: true, loadStations: true, loadGuild: true);
                 if (dAzuraCast is null)
                 {
                     _logger.DatabaseAzuraCastNotFound(guildId);
@@ -557,7 +589,7 @@ public sealed class ConfigCommands
             ulong guildId = context.Guild.Id;
             string guildName = context.Guild.Name;
             DiscordMember member = context.Member;
-            GuildEntity? guild = await _dbActions.GetGuildAsync(guildId, loadEverything: true);
+            GuildEntity? guild = await _dbActions.ReadGuildAsync(guildId, loadEverything: true);
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(guildId);
@@ -591,27 +623,32 @@ public sealed class ConfigCommands
                         DiscordRole? stationDjRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationDjRoleId);
                         stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? "Name not found");
                         stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found");
+                        string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(ac.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
 
                         AzuraStationRecord? stationRecord = null;
                         try
                         {
-                            stationRecord = await _azuraCastApi.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), station.StationId);
+                            stationRecord = await _azuraCastApi.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), apiKey, station.StationId);
                         }
                         catch (HttpRequestException)
                         {
                             await _azuraCastPing.PingInstanceAsync(ac);
                             break;
                         }
-
-                        if (stationRecord is null)
+                        catch (InvalidOperationException)
                         {
-                            await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                            // This can happen when the permissions are not sufficient to access the station
+                            await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I can't access the **station** ({station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}. Maybe also check if the API key is valid.");
                             continue;
                         }
 
-                        stationNames.Add(station.Id, stationRecord.Name);
+                        string stationName = stationRecord?.Name ?? "Station unaccessible.";
+                        if (stationRecord is null)
+                            await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
 
-                        int stationBotRequests = await _dbActions.GetAzuraCastStationRequestsCountAsync(guildId, station.StationId);
+                        stationNames.Add(station.Id, stationName);
+
+                        int stationBotRequests = await _dbActions.ReadAzuraCastStationRequestsCountAsync(guildId, station.StationId);
                         stationRequests.Add(station.Id, stationBotRequests);
                     }
 
@@ -648,7 +685,7 @@ public sealed class ConfigCommands
             }
 
             await _dbActions.DeleteGuildAsync(context.Guild.Id);
-            await _dbActions.AddGuildAsync(context.Guild.Id);
+            await _dbActions.CreateGuildAsync(context.Guild.Id);
 
             await context.EditResponseAsync(GeneralStrings.ConfigReset);
         }
@@ -670,7 +707,7 @@ public sealed class ConfigCommands
 
             await context.DeferResponseAsync();
 
-            GuildEntity? guild = await _dbActions.GetGuildAsync(context.Guild.Id);
+            GuildEntity? guild = await _dbActions.ReadGuildAsync(context.Guild.Id);
             if (guild is null)
             {
                 _logger.DatabaseGuildNotFound(context.Guild.Id);
@@ -684,7 +721,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            DiscordButtonComponent button = new(DiscordButtonStyle.Primary, $"accept_legals_{context.Guild.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Accept Legals.");
+            DiscordButtonComponent button = new(DiscordButtonStyle.Success, $"accept_legals_{context.Guild.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Accept Legals.");
             await using DiscordMessageBuilder messageBuilder = new();
             messageBuilder.AddActionRowComponent(button);
             string content = GeneralStrings.LegalsInformation

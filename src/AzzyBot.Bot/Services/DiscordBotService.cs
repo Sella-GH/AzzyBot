@@ -71,124 +71,67 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             return;
         }
 
-        List<ulong> channels = new(channelIds.Length);
-        List<ulong> channelNotAccessible = new(channelIds.Length);
-        foreach (ulong channelId in channelIds)
-        {
-            channels.Add(channelId);
-            if (!await CheckChannelPermissionsAsync(member, channelId, [DiscordPermission.SendMessages, DiscordPermission.ViewChannel]))
-                channelNotAccessible.Add(channelId);
-        }
+        await CheckPermissionsCoreAsync(guild, member, channelIds);
+    }
 
-        if (channelNotAccessible.Count is 0)
+    public async Task CheckPermissionsAsync(GuildEntity guildEntity)
+    {
+        ArgumentNullException.ThrowIfNull(guildEntity);
+
+        DiscordGuild? guild = GetDiscordGuild(guildEntity.UniqueId);
+        if (guild is null)
+        {
+            _logger.DatabaseGuildNotFound(guildEntity.UniqueId);
             return;
-
-        StringBuilder builder = new();
-        builder.AppendLine(CultureInfo.InvariantCulture, $"I don't have the required permissions in server **{guild.Name}** to send messages in channel(s):");
-        foreach (ulong channelId in channelNotAccessible)
-        {
-            DiscordChannel? dChannel = await GetDiscordChannelAsync(channelId);
-            if (dChannel is null)
-            {
-                _logger.DiscordItemNotFound(nameof(DiscordChannel), channelId);
-                continue;
-            }
-
-            builder.AppendLine(CultureInfo.InvariantCulture, $"- {dChannel.Mention}");
         }
 
-        builder.AppendLine("Please review your permission set.");
+        DiscordMember? member = await GetDiscordMemberAsync(guild.Id);
+        if (member is null)
+        {
+            _logger.DiscordItemNotFound(nameof(DiscordMember), guild.Id);
+            return;
+        }
 
-        DiscordMember owner = await guild.GetGuildOwnerAsync();
-        await owner.SendMessageAsync(builder.ToString());
+        List<ulong> channels = [];
+        if (guildEntity.UniqueId == _settings.ServerId)
+        {
+            channels.Add(_settings.ErrorChannelId);
+            channels.Add(_settings.NotificationChannelId);
+        }
+
+        if (guildEntity.Preferences.AdminNotifyChannelId is not 0)
+            channels.Add(guildEntity.Preferences.AdminNotifyChannelId);
+
+        if (guildEntity.AzuraCast is not null)
+        {
+            if (guildEntity.AzuraCast.Preferences.NotificationChannelId is not 0)
+                channels.Add(guildEntity.AzuraCast.Preferences.NotificationChannelId);
+
+            if (guildEntity.AzuraCast.Preferences.OutagesChannelId is not 0)
+                channels.Add(guildEntity.AzuraCast.Preferences.OutagesChannelId);
+
+            foreach (AzuraCastStationPreferencesEntity station in guildEntity.AzuraCast.Stations.Select(s => s.Preferences))
+            {
+                if (station.FileUploadChannelId is not 0)
+                    channels.Add(station.FileUploadChannelId);
+
+                if (station.RequestsChannelId is not 0)
+                    channels.Add(station.RequestsChannelId);
+            }
+        }
+
+        await _dbActions.UpdateGuildAsync(guildEntity.UniqueId, true);
+
+        await CheckPermissionsCoreAsync(guild, member, channels);
     }
 
     public async Task CheckPermissionsAsync(IReadOnlyList<GuildEntity> guilds)
     {
         ArgumentNullException.ThrowIfNull(guilds);
 
-        await foreach (DiscordGuild guild in _client.GetGuildsAsync())
+        foreach (GuildEntity guild in guilds)
         {
-            GuildEntity? guildEntity = guilds.FirstOrDefault(g => g.UniqueId == guild.Id);
-            if (guildEntity is null)
-            {
-                _logger.DatabaseGuildNotFound(guild.Id);
-                continue;
-            }
-
-            DiscordMember? member = await GetDiscordMemberAsync(guild.Id);
-            if (member is null)
-            {
-                _logger.DiscordItemNotFound(nameof(DiscordMember), guild.Id);
-                continue;
-            }
-
-            List<ulong> channels = [];
-            List<ulong> channelNotAccessible = [];
-
-            if (guildEntity.UniqueId == _settings.ServerId)
-            {
-                channels.Add(_settings.ErrorChannelId);
-                channels.Add(_settings.NotificationChannelId);
-            }
-
-            if (guildEntity.Preferences.AdminNotifyChannelId is not 0)
-                channels.Add(guildEntity.Preferences.AdminNotifyChannelId);
-
-            if (guildEntity.AzuraCast is not null)
-            {
-                if (guildEntity.AzuraCast.Preferences.NotificationChannelId is not 0)
-                    channels.Add(guildEntity.AzuraCast.Preferences.NotificationChannelId);
-
-                if (guildEntity.AzuraCast.Preferences.OutagesChannelId is not 0)
-                    channels.Add(guildEntity.AzuraCast.Preferences.OutagesChannelId);
-
-                foreach (AzuraCastStationPreferencesEntity station in guildEntity.AzuraCast.Stations.Select(s => s.Preferences))
-                {
-                    if (station.FileUploadChannelId is not 0)
-                        channels.Add(station.FileUploadChannelId);
-
-                    if (station.RequestsChannelId is not 0)
-                        channels.Add(station.RequestsChannelId);
-                }
-            }
-
-            foreach (ulong channelId in channels)
-            {
-                DiscordChannel? channel = await GetDiscordChannelAsync(channelId);
-                if (channel is null)
-                {
-                    _logger.DiscordItemNotFound(nameof(DiscordChannel), channelId);
-                    continue;
-                }
-
-                if (!channel.PermissionsFor(member).HasAllPermissions([DiscordPermission.SendMessages, DiscordPermission.ViewChannel]))
-                    channelNotAccessible.Add(channelId);
-            }
-
-            await _dbActions.UpdateGuildAsync(guildEntity.UniqueId, true);
-
-            if (channelNotAccessible.Count is 0)
-                continue;
-
-            StringBuilder builder = new();
-            builder.AppendLine(CultureInfo.InvariantCulture, $"I don't have the required permissions in server **{guild.Name}** to send messages in channel(s):");
-            foreach (ulong channelId in channelNotAccessible)
-            {
-                DiscordChannel? dChannel = await GetDiscordChannelAsync(channelId);
-                if (dChannel is null)
-                {
-                    _logger.DiscordItemNotFound(nameof(DiscordChannel), channelId);
-                    continue;
-                }
-
-                builder.AppendLine(CultureInfo.InvariantCulture, $"- {dChannel.Mention}");
-            }
-
-            builder.AppendLine("Please review your permission set.");
-
-            DiscordMember owner = await guild.GetGuildOwnerAsync();
-            await owner.SendMessageAsync(builder.ToString());
+            await CheckPermissionsAsync(guild);
         }
     }
 
@@ -218,7 +161,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
 
     public async Task<DiscordMember?> GetDiscordMemberAsync(ulong guildId, ulong userId = 0)
     {
-        DiscordGuild? guild = await _client.GetGuildsAsync().FirstOrDefaultAsync(g => g.Id == guildId);
+        DiscordGuild? guild = await _client.GetGuildAsync(guildId);
         DiscordMember? member = null;
 
         if (guild is not null)
@@ -227,11 +170,11 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         return member;
     }
 
-    public async Task<bool> LogExceptionAsync(Exception ex, DateTimeOffset timestamp, SlashCommandContext? ctx = null, string? info = null)
+    public async Task LogExceptionAsync(Exception ex, DateTimeOffset timestamp, SlashCommandContext? ctx = null, string? info = null)
     {
         ArgumentNullException.ThrowIfNull(ex);
 
-        _logger.ExceptionOccured(ex);
+        _logger.ExceptionOccurred(ex);
 
         // Handle the special case when it's a command exception
         string timestampString = timestamp.ToString("yyyy-MM-dd HH:mm:ss:fffffff", CultureInfo.InvariantCulture);
@@ -255,7 +198,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
 
         try
         {
-            string jsonDump = JsonSerializer.Serialize(new(ex, info), JsonSerializationSourceGen.Default.SerializableExceptionsRecord);
+            string jsonDump = JsonSerializer.Serialize(new(ex, info), JsonSourceGen.Default.SerializableExceptionsRecord);
             timestampString = timestampString.Replace(" ", "_", StringComparison.OrdinalIgnoreCase).Replace(":", "-", StringComparison.OrdinalIgnoreCase);
             string fileName = $"AzzyBotException_{timestampString}.json";
             string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, fileName);
@@ -265,15 +208,11 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
                 _logger.UnableToSendMessage("Error message was not sent");
 
             FileOperations.DeleteFile(tempFilePath);
-
-            return true;
         }
         catch (Exception e) when (e is IOException or NotSupportedException or SecurityException or UnauthorizedAccessException)
         {
             _logger.UnableToLogException(e.ToString());
         }
-
-        return false;
     }
 
     public async Task RespondToChecksExceptionAsync(ChecksFailedException ex, SlashCommandContext context)
@@ -297,19 +236,19 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             string reply = string.Empty;
             switch (moduleActivatedCheck.ErrorMessage)
             {
-                case CheckMessages.AzuraCastIsNull:
+                case ModuleCheckMessages.AzuraCastIsNull:
                     reply = "The AzuraCast module is not activated, you are unable to use commands from it.";
                     break;
 
-                case CheckMessages.GuildIsNull:
+                case ModuleCheckMessages.GuildIsNull:
                     reply = "Your server is not registered within the bot.";
                     break;
 
-                case CheckMessages.LegalsNotAccepted:
+                case ModuleCheckMessages.LegalsNotAccepted:
                     reply = GeneralStrings.LegalsNotAccepted;
                     break;
 
-                case CheckMessages.ModuleNotFound:
+                case ModuleCheckMessages.ModuleNotFound:
                     reply = "The requested module was not found, what have you done?";
                     break;
             }
@@ -319,7 +258,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             return;
         }
 
-        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true, loadStationPrefs: true);
+        AzuraCastEntity? azuraCast = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true, loadStationPrefs: true);
         if (azuraCast is null)
         {
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
@@ -394,84 +333,60 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         await AcknowledgeExceptionAsync(context);
     }
 
-    public async Task<bool> SendMessageAsync(ulong channelId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, IMention[]? mentions = null)
+    public Task<bool> SendMessageAsync(ulong channelId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, IMention[]? mentions = null)
     {
-        if (!CheckIfClientIsConnected)
-        {
-            _logger.BotNotConnected();
-            return false;
-        }
-
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId);
 
-        await using DiscordMessageBuilder builder = new();
-
-        if (!string.IsNullOrWhiteSpace(content))
-            builder.WithContent(content);
-
-        if (embeds?.Count > 0 && embeds.Count <= 10)
-            builder.AddEmbeds(embeds);
-
-        if (mentions is not null)
-            builder.WithAllowedMentions(mentions);
-
-        List<FileStream> streams = new(10);
-        if (filePaths?.Count > 0 && filePaths.Count <= 10)
+        return SendMessageCoreAsync(async builder =>
         {
-            const int maxFileSize = FileSizes.DiscordFileSize;
-            long allFileSize = 0;
-
-            foreach (string path in filePaths)
+            DiscordChannel? channel = await GetDiscordChannelAsync(channelId);
+            if (channel is null)
             {
-                FileInfo fileInfo = new(path);
-                if (fileInfo.Length > maxFileSize || allFileSize > maxFileSize)
-                    break;
-
-                allFileSize += fileInfo.Length;
-
-                FileStream stream = new(path, FileMode.Open, FileAccess.Read, FileShare.None);
-                streams.Add(stream);
-                builder.AddFile(Path.GetFileName(path), stream);
+                _logger.UnableToSendMessage($"{nameof(channel)} is null");
+                return;
             }
-        }
 
-        DiscordChannel? channel = await GetDiscordChannelAsync(channelId);
-        if (channel is null)
-        {
-            _logger.UnableToSendMessage($"{nameof(channel)} is null");
-        }
-        else
-        {
             DiscordMember? dMember = await GetDiscordMemberAsync(channel.Guild.Id);
             if (dMember is null)
             {
                 _logger.UnableToSendMessage($"Bot is not a member of server: {channel.Guild.Name} ({channel.Guild.Id})");
-                return false;
+                return;
             }
 
             if (!channel.PermissionsFor(dMember).HasAllPermissions([DiscordPermission.SendMessages, DiscordPermission.ViewChannel]))
             {
                 _logger.UnableToSendMessage($"Bot has no permission to send messages in channel: {channel.Name} ({channel.Id})");
-                return false;
+                return;
             }
 
             await channel.SendMessageAsync(builder);
-        }
+        }, content, embeds, filePaths, mentions);
+    }
 
-        if (streams.Count > 0)
+    public Task<bool> SendMessageToOwnerAsync(ulong guildId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId);
+
+        return SendMessageCoreAsync(async builder =>
         {
-            foreach (FileStream stream in streams)
+            DiscordGuild? guild = GetDiscordGuild(guildId);
+            if (guild is null)
             {
-                await stream.DisposeAsync();
+                _logger.UnableToSendMessage($"{nameof(guildId)} is null");
+                return;
             }
 
-            foreach (string path in filePaths!)
+            DiscordMember? dMember = await GetDiscordMemberAsync(guildId);
+            if (dMember is null)
             {
-                FileOperations.DeleteFile(path);
+                _logger.UnableToSendMessage($"Bot is not a member of server: {guild.Name} ({guildId})");
+                return;
             }
-        }
 
-        return true;
+            DiscordUser owner = await guild.GetGuildOwnerAsync();
+
+            await owner.SendMessageAsync(builder);
+        }, content, embeds, filePaths);
     }
 
     public async Task SetBotStatusAsync(int status, int type, string doing, Uri? url = null, bool reset = false)
@@ -528,11 +443,11 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         }
     }
 
-    private static void ProcessOptions(IReadOnlyDictionary<CommandParameter, object?> paramaters, Dictionary<string, string> commandParameters)
+    private static void ProcessOptions(IReadOnlyDictionary<CommandParameter, object?> parameters, Dictionary<string, string> commandParameters)
     {
-        ArgumentNullException.ThrowIfNull(paramaters);
+        ArgumentNullException.ThrowIfNull(parameters);
 
-        foreach (KeyValuePair<CommandParameter, object?> kvp in paramaters)
+        foreach (KeyValuePair<CommandParameter, object?> kvp in parameters)
         {
             string name = kvp.Key.Name;
             string value = kvp.Value?.ToString() ?? "undefined";
@@ -540,6 +455,45 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             if (!string.IsNullOrEmpty(name) && value is not "0" or "undefined")
                 commandParameters.Add(name, value);
         }
+    }
+
+    private async Task CheckPermissionsCoreAsync(DiscordGuild guild, DiscordMember member, IEnumerable<ulong> channelIds)
+    {
+        List<ulong> channelNotAccessible = [];
+        foreach (ulong channelId in channelIds)
+        {
+            DiscordChannel? channel = await GetDiscordChannelAsync(channelId);
+            if (channel is null)
+            {
+                _logger.DiscordItemNotFound(nameof(DiscordChannel), channelId);
+                continue;
+            }
+
+            if (!channel.PermissionsFor(member).HasAllPermissions([DiscordPermission.SendMessages, DiscordPermission.ViewChannel]))
+                channelNotAccessible.Add(channelId);
+        }
+
+        if (channelNotAccessible.Count is 0)
+            return;
+
+        StringBuilder builder = new();
+        builder.AppendLine(CultureInfo.InvariantCulture, $"I don't have the required permissions in server **{guild.Name}** to send messages in channel(s):");
+        foreach (ulong channelId in channelNotAccessible)
+        {
+            DiscordChannel? dChannel = await GetDiscordChannelAsync(channelId);
+            if (dChannel is null)
+            {
+                _logger.DiscordItemNotFound(nameof(DiscordChannel), channelId);
+                continue;
+            }
+
+            builder.AppendLine(CultureInfo.InvariantCulture, $"- {dChannel.Mention}");
+        }
+
+        builder.AppendLine("Please review your permission set.");
+
+        DiscordMember owner = await guild.GetGuildOwnerAsync();
+        await owner.SendMessageAsync(builder.ToString());
     }
 
     private DiscordEmbedBuilder CreateExceptionEmbed(Exception ex, string timestamp, string? jsonMessage = null, string? guild = null, string? message = null, string? userMention = null, string? commandName = null, Dictionary<string, string>? commandOptions = null)
@@ -601,5 +555,84 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
 #endif
 
         return builder;
+    }
+
+    private async Task<bool> SendMessageCoreAsync(Func<DiscordMessageBuilder, Task> sendAction, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, IMention[]? mentions = null)
+    {
+        if (!CheckIfClientIsConnected)
+        {
+            _logger.BotNotConnected();
+            return false;
+        }
+
+        await using DiscordMessageBuilder builder = new();
+
+        if (!string.IsNullOrWhiteSpace(content))
+            builder.WithContent(content);
+
+        if (embeds?.Count > 0)
+        {
+            if (embeds.Count > 10)
+            {
+                _logger.TooManyEmbeds(embeds.Count);
+                builder.AddEmbeds(embeds.Take(10));
+            }
+            else
+            {
+                builder.AddEmbeds(embeds);
+            }
+        }
+
+        if (mentions is not null)
+            builder.WithAllowedMentions(mentions);
+
+        List<FileStream> streams = new(10);
+        if (filePaths?.Count > 0)
+        {
+            const int maxFileSize = FileSizes.DiscordFileSize;
+            long allFileSize = 0;
+
+            foreach (string path in filePaths)
+            {
+                FileInfo fileInfo = new(path);
+                if (fileInfo.Length > maxFileSize || allFileSize > maxFileSize)
+                    break;
+
+                allFileSize += fileInfo.Length;
+
+                FileStream stream = new(path, FileMode.Open, FileAccess.Read, FileShare.None);
+                streams.Add(stream);
+                builder.AddFile(Path.GetFileName(path), stream);
+            }
+        }
+
+        bool success = false;
+        try
+        {
+            await sendAction(builder);
+            success = true;
+        }
+        catch (Exception e) when (e is UnauthorizedException or NotFoundException or BadRequestException or ServerErrorException)
+        {
+            _logger.UnableToSendMessage(e.Message);
+        }
+
+        if (streams.Count > 0)
+        {
+            foreach (FileStream stream in streams)
+            {
+                await stream.DisposeAsync();
+            }
+
+            if (filePaths is not null)
+            {
+                foreach (string path in filePaths)
+                {
+                    FileOperations.DeleteFile(path);
+                }
+            }
+        }
+
+        return success;
     }
 }

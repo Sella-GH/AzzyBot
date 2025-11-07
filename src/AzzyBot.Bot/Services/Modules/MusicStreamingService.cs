@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
+using AzzyBot.Core.Utilities;
 
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Entities;
@@ -28,6 +29,13 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
     private readonly IAudioService _audioService = audioService;
     private readonly ILogger<MusicStreamingService> _logger = logger;
     private readonly DiscordBotService _botService = botService;
+
+    public LavalinkPlayer? GetLavalinkPlayer(ulong guildId)
+    {
+        ArgumentOutOfRangeException.ThrowIfZero(guildId);
+
+        return (_audioService.Players.TryGetPlayer(guildId, out LavalinkPlayer? player)) ? player : null;
+    }
 
     private async Task<LavalinkPlayer?> GetLavalinkPlayerAsync(SlashCommandContext context, bool useDefault = true, bool connectToVoice = false, bool suppressResponse = false, bool ignoreVoice = false)
     {
@@ -152,7 +160,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
             PlayerRetrieveStatus.PreconditionFailed when precondition == PlayerPrecondition.NotPlaying.ToString() => "I'm not playing music.",
             PlayerRetrieveStatus.PreconditionFailed when precondition == PlayerPrecondition.Paused.ToString() => "I'm already paused.",
             PlayerRetrieveStatus.PreconditionFailed when precondition == PlayerPrecondition.Playing.ToString() => "I'm already playing music.",
-            _ => "An unknown error occurred while trying to retrieve the player.",
+            _ => "An unknown error occurred while trying to retrieve the player."
         };
     }
 
@@ -213,6 +221,24 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         }
     }
 
+    public TimeSpan? GetCurrentPosition(ulong guildId)
+    {
+        ArgumentOutOfRangeException.ThrowIfZero(guildId);
+
+        LavalinkPlayer? player = GetLavalinkPlayer(guildId);
+        if (player is null)
+            return null;
+
+        try
+        {
+            return (player is QueuedLavalinkPlayer queuedPlayer) ? queuedPlayer.Position?.Position : player.Position?.Position;
+        }
+        catch (InvalidOperationException)
+        {
+            return TimeSpan.MinValue;
+        }
+    }
+
     [SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "Code style")]
     public async Task<IEnumerable<ITrackQueueItem>?> HistoryAsync(SlashCommandContext context, bool queue = false)
     {
@@ -245,7 +271,24 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         }
         catch (InvalidOperationException)
         {
-            return new() { Author = "AzzyBot", Identifier = "AzzyBot.Bot", Title = "50 shades of no track." };
+            return new() { Author = SoftwareStats.GetAppAuthors, Identifier = SoftwareStats.GetAppName, Title = "50 shades of no track." };
+        }
+    }
+
+    public LavalinkTrack? NowPlaying(ulong guildId)
+    {
+        ArgumentOutOfRangeException.ThrowIfZero(guildId);
+        LavalinkPlayer? player = GetLavalinkPlayer(guildId);
+        if (player is null)
+            return null;
+
+        try
+        {
+            return (player is QueuedLavalinkPlayer queuedPlayer) ? queuedPlayer.CurrentTrack : player.CurrentTrack;
+        }
+        catch (InvalidOperationException)
+        {
+            return new() { Author = SoftwareStats.GetAppAuthors, Identifier = SoftwareStats.GetAppName, Title = "50 shades of no track." };
         }
     }
 
@@ -337,19 +380,13 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         return true;
     }
 
-    public async Task<bool> SetVolumeAsync(SlashCommandContext context, float volume, bool reset = false)
+    public async Task<bool> SetVolumeAsync(SlashCommandContext context, float volume)
     {
         ArgumentNullException.ThrowIfNull(context);
 
         LavalinkPlayer? player = await GetLavalinkPlayerAsync(context);
         if (player is null)
             return false;
-
-        if (reset)
-        {
-            await player.SetVolumeAsync(100 / 100f);
-            return true;
-        }
 
         await player.SetVolumeAsync(volume / 100f);
 

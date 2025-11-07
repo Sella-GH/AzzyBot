@@ -19,6 +19,13 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Checks;
 
+/// <summary>
+/// Represents a context check that validates whether a user of a Discord command has the necessary permissions to execute it.
+/// </summary>
+/// <remarks>
+/// This check ensures that specific commands are executed with specific permissions only defined in the database preferences.
+/// If the command is executed by an unauthorized user it returns a string and fails.
+/// </remarks>
 public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger, DbActions dbActions) : IContextCheck<AzuraCastDiscordPermCheckAttribute>
 {
     private readonly ILogger<AzuraCastDiscordPermCheck> _logger = logger;
@@ -36,7 +43,7 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
             await context.DeferResponseAsync();
 
         int stationId = Convert.ToInt32(context.Arguments.SingleOrDefault(static o => o.Key.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
-        AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true, loadStationPrefs: true);
+        AzuraCastEntity? azuraCast = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true, loadStationPrefs: true);
         if (azuraCast is null)
         {
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
@@ -52,6 +59,7 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
 
             case "azuracast export-playlists":
             case "azuracast start-station":
+            case "azuracast station-nowplaying-embed":
             case "azuracast stop-station":
             case "azuracast toggle-song-requests":
             case "config modify-azuracast-station":
@@ -103,6 +111,7 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
             case "azuracast export-playlists":
             case "azuracast force-cache-refresh":
             case "azuracast start-station":
+            case "azuracast station-nowplaying-embed":
             case "azuracast stop-station":
             case "azuracast toggle-song-requests":
             case "config modify-azuracast-station":

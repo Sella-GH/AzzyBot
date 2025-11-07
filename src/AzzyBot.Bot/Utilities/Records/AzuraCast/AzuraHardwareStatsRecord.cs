@@ -96,61 +96,37 @@ public sealed record AzuraCoreData : AzuraCpuTotalData;
 /// <summary>
 /// Represents the memory data for an AzuraCast instance.
 /// </summary>
-public sealed record AzuraMemoryData
+public sealed record AzuraMemoryData : AzuraDiskData
 {
     /// <summary>
-    /// The total memory data for the server.
+    /// The cached memory for the server.
     /// </summary>
-    [JsonPropertyName("readable")]
-    public required AzuraReadableMemoryData Readable { get; init; }
+    [JsonPropertyName("cached_readable")]
+    public required string Cached { get; init; }
 }
 
 /// <summary>
 /// Represents the disk data for an AzuraCast instance.
 /// </summary>
-public sealed record AzuraDiskData
-{
-    /// <summary>
-    /// The total disk data for the server.
-    /// </summary>
-    [JsonPropertyName("readable")]
-    public required AzuraReadableDiskData Readable { get; init; }
-}
-
-/// <summary>
-/// Represents the readable disk data for an AzuraCast instance.
-/// </summary>
-public record AzuraReadableDiskData
+public record AzuraDiskData
 {
     /// <summary>
     /// The total disk space for the server.
     /// </summary>
-    [JsonPropertyName("total")]
+    [JsonPropertyName("total_readable")]
     public required string Total { get; init; }
 
     /// <summary>
     /// The free disk space for the server.
     /// </summary>
-    [JsonPropertyName("free")]
+    [JsonPropertyName("free_readable")]
     public required string Free { get; init; }
 
     /// <summary>
     /// The used disk space for the server.
     /// </summary>
-    [JsonPropertyName("used")]
+    [JsonPropertyName("used_readable")]
     public required string Used { get; init; }
-}
-
-/// <summary>
-/// Represents the readable memory data for an AzuraCast instance.
-/// </summary>
-public sealed record AzuraReadableMemoryData : AzuraReadableDiskData
-{
-    /// <summary>
-    /// The cached memory for the server.
-    /// </summary>
-    [JsonPropertyName("cached")]
-    public required string Cached { get; init; }
 }
 
 /// <summary>
@@ -178,18 +154,6 @@ public sealed record AzuraNetworkData
 }
 
 /// <summary>
-/// Represents the transmission speed data for an AzuraCast instance.
-/// </summary>
-public sealed record AzuraSpeedData
-{
-    /// <summary>
-    /// The speed of the transmission.
-    /// </summary>
-    [JsonPropertyName("readable")]
-    public required string Readable { get; init; }
-}
-
-/// <summary>
 /// Represents the transmission data for an AzuraCast instance.
 /// </summary>
 public sealed record AzuraTransmissionData
@@ -197,6 +161,6 @@ public sealed record AzuraTransmissionData
     /// <summary>
     /// The speed of the transmission.
     /// </summary>
-    [JsonPropertyName("speed")]
-    public required AzuraSpeedData Speed { get; init; }
+    [JsonPropertyName("speed_readable")]
+    public required string Speed { get; init; }
 }

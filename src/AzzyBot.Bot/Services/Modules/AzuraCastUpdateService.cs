@@ -27,21 +27,38 @@ public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiServi
         ArgumentNullException.ThrowIfNull(azuraCast);
 
         string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
-        string? body = await _azuraCastApiService.GetUpdatesAsync(new(Crypto.Decrypt(azuraCast.BaseUrl)), apiKey);
-        if (string.IsNullOrEmpty(body))
+        Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
+
+        string? body;
+        try
         {
-            await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative updates** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+            body = await _azuraCastApiService.GetUpdatesAsync(baseUrl, apiKey);
+            if (string.IsNullOrEmpty(body))
+            {
+                await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative updates** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                return;
+            }
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
+        {
+            // The server is probably down or something, check if user has uptime monitoring enabled
+            // If yes then just exit silently
+            if (azuraCast.Checks.ServerStatus)
+                return;
+
+            // If no we notify the user that something went wrong
+            await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"Failed to check for updates: {ex.Message}");
             return;
         }
 
         AzuraUpdateRecord? update;
         try
         {
-            update = JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.AzuraUpdateRecord);
+            update = JsonSerializer.Deserialize(body, JsonSourceGen.Default.AzuraUpdateRecord);
         }
         catch (JsonException ex)
         {
-            AzuraUpdateErrorRecord? errorRecord = JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.AzuraUpdateErrorRecord) ?? throw new InvalidOperationException($"Failed to deserialize body: {body}", ex);
+            AzuraUpdateErrorRecord? errorRecord = JsonSerializer.Deserialize(body, JsonSourceGen.Default.AzuraUpdateErrorRecord) ?? throw new InvalidOperationException($"Failed to deserialize body: {body}", ex);
             await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"Failed to check for updates: {errorRecord.FormattedMessage}");
             return;
         }
@@ -65,9 +82,9 @@ public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiServi
         await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: checks.UpdateNotificationCounter + 1, lastUpdateCheck: true);
 
         List<DiscordEmbed> embeds = new(2)
-            {
-                EmbedBuilder.BuildAzuraCastUpdatesAvailableEmbed(update)
-            };
+        {
+            EmbedBuilder.BuildAzuraCastUpdatesAvailableEmbed(update)
+        };
 
         if (azuraCast.Checks.UpdatesShowChangelog)
         {
@@ -79,7 +96,7 @@ public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiServi
                     onlineChangelog = onlineChangelog.Split("---")[1];
             }
 
-            embeds.Add(EmbedBuilder.BuildAzuraCastUpdatesChangelogEmbed(update.RollingUpdatesList, update.NeedsRollingUpdate, onlineChangelog));
+            embeds.Add(EmbedBuilder.BuildAzuraCastUpdatesChangelogEmbed(update.NeedsRollingUpdate, onlineChangelog));
         }
 
         await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, embeds: embeds);

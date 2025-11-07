@@ -1,0 +1,4 @@
+[submodule "extern/Lavalink4NET"]
+  path = extern/Lavalink4NET
+  url = https://github.com/Sella-GH/Lavalink4NET.git
+  branch = azzy

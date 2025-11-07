@@ -16,7 +16,6 @@ using AzzyBot.Data.Services;
 using AzzyBot.Data.Settings;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -32,7 +31,6 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
     private readonly DiscordStatusSettings _discordSettings = discordSettings.Value;
     private readonly MusicStreamingSettings _musicStreamingSettings = musicStreamingSettings.Value;
     private readonly IDbContextFactory<AzzyDbContext> _dbContextFactory = dbContextFactory;
-    private readonly Task _completed = Task.CompletedTask;
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -44,17 +42,54 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
 
         _logger.BotStarting(name, version, os, arch, dotnet);
 
+        await EnsureAzzyBotDbTableIsCreatedAsync();
         if (!string.IsNullOrWhiteSpace(_dbSettings.NewEncryptionKey) && (_dbSettings.NewEncryptionKey != _dbSettings.EncryptionKey))
             await ReencryptDatabaseAsync();
 
-        await EnsureAzzyBotDbTableIsCreatedAsync();
+        await MigrateDatabaseEncryptionSchemaAsync();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
     {
         _logger.BotStopping();
 
-        return _completed;
+        return Task.CompletedTask;
+    }
+
+    // TODO: Remove this method in a future release after enough time has passed since the encryption schema change.
+    private async Task MigrateDatabaseEncryptionSchemaAsync()
+    {
+        _logger.DatabaseNewEncryptionStart();
+
+        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
+
+        List<AzuraCastEntity> azuraCast = await dbContext.AzuraCast.ToListAsync();
+        List<AzuraCastStationEntity> azuraCastStations = await dbContext.AzuraCastStations.Where(static e => !string.IsNullOrEmpty(e.ApiKey)).ToListAsync();
+
+        try
+        {
+            foreach (AzuraCastEntity entity in azuraCast)
+            {
+                if (!string.IsNullOrEmpty(entity.BaseUrl) && !Crypto.CheckIfNewCipherIsUsed(entity.BaseUrl))
+                    entity.BaseUrl = Crypto.MigrateOldCipherToNew(entity.BaseUrl);
+
+                if (!string.IsNullOrEmpty(entity.AdminApiKey) && !Crypto.CheckIfNewCipherIsUsed(entity.AdminApiKey))
+                    entity.AdminApiKey = Crypto.MigrateOldCipherToNew(entity.AdminApiKey);
+            }
+
+            foreach (AzuraCastStationEntity entity in azuraCastStations.Where(static e => !Crypto.CheckIfNewCipherIsUsed(e.ApiKey)))
+            {
+                entity.ApiKey = Crypto.MigrateOldCipherToNew(entity.ApiKey);
+            }
+
+            await dbContext.SaveChangesAsync();
+        }
+        catch (Exception ex) when (ex is DbUpdateConcurrencyException or DbUpdateException)
+        {
+            throw new InvalidOperationException("An error occurred while migrating the encryption schema of the database", ex);
+        }
+
+        _logger.DatabaseNewEncryptionComplete();
     }
 
     private async Task EnsureAzzyBotDbTableIsCreatedAsync()
@@ -64,19 +99,15 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
         if (await dbContext.AzzyBot.AnyAsync())
             return;
 
-        await using IDbContextTransaction transaction = await dbContext.Database.BeginTransactionAsync();
-
         try
         {
             await dbContext.AzzyBot.AddAsync(new AzzyBotEntity());
 
             await dbContext.SaveChangesAsync();
-            await transaction.CommitAsync();
         }
         catch (Exception ex) when (ex is DbUpdateConcurrencyException or DbUpdateException)
         {
-            await transaction.RollbackAsync();
-            throw new InvalidOperationException("An error occured while creating the AzzyBot table", ex);
+            throw new InvalidOperationException("An error occurred while creating the AzzyBot table", ex);
         }
     }
 
@@ -91,38 +122,41 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
         byte[] newEncryptionKey = Encoding.UTF8.GetBytes(_dbSettings.NewEncryptionKey);
 
         await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
-        await using IDbContextTransaction transaction = await dbContext.Database.BeginTransactionAsync();
 
         List<AzuraCastEntity> azuraCast = await dbContext.AzuraCast.ToListAsync();
-        List<AzuraCastStationEntity> azuraCastStations = await dbContext.AzuraCastStations.ToListAsync();
+        List<AzuraCastStationEntity> azuraCastStations = await dbContext.AzuraCastStations.Where(static e => !string.IsNullOrEmpty(e.ApiKey)).ToListAsync();
 
         try
         {
             foreach (AzuraCastEntity entity in azuraCast)
             {
-                entity.BaseUrl = Crypto.Decrypt(entity.BaseUrl);
-                entity.BaseUrl = Crypto.Encrypt(entity.BaseUrl, newEncryptionKey);
+                if (!string.IsNullOrEmpty(entity.BaseUrl))
+                {
+                    entity.BaseUrl = Crypto.Decrypt(entity.BaseUrl);
+                    entity.BaseUrl = Crypto.Encrypt(entity.BaseUrl, newEncryptionKey);
+                }
 
-                entity.AdminApiKey = Crypto.Decrypt(entity.AdminApiKey);
-                entity.AdminApiKey = Crypto.Encrypt(entity.AdminApiKey, newEncryptionKey);
+                if (!string.IsNullOrEmpty(entity.AdminApiKey))
+                {
+                    entity.AdminApiKey = Crypto.Decrypt(entity.AdminApiKey);
+                    entity.AdminApiKey = Crypto.Encrypt(entity.AdminApiKey, newEncryptionKey);
+                }
             }
 
-            foreach (AzuraCastStationEntity entity in azuraCastStations.Where(static e => !string.IsNullOrEmpty(e.ApiKey)))
+            foreach (AzuraCastStationEntity entity in azuraCastStations)
             {
                 entity.ApiKey = Crypto.Decrypt(entity.ApiKey);
                 entity.ApiKey = Crypto.Encrypt(entity.ApiKey, newEncryptionKey);
             }
 
             await dbContext.SaveChangesAsync();
-            await transaction.CommitAsync();
         }
         catch (Exception ex) when (ex is DbUpdateConcurrencyException or DbUpdateException)
         {
-            await transaction.RollbackAsync();
-            throw new InvalidOperationException("An error occured while re-encrypting the database", ex);
+            throw new InvalidOperationException("An error occurred while re-encrypting the database", ex);
         }
 
-        Crypto.EncryptionKey = newEncryptionKey;
+        Crypto.SetEncryptionKey(newEncryptionKey);
         _dbSettings.EncryptionKey = _dbSettings.NewEncryptionKey;
         _dbSettings.NewEncryptionKey = string.Empty;
 
@@ -135,7 +169,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
             CoreUpdaterSettings = _updaterSettings
         };
 
-        string json = JsonSerializer.Serialize(appSettings, JsonSerializationSourceGen.Default.AppSettingsRecord);
+        string json = JsonSerializer.Serialize(appSettings, JsonSourceGen.Default.AppSettingsRecord);
         await FileOperations.WriteToFileAsync(_azzySettings.SettingsFile, json);
 
         _logger.DatabaseReencryptionComplete();

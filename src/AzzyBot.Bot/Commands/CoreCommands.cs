@@ -49,7 +49,7 @@ public sealed class CoreCommands
 
             _logger.CommandRequested(nameof(ForceChannelPermissionsCheckAsync), context.User.GlobalName);
 
-            GuildEntity? guild = await _dbActions.GetGuildAsync(_settings.ServerId, loadEverything: true);
+            GuildEntity? guild = await _dbActions.ReadGuildAsync(_settings.ServerId, loadEverything: true);
             if (guild is null)
             {
                 await context.RespondAsync(GeneralStrings.GuildNotFound);
@@ -58,7 +58,7 @@ public sealed class CoreCommands
 
             await context.EditResponseAsync("I initiated a check of the permissions for the bot, please wait a little for the result.");
 
-            await _botService.CheckPermissionsAsync([guild]);
+            await _botService.CheckPermissionsAsync(guild);
         }
 
         [Command("help"), Description("Gives you an overview about all the available commands."), InteractionLocalizer<CommandLocalizer>]
@@ -100,7 +100,7 @@ public sealed class CoreCommands
                 embeds.Add(embed);
             }
 
-            AzuraCastEntity? ac = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
+            AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id);
             if (embeds.Count is not 10 && ac is null)
             {
                 DiscordEmbed embed = EmbedBuilder.BuildAzzyHelpSetupEmbed();

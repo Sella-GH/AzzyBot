@@ -11,7 +11,7 @@ public record AzuraStationQueueItemRecord
     /// UNIX timestamp when playback is expected to start.
     /// </summary>
     [JsonPropertyName("played_at")]
-    public required int PlayedAt { get; init; }
+    public required long PlayedAt { get; init; }
 
     /// <summary>
     /// Duration of the song in seconds

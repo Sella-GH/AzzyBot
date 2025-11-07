@@ -10,6 +10,7 @@ using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Data.Services;
+
 using DSharpPlus.Entities;
 
 using Microsoft.Extensions.Logging;
@@ -42,8 +43,6 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
 
     public async Task CheckForAzzyUpdatesAsync()
     {
-        _logger.GlobalTimerCheckForUpdates();
-
         string localVersion = SoftwareStats.GetAppVersion;
         bool isPreview = localVersion.Contains("-preview", StringComparison.OrdinalIgnoreCase);
 
@@ -54,7 +53,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
             return;
         }
 
-        AzzyUpdateRecord? updaterRecord = (isPreview) ? JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.ListAzzyUpdateRecord)?[0] : JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.AzzyUpdateRecord);
+        AzzyUpdateRecord? updaterRecord = (isPreview) ? JsonSerializer.Deserialize(body, JsonSourceGen.Default.ListAzzyUpdateRecord)?[0] : JsonSerializer.Deserialize(body, JsonSourceGen.Default.AzzyUpdateRecord);
         if (updaterRecord is null)
         {
             _logger.OnlineVersionUnserializable();
@@ -114,7 +113,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
             EmbedBuilder.BuildAzzyUpdatesAvailableEmbed(updateVersion, releaseDate, _latestUrl)
         };
 
-        if (_updaterSettings.DisplayChangelog)
+        if (_updaterSettings.DisplayChangelog && !string.IsNullOrEmpty(changelog))
             embeds.Add(EmbedBuilder.BuildAzzyUpdatesChangelogEmbed(changelog, _latestUrl));
 
         if (_updaterSettings.DisplayInstructions)

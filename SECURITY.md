@@ -6,7 +6,12 @@ We expect that all users of the software, if they are interested in taking advan
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 2.3.x | :white_check_mark: |
+| 2.8.x | :white_check_mark: |
+| 2.7.x | :x: |
+| 2.6.x | :x: |
+| 2.5.x | :x: |
+| 2.4.x | :x: |
+| 2.3.x | :x: |
 | 2.2.x | :x: |
 | 2.1.x | :x: |
 | 2.0.x | :x: |
@@ -17,7 +22,7 @@ We expect that all users of the software, if they are interested in taking advan
 
 ## Reporting a Vulnerability
 
-AzzyBot utilises code scanning via GitHub Actions and various checks from our development team to keep our software as secure as possible for our users, however, no software is perfect.
+AzzyBot utilizes code scanning via GitHub Actions and various checks from our development team to keep our software as secure as possible for our users, however, no software is perfect.
 
 We recommend using GitHub [Security Advisories](https://github.com/Sella-GH/AzzyBot/security/advisories/new) to report vulnerabilities directly to us.
 

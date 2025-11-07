@@ -1,4 +1,6 @@
 using System;
+using System.Net;
+using System.Net.Http;
 
 using AzzyBot.Bot.Commands;
 using AzzyBot.Bot.Commands.Checks;
@@ -9,6 +11,7 @@ using AzzyBot.Bot.Services.DiscordEvents;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Settings.Validators;
+using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Records;
 using AzzyBot.Data.Extensions;
 using AzzyBot.Data.Settings;
@@ -45,7 +48,7 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<CoreServiceHost>().AddHostedService(static s => s.GetRequiredService<CoreServiceHost>());
 
         // Register the database services
-        services.AzzyBotDataServices(dbSettings.EncryptionKey, dbSettings.Host, dbSettings.Port, dbSettings.User, dbSettings.Password, dbSettings.DatabaseName);
+        services.AzzyBotDataServices(dbSettings);
 
         services.DiscordClient(botSettings.BotToken);
         services.DiscordClientCommands(botSettings);
@@ -53,7 +56,15 @@ public static class IServiceCollectionExtensions
 
         services.AddSingleton<DiscordBotService>();
         services.AddSingleton<DiscordBotServiceHost>().AddHostedService(static s => s.GetRequiredService<DiscordBotServiceHost>());
+        services.AddSingleton<CoreService>();
 
+        services.AddHttpClient(SoftwareStats.GetAppName, static c =>
+        {
+            c.DefaultRequestHeaders.UserAgent.Add(new(SoftwareStats.GetAppName, SoftwareStats.GetAppVersion));
+            c.DefaultRequestVersion = HttpVersion.Version11;
+            c.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher;
+            c.Timeout = TimeSpan.FromSeconds(30);
+        });
         services.AddSingleton<WebRequestService>();
         services.AddSingleton<UpdaterService>();
 
@@ -63,9 +74,33 @@ public static class IServiceCollectionExtensions
         services.AddSingleton<AzuraCastUpdateService>();
         services.AddNCronJob(o =>
         {
-            o.AddJob<AzuraRequestJob>();
-            o.AddJob<AzzyBotGlobalChecksJob>(j => j.WithCronExpression("*/15 * * * *").WithName(nameof(AzzyBotGlobalChecksJob))); // Every 15 minutes
-            o.AddJob<LogfileCleaningJob>(j => j.WithCronExpression("0 0 */1 * *").WithName(nameof(LogfileCleaningJob)).WithParameter(logDays)).RunAtStartup(); // Every day
+#if DEBUG && !DOCKER_DEBUG
+            const string everyMinute = "* * * * *";
+            const string every15Minutes = "*/2 * * * *";
+            const string everyHour = "*/3 * * * *";
+            const string every6Hours = "*/4 * * * *";
+            const string every12Hours = "*/5 * * * *";
+            const string everyDay = "*/6 * * * *";
+#else
+            const string everyMinute = "* * * * *";
+            const string every15Minutes = "*/15 * * * *";
+            const string everyHour = "0 * * * *";
+            const string every6Hours = "0 */6 * * *";
+            const string every12Hours = "0 */12 * * *";
+            const string everyDay = "0 0 * * *";
+#endif
+            o.AddJob<AzuraCheckApiPermissionsJob>(j => j.WithName(nameof(AzuraCheckApiPermissionsJob)).WithCronExpression(every12Hours));
+            o.AddJob<AzuraCheckFileChangesJob>(j => j.WithName(nameof(AzuraCheckFileChangesJob)).WithCronExpression(everyHour));
+            o.AddJob<AzuraCheckUpdatesJob>(j => j.WithName(nameof(AzuraCheckUpdatesJob)).WithCronExpression(every6Hours));
+            o.AddJob<AzuraPersistentNowPlayingJob>(j => j.WithName(nameof(AzuraPersistentNowPlayingJob)).WithCronExpression(everyMinute));
+            o.AddJob<AzuraRequestJob>(j => j.WithName(nameof(AzuraRequestJob))); // This job is not intended to be run at a certain time, it will only be requested!
+            o.AddJob<AzuraStatusPingJob>(j => j.WithName(nameof(AzuraStatusPingJob)).WithCronExpression(every15Minutes));
+            o.AddJob<AzzyBotCheckPermissionsJob>(j => j.WithName(nameof(AzzyBotCheckPermissionsJob)).WithCronExpression(every12Hours));
+            o.AddJob<AzzyBotInactiveGuildJob>(j => j.WithName(nameof(AzzyBotInactiveGuildJob)).WithCronExpression(everyDay));
+            o.AddJob<AzzyBotUpdateCheckJob>(j => j.WithName(nameof(AzzyBotUpdateCheckJob)).WithCronExpression(every6Hours));
+            o.AddJob<DatabaseCleaningJob>(j => j.WithName(nameof(DatabaseCleaningJob)).WithCronExpression(everyDay).RunAtStartup());
+            o.AddJob<LogfileCleaningJob>(j => j.WithName(nameof(LogfileCleaningJob)).WithCronExpression(everyDay).WithParameter(logDays).RunAtStartup());
+            o.AddJob<MusicStreamingPersistentNowPlayingJob>(j => j.WithName(nameof(MusicStreamingPersistentNowPlayingJob)).WithCronExpression(everyMinute));
         });
         services.AddSingleton<CronJobManager>();
 
@@ -150,7 +185,7 @@ public static class IServiceCollectionExtensions
     private static void DiscordClientCommands(this IServiceCollection services, AzzyBotSettings settings)
     {
         services.AddSingleton<DiscordCommandsErrorHandler>();
-        services.AddCommandsExtension((IServiceProvider sp, CommandsExtension c) =>
+        services.AddCommandsExtension((sp, c) =>
         {
             DiscordCommandsErrorHandler handler = sp.GetRequiredService<DiscordCommandsErrorHandler>();
 

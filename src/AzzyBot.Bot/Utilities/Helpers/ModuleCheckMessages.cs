@@ -1,6 +1,6 @@
 ﻿namespace AzzyBot.Bot.Utilities.Helpers;
 
-public static class CheckMessages
+public static class ModuleCheckMessages
 {
     public const string AzuraCastIsNull = "AzuraCast is null!";
     public const string GuildIsNull = "Guild is null!";

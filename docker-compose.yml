@@ -19,9 +19,11 @@ services:
     volumes:
       - ./AzzyBot/Modules/AzuraCast/Files:/app/Modules/AzuraCast/Files
       - ./AzzyBot/Backups:/app/Backups
+      - ./AzzyBot/Certificates:/app/Certificates
       - ./AzzyBot/Logs:/app/Logs
       - ./AzzyBot/Settings:/app/Settings
-
+      
+# If you use an external database, you can comment out the AzzyBot-Db service
   AzzyBot-Db:
     container_name: AzzyBot-Db
     image: postgres:16-alpine

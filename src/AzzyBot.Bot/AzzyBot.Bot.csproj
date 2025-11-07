@@ -32,7 +32,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lavalink4NET.DSharpPlus.Nightly" />
+    <!--<PackageReference Include="Lavalink4NET.DSharpPlus.Nightly" />-->
+    <ProjectReference Include="..\..\extern\Lavalink4NET\src\Lavalink4NET.DSharpPlus.Nightly\Lavalink4NET.DSharpPlus.Nightly.csproj" />
+
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

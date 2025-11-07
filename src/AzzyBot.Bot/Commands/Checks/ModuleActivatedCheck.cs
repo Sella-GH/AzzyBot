@@ -35,31 +35,31 @@ public sealed class ModuleActivatedCheck(ILogger<ModuleActivatedCheck> logger, D
             switch (module)
             {
                 case AzzyModules.AzuraCast:
-                    AzuraCastEntity? azuraCast = await _dbActions.GetAzuraCastAsync(context.Guild.Id);
+                    AzuraCastEntity? azuraCast = await _dbActions.ReadAzuraCastAsync(context.Guild.Id);
                     if (azuraCast is null)
                     {
                         _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
-                        return CheckMessages.AzuraCastIsNull;
+                        return ModuleCheckMessages.AzuraCastIsNull;
                     }
 
                     return null;
 
                 case AzzyModules.LegalTerms:
-                    GuildEntity? guild = await _dbActions.GetGuildAsync(context.Guild.Id);
+                    GuildEntity? guild = await _dbActions.ReadGuildAsync(context.Guild.Id);
                     if (guild is null)
                     {
                         _logger.DatabaseGuildNotFound(context.Guild.Id);
-                        return CheckMessages.GuildIsNull;
+                        return ModuleCheckMessages.GuildIsNull;
                     }
                     else if (!guild.LegalsAccepted)
                     {
-                        return CheckMessages.LegalsNotAccepted;
+                        return ModuleCheckMessages.LegalsNotAccepted;
                     }
 
                     return null;
 
                 default:
-                    return CheckMessages.ModuleNotFound;
+                    return ModuleCheckMessages.ModuleNotFound;
             }
         }
 

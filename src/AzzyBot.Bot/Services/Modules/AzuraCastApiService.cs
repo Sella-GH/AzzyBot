@@ -59,8 +59,9 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     private async Task CheckForAdminApiPermissionsAsync(AzuraCastEntity azuraCast)
     {
-        string baseUrl = Crypto.Decrypt(azuraCast.BaseUrl);
-        string apiUrl = $"{baseUrl}/api";
+        Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
+        string apiUrl = $"{baseUrl}api"; // Omit the trailing slash because it's an Uri
+        string adminApiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
         List<Uri> apis = new(4)
         {
             new($"{apiUrl}/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Logs}"),
@@ -71,7 +72,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         if (azuraCast.Checks.Updates)
             apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Updates}"));
 
-        IEnumerable<string> missing = await ExecuteApiPermissionCheckAsync(apis, Crypto.Decrypt(azuraCast.AdminApiKey));
+        IEnumerable<string> missing = await ExecuteApiPermissionCheckAsync(apis, adminApiKey);
         if (!missing.Any())
             return;
 
@@ -89,14 +90,15 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
     private async Task CheckForStationApiPermissionsAsync(AzuraCastStationEntity station)
     {
-        string baseUrl = Crypto.Decrypt(station.AzuraCast.BaseUrl);
-        string apiUrl = $"{baseUrl}/api";
+        Uri baseUrl = new(Crypto.Decrypt(station.AzuraCast.BaseUrl));
+        string apiUrl = $"{baseUrl}api"; // Omit the trailing slash because it's an Uri
         int stationId = station.StationId;
-        AzuraAdminStationConfigRecord? config = await GetStationAdminConfigAsync(new(baseUrl), Crypto.Decrypt(station.AzuraCast.AdminApiKey), stationId);
+        string adminApiKey = Crypto.Decrypt(station.AzuraCast.AdminApiKey);
+        AzuraAdminStationConfigRecord? config = await GetStationAdminConfigAsync(baseUrl, adminApiKey, stationId);
         if (config is null)
             return;
 
-        List<Uri> apis = new(7)
+        List<Uri> apis = new(6)
         {
             new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}"),
             new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlists}"),
@@ -110,8 +112,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         if (station.Checks.FileChanges)
             apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}"));
 
-        string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? station.AzuraCast.AdminApiKey : station.ApiKey;
-        IEnumerable<string> missing = await ExecuteApiPermissionCheckAsync(apis, Crypto.Decrypt(apiKey));
+        string apiKey = (!string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : adminApiKey;
+        IEnumerable<string> missing = await ExecuteApiPermissionCheckAsync(apis, apiKey);
         if (!missing.Any())
             return;
 
@@ -191,11 +193,27 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            return (T)JsonSerializer.Deserialize(body, JsonDeserializationSourceGen.Default.GetTypeInfo(typeof(T))!)!;
+            return (T)JsonSerializer.Deserialize(body, JsonSourceGen.Default.GetTypeInfo(typeof(T))!)!;
         }
-        catch (JsonException ex)
+        catch (JsonException jsonEx)
         {
-            throw new InvalidOperationException($"Failed to deserialize body: {body}", ex);
+            AzuraErrorRecord? error;
+            try
+            {
+                // See if we can catch an error message
+                error = JsonSerializer.Deserialize(body, JsonSourceGen.Default.AzuraErrorRecord);
+                if (error is not null)
+                {
+                    await _botService.LogExceptionAsync(new InvalidOperationException($"API returned an error: {error.Message}"), DateTimeOffset.Now);
+                    return default;
+                }
+            }
+            catch (JsonException errorEx)
+            {
+                throw new InvalidOperationException($"Failed to deserialize body: {body}", errorEx);
+            }
+
+            throw new InvalidOperationException($"Failed to deserialize body: {body}", jsonEx);
         }
     }
 
@@ -209,11 +227,27 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            return (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonDeserializationListSourceGen.Default.GetTypeInfo(typeof(IEnumerable<T>))!)!;
+            return (IEnumerable<T>)JsonSerializer.Deserialize(body, JsonSourceGen.Default.GetTypeInfo(typeof(IEnumerable<T>))!)!;
         }
-        catch (JsonException ex)
+        catch (JsonException jsonEx)
         {
-            throw new InvalidOperationException($"Failed to deserialize body: {body}", ex);
+            AzuraErrorRecord? error;
+            try
+            {
+                // See if we can catch an error message
+                error = JsonSerializer.Deserialize(body, JsonSourceGen.Default.AzuraErrorRecord);
+                if (error is not null)
+                {
+                    await _botService.LogExceptionAsync(new InvalidOperationException($"API returned an error: {error.Message}"), DateTimeOffset.Now);
+                    return default;
+                }
+            }
+            catch (JsonException errorEx)
+            {
+                throw new InvalidOperationException($"Failed to deserialize body: {body}", errorEx);
+            }
+
+            throw new InvalidOperationException($"Failed to deserialize body: {body}", jsonEx);
         }
     }
 
@@ -303,6 +337,14 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         await _webService.DownloadAsync(url, downloadPath, CreateHeader(apiKey), acceptJson: true);
     }
 
+    public Task<string> DownloadSongArtworkAsync(Uri url, string apiKey, string downloadPath)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentException.ThrowIfNullOrWhiteSpace(downloadPath);
+
+        return _webService.DownloadAsync(url, downloadPath, CreateHeader(apiKey), acceptImage: true);
+    }
+
     public async Task<IEnumerable<AzuraFilesRecord>> GetFilesLocalAsync(int guildId, int azuraCastId, int databaseId, int stationId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(azuraCastId);
@@ -319,7 +361,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            return JsonSerializer.Deserialize(content, JsonDeserializationListSourceGen.Default.IEnumerableAzuraFilesRecord) ?? throw new InvalidOperationException($"Could not deserialize content: {content}");
+            return JsonSerializer.Deserialize(content, JsonSourceGen.Default.IEnumerableAzuraFilesRecord) ?? throw new InvalidOperationException($"Could not deserialize content: {content}");
         }
         catch (JsonException ex)
         {
@@ -358,13 +400,13 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         return GetFromApiAsync<AzuraStatusRecord>(baseUrl, endpoint, noLogging: true);
     }
 
-    public Task<AzuraNowPlayingDataRecord?> GetNowPlayingAsync(Uri baseUrl, int stationId, bool noLogging = false)
+    public Task<AzuraNowPlayingDataRecord?> GetNowPlayingAsync(Uri baseUrl, string apiKey, int stationId, bool noLogging = false)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = $"{AzuraApiEndpoints.NowPlaying}/{stationId}";
 
-        return GetFromApiAsync<AzuraNowPlayingDataRecord>(baseUrl, endpoint, noLogging: noLogging);
+        return GetFromApiAsync<AzuraNowPlayingDataRecord>(baseUrl, endpoint, CreateHeader(apiKey), noLogging);
     }
 
     public Task<AzuraPlaylistRecord?> GetPlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId)
@@ -463,13 +505,13 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         };
     }
 
-    public Task<AzuraStationRecord?> GetStationAsync(Uri baseUrl, int stationId)
+    public Task<AzuraStationRecord?> GetStationAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}";
 
-        return GetFromApiAsync<AzuraStationRecord>(baseUrl, endpoint);
+        return GetFromApiAsync<AzuraStationRecord>(baseUrl, endpoint, CreateHeader(apiKey));
     }
 
     public Task<AzuraAdminStationConfigRecord?> GetStationAdminConfigAsync(Uri baseUrl, string apiKey, int stationId)
@@ -577,7 +619,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}";
 
-        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, JsonSerializationSourceGen.Default.AzuraAdminStationConfigRecord), CreateHeader(apiKey));
+        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, JsonSourceGen.Default.AzuraAdminStationConfigRecord), CreateHeader(apiKey));
     }
 
     public async Task RequestInternalSongAsync(Uri baseUrl, string apiKey, int stationId, string songPath)
@@ -594,7 +636,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         AzuraInternalRequestRecord songRequest = new(songPath[..lastSlash], AzuraApiEndpoints.Queue, [songPath]);
 
-        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(songRequest, JsonSerializationSourceGen.Default.AzuraInternalRequestRecord), CreateHeader(apiKey));
+        await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(songRequest, JsonSourceGen.Default.AzuraInternalRequestRecord), CreateHeader(apiKey));
     }
 
     public async Task RequestSongAsync(Uri baseUrl, int stationId, string requestId)
@@ -654,7 +696,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         {
             try
             {
-                nowPlaying = await GetNowPlayingAsync(baseUrl, stationId, true);
+                nowPlaying = await GetNowPlayingAsync(baseUrl, apiKey, stationId, noLogging: true);
             }
             catch (Exception e) when (e is HttpRequestException or InvalidOperationException or JsonException)
             {
@@ -783,7 +825,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
-            return (T)JsonSerializer.Deserialize(result, JsonDeserializationSourceGen.Default.GetTypeInfo(typeof(T))!)!;
+            return (T)JsonSerializer.Deserialize(result, JsonSourceGen.Default.GetTypeInfo(typeof(T))!)!;
         }
         catch (JsonException ex)
         {

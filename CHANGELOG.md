@@ -1,3 +1,138 @@
+## 2.8.2 - 2025-10-19
+### Improvements
+- We now check before a new AzuraCast instance is created if the provided API URL is reachable to prevent misconfigurations
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02554
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 9.0.10
+- Updated [Microsoft.Extensions.X](https://github.com/dotnet/runtime) libraries to version 9.0.10
+
+## 2.8.1 - 2025-10-12
+### Fixes
+- Removed the check for `/api/station/{id}` since it was making more issues than it gave value
+- Some minor fixes regarding NullExceptions coming up in rare cases
+
+## 2.8.0 - 2025-09-29
+### General
+- A new daily check added which notifies unused/unconfigured instances and forces the bot to leave these servers after 3 or 7 days
+  - This check was added to reduce database clutter and to ensure that the bot is only used in actively managed servers
+  - Maybe server counts of the public bot will go down after this but this is negligible
+
+### Additions
+- A new setting was added to specify a channel id where the bot will send a copy of its `admin send-bot-wide-message` message to
+  - This setting is optional and does not break your existing setup, therefore it's not shown in the default settings.json
+  - If you want to use it take a look in the [Wiki](https://github.com/Sella-GH/AzzyBot/wiki/Azzy-2.0.0-AzzyBot-Settings)
+
+### Improvements
+- Added support for https://github.com/AzuraCast/AzuraCast/pull/8150
+  - For `music now-playing` this means we now download the song artwork temporarily so we can deliver it to you
+- Discord Uri protocols now default to https instead of http if no protocol is specified
+- Refactored internal code with some micro optimizations and hardenings around errors
+
+### Development
+- Deleted unnecessary code which is native in .NET
+- Miscellaneous action improvements
+- Simplified Json Source Generation
+
+### Fixes
+- Fixed an issue where the bot failed to run the AzuraCastUpdateJobs if an exception occurred
+- Fixed an issue which prevented the command `azuracast force-api-permission-check` from running
+- Fixed an issue which let the api permissions check run only on admin nodes
+- Fixed an issue which broke the `azuracast hardware-stats` command
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02551
+
+## 2.7.0 - 2025-09-14
+### General
+- Reworked the Encryption strength of the critical data stored in the database
+  - We now use the AesGcm algorithm with a 256 bit key to be more future-proof since .NET 10 will deprecate AesCcm on some platforms
+  - Current stored data is automatically migrated to the new algorithm upon startup for a limited amount of releases
+- We now use the native produced executable instead of the .dll in docker images
+
+### Improvements
+- Dropped the self-build HttpClient handling and adapted to Microsoft.Extensions.Http
+  - This should improve the performance and reliability of all http requests
+
+### Fixes
+- Fixed an issue resulting in exceptions when there was a malformed uri in the database
+- Fixed a daily exception occurring when trying to check discord permissions
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02544
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 9.0.9
+- Updated [Microsoft.Extensions.X](https://github.com/dotnet/runtime) libraries to version 9.0.9
+- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.6.0
+- Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.14.0
+- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.15.0.120848
+
+## 2.6.2 - 2025-07-18
+### Fixes
+- Another fix for the AzuraCast Update Check to make it work with the latest AzuraCast version
+
+## 2.6.1 - 2025-07-17
+### Fixes
+- The AzuraCast Update Check is now able to work with the latest AzuraCast rolling release changes and does not throw a NullReferenceException anymore
+
+### Dependencies
+- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.14.0.120626
+
+## 2.6.0 - 2025-07-13
+### General
+- For a short while we now use a custom version of Lavalink4NET which includes a fix so we're able to update DSharpPlus to the latest version
+  - This is a temporary solution until a PR with the fix gets merged
+
+### Additions
+- Added two new commands `azuracast station-nowplaying-embed` and `player streaming-nowplaying-embed`
+  - These commands allow you to create a persistent embed which shows the current song playing on the AzuraCast station or the streaming player
+  - The embed will automatically update each minute
+  - If you leave the optional `channel` parameter empty OR the music/station stops playing the embed will be deleted
+- You can now specify the used backend database version in the DatabaseSettings section of your .json file
+  - This can improve the translation of code to SQL specifically for your database version
+  - Be aware that this setting is hidden and if you decide to use it, enter the version like in the following example `"15.0"`
+
+### Improvements
+- Split up the maintenance jobs of the bot internals to make them more fail-safe
+- Optimized some discord related code to improve performance
+- Reordered and added some more info to embeds to make them more readable
+- The volume parameter of the MusicStreaming commands now defaults to 50 and gets saved in the database so it's restored each reconnect
+- Removed three layers of the dockerfile by combining ENV instructions
+
+### Fixes
+- Spelling mistakes were fixed
+- Long running songs are now correctly shown in now playing embeds
+
+### Development
+- Deleted some (now) unused logging code
+- Deleted the unused `reset` Boolean parameter in MusicStreamingService.SetVolumeAsync
+- Added new non-async methods to some music streaming and AzuraCast api methods
+- Added a whole new database entity for MusicStreaming
+
+- ### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02531
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 9.0.7
+- Updated [Microsoft.Extensions.Hosting](https://github.com/dotnet/runtime) to version 9.0.7
+
+## 2.5.0 - 2025-05-25
+### General
+- Reduced the size of the docker image by a few MB (maybe unnoticeable)
+- You are now able to connect to your database via SSL
+  - Please read the [docs](https://github.com/Sella-GH/AzzyBot/wiki/) if you want to use this feature
+
+### Dependencies
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 9.0.6
+- Updated [Microsoft.Extensions.Hosting](https://github.com/dotnet/runtime) to version 9.0.6
+- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.5.4
+- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.12.0.118525
+- Updated [System.Linq.Async](https://github.com/dotnet/reactive) to version 6.0.3
+
+## 2.4.1 - 2025-06-12
+### Dependencies
+- Downgraded [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02499
+
+### Fixes
+- Fixed an issue where the bot is unable to join a voice channel due to implementation changes in DSharpPlus
+
 ## 2.4.0 - 2025-06-01
 ### Breaking Changes
 - This version is only compatible with AzuraCast 0.21.0 and upwards!

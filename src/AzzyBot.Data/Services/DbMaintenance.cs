@@ -15,13 +15,13 @@ public sealed class DbMaintenance(ILogger<DbMaintenance> logger, DbActions dbAct
     private readonly ILogger<DbMaintenance> _logger = logger;
     private readonly DbActions _dbActions = dbActions;
 
-    public async Task CleanupLeftoverGuildsAsync(IReadOnlyDictionary<ulong, DiscordGuild> guilds)
+    public async Task CleanupLeftoverGuildsAsync(IAsyncEnumerable<DiscordGuild> guilds)
     {
-        _logger.DatabaseCleanupStart();
+        _logger.DatabaseOrphanedGuildsStart();
 
         IEnumerable<ulong> removedGuilds = await _dbActions.DeleteGuildsAsync(guilds);
         await _dbActions.UpdateAzzyBotAsync(lastDatabaseCleanup: true);
 
-        _logger.DatabaseCleanupComplete(removedGuilds.Count());
+        _logger.DatabaseOrphanedGuildsComplete(removedGuilds.Count());
     }
 }
