@@ -66,13 +66,13 @@ Follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wi
 
 ## Built With
 ### Software
-* [AzuraCast](https://github.com/AzuraCast/AzuraCast)
 * [.NET 10](https://github.com/dotnet/runtime)
+* [AzuraCast](https://github.com/AzuraCast/AzuraCast)
 * [Docker](https://docker.com/)
 * [Docker Compose](https://docker.com/)
 * [Lavalink](https://github.com/lavalink-devs/Lavalink)
 * [PostgreSQL](https://www.postgresql.org/)
-* [Visual Studio 2022 Community](https://visualstudio.microsoft.com/de/downloads)
+* [Visual Studio 2026 Community](https://visualstudio.microsoft.com/de/downloads)
 
 ### Dependencies
 * [CsvHelper](https://github.com/JoshClose/CsvHelper)

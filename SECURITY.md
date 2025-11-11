@@ -35,8 +35,8 @@ You can report any vulnerabilities directly to us if they relate to the core Azz
 ## Out of Scope
 
 AzzyBot is not responsible for the development or maintenance of several pieces of "upstream" software that we incorporate into our own product. This list of software includes, but is not limited to:
-* [AzuraCast](https://github.com/AzuraCast/AzuraCast)
 * [.NET 10](https://github.com/dotnet/runtime/)
+* [AzuraCast](https://github.com/AzuraCast/AzuraCast)
 * [CsvHelper](https://github.com/JoshClose/CsvHelper)
 * [Docker](https://docker.com/)
 * [Docker Compose](https://docker.com/)
@@ -52,7 +52,6 @@ AzzyBot is not responsible for the development or maintenance of several pieces 
 * [NReco.Logging.File](https://github.com/NReco/Logging)
 * [Roslynator](https://github.com/dotnet/roslynator)
 * [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet)
-* [System.Linq.Async](https://github.com/dotnet/reactive)
 * [TagLibSharp](https://github.com/mono/taglib-sharp)
 
 If you identify a security issue with any of those pieces of software, we encourage you to report it to them directly. If the issue also affects AzzyBot's implementation of the software, please let us know if and when a resolution is available so that we can update our own software to incorporate the fix.
