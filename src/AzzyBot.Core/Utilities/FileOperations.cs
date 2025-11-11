@@ -50,11 +50,11 @@ public static class FileOperations
 
         string zipPath = Path.Combine(zipFileDir, zipFileName);
         await using FileStream stream = new(zipPath, FileMode.Create);
-        using ZipArchive zipFile = new(stream, ZipArchiveMode.Create, false, Encoding.UTF8);
+        await using ZipArchive zipFile = new(stream, ZipArchiveMode.Create, false, Encoding.UTF8);
         foreach (string file in Directory.EnumerateFiles(filesDir))
         {
             string fileName = Path.GetFileName(file);
-            zipFile.CreateEntryFromFile(file, fileName, CompressionLevel.SmallestSize);
+            await zipFile.CreateEntryFromFileAsync(file, fileName, CompressionLevel.SmallestSize);
         }
 
         if (!File.Exists(zipPath))
