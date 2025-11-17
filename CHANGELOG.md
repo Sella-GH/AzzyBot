@@ -1,3 +1,13 @@
+## 2.9.0
+### General
+- Updated AzzyBot and all including dependencies from Microsoft to .NET 10
+- Removed the submodule from Lavalink4NET and now use the official NuGet package again
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02558
+- Updated [Lavalink4NET](https://github.com/lavalink4net/Lavalink4NET) to version 4.1.0
+- Updated [Nreco.Logging.File](https://github.com/nreco/logging) to version 1.3.0
+
 ## 2.8.2 - 2025-10-19
 ### Improvements
 - We now check before a new AzuraCast instance is created if the provided API URL is reachable to prevent misconfigurations

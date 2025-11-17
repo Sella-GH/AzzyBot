@@ -50,16 +50,6 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           fetch-depth: 0
-          submodules: recursive
-
-      - name: Checkout submodules
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-        with:
-          fetch-depth: 0
-          repository: Sella-GH/Lavalink4NET
-          ref: azzy
-          submodules: recursive
-          path: extern/Lavalink4NET
 
       - name: Get build environment
         id: get-environment
@@ -119,16 +109,6 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           fetch-depth: 0
-          submodules: recursive
-
-      - name: Checkout submodules
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-        with:
-          fetch-depth: 0
-          repository: Sella-GH/Lavalink4NET
-          ref: azzy
-          submodules: recursive
-          path: extern/Lavalink4NET
 
       - name: Replace values in files
         run: |
