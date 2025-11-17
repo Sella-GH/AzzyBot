@@ -34,7 +34,6 @@
   <ItemGroup>
     <PackageReference Include="Lavalink4NET.DSharpPlus.Nightly" />
     <PackageReference Include="Microsoft.Build" />
-
     <PackageReference Include="Microsoft.Build.Tasks.Core" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
       <PrivateAssets>all</PrivateAssets>
