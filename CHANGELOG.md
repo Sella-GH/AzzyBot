@@ -6,7 +6,7 @@
 ### Dependencies
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02558
 - Updated [Lavalink4NET](https://github.com/lavalink4net/Lavalink4NET) to version 4.1.0
-- Updated [Nreco.Logging.File](https://github.com/nreco/logging) to version 1.3.0
+- Updated [Nreco.Logging.File](https://github.com/nreco/logging) to version 1.3.1
 
 ## 2.8.2 - 2025-10-19
 ### Improvements
