@@ -78,44 +78,4 @@ public static class Crypto
 
         return Encoding.UTF8.GetString(plainBytes);
     }
-
-    // TODO: Remove this method in a future release after enough time has passed since the encryption schema change.
-    public static bool CheckIfNewCipherIsUsed(string cipher)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(cipher);
-
-        string[] parts = cipher.Split(':');
-
-        return parts.Length is 3;
-    }
-
-    /// <summary>
-    /// Migrates a legacy cipher string to a new encryption format.
-    /// </summary>
-    /// <param name="legacyCipher">The base64-encoded string representing the legacy cipher to be migrated.</param>
-    /// <returns>A string containing the newly encrypted cipher in the updated format.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if the migration process fails, typically due to an invalid legacy cipher or incorrect encryption key.</exception>
-    // TODO: Remove this method in a future release after enough time has passed since the encryption schema change.
-    public static string MigrateOldCipherToNew(string legacyCipher)
-    {
-        try
-        {
-            AesGcmCipher gcmCipher = AesGcmCipher.FromBase64String(legacyCipher);
-
-            using AesCcm aes = new(EncryptionKey);
-            byte[] plainBytes = new byte[gcmCipher.Cipher.Length];
-            aes.Decrypt(gcmCipher.Nonce, gcmCipher.Cipher, gcmCipher.Tag, plainBytes);
-            string plain = Encoding.UTF8.GetString(plainBytes);
-
-            return Encrypt(plain, EncryptionKey);
-        }
-        catch (FormatException ex)
-        {
-            throw new InvalidOperationException("Failed to migrate old cipher to new format: Invalid base64 encoding.", ex);
-        }
-        catch (CryptographicException ex)
-        {
-            throw new InvalidOperationException("Failed to migrate old cipher to new format: Decryption failed.", ex);
-        }
-    }
 }
