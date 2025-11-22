@@ -1,14 +1,19 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace AzzyBot.Data.Extensions;
 
+[SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Known Issue.")]
 public static class EFCoreExtensions
 {
-    public static IQueryable<T> IncludeIf<T>(this IQueryable<T> query, bool condition, Func<IQueryable<T>, IQueryable<T>> transform)
+    extension<T>(IQueryable<T> query)
     {
-        ArgumentNullException.ThrowIfNull(transform);
+        public IQueryable<T> IncludeIf(bool condition, Func<IQueryable<T>, IQueryable<T>> transform)
+        {
+            ArgumentNullException.ThrowIfNull(transform);
 
-        return (condition) ? transform(query) : query;
+            return (condition) ? transform(query) : query;
+        }
     }
 }

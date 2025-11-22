@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:labs
 
 # BUILD IMAGE
-FROM mcr.microsoft.com/dotnet/sdk:9.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
 USER root
 
 RUN apk update && apk upgrade && apk cache sync
@@ -18,7 +18,7 @@ RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.con
   && dotnet publish ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c $CONFIG --no-build --no-restore --no-self-contained -o out --ucr
 
 # RUNNER IMAGE
-FROM mcr.microsoft.com/dotnet/runtime:9.0-alpine AS runner
+FROM mcr.microsoft.com/dotnet/runtime:10.0-alpine AS runner
 USER root
 
 # Upgrade internal tools and packages first
