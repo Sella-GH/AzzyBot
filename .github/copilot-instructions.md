@@ -2,10 +2,10 @@
 
 ## Repository Overview
 
-AzzyBot is a Discord music bot written in C# using .NET 9 and DSharpPlus. It's specifically designed to integrate with AzuraCast (internet radio station management software) and provides music streaming capabilities through Lavalink. The bot supports Discord slash commands, file uploads, server management, and various AzuraCast-specific features.
+AzzyBot is a Discord music bot written in C# using .NET 10 and DSharpPlus. It's specifically designed to integrate with AzuraCast (internet radio station management software) and provides music streaming capabilities through Lavalink. The bot supports Discord slash commands, file uploads, server management, and various AzuraCast-specific features.
 
 **Key Statistics:**
-- **Language**: C# (.NET 9.0)
+- **Language**: C# (.NET 10.0)
 - **Project Type**: Multi-project Discord bot solution
 - **Architecture**: 3-tier (Bot, Core, Data) + External submodules
 - **Database**: PostgreSQL with Entity Framework Core
@@ -15,7 +15,7 @@ AzzyBot is a Discord music bot written in C# using .NET 9 and DSharpPlus. It's s
 ## Build Instructions & Environment Setup
 
 ### Prerequisites
-1. **.NET 9 SDK** (version 9.0.304) - **CRITICAL**: This project will not build with .NET 8 or earlier
+1. **.NET 10 SDK** (version 10.0.100) - **CRITICAL**: This project will not build with .NET 9 or earlier
 2. **Git** with submodule support
 3. **PostgreSQL** (for local development) or Docker
 4. **Lavalink** server (for music streaming features)
@@ -48,8 +48,8 @@ dotnet build ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Debug --no-incremental --no
 
 ### Common Build Issues & Solutions
 
-**Issue**: `NETSDK1045: The current .NET SDK does not support targeting .NET 9.0`
-- **Solution**: Install .NET 9 SDK version 9.0.304 or later. **Do not downgrade the target framework.**
+**Issue**: `NETSDK1045: The current .NET SDK does not support targeting .NET 10.0`
+- **Solution**: Install .NET 10 SDK version 10.0.100 or later. **Do not downgrade the target framework.**
 
 **Issue**: `Submodule 'extern/Lavalink4NET' not found`
 - **Solution**: Run `git submodule update --init --recursive` before any build commands
@@ -97,7 +97,7 @@ AzzyBot/
 ### Key Configuration Files
 - **Directory.Build.props**: Global MSBuild settings, analyzer configuration, build optimizations
 - **Directory.Packages.props**: Centralized package version management (enables `ManagePackageVersionsCentrally`)
-- **global.json**: Locks .NET SDK to version 9.0.304
+- **global.json**: Locks .NET SDK to version 10.0.100
 - **.editorconfig**: Extensive code style and analyzer rules (1000+ lines)
 - **Nuget.config**: Package sources and restore settings
 
@@ -139,7 +139,7 @@ The bot uses a modular architecture:
 ## Development Environment
 
 ### Recommended Setup
-1. **IDE**: Visual Studio 2022 Community (as mentioned in README)
+1. **IDE**: Visual Studio 2026 Community (as mentioned in README)
 2. **Extensions**: C# Dev Kit, Docker, GitHub Actions
 3. **Local Services**: PostgreSQL, Lavalink (via Docker Compose)
 
@@ -168,7 +168,7 @@ The project uses extensive static analysis:
 - **CodeQL**: Security vulnerability scanning
 
 ### Coding Standards
-- **C# Version**: Modern C# with .NET 9 features
+- **C# Version**: Modern C# with .NET 10 features
 - **Nullable Reference Types**: Enabled (`<Nullable>enable</Nullable>`)
 - **Code Style**: File-scoped namespaces, expression-bodied members, pattern matching
 - **Architecture**: Clean separation between Bot, Core, and Data layers
@@ -223,7 +223,7 @@ dotnet ef database update --project src/AzzyBot.Data --startup-project src/AzzyB
 ## Troubleshooting Guide
 
 ### "Project failed to restore"
-1. Ensure .NET 9 SDK is installed: `dotnet --list-sdks`
+1. Ensure .NET 10 SDK is installed: `dotnet --list-sdks`
 2. Check submodules: `git submodule status`
 3. Clear NuGet cache: `dotnet nuget locals all --clear`
 4. Use correct restore command with `--configfile ./Nuget.config`

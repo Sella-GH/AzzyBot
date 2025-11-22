@@ -1,4 +1,4 @@
-## 2.9.0
+## 2.9.0 - 2025-11-22
 ### Breaking Changes
 - The migration period for the old encryption method ended!
   - All data stored with the old encryption method is now inaccessible and lost
