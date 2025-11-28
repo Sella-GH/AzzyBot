@@ -124,7 +124,7 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@318604b99e75e41977312d83839a89be02ca4893 # v3.6.1
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v3.6.1
         with:
           flavor: latest=${{ matrix.os == 'ubuntu' && (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) || 'false' }}
           images: sellagh/azzybot
@@ -200,7 +200,7 @@ jobs:
 
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@318604b99e75e41977312d83839a89be02ca4893 # v3.6.1
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v3.6.1
         with:
           flavor: latest=${{ matrix.os == 'ubuntu' && (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) || 'false' }}
           images: sellagh/azzybot
