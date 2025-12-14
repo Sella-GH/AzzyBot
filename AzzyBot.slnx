@@ -25,9 +25,11 @@
     <File Path=".github/workflows/tag-creation.yml" />
   </Folder>
   <Folder Name="/global/">
+    <File Path="CHANGELOG.md" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
     <File Path="global.json" />
+    <File Path="SECURITY.md" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/AzzyBot.Bot/AzzyBot.Bot.csproj">
