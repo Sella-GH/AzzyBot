@@ -56,23 +56,13 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       with:
         fetch-depth: 0
-        submodules: recursive
-
-    - name: Checkout submodules
-      uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      with:
-        fetch-depth: 0
-        repository: Sella-GH/Lavalink4NET
-        ref: azzy
-        submodules: recursive
-        path: extern/Lavalink4NET
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@0499de31b99561a6d14a36a5f662c2a54f91beee # v3.29.5
+      uses: github/codeql-action/init@1b168cd39490f61582a9beae412bb7057a6b2c4e # v3.29.5
       with:
         config-file: ./.github/codeql/codeql-config.yml
         languages: ${{ matrix.language }}
@@ -91,10 +81,8 @@ jobs:
     # to build your code.
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
-    - name: Setup .NET 9
-      uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
-      with:
-        dotnet-version: 9
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@2016bd2012dba4e32de620c46fe006a3ac9f0602 # v5.0.1
 
     - name: Restore And Build
       run: |
@@ -102,7 +90,7 @@ jobs:
         dotnet build /home/runner/work/AzzyBot/AzzyBot/src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Release --no-incremental --no-restore --no-self-contained --ucr
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@0499de31b99561a6d14a36a5f662c2a54f91beee # v3.29.5
+      uses: github/codeql-action/analyze@1b168cd39490f61582a9beae412bb7057a6b2c4e # v3.29.5
       with:
         category: "/language:${{matrix.language}}"
         output: sarif-results
@@ -119,7 +107,7 @@ jobs:
         output: sarif-results/csharp.sarif
 
     - name: Upload Sarif
-      uses: github/codeql-action/upload-sarif@0499de31b99561a6d14a36a5f662c2a54f91beee # v3.29.5
+      uses: github/codeql-action/upload-sarif@1b168cd39490f61582a9beae412bb7057a6b2c4e # v3.29.5
       with:
         sarif_file: sarif-results/csharp.sarif
 

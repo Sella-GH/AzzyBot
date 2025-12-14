@@ -1,3 +1,19 @@
+## 2.9.0 - 2025-11-22
+### Breaking Changes
+- The migration period for the old encryption method ended!
+  - All data stored with the old encryption method is now inaccessible and lost
+  - If you use version 2.7.0 or lower please update to 2.8.2 and start the bot at least once to migrate your data
+
+### General
+- Updated AzzyBot and all including dependencies from Microsoft to .NET 10
+- Removed the submodule from Lavalink4NET and now use the official NuGet package again
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02558
+- Updated [Lavalink4NET](https://github.com/lavalink4net/Lavalink4NET) to version 4.1.0
+- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.7.0
+- Updated [Nreco.Logging.File](https://github.com/nreco/logging) to version 1.3.1
+
 ## 2.8.2 - 2025-10-19
 ### Improvements
 - We now check before a new AzuraCast instance is created if the provided API URL is reachable to prevent misconfigurations

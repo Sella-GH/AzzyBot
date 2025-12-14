@@ -45,8 +45,6 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
         await EnsureAzzyBotDbTableIsCreatedAsync();
         if (!string.IsNullOrWhiteSpace(_dbSettings.NewEncryptionKey) && (_dbSettings.NewEncryptionKey != _dbSettings.EncryptionKey))
             await ReencryptDatabaseAsync();
-
-        await MigrateDatabaseEncryptionSchemaAsync();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
@@ -54,42 +52,6 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
         _logger.BotStopping();
 
         return Task.CompletedTask;
-    }
-
-    // TODO: Remove this method in a future release after enough time has passed since the encryption schema change.
-    private async Task MigrateDatabaseEncryptionSchemaAsync()
-    {
-        _logger.DatabaseNewEncryptionStart();
-
-        await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
-
-        List<AzuraCastEntity> azuraCast = await dbContext.AzuraCast.ToListAsync();
-        List<AzuraCastStationEntity> azuraCastStations = await dbContext.AzuraCastStations.Where(static e => !string.IsNullOrEmpty(e.ApiKey)).ToListAsync();
-
-        try
-        {
-            foreach (AzuraCastEntity entity in azuraCast)
-            {
-                if (!string.IsNullOrEmpty(entity.BaseUrl) && !Crypto.CheckIfNewCipherIsUsed(entity.BaseUrl))
-                    entity.BaseUrl = Crypto.MigrateOldCipherToNew(entity.BaseUrl);
-
-                if (!string.IsNullOrEmpty(entity.AdminApiKey) && !Crypto.CheckIfNewCipherIsUsed(entity.AdminApiKey))
-                    entity.AdminApiKey = Crypto.MigrateOldCipherToNew(entity.AdminApiKey);
-            }
-
-            foreach (AzuraCastStationEntity entity in azuraCastStations.Where(static e => !Crypto.CheckIfNewCipherIsUsed(e.ApiKey)))
-            {
-                entity.ApiKey = Crypto.MigrateOldCipherToNew(entity.ApiKey);
-            }
-
-            await dbContext.SaveChangesAsync();
-        }
-        catch (Exception ex) when (ex is DbUpdateConcurrencyException or DbUpdateException)
-        {
-            throw new InvalidOperationException("An error occurred while migrating the encryption schema of the database", ex);
-        }
-
-        _logger.DatabaseNewEncryptionComplete();
     }
 
     private async Task EnsureAzzyBotDbTableIsCreatedAsync()
