@@ -458,7 +458,7 @@ public sealed class ConfigCommands
                 {
                     channels = [uploadChannel.Id];
                 }
-                else if (requestsChannel is not null && uploadChannel is not null)
+                else
                 {
                     channels = [requestsChannel.Id, uploadChannel.Id];
                 }
