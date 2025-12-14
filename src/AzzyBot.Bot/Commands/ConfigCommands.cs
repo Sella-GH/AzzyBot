@@ -449,22 +449,15 @@ public sealed class ConfigCommands
             {
                 await _dbActions.UpdateAzuraCastStationPreferencesAsync(context.Guild.Id, station, adminGroup?.Id, djGroup?.Id, uploadChannel?.Id, null, null, requestsChannel?.Id, uploadPath, showPlaylistInEmbed);
 
-                ulong[] channels = [];
-                if (requestsChannel is not null && uploadChannel is null)
-                {
-                    channels = [requestsChannel.Id];
-                }
-                else if (uploadChannel is not null && requestsChannel is null)
-                {
-                    channels = [uploadChannel.Id];
-                }
-                else
-                {
-                    channels = [requestsChannel.Id, uploadChannel.Id];
-                }
+                List<ulong> channels = new(2);
+                if (requestsChannel is not null)
+                    channels.Add(requestsChannel.Id);
 
-                if (channels.Length is not 0)
-                    await _botService.CheckPermissionsAsync(context.Guild, channels);
+                if (uploadChannel is not null)
+                    channels.Add(uploadChannel.Id);
+
+                if (channels.Count is not 0)
+                    await _botService.CheckPermissionsAsync(context.Guild, [.. channels]);
             }
 
             if (stationId.HasValue || !string.IsNullOrWhiteSpace(apiKey))
