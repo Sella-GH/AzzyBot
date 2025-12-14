@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Choices;
+using AzzyBot.Bot.Localization;
 using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
@@ -24,6 +25,7 @@ using DSharpPlus.Commands.ArgumentModifiers;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
+using DSharpPlus.Commands.Processors.SlashCommands.Localization;
 using DSharpPlus.Entities;
 
 using Microsoft.Extensions.Logging;
@@ -34,7 +36,7 @@ namespace AzzyBot.Bot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class AdminCommands
 {
-    [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator])]
+    [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), InteractionLocalizer<CommandLocalizer>]
     public sealed class AdminGroup(ILogger<AdminGroup> logger, IOptions<AzzyBotSettings> settings, DbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<AdminGroup> _logger = logger;
@@ -42,15 +44,15 @@ public sealed class AdminCommands
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
 
-        [Command("change-bot-status"), Description("Change the global bot status according to your likes.")]
+        [Command("change-bot-status"), Description("Change the global bot status according to your likes."), InteractionLocalizer<CommandLocalizer>]
         public async ValueTask ChangeStatusAsync
         (
             SlashCommandContext context,
-            [Description("Choose the activity type which the bot should have."), SlashChoiceProvider<BotActivityProvider>] int activity,
-            [Description("Choose the status type which the bot should have."), SlashChoiceProvider<BotStatusProvider>] int status,
-            [Description("Enter a custom doing which is added after the activity type."), MinMaxLength(0, 128)] string doing,
-            [Description("Enter a custom url. Only usable when having activity type streaming or watching!")] Uri? url = null,
-            [Description("Reset the bot status to default."), SlashChoiceProvider<BooleanYesNoStateProvider>] int reset = 0
+            [Description("Choose the activity type which the bot should have."), SlashChoiceProvider<BotActivityProvider>, InteractionLocalizer<CommandLocalizer>] int activity,
+            [Description("Choose the status type which the bot should have."), SlashChoiceProvider<BotStatusProvider>, InteractionLocalizer<CommandLocalizer>] int status,
+            [Description("Enter a custom doing which is added after the activity type."), MinMaxLength(0, 128), InteractionLocalizer<CommandLocalizer>] string doing,
+            [Description("Enter a custom url. Only usable when having activity type streaming or watching!"), InteractionLocalizer<CommandLocalizer>] Uri? url = null,
+            [Description("Reset the bot status to default."), SlashChoiceProvider<BooleanYesNoStateProvider>, InteractionLocalizer<CommandLocalizer>] int reset = 0
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -71,11 +73,11 @@ public sealed class AdminCommands
             }
         }
 
-        [Command("get-joined-server"), Description("Displays all servers the bot is in.")]
+        [Command("get-joined-server"), Description("Displays all servers the bot is in."), InteractionLocalizer<CommandLocalizer>]
         public async ValueTask GetJoinedGuildsAsync
         (
             SlashCommandContext context,
-            [Description("Select the server you want to get more information about."), SlashAutoCompleteProvider<GuildsAutocomplete>] string? serverId = null
+            [Description("Select the server you want to get more information about."), SlashAutoCompleteProvider<GuildsAutocomplete>, InteractionLocalizer<CommandLocalizer>] string? serverId = null
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -130,11 +132,11 @@ public sealed class AdminCommands
             }
         }
 
-        [Command("remove-joined-server"), Description("Removes the bot from a server.")]
+        [Command("remove-joined-server"), Description("Removes the bot from a server."), InteractionLocalizer<CommandLocalizer>]
         public async ValueTask RemoveJoinedGuildAsync
         (
             SlashCommandContext context,
-            [Description("Select the server you want to remove."), SlashAutoCompleteProvider<GuildsAutocomplete>] string serverId
+            [Description("Select the server you want to remove."), SlashAutoCompleteProvider<GuildsAutocomplete>, InteractionLocalizer<CommandLocalizer>] string serverId
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -191,11 +193,11 @@ public sealed class AdminCommands
             await context.EditResponseAsync(GeneralStrings.MessageSentToAll);
         }
 
-        [Command("send-bot-wide-message"), Description("Sends a message to all servers the bot is in.")]
+        [Command("send-bot-wide-message"), Description("Sends a message to all servers the bot is in."), InteractionLocalizer<CommandLocalizer>]
         public async ValueTask SendBotWideMessageAsync
         (
             SlashCommandContext context,
-            [Description("The message you want to send."), MinMaxLength(1, 2000)] string message
+            [Description("The message you want to send."), MinMaxLength(1, 2000), InteractionLocalizer<CommandLocalizer>] string message
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -222,11 +224,11 @@ public sealed class AdminCommands
             await context.EditResponseAsync(GeneralStrings.MessageSentToAll);
         }
 
-        [Command("view-logs"), Description("View the logs of the bot.")]
+        [Command("view-logs"), Description("View the logs of the bot."), InteractionLocalizer<CommandLocalizer>]
         public async ValueTask ViewLogsAsync
         (
             SlashCommandContext context,
-            [Description("The log file you want to read."), SlashAutoCompleteProvider<AzzyViewLogsAutocomplete>] string? logfile = null
+            [Description("The log file you want to read."), SlashAutoCompleteProvider<AzzyViewLogsAutocomplete>, InteractionLocalizer<CommandLocalizer>] string? logfile = null
         )
         {
             ArgumentNullException.ThrowIfNull(context);
