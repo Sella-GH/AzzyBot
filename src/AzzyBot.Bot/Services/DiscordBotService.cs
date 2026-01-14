@@ -202,8 +202,8 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             if (!string.IsNullOrWhiteSpace(ex.StackTrace))
             {
                 string jsonDump = JsonSerializer.Serialize(new(ex, info), JsonSourceGen.Default.SerializableExceptionsRecord);
-                timestampString = timestampString.Replace(" ", "_", StringComparison.OrdinalIgnoreCase).Replace(":", "-", StringComparison.OrdinalIgnoreCase);
-                string fileName = $"AzzyBotException_{timestampString}.json";
+                string fileTimestamp = timestampString.Replace(" ", "_", StringComparison.OrdinalIgnoreCase).Replace(":", "-", StringComparison.OrdinalIgnoreCase);
+                string fileName = $"AzzyBotException_{fileTimestamp}.json";
                 string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, fileName);
 
                 messageSent = await SendMessageAsync(_settings.ErrorChannelId, embeds: [embed], filePaths: [tempFilePath]);
