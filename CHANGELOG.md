@@ -1,3 +1,7 @@
+## Unreleased
+### Fixes
+- Exception logs no longer create and send empty JSON files when the exception has no StackTrace
+
 ## 2.9.0 - 2025-11-22
 ### Breaking Changes
 - The migration period for the old encryption method ended!
