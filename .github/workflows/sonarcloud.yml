@@ -24,7 +24,7 @@ jobs:
       contents: read
     steps:
       - name: Set up .NET SDK
-        uses: actions/setup-dotnet@2016bd2012dba4e32de620c46fe006a3ac9f0602 # v5.0.1
+        uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5.1.0
         with:
           dotnet-version: 10
 
@@ -40,7 +40,7 @@ jobs:
           fetch-depth: 0
 
       - name: Cache SonarQube Cloud Packages
-        uses: actions/cache@a7833574556fa59680c1b7cb190c1735db73ebf0 # 5.0.0
+        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # 5.0.1
         with:
           path: ~\sonar\cache
           key: ${{ runner.os }}-sonar
@@ -48,7 +48,7 @@ jobs:
 
       - name: Cache SonarQube Cloud Scanner
         id: cache-sonar-scanner
-        uses: actions/cache@a7833574556fa59680c1b7cb190c1735db73ebf0 # 5.0.0
+        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # 5.0.1
         with:
           path: .\.sonar\scanner
           key: ${{ runner.os }}-sonar-scanner

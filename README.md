@@ -109,9 +109,13 @@ Contributions are what make the open source community such an amazing place to b
 
 Distributed under the AGPL-3.0 License. See [LICENSE](https://github.com/Sella-GH/AzzyBot/blob/main/LICENSE) for more information.
 
-## Authors
+## Contributors
 
-* [Sella-GH](https://github.com/Sella-GH)
+<a href="https://github.com/Sella-GH/AzzyBot/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Sella-GH/AzzyBot" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
 
 ## Acknowledgements
 

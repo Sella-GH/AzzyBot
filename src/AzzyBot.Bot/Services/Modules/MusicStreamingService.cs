@@ -150,7 +150,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         return _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Queued, Options.Create(playerOptions), retrieveOptions);
     }
 
-    [SuppressMessage("Style", "IDE0072:Add missing cases", Justification = "These are not needed.")]
+    [SuppressMessage("Style", "IDE0072:Add missing cases", Justification = "Those are not needed.")]
     private static string PostPlayerRetrieveError(PlayerRetrieveStatus status, string? precondition)
     {
         return status switch
