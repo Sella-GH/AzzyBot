@@ -73,6 +73,31 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Localization\CommandChoices.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CommandChoices.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Localization\CommandDescriptions.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CommandDescriptions.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Localization\CommandNames.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CommandNames.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Localization\CommandParamDescriptions.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CommandParamDescriptions.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Localization\CommandParamNames.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CommandParamNames.resx</DependentUpon>
+    </Compile>
     <Compile Update="Resources\UriStrings.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -81,6 +106,26 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Localization\CommandChoices.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CommandChoices.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\CommandDescriptions.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CommandDescriptions.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\CommandNames.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CommandNames.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\CommandParamDescriptions.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CommandParamDescriptions.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Localization\CommandParamNames.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CommandParamNames.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\UriStrings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>UriStrings.Designer.cs</LastGenOutput>
