@@ -24,7 +24,7 @@ jobs:
   extract_meta:
     name: Extract metadata for use
     if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     outputs:
       loc_cs: ${{ steps.loc_cs.outputs.total_lines }}
       datetime: ${{ steps.dateTime.outputs.time }}
@@ -60,7 +60,7 @@ jobs:
     name: Build docker .zip file
     needs: extract_meta
     if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
@@ -97,7 +97,7 @@ jobs:
   create_release:
     name: Create GitHub Release
     needs: [extract_meta, build-docker]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     outputs:
       release_version: ${{ steps.set_output.outputs.release_version }}
     steps:
@@ -139,7 +139,7 @@ jobs:
   upload_assets:
     name: Upload GitHub Release Assets
     needs: [build-docker, create_release]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     steps:
       - name: Install GitHub CLI
         run: sudo apt-get update && sudo apt-get install -y gh

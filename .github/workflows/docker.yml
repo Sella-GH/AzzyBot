@@ -36,7 +36,7 @@ jobs:
   extract_meta:
     name: Extract metadata for use
     if: ${{ github.event_name != 'schedule' }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     outputs:
       environment: ${{ steps.get-environment.outputs.environment }}
       environment_alpine: ${{ steps.get-environment.outputs.environment_alpine }}
@@ -175,7 +175,7 @@ jobs:
 
   merge:
     name: Creating Docker Release
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
     needs: [extract_meta, docker-build]
     strategy:
       matrix:
