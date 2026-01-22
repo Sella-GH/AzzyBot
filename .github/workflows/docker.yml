@@ -175,7 +175,7 @@ jobs:
 
   merge:
     name: Creating Docker Release
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-24.04
     needs: [extract_meta, docker-build]
     strategy:
       matrix:
@@ -213,3 +213,4 @@ jobs:
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
             $(printf 'sellagh/azzybot@sha256:%s ' *)
+
