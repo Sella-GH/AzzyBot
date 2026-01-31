@@ -805,7 +805,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             guild.ReminderLeaveDate = reminderLeaveDate.Value;
         }
         // Reset the leave date if the guild has accepted the legals and configured the bot
-        else if (guild.ReminderLeaveDate != DateTimeOffset.MinValue && (guild.LegalsAccepted && guild.ConfigSet))
+        else if (guild.LegalsAccepted && guild.ConfigSet)
         {
             guild.ReminderLeaveDate = DateTimeOffset.MinValue;
         }
