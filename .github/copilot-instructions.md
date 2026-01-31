@@ -18,7 +18,7 @@ AzzyBot is a Discord music bot written in C# using .NET 10 and DSharpPlus. It's 
 
 ### Prerequisites
 1. **.NET 10 SDK** (version 10.0.101 or later) - **CRITICAL**: This project will not build with .NET 9 or earlier
-2. **Git** (submodule support no longer required as of version 2.9.0)
+2. **Git**
 3. **PostgreSQL** (for local development) or Docker
 4. **Lavalink** server (for music streaming features)
 
@@ -33,15 +33,11 @@ dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.config 
 dotnet build ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Debug --no-incremental --no-restore --no-self-contained --ucr
 ```
 
-**Note:** As of version 2.9.0, the Lavalink4NET submodule has been removed and replaced with the official NuGet package. Submodule initialization is no longer required.
-
 ### Build Configurations
 - **Debug**: Development builds (`AzzyBot-Dev.exe` on Windows, `AzzyBot-Dev` on Linux)
 - **Release**: Production builds (`AzzyBot.exe` on Windows, `AzzyBot` on Linux)  
 - **Docker**: Container production builds (`AzzyBot-Docker.exe` / `AzzyBot-Docker`)
 - **Docker-debug**: Container development builds (`AzzyBot-Docker-Dev.exe` / `AzzyBot-Docker-Dev`)
-
-**Note:** As of version 2.7.0, Docker images use native executables instead of .dll files for better performance.
 
 ### Build Timing
 - **Full clean build**: ~2-3 minutes
@@ -102,8 +98,6 @@ AzzyBot/
 └── AzzyBot.slnx              # Solution file
 ```
 
-**Note:** As of version 2.9.0, the `extern/Lavalink4NET/` submodule has been removed. The project now uses the official Lavalink4NET NuGet package.
-
 ### Key Configuration Files
 - **Directory.Build.props**: Global MSBuild settings, analyzer configuration, build optimizations
 - **Directory.Packages.props**: Centralized package version management (enables `ManagePackageVersionsCentrally`)
@@ -135,8 +129,6 @@ The bot uses a modular architecture with two main modules:
 1. **Code Push** triggers workflows on paths: `**.cs`, `**.csproj`, `**.json`, `**.props`, `**.sln`, `**.yml`
 2. **Build Process**:
         ```bash
-        # Checkout (no submodule initialization needed as of v2.9.0)
-   
         # Build (Windows for SonarCloud, Ubuntu for CodeQL)
         dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.config --force --no-cache --ucr
         dotnet build ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Release --no-incremental --no-restore --no-self-contained --ucr
@@ -258,31 +250,6 @@ dotnet ef migrations add MigrationName --project src/AzzyBot.Data --startup-proj
 dotnet ef database update --project src/AzzyBot.Data --startup-project src/AzzyBot.Bot
 ```
 
-## Dependency Management
-
-### Dependabot Configuration
-The project uses comprehensive Dependabot automation:
-
-1. **GitHub Actions**: Daily updates for workflow actions
-   - Auto-labeled with `area-ci` and `area-dependencies`
-   - Assigned to `Sella-GH`
-   - Commit messages prefixed with `[Actions]`
-
-2. **.NET SDK**: Daily updates for SDK versions
-   - Only minor and patch updates (major versions ignored)
-   - Commit messages prefixed with `[.NET SDK]`
-
-3. **NuGet Packages**: Daily updates with smart grouping
-   - **Analyzers Group**: Roslynator and SonarAnalyzer (all update types)
-   - **Microsoft Group**: EF Core, Microsoft.Extensions, Npgsql, NReco (minor/patch only)
-   - **Others Group**: All other packages except DSharpPlus (all update types)
-   - DSharpPlus updates are manually managed (ignored by Dependabot)
-
-### Dependabot Workflows
-- **dependabot-auto-merge.yml**: Automatically merges approved Dependabot PRs
-- **dependabot-formatting.yml**: Applies code formatting to Dependabot PRs before merge
-- Both workflows ensure code quality standards are maintained for automated updates
-
 ## Common Development Tasks
 
 ### Adding New Discord Commands
@@ -342,39 +309,6 @@ The project uses multiple security scanning tools:
 - All API keys and tokens must be stored in `AzzyBotSettings.json` (gitignored)
 - Database connection strings should use environment variables in production
 - HTTPS is enforced for all Discord URI protocols
-
-## Important Version-Specific Changes
-
-### Version 2.9.0 (Current) - November 2025
-**Breaking Changes:**
-- Migration period for old encryption method ended
-- Data encrypted with old method (pre-2.7.0) is now inaccessible
-
-**Major Updates:**
-- Upgraded to .NET 10 from .NET 9
-- Removed Lavalink4NET submodule, now using official NuGet package (v4.1.0)
-- Updated DSharpPlus to v5.0.0-nightly-02562
-- Updated NCronJob to v4.9.0
-
-**Impact:**
-- No longer requires git submodule initialization
-- Simplified build process and dependency management
-- Faster CI/CD pipeline (no submodule checkout)
-
-### Version 2.8.0 - September 2025
-- Added daily check for unused/unconfigured instances
-- Bot automatically leaves inactive servers after 3-7 days
-- Reduces database clutter and ensures active server management
-
-### Version 2.7.0 - September 2025
-- Encryption strength rework (AES-CCM → AES-GCM)
-- Native executable used in Docker images instead of .dll
-- Migrated to Microsoft.Extensions.Http for improved HTTP handling
-
-### Version 2.6.0 - July 2025
-- Added persistent now-playing embeds with auto-updates
-- Database version specification for optimized SQL translation
-- Volume settings now persist in database
 
 ## Key Files for Agents
 
