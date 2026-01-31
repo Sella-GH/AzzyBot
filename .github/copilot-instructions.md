@@ -102,7 +102,7 @@ AzzyBot/
 - **Directory.Build.props**: Global MSBuild settings, analyzer configuration, build optimizations
 - **Directory.Packages.props**: Centralized package version management (enables `ManagePackageVersionsCentrally`)
 - **global.json**: Locks .NET SDK to version 10.0.101 with `allowPrerelease: true` and `rollForward: latestFeature`
-- **.editorconfig**: Extensive code style and analyzer rules (1105 lines)
+- **.editorconfig**: Extensive code style and analyzer rules (1106 lines)
 - **Nuget.config**: Package sources and restore settings
 
 ### Module Organization
