@@ -129,26 +129,27 @@ The bot uses a modular architecture with two main modules:
 1. **Code Push** triggers workflows on paths: `**.cs`, `**.csproj`, `**.json`, `**.props`, `**.sln`, `**.yml`
 2. **Build Process**:
         ```bash
+        # Checkout
         # Build (Windows for SonarCloud, Ubuntu for CodeQL)
         dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.config --force --no-cache --ucr
         dotnet build ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Release --no-incremental --no-restore --no-self-contained --ucr
         ```
-3. **Quality Checks**: 
+4. **Quality Checks**: 
    - SonarCloud analysis (code quality, bugs, code smells)
    - CodeQL security scanning for C# code and GitHub Actions
    - HCL AppScan CodeSweep (additional security scanning on PRs)
-4. **Docker Builds**: Multi-platform images (linux/amd64, linux/arm64) for both Ubuntu and Alpine, pushed to Docker Hub
-5. **Release Process**: 
+5. **Docker Builds**: Multi-platform images (linux/amd64, linux/arm64) for both Ubuntu and Alpine, pushed to Docker Hub
+6. **Release Process**: 
    - Automated on commit messages containing `[release]` or `[pre-release]`
    - Creates git tags automatically
    - Builds Docker images and .NET binaries
    - Generates release notes from CHANGELOG.md
    - Publishes to GitHub Releases and Docker Hub
-6. **Dependabot Integration**:
+7. **Dependabot Integration**:
    - Daily dependency checks for NuGet packages, GitHub Actions, and .NET SDK
    - Auto-formatting of dependabot PRs
    - Auto-merge capability for minor/patch updates
-7. **Backports**: Automated backporting to release branches when needed
+8. **Backports**: Automated backporting to release branches when needed
 
 ### Build Matrix
 - **Platforms**: linux/amd64, linux/arm64
