@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -68,7 +68,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(ExportPlaylistsAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(ExportPlaylistsAsync), context.User.Username);
 
             AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true);
             if (ac is null)
@@ -157,7 +157,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(ForceApiPermissionCheckAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(ForceApiPermissionCheckAsync), context.User.Username);
 
             AzuraCastEntity? dAzuraCast = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true, loadStationChecks: true);
             if (dAzuraCast is null)
@@ -197,7 +197,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(ForceCacheRefreshAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(ForceCacheRefreshAsync), context.User.Username);
 
             AzuraCastEntity? dAzuraCast = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true, loadStationChecks: true, loadGuild: true);
             if (dAzuraCast is null)
@@ -236,7 +236,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(ForceOnlineCheckAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(ForceOnlineCheckAsync), context.User.Username);
 
             AzuraCastEntity? dAzuraCast = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadGuild: true);
             if (dAzuraCast is null)
@@ -256,7 +256,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(ForceUpdateCheckAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(ForceUpdateCheckAsync), context.User.Username);
 
             AzuraCastEntity? dAzuraCast = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadChecks: true, loadPrefs: true, loadGuild: true);
             if (dAzuraCast is null)
@@ -280,7 +280,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(GetSystemLogsAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(GetSystemLogsAsync), context.User.Username);
 
             AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id);
             if (ac is null)
@@ -316,7 +316,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(GetHardwareStatsAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(GetHardwareStatsAsync), context.User.Username);
 
             AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id);
             if (ac is null)
@@ -352,7 +352,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(StartStationAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(StartStationAsync), context.User.Username);
 
             AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadStations: true);
             if (ac is null)
@@ -397,7 +397,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(SetStationNowPlayingEmbedAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(SetStationNowPlayingEmbedAsync), context.User.Username);
 
             string response = string.Empty;
             if (channel is null)
@@ -458,7 +458,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(StopStationAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(StopStationAsync), context.User.Username);
 
             AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadStations: true);
             if (ac is null)
@@ -523,7 +523,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(ToggleSongRequestsAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(ToggleSongRequestsAsync), context.User.Username);
 
             AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadStations: true);
             if (ac is null)
@@ -564,7 +564,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(UpdateInstanceAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(UpdateInstanceAsync), context.User.Username);
 
             AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id);
             if (ac is null)
@@ -638,7 +638,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(AddInternalSongRequestAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(AddInternalSongRequestAsync), context.User.Username);
 
             AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadStations: true);
             if (ac is null)
@@ -713,7 +713,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(DeleteSongRequestAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(DeleteSongRequestAsync), context.User.Username);
 
             AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadStations: true);
             if (ac is null)
@@ -755,7 +755,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(SkipSongAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(SkipSongAsync), context.User.Username);
 
             AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadStations: true);
             if (ac is null)
@@ -814,7 +814,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(SwitchPlaylistAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(SwitchPlaylistAsync), context.User.Username);
 
             AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadStations: true);
             if (ac is null)
@@ -882,7 +882,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(GetSongHistoryAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(GetSongHistoryAsync), context.User.Username);
 
             DateTimeOffset dateTime;
             if (date is null)
@@ -964,7 +964,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(GetSongsInPlaylistAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(GetSongsInPlaylistAsync), context.User.Username);
 
             AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadStations: true);
             if (ac is null)
@@ -1037,7 +1037,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(GetNowPlayingAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(GetNowPlayingAsync), context.User.Username);
 
             AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadStations: true, loadStationPrefs: true);
             if (ac is null)
@@ -1136,7 +1136,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(SearchSongAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(SearchSongAsync), context.User.Username);
 
             AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadStations: true, loadStationChecks: true);
             if (ac is null)
@@ -1281,7 +1281,7 @@ public sealed class AzuraCastCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(UploadFilesAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(UploadFilesAsync), context.User.Username);
 
             if (file is null || string.IsNullOrWhiteSpace(file.FileName) || string.IsNullOrWhiteSpace(file.Url))
             {

@@ -45,7 +45,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
         if (context.Member.VoiceState is null)
         {
-            _logger.UserNotConnected(context.User.GlobalName);
+            _logger.UserNotConnected(context.User.Username);
 
             if (!suppressResponse)
                 await context.EditResponseAsync(GeneralStrings.VoiceNotConnected);

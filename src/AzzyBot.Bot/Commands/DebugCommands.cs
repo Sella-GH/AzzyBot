@@ -45,7 +45,7 @@ public sealed class DebugCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(DebugClusterLoggingAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(DebugClusterLoggingAsync), context.User.Username);
 
             await context.DeferResponseAsync();
             for (int i = 0; i < logAmount; i++)
@@ -66,7 +66,7 @@ public sealed class DebugCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(DebugDatabaseConcurrencyAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(DebugDatabaseConcurrencyAsync), context.User.Username);
 
             if (!ulong.TryParse(serverId, out ulong guildIdValue))
             {
@@ -132,7 +132,7 @@ public sealed class DebugCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(DebugEncryptDecryptAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(DebugEncryptDecryptAsync), context.User.Username);
 
             await context.DeferResponseAsync();
 
@@ -152,7 +152,7 @@ public sealed class DebugCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(DebugTriggerExceptionAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(DebugTriggerExceptionAsync), context.User.Username);
 
             if (throwAfterDefering is 1)
                 await context.DeferResponseAsync();
@@ -175,7 +175,7 @@ public sealed class DebugCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(DebugWebServiceTestsAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(DebugWebServiceTestsAsync), context.User.Username);
 
             await context.DeferResponseAsync();
 

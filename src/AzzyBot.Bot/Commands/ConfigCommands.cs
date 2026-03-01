@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -69,7 +69,7 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(AddAzuraCastAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(AddAzuraCastAsync), context.User.Username);
 
             if (url is null)
             {
@@ -178,7 +178,7 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(AddAzuraCastStationAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(AddAzuraCastStationAsync), context.User.Username);
 
             if (adminGroup is null)
             {
@@ -225,7 +225,7 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(DeleteAzuraCastAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(DeleteAzuraCastAsync), context.User.Username);
 
             AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id);
             if (ac is null)
@@ -251,7 +251,7 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(DeleteAzuraCastStationAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(DeleteAzuraCastStationAsync), context.User.Username);
 
             AzuraCastStationEntity? acStation = await _dbActions.ReadAzuraCastStationAsync(context.Guild.Id, station, loadAzuraCast: true);
             if (acStation is null)
@@ -281,7 +281,7 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(UpdateAzuraCastAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(UpdateAzuraCastAsync), context.User.Username);
 
             if (url is null && apiKey is null && instanceAdminGroup is null && notificationsChannel is null && outagesChannel is null)
             {
@@ -348,7 +348,7 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(UpdateAzuraCastChecksAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(UpdateAzuraCastChecksAsync), context.User.Username);
 
             if (serverStatus is 0 && updates is 0 && updatesChangelog is 0)
             {
@@ -427,7 +427,7 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(UpdateAzuraCastStationAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(UpdateAzuraCastStationAsync), context.User.Username);
 
             if (stationId is null && apiKey is null && adminGroup is null && djGroup is null && uploadChannel is null && string.IsNullOrWhiteSpace(uploadPath) && requestsChannel is null && showPlaylist is 0)
             {
@@ -499,7 +499,7 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(UpdateAzuraCastStationChecksAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(UpdateAzuraCastStationChecksAsync), context.User.Username);
 
             if (fileChanges is 0)
             {
@@ -554,7 +554,7 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(UpdateCoreAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(UpdateCoreAsync), context.User.Username);
 
             if (adminRole is null && adminChannel is null)
             {
@@ -577,7 +577,7 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context.Guild);
             ArgumentNullException.ThrowIfNull(context.Member);
 
-            _logger.CommandRequested(nameof(GetSettingsAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(GetSettingsAsync), context.User.Username);
 
             ulong guildId = context.Guild.Id;
             string guildName = context.Guild.Name;
@@ -662,7 +662,7 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(ResetSettingsAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(ResetSettingsAsync), context.User.Username);
 
             DiscordButtonComponent button = new(DiscordButtonStyle.Danger, $"reset_settings_{context.User.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Confirm reset.");
             await using DiscordMessageBuilder messageBuilder = new();
@@ -696,7 +696,7 @@ public sealed class ConfigCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(AcceptLegalsAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(AcceptLegalsAsync), context.User.Username);
 
             await context.DeferResponseAsync();
 

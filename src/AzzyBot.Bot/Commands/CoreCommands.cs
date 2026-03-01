@@ -45,7 +45,7 @@ public sealed class CoreCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(ForceChannelPermissionsCheckAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(ForceChannelPermissionsCheckAsync), context.User.Username);
 
             GuildEntity? guild = await _dbActions.ReadGuildAsync(_settings.ServerId, loadEverything: true);
             if (guild is null)
@@ -71,7 +71,7 @@ public sealed class CoreCommands
             ArgumentNullException.ThrowIfNull(context.Guild);
             ArgumentNullException.ThrowIfNull(context.Member);
 
-            _logger.CommandRequested(nameof(HelpAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(HelpAsync), context.User.Username);
 
             IEnumerable<DiscordUser> botOwners = context.Client.CurrentApplication.Owners;
             ulong guildId = context.Guild.Id;
@@ -123,7 +123,7 @@ public sealed class CoreCommands
                 ArgumentNullException.ThrowIfNull(context);
                 ArgumentNullException.ThrowIfNull(context.Guild);
 
-                _logger.CommandRequested(nameof(HardwareStatsAsync), context.User.GlobalName);
+                _logger.CommandRequested(nameof(HardwareStatsAsync), context.User.Username);
 
                 Uri avaUrl = new(context.Client.CurrentUser.AvatarUrl);
                 DiscordEmbed embed = await EmbedBuilder.BuildAzzyHardwareStatsEmbedAsync(avaUrl, context.Client.GetConnectionLatency(context.Guild.Id).Milliseconds);
@@ -136,7 +136,7 @@ public sealed class CoreCommands
             {
                 ArgumentNullException.ThrowIfNull(context);
 
-                _logger.CommandRequested(nameof(InfoStatsAsync), context.User.GlobalName);
+                _logger.CommandRequested(nameof(InfoStatsAsync), context.User.Username);
 
                 Uri avaUrl = new(context.Client.CurrentUser.AvatarUrl);
                 string dspVersion = context.Client.VersionString.Split('+')[0];
@@ -151,7 +151,7 @@ public sealed class CoreCommands
                 ArgumentNullException.ThrowIfNull(context);
                 ArgumentNullException.ThrowIfNull(context.Guild);
 
-                _logger.CommandRequested(nameof(PingAsync), context.User.GlobalName);
+                _logger.CommandRequested(nameof(PingAsync), context.User.Username);
 
                 await context.RespondAsync($"Pong! {context.Client.GetConnectionLatency(context.Guild.Id).Milliseconds} ms");
             }

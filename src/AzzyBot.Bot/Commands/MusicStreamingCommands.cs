@@ -57,7 +57,7 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(ChangeVolumeAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(ChangeVolumeAsync), context.User.Username);
 
             if (volume is < 0 or > 100)
             {
@@ -92,7 +92,7 @@ public sealed class MusicStreamingCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(HistoryAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(HistoryAsync), context.User.Username);
 
             IEnumerable<ITrackQueueItem>? history = await _musicStreaming.HistoryAsync(context);
             if (history?.Any() is not true)
@@ -112,7 +112,7 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context.Guild);
             ArgumentNullException.ThrowIfNull(context.Member);
 
-            _logger.CommandRequested(nameof(JoinAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(JoinAsync), context.User.Username);
 
             if (context.Member.VoiceState?.ChannelId is null)
             {
@@ -138,7 +138,7 @@ public sealed class MusicStreamingCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(LeaveAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(LeaveAsync), context.User.Username);
 
             if (!await _musicStreaming.StopMusicAsync(context, true))
                 return;
@@ -151,7 +151,7 @@ public sealed class MusicStreamingCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(NowPlayingAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(NowPlayingAsync), context.User.Username);
 
             LavalinkTrack? track = await _musicStreaming.NowPlayingAsync(context);
             TimeSpan? pos = await _musicStreaming.GetCurrentPositionAsync(context);
@@ -176,7 +176,7 @@ public sealed class MusicStreamingCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(PauseAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(PauseAsync), context.User.Username);
 
             LavalinkTrack? track = await _musicStreaming.NowPlayingAsync(context);
             if (track is null)
@@ -208,7 +208,7 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(PlayAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(PlayAsync), context.User.Username);
 
             if (volume is not 50)
             {
@@ -248,7 +248,7 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(PlayMountAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(PlayMountAsync), context.User.Username);
 
             if (volume is not 50)
             {
@@ -320,7 +320,7 @@ public sealed class MusicStreamingCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(QueueAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(QueueAsync), context.User.Username);
 
             IEnumerable<ITrackQueueItem>? history = await _musicStreaming.HistoryAsync(context, true);
             if (history?.Any() is not true)
@@ -342,7 +342,7 @@ public sealed class MusicStreamingCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(QueueClearAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(QueueClearAsync), context.User.Username);
 
             if (!await _musicStreaming.ClearQueueAsync(context, songNumber))
                 return;
@@ -355,7 +355,7 @@ public sealed class MusicStreamingCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(ResumeAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(ResumeAsync), context.User.Username);
 
             LavalinkTrack? track = await _musicStreaming.NowPlayingAsync(context);
             if (track is null)
@@ -384,7 +384,7 @@ public sealed class MusicStreamingCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(SkipAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(SkipAsync), context.User.Username);
 
             LavalinkTrack? track = await _musicStreaming.NowPlayingAsync(context);
             if (track is null)
@@ -413,7 +413,7 @@ public sealed class MusicStreamingCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(StopAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(StopAsync), context.User.Username);
 
             bool leaving = leave is 1;
             if (!await _musicStreaming.StopMusicAsync(context, leaving))
@@ -434,7 +434,7 @@ public sealed class MusicStreamingCommands
             ArgumentNullException.ThrowIfNull(context);
             ArgumentNullException.ThrowIfNull(context.Guild);
 
-            _logger.CommandRequested(nameof(StreamingNowPlayingEmbedAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(StreamingNowPlayingEmbedAsync), context.User.Username);
 
             string response = string.Empty;
 
