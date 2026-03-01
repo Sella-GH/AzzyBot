@@ -10,21 +10,21 @@ on:
     - "**/release.yml"
   workflow_dispatch:
 
-permissions:
-  actions: write
-  checks: write
-  contents: write
-
 jobs:
   check_for_tag:
     name: Check if tag has to be created
     if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
+    permissions:
+      contents: write
     uses: ./.github/workflows/tag-creation.yml
 
   extract_meta:
     name: Extract metadata for use
     if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
     runs-on: ubuntu-slim
+    permissions:
+      checks: write
+      contents: read
     outputs:
       loc_cs: ${{ steps.loc_cs.outputs.total_lines }}
       datetime: ${{ steps.dateTime.outputs.time }}
@@ -61,6 +61,8 @@ jobs:
     needs: extract_meta
     if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
     runs-on: ubuntu-slim
+    permissions:
+      contents: read
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -98,6 +100,8 @@ jobs:
     name: Create GitHub Release
     needs: [extract_meta, build-docker]
     runs-on: ubuntu-slim
+    permissions:
+      contents: write
     outputs:
       release_version: ${{ steps.set_output.outputs.release_version }}
     steps:
@@ -140,6 +144,9 @@ jobs:
     name: Upload GitHub Release Assets
     needs: [build-docker, create_release]
     runs-on: ubuntu-slim
+    permissions:
+      actions: read
+      contents: write
     steps:
       - name: Install GitHub CLI
         run: sudo apt-get update && sudo apt-get install -y gh

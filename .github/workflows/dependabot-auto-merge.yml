@@ -15,7 +15,7 @@ permissions:
 jobs:
   dependabot:
     runs-on: ubuntu-slim
-    if: ${{ github.actor == 'dependabot[bot]' }}
+    if: ${{ github.event.pull_request.user.login == 'dependabot[bot]' }}
     steps:
       - name: Get PR URL
         run: echo "PR_URL=${{ github.event.pull_request.html_url }}" >> $GITHUB_ENV

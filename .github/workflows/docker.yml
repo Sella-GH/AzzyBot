@@ -20,15 +20,12 @@ on:
   # once a day at 02:00 UTC to cleanup old runs
     - cron: "0 2 * * *"
 
-permissions:
-  actions: write
-  checks: write
-  contents: read
-
 jobs:
   cleanup:
     name: Cleanup Runs
     if: ${{ github.event_name == 'schedule' }}
+    permissions:
+      actions: write
     uses: dotnet/arcade/.github/workflows/scheduled-action-cleanup-base.yml@main
     with:
       repository_owners: ${{ github.repository_owner }}
@@ -37,6 +34,9 @@ jobs:
     name: Extract metadata for use
     if: ${{ github.event_name != 'schedule' }}
     runs-on: ubuntu-slim
+    permissions:
+      checks: write
+      contents: read
     outputs:
       environment: ${{ steps.get-environment.outputs.environment }}
       environment_alpine: ${{ steps.get-environment.outputs.environment_alpine }}
@@ -99,6 +99,9 @@ jobs:
     name: Build Docker Image For ${{ matrix.os }} - ${{ matrix.arch }}
     needs: [extract_meta]
     runs-on: ubuntu-24.04${{ matrix.arch == 'arm64' && '-arm' || '' }}
+    permissions:
+      checks: write
+      contents: read
     strategy:
       matrix:
         os: [ubuntu, alpine]
@@ -177,6 +180,9 @@ jobs:
     name: Creating Docker Release
     runs-on: ubuntu-24.04
     needs: [extract_meta, docker-build]
+    permissions:
+      checks: write
+      contents: read
     strategy:
       matrix:
         os: [ubuntu, alpine]
