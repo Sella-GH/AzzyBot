@@ -461,7 +461,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             string name = kvp.Key.Name;
             string value = kvp.Value?.ToString() ?? "undefined";
 
-            if (!string.IsNullOrEmpty(name) && value is not "0" or "undefined")
+            if (!string.IsNullOrEmpty(name) && value is not "0")
                 commandParameters.Add(name, value);
         }
     }
