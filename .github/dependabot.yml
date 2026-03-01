@@ -83,3 +83,16 @@ updates:
         - "major"
         - "minor"
         - "patch"
+
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "Sella-GH"
+    commit-message:
+      prefix: "[Docker]"
+      include: "scope"
+    labels:
+      - "area-docker"
+      - "area-dependencies"

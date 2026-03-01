@@ -8,20 +8,19 @@ on:
         value: ${{ jobs.create_tag.outputs.tag_was_created }}
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
   check_csproj:
     name: Check the project version
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
+    permissions:
+      contents: read
     if: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') }}
     outputs:
       create_tag_needed: ${{ steps.compare.outputs.create_tag }}
       tag_version: ${{ steps.compare.outputs.set_tag_version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
 
@@ -45,12 +44,14 @@ jobs:
     name: Create the tag if needed
     needs: check_csproj
     if: ${{ needs.check_csproj.outputs.create_tag_needed == 'true' &&  needs.check_csproj.outputs.tag_version != '' }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-slim
+    permissions:
+      contents: write
     outputs:
       tag_was_created: ${{ steps.create-tag.outputs.created-tag }}
     steps:
       - name: Checkout
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
 
