@@ -11,8 +11,7 @@ using NReco.Logging.File;
 
 namespace AzzyBot.Core.Extensions;
 
-[SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Known Issue.")]
-[SuppressMessage("Minor Code Smell", "S2325:Methods and properties that don't access instance data should be static", Justification = "Known Issue.")]
+[SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "https://github.com/dotnet/sdk/issues/51681")]
 public static class ILoggingBuilderExtensions
 {
     extension(ILoggingBuilder logging)

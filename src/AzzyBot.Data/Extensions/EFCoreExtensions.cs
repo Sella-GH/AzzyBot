@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace AzzyBot.Data.Extensions;
 
-[SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Known Issue.")]
+[SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "https://github.com/dotnet/sdk/issues/51681")]
 public static class EFCoreExtensions
 {
     extension<T>(IQueryable<T> query)

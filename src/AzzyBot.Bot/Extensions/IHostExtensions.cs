@@ -13,8 +13,7 @@ using Npgsql;
 
 namespace AzzyBot.Bot.Extensions;
 
-[SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Known Issue.")]
-[SuppressMessage("Minor Code Smell", "S2325:Methods and properties that don't access instance data should be static", Justification = "Known Issue.")]
+[SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "https://github.com/dotnet/sdk/issues/51681")]
 public static class IHostExtensions
 {
     extension(IHost app)

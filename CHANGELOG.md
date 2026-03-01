@@ -1,4 +1,22 @@
-## 2.9.0
+﻿## Unreleased
+### Fixes
+- Exception logs no longer create and send empty JSON files when the exception has no StackTrace
+
+### Development
+- Fixed the global.json to SDK version 10.0.103 and to use the latest patch
+- Command executions are now logged with the username instead of the display name by a user
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02573
+- Updated [Lavalink4NET](https://github.com/lavalink4net/Lavalink4NET) to version 4.1.1
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 10.0.3
+- Updated [Microsoft.Extensions.X](https://github.com/dotnet/runtime) libraries to version 10.0.3
+- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.9.0
+- Updated [Npgsql](https://github.com/npgsql/efcore.pg) to version 10.0.1
+- Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.15.0
+- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.20.0.135146
+
+## 2.9.0 - 2025-11-22
 ### Breaking Changes
 - The migration period for the old encryption method ended!
   - All data stored with the old encryption method is now inaccessible and lost

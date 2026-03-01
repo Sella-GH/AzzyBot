@@ -55,7 +55,7 @@ public sealed class AdminCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(ChangeStatusAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(ChangeStatusAsync), context.User.Username);
 
             await context.DeferResponseAsync();
 
@@ -80,7 +80,7 @@ public sealed class AdminCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(GetJoinedGuildsAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(GetJoinedGuildsAsync), context.User.Username);
 
             await context.DeferResponseAsync();
 
@@ -139,7 +139,7 @@ public sealed class AdminCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(RemoveJoinedGuildAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(RemoveJoinedGuildAsync), context.User.Username);
 
             if (!ulong.TryParse(serverId, out ulong guildIdValue))
             {
@@ -173,7 +173,7 @@ public sealed class AdminCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(ResetLegalsAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(ResetLegalsAsync), context.User.Username);
 
             await context.DeferResponseAsync();
 
@@ -200,7 +200,7 @@ public sealed class AdminCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(SendBotWideMessageAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(SendBotWideMessageAsync), context.User.Username);
 
             if (string.IsNullOrWhiteSpace(message))
             {
@@ -231,7 +231,7 @@ public sealed class AdminCommands
         {
             ArgumentNullException.ThrowIfNull(context);
 
-            _logger.CommandRequested(nameof(ViewLogsAsync), context.User.GlobalName);
+            _logger.CommandRequested(nameof(ViewLogsAsync), context.User.Username);
 
             await context.DeferResponseAsync();
 

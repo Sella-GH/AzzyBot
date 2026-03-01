@@ -17,6 +17,7 @@ body :
       label : "Azzy Bot Version"
       description : "Which version of Azzy are you using? Ensure you're using the latest minor version of your line!"
       options :
+        - "2.9.x"
         - "2.8.x"
         - "2.7.x"
         - "2.6.x"
