@@ -785,9 +785,8 @@ public sealed class AzuraCastCommands
             AzuraNowPlayingDataRecord? nowPlaying;
             try
             {
-                nowPlaying = await _azuraCast.GetNowPlayingAsync(baseUrl, apiKey, station);
-                if (nowPlaying is null)
-                    throw new HttpRequestException("NowPlaying is null");
+                nowPlaying = await _azuraCast.GetNowPlayingAsync(baseUrl, apiKey, station)
+                    ?? throw new HttpRequestException("NowPlaying is null");
             }
             catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException)
             {
@@ -1061,9 +1060,8 @@ public sealed class AzuraCastCommands
             AzuraNowPlayingDataRecord? nowPlaying;
             try
             {
-                nowPlaying = await _azuraCast.GetNowPlayingAsync(baseUrl, apiKey, station);
-                if (nowPlaying is null)
-                    throw new HttpRequestException("NowPlaying is null");
+                nowPlaying = await _azuraCast.GetNowPlayingAsync(baseUrl, apiKey, station)
+                    ?? throw new HttpRequestException("NowPlaying is null");
             }
             catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException)
             {
