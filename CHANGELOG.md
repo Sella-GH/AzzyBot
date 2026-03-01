@@ -1,4 +1,4 @@
-﻿## Unreleased
+﻿## 2.9.1 - 2026-03-01
 ### Fixes
 - Exception logs no longer create and send empty JSON files when the exception has no StackTrace
 
