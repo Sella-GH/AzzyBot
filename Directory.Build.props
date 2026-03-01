@@ -57,7 +57,7 @@
     <NeutralLanguage>en</NeutralLanguage>
     <RepositoryType>Git</RepositoryType>
     <RepositoryUrl>https://github.com/Sella-GH/AzzyBot</RepositoryUrl>
-    <Version>2.9.0</Version>
+    <Version>2.9.1</Version>
   </PropertyGroup>
   
   <!-- Runtimeconfig settings -->
@@ -82,3 +82,4 @@
     <InvariantGlobalization>False</InvariantGlobalization>
   </PropertyGroup>
 </Project>
+
