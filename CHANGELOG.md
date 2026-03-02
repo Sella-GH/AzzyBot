@@ -1,4 +1,8 @@
-﻿## 2.9.1 - 2026-03-01
+﻿## Unreleased
+### Improvements
+- Migrated from [TagLibSharp](https://github.com/mono/taglib-sharp) to [TagLibSharp2](https://github.com/decriptor/TagLibSharp2)
+
+## 2.9.1 - 2026-03-01
 ### Fixes
 - Exception logs no longer create and send empty JSON files when the exception has no StackTrace
 
