@@ -1321,7 +1321,7 @@ public sealed class AzuraCastCommands
             string filePath = Path.Combine(Path.GetTempPath(), $"{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{ac.GuildId}-{ac.Id}-{acStation.Id}_{file.FileName}");
             await _webRequest.DownloadAsync(new(file.Url), filePath);
 
-            AzuraFileComplianceRecord compliance = AzuraFileChecker.FileIsCompliant(filePath);
+            AzuraFileComplianceRecord compliance = await AzuraFileChecker.FileIsCompliantAsync(filePath);
             if (!compliance.IsCompliant)
             {
                 StringBuilder message = new();
