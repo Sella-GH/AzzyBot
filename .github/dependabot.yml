@@ -5,8 +5,8 @@
 
 version: 2
 updates:
-  - package-ecosystem: "github-actions" # See documentation for possible values
-    directory: "/.github/workflows" # Location of package manifests
+  - package-ecosystem: "github-actions"
+    directory: "/.github/workflows"
     schedule:
       interval: "daily"
     assignees:
@@ -34,8 +34,8 @@ updates:
         update-types:
           - "version-update:semver-major" # We only want minor and patch releases of the newest SDK(s)
 
-  - package-ecosystem: "nuget" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "nuget"
+    directory: "/"
     schedule:
       interval: "daily"
     assignees:
@@ -45,9 +45,6 @@ updates:
       include: "scope"
     labels:
       - "area-dependencies"
-    ignore:
-      - dependency-name: "DSharpPlus*"
-      - dependency-name: "DSharpPlus.*"
     groups:
       Analyzers:
         applies-to: version-updates
@@ -58,22 +55,34 @@ updates:
         - "major"
         - "minor"
         - "patch"
-      Microsoft:
+      Core:
+        applies-to: version-updates
+        patterns:
+        - "DSharpPlus"
+        - "DSharpPlus.*"
+        - "LavaLink4NET.DSharpPlus.Nightly"
+        - "NReco.*"
+        - "Microsoft.*"
+        update-types:
+        - "minor"
+        - "patch"
+      Database:
         applies-to: version-updates
         patterns:
         - "EntityFrameworkCore.*"
-        - "Microsoft.*"
         - "Npgsql*"
         - "Npgsql.*"
-        - "NReco.*"
         update-types:
         - "minor"
         - "patch"
       Others:
         applies-to: version-updates
         exclude-patterns:
+        - "DSharpPlus"
+        - "DSharpPlus.*"
         - "EntityFrameworkCore.*"
         - "Microsoft.*"
+        - "LavaLink4NET.DSharpPlus.Nightly"
         - "Npgsql"
         - "Npgsql.*"
         - "NReco.*"
