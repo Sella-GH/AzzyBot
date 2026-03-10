@@ -193,6 +193,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         try
         {
+            // TODO: Revisit this in .NET 11 (https://github.com/dotnet/core/blob/main/release-notes/11.0/preview/preview2/libraries.md#generic-gettypeinfo-for-systemtextjson)
             return (T)JsonSerializer.Deserialize(body, JsonSourceGen.Default.GetTypeInfo(typeof(T))!)!;
         }
         catch (JsonException jsonEx)
