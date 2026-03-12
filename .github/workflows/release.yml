@@ -39,7 +39,7 @@ jobs:
 
      - name: Get Date and Time
        id: dateTime
-       uses: Kaven-Universe/github-action-current-date-time@f2c12d90cff9c3e7b1f50430886e632fe31fcee1 # v1.4.0
+       uses: Kaven-Universe/github-action-current-date-time@7c1d8465d1bfd7d35466d2ee82a8e460780561ae # v1.5.0
        with:
          format: "YYYY-MM-DDTHH:mm:ss"
 
