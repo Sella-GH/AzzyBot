@@ -24,7 +24,7 @@
     <PackageVersion Include="Roslynator.CodeFixes" Version="4.15.0" />
     <PackageVersion Include="Roslynator.Formatting.Analyzers" Version="4.15.0" />
     <PackageVersion Include="Roslynator.Refactorings" Version="4.15.0" />
-    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.20.0.135146" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.21.0.135717" />
     <PackageVersion Include="TagLibSharp2" Version="0.6.0" />
   </ItemGroup>
 </Project>
