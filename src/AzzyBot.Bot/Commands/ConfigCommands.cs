@@ -594,7 +594,7 @@ public sealed class ConfigCommands
             DiscordRole? adminRole = roles.FirstOrDefault(r => r.Id == guild.Preferences.AdminRoleId);
             DiscordEmbed guildEmbed = EmbedBuilder.BuildGetSettingsGuildEmbed(guildName, guild, $"{adminRole?.Name} ({adminRole?.Id})");
 
-            await using DiscordMessageBuilder messageBuilder = new();
+            DiscordMessageBuilder messageBuilder = new();
             messageBuilder.AddEmbeds([guildEmbed]);
 
             if (guild.AzuraCast is not null)
@@ -665,7 +665,7 @@ public sealed class ConfigCommands
             _logger.CommandRequested(nameof(ResetSettingsAsync), context.User.Username);
 
             DiscordButtonComponent button = new(DiscordButtonStyle.Danger, $"reset_settings_{context.User.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Confirm reset.");
-            await using DiscordMessageBuilder messageBuilder = new();
+            DiscordMessageBuilder messageBuilder = new();
             messageBuilder.AddActionRowComponent(button);
             messageBuilder.WithContent("Are you sure you want to reset all of your settings?");
 
@@ -715,7 +715,7 @@ public sealed class ConfigCommands
             }
 
             DiscordButtonComponent button = new(DiscordButtonStyle.Success, $"accept_legals_{context.Guild.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Accept Legals.");
-            await using DiscordMessageBuilder messageBuilder = new();
+            DiscordMessageBuilder messageBuilder = new();
             messageBuilder.AddActionRowComponent(button);
             string content = GeneralStrings.LegalsInformation
                 .Replace("%PP%", UriStrings.GitHubRepoPrivacyPolicyUrl, StringComparison.OrdinalIgnoreCase)

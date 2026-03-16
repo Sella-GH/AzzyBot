@@ -131,7 +131,7 @@ public sealed class AzuraCastCommands
             filePaths.Add(Path.Combine(_azuraCastApi.FilePath, zFileName));
 
             await using FileStream fileStream = new(Path.Combine(_azuraCastApi.FilePath, zFileName), FileMode.Open, FileAccess.Read, FileShare.None);
-            await using DiscordMessageBuilder builder = new();
+            DiscordMessageBuilder builder = new();
             AzuraStationRecord? azuraStation = await _azuraCastApi.GetStationAsync(baseUrl, apiKey, station);
             if (azuraStation is null)
             {
@@ -302,7 +302,7 @@ public sealed class AzuraCastCommands
             string fileName = $"{ac.Id}_{logName}_{DateTimeOffset.Now:yyyy-MM-dd_hh-mm-ss-fffffff}.log";
             string filePath = await FileOperations.CreateTempFileAsync(systemLog.Content, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
-            await using DiscordMessageBuilder builder = new();
+            DiscordMessageBuilder builder = new();
             builder.WithContent($"Here is the requested system log ({logName}).");
             builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
             await context.EditResponseAsync(builder);
@@ -944,7 +944,7 @@ public sealed class AzuraCastCommands
             string fileName = $"{ac.GuildId}-{ac.Id}-{acStation.Id}-{acStation.StationId}_SongHistory_{dateStringFile}.csv";
             string filePath = await FileOperations.CreateCsvFileAsync(exportHistory, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
-            await using DiscordMessageBuilder builder = new();
+            DiscordMessageBuilder builder = new();
             builder.WithContent($"Here is the song history for station **{azuraStation.Name}** on **{dateString}**.");
             builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
             await context.EditResponseAsync(builder);
@@ -1018,7 +1018,7 @@ public sealed class AzuraCastCommands
             string fileName = $"{ac.GuildId}-{ac.Id}-{acStation.Id}-{acStation.StationId}_PlaylistSongs_{playlist.ShortName}.csv";
             string filePath = await FileOperations.CreateCsvFileAsync(songs, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
-            await using DiscordMessageBuilder builder = new();
+            DiscordMessageBuilder builder = new();
             builder.WithContent($"Here are the songs in playlist **{playlist.Name}**.");
             builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
             await context.EditResponseAsync(builder);
@@ -1083,7 +1083,7 @@ public sealed class AzuraCastCommands
                 playlistName = playlist.Where(p => p.Name == nowPlaying.NowPlaying.Playlist).Select(static p => p.Name).FirstOrDefault();
             }
 
-            await using DiscordMessageBuilder builder = new();
+            DiscordMessageBuilder builder = new();
             DiscordEmbed embed;
             if (nowPlaying.Station.IsPublic)
             {
@@ -1244,7 +1244,7 @@ public sealed class AzuraCastCommands
             }
 
             DiscordButtonComponent button = new(DiscordButtonStyle.Success, $"request_song_{context.User.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Request Song");
-            await using DiscordMessageBuilder builder = new();
+            DiscordMessageBuilder builder = new();
             builder.AddEmbed(embed);
             builder.AddActionRowComponent(button);
 
@@ -1255,7 +1255,7 @@ public sealed class AzuraCastCommands
                 AzuraCustomQueueItemRecord record = new(context.Guild.Id, baseUrl, station, songRequest.RequestId, songRequest.Song.SongId, DateTimeOffset.UtcNow);
                 _cronJobManager.RunAzuraRequestJob(record);
 
-                await using DiscordInteractionResponseBuilder interaction = new()
+                DiscordInteractionResponseBuilder interaction = new()
                 {
                     Content = GeneralStrings.SongRequestQueued
                 };

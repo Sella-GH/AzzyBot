@@ -105,7 +105,7 @@ public sealed class CoreCommands
                 embeds.Add(embed);
             }
 
-            await using DiscordMessageBuilder messageBuilder = new();
+            DiscordMessageBuilder messageBuilder = new();
             messageBuilder.AddEmbeds(embeds);
 
             await context.EditResponseAsync(messageBuilder);
