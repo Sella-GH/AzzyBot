@@ -626,19 +626,16 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             _logger.UnableToSendMessage(e.Message);
         }
 
-        if (streams.Count > 0)
+        if (streams.Count > 0 && filePaths is not null)
         {
             foreach (FileStream stream in streams)
             {
                 await stream.DisposeAsync();
             }
 
-            if (filePaths is not null)
+            foreach (string path in filePaths)
             {
-                foreach (string path in filePaths)
-                {
-                    FileOperations.DeleteFile(path);
-                }
+                FileOperations.DeleteFile(path);
             }
         }
 
