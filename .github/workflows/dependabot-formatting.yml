@@ -4,11 +4,6 @@ on:
   pull_request:
     types: [opened, synchronize]
 
-permissions:
-  actions: write
-  contents: write
-  pull-requests: read
-
 defaults:
   run:
     # Use a non-interactive, safe shell and enforce strict mode by default.
@@ -24,6 +19,10 @@ env:
 jobs:
   normalize:
     runs-on: ubuntu-slim
+    permissions:
+      actions: write
+      contents: write
+      pull-requests: read
     steps:
       - name: Checkout PR
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2

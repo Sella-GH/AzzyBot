@@ -7,14 +7,13 @@ on:
     # once a day at 01:00 UTC to cleanup old runs
     - cron: '0 1 * * *'
 
-permissions:
-  actions: write
-  contents: write
-  issues: write
-  pull-requests: write
-
 jobs:
   backport:
+    permissions:
+      actions: write
+      contents: write
+      issues: write
+      pull-requests: write
     uses: dotnet/arcade/.github/workflows/backport-base.yml@main
     with:
       pr_title_template: '[Backport] #%source_pr_number% to %target_branch%'
