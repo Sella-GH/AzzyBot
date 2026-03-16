@@ -236,7 +236,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(context.Guild);
 
-        await using DiscordMessageBuilder builder = new();
+        DiscordMessageBuilder builder = new();
         builder.WithAllowedMention(RoleMention.All);
 
         ContextCheckFailedData? moduleActivatedCheck = ex.Errors.FirstOrDefault(static e => e.ContextCheckAttribute is ModuleActivatedCheckAttribute);
@@ -430,7 +430,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
 
     private static async Task<DiscordMessage?> AcknowledgeExceptionAsync(SlashCommandContext ctx)
     {
-        await using DiscordMessageBuilder builder = new()
+        DiscordMessageBuilder builder = new()
         {
             Content = $"An unexpected error occurred. Our team has been notified and is working on a fix.\nJoin our support server for more information: {UriStrings.DiscordSupportServer}"
         };
@@ -574,7 +574,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             return false;
         }
 
-        await using DiscordMessageBuilder builder = new();
+        DiscordMessageBuilder builder = new();
 
         if (!string.IsNullOrWhiteSpace(content))
             builder.WithContent(content);
