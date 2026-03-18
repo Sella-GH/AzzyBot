@@ -1,4 +1,4 @@
-# AzzyBot Development Guide for AI Coding Agents
+﻿# AzzyBot Development Guide for AI Coding Agents
 
 ## Repository Overview
 
@@ -6,7 +6,7 @@ AzzyBot is a Discord music bot written in C# using .NET 10 and DSharpPlus. It's 
 
 **Key Statistics:**
 - **Language**: C# (.NET 10.0)
-- **Current Version**: 2.9.0
+- **Current Version**: 2.9.1
 - **Project Type**: Multi-project Discord bot solution
 - **Architecture**: 3-tier (Bot, Core, Data)
 - **Database**: PostgreSQL with Entity Framework Core
@@ -17,7 +17,7 @@ AzzyBot is a Discord music bot written in C# using .NET 10 and DSharpPlus. It's 
 ## Build Instructions & Environment Setup
 
 ### Prerequisites
-1. **.NET 10 SDK** (version 10.0.101 or later) - **CRITICAL**: This project will not build with .NET 9 or earlier
+1. **.NET 10 SDK**
 2. **Git**
 3. **PostgreSQL** (for local development) or Docker
 4. **Lavalink** server (for music streaming features)
@@ -48,7 +48,7 @@ dotnet build ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Debug --no-incremental --no
 ### Common Build Issues & Solutions
 
 **Issue**: `NETSDK1045: The current .NET SDK does not support targeting .NET 10.0`
-- **Solution**: Install .NET 10 SDK version 10.0.101 or later. **Do not downgrade the target framework.**
+- **Solution**: Install .NET 10 SDK version 10.0.201 or later. **Do not downgrade the target framework.**
 
 **Issue**: Package restore failures
 - **Solution**: Use the `--configfile ./Nuget.config` parameter and ensure you have internet connectivity
@@ -87,22 +87,22 @@ AzzyBot/
 ├── legal/                     # Legal documents and licenses
 ├── Directory.Build.props      # MSBuild global properties
 ├── Directory.Packages.props   # Centralized package versions
-├── global.json               # .NET SDK version lock (10.0.101)
-├── Nuget.config              # Package source configuration
+├── global.json                # .NET SDK version lock
+├── Nuget.config               # Package source configuration
 ├── dev.Dockerfile             # Development Docker image
 ├── dev.alpine.Dockerfile      # Development Alpine Docker image
 ├── release.Dockerfile         # Production Docker image
 ├── release.alpine.Dockerfile  # Production Alpine Docker image
 ├── docker-compose.yml         # Production Docker Compose
 ├── docker-compose.dev.yml     # Development Docker Compose
-└── AzzyBot.slnx              # Solution file
+└── AzzyBot.slnx               # Solution file
 ```
 
 ### Key Configuration Files
 - **Directory.Build.props**: Global MSBuild settings, analyzer configuration, build optimizations
 - **Directory.Packages.props**: Centralized package version management (enables `ManagePackageVersionsCentrally`)
-- **global.json**: Locks .NET SDK to version 10.0.101 with `allowPrerelease: true` and `rollForward: latestFeature`
-- **.editorconfig**: Extensive code style and analyzer rules (1106 lines)
+- **global.json**: Locks .NET SDK with `allowPrerelease: true` and `rollForward: latestFeature`
+- **.editorconfig**: Extensive code style and analyzer rules
 - **Nuget.config**: Package sources and restore settings
 
 ### Module Organization
@@ -162,7 +162,7 @@ The bot uses a modular architecture with two main modules:
 ## Development Environment
 
 ### Recommended Setup
-1. **IDE**: Visual Studio 2026 Community (as mentioned in README)
+1. **IDE**: Visual Studio 2026 Community (Or VSCode) (as mentioned in README)
 2. **Extensions**: C# Dev Kit, Docker, GitHub Actions
 3. **Local Services**: PostgreSQL, Lavalink (via Docker Compose)
 
@@ -219,7 +219,7 @@ The project uses extensive static analysis:
 - **NuGetAuditMode**: `all` (enables NuGet package vulnerability auditing)
 
 ### Runtime Configuration
-- **HTTP/3 Support**: Explicitly disabled (`System.Net.SocketsHttpHandler.Http3Support = false`) until .NET fixes it
+- **HTTP/3 Support**: Explicitly disabled (`System.Net.SocketsHttpHandler.Http3Support = false`)
 - **JIT Settings**: TieredCompilation, QuickJit, and TieredPGO enabled for optimal performance
 - **Garbage Collection**: Server GC with concurrent collection and adaptive mode
 - **Globalization**: InvariantGlobalization disabled (full globalization support)
@@ -239,7 +239,7 @@ These standards ensure consistency across the codebase and prevent formatting co
 - **Provider**: PostgreSQL via Npgsql.EntityFrameworkCore.PostgreSQL
 - **Migrations**: Located in `src/AzzyBot.Data/Migrations/`
 - **Configuration**: Connection strings in `Settings/AzzyBotSettings.json`
-- **SSL Support**: Available as of version 2.5.0 (optional configuration)
+- **SSL Support**: Optional configuration
 - **Version Optimization**: Optional database version specification for improved SQL translation
 
 ### EF Core Commands
@@ -274,7 +274,7 @@ dotnet ef database update --project src/AzzyBot.Data --startup-project src/AzzyB
 ## Troubleshooting Guide
 
 ### "Project failed to restore"
-1. Ensure .NET 10 SDK is installed: `dotnet --list-sdks` (version 10.0.101 or later)
+1. Ensure .NET 10 SDK is installed: `dotnet --list-sdks`
 2. Clear NuGet cache: `dotnet nuget locals all --clear`
 3. Use correct restore command with `--configfile ./Nuget.config`
 
@@ -293,9 +293,7 @@ The project has extensive code analysis that can slow builds:
 ## Security & Encryption
 
 ### Data Protection
-- **Encryption Algorithm**: AES-GCM with 256-bit keys (as of version 2.7.0)
-  - Migrated from AES-CCM for future-proofing (.NET 10 deprecates AesCCM on some platforms)
-  - Automatic migration for existing data during startup (limited migration period)
+- **Encryption Algorithm**: AES-GCM with 256-bit keys
   - All sensitive data in the database is encrypted at rest
 
 ### Security Scanning
@@ -333,7 +331,7 @@ The project uses multiple security scanning tools:
 **Resources:**
 - `src/AzzyBot.Bot/Resources/UriStrings.resx` - URI string resources with code generation
 
-**Trust these instructions** - they are verified against the actual codebase (version 2.9.0) and CI/CD processes. Only search for additional information if these instructions are incomplete or appear incorrect based on build failures.
+**Trust these instructions** - they are verified against the actual codebase (version 2.9.1) and CI/CD processes. Only search for additional information if these instructions are incomplete or appear incorrect based on build failures.
 
 ## Additional Notes
 
