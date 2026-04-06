@@ -4,7 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
-    <PackageVersion Include="DSharpPlus" Version="5.0.0-nightly-02578" />
+    <PackageVersion Include="DSharpPlus" Version="5.0.0-nightly-02581" />
     <PackageVersion Include="DSharpPlus.Commands" Version="5.0.0-nightly-02578" />
     <PackageVersion Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02578" />
     <PackageVersion Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="10.0.0" />
