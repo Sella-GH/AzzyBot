@@ -213,6 +213,9 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
                 responseContent = await response.Content.ReadAsStringAsync();
             }
 
+            if (IsServerDownStatus(status))
+                throw new HttpRequestException($"Request returned status code {(int)status}", null, status);
+
             return (status is not HttpStatusCode.Forbidden) ? responseContent : null;
         }
         catch (InvalidOperationException)
@@ -333,6 +336,25 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
             _logger.WebRequestFailed(HttpMethod.Post, ex.Message, url);
             throw;
         }
+    }
+
+    private static bool IsServerDownStatus(HttpStatusCode status)
+    {
+        return (int)status switch
+        {
+            502 or
+            503 or
+            504 or
+            520 or
+            521 or
+            522 or
+            523 or
+            524 or
+            525 or
+            526 or
+            530 => true,
+            _ => false
+        };
     }
 
     private static void AddRequestHeaders(HttpRequestMessage message, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool acceptImage = false, bool noCache = true)
