@@ -577,7 +577,17 @@ public sealed class AzuraCastCommands
             string apiKey = Crypto.Decrypt(ac.AdminApiKey);
             Uri baseUrl = new(Crypto.Decrypt(ac.BaseUrl));
 
-            string? body = await _azuraCastApi.GetUpdatesAsync(baseUrl, apiKey);
+            string? body;
+            try
+            {
+                body = await _azuraCastApi.GetUpdatesAsync(baseUrl, apiKey);
+            }
+            catch (HttpRequestException)
+            {
+                await context.EditResponseAsync("AzuraCast instance is currently unreachable. Please try again once it is up.");
+                return;
+            }
+
             if (string.IsNullOrEmpty(body))
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
