@@ -2,8 +2,16 @@
 
 namespace AzzyBot.Bot.Utilities.Helpers;
 
+/// <summary>
+/// Provides utility helpers to classify HTTP status codes for network error handling paths.
+/// </summary>
 public static class HttpStatusCodeHelpers
 {
+    /// <summary>
+    /// Determines whether the status code indicates an upstream or backend availability failure.
+    /// </summary>
+    /// <param name="status">The HTTP status code to classify.</param>
+    /// <returns><see langword="true"/> when the status should be treated as a server-down condition; otherwise <see langword="false"/>.</returns>
     public static bool IsServerDownStatus(HttpStatusCode status)
     {
         return (int)status switch
