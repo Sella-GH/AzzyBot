@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,7 +29,14 @@ public sealed class AzuraStatusPingJob(AzuraCastPingService pingService, DbActio
 
             foreach (AzuraCastEntity azuraCast in azuraCasts.Where(a => a.Checks.ServerStatus))
             {
-                await _pingService.PingInstanceAsync(azuraCast);
+                try
+                {
+                    await _pingService.PingInstanceAsync(azuraCast);
+                }
+                catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+                {
+                    await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, lastServerStatusCheck: true);
+                }
             }
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
