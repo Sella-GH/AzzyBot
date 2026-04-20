@@ -5,8 +5,8 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.Modules;
+using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
@@ -67,6 +67,6 @@ public sealed class AzuraStatusPingJob(ILogger<AzuraStatusPingJob> logger, Azura
 
         return ex is HttpRequestException requestException &&
             requestException.StatusCode is not null &&
-            WebRequestService.IsServerDownStatus(requestException.StatusCode.Value);
+            HttpStatusCodeHelpers.IsServerDownStatus(requestException.StatusCode.Value);
     }
 }
