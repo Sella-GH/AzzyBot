@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
+using AzzyBot.Bot.Localization;
 using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
@@ -22,6 +23,7 @@ using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
+using DSharpPlus.Commands.Processors.SlashCommands.Localization;
 using DSharpPlus.Entities;
 
 using Microsoft.Extensions.Logging;
@@ -32,7 +34,7 @@ namespace AzzyBot.Bot.Commands;
 [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "DSharpPlus best practice")]
 public sealed class CoreCommands
 {
-    [Command("core"), RequireGuild, ModuleActivatedCheck([AzzyModules.LegalTerms])]
+    [Command("core"), RequireGuild, ModuleActivatedCheck([AzzyModules.LegalTerms]), InteractionLocalizer<CommandLocalizer>]
     public sealed class CoreGroup(ILogger<CoreGroup> logger, IOptions<AzzyBotSettings> settings, DbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<CoreGroup> _logger = logger;
@@ -40,7 +42,7 @@ public sealed class CoreCommands
         private readonly DbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
 
-        [Command("force-channel-permissions-check"), Description("Forces a check of the permissions for the bot in the necessary channel."), RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator])]
+        [Command("force-channel-permissions-check"), Description("Forces a check of the permissions for the bot in the necessary channel."), RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), InteractionLocalizer<CommandLocalizer>]
         public async ValueTask ForceChannelPermissionsCheckAsync(SlashCommandContext context)
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -59,7 +61,7 @@ public sealed class CoreCommands
             await _botService.CheckPermissionsAsync(guild);
         }
 
-        [Command("help"), Description("Gives you an overview about all the available commands.")]
+        [Command("help"), Description("Gives you an overview about all the available commands."), InteractionLocalizer<CommandLocalizer>]
         public async ValueTask HelpAsync
         (
             SlashCommandContext context,
@@ -111,13 +113,13 @@ public sealed class CoreCommands
             await context.EditResponseAsync(messageBuilder);
         }
 
-        [Command("stats")]
+        [Command("stats"), InteractionLocalizer<CommandLocalizer>]
         public sealed class CoreStats(IOptions<AppStats> stats, ILogger<CoreStats> logger)
         {
             private readonly AppStats _stats = stats.Value;
             private readonly ILogger<CoreStats> _logger = logger;
 
-            [Command("hardware"), Description("Shows information about the hardware side of the bot.")]
+            [Command("hardware"), Description("Shows information about the hardware side of the bot."), InteractionLocalizer<CommandLocalizer>]
             public async ValueTask HardwareStatsAsync(SlashCommandContext context)
             {
                 ArgumentNullException.ThrowIfNull(context);
@@ -131,7 +133,7 @@ public sealed class CoreCommands
                 await context.EditResponseAsync(embed);
             }
 
-            [Command("info"), Description("Shows information about the bot and its components.")]
+            [Command("info"), Description("Shows information about the bot and its components."), InteractionLocalizer<CommandLocalizer>]
             public async ValueTask InfoStatsAsync(SlashCommandContext context)
             {
                 ArgumentNullException.ThrowIfNull(context);
@@ -145,7 +147,7 @@ public sealed class CoreCommands
                 await context.EditResponseAsync(embed);
             }
 
-            [Command("ping"), Description("Ping the bot and get the latency to discord.")]
+            [Command("ping"), Description("Ping the bot and get the latency to discord."), InteractionLocalizer<CommandLocalizer>]
             public async ValueTask PingAsync(SlashCommandContext context)
             {
                 ArgumentNullException.ThrowIfNull(context);
