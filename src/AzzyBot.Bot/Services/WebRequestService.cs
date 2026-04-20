@@ -338,7 +338,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         }
     }
 
-    private static bool IsServerDownStatus(HttpStatusCode status)
+    internal static bool IsServerDownStatus(HttpStatusCode status)
     {
         return (int)status switch
         {
