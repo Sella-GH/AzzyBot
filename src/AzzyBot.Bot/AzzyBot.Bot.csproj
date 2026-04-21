@@ -32,36 +32,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lavalink4NET.DSharpPlus.Nightly" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="NCronJob" />
-    <PackageReference Include="TagLibSharp2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\AzzyBot.Core\AzzyBot.Core.csproj" />
-    <ProjectReference Include="..\AzzyBot.Data\AzzyBot.Data.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Update="Resources\UriStrings.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>UriStrings.resx</DependentUpon>
     </Compile>
-  </ItemGroup>
 
-  <ItemGroup>
     <EmbeddedResource Update="Resources\UriStrings.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>UriStrings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
 
-  <ItemGroup>
     <None Update="Modules\Core\Files\AppStats.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -77,6 +58,21 @@
     <None Update="Settings\AzzyBotSettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AzzyBot.Core\AzzyBot.Core.csproj" />
+    <ProjectReference Include="..\AzzyBot.Data\AzzyBot.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lavalink4NET.DSharpPlus.Nightly" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="NCronJob" />
+    <PackageReference Include="TagLibSharp2" />
   </ItemGroup>
 
 </Project>
