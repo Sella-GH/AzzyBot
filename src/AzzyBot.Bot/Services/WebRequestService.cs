@@ -215,7 +215,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
 
             int statusCode = (int)status;
             if (statusCode is 502 or 503 or 504 or (>= 520 and <= 526))
-                throw new HttpRequestException($"Server unreachable ({statusCode} {status}).");
+                throw new HttpRequestException($"Server is unreachable ({statusCode}).");
 
             return (status is not HttpStatusCode.Forbidden) ? responseContent : null;
         }
