@@ -174,7 +174,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
             _logger.WebInvalidUri(uri);
             throw;
         }
-        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        catch (Exception ex) when (ex is PingException or TaskCanceledException)
         {
             _logger.WebRequestFailed(HttpMethod.Get, ex.Message, uri);
             throw;
@@ -196,14 +196,14 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
                 responseContent = await response.Content.ReadAsStringAsync();
             }
 
+            const int maxRetries= 7;
             int retryCount = 0;
-            while (status is HttpStatusCode.TooManyRequests)
+            while (status is HttpStatusCode.TooManyRequests && retryCount <= maxRetries)
             {
                 _logger.BotRatelimited(url, retryCount);
 
                 await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2, retryCount)));
-                if (retryCount is not 7)
-                    retryCount++;
+                retryCount++;
 
                 using HttpRequestMessage retryRequest = new(HttpMethod.Get, url);
                 AddRequestHeaders(retryRequest, headers, acceptJson: acceptJson, noCache: noCache);
@@ -214,10 +214,14 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
             }
 
             int statusCode = (int)status;
-            if (statusCode is 502 or 503 or 504 or (>= 520 and <= 526))
-                throw new HttpRequestException($"Server is unreachable ({statusCode}).");
-
-            return (status is not HttpStatusCode.Forbidden) ? responseContent : null;
+            return statusCode switch
+            {
+                >= 100 and <= 199 => null,
+                >= 200 and <= 399 => responseContent,
+                >= 400 and <= 499 => null,
+                >= 500 => throw new HttpRequestException($"Server returned an error: {statusCode}.", null, status),
+                _ => throw new HttpRequestException($"Unexpected status code: {statusCode}.", null, status)
+            };
         }
         catch (InvalidOperationException)
         {
