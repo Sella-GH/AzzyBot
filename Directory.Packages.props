@@ -4,15 +4,15 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
-    <PackageVersion Include="DSharpPlus" Version="5.0.0-nightly-02583" />
-    <PackageVersion Include="DSharpPlus.Commands" Version="5.0.0-nightly-02582" />
-    <PackageVersion Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02582" />
+    <PackageVersion Include="DSharpPlus" Version="5.0.0-nightly-02584" />
+    <PackageVersion Include="DSharpPlus.Commands" Version="5.0.0-nightly-02584" />
+    <PackageVersion Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02584" />
     <PackageVersion Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="10.0.0" />
     <PackageVersion Include="Lavalink4NET.DSharpPlus.Nightly" Version="4.2.1" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.6" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="10.0.6" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.6" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.6" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.7" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="10.0.7" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.7" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.7" />
     <PackageVersion Include="NCronJob" Version="4.10.1" />
     <PackageVersion Include="Npgsql" Version="10.0.2" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
@@ -22,7 +22,7 @@
     <PackageVersion Include="Roslynator.CodeFixes" Version="4.15.0" />
     <PackageVersion Include="Roslynator.Formatting.Analyzers" Version="4.15.0" />
     <PackageVersion Include="Roslynator.Refactorings" Version="4.15.0" />
-    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.23.0.137933" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.24.0.138807" />
     <PackageVersion Include="TagLibSharp2" Version="0.6.0" />
   </ItemGroup>
 </Project>

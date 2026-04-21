@@ -87,7 +87,7 @@ Follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wi
 * [NReco.Logging.File](https://github.com/NReco/Logging)
 * [Roslynator](https://github.com/dotnet/roslynator)
 * [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet)
-* [TagLibSharp](https://github.com/mono/taglib-sharp)
+* [TagLibSharp2](https://github.com/decriptor/TagLibSharp2)
 
 ## Contributing
 
