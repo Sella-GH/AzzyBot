@@ -1,6 +1,7 @@
 ﻿## Unreleased
 ### Improvements
 - Migrated from [TagLibSharp](https://github.com/mono/taglib-sharp) to [TagLibSharp2](https://github.com/decriptor/TagLibSharp2)
+- Status codes 502, 503, 504 and 520 - 526 are now handled as offline status for AzuraCast instances
 
 ## 2.9.1 - 2026-03-01
 ### Fixes
