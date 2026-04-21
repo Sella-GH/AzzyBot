@@ -1,7 +1,18 @@
 ﻿## Unreleased
+
+## 2.10.0 - 2026-04-21
 ### Improvements
 - Migrated from [TagLibSharp](https://github.com/mono/taglib-sharp) to [TagLibSharp2](https://github.com/decriptor/TagLibSharp2)
 - Status codes for AzuraCast instances are now better handeled
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02584
+- Updated [Lavalink4NET](https://github.com/lavalink4net/Lavalink4NET) to version 4.2.1
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 10.0.7
+- Updated [Microsoft.Extensions.X](https://github.com/dotnet/runtime) libraries to version 10.0.7
+- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.10.1
+- Updated [Npgsql](https://github.com/npgsql/efcore.pg) to version 10.0.2
+- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.24.0.138807
 
 ## 2.9.1 - 2026-03-01
 ### Fixes
