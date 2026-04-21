@@ -213,6 +213,15 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
                 responseContent = await response.Content.ReadAsStringAsync();
             }
 
+            int statusCode = (int)status;
+            if (status is HttpStatusCode.BadGateway
+                         or HttpStatusCode.ServiceUnavailable
+                         or HttpStatusCode.GatewayTimeout
+                || (statusCode >= 520 && statusCode <= 526))
+            {
+                throw new HttpRequestException($"Server unreachable ({statusCode} {status}).");
+            }
+
             return (status is not HttpStatusCode.Forbidden) ? responseContent : null;
         }
         catch (InvalidOperationException)
