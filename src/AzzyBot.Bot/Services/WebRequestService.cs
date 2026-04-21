@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -216,8 +216,8 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
             int statusCode = (int)status;
             if (status is HttpStatusCode.BadGateway
                          or HttpStatusCode.ServiceUnavailable
-                         or HttpStatusCode.GatewayTimeout
-                || (statusCode >= 520 && statusCode <= 526))
+                         or HttpStatusCode.GatewayTimeout ||
+                    (statusCode >= 520 && statusCode <= 526))
             {
                 throw new HttpRequestException($"Server unreachable ({statusCode} {status}).");
             }
