@@ -214,10 +214,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
             }
 
             int statusCode = (int)status;
-            if (status is HttpStatusCode.BadGateway
-                         or HttpStatusCode.ServiceUnavailable
-                         or HttpStatusCode.GatewayTimeout ||
-                    (statusCode >= 520 && statusCode <= 526))
+            if (statusCode is 502 or 503 or 504 or (>= 520 and <= 526))
             {
                 throw new HttpRequestException($"Server unreachable ({statusCode} {status}).");
             }
