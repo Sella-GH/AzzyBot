@@ -20,7 +20,7 @@ using NCronJob;
 
 namespace AzzyBot.Bot;
 
-public static class Startup
+public static class Program
 {
     public static async Task Main(string[] args)
     {
