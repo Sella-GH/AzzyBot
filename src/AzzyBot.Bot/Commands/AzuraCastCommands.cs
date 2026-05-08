@@ -673,7 +673,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            IEnumerable<AzuraFilesRecord>? songs = await _azuraCast.GetFilesOnlineAsync<AzuraFilesRecord>(baseUrl, apiKey, station);
+            IEnumerable<AzuraFilesRecord>? songs = await _azuraCast.GetFilesOnlineAsync(baseUrl, apiKey, station);
             if (songs is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
@@ -1339,7 +1339,7 @@ public sealed class AzuraCastCommands
 
             string uploadPath = (string.IsNullOrEmpty(acStation.Preferences.FileUploadPath)) ? "/" : acStation.Preferences.FileUploadPath;
 
-            AzuraFilesDetailedRecord? uploadedFile = await _azuraCast.UploadFileAsync<AzuraFilesDetailedRecord>(baseUrl, apiKey, station, filePath, file.FileName, uploadPath);
+            AzuraFilesDetailedRecord? uploadedFile = await _azuraCast.UploadFileAsync(baseUrl, apiKey, station, filePath, file.FileName, uploadPath, JsonSourceGen.Default.AzuraFilesDetailedRecord);
             AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(baseUrl, apiKey, station);
             if (uploadedFile is null || azuraStation is null)
             {
