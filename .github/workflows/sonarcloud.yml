@@ -32,6 +32,16 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
+          submodules: recursive
+
+      - name: Checkout submodules
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v6.0.2
+        with:
+          fetch-depth: 0
+          repository: Sella-GH/Lavalink4NET
+          ref: azzy
+          submodules: recursive
+          path: extern/Lavalink4NET
 
       - name: Cache SonarQube Cloud Packages
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # 5.0.5
