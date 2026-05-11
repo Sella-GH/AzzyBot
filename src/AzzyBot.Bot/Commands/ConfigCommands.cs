@@ -615,13 +615,8 @@ public sealed class ConfigCommands
                     {
                         DiscordRole? stationAdminRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationAdminRoleId);
                         DiscordRole? stationDjRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationDjRoleId);
-                        ulong adminRoleId = stationAdminRole?.Id ?? 0;
-                        ulong djRoleId = stationDjRole?.Id ?? 0;
-                        if (!stationRoles.Exists(r => r.Id == adminRoleId))
-                            stationRoles.Add(new(adminRoleId, stationAdminRole?.Name ?? "Name not found"));
-
-                        if (!stationRoles.Exists(r => r.Id == djRoleId))
-                            stationRoles.Add(new(djRoleId, stationDjRole?.Name ?? "Name not found"));
+                        stationRoles.Add(new(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? "Name not found"));
+                        stationRoles.Add(new(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found"));
 
                         string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(ac.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
 
