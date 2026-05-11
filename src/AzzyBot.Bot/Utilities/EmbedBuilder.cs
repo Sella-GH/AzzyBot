@@ -659,45 +659,37 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, color: DiscordColor.White, fields: fields);
     }
 
-    public static IEnumerable<DiscordEmbed> BuildGetSettingsAzuraStationsEmbed(AzuraCastEntity azuraCast, IReadOnlyDictionary<ulong, string> stationRoles, IReadOnlyDictionary<int, string> stationNames, IReadOnlyDictionary<int, int> stationRequests)
+    public static IEnumerable<DiscordEmbed> BuildGetSettingsAzuraStationsEmbed(AzuraCastEntity azuraCast, IReadOnlyList<AzzyStationRoleStruct> stationRoles, IReadOnlyDictionary<int, string> stationNames, IReadOnlyDictionary<int, int> stationRequests)
     {
         ArgumentNullException.ThrowIfNull(azuraCast);
+        ArgumentNullException.ThrowIfNull(stationRoles);
 
         const string stationTitle = "AzuraCast Stations";
+        Dictionary<ulong, string> roleMap = new(stationRoles.Count);
+        foreach (AzzyStationRoleStruct role in stationRoles)
+        {
+            roleMap.TryAdd(role.Id, role.Name);
+        }
+
         List<DiscordEmbed> embeds = new(azuraCast.Stations.Count);
         foreach (AzuraCastStationEntity station in azuraCast.Stations)
         {
             string stationName = stationNames.FirstOrDefault(x => x.Key == station.Id).Value;
             string stationId = station.StationId.ToString(CultureInfo.InvariantCulture);
             string stationApiKey = $"||{((!string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : NotSetString)}||";
-            string stationAdminRole;
-            if (station.Preferences.StationAdminRoleId > 0)
-            {
-                string role = stationRoles.FirstOrDefault(x => x.Key == station.Preferences.StationAdminRoleId).Value;
-                ulong roleId = stationRoles.FirstOrDefault(x => x.Key == station.Preferences.StationAdminRoleId).Key;
-                stationAdminRole = (role is not null) ? $"{role} ({roleId})" : NotSetString;
-            }
-            else
-            {
-                stationAdminRole = "Not set";
-            }
 
-            string stationDjRole;
-            if (station.Preferences.StationDjRoleId > 0)
-            {
-                string role = stationRoles.FirstOrDefault(x => x.Key == station.Preferences.StationDjRoleId).Value;
-                ulong roleId = stationRoles.FirstOrDefault(x => x.Key == station.Preferences.StationDjRoleId).Key;
-                stationDjRole = (role is not null) ? $"{role} ({roleId})" : NotSetString;
-            }
-            else
-            {
-                stationDjRole = "Not set";
-            }
+            string stationAdminRole = (station.Preferences.StationAdminRoleId is > 0 && roleMap.TryGetValue(station.Preferences.StationAdminRoleId, out string? adminName))
+                ? $"{adminName} ({station.Preferences.StationAdminRoleId})"
+                : NotSetString;
 
-            string fileUploadChannel = (station.Preferences.FileUploadChannelId > 0) ? $"<#{station.Preferences.FileUploadChannelId}>" : NotSetString;
+            string stationDjRole = (station.Preferences.StationDjRoleId is > 0 && roleMap.TryGetValue(station.Preferences.StationDjRoleId, out string? djName))
+                ? $"{djName} ({station.Preferences.StationDjRoleId})"
+                : NotSetString;
+
+            string fileUploadChannel = (station.Preferences.FileUploadChannelId is > 0) ? $"<#{station.Preferences.FileUploadChannelId}>" : NotSetString;
             string fileUploadPath = (!string.IsNullOrEmpty(station.Preferences.FileUploadPath)) ? station.Preferences.FileUploadPath : NotSetString;
-            string nowPlayingChannel = (station.Preferences.NowPlayingEmbedChannelId > 0) ? $"<#{station.Preferences.NowPlayingEmbedChannelId}>" : NotSetString;
-            string requestsChannel = (station.Preferences.RequestsChannelId > 0) ? $"<#{station.Preferences.RequestsChannelId}>" : NotSetString;
+            string nowPlayingChannel = (station.Preferences.NowPlayingEmbedChannelId is > 0) ? $"<#{station.Preferences.NowPlayingEmbedChannelId}>" : NotSetString;
+            string requestsChannel = (station.Preferences.RequestsChannelId is > 0) ? $"<#{station.Preferences.RequestsChannelId}>" : NotSetString;
             int requestCount = stationRequests.FirstOrDefault(x => x.Key == station.Id).Value;
             string showPlaylist = Misc.GetReadableBool(station.Preferences.ShowPlaylistInNowPlaying, ReadableBool.EnabledDisabled);
             string fileChanges = Misc.GetReadableBool(station.Checks.FileChanges, ReadableBool.EnabledDisabled);

@@ -301,7 +301,7 @@ node_modules/
 *.dsw
 *.dsp
 
-# Visual Studio 6 technical files 
+# Visual Studio 6 technical files
 *.ncb
 *.aps
 
@@ -399,3 +399,6 @@ FodyWeavers.xsd
 
 # Config files
 AzzyBotSettings-Dev.json
+
+# Claude files
+.claude/settings.local.json
