@@ -659,7 +659,7 @@ public static class EmbedBuilder
         return CreateBasicEmbed(title, color: DiscordColor.White, fields: fields);
     }
 
-    public static IEnumerable<DiscordEmbed> BuildGetSettingsAzuraStationsEmbed(AzuraCastEntity azuraCast, IReadOnlyDictionary<ulong, string> stationRoles, IReadOnlyDictionary<int, string> stationNames, IReadOnlyDictionary<int, int> stationRequests)
+    public static IEnumerable<DiscordEmbed> BuildGetSettingsAzuraStationsEmbed(AzuraCastEntity azuraCast, IReadOnlyList<AzzyStationRoleStruct> stationRoles, IReadOnlyDictionary<int, string> stationNames, IReadOnlyDictionary<int, int> stationRequests)
     {
         ArgumentNullException.ThrowIfNull(azuraCast);
 
@@ -673,9 +673,8 @@ public static class EmbedBuilder
             string stationAdminRole;
             if (station.Preferences.StationAdminRoleId > 0)
             {
-                string role = stationRoles.FirstOrDefault(x => x.Key == station.Preferences.StationAdminRoleId).Value;
-                ulong roleId = stationRoles.FirstOrDefault(x => x.Key == station.Preferences.StationAdminRoleId).Key;
-                stationAdminRole = (role is not null) ? $"{role} ({roleId})" : NotSetString;
+                AzzyStationRoleStruct roleData = stationRoles.FirstOrDefault(x => x.Id == station.Preferences.StationAdminRoleId);
+                stationAdminRole = (roleData.Name is not null) ? $"{roleData.Name} ({roleData.Id})" : NotSetString;
             }
             else
             {
@@ -685,9 +684,8 @@ public static class EmbedBuilder
             string stationDjRole;
             if (station.Preferences.StationDjRoleId > 0)
             {
-                string role = stationRoles.FirstOrDefault(x => x.Key == station.Preferences.StationDjRoleId).Value;
-                ulong roleId = stationRoles.FirstOrDefault(x => x.Key == station.Preferences.StationDjRoleId).Key;
-                stationDjRole = (role is not null) ? $"{role} ({roleId})" : NotSetString;
+                AzzyStationRoleStruct roleData = stationRoles.FirstOrDefault(x => x.Id == station.Preferences.StationDjRoleId);
+                stationDjRole = (roleData.Name is not null) ? $"{roleData.Name} ({roleData.Id})" : NotSetString;
             }
             else
             {
