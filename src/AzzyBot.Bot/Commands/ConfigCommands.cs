@@ -17,6 +17,7 @@ using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
+using AzzyBot.Bot.Utilities.Structs;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
@@ -607,15 +608,16 @@ public sealed class ConfigCommands
 
                 if (ac.IsOnline)
                 {
-                    Dictionary<ulong, string> stationRoles = new(ac.Stations.Count);
+                    List<AzzyStationRoleStruct> stationRoles = new(ac.Stations.Count * 2);
                     Dictionary<int, string> stationNames = new(ac.Stations.Count);
                     Dictionary<int, int> stationRequests = new(ac.Stations.Count);
                     foreach (AzuraCastStationEntity station in ac.Stations)
                     {
                         DiscordRole? stationAdminRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationAdminRoleId);
                         DiscordRole? stationDjRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationDjRoleId);
-                        stationRoles.Add(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? "Name not found");
-                        stationRoles.Add(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found");
+                        stationRoles.Add(new(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? "Name not found"));
+                        stationRoles.Add(new(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found"));
+
                         string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(ac.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
 
                         AzuraStationRecord? stationRecord = null;
