@@ -45,7 +45,7 @@ jobs:
 
      - name: Calculate Lines of Source Code
        id: loc_cs
-       uses: PavanMudigonda/lines-of-code-reporter@6c5507f592136d1c05cb1e8c30889dc4eb5561f5 # v1.6
+       uses: PavanMudigonda/lines-of-code-reporter@de8bca4aac0aa952e9c9f771b30b0b3ad2c73958 # v1.8
        with:
          include_lang: "C#,MSBuild script"
 
