@@ -263,13 +263,6 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         return files.FirstOrDefault(f => f.Contains(fileName, StringComparison.OrdinalIgnoreCase)) ?? string.Empty;
     }
 
-    private Task<IEnumerable<AzuraFilesDetailedRecord>?> GetOnlineFilesAsync(Uri baseUrl, string apiKey, int stationId)
-    {
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}";
-
-        return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraFilesDetailedRecord, CreateHeader(apiKey));
-    }
-
     private async Task PostToApiAsync(Uri baseUrl, string endpoint, string? content = null, Dictionary<string, string>? headers = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(endpoint);
@@ -384,16 +377,14 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         }
     }
 
-    public async Task<IEnumerable<AzuraFilesRecord>?> GetFilesOnlineBasicAsync(Uri baseUrl, string apiKey, int stationId)
+    public Task<IEnumerable<AzuraFilesRecord>?> GetFilesOnlineBasicAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        IEnumerable<AzuraFilesDetailedRecord>? detailed = await GetOnlineFilesAsync(baseUrl, apiKey, stationId);
-        if (detailed is null)
-            return null;
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}";
 
-        return detailed.Cast<AzuraFilesRecord>();
+        return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraFilesRecord, CreateHeader(apiKey));
     }
 
     public Task<IEnumerable<AzuraFilesDetailedRecord>?> GetFilesOnlineDetailedAsync(Uri baseUrl, string apiKey, int stationId)
@@ -401,7 +392,9 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        return GetOnlineFilesAsync(baseUrl, apiKey, stationId);
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}";
+
+        return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraFilesDetailedRecord, CreateHeader(apiKey));
     }
 
     public async Task<AzuraHardwareStatsRecord?> GetHardwareStatsAsync(Uri baseUrl, string apiKey)
