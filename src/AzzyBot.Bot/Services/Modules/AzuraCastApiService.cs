@@ -354,11 +354,17 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         string file = GetLocalFile(guildId, azuraCastId, databaseId, stationId);
         if (string.IsNullOrEmpty(file))
+        {
+            _logger.LocalFileNotFound(stationId, databaseId, azuraCastId, guildId);
             return [];
+        }
 
         string content = await FileOperations.GetFileContentAsync(file);
         if (string.IsNullOrEmpty(content))
+        {
+            _logger.LocalFileContentNotFound(stationId, databaseId, azuraCastId, guildId);
             return [];
+        }
 
         try
         {
