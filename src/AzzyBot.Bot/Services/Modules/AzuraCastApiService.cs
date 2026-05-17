@@ -354,11 +354,17 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
 
         string file = GetLocalFile(guildId, azuraCastId, databaseId, stationId);
         if (string.IsNullOrEmpty(file))
+        {
+            _logger.LocalFileNotFound(stationId, databaseId, azuraCastId, guildId);
             return [];
+        }
 
         string content = await FileOperations.GetFileContentAsync(file);
         if (string.IsNullOrEmpty(content))
+        {
+            _logger.LocalFileContentNotFound(stationId, databaseId, azuraCastId, guildId);
             return [];
+        }
 
         try
         {
@@ -371,7 +377,17 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         }
     }
 
-    public Task<IEnumerable<AzuraFilesDetailedRecord>?> GetFilesOnlineAsync(Uri baseUrl, string apiKey, int stationId)
+    public Task<IEnumerable<AzuraFilesRecord>?> GetFilesOnlineBasicAsync(Uri baseUrl, string apiKey, int stationId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
+
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}";
+
+        return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraFilesRecord, CreateHeader(apiKey));
+    }
+
+    public Task<IEnumerable<AzuraFilesDetailedRecord>?> GetFilesOnlineDetailedAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
@@ -483,7 +499,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         ArgumentNullException.ThrowIfNull(station);
 
         IEnumerable<AzuraFilesRecord>? songs = (online)
-            ? await GetFilesOnlineAsync(baseUrl, apiKey, station.StationId)
+            ? await GetFilesOnlineBasicAsync(baseUrl, apiKey, station.StationId)
             : await GetFilesLocalAsync(station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
 
         if (songs is null)

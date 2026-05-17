@@ -143,7 +143,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
             }
             else
             {
-                IEnumerable<AzuraFilesDetailedRecord>? filesOnline = await _azuraCast.GetFilesOnlineAsync(baseUrl, apiKey, stationId);
+                IEnumerable<AzuraFilesDetailedRecord>? filesOnline = await _azuraCast.GetFilesOnlineDetailedAsync(baseUrl, apiKey, stationId);
                 if (filesOnline is null)
                 {
                     await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station ({stationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");

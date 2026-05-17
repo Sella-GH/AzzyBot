@@ -673,7 +673,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            IEnumerable<AzuraFilesRecord>? songs = await _azuraCast.GetFilesOnlineAsync(baseUrl, apiKey, station);
+            IEnumerable<AzuraFilesRecord>? songs = await _azuraCast.GetFilesOnlineBasicAsync(baseUrl, apiKey, station);
             if (songs is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);

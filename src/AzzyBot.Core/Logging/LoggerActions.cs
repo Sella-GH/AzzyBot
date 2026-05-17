@@ -186,6 +186,12 @@ public static partial class LoggerActions
     [LoggerMessage(251, LogLevel.Warning, "Unable to notify admins or owner of guild {guildName} ({guildId}) about being unused")]
     public static partial void UnableToNotifyUnusedGuildUnused(this ILogger logger, string guildName, ulong guildId);
 
+    [LoggerMessage(260, LogLevel.Warning, "Could not find local file for station {station} (db: {dId}) in instance {instance} in guild {guild}")]
+    public static partial void LocalFileNotFound(this ILogger logger, int station, int dId, int instance, int guild);
+
+    [LoggerMessage(261, LogLevel.Warning, "Could not fetch local file content for station {station} (db: {dId}) in instance {instance} in guild {guild}")]
+    public static partial void LocalFileContentNotFound(this ILogger logger, int station, int dId, int instance, int guild);
+
     [LoggerMessage(290, LogLevel.Warning, "Latest online version of the bot is empty")]
     public static partial void OnlineVersionEmpty(this ILogger logger);
 
