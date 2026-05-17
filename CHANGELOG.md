@@ -1,4 +1,22 @@
 ﻿## Unreleased
+### General
+- Added a missing package to the docker images to fix errors regarding authentication
+- Upgraded docker images to Ubuntu 26.04 resolute
+
+### Fixes
+- An `ArgumentException` could appear when you have multiple stations using the same discord roles
+
+### Development
+- JSON types in `AzuraCastApiService.cs` are known at compile time instead of runtime
+- Renamed `Startup.cs` to `Program.cs` to align with .NET conventions
+- Reorganized the .slnx file a bit
+
+### Dependencies
+- Updated [.NET SDK](https://github.com/dotnet/sdk) to minimum version 10.0.108
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02587
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 10.0.8
+- Updated [Microsoft.Extensions.X](https://github.com/dotnet/runtime) libraries to version 10.0.8
+- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.25.0.139117
 
 ## 2.10.0 - 2026-04-21
 ### Improvements
