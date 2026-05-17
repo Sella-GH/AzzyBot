@@ -4,7 +4,10 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0-resolute AS build
 USER root
 
-RUN apt update && apt upgrade -y && apt autoremove -y && apt clean -y
+RUN apt-get update \
+  && apt-get upgrade -y \
+  && apt-get autoremove -y \
+  && apt-get clean -y
 
 WORKDIR /build
 COPY ./ ./
@@ -22,11 +25,11 @@ FROM mcr.microsoft.com/dotnet/runtime:10.0-resolute AS runner
 USER root
 
 # Upgrade internal tools and packages first
-RUN apt update \
-  && apt upgrade -y \
-  && apt install -y --no-install-recommends iputils-ping libzstd-dev \
-  && apt autoremove --purge -y \
-  && apt clean -y \
+RUN apt-get update \
+  && apt-get upgrade -y \
+  && apt-get install -y --no-install-recommends iputils-ping libzstd-dev \
+  && apt-get autoremove --purge -y \
+  && apt-get clean -y \
   && rm -rf /var/lib/apt/lists/*
 
 # Add environment variables
