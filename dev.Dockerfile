@@ -1,10 +1,13 @@
 # syntax=docker/dockerfile:labs
 
 # BUILD IMAGE
-FROM mcr.microsoft.com/dotnet/sdk:10.0-noble AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0-resolute AS build
 USER root
 
-RUN apt update && apt upgrade -y && apt autoremove -y && apt clean -y
+RUN apt-get update \
+  && apt-get upgrade -y \
+  && apt-get autoremove -y \
+  && apt-get clean -y
 
 WORKDIR /build
 COPY ./ ./
@@ -18,11 +21,16 @@ RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.con
   && dotnet publish ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c $CONFIG --no-build --no-restore --no-self-contained -o out --ucr
 
 # RUNNER IMAGE
-FROM mcr.microsoft.com/dotnet/runtime:10.0-noble AS runner
+FROM mcr.microsoft.com/dotnet/runtime:10.0-resolute AS runner
 USER root
 
 # Upgrade internal tools and packages first
-RUN apt update && apt upgrade -y && apt install -y --no-install-recommends iputils-ping libzstd-dev && apt autoremove --purge -y && apt clean -y && rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+  && apt-get upgrade -y \
+  && apt-get install -y --no-install-recommends iputils-ping libgssapi-krb5-2 libzstd-dev \
+  && apt-get autoremove --purge -y \
+  && apt-get clean -y \
+  && rm -rf /var/lib/apt/lists/*
 
 # Add environment variables
 ENV PATH="/usr/local/zstd:${PATH}" \
