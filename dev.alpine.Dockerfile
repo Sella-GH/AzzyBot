@@ -22,7 +22,11 @@ FROM mcr.microsoft.com/dotnet/runtime:10.0-alpine AS runner
 USER root
 
 # Upgrade internal tools and packages first
-RUN apk update && apk upgrade && apk add --no-cache icu-data-full icu-libs iputils-ping tzdata zstd-dev && apk cache sync && rm -rf /var/cache/apk/*
+RUN apk update \
+  && apk upgrade \
+  && apk add --no-cache icu-data-full icu-libs iputils-ping tzdata zstd-dev \
+  && apk cache sync \
+  && rm -rf /var/cache/apk/*
 
 # Add environment variables
 ENV PATH="/usr/local/zstd:${PATH}" \
