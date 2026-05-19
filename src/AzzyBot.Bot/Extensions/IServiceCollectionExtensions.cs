@@ -70,7 +70,7 @@ public static class IServiceCollectionExtensions
                 c.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher;
                 c.Timeout = TimeSpan.FromSeconds(30);
             });
-            services.AddSingleton<WebRequestService>();
+            services.AddSingleton<IWebRequestService, WebRequestService>();
             services.AddSingleton<IUpdaterService, UpdaterService>();
 
             services.AddSingleton<AzuraCastApiService>();

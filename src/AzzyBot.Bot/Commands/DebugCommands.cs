@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Choices;
-using AzzyBot.Bot.Services;
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
@@ -30,11 +30,11 @@ namespace AzzyBot.Bot.Commands;
 public sealed class DebugCommands
 {
     [Command("debug"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator])]
-    public sealed class DebugGroup(ILogger<DebugGroup> logger, IDbActions dbActions, WebRequestService webRequestService)
+    public sealed class DebugGroup(ILogger<DebugGroup> logger, IDbActions dbActions, IWebRequestService webRequestService)
     {
         private readonly ILogger<DebugGroup> _logger = logger;
         private readonly IDbActions _dbActions = dbActions;
-        private readonly WebRequestService _webRequestService = webRequestService;
+        private readonly IWebRequestService _webRequestService = webRequestService;
 
         [Command("cluster-logging"), Description("Test the logging file rotation feature of the bot.")]
         public async ValueTask DebugClusterLoggingAsync

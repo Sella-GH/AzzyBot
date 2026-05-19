@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Resources;
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Core.Logging;
@@ -19,10 +20,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebRequestService> logger)
+public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebRequestService> logger) : IWebRequestService
 {
     private readonly IHttpClientFactory _factory = factory;
-    private readonly ILogger _logger = logger;
+    private readonly ILogger<WebRequestService> _logger = logger;
     private const string MediaTypeJson = MediaTypeNames.Application.Json;
     private static readonly string HttpClientName = SoftwareStats.GetAppName;
 

@@ -19,14 +19,14 @@ using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<AzzyBotSettings> botSettings, IOptions<CoreUpdaterSettings> updaterSettings, IDbActions dbActions, DiscordBotService botService, WebRequestService webService) : IUpdaterService
+public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<AzzyBotSettings> botSettings, IOptions<CoreUpdaterSettings> updaterSettings, IDbActions dbActions, DiscordBotService botService, IWebRequestService webService) : IUpdaterService
 {
     private readonly ILogger<UpdaterService> _logger = logger;
     private readonly AzzyBotSettings _botSettings = botSettings.Value;
     private readonly CoreUpdaterSettings _updaterSettings = updaterSettings.Value;
     private readonly IDbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
-    private readonly WebRequestService _webService = webService;
+    private readonly IWebRequestService _webService = webService;
     private DateTimeOffset _lastAzzyUpdateNotificationTime = DateTimeOffset.MinValue;
     private string _lastOnlineVersion = string.Empty;
     private int _azzyNotifyCounter;

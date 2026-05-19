@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Services;
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
@@ -23,14 +24,14 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplete> logger, AzuraCastApiService azuraCast, AzuraCastPingService azuraCastPing, IDbActions dbActions, DiscordBotService botService, WebRequestService webRequest) : IAutoCompleteProvider
+public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplete> logger, AzuraCastApiService azuraCast, AzuraCastPingService azuraCastPing, IDbActions dbActions, DiscordBotService botService, IWebRequestService webRequest) : IAutoCompleteProvider
 {
     private readonly ILogger<AzuraCastMountAutocomplete> _logger = logger;
     private readonly AzuraCastApiService _azuraCast = azuraCast;
     private readonly AzuraCastPingService _azuraCastPing = azuraCastPing;
     private readonly IDbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
-    private readonly WebRequestService _webRequest = webRequest;
+    private readonly IWebRequestService _webRequest = webRequest;
 
     public async ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)
     {

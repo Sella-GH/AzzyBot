@@ -9,6 +9,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
@@ -23,11 +24,11 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DiscordBotService botService, WebRequestService webService)
+public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DiscordBotService botService, IWebRequestService webService)
 {
     private readonly ILogger<AzuraCastApiService> _logger = logger;
     private readonly DiscordBotService _botService = botService;
-    private readonly WebRequestService _webService = webService;
+    private readonly IWebRequestService _webService = webService;
     public const string AzuraCastPermissionsWiki = "Please review your [permission](https://github.com/Sella-GH/AzzyBot/wiki/AzuraCast-API-Key-required-permissions) set.";
 
     public string FilePath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "AzuraCast", "Files");

@@ -862,14 +862,14 @@ public sealed class AzuraCastCommands
     }
 
     [Command("music"), RequireGuild, ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast]), AzuraCastOnlineCheck]
-    public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastApiService azuraCast, ICronJobManager cronJobManager, IDbActions dbActions, DiscordBotService botService, WebRequestService webRequest)
+    public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastApiService azuraCast, ICronJobManager cronJobManager, IDbActions dbActions, DiscordBotService botService, IWebRequestService webRequest)
     {
         private readonly ILogger<MusicGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCast = azuraCast;
         private readonly ICronJobManager _cronJobManager = cronJobManager;
         private readonly IDbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
-        private readonly WebRequestService _webRequest = webRequest;
+        private readonly IWebRequestService _webRequest = webRequest;
 
         [Command("get-song-history"), Description("Get the song history of the selected station.")]
         public async ValueTask GetSongHistoryAsync
