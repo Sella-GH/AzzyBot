@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
@@ -15,11 +16,11 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzuraRequestJob(ILogger<AzuraRequestJob> logger, AzuraCastApiService apiService, CronJobManager cronJobManager, IDbActions dbActions, DiscordBotService botService) : IJob
+public sealed class AzuraRequestJob(ILogger<AzuraRequestJob> logger, AzuraCastApiService apiService, ICronJobManager cronJobManager, IDbActions dbActions, DiscordBotService botService) : IJob
 {
     private readonly ILogger<AzuraRequestJob> _logger = logger;
     private readonly AzuraCastApiService _apiService = apiService;
-    private readonly CronJobManager _cronJobManager = cronJobManager;
+    private readonly ICronJobManager _cronJobManager = cronJobManager;
     private readonly IDbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
 

@@ -9,6 +9,7 @@ using AzzyBot.Bot.Commands.Converters;
 using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.CronJobs;
 using AzzyBot.Bot.Services.DiscordEvents;
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Settings.Validators;
@@ -106,7 +107,7 @@ public static class IServiceCollectionExtensions
                 o.AddJob<LogfileCleaningJob>(j => j.WithName(nameof(LogfileCleaningJob)).WithCronExpression(everyDay).WithParameter(logDays).RunAtStartup());
                 o.AddJob<MusicStreamingPersistentNowPlayingJob>(j => j.WithName(nameof(MusicStreamingPersistentNowPlayingJob)).WithCronExpression(everyMinute));
             });
-            services.AddSingleton<CronJobManager>();
+            services.AddSingleton<ICronJobManager, CronJobManager>();
 
             services.AddLavalink();
             services.ConfigureLavalink(config =>
