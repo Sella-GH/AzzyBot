@@ -25,7 +25,7 @@ using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Core.Utilities.Enums;
 using AzzyBot.Core.Utilities.Helpers;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
@@ -45,14 +45,14 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AzuraCastCommands
 {
     [Command("azuracast"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast])]
-    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, DbActions dbActions, DiscordBotService botService, MusicStreamingService musicStreaming)
+    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, IDbActions dbActions, DiscordBotService botService, MusicStreamingService musicStreaming)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCastApi = azuraCastApi;
         private readonly AzuraCastFileService _azuraCastFile = azuraCastFile;
         private readonly AzuraCastPingService _azuraCastPing = azuraCastPing;
         private readonly AzuraCastUpdateService _azuraCastUpdate = azuraCastUpdate;
-        private readonly DbActions _dbActions = dbActions;
+        private readonly IDbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
         private readonly MusicStreamingService _musicStreaming = musicStreaming;
 
@@ -620,11 +620,11 @@ public sealed class AzuraCastCommands
     }
 
     [Command("dj"), RequireGuild, ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast]), AzuraCastOnlineCheck]
-    public sealed class DjGroup(ILogger<DjGroup> logger, AzuraCastApiService azuraCast, DbActions dbActions, DiscordBotService botService)
+    public sealed class DjGroup(ILogger<DjGroup> logger, AzuraCastApiService azuraCast, IDbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<DjGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCast = azuraCast;
-        private readonly DbActions _dbActions = dbActions;
+        private readonly IDbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
 
         [Command("add-internal-song-request"), Description("Adds an internal song request which will be played ASAP. This bypasses the usual api."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationDJGroup, AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -861,12 +861,12 @@ public sealed class AzuraCastCommands
     }
 
     [Command("music"), RequireGuild, ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast]), AzuraCastOnlineCheck]
-    public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastApiService azuraCast, CronJobManager cronJobManager, DbActions dbActions, DiscordBotService botService, WebRequestService webRequest)
+    public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastApiService azuraCast, CronJobManager cronJobManager, IDbActions dbActions, DiscordBotService botService, WebRequestService webRequest)
     {
         private readonly ILogger<MusicGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCast = azuraCast;
         private readonly CronJobManager _cronJobManager = cronJobManager;
-        private readonly DbActions _dbActions = dbActions;
+        private readonly IDbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
         private readonly WebRequestService _webRequest = webRequest;
 

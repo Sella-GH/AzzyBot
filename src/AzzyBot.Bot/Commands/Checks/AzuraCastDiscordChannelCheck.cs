@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
@@ -24,10 +24,10 @@ namespace AzzyBot.Bot.Commands.Checks;
 /// This check ensures that specific commands are executed in the appropriate Discord channel as defined in the AzuraCast
 /// station preferences. If the command is executed in an incorrect channel, the check returns the expected channel ID and fails.
 /// </remarks>
-public sealed class AzuraCastDiscordChannelCheck(ILogger<AzuraCastDiscordChannelCheck> logger, DbActions dbActions) : IContextCheck<AzuraCastDiscordChannelCheckAttribute>
+public sealed class AzuraCastDiscordChannelCheck(ILogger<AzuraCastDiscordChannelCheck> logger, IDbActions dbActions) : IContextCheck<AzuraCastDiscordChannelCheckAttribute>
 {
     private readonly ILogger<AzuraCastDiscordChannelCheck> _logger = logger;
-    private readonly DbActions _dbActions = dbActions;
+    private readonly IDbActions _dbActions = dbActions;
 
     public async ValueTask<string?> ExecuteCheckAsync(AzuraCastDiscordChannelCheckAttribute attribute, CommandContext context)
     {

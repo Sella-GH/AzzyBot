@@ -22,7 +22,7 @@ using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ArgumentModifiers;
@@ -42,14 +42,14 @@ namespace AzzyBot.Bot.Commands;
 public sealed class ConfigCommands
 {
     [Command("config"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
-    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, DbActions dbActions, DiscordBotService botService)
+    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, IDbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<ConfigGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCastApi = azuraCastApi;
         private readonly AzuraCastFileService _azuraCastFile = azuraCastFile;
         private readonly AzuraCastPingService _azuraCastPing = azuraCastPing;
         private readonly AzuraCastUpdateService _azuraCastUpdate = azuraCastUpdate;
-        private readonly DbActions _dbActions = dbActions;
+        private readonly IDbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
 
         [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "This is just a hard check.")]
@@ -686,10 +686,10 @@ public sealed class ConfigCommands
     }
 
     [Command("legals"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator])]
-    public sealed class LegalsGroup(ILogger<LegalsGroup> logger, DbActions dbActions)
+    public sealed class LegalsGroup(ILogger<LegalsGroup> logger, IDbActions dbActions)
     {
         private readonly ILogger<LegalsGroup> _logger = logger;
-        private readonly DbActions _dbActions = dbActions;
+        private readonly IDbActions _dbActions = dbActions;
 
         [Command("accept-legals"), Description("Provides you the links and guides you through the steps how to accept the legal conditions.")]
         public async ValueTask AcceptLegalsAsync(SlashCommandContext context)

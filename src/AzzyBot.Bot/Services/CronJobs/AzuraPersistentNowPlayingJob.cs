@@ -10,7 +10,7 @@ using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
@@ -21,11 +21,11 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayingJob> logger, AzuraCastApiService apiService, DbActions dbActions, DiscordBotService botService) : IJob
+public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayingJob> logger, AzuraCastApiService apiService, IDbActions dbActions, DiscordBotService botService) : IJob
 {
     private readonly ILogger<AzuraPersistentNowPlayingJob> _logger = logger;
     private readonly AzuraCastApiService _apiService = apiService;
-    private readonly DbActions _dbActions = dbActions;
+    private readonly IDbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)

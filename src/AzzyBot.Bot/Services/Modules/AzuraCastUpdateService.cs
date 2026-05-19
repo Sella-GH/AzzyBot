@@ -8,16 +8,16 @@ using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Entities;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiService, DbActions dbActions, DiscordBotService botService, UpdaterService updaterService, WebRequestService webRequest)
+public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiService, IDbActions dbActions, DiscordBotService botService, UpdaterService updaterService, WebRequestService webRequest)
 {
     private readonly AzuraCastApiService _azuraCastApiService = azuraCastApiService;
-    private readonly DbActions _dbActions = dbActions;
+    private readonly IDbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
     private readonly UpdaterService _updaterService = updaterService;
     private readonly WebRequestService _webRequest = webRequest;

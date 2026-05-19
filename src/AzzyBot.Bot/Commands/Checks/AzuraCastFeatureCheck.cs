@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
@@ -17,10 +17,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Checks;
 
-public sealed class FeatureAvailableCheck(ILogger<FeatureAvailableCheck> logger, DbActions dbActions) : IContextCheck<FeatureAvailableCheckAttribute>
+public sealed class FeatureAvailableCheck(ILogger<FeatureAvailableCheck> logger, IDbActions dbActions) : IContextCheck<FeatureAvailableCheckAttribute>
 {
     private readonly ILogger<FeatureAvailableCheck> _logger = logger;
-    private readonly DbActions _dbActions = dbActions;
+    private readonly IDbActions _dbActions = dbActions;
 
     public async ValueTask<string?> ExecuteCheckAsync(FeatureAvailableCheckAttribute attribute, CommandContext context)
     {

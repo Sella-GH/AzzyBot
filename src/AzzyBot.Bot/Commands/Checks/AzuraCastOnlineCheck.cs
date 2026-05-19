@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
@@ -14,9 +14,9 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Checks;
 
-public sealed class AzuraCastOnlineCheck(ILogger<AzuraCastOnlineCheck> logger, DbActions dbActions) : IContextCheck<AzuraCastOnlineCheckAttribute>
+public sealed class AzuraCastOnlineCheck(ILogger<AzuraCastOnlineCheck> logger, IDbActions dbActions) : IContextCheck<AzuraCastOnlineCheckAttribute>
 {
-    private readonly DbActions _dbActions = dbActions;
+    private readonly IDbActions _dbActions = dbActions;
 
     public async ValueTask<string?> ExecuteCheckAsync(AzuraCastOnlineCheckAttribute attribute, CommandContext context)
     {

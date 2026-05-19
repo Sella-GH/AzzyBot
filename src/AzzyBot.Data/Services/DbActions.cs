@@ -7,6 +7,7 @@ using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Extensions;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Entities;
 
@@ -17,7 +18,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Data.Services;
 
-public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyDbContext> dbContextFactory)
+public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyDbContext> dbContextFactory) : IDbActions
 {
     private readonly ILogger<DbActions> _logger = logger;
     private readonly IDbContextFactory<AzzyDbContext> _dbContextFactory = dbContextFactory;

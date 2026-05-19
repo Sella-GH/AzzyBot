@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -12,9 +12,9 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class DatabaseCleaningJob(DbMaintenance dbMaintenance, DiscordBotService botService, DiscordClient discordClient) : IJob
+public sealed class DatabaseCleaningJob(IDbMaintenance dbMaintenance, DiscordBotService botService, DiscordClient discordClient) : IJob
 {
-    private readonly DbMaintenance _dbMaintenance = dbMaintenance;
+    private readonly IDbMaintenance _dbMaintenance = dbMaintenance;
     private readonly DiscordBotService _botService = botService;
     private readonly DiscordClient _discordClient = discordClient;
 

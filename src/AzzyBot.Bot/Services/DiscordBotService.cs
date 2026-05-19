@@ -17,7 +17,7 @@ using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Helpers;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus;
 using DSharpPlus.Commands.ContextChecks;
@@ -33,11 +33,11 @@ using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOptions<AzzyBotSettings> settings, DbActions dbActions, DiscordClient client)
+public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOptions<AzzyBotSettings> settings, IDbActions dbActions, DiscordClient client)
 {
     private readonly ILogger<DiscordBotService> _logger = logger;
     private readonly AzzyBotSettings _settings = settings.Value;
-    private readonly DbActions _dbActions = dbActions;
+    private readonly IDbActions _dbActions = dbActions;
     private readonly DiscordClient _client = client;
 
     private bool CheckIfClientIsConnected

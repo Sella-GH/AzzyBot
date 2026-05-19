@@ -9,7 +9,7 @@ using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Entities;
 
@@ -18,12 +18,12 @@ using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<AzzyBotSettings> botSettings, IOptions<CoreUpdaterSettings> updaterSettings, DbActions dbActions, DiscordBotService botService, WebRequestService webService)
+public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<AzzyBotSettings> botSettings, IOptions<CoreUpdaterSettings> updaterSettings, IDbActions dbActions, DiscordBotService botService, WebRequestService webService)
 {
     private readonly ILogger<UpdaterService> _logger = logger;
     private readonly AzzyBotSettings _botSettings = botSettings.Value;
     private readonly CoreUpdaterSettings _updaterSettings = updaterSettings.Value;
-    private readonly DbActions _dbActions = dbActions;
+    private readonly IDbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
     private readonly WebRequestService _webService = webService;
     private DateTimeOffset _lastAzzyUpdateNotificationTime = DateTimeOffset.MinValue;

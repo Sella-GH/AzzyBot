@@ -13,7 +13,7 @@ using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
@@ -23,12 +23,12 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplete> logger, AzuraCastApiService azuraCast, AzuraCastPingService azuraCastPing, DbActions dbActions, DiscordBotService botService, WebRequestService webRequest) : IAutoCompleteProvider
+public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplete> logger, AzuraCastApiService azuraCast, AzuraCastPingService azuraCastPing, IDbActions dbActions, DiscordBotService botService, WebRequestService webRequest) : IAutoCompleteProvider
 {
     private readonly ILogger<AzuraCastMountAutocomplete> _logger = logger;
     private readonly AzuraCastApiService _azuraCast = azuraCast;
     private readonly AzuraCastPingService _azuraCastPing = azuraCastPing;
-    private readonly DbActions _dbActions = dbActions;
+    private readonly IDbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
     private readonly WebRequestService _webRequest = webRequest;
 

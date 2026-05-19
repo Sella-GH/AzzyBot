@@ -8,7 +8,7 @@ using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
@@ -21,10 +21,10 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class MusicStreamingPersistentNowPlayingJob(ILogger<MusicStreamingPersistentNowPlayingJob> logger, MusicStreamingService musicStreaming, DbActions dbActions, DiscordBotService botService) : IJob
+public sealed class MusicStreamingPersistentNowPlayingJob(ILogger<MusicStreamingPersistentNowPlayingJob> logger, MusicStreamingService musicStreaming, IDbActions dbActions, DiscordBotService botService) : IJob
 {
     private readonly ILogger<MusicStreamingPersistentNowPlayingJob> _logger = logger;
-    private readonly DbActions _dbActions = dbActions;
+    private readonly IDbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
     private readonly MusicStreamingService _musicStreaming = musicStreaming;
 

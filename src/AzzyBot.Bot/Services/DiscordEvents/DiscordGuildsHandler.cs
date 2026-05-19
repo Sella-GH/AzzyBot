@@ -7,7 +7,7 @@ using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus;
 using DSharpPlus.Entities;
@@ -18,13 +18,13 @@ using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services.DiscordEvents;
 
-public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, IOptions<AzzyBotSettings> settings, CronJobManager cron, DbActions dbActions, DiscordBotService botService)
+public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, IOptions<AzzyBotSettings> settings, CronJobManager cron, IDbActions dbActions, DiscordBotService botService)
     : IEventHandler<GuildCreatedEventArgs>, IEventHandler<GuildDeletedEventArgs>, IEventHandler<GuildDownloadCompletedEventArgs>
 {
     private readonly ILogger<DiscordGuildsHandler> _logger = logger;
     private readonly AzzyBotSettings _settings = settings.Value;
     private readonly CronJobManager _cron = cron;
-    private readonly DbActions _dbActions = dbActions;
+    private readonly IDbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
 
     public async Task HandleEventAsync(DiscordClient sender, GuildCreatedEventArgs eventArgs)

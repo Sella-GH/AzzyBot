@@ -17,7 +17,7 @@ using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ArgumentModifiers;
@@ -35,11 +35,11 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AdminCommands
 {
     [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator])]
-    public sealed class AdminGroup(ILogger<AdminGroup> logger, IOptions<AzzyBotSettings> settings, DbActions dbActions, DiscordBotService botService)
+    public sealed class AdminGroup(ILogger<AdminGroup> logger, IOptions<AzzyBotSettings> settings, IDbActions dbActions, DiscordBotService botService)
     {
         private readonly ILogger<AdminGroup> _logger = logger;
         private readonly AzzyBotSettings _settings = settings.Value;
-        private readonly DbActions _dbActions = dbActions;
+        private readonly IDbActions _dbActions = dbActions;
         private readonly DiscordBotService _botService = botService;
 
         [Command("change-bot-status"), Description("Change the global bot status according to your likes.")]

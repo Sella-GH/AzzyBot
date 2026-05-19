@@ -18,7 +18,7 @@ using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
@@ -38,11 +38,11 @@ namespace AzzyBot.Bot.Commands;
 public sealed class MusicStreamingCommands
 {
     [Command("player"), RequireGuild, RequirePermissions(botPermissions: [DiscordPermission.Connect, DiscordPermission.Speak], userPermissions: [DiscordPermission.Connect]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
-    public sealed class PlayerGroup(ILogger<PlayerGroup> logger, AzuraCastApiService azuraCast, DbActions dbActions, MusicStreamingService musicStreaming)
+    public sealed class PlayerGroup(ILogger<PlayerGroup> logger, AzuraCastApiService azuraCast, IDbActions dbActions, MusicStreamingService musicStreaming)
     {
         private readonly ILogger<PlayerGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCast = azuraCast;
-        private readonly DbActions _dbActions = dbActions;
+        private readonly IDbActions _dbActions = dbActions;
         private readonly MusicStreamingService _musicStreaming = musicStreaming;
         private static readonly string AppName = SoftwareStats.GetAppName;
 

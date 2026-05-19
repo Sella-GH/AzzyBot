@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using AzzyBot.Core.Logging;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Entities;
 
@@ -10,10 +11,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Data.Services;
 
-public sealed class DbMaintenance(ILogger<DbMaintenance> logger, DbActions dbActions)
+public sealed class DbMaintenance(ILogger<DbMaintenance> logger, IDbActions dbActions) : IDbMaintenance
 {
     private readonly ILogger<DbMaintenance> _logger = logger;
-    private readonly DbActions _dbActions = dbActions;
+    private readonly IDbActions _dbActions = dbActions;
 
     public async Task CleanupLeftoverGuildsAsync(IAsyncEnumerable<DiscordGuild> guilds)
     {

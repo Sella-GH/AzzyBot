@@ -5,6 +5,7 @@ using System.Text;
 
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 using AzzyBot.Data.Settings;
 
 using EntityFramework.Exceptions.PostgreSQL;
@@ -66,8 +67,8 @@ public static class IServiceCollectionExtensions
 #else
             services.AddPooledDbContextFactory<AzzyDbContext>(o => o.UseNpgsql(connectionString, o => o.EnableRetryOnFailure().SetPostgresVersion(settings.DatabaseVersion)).UseExceptionProcessor());
 #endif
-            services.AddSingleton<DbActions>();
-            services.AddSingleton<DbMaintenance>();
+            services.AddSingleton<IDbActions, DbActions>();
+            services.AddSingleton<IDbMaintenance, DbMaintenance>();
         }
     }
 }
