@@ -4,8 +4,10 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Resources;
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
+using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services.Interfaces;
@@ -14,12 +16,12 @@ using DSharpPlus.Entities;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiService, IDbActions dbActions, DiscordBotService botService, UpdaterService updaterService, WebRequestService webRequest)
+public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiService, IDbActions dbActions, DiscordBotService botService, IUpdaterService updaterService, WebRequestService webRequest)
 {
     private readonly AzuraCastApiService _azuraCastApiService = azuraCastApiService;
     private readonly IDbActions _dbActions = dbActions;
     private readonly DiscordBotService _botService = botService;
-    private readonly UpdaterService _updaterService = updaterService;
+    private readonly IUpdaterService _updaterService = updaterService;
     private readonly WebRequestService _webRequest = webRequest;
 
     public async Task CheckForAzuraCastUpdatesAsync(AzuraCastEntity azuraCast, bool forced = false)
@@ -76,7 +78,7 @@ public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiServi
         }
 
         AzuraCastChecksEntity checks = azuraCast.Checks;
-        if (!forced && !UpdaterService.CheckUpdateNotification(checks.UpdateNotificationCounter, checks.LastUpdateCheck))
+        if (!forced && !Misc.CheckUpdateNotification(checks.UpdateNotificationCounter, checks.LastUpdateCheck))
             return;
 
         await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: checks.UpdateNotificationCounter + 1, lastUpdateCheck: true);

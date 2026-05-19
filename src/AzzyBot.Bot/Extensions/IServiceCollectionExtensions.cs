@@ -71,7 +71,7 @@ public static class IServiceCollectionExtensions
                 c.Timeout = TimeSpan.FromSeconds(30);
             });
             services.AddSingleton<WebRequestService>();
-            services.AddSingleton<UpdaterService>();
+            services.AddSingleton<IUpdaterService, UpdaterService>();
 
             services.AddSingleton<AzuraCastApiService>();
             services.AddSingleton<AzuraCastFileService>();

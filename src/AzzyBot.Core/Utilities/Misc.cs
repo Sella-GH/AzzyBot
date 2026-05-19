@@ -8,6 +8,25 @@ namespace AzzyBot.Core.Utilities;
 
 public static class Misc
 {
+    public static bool CheckUpdateNotification(int notifyCounter, in DateTimeOffset lastNotificationTime)
+    {
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        if (notifyCounter < 3 && now - lastNotificationTime > TimeSpan.FromHours(23.98))
+        {
+            return true;
+        }
+        else if (notifyCounter >= 3 && now - lastNotificationTime > TimeSpan.FromHours(11.98))
+        {
+            return true;
+        }
+        else if (notifyCounter >= 7 && now - lastNotificationTime > TimeSpan.FromHours(5.98))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public static string GetProgressBar(double number, double elapsed, double duration)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(number);
