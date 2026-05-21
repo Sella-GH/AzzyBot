@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Core.Logging;
 
 using DSharpPlus.Commands;
@@ -13,10 +14,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.DiscordEvents;
 
-public sealed class DiscordCommandsErrorHandler(ILogger<DiscordCommandsErrorHandler> logger, DiscordBotService botService)
+public sealed class DiscordCommandsErrorHandler(ILogger<DiscordCommandsErrorHandler> logger, IDiscordBotService botService)
 {
     private readonly ILogger<DiscordCommandsErrorHandler> _logger = logger;
-    private readonly DiscordBotService _botService = botService;
+    private readonly IDiscordBotService _botService = botService;
 
     public async Task CommandErroredAsync(CommandsExtension c, CommandErroredEventArgs e)
     {

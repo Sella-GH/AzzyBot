@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Resources;
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
@@ -33,7 +34,7 @@ using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOptions<AzzyBotSettings> settings, IDbActions dbActions, DiscordClient client)
+public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOptions<AzzyBotSettings> settings, IDbActions dbActions, DiscordClient client) : IDiscordBotService
 {
     private readonly ILogger<DiscordBotService> _logger = logger;
     private readonly AzzyBotSettings _settings = settings.Value;
@@ -412,21 +413,50 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         await _client.UpdateStatusAsync(activity, newStatus);
     }
 
-    public static DiscordActivity SetBotStatusActivity(int type, string doing, Uri? url)
+    public DiscordActivity SetBotStatusActivity(int type, string doing, Uri? url)
     {
-        DiscordActivityType activityType = (Enum.IsDefined(typeof(DiscordActivityType), type)) ? (DiscordActivityType)type : DiscordActivityType.ListeningTo;
+        DiscordActivityType activityType;
+        if (Enum.IsDefined(typeof(DiscordActivityType), type))
+        {
+            activityType = (DiscordActivityType)type;
+        }
+        else
+        {
+            _logger.BotStatusActivityTypeNotDefined(type);
+            activityType = DiscordActivityType.ListeningTo;
+        }
+
         if (activityType is DiscordActivityType.Streaming && url is null)
+        {
+            _logger.BotStatusStreamingRequiresUrl();
             activityType = DiscordActivityType.Playing;
+        }
 
         DiscordActivity activity = new(doing, activityType);
         if (activityType is DiscordActivityType.Streaming && url is not null && (url.Host.Contains("twitch", StringComparison.OrdinalIgnoreCase) || url.Host.Contains("youtube", StringComparison.OrdinalIgnoreCase)))
+        {
             activity.StreamUrl = url.OriginalString;
+            _logger.BotStatusStreamUrlSet(url.OriginalString);
+        }
+
+        _logger.BotStatusActivitySet(activityType.ToString(), doing);
 
         return activity;
     }
 
-    public static DiscordUserStatus SetBotStatusUserStatus(int status)
-        => (Enum.IsDefined(typeof(DiscordUserStatus), status)) ? (DiscordUserStatus)status : DiscordUserStatus.Online;
+    public DiscordUserStatus SetBotStatusUserStatus(int status)
+    {
+        if (!Enum.IsDefined(typeof(DiscordUserStatus), status))
+        {
+            _logger.BotStatusUserStatusNotDefined(status);
+            return DiscordUserStatus.Online;
+        }
+
+        DiscordUserStatus userStatus = (DiscordUserStatus)status;
+        _logger.BotStatusUserStatusSet(userStatus.ToString());
+
+        return userStatus;
+    }
 
     private static async Task<DiscordMessage?> AcknowledgeExceptionAsync(SlashCommandContext ctx)
     {

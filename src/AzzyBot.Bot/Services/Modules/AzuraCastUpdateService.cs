@@ -16,11 +16,11 @@ using DSharpPlus.Entities;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiService, IDbActions dbActions, DiscordBotService botService, IUpdaterService updaterService, IWebRequestService webRequest)
+public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiService, IDbActions dbActions, IDiscordBotService botService, IUpdaterService updaterService, IWebRequestService webRequest)
 {
     private readonly AzuraCastApiService _azuraCastApiService = azuraCastApiService;
     private readonly IDbActions _dbActions = dbActions;
-    private readonly DiscordBotService _botService = botService;
+    private readonly IDiscordBotService _botService = botService;
     private readonly IUpdaterService _updaterService = updaterService;
     private readonly IWebRequestService _webRequest = webRequest;
 

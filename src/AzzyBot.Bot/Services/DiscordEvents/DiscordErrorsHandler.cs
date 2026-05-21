@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Services.Interfaces;
+
 using DSharpPlus;
 using DSharpPlus.Exceptions;
 
 namespace AzzyBot.Bot.Services.DiscordEvents;
 
-public sealed class DiscordErrorsHandler(DiscordBotService botService) : IClientErrorHandler
+public sealed class DiscordErrorsHandler(IDiscordBotService botService) : IClientErrorHandler
 {
-    private readonly DiscordBotService _botService = botService;
+    private readonly IDiscordBotService _botService = botService;
 
     public async ValueTask HandleEventHandlerError(string name, Exception exception, Delegate invokedDelegate, object sender, object args)
     {

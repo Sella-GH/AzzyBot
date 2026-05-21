@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
@@ -21,12 +22,12 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayingJob> logger, AzuraCastApiService apiService, IDbActions dbActions, DiscordBotService botService) : IJob
+public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayingJob> logger, AzuraCastApiService apiService, IDbActions dbActions, IDiscordBotService botService) : IJob
 {
     private readonly ILogger<AzuraPersistentNowPlayingJob> _logger = logger;
     private readonly AzuraCastApiService _apiService = apiService;
     private readonly IDbActions _dbActions = dbActions;
-    private readonly DiscordBotService _botService = botService;
+    private readonly IDiscordBotService _botService = botService;
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
     {

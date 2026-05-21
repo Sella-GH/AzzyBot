@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services.Interfaces;
 
@@ -11,10 +12,10 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzzyBotCheckPermissionsJob(IDbActions dbActions, DiscordBotService botService) : IJob
+public sealed class AzzyBotCheckPermissionsJob(IDbActions dbActions, IDiscordBotService botService) : IJob
 {
     private readonly IDbActions _dbActions = dbActions;
-    private readonly DiscordBotService _botService = botService;
+    private readonly IDiscordBotService _botService = botService;
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
     {

@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Choices;
-using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
@@ -46,7 +45,7 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AzuraCastCommands
 {
     [Command("azuracast"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast])]
-    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, IDbActions dbActions, DiscordBotService botService, MusicStreamingService musicStreaming)
+    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, IDbActions dbActions, IDiscordBotService botService, MusicStreamingService musicStreaming)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCastApi = azuraCastApi;
@@ -54,7 +53,7 @@ public sealed class AzuraCastCommands
         private readonly AzuraCastPingService _azuraCastPing = azuraCastPing;
         private readonly AzuraCastUpdateService _azuraCastUpdate = azuraCastUpdate;
         private readonly IDbActions _dbActions = dbActions;
-        private readonly DiscordBotService _botService = botService;
+        private readonly IDiscordBotService _botService = botService;
         private readonly MusicStreamingService _musicStreaming = musicStreaming;
 
         [Command("export-playlists"), Description("Export all playlists from the selected AzuraCast station into a zip file."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
@@ -621,12 +620,12 @@ public sealed class AzuraCastCommands
     }
 
     [Command("dj"), RequireGuild, ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast]), AzuraCastOnlineCheck]
-    public sealed class DjGroup(ILogger<DjGroup> logger, AzuraCastApiService azuraCast, IDbActions dbActions, DiscordBotService botService)
+    public sealed class DjGroup(ILogger<DjGroup> logger, AzuraCastApiService azuraCast, IDbActions dbActions, IDiscordBotService botService)
     {
         private readonly ILogger<DjGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCast = azuraCast;
         private readonly IDbActions _dbActions = dbActions;
-        private readonly DiscordBotService _botService = botService;
+        private readonly IDiscordBotService _botService = botService;
 
         [Command("add-internal-song-request"), Description("Adds an internal song request which will be played ASAP. This bypasses the usual api."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationDJGroup, AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
         public async ValueTask AddInternalSongRequestAsync
@@ -862,13 +861,13 @@ public sealed class AzuraCastCommands
     }
 
     [Command("music"), RequireGuild, ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast]), AzuraCastOnlineCheck]
-    public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastApiService azuraCast, ICronJobManager cronJobManager, IDbActions dbActions, DiscordBotService botService, IWebRequestService webRequest)
+    public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastApiService azuraCast, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService, IWebRequestService webRequest)
     {
         private readonly ILogger<MusicGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCast = azuraCast;
         private readonly ICronJobManager _cronJobManager = cronJobManager;
         private readonly IDbActions _dbActions = dbActions;
-        private readonly DiscordBotService _botService = botService;
+        private readonly IDiscordBotService _botService = botService;
         private readonly IWebRequestService _webRequest = webRequest;
 
         [Command("get-song-history"), Description("Get the song history of the selected station.")]

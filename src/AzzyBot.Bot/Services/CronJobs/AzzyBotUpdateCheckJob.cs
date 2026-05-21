@@ -8,9 +8,9 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzzyBotUpdateCheckJob(DiscordBotService botService, IUpdaterService updater) : IJob
+public sealed class AzzyBotUpdateCheckJob(IDiscordBotService botService, IUpdaterService updater) : IJob
 {
-    private readonly DiscordBotService _botService = botService;
+    private readonly IDiscordBotService _botService = botService;
     private readonly IUpdaterService _updater = updater;
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)

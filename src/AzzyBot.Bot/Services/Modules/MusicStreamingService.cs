@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
@@ -24,11 +25,11 @@ using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class MusicStreamingService(IAudioService audioService, ILogger<MusicStreamingService> logger, DiscordBotService botService)
+public sealed class MusicStreamingService(IAudioService audioService, ILogger<MusicStreamingService> logger, IDiscordBotService botService)
 {
     private readonly IAudioService _audioService = audioService;
     private readonly ILogger<MusicStreamingService> _logger = logger;
-    private readonly DiscordBotService _botService = botService;
+    private readonly IDiscordBotService _botService = botService;
 
     public LavalinkPlayer? GetLavalinkPlayer(ulong guildId)
     {

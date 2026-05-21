@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
@@ -20,12 +21,12 @@ using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSettings> settings, IDbActions dbActions, DiscordBotService botService)
+public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSettings> settings, IDbActions dbActions, IDiscordBotService botService)
 {
     private readonly ILogger<CoreService> _logger = logger;
     private readonly AzzyBotSettings _settings = settings.Value;
     private readonly IDbActions _dbActions = dbActions;
-    private readonly DiscordBotService _botService = botService;
+    private readonly IDiscordBotService _botService = botService;
 
     public async Task<IReadOnlyDictionary<GuildEntity, AzzyInactiveGuildStruct>> CheckUnusedGuildsAsync()
     {

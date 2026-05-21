@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Core.Logging;
 
 using Microsoft.Extensions.Logging;
@@ -13,10 +14,10 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class LogfileCleaningJob(ILogger<LogfileCleaningJob> logger, DiscordBotService botService) : IJob
+public sealed class LogfileCleaningJob(ILogger<LogfileCleaningJob> logger, IDiscordBotService botService) : IJob
 {
     private readonly ILogger<LogfileCleaningJob> _logger = logger;
-    private readonly DiscordBotService _botService = botService;
+    private readonly IDiscordBotService _botService = botService;
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
     {

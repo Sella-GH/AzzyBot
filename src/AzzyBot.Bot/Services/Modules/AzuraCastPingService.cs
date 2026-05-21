@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
@@ -13,12 +14,12 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, AzuraCastApiService azuraCast, IDbActions dbActions, DiscordBotService discordBotService)
+public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, AzuraCastApiService azuraCast, IDbActions dbActions, IDiscordBotService discordBotService)
 {
     private readonly ILogger<AzuraCastPingService> _logger = logger;
     private readonly AzuraCastApiService _azuraCast = azuraCast;
     private readonly IDbActions _dbActions = dbActions;
-    private readonly DiscordBotService _botService = discordBotService;
+    private readonly IDiscordBotService _botService = discordBotService;
 
     public async Task PingInstanceAsync(AzuraCastEntity azuraCast)
     {

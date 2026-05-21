@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
@@ -20,12 +21,12 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, AzuraCastApiService azuraCast, IDbActions dbActions, DiscordBotService discordBotService)
+public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, AzuraCastApiService azuraCast, IDbActions dbActions, IDiscordBotService discordBotService)
 {
     private readonly ILogger<AzuraCastFileService> _logger = logger;
     private readonly AzuraCastApiService _azuraCast = azuraCast;
     private readonly IDbActions _dbActions = dbActions;
-    private readonly DiscordBotService _botService = discordBotService;
+    private readonly IDiscordBotService _botService = discordBotService;
 
     public async Task CheckForFileChangesAsync(AzuraCastStationEntity station)
     {

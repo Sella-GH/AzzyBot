@@ -59,8 +59,8 @@ public static class IServiceCollectionExtensions
             services.DiscordClientCommands(botSettings);
             services.DiscordClientInteractivity();
 
-            services.AddSingleton<DiscordBotService>();
-            services.AddSingleton<DiscordBotServiceHost>().AddHostedService(static s => s.GetRequiredService<DiscordBotServiceHost>());
+            services.AddSingleton<IDiscordBotService, DiscordBotService>();
+            services.AddSingleton<IDiscordBotServiceHost, DiscordBotServiceHost>().AddHostedService(static s => s.GetRequiredService<IDiscordBotServiceHost>());
             services.AddSingleton<CoreService>();
 
             services.AddHttpClient(SoftwareStats.GetAppName, static c =>

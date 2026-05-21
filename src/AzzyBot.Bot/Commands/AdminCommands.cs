@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Choices;
-using AzzyBot.Bot.Services;
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
@@ -35,12 +35,12 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AdminCommands
 {
     [Command("admin"), RequireGuild, RequireApplicationOwner, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator])]
-    public sealed class AdminGroup(ILogger<AdminGroup> logger, IOptions<AzzyBotSettings> settings, IDbActions dbActions, DiscordBotService botService)
+    public sealed class AdminGroup(ILogger<AdminGroup> logger, IOptions<AzzyBotSettings> settings, IDbActions dbActions, IDiscordBotService botService)
     {
         private readonly ILogger<AdminGroup> _logger = logger;
         private readonly AzzyBotSettings _settings = settings.Value;
         private readonly IDbActions _dbActions = dbActions;
-        private readonly DiscordBotService _botService = botService;
+        private readonly IDiscordBotService _botService = botService;
 
         [Command("change-bot-status"), Description("Change the global bot status according to your likes.")]
         public async ValueTask ChangeStatusAsync

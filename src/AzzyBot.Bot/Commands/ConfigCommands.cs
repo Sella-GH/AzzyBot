@@ -11,7 +11,7 @@ using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Choices;
 using AzzyBot.Bot.Resources;
-using AzzyBot.Bot.Services;
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Enums;
@@ -42,7 +42,7 @@ namespace AzzyBot.Bot.Commands;
 public sealed class ConfigCommands
 {
     [Command("config"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
-    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, IDbActions dbActions, DiscordBotService botService)
+    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, IDbActions dbActions, IDiscordBotService botService)
     {
         private readonly ILogger<ConfigGroup> _logger = logger;
         private readonly AzuraCastApiService _azuraCastApi = azuraCastApi;
@@ -50,7 +50,7 @@ public sealed class ConfigCommands
         private readonly AzuraCastPingService _azuraCastPing = azuraCastPing;
         private readonly AzuraCastUpdateService _azuraCastUpdate = azuraCastUpdate;
         private readonly IDbActions _dbActions = dbActions;
-        private readonly DiscordBotService _botService = botService;
+        private readonly IDiscordBotService _botService = botService;
 
         [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "This is just a hard check.")]
         [Command("add-azuracast"), Description("Add an AzuraCast instance to your server. This is a requirement to use the features.")]

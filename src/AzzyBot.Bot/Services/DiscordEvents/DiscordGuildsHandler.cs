@@ -19,14 +19,14 @@ using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services.DiscordEvents;
 
-public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, IOptions<AzzyBotSettings> settings, ICronJobManager cron, IDbActions dbActions, DiscordBotService botService)
+public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, IOptions<AzzyBotSettings> settings, ICronJobManager cron, IDbActions dbActions, IDiscordBotService botService)
     : IEventHandler<GuildCreatedEventArgs>, IEventHandler<GuildDeletedEventArgs>, IEventHandler<GuildDownloadCompletedEventArgs>
 {
     private readonly ILogger<DiscordGuildsHandler> _logger = logger;
     private readonly AzzyBotSettings _settings = settings.Value;
     private readonly ICronJobManager _cron = cron;
     private readonly IDbActions _dbActions = dbActions;
-    private readonly DiscordBotService _botService = botService;
+    private readonly IDiscordBotService _botService = botService;
 
     public async Task HandleEventAsync(DiscordClient sender, GuildCreatedEventArgs eventArgs)
     {
