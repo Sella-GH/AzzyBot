@@ -11,6 +11,7 @@ using AzzyBot.Bot.Services.CronJobs;
 using AzzyBot.Bot.Services.DiscordEvents;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Settings.Validators;
 using AzzyBot.Core.Utilities;
@@ -73,7 +74,7 @@ public static class IServiceCollectionExtensions
             services.AddSingleton<IWebRequestService, WebRequestService>();
             services.AddSingleton<IUpdaterService, UpdaterService>();
 
-            services.AddSingleton<AzuraCastApiService>();
+            services.AddSingleton<IAzuraCastApiService, AzuraCastApiService>();
             services.AddSingleton<AzuraCastFileService>();
             services.AddSingleton<AzuraCastPingService>();
             services.AddSingleton<AzuraCastUpdateService>();

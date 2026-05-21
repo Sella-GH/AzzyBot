@@ -13,6 +13,7 @@ using AzzyBot.Bot.Commands.Choices;
 using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Bot.Utilities.Helpers;
@@ -42,10 +43,10 @@ namespace AzzyBot.Bot.Commands;
 public sealed class ConfigCommands
 {
     [Command("config"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
-    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, IDbActions dbActions, IDiscordBotService botService)
+    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, IAzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, IDbActions dbActions, IDiscordBotService botService)
     {
         private readonly ILogger<ConfigGroup> _logger = logger;
-        private readonly AzuraCastApiService _azuraCastApi = azuraCastApi;
+        private readonly IAzuraCastApiService _azuraCastApi = azuraCastApi;
         private readonly AzuraCastFileService _azuraCastFile = azuraCastFile;
         private readonly AzuraCastPingService _azuraCastPing = azuraCastPing;
         private readonly AzuraCastUpdateService _azuraCastUpdate = azuraCastUpdate;
@@ -632,13 +633,13 @@ public sealed class ConfigCommands
                         catch (InvalidOperationException)
                         {
                             // This can happen when the permissions are not sufficient to access the station
-                            await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I can't access the **station** ({station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}. Maybe also check if the API key is valid.");
+                            await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I can't access the **station** ({station.StationId}) endpoint.\n{_azuraCastApi.AzuraCastPermissionsWiki}. Maybe also check if the API key is valid.");
                             continue;
                         }
 
                         string stationName = stationRecord?.Name ?? "Station unaccessible.";
                         if (stationRecord is null)
-                            await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                            await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
 
                         stationNames.Add(station.Id, stationName);
 

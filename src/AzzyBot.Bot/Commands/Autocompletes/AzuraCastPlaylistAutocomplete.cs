@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
@@ -23,10 +24,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutocomplete> logger, AzuraCastApiService azuraCastApi, AzuraCastPingService azuraCastPing, IDbActions dbActions, IDiscordBotService botService) : IAutoCompleteProvider
+public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutocomplete> logger, IAzuraCastApiService azuraCastApi, AzuraCastPingService azuraCastPing, IDbActions dbActions, IDiscordBotService botService) : IAutoCompleteProvider
 {
     private readonly ILogger<AzuraCastPlaylistAutocomplete> _logger = logger;
-    private readonly AzuraCastApiService _azuraCast = azuraCastApi;
+    private readonly IAzuraCastApiService _azuraCast = azuraCastApi;
     private readonly AzuraCastPingService _azuraCastPing = azuraCastPing;
     private readonly IDbActions _dbActions = dbActions;
     private readonly IDiscordBotService _botService = botService;
@@ -65,7 +66,7 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
             playlists = await _azuraCast.GetPlaylistsAsync(baseUrl, apiKey, stationId);
             if (playlists is null)
             {
-                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station ({stationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station ({stationId}).\n{_azuraCast.AzuraCastPermissionsWiki}");
                 return [];
             }
         }

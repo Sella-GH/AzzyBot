@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Services.Interfaces;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
@@ -21,10 +22,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, AzuraCastApiService azuraCast, IDbActions dbActions, IDiscordBotService discordBotService)
+public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, IAzuraCastApiService azuraCast, IDbActions dbActions, IDiscordBotService discordBotService)
 {
     private readonly ILogger<AzuraCastFileService> _logger = logger;
-    private readonly AzuraCastApiService _azuraCast = azuraCast;
+    private readonly IAzuraCastApiService _azuraCast = azuraCast;
     private readonly IDbActions _dbActions = dbActions;
     private readonly IDiscordBotService _botService = discordBotService;
 
@@ -41,14 +42,14 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, A
         AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(baseUrl, apiKey, station.StationId);
         if (azuraStation is null)
         {
-            await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station ID: {station.StationId}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+            await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station ID: {station.StationId}.\n{_azuraCast.AzuraCastPermissionsWiki}");
             return;
         }
 
         IEnumerable<AzuraFilesRecord>? onlineFiles = await _azuraCast.GetFilesOnlineBasicAsync(baseUrl, apiKey, station.StationId);
         if (onlineFiles is null)
         {
-            await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station *{azuraStation.Name}* (ID: {station.StationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+            await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station *{azuraStation.Name}* (ID: {station.StationId}).\n{_azuraCast.AzuraCastPermissionsWiki}");
             return;
         }
 

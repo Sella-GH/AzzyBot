@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Services.Interfaces;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Utilities;
@@ -16,9 +17,9 @@ using DSharpPlus.Entities;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiService, IDbActions dbActions, IDiscordBotService botService, IUpdaterService updaterService, IWebRequestService webRequest)
+public sealed class AzuraCastUpdateService(IAzuraCastApiService azuraCastApiService, IDbActions dbActions, IDiscordBotService botService, IUpdaterService updaterService, IWebRequestService webRequest)
 {
-    private readonly AzuraCastApiService _azuraCastApiService = azuraCastApiService;
+    private readonly IAzuraCastApiService _azuraCastApiService = azuraCastApiService;
     private readonly IDbActions _dbActions = dbActions;
     private readonly IDiscordBotService _botService = botService;
     private readonly IUpdaterService _updaterService = updaterService;
@@ -37,7 +38,7 @@ public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiServi
             body = await _azuraCastApiService.GetUpdatesAsync(baseUrl, apiKey);
             if (string.IsNullOrEmpty(body))
             {
-                await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative updates** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative updates** endpoint.\n{_azuraCastApiService.AzuraCastPermissionsWiki}");
                 return;
             }
         }
@@ -67,7 +68,7 @@ public sealed class AzuraCastUpdateService(AzuraCastApiService azuraCastApiServi
 
         if (update is null)
         {
-            await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative updates** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+            await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative updates** endpoint.\n{_azuraCastApiService.AzuraCastPermissionsWiki}");
             return;
         }
 

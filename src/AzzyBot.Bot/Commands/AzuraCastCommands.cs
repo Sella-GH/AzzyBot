@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -15,6 +15,7 @@ using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Choices;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Bot.Utilities.Helpers;
@@ -45,10 +46,10 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AzuraCastCommands
 {
     [Command("azuracast"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast])]
-    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, AzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, IDbActions dbActions, IDiscordBotService botService, MusicStreamingService musicStreaming)
+    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, IAzuraCastApiService azuraCastApi, AzuraCastFileService azuraCastFile, AzuraCastPingService azuraCastPing, AzuraCastUpdateService azuraCastUpdate, IDbActions dbActions, IDiscordBotService botService, MusicStreamingService musicStreaming)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
-        private readonly AzuraCastApiService _azuraCastApi = azuraCastApi;
+        private readonly IAzuraCastApiService _azuraCastApi = azuraCastApi;
         private readonly AzuraCastFileService _azuraCastFile = azuraCastFile;
         private readonly AzuraCastPingService _azuraCastPing = azuraCastPing;
         private readonly AzuraCastUpdateService _azuraCastUpdate = azuraCastUpdate;
@@ -96,7 +97,7 @@ public sealed class AzuraCastCommands
             if (playlists is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
                 return;
             }
 
@@ -136,7 +137,7 @@ public sealed class AzuraCastCommands
             if (azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station {station}.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
                 return;
             }
 
@@ -333,7 +334,7 @@ public sealed class AzuraCastCommands
             if (hardwareStats is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative server stats** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative server stats** endpoint.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
                 return;
             }
 
@@ -379,7 +380,7 @@ public sealed class AzuraCastCommands
             if (azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
                 return;
             }
 
@@ -482,7 +483,7 @@ public sealed class AzuraCastCommands
             if (azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
                 return;
             }
 
@@ -548,7 +549,7 @@ public sealed class AzuraCastCommands
             if (stationConfig is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
                 return;
             }
 
@@ -581,7 +582,7 @@ public sealed class AzuraCastCommands
             if (string.IsNullOrEmpty(body))
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative updates** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative updates** endpoint.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
                 return;
             }
 
@@ -601,7 +602,7 @@ public sealed class AzuraCastCommands
             if (update is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative updates** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative updates** endpoint.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
                 return;
             }
 
@@ -620,10 +621,10 @@ public sealed class AzuraCastCommands
     }
 
     [Command("dj"), RequireGuild, ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast]), AzuraCastOnlineCheck]
-    public sealed class DjGroup(ILogger<DjGroup> logger, AzuraCastApiService azuraCast, IDbActions dbActions, IDiscordBotService botService)
+    public sealed class DjGroup(ILogger<DjGroup> logger, IAzuraCastApiService azuraCast, IDbActions dbActions, IDiscordBotService botService)
     {
         private readonly ILogger<DjGroup> _logger = logger;
-        private readonly AzuraCastApiService _azuraCast = azuraCast;
+        private readonly IAzuraCastApiService _azuraCast = azuraCast;
         private readonly IDbActions _dbActions = dbActions;
         private readonly IDiscordBotService _botService = botService;
 
@@ -663,7 +664,7 @@ public sealed class AzuraCastCommands
             if (stationConfig is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
                 return;
             }
 
@@ -677,7 +678,7 @@ public sealed class AzuraCastCommands
             if (songs is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
                 return;
             }
 
@@ -837,7 +838,7 @@ public sealed class AzuraCastCommands
             if (azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
                 return;
             }
 
@@ -845,7 +846,7 @@ public sealed class AzuraCastCommands
             if (states is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
                 return;
             }
 
@@ -861,10 +862,10 @@ public sealed class AzuraCastCommands
     }
 
     [Command("music"), RequireGuild, ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast]), AzuraCastOnlineCheck]
-    public sealed class MusicGroup(ILogger<MusicGroup> logger, AzuraCastApiService azuraCast, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService, IWebRequestService webRequest)
+    public sealed class MusicGroup(ILogger<MusicGroup> logger, IAzuraCastApiService azuraCast, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService, IWebRequestService webRequest)
     {
         private readonly ILogger<MusicGroup> _logger = logger;
-        private readonly AzuraCastApiService _azuraCast = azuraCast;
+        private readonly IAzuraCastApiService _azuraCast = azuraCast;
         private readonly ICronJobManager _cronJobManager = cronJobManager;
         private readonly IDbActions _dbActions = dbActions;
         private readonly IDiscordBotService _botService = botService;
@@ -919,7 +920,7 @@ public sealed class AzuraCastCommands
             if (history is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **reports** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **reports** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
                 return;
             }
 
@@ -933,7 +934,7 @@ public sealed class AzuraCastCommands
             if (azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
                 return;
             }
 
@@ -991,7 +992,7 @@ public sealed class AzuraCastCommands
                 if (playlist is null)
                 {
                     await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                    await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                    await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
                     return;
                 }
             }
@@ -1005,7 +1006,7 @@ public sealed class AzuraCastCommands
             if (songs is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
                 return;
             }
 
@@ -1076,7 +1077,7 @@ public sealed class AzuraCastCommands
                 if (playlist is null)
                 {
                     await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                    await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                    await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
                     return;
                 }
 
@@ -1159,7 +1160,7 @@ public sealed class AzuraCastCommands
             if (stationConfig is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
                 return;
             }
 
@@ -1216,7 +1217,7 @@ public sealed class AzuraCastCommands
                 if (requestsPlayed is null)
                 {
                     await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                    await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **reports** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                    await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **reports** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
                     return;
                 }
 
@@ -1229,7 +1230,7 @@ public sealed class AzuraCastCommands
             if (stationQueue is null || requestsPending is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **queue** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **queue** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
                 return;
             }
 
@@ -1344,7 +1345,7 @@ public sealed class AzuraCastCommands
             if (uploadedFile is null || azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station {station}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
                 return;
             }
 

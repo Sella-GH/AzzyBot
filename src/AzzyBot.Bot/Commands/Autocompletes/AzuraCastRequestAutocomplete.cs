@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Services.Interfaces;
-using AzzyBot.Bot.Services.Modules;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
@@ -21,10 +21,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocomplete> logger, AzuraCastApiService azuraCast, IDbActions dbActions, IDiscordBotService botService) : IAutoCompleteProvider
+public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocomplete> logger, IAzuraCastApiService azuraCast, IDbActions dbActions, IDiscordBotService botService) : IAutoCompleteProvider
 {
     private readonly ILogger<AzuraCastRequestAutocomplete> _logger = logger;
-    private readonly AzuraCastApiService _azuraCast = azuraCast;
+    private readonly IAzuraCastApiService _azuraCast = azuraCast;
     private readonly IDbActions _dbActions = dbActions;
     private readonly IDiscordBotService _botService = botService;
 
@@ -112,7 +112,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
             IEnumerable<AzuraRequestQueueItemRecord>? requests = await _azuraCast.GetStationRequestItemsAsync(baseUrl, apiKey, stationId, history: false);
             if (requests is null)
             {
-                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **requests** endpoint on station ({stationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **requests** endpoint on station ({stationId}).\n{_azuraCast.AzuraCastPermissionsWiki}");
                 return results;
             }
 
@@ -126,7 +126,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
             AzuraAdminStationConfigRecord? config = await _azuraCast.GetStationAdminConfigAsync(baseUrl, apiKey, stationId);
             if (config is null)
             {
-                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint.\n{_azuraCast.AzuraCastPermissionsWiki}");
                 return results;
             }
 
@@ -135,7 +135,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
                 IEnumerable<AzuraRequestRecord>? requests = await _azuraCast.GetRequestableSongsAsync(baseUrl, apiKey, stationId);
                 if (requests is null)
                 {
-                    await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **requests** endpoint on station ({stationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                    await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **requests** endpoint on station ({stationId}).\n{_azuraCast.AzuraCastPermissionsWiki}");
                     return results;
                 }
 
@@ -146,14 +146,14 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
                 IEnumerable<AzuraFilesDetailedRecord>? filesOnline = await _azuraCast.GetFilesOnlineDetailedAsync(baseUrl, apiKey, stationId);
                 if (filesOnline is null)
                 {
-                    await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station ({stationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                    await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station ({stationId}).\n{_azuraCast.AzuraCastPermissionsWiki}");
                     return results;
                 }
 
                 IEnumerable<AzuraPlaylistRecord>? playlists = await _azuraCast.GetPlaylistsWithRequestsAsync(baseUrl, apiKey, stationId);
                 if (playlists is null)
                 {
-                    await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station ({stationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                    await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station ({stationId}).\n{_azuraCast.AzuraCastPermissionsWiki}");
                     return results;
                 }
 

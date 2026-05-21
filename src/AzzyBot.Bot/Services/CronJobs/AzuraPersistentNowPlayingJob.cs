@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Services.Interfaces;
-using AzzyBot.Bot.Services.Modules;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
@@ -22,10 +22,10 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayingJob> logger, AzuraCastApiService apiService, IDbActions dbActions, IDiscordBotService botService) : IJob
+public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayingJob> logger, IAzuraCastApiService apiService, IDbActions dbActions, IDiscordBotService botService) : IJob
 {
     private readonly ILogger<AzuraPersistentNowPlayingJob> _logger = logger;
-    private readonly AzuraCastApiService _apiService = apiService;
+    private readonly IAzuraCastApiService _apiService = apiService;
     private readonly IDbActions _dbActions = dbActions;
     private readonly IDiscordBotService _botService = botService;
 
