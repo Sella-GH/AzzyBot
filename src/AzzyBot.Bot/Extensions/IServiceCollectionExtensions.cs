@@ -51,7 +51,7 @@ public static class IServiceCollectionExtensions
 
             // Need to register as Singleton first
             // Otherwise DI doesn't work properly
-            services.AddSingleton<CoreServiceHost>().AddHostedService(static s => s.GetRequiredService<CoreServiceHost>());
+            services.AddSingleton<ICoreServiceHost, CoreServiceHost>().AddHostedService(static s => s.GetRequiredService<ICoreServiceHost>());
 
             // Register the database services
             services.AzzyBotDataServices(dbSettings);
@@ -62,7 +62,7 @@ public static class IServiceCollectionExtensions
 
             services.AddSingleton<IDiscordBotService, DiscordBotService>();
             services.AddSingleton<IDiscordBotServiceHost, DiscordBotServiceHost>().AddHostedService(static s => s.GetRequiredService<IDiscordBotServiceHost>());
-            services.AddSingleton<CoreService>();
+            services.AddSingleton<ICoreService, CoreService>();
 
             services.AddHttpClient(SoftwareStats.GetAppName, static c =>
             {

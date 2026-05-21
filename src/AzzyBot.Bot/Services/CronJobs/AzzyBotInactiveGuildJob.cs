@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Services.Interfaces;
-using AzzyBot.Bot.Services.Modules;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities.Structs;
 using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
@@ -16,10 +16,10 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzzyBotInactiveGuildJob(ILogger<AzzyBotInactiveGuildJob> logger, CoreService coreService, IDiscordBotService botService) : IJob
+public sealed class AzzyBotInactiveGuildJob(ILogger<AzzyBotInactiveGuildJob> logger, ICoreService coreService, IDiscordBotService botService) : IJob
 {
     private readonly ILogger<AzzyBotInactiveGuildJob> _logger = logger;
-    private readonly CoreService _coreService = coreService;
+    private readonly ICoreService _coreService = coreService;
     private readonly IDiscordBotService _botService = botService;
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)

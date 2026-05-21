@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Core.Logging;
@@ -16,13 +17,12 @@ using AzzyBot.Data.Services;
 using AzzyBot.Data.Settings;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<AzzyBotSettings> azzySettings, IOptions<DatabaseSettings> dbSettings, IOptions<DiscordStatusSettings> discordSettings, IOptions<MusicStreamingSettings> musicStreamingSettings, IOptions<CoreUpdaterSettings> updaterSettings, IDbContextFactory<AzzyDbContext> dbContextFactory) : IHostedService
+public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<AzzyBotSettings> azzySettings, IOptions<DatabaseSettings> dbSettings, IOptions<DiscordStatusSettings> discordSettings, IOptions<MusicStreamingSettings> musicStreamingSettings, IOptions<CoreUpdaterSettings> updaterSettings, IDbContextFactory<AzzyDbContext> dbContextFactory) : ICoreServiceHost
 {
     private readonly ILogger<CoreServiceHost> _logger = logger;
     private readonly AzzyBotSettings _azzySettings = azzySettings.Value;

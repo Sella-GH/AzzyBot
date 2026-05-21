@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Services.Interfaces;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
@@ -21,7 +22,7 @@ using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSettings> settings, IDbActions dbActions, IDiscordBotService botService)
+public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSettings> settings, IDbActions dbActions, IDiscordBotService botService) : ICoreService
 {
     private readonly ILogger<CoreService> _logger = logger;
     private readonly AzzyBotSettings _settings = settings.Value;
