@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Services.Interfaces;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
@@ -25,7 +26,7 @@ using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class MusicStreamingService(IAudioService audioService, ILogger<MusicStreamingService> logger, IDiscordBotService botService)
+public sealed class MusicStreamingService(IAudioService audioService, ILogger<MusicStreamingService> logger, IDiscordBotService botService) : IMusicStreamingService
 {
     private readonly IAudioService _audioService = audioService;
     private readonly ILogger<MusicStreamingService> _logger = logger;

@@ -146,7 +146,7 @@ public static class IServiceCollectionExtensions
                 config.ReadyTimeout = TimeSpan.FromSeconds(30);
                 config.ResumptionOptions = new(TimeSpan.Zero);
             });
-            services.AddSingleton<MusicStreamingService>();
+            services.AddSingleton<IMusicStreamingService, MusicStreamingService>();
         }
 
         public void AddAppSettings(string settingsFile)
