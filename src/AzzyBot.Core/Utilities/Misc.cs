@@ -10,21 +10,15 @@ public static class Misc
 {
     public static bool CheckUpdateNotification(int notifyCounter, in DateTimeOffset lastNotificationTime)
     {
-        DateTimeOffset now = DateTimeOffset.UtcNow;
-        if (notifyCounter < 3 && now - lastNotificationTime > TimeSpan.FromHours(23.98))
-        {
-            return true;
-        }
-        else if (notifyCounter >= 3 && now - lastNotificationTime > TimeSpan.FromHours(11.98))
-        {
-            return true;
-        }
-        else if (notifyCounter >= 7 && now - lastNotificationTime > TimeSpan.FromHours(5.98))
-        {
-            return true;
-        }
+        TimeSpan elapsed = DateTimeOffset.UtcNow - lastNotificationTime;
 
-        return false;
+        return notifyCounter switch
+        {
+            >= 7 when elapsed > TimeSpan.FromHours(5.98) => true,
+            >= 3 when elapsed > TimeSpan.FromHours(11.98) => true,
+            < 3 when elapsed > TimeSpan.FromHours(23.98) => true,
+            _ => false
+        };
     }
 
     public static string GetProgressBar(double number, double elapsed, double duration)
