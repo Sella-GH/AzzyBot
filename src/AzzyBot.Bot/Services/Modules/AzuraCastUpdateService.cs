@@ -17,7 +17,7 @@ using DSharpPlus.Entities;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastUpdateService(IAzuraCastApiService azuraCastApiService, IDbActions dbActions, IDiscordBotService botService, IUpdaterService updaterService, IWebRequestService webRequest)
+public sealed class AzuraCastUpdateService(IAzuraCastApiService azuraCastApiService, IDbActions dbActions, IDiscordBotService botService, IUpdaterService updaterService, IWebRequestService webRequest) : IAzuraCastUpdateService
 {
     private readonly IAzuraCastApiService _azuraCastApiService = azuraCastApiService;
     private readonly IDbActions _dbActions = dbActions;

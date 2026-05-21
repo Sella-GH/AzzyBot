@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Services.Interfaces;
-using AzzyBot.Bot.Services.Modules;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services.Interfaces;
 
@@ -13,9 +13,9 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzuraCheckUpdatesJob(AzuraCastUpdateService azuraUpdateService, IDbActions dbActions, IDiscordBotService botService) : IJob
+public sealed class AzuraCheckUpdatesJob(IAzuraCastUpdateService azuraUpdateService, IDbActions dbActions, IDiscordBotService botService) : IJob
 {
-    private readonly AzuraCastUpdateService _azuraUpdateService = azuraUpdateService;
+    private readonly IAzuraCastUpdateService _azuraUpdateService = azuraUpdateService;
     private readonly IDbActions _dbActions = dbActions;
     private readonly IDiscordBotService _botService = botService;
 
