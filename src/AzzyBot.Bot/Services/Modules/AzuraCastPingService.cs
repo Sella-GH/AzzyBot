@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, IAzuraCastApiService azuraCast, IDbActions dbActions, IDiscordBotService discordBotService)
+public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, IAzuraCastApiService azuraCast, IDbActions dbActions, IDiscordBotService discordBotService) : IAzuraCastPingService
 {
     private readonly ILogger<AzuraCastPingService> _logger = logger;
     private readonly IAzuraCastApiService _azuraCast = azuraCast;

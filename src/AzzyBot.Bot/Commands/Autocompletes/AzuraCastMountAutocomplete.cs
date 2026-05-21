@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Services.Interfaces;
-using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
@@ -24,11 +23,11 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplete> logger, IAzuraCastApiService azuraCast, AzuraCastPingService azuraCastPing, IDbActions dbActions, IDiscordBotService botService, IWebRequestService webRequest) : IAutoCompleteProvider
+public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplete> logger, IAzuraCastApiService azuraCast, IAzuraCastPingService azuraCastPing, IDbActions dbActions, IDiscordBotService botService, IWebRequestService webRequest) : IAutoCompleteProvider
 {
     private readonly ILogger<AzuraCastMountAutocomplete> _logger = logger;
     private readonly IAzuraCastApiService _azuraCast = azuraCast;
-    private readonly AzuraCastPingService _azuraCastPing = azuraCastPing;
+    private readonly IAzuraCastPingService _azuraCastPing = azuraCastPing;
     private readonly IDbActions _dbActions = dbActions;
     private readonly IDiscordBotService _botService = botService;
     private readonly IWebRequestService _webRequest = webRequest;

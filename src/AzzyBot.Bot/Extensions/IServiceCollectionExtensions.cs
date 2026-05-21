@@ -76,7 +76,7 @@ public static class IServiceCollectionExtensions
 
             services.AddSingleton<IAzuraCastApiService, AzuraCastApiService>();
             services.AddSingleton<IAzuraCastFileService, AzuraCastFileService>();
-            services.AddSingleton<AzuraCastPingService>();
+            services.AddSingleton<IAzuraCastPingService, AzuraCastPingService>();
             services.AddSingleton<AzuraCastUpdateService>();
             services.AddNCronJob(o =>
             {
