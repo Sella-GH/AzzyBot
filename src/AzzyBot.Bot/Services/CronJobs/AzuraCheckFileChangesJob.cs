@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Services.Interfaces;
-using AzzyBot.Bot.Services.Modules;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services.Interfaces;
 
@@ -13,9 +13,9 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzuraCheckFileChangesJob(AzuraCastFileService azuraFileService, IDbActions dbActions, IDiscordBotService botService) : IJob
+public sealed class AzuraCheckFileChangesJob(IAzuraCastFileService azuraFileService, IDbActions dbActions, IDiscordBotService botService) : IJob
 {
-    private readonly AzuraCastFileService _azuraFileService = azuraFileService;
+    private readonly IAzuraCastFileService _azuraFileService = azuraFileService;
     private readonly IDbActions _dbActions = dbActions;
     private readonly IDiscordBotService _botService = botService;
 

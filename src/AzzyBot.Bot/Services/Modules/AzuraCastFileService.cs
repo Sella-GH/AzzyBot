@@ -22,7 +22,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, IAzuraCastApiService azuraCast, IDbActions dbActions, IDiscordBotService discordBotService)
+public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, IAzuraCastApiService azuraCast, IDbActions dbActions, IDiscordBotService discordBotService) : IAzuraCastFileService
 {
     private readonly ILogger<AzuraCastFileService> _logger = logger;
     private readonly IAzuraCastApiService _azuraCast = azuraCast;
