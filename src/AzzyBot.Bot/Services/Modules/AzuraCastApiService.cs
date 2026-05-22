@@ -31,7 +31,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
     private readonly IDiscordBotService _botService = botService;
     private readonly IWebRequestService _webService = webService;
 
-    public string AzuraCastPermissionsWiki { get; } = "Please review your [permission](https://github.com/Sella-GH/AzzyBot/wiki/AzuraCast-API-Key-required-permissions) set.";
+    public string AzuraCastPermissionsWiki { get; } = "Please review your [permissions](https://github.com/Sella-GH/AzzyBot/wiki/AzuraCast-API-Key-required-permissions) set.";
     public string FilePath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "AzuraCast", "Files");
 
     private static Dictionary<string, string> CreateHeader(string apiKey)
