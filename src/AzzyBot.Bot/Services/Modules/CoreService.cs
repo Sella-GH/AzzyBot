@@ -54,7 +54,7 @@ public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSet
             victims.Add(guild, guildStruct);
         }
 
-        await _dbActions.UpdateAzzyBotAsync(lastGuildReminder: true);
+        await _dbActions.UpdateAzzyBotAsync(updateLastGuildReminder: true);
 
         return victims;
     }

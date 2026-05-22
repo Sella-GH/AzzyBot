@@ -107,7 +107,7 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, I
         // Start the Guild Reminder Check
         _cron.RunAzzyBotInactiveGuildJob();
         azzy.LastGuildReminderCheck = DateTimeOffset.UtcNow;
-        await _dbActions.UpdateAzzyBotAsync(lastGuildReminder: true);
+        await _dbActions.UpdateAzzyBotAsync(updateLastGuildReminder: true);
     }
 
     private async Task GuildCreatedHelperAsync(IEnumerable<DiscordGuild> guilds)

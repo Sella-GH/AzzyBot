@@ -61,7 +61,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
             return;
         }
 
-        await _dbActions.UpdateAzzyBotAsync(lastUpdateCheck: true);
+        await _dbActions.UpdateAzzyBotAsync(updateLastUpdateCheck: true);
 
         string onlineVersion = updaterRecord.Name;
         if (localVersion == onlineVersion)

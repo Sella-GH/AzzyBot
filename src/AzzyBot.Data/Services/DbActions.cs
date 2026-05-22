@@ -653,7 +653,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         }
     }
 
-    public async Task UpdateAzuraCastStationChecksAsync(ulong guildId, int stationId, bool? fileChanges = null, bool? lastFileChangesCheck = null)
+    public async Task UpdateAzuraCastStationChecksAsync(ulong guildId, int stationId, bool? fileChanges = null, bool updateLastFileChangesCheck = false)
     {
         await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
 
@@ -670,7 +670,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         if (fileChanges.HasValue)
             checks.FileChanges = fileChanges.Value;
 
-        if (lastFileChangesCheck.HasValue)
+        if (updateLastFileChangesCheck)
             checks.LastFileChangesCheck = DateTimeOffset.UtcNow;
 
         dbContext.AzuraCastStationChecks.Update(checks);
@@ -684,7 +684,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await UpdateAzuraCastStationChecksAsync(guildId, stationId, fileChanges, lastFileChangesCheck);
+            await UpdateAzuraCastStationChecksAsync(guildId, stationId, fileChanges, updateLastFileChangesCheck);
 
             _logger.DatabaseConcurrencyResolved();
         }
@@ -745,7 +745,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         }
     }
 
-    public async Task UpdateAzzyBotAsync(bool? lastDatabaseCleanup = null, bool? lastGuildReminder = null, bool? lastUpdateCheck = null)
+    public async Task UpdateAzzyBotAsync(bool updateLastDatabaseCleanup = false, bool updateLastGuildReminder = false, bool updateLastUpdateCheck = false)
     {
         await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
 
@@ -757,13 +757,13 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         }
 
         DateTimeOffset now = DateTimeOffset.UtcNow;
-        if (lastDatabaseCleanup.HasValue)
+        if (updateLastDatabaseCleanup)
             azzyBot.LastDatabaseCleanup = now;
 
-        if (lastGuildReminder.HasValue)
+        if (updateLastGuildReminder)
             azzyBot.LastGuildReminderCheck = now;
 
-        if (lastUpdateCheck.HasValue)
+        if (updateLastUpdateCheck)
             azzyBot.LastUpdateCheck = now;
 
         dbContext.AzzyBot.Update(azzyBot);
@@ -777,13 +777,13 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await UpdateAzzyBotAsync(lastDatabaseCleanup, lastGuildReminder, lastUpdateCheck);
+            await UpdateAzzyBotAsync(updateLastDatabaseCleanup, updateLastGuildReminder, updateLastUpdateCheck);
 
             _logger.DatabaseConcurrencyResolved();
         }
     }
 
-    public async Task UpdateGuildAsync(ulong guildId, bool? lastPermissionCheck = null, DateTimeOffset? reminderLeaveDate = null, bool? legalsAccepted = null)
+    public async Task UpdateGuildAsync(ulong guildId, bool updateLastPermissionCheck = false, DateTimeOffset? reminderLeaveDate = null, bool? legalsAccepted = null)
     {
         await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
 
@@ -798,7 +798,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         }
 
         DateTimeOffset now = DateTimeOffset.UtcNow;
-        if (lastPermissionCheck.HasValue)
+        if (updateLastPermissionCheck)
             guild.LastPermissionCheck = now;
 
         if (reminderLeaveDate.HasValue)
@@ -825,7 +825,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await UpdateGuildAsync(guildId, lastPermissionCheck, reminderLeaveDate, legalsAccepted);
+            await UpdateGuildAsync(guildId, updateLastPermissionCheck, reminderLeaveDate, legalsAccepted);
 
             _logger.DatabaseConcurrencyResolved();
         }

@@ -121,7 +121,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             }
         }
 
-        await _dbActions.UpdateGuildAsync(guildEntity.UniqueId, true);
+        await _dbActions.UpdateGuildAsync(guildEntity.UniqueId, updateLastPermissionCheck: true);
 
         await CheckPermissionsCoreAsync(guild, member, channels);
     }

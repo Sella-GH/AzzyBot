@@ -21,7 +21,7 @@ public sealed class DbMaintenance(ILogger<DbMaintenance> logger, IDbActions dbAc
         _logger.DatabaseOrphanedGuildsStart();
 
         IEnumerable<ulong> removedGuilds = await _dbActions.DeleteGuildsAsync(guilds);
-        await _dbActions.UpdateAzzyBotAsync(lastDatabaseCleanup: true);
+        await _dbActions.UpdateAzzyBotAsync(updateLastDatabaseCleanup: true);
 
         _logger.DatabaseOrphanedGuildsComplete(removedGuilds.Count());
     }

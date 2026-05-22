@@ -93,7 +93,7 @@ public sealed class DebugCommands
             {
                 if (value is 1)
                 {
-                    await _dbActions.UpdateGuildAsync(guildEntity.UniqueId, lastPermissionCheck: true);
+                    await _dbActions.UpdateGuildAsync(guildEntity.UniqueId, updateLastPermissionCheck: true);
                     sb.AppendLine("Changed LastPermissionCheck to true");
                 }
                 else if (value is 2)

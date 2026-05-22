@@ -34,10 +34,10 @@ public interface IDbActions
     Task UpdateAzuraCastChecksAsync(ulong guildId, bool? serverStatus = null, bool? updates = null, bool? changelog = null, int? updateNotificationCounter = null, bool updateLastUpdateCheck = false, bool updateLastServerStatusCheck = false);
     Task UpdateAzuraCastPreferencesAsync(ulong guildId, ulong? instanceAdminGroup = null, ulong? notificationId = null, ulong? outagesId = null);
     Task UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? apiKey = null, bool updateLastSkipTime = false, bool updateLastRequestTime = false);
-    Task UpdateAzuraCastStationChecksAsync(ulong guildId, int stationId, bool? fileChanges = null, bool? lastFileChangesCheck = null);
+    Task UpdateAzuraCastStationChecksAsync(ulong guildId, int stationId, bool? fileChanges = null, bool updateLastFileChangesCheck = false);
     Task UpdateAzuraCastStationPreferencesAsync(ulong guildId, int stationId, ulong? stationAdminGroup = null, ulong? stationDjGroup = null, ulong? fileUploadId = null, ulong? nowPlayingEmbedChannelId = null, ulong? nowPlayingEmbedMessageId = null, ulong? requestId = null, string? fileUploadPath = null, bool? playlist = null);
-    Task UpdateAzzyBotAsync(bool? lastDatabaseCleanup = null, bool? lastGuildReminder = null, bool? lastUpdateCheck = null);
-    Task UpdateGuildAsync(ulong guildId, bool? lastPermissionCheck = null, DateTimeOffset? reminderLeaveDate = null, bool? legalsAccepted = null);
+    Task UpdateAzzyBotAsync(bool updateLastDatabaseCleanup = false, bool updateLastGuildReminder = false, bool updateLastUpdateCheck = false);
+    Task UpdateGuildAsync(ulong guildId, bool updateLastPermissionCheck = false, DateTimeOffset? reminderLeaveDate = null, bool? legalsAccepted = null);
     Task UpdateGuildsLegalsAsync();
     Task UpdateGuildPreferencesAsync(ulong guildId, ulong? adminRoleId = null, ulong? adminNotifyChannelId = null);
     Task UpdateMusicStreamingAsync(ulong guildId, ulong? nowPlayingEmbedChannelId = null, ulong? nowPlayingEmbedMessageId = null, int? volume = null);
