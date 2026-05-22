@@ -31,9 +31,9 @@ public interface IDbActions
     Task<MusicStreamingEntity?> ReadMusicStreamingAsync(ulong guildId, bool loadGuild = false);
     Task<IReadOnlyList<MusicStreamingEntity>> ReadMusicStreamingAsync(bool loadGuild = false);
     Task UpdateAzuraCastAsync(ulong guildId, Uri? baseUrl = null, string? apiKey = null, bool? isOnline = null);
-    Task UpdateAzuraCastChecksAsync(ulong guildId, bool? serverStatus = null, bool? updates = null, bool? changelog = null, int? updateNotificationCounter = null, bool? lastUpdateCheck = null, bool? lastServerStatusCheck = null);
+    Task UpdateAzuraCastChecksAsync(ulong guildId, bool? serverStatus = null, bool? updates = null, bool? changelog = null, int? updateNotificationCounter = null, bool updateLastUpdateCheck = false, bool updateLastServerStatusCheck = false);
     Task UpdateAzuraCastPreferencesAsync(ulong guildId, ulong? instanceAdminGroup = null, ulong? notificationId = null, ulong? outagesId = null);
-    Task UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? apiKey = null, bool? lastSkipTime = null, bool? lastRequestTime = null);
+    Task UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? apiKey = null, bool updateLastSkipTime = false, bool updateLastRequestTime = false);
     Task UpdateAzuraCastStationChecksAsync(ulong guildId, int stationId, bool? fileChanges = null, bool? lastFileChangesCheck = null);
     Task UpdateAzuraCastStationPreferencesAsync(ulong guildId, int stationId, ulong? stationAdminGroup = null, ulong? stationDjGroup = null, ulong? fileUploadId = null, ulong? nowPlayingEmbedChannelId = null, ulong? nowPlayingEmbedMessageId = null, ulong? requestId = null, string? fileUploadPath = null, bool? playlist = null);
     Task UpdateAzzyBotAsync(bool? lastDatabaseCleanup = null, bool? lastGuildReminder = null, bool? lastUpdateCheck = null);

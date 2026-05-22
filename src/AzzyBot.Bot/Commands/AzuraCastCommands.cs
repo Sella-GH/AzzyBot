@@ -796,7 +796,7 @@ public sealed class AzuraCastCommands
 
             await _azuraCast.SkipSongAsync(baseUrl, apiKey, station);
 
-            await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, null, null, true);
+            await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, updateLastSkipTime: true);
 
             await context.EditResponseAsync($"I skipped **{nowPlaying.NowPlaying.Song.Title}** by **{nowPlaying.NowPlaying.Song.Artist}**.");
         }

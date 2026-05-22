@@ -74,7 +74,7 @@ public sealed class AzuraCastUpdateService(IAzuraCastApiService azuraCastApiServ
 
         if (!update.NeedsReleaseUpdate && !update.NeedsRollingUpdate)
         {
-            await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: 0, lastUpdateCheck: true);
+            await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: 0, updateLastUpdateCheck: true);
             return;
         }
 
@@ -82,7 +82,7 @@ public sealed class AzuraCastUpdateService(IAzuraCastApiService azuraCastApiServ
         if (!forced && !Misc.CheckUpdateNotification(checks.UpdateNotificationCounter, checks.LastUpdateCheck))
             return;
 
-        await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: checks.UpdateNotificationCounter + 1, lastUpdateCheck: true);
+        await _dbActions.UpdateAzuraCastChecksAsync(azuraCast.Guild.UniqueId, updateNotificationCounter: checks.UpdateNotificationCounter + 1, updateLastUpdateCheck: true);
 
         List<DiscordEmbed> embeds = new(2)
         {

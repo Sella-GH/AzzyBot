@@ -55,7 +55,7 @@ public sealed class AzuraRequestJob(ILogger<AzuraRequestJob> logger, IAzuraCastA
             try
             {
                 await _apiService.RequestSongAsync(record.BaseUri, record.StationId, record.RequestId);
-                await _dbActions.UpdateAzuraCastStationAsync(record.GuildId, record.StationId, lastRequestTime: true);
+                await _dbActions.UpdateAzuraCastStationAsync(record.GuildId, record.StationId, updateLastRequestTime: true);
                 await _dbActions.CreateAzuraCastStationRequestAsync(record.GuildId, record.StationId, record.SongId);
 
                 _logger.BackgroundServiceSongRequestFinished(record.RequestId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
