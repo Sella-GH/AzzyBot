@@ -30,7 +30,6 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, I
 
     public async Task HandleEventAsync(DiscordClient sender, GuildCreatedEventArgs eventArgs)
     {
-        ArgumentNullException.ThrowIfNull(sender);
         ArgumentNullException.ThrowIfNull(eventArgs);
 
         _logger.GuildCreated(eventArgs.Guild.Name);
@@ -41,7 +40,6 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, I
 
     public async Task HandleEventAsync(DiscordClient sender, GuildDeletedEventArgs eventArgs)
     {
-        ArgumentNullException.ThrowIfNull(sender);
         ArgumentNullException.ThrowIfNull(eventArgs);
 
         if (eventArgs.Guild.Id == _settings.ServerId)
@@ -67,7 +65,6 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, I
 
     public async Task HandleEventAsync(DiscordClient sender, GuildDownloadCompletedEventArgs eventArgs)
     {
-        ArgumentNullException.ThrowIfNull(sender);
         ArgumentNullException.ThrowIfNull(eventArgs);
 
         if (!eventArgs.Guilds.ContainsKey(_settings.ServerId))
@@ -112,14 +109,24 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, I
 
     private async Task GuildCreatedHelperAsync(IEnumerable<DiscordGuild> guilds)
     {
-        ArgumentNullException.ThrowIfNull(guilds);
-
-        DiscordEmbed embed;
+        DiscordChannel? channel;
+        DiscordEmbed embed = EmbedBuilder.BuildAzzyAddedEmbed();
         DiscordMember owner;
         foreach (DiscordGuild guild in guilds)
         {
             owner = await guild.GetGuildOwnerAsync();
-            await owner.SendMessageAsync(EmbedBuilder.BuildAzzyAddedEmbed());
+            await owner.SendMessageAsync(embed);
+
+            channel = guild.GetDefaultChannel();
+            if (channel is not null)
+            {
+                await channel.SendMessageAsync(embed);
+            }
+            else
+            {
+                _logger.UnableToNotifyGuildCreated(guild.Id);
+            }
+
             embed = await EmbedBuilder.BuildGuildAddedEmbedAsync(guild);
             await _botService.SendMessageAsync(_settings.NotificationChannelId, embeds: [embed]);
         }

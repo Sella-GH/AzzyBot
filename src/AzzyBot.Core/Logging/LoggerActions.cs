@@ -195,6 +195,9 @@ public static partial class LoggerActions
     [LoggerMessage(225, LogLevel.Warning, "Bot status activity type Streaming requires a Twitch or YouTube URL, falling back to Playing")]
     public static partial void BotStatusStreamingInvalidUrl(this ILogger logger);
 
+    [LoggerMessage(226, LogLevel.Warning, "Unable to send message to default channel in guild {guildId} to notify about creation.")]
+    public static partial void UnableToNotifyGuildCreated(this ILogger logger, ulong guildId);
+
     [LoggerMessage(230, LogLevel.Warning, "Bot is ratelimited on uri: {uri} retrying in {time} seconds")]
     public static partial void BotRatelimited(this ILogger logger, Uri uri, int time);
 

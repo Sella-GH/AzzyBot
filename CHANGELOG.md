@@ -3,6 +3,10 @@
 - Added a missing package to the docker images to fix errors regarding authentication
 - Upgraded docker images to Ubuntu 26.04 resolute
 
+### Improvements
+- The bot now also sends a welcome notification to the first channel it can see when it's added to a server
+  - This is in addition to the DM sent to the server owner and is intended to make sure that the bot can reach the users in some way
+
 ### Fixes
 - An `ArgumentException` could appear when you have multiple stations using the same discord roles
 
