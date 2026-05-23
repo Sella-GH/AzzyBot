@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Logging;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities.Helpers;
-using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 
 using DSharpPlus.Commands.Processors.SlashCommands;

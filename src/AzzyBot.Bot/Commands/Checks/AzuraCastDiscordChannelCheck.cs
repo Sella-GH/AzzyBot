@@ -3,8 +3,8 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Logging;
 using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Commands;
@@ -62,6 +62,8 @@ public sealed class AzuraCastDiscordChannelCheck(ILogger<AzuraCastDiscordChannel
                 return null;
         }
 
-        return (context.Channel.Id != channelId) ? channelId.ToString(CultureInfo.InvariantCulture) : null;
+        return (context.Channel.Id != channelId)
+            ? channelId.ToString(CultureInfo.InvariantCulture)
+            : null;
     }
 }

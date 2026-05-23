@@ -4,11 +4,11 @@ using System.Globalization;
 using System.Text.Json;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Logging;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records;
-using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Data.Services.Interfaces;
 

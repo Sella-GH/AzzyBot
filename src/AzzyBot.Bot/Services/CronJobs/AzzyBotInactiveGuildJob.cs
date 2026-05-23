@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Logging;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities.Structs;
-using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
 
 using Microsoft.Extensions.Logging;
@@ -44,6 +44,8 @@ public sealed class AzzyBotInactiveGuildJob(ILogger<AzzyBotInactiveGuildJob> log
             Dictionary<GuildEntity, AzzyInactiveGuildStruct> reminderGuilds = unusedGuilds.Except(deletionGuilds).ToDictionary(static kv => kv.Key, static kv => kv.Value);
             if (reminderGuilds.Count is not 0)
                 await _coreService.NotifyUnusedGuildsAsync(reminderGuilds);
+
+            _logger.DatabaseUnusedGuildsComplete(unusedGuilds.Count, deletionGuilds.Count, reminderGuilds.Count);
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
         {

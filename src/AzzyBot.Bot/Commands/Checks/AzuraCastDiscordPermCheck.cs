@@ -5,9 +5,10 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Logging;
 using AzzyBot.Bot.Utilities.Enums;
-using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Logging;
 using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Commands;

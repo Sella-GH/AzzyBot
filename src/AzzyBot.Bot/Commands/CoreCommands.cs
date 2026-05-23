@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
+using AzzyBot.Bot.Logging;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records;
-using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Records;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services.Interfaces;

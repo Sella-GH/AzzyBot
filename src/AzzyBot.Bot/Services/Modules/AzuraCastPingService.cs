@@ -3,10 +3,10 @@ using System.Net.Http;
 using System.Security.Authentication;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Logging;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
-using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services.Interfaces;

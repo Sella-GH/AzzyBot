@@ -9,11 +9,11 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Logging;
 using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records;
-using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 
 using Microsoft.Extensions.Logging;

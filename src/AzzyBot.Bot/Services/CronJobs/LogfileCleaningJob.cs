@@ -5,8 +5,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Logging;
 using AzzyBot.Bot.Services.Interfaces;
-using AzzyBot.Core.Logging;
 
 using Microsoft.Extensions.Logging;
 

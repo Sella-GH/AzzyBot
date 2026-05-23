@@ -9,15 +9,16 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Commands.Checks;
+using AzzyBot.Bot.Logging;
 using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
-using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Helpers;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Logging;
 using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus;

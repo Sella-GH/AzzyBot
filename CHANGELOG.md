@@ -17,6 +17,7 @@
 - Reencoded all source files to UTF-8 without BOM
 - Renamed `Startup.cs` to `Program.cs` to align with .NET conventions
 - Reorganized the .slnx file a bit
+- Split up the logger actions into multiple files and scope the entries to the respective classes
 
 ### Dependencies
 - Updated [.NET SDK](https://github.com/dotnet/sdk) to minimum version 10.0.108

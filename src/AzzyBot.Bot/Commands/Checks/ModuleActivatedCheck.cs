@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Bot.Utilities.Helpers;
-using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Logging;
 using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Commands;

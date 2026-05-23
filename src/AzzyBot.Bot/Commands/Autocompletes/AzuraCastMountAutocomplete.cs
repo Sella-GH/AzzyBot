@@ -10,9 +10,9 @@ using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
-using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
+using AzzyBot.Data.Logging;
 using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Commands.Processors.SlashCommands;

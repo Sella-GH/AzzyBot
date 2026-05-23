@@ -1,8 +1,8 @@
 using System;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Logging;
 using AzzyBot.Bot.Services.Interfaces;
-using AzzyBot.Core.Logging;
 
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.EventArgs;

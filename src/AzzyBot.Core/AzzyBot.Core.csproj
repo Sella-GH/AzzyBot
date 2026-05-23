@@ -37,4 +37,8 @@
     <PackageReference Include="NReco.Logging.File" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Logging\" />
+  </ItemGroup>
+
 </Project>
