@@ -6,6 +6,7 @@
 ### Improvements
 - The bot now also sends a welcome notification to the first channel it can see when it's added to a server
   - This is in addition to the DM sent to the server owner and is intended to make sure that the bot can reach the users in some way
+- We now log the full exception when the ChecksFailedException occurs to be able to see what the issue is
 
 ### Fixes
 - An `ArgumentException` could appear when you have multiple stations using the same discord roles

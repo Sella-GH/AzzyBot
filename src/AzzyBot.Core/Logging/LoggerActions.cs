@@ -81,8 +81,8 @@ public static partial class LoggerActions
     [LoggerMessage(102, LogLevel.Information, "Command {command} requested by {user} to execute")]
     public static partial void CommandRequested(this ILogger logger, string command, string user);
 
-    [LoggerMessage(103, LogLevel.Information, "Commands error is: {ex}")]
-    public static partial void CommandsErrorType(this ILogger logger, string ex);
+    [LoggerMessage(103, LogLevel.Information, "Commands error is: ")]
+    public static partial void CommandsErrorType(this ILogger logger, Exception ex);
 
     [LoggerMessage(104, LogLevel.Information, "Starting Database Reencryption")]
     public static partial void DatabaseReencryptionStart(this ILogger logger);

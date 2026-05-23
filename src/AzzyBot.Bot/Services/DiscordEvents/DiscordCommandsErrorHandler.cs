@@ -25,7 +25,7 @@ public sealed class DiscordCommandsErrorHandler(ILogger<DiscordCommandsErrorHand
         ArgumentNullException.ThrowIfNull(e);
 
         _logger.CommandsError();
-        _logger.CommandsErrorType(e.Exception.GetType().Name);
+        _logger.CommandsErrorType(e.Exception);
 
         Exception ex = e.Exception;
         DateTimeOffset now = DateTimeOffset.Now;
