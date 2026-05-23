@@ -610,22 +610,22 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         }
     }
 
-    public async Task UpdateAzuraCastStationAsync(ulong guildId, int station, int? stationId = null, string? apiKey = null, bool updateLastSkipTime = false, bool updateLastRequestTime = false)
+    public async Task UpdateAzuraCastStationAsync(ulong guildId, int currStationId, int? newStationId = null, string? apiKey = null, bool updateLastSkipTime = false, bool updateLastRequestTime = false)
     {
         await using AzzyDbContext dbContext = _dbContextFactory.CreateDbContext();
 
         AzuraCastStationEntity? azuraStation = await dbContext.AzuraCastStations
-            .Where(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == station)
+            .Where(s => s.AzuraCast.Guild.UniqueId == guildId && s.StationId == currStationId)
             .SingleOrDefaultAsync();
 
         if (azuraStation is null)
         {
-            _logger.DatabaseAzuraCastStationNotFound(guildId, 0, station);
+            _logger.DatabaseAzuraCastStationNotFound(guildId, 0, currStationId);
             return;
         }
 
-        if (stationId.HasValue)
-            azuraStation.StationId = stationId.Value;
+        if (newStationId.HasValue)
+            azuraStation.StationId = newStationId.Value;
 
         if (!string.IsNullOrEmpty(apiKey))
             azuraStation.ApiKey = Crypto.Encrypt(apiKey);
@@ -647,7 +647,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             _logger.DatabaseConcurrencyException(ex);
 
             await HandleConcurrencyExceptionAsync(ex.Entries);
-            await UpdateAzuraCastStationAsync(guildId, station, stationId, apiKey, updateLastSkipTime, updateLastRequestTime);
+            await UpdateAzuraCastStationAsync(guildId, currStationId, newStationId, apiKey, updateLastSkipTime, updateLastRequestTime);
 
             _logger.DatabaseConcurrencyResolved();
         }

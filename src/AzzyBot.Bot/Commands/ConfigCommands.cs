@@ -633,7 +633,7 @@ public sealed class ConfigCommands
                         catch (InvalidOperationException)
                         {
                             // This can happen when the permissions are not sufficient to access the station
-                            await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I can't access the **station** ({station.StationId}) endpoint.\n{_azuraCastApi.AzuraCastPermissionsWiki}. Maybe also check if the API key is valid.");
+                            await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I can't access the **station** ({station.StationId}) endpoint.\n{_azuraCastApi.AzuraCastPermissionsWiki} Maybe also check if the API key is valid.");
                             continue;
                         }
 

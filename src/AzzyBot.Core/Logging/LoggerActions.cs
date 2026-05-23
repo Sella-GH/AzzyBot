@@ -192,6 +192,9 @@ public static partial class LoggerActions
     [LoggerMessage(224, LogLevel.Warning, "Bot status user status {status} is not defined, falling back to Online")]
     public static partial void BotStatusUserStatusNotDefined(this ILogger logger, int status);
 
+    [LoggerMessage(225, LogLevel.Warning, "Bot status activity type Streaming requires a Twitch or YouTube URL, falling back to Playing")]
+    public static partial void BotStatusStreamingInvalidUrl(this ILogger logger);
+
     [LoggerMessage(230, LogLevel.Warning, "Bot is ratelimited on uri: {uri} retrying in {time} seconds")]
     public static partial void BotRatelimited(this ILogger logger, Uri uri, int time);
 
