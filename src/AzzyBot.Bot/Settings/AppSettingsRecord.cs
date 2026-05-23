@@ -1,4 +1,4 @@
-﻿using AzzyBot.Data.Settings;
+using AzzyBot.Data.Settings;
 
 namespace AzzyBot.Bot.Settings;
 

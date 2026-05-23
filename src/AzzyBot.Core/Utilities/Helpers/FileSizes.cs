@@ -1,4 +1,4 @@
-﻿namespace AzzyBot.Core.Utilities.Helpers;
+namespace AzzyBot.Core.Utilities.Helpers;
 
 public static class FileSizes
 {

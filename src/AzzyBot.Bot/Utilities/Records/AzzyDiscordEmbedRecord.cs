@@ -1,4 +1,4 @@
-﻿namespace AzzyBot.Bot.Utilities.Records;
+namespace AzzyBot.Bot.Utilities.Records;
 
 /// <summary>
 /// Represents an embed field for a Discord message.

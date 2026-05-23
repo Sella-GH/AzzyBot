@@ -1,4 +1,4 @@
-﻿using AzzyBot.Bot.Utilities.Records.AzuraCast;
+using AzzyBot.Bot.Utilities.Records.AzuraCast;
 
 using NCronJob;
 

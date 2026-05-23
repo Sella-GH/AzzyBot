@@ -197,7 +197,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
                 responseContent = await response.Content.ReadAsStringAsync();
             }
 
-            const int maxRetries= 7;
+            const int maxRetries = 7;
             int retryCount = 0;
             while (status is HttpStatusCode.TooManyRequests && retryCount <= maxRetries)
             {

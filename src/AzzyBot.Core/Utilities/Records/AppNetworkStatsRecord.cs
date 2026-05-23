@@ -1,4 +1,4 @@
-﻿namespace AzzyBot.Core.Utilities.Records;
+namespace AzzyBot.Core.Utilities.Records;
 
 /// <summary>
 /// Represents the network statistics for the hardware.

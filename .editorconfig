@@ -6,12 +6,14 @@ root = true
 # Default settings:
 # A newline ending every file
 # Use 4 spaces as indentation
+# Use UTF-8 charset
 [*]
 insert_final_newline = true
 indent_style = space
 indent_size = 4
 trim_trailing_whitespace = true
 end_of_line = crlf
+charset = utf-8
 
 # Generated code
 [*{_AssemblyInfo.cs,.notsupported.cs,AsmOffsets.cs}]
