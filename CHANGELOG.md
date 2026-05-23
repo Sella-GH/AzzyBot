@@ -1,4 +1,4 @@
-﻿## Unreleased
+## Unreleased
 ### General
 - Added a missing package to the docker images to fix errors regarding authentication
 - Upgraded docker images to Ubuntu 26.04 resolute
@@ -12,7 +12,9 @@
 - An `ArgumentException` could appear when you have multiple stations using the same discord roles
 
 ### Development
+- Abstracted all relevant services to interfaces to follow dependency inversion principles
 - JSON types in `AzuraCastApiService.cs` are known at compile time instead of runtime
+- Reencoded all source files to UTF-8 without BOM
 - Renamed `Startup.cs` to `Program.cs` to align with .NET conventions
 - Reorganized the .slnx file a bit
 
