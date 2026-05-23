@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-using AzzyBot.Bot.Services;
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Settings;
 
 using DSharpPlus.Commands.Processors.SlashCommands;
@@ -15,10 +15,10 @@ using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class GuildsAutocomplete(IOptions<AzzyBotSettings> settings, DiscordBotService botService) : IAutoCompleteProvider
+public sealed class GuildsAutocomplete(IOptions<AzzyBotSettings> settings, IDiscordBotService botService) : IAutoCompleteProvider
 {
     private readonly AzzyBotSettings _settings = settings.Value;
-    private readonly DiscordBotService _botService = botService;
+    private readonly IDiscordBotService _botService = botService;
 
     public ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)
     {

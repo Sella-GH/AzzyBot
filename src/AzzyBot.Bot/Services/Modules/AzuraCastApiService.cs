@@ -9,6 +9,8 @@ using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Services.Interfaces;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
@@ -23,13 +25,13 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, DiscordBotService botService, WebRequestService webService)
+public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDiscordBotService botService, IWebRequestService webService) : IAzuraCastApiService
 {
     private readonly ILogger<AzuraCastApiService> _logger = logger;
-    private readonly DiscordBotService _botService = botService;
-    private readonly WebRequestService _webService = webService;
-    public const string AzuraCastPermissionsWiki = "Please review your [permission](https://github.com/Sella-GH/AzzyBot/wiki/AzuraCast-API-Key-required-permissions) set.";
+    private readonly IDiscordBotService _botService = botService;
+    private readonly IWebRequestService _webService = webService;
 
+    public string AzuraCastPermissionsWiki { get; } = "Please review your [permissions](https://github.com/Sella-GH/AzzyBot/wiki/AzuraCast-API-Key-required-permissions) set.";
     public string FilePath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "AzuraCast", "Files");
 
     private static Dictionary<string, string> CreateHeader(string apiKey)
@@ -545,12 +547,12 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, Dis
         return GetFromApiAsync<AzuraAdminStationConfigRecord>(baseUrl, endpoint, JsonSourceGen.Default.AzuraAdminStationConfigRecord, CreateHeader(apiKey));
     }
 
-    public Task<IEnumerable<AzuraStationHistoryItemRecord>?> GetStationHistoryAsync(Uri baseUrl, string apiKey, int stationId, in DateTimeOffset start, in DateTimeOffset end)
+    public Task<IEnumerable<AzuraStationHistoryItemRecord>?> GetStationHistoryAsync(Uri baseUrl, string apiKey, int stationId, in DateTimeOffset startHistory, in DateTimeOffset endHistory)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}?{AzuraApiFilters.Start}={start:yyyy-MM-dd}&{AzuraApiFilters.End}={end:yyyy-MM-dd}";
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}?{AzuraApiFilters.Start}={startHistory:yyyy-MM-dd}&{AzuraApiFilters.End}={endHistory:yyyy-MM-dd}";
 
         return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraStationHistoryItemRecord, CreateHeader(apiKey));
     }

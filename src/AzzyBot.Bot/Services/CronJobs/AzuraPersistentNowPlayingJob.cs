@@ -1,16 +1,17 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using AzzyBot.Bot.Services.Modules;
+using AzzyBot.Bot.Services.Interfaces;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
@@ -21,12 +22,12 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayingJob> logger, AzuraCastApiService apiService, DbActions dbActions, DiscordBotService botService) : IJob
+public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayingJob> logger, IAzuraCastApiService apiService, IDbActions dbActions, IDiscordBotService botService) : IJob
 {
     private readonly ILogger<AzuraPersistentNowPlayingJob> _logger = logger;
-    private readonly AzuraCastApiService _apiService = apiService;
-    private readonly DbActions _dbActions = dbActions;
-    private readonly DiscordBotService _botService = botService;
+    private readonly IAzuraCastApiService _apiService = apiService;
+    private readonly IDbActions _dbActions = dbActions;
+    private readonly IDiscordBotService _botService = botService;
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
     {

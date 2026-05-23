@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 
 using Microsoft.Extensions.Logging;
@@ -114,6 +114,15 @@ public static partial class LoggerActions
     [LoggerMessage(113, LogLevel.Information, "Sent the bot-wide info message to {count} guilds")]
     public static partial void BotWideMessageSent(this ILogger logger, int count);
 
+    [LoggerMessage(114, LogLevel.Information, "Bot status activity type set to {activityType} with doing '{doing}'")]
+    public static partial void BotStatusActivitySet(this ILogger logger, string activityType, string doing);
+
+    [LoggerMessage(115, LogLevel.Information, "Bot status stream URL set to {url}")]
+    public static partial void BotStatusStreamUrlSet(this ILogger logger, string url);
+
+    [LoggerMessage(116, LogLevel.Information, "Bot status user status set to {userStatus}")]
+    public static partial void BotStatusUserStatusSet(this ILogger logger, string userStatus);
+
     [LoggerMessage(120, LogLevel.Information, "Database concurrency situation resolved.")]
     public static partial void DatabaseConcurrencyResolved(this ILogger logger);
 
@@ -173,6 +182,18 @@ public static partial class LoggerActions
 
     [LoggerMessage(221, LogLevel.Warning, "Could not find referenced command {command}")]
     public static partial void CommandNotFound(this ILogger logger, string command);
+
+    [LoggerMessage(222, LogLevel.Warning, "Bot status activity type {type} is not defined, falling back to ListeningTo")]
+    public static partial void BotStatusActivityTypeNotDefined(this ILogger logger, int type);
+
+    [LoggerMessage(223, LogLevel.Warning, "Bot status activity type Streaming requires a URL, falling back to Playing")]
+    public static partial void BotStatusStreamingRequiresUrl(this ILogger logger);
+
+    [LoggerMessage(224, LogLevel.Warning, "Bot status user status {status} is not defined, falling back to Online")]
+    public static partial void BotStatusUserStatusNotDefined(this ILogger logger, int status);
+
+    [LoggerMessage(225, LogLevel.Warning, "Bot status activity type Streaming requires a Twitch or YouTube URL, falling back to Playing")]
+    public static partial void BotStatusStreamingInvalidUrl(this ILogger logger);
 
     [LoggerMessage(230, LogLevel.Warning, "Bot is ratelimited on uri: {uri} retrying in {time} seconds")]
     public static partial void BotRatelimited(this ILogger logger, Uri uri, int time);

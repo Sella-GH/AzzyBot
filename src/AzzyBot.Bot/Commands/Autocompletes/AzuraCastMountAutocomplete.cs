@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -6,14 +6,14 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-using AzzyBot.Bot.Services;
-using AzzyBot.Bot.Services.Modules;
+using AzzyBot.Bot.Services.Interfaces;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
@@ -23,14 +23,14 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplete> logger, AzuraCastApiService azuraCast, AzuraCastPingService azuraCastPing, DbActions dbActions, DiscordBotService botService, WebRequestService webRequest) : IAutoCompleteProvider
+public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplete> logger, IAzuraCastApiService azuraCast, IAzuraCastPingService azuraCastPing, IDbActions dbActions, IDiscordBotService botService, IWebRequestService webRequest) : IAutoCompleteProvider
 {
     private readonly ILogger<AzuraCastMountAutocomplete> _logger = logger;
-    private readonly AzuraCastApiService _azuraCast = azuraCast;
-    private readonly AzuraCastPingService _azuraCastPing = azuraCastPing;
-    private readonly DbActions _dbActions = dbActions;
-    private readonly DiscordBotService _botService = botService;
-    private readonly WebRequestService _webRequest = webRequest;
+    private readonly IAzuraCastApiService _azuraCast = azuraCast;
+    private readonly IAzuraCastPingService _azuraCastPing = azuraCastPing;
+    private readonly IDbActions _dbActions = dbActions;
+    private readonly IDiscordBotService _botService = botService;
+    private readonly IWebRequestService _webRequest = webRequest;
 
     public async ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)
     {
@@ -61,7 +61,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
             record = await _azuraCast.GetStationAsync(baseUrl, apiKey, stationId);
             if (record is null)
             {
-                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({stationId}) endpoint.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({stationId}) endpoint.\n{_azuraCast.AzuraCastPermissionsWiki}");
                 return [];
             }
         }

@@ -1,4 +1,4 @@
-﻿namespace AzzyBot.Bot.Utilities.Helpers;
+namespace AzzyBot.Bot.Utilities.Helpers;
 
 public static class ModuleCheckMessages
 {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,13 +6,15 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Services.Interfaces;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Entities;
 
@@ -20,12 +22,12 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services.Modules;
 
-public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, AzuraCastApiService azuraCast, DbActions dbActions, DiscordBotService discordBotService)
+public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, IAzuraCastApiService azuraCast, IDbActions dbActions, IDiscordBotService discordBotService) : IAzuraCastFileService
 {
     private readonly ILogger<AzuraCastFileService> _logger = logger;
-    private readonly AzuraCastApiService _azuraCast = azuraCast;
-    private readonly DbActions _dbActions = dbActions;
-    private readonly DiscordBotService _botService = discordBotService;
+    private readonly IAzuraCastApiService _azuraCast = azuraCast;
+    private readonly IDbActions _dbActions = dbActions;
+    private readonly IDiscordBotService _botService = discordBotService;
 
     public async Task CheckForFileChangesAsync(AzuraCastStationEntity station)
     {
@@ -40,14 +42,14 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, A
         AzuraStationRecord? azuraStation = await _azuraCast.GetStationAsync(baseUrl, apiKey, station.StationId);
         if (azuraStation is null)
         {
-            await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station ID: {station.StationId}.\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+            await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station ID: {station.StationId}.\n{_azuraCast.AzuraCastPermissionsWiki}");
             return;
         }
 
         IEnumerable<AzuraFilesRecord>? onlineFiles = await _azuraCast.GetFilesOnlineBasicAsync(baseUrl, apiKey, station.StationId);
         if (onlineFiles is null)
         {
-            await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station *{azuraStation.Name}* (ID: {station.StationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+            await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station *{azuraStation.Name}* (ID: {station.StationId}).\n{_azuraCast.AzuraCastPermissionsWiki}");
             return;
         }
 
@@ -67,7 +69,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, A
         List<AzuraFilesRecord> addedFiles = [.. onlineHashSet.Except(localHashSet)];
         List<AzuraFilesRecord> removedFiles = [.. localHashSet.Except(onlineHashSet)];
         bool filesChanged = addedFiles.Count is not 0 || removedFiles.Count is not 0;
-        await _dbActions.UpdateAzuraCastStationChecksAsync(station.AzuraCast.Guild.UniqueId, station.StationId, lastFileChangesCheck: true);
+        await _dbActions.UpdateAzuraCastStationChecksAsync(station.AzuraCast.Guild.UniqueId, station.StationId, updateLastFileChangesCheck: true);
         if (!filesChanged)
             return;
 

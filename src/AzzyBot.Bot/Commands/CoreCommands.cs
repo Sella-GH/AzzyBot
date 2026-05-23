@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
-using AzzyBot.Bot.Services;
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Enums;
@@ -16,7 +16,7 @@ using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities.Records;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
@@ -33,12 +33,12 @@ namespace AzzyBot.Bot.Commands;
 public sealed class CoreCommands
 {
     [Command("core"), RequireGuild, ModuleActivatedCheck([AzzyModules.LegalTerms])]
-    public sealed class CoreGroup(ILogger<CoreGroup> logger, IOptions<AzzyBotSettings> settings, DbActions dbActions, DiscordBotService botService)
+    public sealed class CoreGroup(ILogger<CoreGroup> logger, IOptions<AzzyBotSettings> settings, IDbActions dbActions, IDiscordBotService botService)
     {
         private readonly ILogger<CoreGroup> _logger = logger;
         private readonly AzzyBotSettings _settings = settings.Value;
-        private readonly DbActions _dbActions = dbActions;
-        private readonly DiscordBotService _botService = botService;
+        private readonly IDbActions _dbActions = dbActions;
+        private readonly IDiscordBotService _botService = botService;
 
         [Command("force-channel-permissions-check"), Description("Forces a check of the permissions for the bot in the necessary channel."), RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator])]
         public async ValueTask ForceChannelPermissionsCheckAsync(SlashCommandContext context)

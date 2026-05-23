@@ -1,19 +1,19 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-using AzzyBot.Bot.Services;
-using AzzyBot.Bot.Services.Modules;
+using AzzyBot.Bot.Services.Interfaces;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Core.Utilities.Enums;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
@@ -23,13 +23,13 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutocomplete> logger, AzuraCastApiService azuraCastApi, AzuraCastPingService azuraCastPing, DbActions dbActions, DiscordBotService botService) : IAutoCompleteProvider
+public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutocomplete> logger, IAzuraCastApiService azuraCastApi, IAzuraCastPingService azuraCastPing, IDbActions dbActions, IDiscordBotService botService) : IAutoCompleteProvider
 {
     private readonly ILogger<AzuraCastPlaylistAutocomplete> _logger = logger;
-    private readonly AzuraCastApiService _azuraCast = azuraCastApi;
-    private readonly AzuraCastPingService _azuraCastPing = azuraCastPing;
-    private readonly DbActions _dbActions = dbActions;
-    private readonly DiscordBotService _botService = botService;
+    private readonly IAzuraCastApiService _azuraCast = azuraCastApi;
+    private readonly IAzuraCastPingService _azuraCastPing = azuraCastPing;
+    private readonly IDbActions _dbActions = dbActions;
+    private readonly IDiscordBotService _botService = botService;
 
     public async ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)
     {
@@ -65,7 +65,7 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
             playlists = await _azuraCast.GetPlaylistsAsync(baseUrl, apiKey, stationId);
             if (playlists is null)
             {
-                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station ({stationId}).\n{AzuraCastApiService.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station ({stationId}).\n{_azuraCast.AzuraCastPermissionsWiki}");
                 return [];
             }
         }

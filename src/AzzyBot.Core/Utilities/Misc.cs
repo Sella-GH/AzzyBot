@@ -8,6 +8,19 @@ namespace AzzyBot.Core.Utilities;
 
 public static class Misc
 {
+    public static bool CheckUpdateNotification(int notifyCounter, in DateTimeOffset lastNotificationTime)
+    {
+        TimeSpan elapsed = DateTimeOffset.UtcNow - lastNotificationTime;
+
+        return notifyCounter switch
+        {
+            >= 7 when elapsed > TimeSpan.FromHours(5.98) => true,
+            >= 3 when elapsed > TimeSpan.FromHours(11.98) => true,
+            < 3 when elapsed > TimeSpan.FromHours(23.98) => true,
+            _ => false
+        };
+    }
+
     public static string GetProgressBar(double number, double elapsed, double duration)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(number);

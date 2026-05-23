@@ -1,13 +1,14 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-using AzzyBot.Bot.Services.Modules;
+using AzzyBot.Bot.Services.Interfaces;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using Microsoft.Extensions.Logging;
 
@@ -15,13 +16,13 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzuraRequestJob(ILogger<AzuraRequestJob> logger, AzuraCastApiService apiService, CronJobManager cronJobManager, DbActions dbActions, DiscordBotService botService) : IJob
+public sealed class AzuraRequestJob(ILogger<AzuraRequestJob> logger, IAzuraCastApiService apiService, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService) : IJob
 {
     private readonly ILogger<AzuraRequestJob> _logger = logger;
-    private readonly AzuraCastApiService _apiService = apiService;
-    private readonly CronJobManager _cronJobManager = cronJobManager;
-    private readonly DbActions _dbActions = dbActions;
-    private readonly DiscordBotService _botService = botService;
+    private readonly IAzuraCastApiService _apiService = apiService;
+    private readonly ICronJobManager _cronJobManager = cronJobManager;
+    private readonly IDbActions _dbActions = dbActions;
+    private readonly IDiscordBotService _botService = botService;
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
     {
@@ -54,7 +55,7 @@ public sealed class AzuraRequestJob(ILogger<AzuraRequestJob> logger, AzuraCastAp
             try
             {
                 await _apiService.RequestSongAsync(record.BaseUri, record.StationId, record.RequestId);
-                await _dbActions.UpdateAzuraCastStationAsync(record.GuildId, record.StationId, lastRequestTime: true);
+                await _dbActions.UpdateAzuraCastStationAsync(record.GuildId, record.StationId, updateLastRequestTime: true);
                 await _dbActions.CreateAzuraCastStationRequestAsync(record.GuildId, record.StationId, record.SongId);
 
                 _logger.BackgroundServiceSongRequestFinished(record.RequestId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);

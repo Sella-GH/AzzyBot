@@ -1,18 +1,19 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Services.CronJobs;
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Utilities.Records.AzuraCast;
 
 using NCronJob;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class CronJobManager(IInstantJobRegistry jobRegistry, DiscordBotService botService) : IExceptionHandler
+public sealed class CronJobManager(IInstantJobRegistry jobRegistry, IDiscordBotService botService) : ICronJobManager
 {
     private readonly IInstantJobRegistry _jobRegistry = jobRegistry;
-    private readonly DiscordBotService _botService = botService;
+    private readonly IDiscordBotService _botService = botService;
 
     public void RunAzzyBotInactiveGuildJob()
         => _jobRegistry.RunInstantJob<AzzyBotInactiveGuildJob>();

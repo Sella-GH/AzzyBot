@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Bot.Utilities.Helpers;
 using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
@@ -16,10 +16,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Checks;
 
-public sealed class ModuleActivatedCheck(ILogger<ModuleActivatedCheck> logger, DbActions dbActions) : IContextCheck<ModuleActivatedCheckAttribute>
+public sealed class ModuleActivatedCheck(ILogger<ModuleActivatedCheck> logger, IDbActions dbActions) : IContextCheck<ModuleActivatedCheckAttribute>
 {
     private readonly ILogger<ModuleActivatedCheck> _logger = logger;
-    private readonly DbActions _dbActions = dbActions;
+    private readonly IDbActions _dbActions = dbActions;
 
     public async ValueTask<string?> ExecuteCheckAsync(ModuleActivatedCheckAttribute attribute, CommandContext context)
     {

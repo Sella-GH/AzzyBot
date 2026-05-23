@@ -9,7 +9,9 @@ using AzzyBot.Bot.Commands.Converters;
 using AzzyBot.Bot.Services;
 using AzzyBot.Bot.Services.CronJobs;
 using AzzyBot.Bot.Services.DiscordEvents;
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Settings.Validators;
 using AzzyBot.Core.Utilities;
@@ -49,7 +51,7 @@ public static class IServiceCollectionExtensions
 
             // Need to register as Singleton first
             // Otherwise DI doesn't work properly
-            services.AddSingleton<CoreServiceHost>().AddHostedService(static s => s.GetRequiredService<CoreServiceHost>());
+            services.AddSingleton<ICoreServiceHost, CoreServiceHost>().AddHostedService(static s => s.GetRequiredService<ICoreServiceHost>());
 
             // Register the database services
             services.AzzyBotDataServices(dbSettings);
@@ -58,9 +60,9 @@ public static class IServiceCollectionExtensions
             services.DiscordClientCommands(botSettings);
             services.DiscordClientInteractivity();
 
-            services.AddSingleton<DiscordBotService>();
-            services.AddSingleton<DiscordBotServiceHost>().AddHostedService(static s => s.GetRequiredService<DiscordBotServiceHost>());
-            services.AddSingleton<CoreService>();
+            services.AddSingleton<IDiscordBotService, DiscordBotService>();
+            services.AddSingleton<IDiscordBotServiceHost, DiscordBotServiceHost>().AddHostedService(static s => s.GetRequiredService<IDiscordBotServiceHost>());
+            services.AddSingleton<ICoreService, CoreService>();
 
             services.AddHttpClient(SoftwareStats.GetAppName, static c =>
             {
@@ -69,13 +71,13 @@ public static class IServiceCollectionExtensions
                 c.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionOrHigher;
                 c.Timeout = TimeSpan.FromSeconds(30);
             });
-            services.AddSingleton<WebRequestService>();
-            services.AddSingleton<UpdaterService>();
+            services.AddSingleton<IWebRequestService, WebRequestService>();
+            services.AddSingleton<IUpdaterService, UpdaterService>();
 
-            services.AddSingleton<AzuraCastApiService>();
-            services.AddSingleton<AzuraCastFileService>();
-            services.AddSingleton<AzuraCastPingService>();
-            services.AddSingleton<AzuraCastUpdateService>();
+            services.AddSingleton<IAzuraCastApiService, AzuraCastApiService>();
+            services.AddSingleton<IAzuraCastFileService, AzuraCastFileService>();
+            services.AddSingleton<IAzuraCastPingService, AzuraCastPingService>();
+            services.AddSingleton<IAzuraCastUpdateService, AzuraCastUpdateService>();
             services.AddNCronJob(o =>
             {
 #if DEBUG && !DOCKER_DEBUG
@@ -106,7 +108,7 @@ public static class IServiceCollectionExtensions
                 o.AddJob<LogfileCleaningJob>(j => j.WithName(nameof(LogfileCleaningJob)).WithCronExpression(everyDay).WithParameter(logDays).RunAtStartup());
                 o.AddJob<MusicStreamingPersistentNowPlayingJob>(j => j.WithName(nameof(MusicStreamingPersistentNowPlayingJob)).WithCronExpression(everyMinute));
             });
-            services.AddSingleton<CronJobManager>();
+            services.AddSingleton<ICronJobManager, CronJobManager>();
 
             services.AddLavalink();
             services.ConfigureLavalink(config =>
@@ -144,7 +146,7 @@ public static class IServiceCollectionExtensions
                 config.ReadyTimeout = TimeSpan.FromSeconds(30);
                 config.ResumptionOptions = new(TimeSpan.Zero);
             });
-            services.AddSingleton<MusicStreamingService>();
+            services.AddSingleton<IMusicStreamingService, MusicStreamingService>();
         }
 
         public void AddAppSettings(string settingsFile)

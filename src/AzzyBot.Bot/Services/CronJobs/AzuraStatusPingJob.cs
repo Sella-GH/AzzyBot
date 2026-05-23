@@ -1,22 +1,23 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using AzzyBot.Bot.Services.Modules;
+using AzzyBot.Bot.Services.Interfaces;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class AzuraStatusPingJob(AzuraCastPingService pingService, DbActions dbActions, DiscordBotService botService) : IJob
+public sealed class AzuraStatusPingJob(IAzuraCastPingService pingService, IDbActions dbActions, IDiscordBotService botService) : IJob
 {
-    private readonly AzuraCastPingService _pingService = pingService;
-    private readonly DbActions _dbActions = dbActions;
-    private readonly DiscordBotService _botService = botService;
+    private readonly IAzuraCastPingService _pingService = pingService;
+    private readonly IDbActions _dbActions = dbActions;
+    private readonly IDiscordBotService _botService = botService;
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
     {

@@ -1,15 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.Json;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Core.Logging;
 using AzzyBot.Core.Utilities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Entities;
 
@@ -18,14 +19,14 @@ using Microsoft.Extensions.Options;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<AzzyBotSettings> botSettings, IOptions<CoreUpdaterSettings> updaterSettings, DbActions dbActions, DiscordBotService botService, WebRequestService webService)
+public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<AzzyBotSettings> botSettings, IOptions<CoreUpdaterSettings> updaterSettings, IDbActions dbActions, IDiscordBotService botService, IWebRequestService webService) : IUpdaterService
 {
     private readonly ILogger<UpdaterService> _logger = logger;
     private readonly AzzyBotSettings _botSettings = botSettings.Value;
     private readonly CoreUpdaterSettings _updaterSettings = updaterSettings.Value;
-    private readonly DbActions _dbActions = dbActions;
-    private readonly DiscordBotService _botService = botService;
-    private readonly WebRequestService _webService = webService;
+    private readonly IDbActions _dbActions = dbActions;
+    private readonly IDiscordBotService _botService = botService;
+    private readonly IWebRequestService _webService = webService;
     private DateTimeOffset _lastAzzyUpdateNotificationTime = DateTimeOffset.MinValue;
     private string _lastOnlineVersion = string.Empty;
     private int _azzyNotifyCounter;
@@ -60,7 +61,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
             return;
         }
 
-        await _dbActions.UpdateAzzyBotAsync(lastUpdateCheck: true);
+        await _dbActions.UpdateAzzyBotAsync(updateLastUpdateCheck: true);
 
         string onlineVersion = updaterRecord.Name;
         if (localVersion == onlineVersion)
@@ -72,25 +73,6 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
         await SendUpdateMessageAsync(onlineVersion, releaseDate, updaterRecord.Body);
     }
 
-    public static bool CheckUpdateNotification(int notifyCounter, in DateTimeOffset lastNotificationTime)
-    {
-        DateTimeOffset now = DateTimeOffset.UtcNow;
-        if (notifyCounter < 3 && now - lastNotificationTime > TimeSpan.FromHours(23.98))
-        {
-            return true;
-        }
-        else if (notifyCounter >= 3 && now - lastNotificationTime > TimeSpan.FromHours(11.98))
-        {
-            return true;
-        }
-        else if (notifyCounter >= 7 && now - lastNotificationTime > TimeSpan.FromHours(5.98))
-        {
-            return true;
-        }
-
-        return false;
-    }
-
     private async Task SendUpdateMessageAsync(string updateVersion, DateTimeOffset releaseDate, string changelog)
     {
         if (_lastOnlineVersion != updateVersion)
@@ -99,7 +81,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
             _azzyNotifyCounter = 0;
         }
 
-        if (!CheckUpdateNotification(_azzyNotifyCounter, _lastAzzyUpdateNotificationTime))
+        if (!Misc.CheckUpdateNotification(_azzyNotifyCounter, _lastAzzyUpdateNotificationTime))
             return;
 
         _lastAzzyUpdateNotificationTime = DateTimeOffset.UtcNow;

@@ -1,14 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using AzzyBot.Bot.Services.Modules;
+using AzzyBot.Bot.Services.Interfaces;
+using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Entities;
 using DSharpPlus.Exceptions;
@@ -21,12 +22,12 @@ using NCronJob;
 
 namespace AzzyBot.Bot.Services.CronJobs;
 
-public sealed class MusicStreamingPersistentNowPlayingJob(ILogger<MusicStreamingPersistentNowPlayingJob> logger, MusicStreamingService musicStreaming, DbActions dbActions, DiscordBotService botService) : IJob
+public sealed class MusicStreamingPersistentNowPlayingJob(ILogger<MusicStreamingPersistentNowPlayingJob> logger, IMusicStreamingService musicStreaming, IDbActions dbActions, IDiscordBotService botService) : IJob
 {
     private readonly ILogger<MusicStreamingPersistentNowPlayingJob> _logger = logger;
-    private readonly DbActions _dbActions = dbActions;
-    private readonly DiscordBotService _botService = botService;
-    private readonly MusicStreamingService _musicStreaming = musicStreaming;
+    private readonly IDbActions _dbActions = dbActions;
+    private readonly IDiscordBotService _botService = botService;
+    private readonly IMusicStreamingService _musicStreaming = musicStreaming;
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
     {

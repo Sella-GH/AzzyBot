@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 #if DOCKER_DEBUG || DOCKER
 using System.Globalization;
 #endif

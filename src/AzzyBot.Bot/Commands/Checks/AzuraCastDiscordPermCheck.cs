@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Utilities.Enums;
 using AzzyBot.Core.Logging;
 using AzzyBot.Data.Entities;
-using AzzyBot.Data.Services;
+using AzzyBot.Data.Services.Interfaces;
 
 using DSharpPlus.Commands;
 using DSharpPlus.Commands.ContextChecks;
@@ -26,10 +26,10 @@ namespace AzzyBot.Bot.Commands.Checks;
 /// This check ensures that specific commands are executed with specific permissions only defined in the database preferences.
 /// If the command is executed by an unauthorized user it returns a string and fails.
 /// </remarks>
-public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger, DbActions dbActions) : IContextCheck<AzuraCastDiscordPermCheckAttribute>
+public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger, IDbActions dbActions) : IContextCheck<AzuraCastDiscordPermCheckAttribute>
 {
     private readonly ILogger<AzuraCastDiscordPermCheck> _logger = logger;
-    private readonly DbActions _dbActions = dbActions;
+    private readonly IDbActions _dbActions = dbActions;
 
     [SuppressMessage("Style", "IDE0066:Convert switch statement to expression", Justification = "Better reading style")]
     public async ValueTask<string?> ExecuteCheckAsync(AzuraCastDiscordPermCheckAttribute attribute, CommandContext context)

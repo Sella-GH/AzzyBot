@@ -1,4 +1,4 @@
-﻿using AzzyBot.Data.Entities;
+using AzzyBot.Data.Entities;
 
 using Microsoft.EntityFrameworkCore;
 
