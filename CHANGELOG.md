@@ -24,7 +24,7 @@
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02587
 - Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 10.0.8
 - Updated [Microsoft.Extensions.X](https://github.com/dotnet/runtime) libraries to version 10.0.8
-- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.25.0.139117
+- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.26.0.140279
 
 ## 2.10.0 - 2026-04-21
 ### Improvements
