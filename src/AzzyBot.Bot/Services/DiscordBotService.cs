@@ -426,24 +426,26 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             activityType = DiscordActivityType.ListeningTo;
         }
 
-        if (activityType is DiscordActivityType.Streaming && url is null)
-        {
-            _logger.BotStatusStreamingRequiresUrl();
-            activityType = DiscordActivityType.Playing;
-        }
-
         string[] allowedStreamingHosts = ["twitch", "youtube"];
-        bool isAllowedStreamingHost = url is not null && Array.Exists(allowedStreamingHosts, h => url.Host.Contains(h, StringComparison.OrdinalIgnoreCase));
+        bool isValidStreamingUrl = url is not null && Array.Exists(allowedStreamingHosts, h => url.Host.Contains(h, StringComparison.OrdinalIgnoreCase));
 
-        if (activityType is DiscordActivityType.Streaming && !isAllowedStreamingHost)
+        if (activityType is DiscordActivityType.Streaming && !isValidStreamingUrl)
         {
-            _logger.BotStatusStreamingInvalidUrl();
+            if (url is null)
+            {
+                _logger.BotStatusStreamingRequiresUrl();
+            }
+            else
+            {
+                _logger.BotStatusStreamingInvalidUrl();
+            }
+
             activityType = DiscordActivityType.Playing;
         }
 
         DiscordActivity activity = new(doing, activityType);
 
-        if (activityType is DiscordActivityType.Streaming && isAllowedStreamingHost && url is not null)
+        if (activityType is DiscordActivityType.Streaming && url is not null)
         {
             activity.StreamUrl = url.OriginalString;
             _logger.BotStatusStreamUrlSet(url.OriginalString);
