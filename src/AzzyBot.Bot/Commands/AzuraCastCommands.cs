@@ -223,8 +223,8 @@ public sealed class AzuraCastCommands
             }
 
             await context.EditResponseAsync((station is not null)
-                ? "I initiated the cache refresh for all stations."
-                : "I initiated the cache refresh for the selected station.");
+                ? "I initiated the cache refresh for the selected station."
+                : "I initiated the cache refresh for all stations.");
         }
 
         [Command("force-online-check"), Description("Force the bot to check if the AzuraCast instance is online."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
