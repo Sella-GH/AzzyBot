@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-using AzzyBot.Core.Utilities.Enums;
+using AzzyBot.Core.Enums;
 
 namespace AzzyBot.Core.Utilities;
 

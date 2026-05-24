@@ -9,14 +9,14 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Commands.Checks;
+using AzzyBot.Bot.Helpers;
 using AzzyBot.Bot.Logging;
 using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
-using AzzyBot.Bot.Utilities.Helpers;
+using AzzyBot.Core.Helpers;
 using AzzyBot.Core.Utilities;
-using AzzyBot.Core.Utilities.Helpers;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Logging;
 using AzzyBot.Data.Services.Interfaces;
@@ -203,7 +203,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             bool messageSent;
             if (!string.IsNullOrWhiteSpace(ex.StackTrace))
             {
-                string jsonDump = JsonSerializer.Serialize(new(ex, info), JsonSourceGen.Default.SerializableExceptionsRecord);
+                string jsonDump = JsonSerializer.Serialize(new(ex, info), JsonSourceGen.Default.SerializableExceptionsModel);
                 string fileTimestamp = timestampString.Replace(" ", "_", StringComparison.OrdinalIgnoreCase).Replace(":", "-", StringComparison.OrdinalIgnoreCase);
                 string fileName = $"AzzyBotException_{fileTimestamp}.json";
                 string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, fileName);

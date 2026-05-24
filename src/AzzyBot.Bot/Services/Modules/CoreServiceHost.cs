@@ -11,7 +11,6 @@ using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Core.Utilities;
-using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services;
 using AzzyBot.Data.Settings;
@@ -122,7 +121,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
         _dbSettings.EncryptionKey = _dbSettings.NewEncryptionKey;
         _dbSettings.NewEncryptionKey = string.Empty;
 
-        AppSettingsRecord appSettings = new()
+        AppSettingsModel appSettings = new()
         {
             AzzyBotSettings = _azzySettings,
             DatabaseSettings = _dbSettings,
@@ -131,7 +130,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
             CoreUpdaterSettings = _updaterSettings
         };
 
-        string json = JsonSerializer.Serialize(appSettings, JsonSourceGen.Default.AppSettingsRecord);
+        string json = JsonSerializer.Serialize(appSettings, JsonSourceGen.Default.AppSettingsModel);
         await FileOperations.WriteToFileAsync(_azzySettings.SettingsFile, json);
 
         _logger.DatabaseReencryptionComplete();

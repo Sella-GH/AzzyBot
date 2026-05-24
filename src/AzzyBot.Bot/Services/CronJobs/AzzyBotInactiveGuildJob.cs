@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Logging;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules.Interfaces;
-using AzzyBot.Bot.Utilities.Structs;
+using AzzyBot.Bot.Structs;
 using AzzyBot.Data.Entities;
 
 using Microsoft.Extensions.Logging;

@@ -4,10 +4,10 @@ using System.Security.Authentication;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Logging;
+using AzzyBot.Bot.Models.AzuraCast;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules.Interfaces;
-using AzzyBot.Bot.Utilities.Records.AzuraCast;
-using AzzyBot.Core.Utilities.Encryption;
+using AzzyBot.Core.Utilities;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services.Interfaces;
 
@@ -27,7 +27,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
         ArgumentNullException.ThrowIfNull(azuraCast);
 
         Uri uri = new(Crypto.Decrypt(azuraCast.BaseUrl));
-        AzuraStatusRecord? status = null;
+        AzuraStatusModel? status = null;
         try
         {
             status = await _azuraCast.GetInstanceStatusAsync(uri);

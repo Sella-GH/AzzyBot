@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Models.AzuraCast;
 using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities;
-using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Utilities;
-using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services.Interfaces;
 
@@ -54,15 +53,15 @@ public sealed class AzuraCastUpdateService(IAzuraCastApiService azuraCastApiServ
             return;
         }
 
-        AzuraUpdateRecord? update;
+        AzuraUpdateModel? update;
         try
         {
-            update = JsonSerializer.Deserialize(body, JsonSourceGen.Default.AzuraUpdateRecord);
+            update = JsonSerializer.Deserialize(body, JsonSourceGen.Default.AzuraUpdateModel);
         }
         catch (JsonException ex)
         {
-            AzuraUpdateErrorRecord? errorRecord = JsonSerializer.Deserialize(body, JsonSourceGen.Default.AzuraUpdateErrorRecord) ?? throw new InvalidOperationException($"Failed to deserialize body: {body}", ex);
-            await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"Failed to check for updates: {errorRecord.FormattedMessage}");
+            AzuraUpdateErrorModel? errorModel = JsonSerializer.Deserialize(body, JsonSourceGen.Default.AzuraUpdateErrorModel) ?? throw new InvalidOperationException($"Failed to deserialize body: {body}", ex);
+            await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"Failed to check for updates: {errorModel.FormattedMessage}");
             return;
         }
 

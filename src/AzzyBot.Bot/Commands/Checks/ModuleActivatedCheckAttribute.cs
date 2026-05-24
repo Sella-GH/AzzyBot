@@ -1,6 +1,6 @@
 using System;
 
-using AzzyBot.Bot.Utilities.Enums;
+using AzzyBot.Bot.Enums;
 
 using DSharpPlus.Commands.ContextChecks;
 

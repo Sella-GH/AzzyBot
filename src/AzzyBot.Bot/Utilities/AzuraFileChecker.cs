@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-using AzzyBot.Bot.Utilities.Records.AzuraCast;
+using AzzyBot.Bot.Models.AzuraCast;
 
 using TagLibSharp2.Core;
 
@@ -8,7 +8,7 @@ namespace AzzyBot.Bot.Utilities;
 
 public static class AzuraFileChecker
 {
-    public static async Task<AzuraFileComplianceRecord> FileIsCompliantAsync(string path)
+    public static async Task<AzuraFileComplianceModel> FileIsCompliantAsync(string path)
     {
         MediaFileResult media = await MediaFile.ReadAsync(path);
 
@@ -16,6 +16,6 @@ public static class AzuraFileChecker
         bool artistCompliant = !string.IsNullOrWhiteSpace(media.Tag?.Artist);
         bool isCompliant = titleCompliant && artistCompliant;
 
-        return new AzuraFileComplianceRecord(isCompliant, titleCompliant, artistCompliant);
+        return new AzuraFileComplianceModel(isCompliant, titleCompliant, artistCompliant);
     }
 }

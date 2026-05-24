@@ -9,14 +9,13 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Choices;
+using AzzyBot.Bot.Enums;
+using AzzyBot.Bot.Helpers;
 using AzzyBot.Bot.Logging;
+using AzzyBot.Bot.Models.AzuraCast;
 using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities;
-using AzzyBot.Bot.Utilities.Enums;
-using AzzyBot.Bot.Utilities.Helpers;
-using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Core.Utilities;
-using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Logging;
 using AzzyBot.Data.Services.Interfaces;
@@ -289,7 +288,7 @@ public sealed class MusicStreamingCommands
             string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             Uri baseUrl = new(Crypto.Decrypt(ac.BaseUrl));
 
-            AzuraNowPlayingDataRecord? nowPlaying;
+            AzuraNowPlayingDataModel? nowPlaying;
             try
             {
                 nowPlaying = await _azuraCast.GetNowPlayingAsync(baseUrl, apiKey, station)

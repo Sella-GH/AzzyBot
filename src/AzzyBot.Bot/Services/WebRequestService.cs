@@ -14,13 +14,13 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Logging;
+using AzzyBot.Bot.Models;
 using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Services.Interfaces;
-using AzzyBot.Bot.Utilities;
-using AzzyBot.Bot.Utilities.Records;
 #if DEBUG || DOCKER_DEBUG
-using AzzyBot.Bot.Utilities.Structs;
+using AzzyBot.Bot.Structs;
 #endif
+using AzzyBot.Bot.Utilities;
 using AzzyBot.Core.Utilities;
 
 using Microsoft.Extensions.Logging;
@@ -150,7 +150,7 @@ public sealed class WebRequestService : IWebRequestService
         }
     }
 
-    public async Task<AzzyIpAddressRecord> GetIpAddressesAsync()
+    public async Task<AzzyIpAddressModel> GetIpAddressesAsync()
     {
         string ipv4 = string.Empty;
         string ipv6 = string.Empty;
@@ -400,7 +400,7 @@ public sealed class WebRequestService : IWebRequestService
         {
             byte[] fileBytes = await FileOperations.GetBase64BytesFromFileAsync(file);
             string base64String = Convert.ToBase64String(fileBytes);
-            string json = JsonSerializer.Serialize(new($"{filePath}/{fileName}", base64String), JsonSourceGen.Default.AzuraFileUploadRecord);
+            string json = JsonSerializer.Serialize(new($"{filePath}/{fileName}", base64String), JsonSourceGen.Default.AzuraFileUploadModel);
 
             using HttpClient client = _factory.CreateClient(HttpClientName);
             using HttpContent httpContent = new StringContent(json, Encoding.UTF8, MediaTypeJson);

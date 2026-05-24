@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Models.AzuraCast;
 using AzzyBot.Bot.Services.Modules.Interfaces;
-using AzzyBot.Bot.Utilities.Records.AzuraCast;
+using AzzyBot.Core.Enums;
 using AzzyBot.Core.Utilities;
-using AzzyBot.Core.Utilities.Encryption;
-using AzzyBot.Core.Utilities.Enums;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Logging;
 using AzzyBot.Data.Services.Interfaces;
@@ -45,14 +44,14 @@ public sealed class AzuraCastStationsOnlineAutocomplete(ILogger<AzuraCastStation
         Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
         string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
         IEnumerable<AzuraCastStationEntity> stationsInDb = azuraCast.Stations;
-        IEnumerable<AzuraAdminStationConfigRecord>? stationsOnline = await _azuraCast.GetStationsAdminConfigAsync(baseUrl, apiKey);
+        IEnumerable<AzuraAdminStationConfigModel>? stationsOnline = await _azuraCast.GetStationsAdminConfigAsync(baseUrl, apiKey);
         if (stationsOnline is null)
             return [];
 
-        IEnumerable<AzuraAdminStationConfigRecord> stations = stationsOnline.Where(o => !stationsInDb.Any(s => s.StationId == o.Id));
+        IEnumerable<AzuraAdminStationConfigModel> stations = stationsOnline.Where(o => !stationsInDb.Any(s => s.StationId == o.Id));
         string? search = context.UserInput;
         List<DiscordAutoCompleteChoice> results = new(25);
-        foreach (AzuraAdminStationConfigRecord station in stations)
+        foreach (AzuraAdminStationConfigModel station in stations)
         {
             if (results.Count is 25)
                 break;

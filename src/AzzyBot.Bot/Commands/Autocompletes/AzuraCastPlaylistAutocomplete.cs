@@ -5,12 +5,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Models.AzuraCast;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules.Interfaces;
-using AzzyBot.Bot.Utilities.Records.AzuraCast;
+using AzzyBot.Core.Enums;
 using AzzyBot.Core.Utilities;
-using AzzyBot.Core.Utilities.Encryption;
-using AzzyBot.Core.Utilities.Enums;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Logging;
 using AzzyBot.Data.Services.Interfaces;
@@ -59,7 +58,7 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
         string? search = context.UserInput;
         string apiKey = (!string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(station.AzuraCast.AdminApiKey);
         Uri baseUrl = new(Crypto.Decrypt(station.AzuraCast.BaseUrl));
-        IEnumerable<AzuraPlaylistRecord>? playlists;
+        IEnumerable<AzuraPlaylistModel>? playlists;
         try
         {
             playlists = await _azuraCast.GetPlaylistsAsync(baseUrl, apiKey, stationId);
@@ -76,7 +75,7 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
         }
 
         List<DiscordAutoCompleteChoice> results = new(25);
-        foreach (AzuraPlaylistRecord playlist in playlists)
+        foreach (AzuraPlaylistModel playlist in playlists)
         {
             if (results.Count is 25)
                 break;

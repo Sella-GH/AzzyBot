@@ -1,0 +1,9 @@
+namespace AzzyBot.Bot.Helpers;
+
+public static class ModuleCheckMessages
+{
+    public const string AzuraCastIsNull = "AzuraCast is null!";
+    public const string GuildIsNull = "Guild is null!";
+    public const string LegalsNotAccepted = "Legals not accepted!";
+    public const string ModuleNotFound = "Module not found!";
+}

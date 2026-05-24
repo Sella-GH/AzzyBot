@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Helpers;
 using AzzyBot.Bot.Logging;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Settings;
+using AzzyBot.Bot.Structs;
 using AzzyBot.Bot.Utilities;
-using AzzyBot.Bot.Utilities.Helpers;
-using AzzyBot.Bot.Utilities.Structs;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services.Interfaces;
 
@@ -33,9 +33,7 @@ public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSet
     {
         IEnumerable<GuildEntity> guilds = await _dbActions.ReadGuildsAsync(loadGuildPrefs: true);
         if (!guilds.Any())
-        {
             return new Dictionary<GuildEntity, AzzyInactiveGuildStruct>();
-        }
 
         HashSet<GuildEntity> noLegals = [.. guilds.Where(g => !g.LegalsAccepted && g.UniqueId != _settings.ServerId)];
         HashSet<GuildEntity> noConfig = [.. guilds.Where(g => !g.ConfigSet && g.UniqueId != _settings.ServerId)];
@@ -46,11 +44,15 @@ public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSet
         {
             DiscordGuild? dGuild = _botService.GetDiscordGuild(guild.UniqueId);
             if (dGuild is null)
-            {
                 continue;
-            }
 
-            AzzyInactiveGuildStruct guildStruct = new(guild: dGuild, config: noConfig.Contains(guild), legals: noLegals.Contains(guild));
+            AzzyInactiveGuildStruct guildStruct = new()
+            {
+                Guild = dGuild,
+                NoConfig = noConfig.Contains(guild),
+                NoLegals = noLegals.Contains(guild)
+            };
+
             victims.Add(guild, guildStruct);
         }
 

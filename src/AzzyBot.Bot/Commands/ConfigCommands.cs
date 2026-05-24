@@ -10,17 +10,16 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
 using AzzyBot.Bot.Commands.Choices;
+using AzzyBot.Bot.Enums;
+using AzzyBot.Bot.Helpers;
 using AzzyBot.Bot.Logging;
+using AzzyBot.Bot.Models.AzuraCast;
 using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules.Interfaces;
+using AzzyBot.Bot.Structs;
 using AzzyBot.Bot.Utilities;
-using AzzyBot.Bot.Utilities.Enums;
-using AzzyBot.Bot.Utilities.Helpers;
-using AzzyBot.Bot.Utilities.Records.AzuraCast;
-using AzzyBot.Bot.Utilities.Structs;
 using AzzyBot.Core.Utilities;
-using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Logging;
 using AzzyBot.Data.Services.Interfaces;
@@ -127,7 +126,7 @@ public sealed class ConfigCommands
             }
 
             Uri sanitizedUri = Misc.SanitizeUri(url);
-            AzuraStatusRecord? status = null;
+            AzuraStatusModel? status = null;
             try
             {
                 status = await _azuraCastApi.GetInstanceStatusAsync(sanitizedUri);
@@ -616,14 +615,27 @@ public sealed class ConfigCommands
                     {
                         DiscordRole? stationAdminRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationAdminRoleId);
                         DiscordRole? stationDjRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationDjRoleId);
-                        stationRoles.Add(new(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? "Name not found"));
-                        stationRoles.Add(new(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found"));
-                        string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(ac.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
+                        AzzyStationRoleStruct stationAdminStruct = new()
+                        {
+                            Id = stationAdminRole?.Id ?? 0,
+                            Name = stationAdminRole?.Name ?? "Name not found"
+                        };
+                        stationRoles.Add(stationAdminStruct);
 
-                        AzuraStationRecord? stationRecord = null;
+                        AzzyStationRoleStruct stationDjStruct = new()
+                        {
+                            Id = stationDjRole?.Id ?? 0,
+                            Name = stationDjRole?.Name ?? "Name not found"
+                        };
+                        stationRoles.Add(stationDjStruct);
+
+                        AzuraStationModel? stationModel = null;
                         try
                         {
-                            stationRecord = await _azuraCastApi.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), apiKey, station.StationId);
+                            Uri baseUrl = new(Crypto.Decrypt(ac.BaseUrl));
+                            string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(ac.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
+
+                            stationModel = await _azuraCastApi.GetStationAsync(baseUrl, apiKey, station.StationId);
                         }
                         catch (HttpRequestException)
                         {
@@ -637,8 +649,8 @@ public sealed class ConfigCommands
                             continue;
                         }
 
-                        string stationName = stationRecord?.Name ?? "Station unaccessible.";
-                        if (stationRecord is null)
+                        string stationName = stationModel?.Name ?? "Station unaccessible.";
+                        if (stationModel is null)
                             await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
 
                         stationNames.Add(station.Id, stationName);

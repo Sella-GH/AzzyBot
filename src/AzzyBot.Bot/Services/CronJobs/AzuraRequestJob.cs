@@ -4,9 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Logging;
+using AzzyBot.Bot.Models.AzuraCast;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules.Interfaces;
-using AzzyBot.Bot.Utilities.Records.AzuraCast;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Logging;
 using AzzyBot.Data.Services.Interfaces;
@@ -35,38 +35,38 @@ public sealed class AzuraRequestJob(ILogger<AzuraRequestJob> logger, IAzuraCastA
 
             token.ThrowIfCancellationRequested();
 
-            if (context.Parameter is not AzuraCustomQueueItemRecord record)
+            if (context.Parameter is not AzuraCustomQueueItemModel queueItem)
                 return;
 
-            AzuraCastStationEntity? station = await _dbActions.ReadAzuraCastStationAsync(record.GuildId, record.StationId, loadAzuraCast: true);
+            AzuraCastStationEntity? station = await _dbActions.ReadAzuraCastStationAsync(queueItem.GuildId, queueItem.StationId, loadAzuraCast: true);
             if (station is null)
             {
-                _logger.DatabaseAzuraCastStationNotFound(record.GuildId, 0, record.StationId);
+                _logger.DatabaseAzuraCastStationNotFound(queueItem.GuildId, 0, queueItem.StationId);
                 return;
             }
 
-            bool requestHasToWait = station.LastRequestTime > record.Timestamp;
+            bool requestHasToWait = station.LastRequestTime > queueItem.Timestamp;
             if (requestHasToWait)
             {
-                TimeSpan diff = station.LastRequestTime - record.Timestamp;
-                _logger.BackgroundServiceSongRequestWaiting(record.RequestId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId, diff.Seconds);
+                TimeSpan diff = station.LastRequestTime - queueItem.Timestamp;
+                _logger.BackgroundServiceSongRequestWaiting(queueItem.RequestId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId, diff.Seconds);
                 await Task.Delay(diff, token);
             }
 
             try
             {
-                await _apiService.RequestSongAsync(record.BaseUri, record.StationId, record.RequestId);
-                await _dbActions.UpdateAzuraCastStationAsync(record.GuildId, record.StationId, updateLastRequestTime: true);
-                await _dbActions.CreateAzuraCastStationRequestAsync(record.GuildId, record.StationId, record.SongId);
+                await _apiService.RequestSongAsync(queueItem.BaseUri, queueItem.StationId, queueItem.RequestId);
+                await _dbActions.UpdateAzuraCastStationAsync(queueItem.GuildId, queueItem.StationId, updateLastRequestTime: true);
+                await _dbActions.CreateAzuraCastStationRequestAsync(queueItem.GuildId, queueItem.StationId, queueItem.SongId);
 
-                _logger.BackgroundServiceSongRequestFinished(record.RequestId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
+                _logger.BackgroundServiceSongRequestFinished(queueItem.RequestId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
             }
             catch (HttpRequestException)
             {
-                record.Timestamp = DateTimeOffset.UtcNow;
-                _cronJobManager.RunAzuraRequestJob(record);
+                queueItem.Timestamp = DateTimeOffset.UtcNow;
+                _cronJobManager.RunAzuraRequestJob(queueItem);
 
-                _logger.BackgroundServiceSongRequestRequeued(record.RequestId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
+                _logger.BackgroundServiceSongRequestRequeued(queueItem.RequestId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
             }
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)

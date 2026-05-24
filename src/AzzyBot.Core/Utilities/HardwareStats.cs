@@ -5,7 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-using AzzyBot.Core.Utilities.Records;
+using AzzyBot.Core.Models;
 
 namespace AzzyBot.Core.Utilities;
 
@@ -140,7 +140,7 @@ public static class HardwareStats
         return result;
     }
 
-    public static async Task<AppCpuLoadRecord> GetSystemCpuLoadAsync()
+    public static async Task<AppCpuLoadModel> GetSystemCpuLoadAsync()
     {
         string loadInfoLines = await File.ReadAllTextAsync(Path.Combine(ProcDir, "loadavg"));
         string[] loadInfoParts = loadInfoLines.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -151,7 +151,7 @@ public static class HardwareStats
         return new(oneMin, fiveMin, fifteenMin);
     }
 
-    public static AppDiskUsageRecord GetSystemDiskUsage()
+    public static AppDiskUsageModel GetSystemDiskUsage()
     {
         DriveInfo drive = Array.Find(DriveInfo.GetDrives(), static d => d.IsReady && d.Name == "/") ?? throw new InvalidOperationException("There is more than one root drive");
         double totalSize = drive.TotalSize / (1024.0 * 1024.0 * 1024.0);
@@ -161,7 +161,7 @@ public static class HardwareStats
         return new(Math.Round(totalSize, 2), Math.Round(totalFreeSpace, 2), Math.Round(totalUsedSpace, 2));
     }
 
-    public static async Task<AppMemoryUsageRecord> GetSystemMemoryUsageAsync()
+    public static async Task<AppMemoryUsageModel> GetSystemMemoryUsageAsync()
     {
         string[] memoryInfoLines = await File.ReadAllLinesAsync(Path.Combine(ProcDir, "meminfo"));
         long memTotalKb = 0;
@@ -198,15 +198,15 @@ public static class HardwareStats
         return new(memTotalGb, memUsedGb);
     }
 
-    public static async Task<Dictionary<string, AppNetworkSpeedRecord>> GetSystemNetworkUsageAsync()
+    public static async Task<Dictionary<string, AppNetworkSpeedModel>> GetSystemNetworkUsageAsync()
     {
         const int delayInMs = 1000;
         const int bytesPerKbit = 125;
 
-        static async Task<Dictionary<string, AppNetworkStatsRecord>> ReadNetworkStatsAsync()
+        static async Task<Dictionary<string, AppNetworkStatsModel>> ReadNetworkStatsAsync()
         {
             string[] lines = await File.ReadAllLinesAsync(Path.Combine(ProcDir, "net", "dev"));
-            Dictionary<string, AppNetworkStatsRecord> networkStats = [];
+            Dictionary<string, AppNetworkStatsModel> networkStats = [];
 
             for (int i = 2; i < lines.Length; i++)
             {
@@ -225,12 +225,12 @@ public static class HardwareStats
             return networkStats;
         }
 
-        Dictionary<string, AppNetworkStatsRecord> prevNetworkStats = await ReadNetworkStatsAsync();
+        Dictionary<string, AppNetworkStatsModel> prevNetworkStats = await ReadNetworkStatsAsync();
         await Task.Delay(delayInMs);
-        Dictionary<string, AppNetworkStatsRecord> currNetworkStats = await ReadNetworkStatsAsync();
+        Dictionary<string, AppNetworkStatsModel> currNetworkStats = await ReadNetworkStatsAsync();
 
-        Dictionary<string, AppNetworkSpeedRecord> networkSpeeds = new(prevNetworkStats.Count);
-        foreach (KeyValuePair<string, AppNetworkStatsRecord> kvp in prevNetworkStats)
+        Dictionary<string, AppNetworkSpeedModel> networkSpeeds = new(prevNetworkStats.Count);
+        foreach (KeyValuePair<string, AppNetworkStatsModel> kvp in prevNetworkStats)
         {
             string networkName = kvp.Key;
             double rxSpeedKbits = (currNetworkStats[networkName].Received - kvp.Value.Received) * 8.0 / bytesPerKbit / (delayInMs / 1000.0);

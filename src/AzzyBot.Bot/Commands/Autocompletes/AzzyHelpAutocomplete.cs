@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Models;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
-using AzzyBot.Bot.Utilities.Records;
 
 using DSharpPlus.Commands.Processors.SlashCommands;
 using DSharpPlus.Commands.Processors.SlashCommands.ArgumentModifiers;
@@ -34,20 +34,17 @@ public sealed class AzzyHelpAutocomplete(IOptions<AzzyBotSettings> settings) : I
         bool approvedDebug = guildId == _settings.ServerId;
         string? search = context.UserInput;
         List<DiscordAutoCompleteChoice> results = new(25);
-        foreach (List<AzzyHelpRecord> kvp in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member).Select(k => k.Value))
+        foreach (List<AzzyHelpModel> kvp in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member).Select(k => k.Value))
         {
             if (results.Count is 25)
                 break;
 
-            if (!string.IsNullOrWhiteSpace(search) && kvp.TrueForAll(r => !r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)))
-                continue;
-
-            foreach (string record in kvp.Where(r => !string.IsNullOrWhiteSpace(search) && r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)).Select(r => r.Name))
+            foreach (string model in kvp.Where(r => string.IsNullOrWhiteSpace(search) || r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)).Select(r => r.Name))
             {
                 if (results.Count is 25)
                     break;
 
-                results.Add(new(record, record));
+                results.Add(new(model, model));
             }
         }
 

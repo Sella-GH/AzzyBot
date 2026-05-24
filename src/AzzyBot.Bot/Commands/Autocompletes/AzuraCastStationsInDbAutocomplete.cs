@@ -4,12 +4,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Models.AzuraCast;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules.Interfaces;
-using AzzyBot.Bot.Utilities.Records.AzuraCast;
+using AzzyBot.Core.Enums;
 using AzzyBot.Core.Utilities;
-using AzzyBot.Core.Utilities.Encryption;
-using AzzyBot.Core.Utilities.Enums;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Logging;
 using AzzyBot.Data.Services.Interfaces;
@@ -61,7 +60,7 @@ public sealed class AzuraCastStationsInDbAutocomplete(ILogger<AzuraCastStationsI
 
             string stationApiKey = (string.IsNullOrEmpty(station.ApiKey)) ? adminApiKey : Crypto.Decrypt(station.ApiKey);
 
-            AzuraStationRecord? azuraStation;
+            AzuraStationModel? azuraStation;
             try
             {
                 azuraStation = await _azuraCast.GetStationAsync(baseUrl, stationApiKey, station.StationId);
@@ -80,7 +79,7 @@ public sealed class AzuraCastStationsInDbAutocomplete(ILogger<AzuraCastStationsI
             if (!string.IsNullOrWhiteSpace(search) && !azuraStation.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            AzuraAdminStationConfigRecord? config = await _azuraCast.GetStationAdminConfigAsync(baseUrl, adminApiKey, station.StationId);
+            AzuraAdminStationConfigModel? config = await _azuraCast.GetStationAdminConfigAsync(baseUrl, adminApiKey, station.StationId);
             if (config is null)
             {
                 await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint.\n{_azuraCast.AzuraCastPermissionsWiki}");

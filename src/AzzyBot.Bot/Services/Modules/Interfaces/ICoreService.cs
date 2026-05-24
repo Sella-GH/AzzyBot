@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using AzzyBot.Bot.Utilities.Structs;
+using AzzyBot.Bot.Structs;
 using AzzyBot.Data.Entities;
 
 namespace AzzyBot.Bot.Services.Modules.Interfaces;

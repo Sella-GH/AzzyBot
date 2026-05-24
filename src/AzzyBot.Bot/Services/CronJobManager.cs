@@ -2,9 +2,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Models.AzuraCast;
 using AzzyBot.Bot.Services.CronJobs;
 using AzzyBot.Bot.Services.Interfaces;
-using AzzyBot.Bot.Utilities.Records.AzuraCast;
 
 using NCronJob;
 
@@ -18,8 +18,8 @@ public sealed class CronJobManager(IInstantJobRegistry jobRegistry, IDiscordBotS
     public void RunAzzyBotInactiveGuildJob()
         => _jobRegistry.RunInstantJob<AzzyBotInactiveGuildJob>();
 
-    public void RunAzuraRequestJob(AzuraCustomQueueItemRecord record)
-        => _jobRegistry.RunInstantJob<AzuraRequestJob>(record);
+    public void RunAzuraRequestJob(AzuraCustomQueueItemModel queueItem)
+        => _jobRegistry.RunInstantJob<AzuraRequestJob>(queueItem);
 
     public async Task<bool> TryHandleAsync(IJobExecutionContext jobExecutionContext, Exception exception, CancellationToken cancellationToken)
     {
