@@ -6,11 +6,11 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Models;
+using AzzyBot.Bot.Models.AzuraCast;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules.Interfaces;
-using AzzyBot.Bot.Utilities.Records;
-using AzzyBot.Bot.Utilities.Records.AzuraCast;
-using AzzyBot.Core.Utilities.Encryption;
+using AzzyBot.Core.Utilities;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Logging;
 using AzzyBot.Data.Services.Interfaces;
@@ -55,11 +55,11 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
         Uri baseUrl = new(Crypto.Decrypt(station.AzuraCast.BaseUrl));
         string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.AzuraCast.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
 
-        AzuraStationRecord? record = null;
+        AzuraStationModel? stationModel = null;
         try
         {
-            record = await _azuraCast.GetStationAsync(baseUrl, apiKey, stationId);
-            if (record is null)
+            stationModel = await _azuraCast.GetStationAsync(baseUrl, apiKey, stationId);
+            if (stationModel is null)
             {
                 await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({stationId}) endpoint.\n{_azuraCast.AzuraCastPermissionsWiki}");
                 return [];
@@ -72,15 +72,15 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
         }
 
         // Try to detect if the bot is already listening to the station
-        IEnumerable<AzuraStationListenerRecord>? listeners = await _azuraCast.GetStationListenersAsync(baseUrl, apiKey, stationId);
-        AzzyIpAddressRecord ipAddresses = await _webRequest.GetIpAddressesAsync();
+        IEnumerable<AzuraStationListenerModel>? listeners = await _azuraCast.GetStationListenersAsync(baseUrl, apiKey, stationId);
+        AzzyIpAddressModel ipAddresses = await _webRequest.GetIpAddressesAsync();
         string? playingMountPoint = listeners?.FirstOrDefault(l => l.Ip == ipAddresses.Ipv4 || l.Ip == ipAddresses.Ipv6)?.MountName;
 
         // List all available mounts
         string? search = context.UserInput;
-        int maxMounts = (record.HlsEnabled) ? 24 : 25;
+        int maxMounts = (stationModel.HlsEnabled) ? 24 : 25;
         List<DiscordAutoCompleteChoice> results = new(25);
-        foreach (AzuraStationMountRecord mount in record.Mounts)
+        foreach (AzuraStationMountModel mount in stationModel.Mounts)
         {
             if (results.Count == maxMounts)
                 break;
@@ -102,15 +102,15 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
             }
 
             name.Append(CultureInfo.InvariantCulture, $" - {mount.Listeners.Total} {((mount.Listeners.Total is not 1) ? "Listeners" : "Listener")}");
-            if (mount.IsDefault && !record.HlsIsDefault)
+            if (mount.IsDefault && !stationModel.HlsIsDefault)
                 name.Append(" (Default)");
 
             results.Add(new(name.ToString(), mount.Id));
         }
 
-        if ((string.IsNullOrWhiteSpace(search) || search.Contains("hls", StringComparison.OrdinalIgnoreCase)) && record.HlsEnabled)
+        if ((string.IsNullOrWhiteSpace(search) || search.Contains("hls", StringComparison.OrdinalIgnoreCase)) && stationModel.HlsEnabled)
         {
-            IEnumerable<AzuraHlsMountRecord>? hlsMounts = await _azuraCast.GetStationHlsMountPointsAsync(baseUrl, apiKey, stationId);
+            IEnumerable<AzuraHlsMountModel>? hlsMounts = await _azuraCast.GetStationHlsMountPointsAsync(baseUrl, apiKey, stationId);
             if (hlsMounts is null)
                 return results;
 
@@ -125,7 +125,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
             name.Append("HTTP Live Streaming ");
             name.Append(CultureInfo.InvariantCulture, $"({hlsMinBitrate} - {hlsMaxBitrate} kbps - AAC) ");
             name.Append(CultureInfo.InvariantCulture, $"- {hlsListeners} {((hlsListeners is not 1) ? "Listeners" : "Listener")}");
-            if (record.HlsIsDefault)
+            if (stationModel.HlsIsDefault)
                 name.Append(" (Default)");
 
             results.Add(new(name.ToString(), 0));

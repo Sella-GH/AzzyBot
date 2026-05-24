@@ -2,15 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-using AzzyBot.Bot.Utilities.Records.AzuraCast;
+using AzzyBot.Bot.Models.AzuraCast;
 
 namespace AzzyBot.Bot.Utilities;
 
 [SuppressMessage("Roslynator", "RCS1241:Implement non-generic counterpart", Justification = "Not needed")]
-public sealed class AzuraFileComparer : IEqualityComparer<AzuraFilesRecord>
+public sealed class AzuraFileComparer : IEqualityComparer<AzuraFilesModel>
 {
     [SuppressMessage("Style", "IDE0046:Convert to conditional expression", Justification = "Code style")]
-    public bool Equals(AzuraFilesRecord? x, AzuraFilesRecord? y)
+    public bool Equals(AzuraFilesModel? x, AzuraFilesModel? y)
     {
         if (ReferenceEquals(x, y))
             return true;
@@ -21,7 +21,7 @@ public sealed class AzuraFileComparer : IEqualityComparer<AzuraFilesRecord>
         return x.UniqueId == y.UniqueId && x.SongId == y.SongId;
     }
 
-    public int GetHashCode(AzuraFilesRecord? obj)
+    public int GetHashCode(AzuraFilesModel? obj)
     {
         if (obj is null)
             return 0;

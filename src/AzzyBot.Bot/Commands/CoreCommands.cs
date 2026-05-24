@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Checks;
+using AzzyBot.Bot.Enums;
+using AzzyBot.Bot.Helpers;
 using AzzyBot.Bot.Logging;
+using AzzyBot.Bot.Models;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
-using AzzyBot.Bot.Utilities.Enums;
-using AzzyBot.Bot.Utilities.Helpers;
-using AzzyBot.Bot.Utilities.Records;
-using AzzyBot.Core.Utilities.Records;
+using AzzyBot.Core.Models;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services.Interfaces;
 
@@ -82,7 +82,7 @@ public sealed class CoreCommands
             List<DiscordEmbed> embeds = new(10);
             if (string.IsNullOrWhiteSpace(command))
             {
-                foreach (KeyValuePair<string, List<AzzyHelpRecord>> kvp in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member))
+                foreach (KeyValuePair<string, List<AzzyHelpModel>> kvp in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member))
                 {
                     if (embeds.Count is 10)
                         break;
@@ -93,7 +93,7 @@ public sealed class CoreCommands
             }
             else
             {
-                AzzyHelpRecord helpCommand = AzzyHelp.GetSingleCommand(context.Extension.Commands, command, adminServer, approvedDebug, member);
+                AzzyHelpModel helpCommand = AzzyHelp.GetSingleCommand(context.Extension.Commands, command, adminServer, approvedDebug, member);
                 DiscordEmbed embed = EmbedBuilder.BuildAzzyHelpEmbed(helpCommand);
                 embeds.Add(embed);
             }
@@ -112,9 +112,9 @@ public sealed class CoreCommands
         }
 
         [Command("stats")]
-        public sealed class CoreStats(IOptions<AppStats> stats, ILogger<CoreStats> logger)
+        public sealed class CoreStats(IOptions<AppStatsModel> stats, ILogger<CoreStats> logger)
         {
-            private readonly AppStats _stats = stats.Value;
+            private readonly AppStatsModel _stats = stats.Value;
             private readonly ILogger<CoreStats> _logger = logger;
 
             [Command("hardware"), Description("Shows information about the hardware side of the bot.")]

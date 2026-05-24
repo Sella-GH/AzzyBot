@@ -5,10 +5,10 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Logging;
+using AzzyBot.Bot.Models;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
-using AzzyBot.Bot.Utilities.Records;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Data.Services.Interfaces;
 
@@ -54,8 +54,8 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
             return;
         }
 
-        AzzyUpdateRecord? updaterRecord = (isPreview) ? JsonSerializer.Deserialize(body, JsonSourceGen.Default.ListAzzyUpdateRecord)?[0] : JsonSerializer.Deserialize(body, JsonSourceGen.Default.AzzyUpdateRecord);
-        if (updaterRecord is null)
+        AzzyUpdateModel? updaterModel = (isPreview) ? JsonSerializer.Deserialize(body, JsonSourceGen.Default.ListAzzyUpdateModel)?[0] : JsonSerializer.Deserialize(body, JsonSourceGen.Default.AzzyUpdateModel);
+        if (updaterModel is null)
         {
             _logger.OnlineVersionUnserializable();
             return;
@@ -63,14 +63,14 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
 
         await _dbActions.UpdateAzzyBotAsync(updateLastUpdateCheck: true);
 
-        string onlineVersion = updaterRecord.Name;
+        string onlineVersion = updaterModel.Name;
         if (localVersion == onlineVersion)
             return;
 
-        if (!DateTimeOffset.TryParse(updaterRecord.CreatedAt, CultureInfo.CurrentCulture, out DateTimeOffset releaseDate))
+        if (!DateTimeOffset.TryParse(updaterModel.CreatedAt, CultureInfo.CurrentCulture, out DateTimeOffset releaseDate))
             releaseDate = DateTimeOffset.Now;
 
-        await SendUpdateMessageAsync(onlineVersion, releaseDate, updaterRecord.Body);
+        await SendUpdateMessageAsync(onlineVersion, releaseDate, updaterModel.Body);
     }
 
     private async Task SendUpdateMessageAsync(string updateVersion, DateTimeOffset releaseDate, string changelog)

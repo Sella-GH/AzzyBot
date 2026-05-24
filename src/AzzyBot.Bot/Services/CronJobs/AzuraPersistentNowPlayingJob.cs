@@ -5,11 +5,11 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Logging;
+using AzzyBot.Bot.Models.AzuraCast;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Utilities;
-using AzzyBot.Bot.Utilities.Records.AzuraCast;
-using AzzyBot.Core.Utilities.Encryption;
+using AzzyBot.Core.Utilities;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services.Interfaces;
 
@@ -68,7 +68,7 @@ public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayi
         string apiKey = (!string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(station.AzuraCast.AdminApiKey);
         Uri baseUrl = new(Crypto.Decrypt(station.AzuraCast.BaseUrl));
 
-        AzuraNowPlayingDataRecord? nowPlaying = await _apiService.GetNowPlayingAsync(baseUrl, apiKey, station.StationId);
+        AzuraNowPlayingDataModel? nowPlaying = await _apiService.GetNowPlayingAsync(baseUrl, apiKey, station.StationId);
         if (nowPlaying?.IsOnline is not true)
         {
             // Fail-fast: If there's no message to delete, we can skip directly to the end

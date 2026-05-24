@@ -10,12 +10,11 @@ using System.Threading.Tasks;
 
 using AzzyBot.Bot.Commands.Autocompletes;
 using AzzyBot.Bot.Commands.Choices;
+using AzzyBot.Bot.Helpers;
 using AzzyBot.Bot.Logging;
 using AzzyBot.Bot.Services.Interfaces;
-using AzzyBot.Bot.Utilities.Helpers;
-using AzzyBot.Bot.Utilities.Structs;
+using AzzyBot.Bot.Structs;
 using AzzyBot.Core.Utilities;
-using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services.Interfaces;
 

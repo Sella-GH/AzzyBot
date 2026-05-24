@@ -28,7 +28,7 @@
 
   <ItemGroup Condition="'$(Configuration)'=='Release' OR '$(Configuration)'=='Docker'">
     <Compile Remove="Commands\DebugCommands.cs" />
-    <Compile Remove="Utilities\Structs\AzzyDebugWebRequestStruct.cs" />
+    <Compile Remove="Structs\AzzyDebugWebRequestStruct.cs" />
   </ItemGroup>
 
   <ItemGroup>

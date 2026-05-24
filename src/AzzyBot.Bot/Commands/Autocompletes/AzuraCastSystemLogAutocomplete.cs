@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
+using AzzyBot.Bot.Models.AzuraCast;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Services.Modules.Interfaces;
-using AzzyBot.Bot.Utilities.Records.AzuraCast;
-using AzzyBot.Core.Utilities.Encryption;
+using AzzyBot.Core.Utilities;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Logging;
 using AzzyBot.Data.Services.Interfaces;
@@ -46,7 +46,7 @@ public sealed class AzuraCastSystemLogAutocomplete(ILogger<AzuraCastSystemLogAut
         string? search = context.UserInput;
         Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
         string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
-        AzuraSystemLogsRecord? systemLogs;
+        AzuraSystemLogsModel? systemLogs;
         try
         {
             systemLogs = await _azuraCastApi.GetSystemLogsAsync(baseUrl, apiKey);
@@ -63,7 +63,7 @@ public sealed class AzuraCastSystemLogAutocomplete(ILogger<AzuraCastSystemLogAut
         }
 
         List<DiscordAutoCompleteChoice> results = new(25);
-        foreach (AzuraSystemLogEntryRecord log in systemLogs.Logs)
+        foreach (AzuraSystemLogEntryModel log in systemLogs.Logs)
         {
             if (results.Count is 25)
                 break;

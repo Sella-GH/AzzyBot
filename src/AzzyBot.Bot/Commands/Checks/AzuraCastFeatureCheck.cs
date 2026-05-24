@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-using AzzyBot.Bot.Utilities.Enums;
+using AzzyBot.Bot.Enums;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Logging;
 using AzzyBot.Data.Services.Interfaces;
