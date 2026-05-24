@@ -28,10 +28,9 @@ public sealed class GuildsAutocomplete(IOptions<AzzyBotSettings> settings, IDisc
         if (guilds.Count is 0)
             return ValueTask.FromResult(new List<DiscordAutoCompleteChoice>(1).AsEnumerable());
 
-        string? search = context.UserInput;
-
-        List<DiscordAutoCompleteChoice> results = new(25);
         string commandName = context.Command.Name;
+        string? search = context.UserInput;
+        List<DiscordAutoCompleteChoice> results = new(25);
         foreach (DiscordGuild guild in guilds.Values)
         {
             if (results.Count is 25)

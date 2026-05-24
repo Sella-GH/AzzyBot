@@ -57,7 +57,7 @@ public sealed class AzuraCastStationsOnlineAutocomplete(ILogger<AzuraCastStation
             if (results.Count is 25)
                 break;
 
-            if (!string.IsNullOrWhiteSpace(search) && station.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(search) && !station.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
                 continue;
 
             results.Add(new DiscordAutoCompleteChoice($"{station.Name} ({Misc.GetReadableBool(station.IsEnabled, ReadableBool.EnabledDisabled)})", station.Id));

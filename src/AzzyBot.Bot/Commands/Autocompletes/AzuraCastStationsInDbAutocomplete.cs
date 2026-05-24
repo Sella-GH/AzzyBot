@@ -22,9 +22,9 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class AzuraCastStationsinDbAutocomplete(ILogger<AzuraCastStationsinDbAutocomplete> logger, IAzuraCastApiService azuraCastApi, IAzuraCastPingService azuraCastPing, IDbActions dbActions, IDiscordBotService botService) : IAutoCompleteProvider
+public sealed class AzuraCastStationsInDbAutocomplete(ILogger<AzuraCastStationsInDbAutocomplete> logger, IAzuraCastApiService azuraCastApi, IAzuraCastPingService azuraCastPing, IDbActions dbActions, IDiscordBotService botService) : IAutoCompleteProvider
 {
-    private readonly ILogger<AzuraCastStationsinDbAutocomplete> _logger = logger;
+    private readonly ILogger<AzuraCastStationsInDbAutocomplete> _logger = logger;
     private readonly IAzuraCastApiService _azuraCast = azuraCastApi;
     private readonly IAzuraCastPingService _azuraCastPing = azuraCastPing;
     private readonly IDbActions _dbActions = dbActions;
@@ -77,7 +77,7 @@ public sealed class AzuraCastStationsinDbAutocomplete(ILogger<AzuraCastStationsi
                 return results;
             }
 
-            if (!string.IsNullOrWhiteSpace(search) && azuraStation.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(search) && !azuraStation.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
                 continue;
 
             AzuraAdminStationConfigRecord? config = await _azuraCast.GetStationAdminConfigAsync(baseUrl, adminApiKey, station.StationId);

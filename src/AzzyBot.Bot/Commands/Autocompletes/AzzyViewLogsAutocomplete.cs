@@ -18,9 +18,8 @@ public sealed class AzzyViewLogsAutocomplete : IAutoCompleteProvider
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        List<DiscordAutoCompleteChoice> results = new(25);
         string? search = context.UserInput;
-
+        List<DiscordAutoCompleteChoice> results = new(25);
         foreach (string file in FileOperations.GetFilesInDirectory("Logs").OrderByDescending(static f => f))
         {
             if (results.Count is 25)

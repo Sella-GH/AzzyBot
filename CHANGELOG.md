@@ -6,10 +6,11 @@
 ### Improvements
 - The bot now also sends a welcome notification to the first channel it can see when it's added to a server
   - This is in addition to the DM sent to the server owner and is intended to make sure that the bot can reach the users in some way
-- The command `config add-azuracast-station` was improved by adding an autocomplete of only display existing stations on the server to reduce issues
+- The command `config add-azuracast-station` was improved by adding autocomplete that displays only existing stations from the server to reduce issues
 - We now log the full exception when the ChecksFailedException occurs to be able to see what the issue is
 
 ### Fixes
+- A bug was fixed regarding searches in autocompletes for stations
 - An `ArgumentException` could appear when you have multiple stations using the same discord roles
 
 ### Development

@@ -247,7 +247,7 @@ public sealed class ConfigCommands
         public async ValueTask DeleteAzuraCastStationAsync
         (
             SlashCommandContext context,
-            [Description("Choose the station you want to delete."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int station
+            [Description("Choose the station you want to delete."), SlashAutoCompleteProvider<AzuraCastStationsInDbAutocomplete>] int station
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -415,7 +415,7 @@ public sealed class ConfigCommands
         public async ValueTask UpdateAzuraCastStationAsync
         (
             SlashCommandContext context,
-            [Description("Choose the station you want to modify."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int station,
+            [Description("Choose the station you want to modify."), SlashAutoCompleteProvider<AzuraCastStationsInDbAutocomplete>] int station,
             [Description("Modify the station id.")] int? stationId = null,
             [Description("Modify the api key.")] string? apiKey = null,
             [Description("Modify the group that has the admin permissions on this station.")] DiscordRole? adminGroup = null,
@@ -494,7 +494,7 @@ public sealed class ConfigCommands
         public async ValueTask UpdateAzuraCastStationChecksAsync
         (
             SlashCommandContext context,
-            [Description("Choose the station you want to modify the checks."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int station,
+            [Description("Choose the station you want to modify the checks."), SlashAutoCompleteProvider<AzuraCastStationsInDbAutocomplete>] int station,
             [Description("Enable or disable the check if server files have been changed. This also enables local file caching."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int fileChanges = 0
         )
         {

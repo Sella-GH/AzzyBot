@@ -26,14 +26,13 @@ public sealed class AzzyHelpAutocomplete(IOptions<AzzyBotSettings> settings) : I
         ArgumentNullException.ThrowIfNull(context.Guild);
         ArgumentNullException.ThrowIfNull(context.Member);
 
-        string? search = context.UserInput;
-
         IEnumerable<DiscordUser> botOwners = context.Client.CurrentApplication.Owners;
         ulong guildId = context.Guild.Id;
         DiscordMember member = context.Member;
 
         bool adminServer = botOwners.Any(u => u.Id == context.User.Id && member.Permissions.HasPermission(DiscordPermission.Administrator) && guildId == _settings.ServerId);
         bool approvedDebug = guildId == _settings.ServerId;
+        string? search = context.UserInput;
         List<DiscordAutoCompleteChoice> results = new(25);
         foreach (List<AzzyHelpRecord> kvp in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member).Select(k => k.Value))
         {
