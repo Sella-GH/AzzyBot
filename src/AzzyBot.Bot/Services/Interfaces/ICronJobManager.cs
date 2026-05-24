@@ -1,6 +1,8 @@
 using AzzyBot.Bot.Models.AzuraCast;
 using AzzyBot.Data.Entities;
 
+using DSharpPlus.Entities;
+
 using NCronJob;
 
 namespace AzzyBot.Bot.Services.Interfaces;
@@ -15,7 +17,8 @@ public interface ICronJobManager : IExceptionHandler
     void RunAzuraPersistentNowPlayingJob();
     void RunAzuraRequestJob(AzuraCustomQueueItemModel queueItem);
     void RunAzuraStatusPingJob(AzuraCastEntity azuraCast);
-    void RunAzzyBotCheckPermissionsJob();
+    void RunAzzyBotCheckPermissionsJob(DiscordGuild guild, ulong[] guildIds);
+    void RunAzzyBotCheckPermissionsJob(GuildEntity guild);
     void RunAzzyBotInactiveGuildJob();
     void RunAzzyBotUpdateCheckJob();
     void RunDatabaseCleaningJob();

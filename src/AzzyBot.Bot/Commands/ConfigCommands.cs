@@ -154,7 +154,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            await _botService.CheckPermissionsAsync(context.Guild, [notificationChannel.Id, outagesChannel.Id]);
+            _cronJobManager.RunAzzyBotCheckPermissionsJob(context.Guild, [notificationChannel.Id, outagesChannel.Id]);
             if (dAzuraCast.Checks.ServerStatus)
                 _cronJobManager.RunAzuraStatusPingJob(dAzuraCast);
         }
@@ -318,7 +318,7 @@ public sealed class ConfigCommands
                     channels[0] = outagesChannel.Id;
                 }
 
-                await _botService.CheckPermissionsAsync(context.Guild, [.. channels]);
+                _cronJobManager.RunAzzyBotCheckPermissionsJob(context.Guild, [.. channels]);
             }
 
             if (url is not null)
@@ -456,7 +456,7 @@ public sealed class ConfigCommands
                     channels.Add(uploadChannel.Id);
 
                 if (channels.Count is not 0)
-                    await _botService.CheckPermissionsAsync(context.Guild, [.. channels]);
+                    _cronJobManager.RunAzzyBotCheckPermissionsJob(context.Guild, [.. channels]);
             }
 
             if (stationId.HasValue || !string.IsNullOrWhiteSpace(apiKey))
@@ -566,7 +566,7 @@ public sealed class ConfigCommands
             await context.EditResponseAsync(GeneralStrings.CoreSettingsModified);
 
             if (adminChannel is not null)
-                await _botService.CheckPermissionsAsync(context.Guild, [adminChannel.Id]);
+                _cronJobManager.RunAzzyBotCheckPermissionsJob(context.Guild, [adminChannel.Id]);
         }
 
         [Command("get-settings"), Description("Get all configured settings in a direct message.")]

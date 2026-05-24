@@ -5,7 +5,10 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Models.AzuraCast;
 using AzzyBot.Bot.Services.CronJobs;
 using AzzyBot.Bot.Services.Interfaces;
+using AzzyBot.Bot.Structs;
 using AzzyBot.Data.Entities;
+
+using DSharpPlus.Entities;
 
 using NCronJob;
 
@@ -40,8 +43,18 @@ public sealed class CronJobManager(IInstantJobRegistry jobRegistry, IDiscordBotS
     public void RunAzuraStatusPingJob(AzuraCastEntity azuraCast)
         => _jobRegistry.RunInstantJob<AzuraStatusPingJob>(azuraCast);
 
-    public void RunAzzyBotCheckPermissionsJob()
-        => _jobRegistry.RunInstantJob<AzzyBotCheckPermissionsJob>();
+    public void RunAzzyBotCheckPermissionsJob(DiscordGuild guild, ulong[] guildIds)
+        => _jobRegistry.RunInstantJob<AzzyBotCheckPermissionsJob>(new AzzyCheckPermissionsStruct()
+        {
+            DiscordGuild = guild,
+            DiscordGuildIds = [.. guildIds]
+        });
+
+    public void RunAzzyBotCheckPermissionsJob(GuildEntity guild)
+        => _jobRegistry.RunInstantJob<AzzyBotCheckPermissionsJob>(new AzzyCheckPermissionsStruct()
+        {
+            GuildEntity = guild
+        });
 
     public void RunAzzyBotInactiveGuildJob()
         => _jobRegistry.RunInstantJob<AzzyBotInactiveGuildJob>();
