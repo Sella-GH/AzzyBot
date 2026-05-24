@@ -14,14 +14,9 @@ public interface ICronJobManager : IExceptionHandler
     void RunAzuraCheckFileChangesJob(AzuraCastEntity azuraCast);
     void RunAzuraCheckFileChangesJob(AzuraCastStationEntity station);
     void RunAzuraCheckUpdatesJob(AzuraCastEntity azuraCast);
-    void RunAzuraPersistentNowPlayingJob();
     void RunAzuraRequestJob(AzuraCustomQueueItemModel queueItem);
     void RunAzuraStatusPingJob(AzuraCastEntity azuraCast);
     void RunAzzyBotCheckPermissionsJob(DiscordGuild guild, ulong[] guildIds);
     void RunAzzyBotCheckPermissionsJob(GuildEntity guild);
     void RunAzzyBotInactiveGuildJob();
-    void RunAzzyBotUpdateCheckJob();
-    void RunDatabaseCleaningJob();
-    void RunLogfileCleaningJob();
-    void RunMusicStreamingPersistentNowPlayingJob();
 }

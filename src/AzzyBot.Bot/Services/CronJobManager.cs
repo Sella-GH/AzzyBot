@@ -34,9 +34,6 @@ public sealed class CronJobManager(IInstantJobRegistry jobRegistry, IDiscordBotS
     public void RunAzuraCheckUpdatesJob(AzuraCastEntity azuraCast)
         => _jobRegistry.RunInstantJob<AzuraCheckUpdatesJob>(azuraCast);
 
-    public void RunAzuraPersistentNowPlayingJob()
-        => _jobRegistry.RunInstantJob<AzuraPersistentNowPlayingJob>();
-
     public void RunAzuraRequestJob(AzuraCustomQueueItemModel queueItem)
         => _jobRegistry.RunInstantJob<AzuraRequestJob>(queueItem);
 
@@ -58,18 +55,6 @@ public sealed class CronJobManager(IInstantJobRegistry jobRegistry, IDiscordBotS
 
     public void RunAzzyBotInactiveGuildJob()
         => _jobRegistry.RunInstantJob<AzzyBotInactiveGuildJob>();
-
-    public void RunAzzyBotUpdateCheckJob()
-        => _jobRegistry.RunInstantJob<AzzyBotUpdateCheckJob>();
-
-    public void RunDatabaseCleaningJob()
-        => _jobRegistry.RunInstantJob<DatabaseCleaningJob>();
-
-    public void RunLogfileCleaningJob()
-        => _jobRegistry.RunInstantJob<LogfileCleaningJob>();
-
-    public void RunMusicStreamingPersistentNowPlayingJob()
-        => _jobRegistry.RunInstantJob<MusicStreamingPersistentNowPlayingJob>();
 
     public async Task<bool> TryHandleAsync(IJobExecutionContext jobExecutionContext, Exception exception, CancellationToken cancellationToken)
     {
