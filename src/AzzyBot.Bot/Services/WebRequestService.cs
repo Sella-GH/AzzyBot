@@ -214,7 +214,7 @@ public sealed class WebRequestService : IWebRequestService
 
             const int maxRetries = 7;
             int retryCount = 0;
-            while (status is HttpStatusCode.TooManyRequests && retryCount <= maxRetries)
+            while (status is HttpStatusCode.TooManyRequests && retryCount is < maxRetries)
             {
                 _logger.BotRatelimited(url, retryCount);
 
@@ -284,7 +284,7 @@ public sealed class WebRequestService : IWebRequestService
 
             const int maxRetries = 7;
             int retryCount = 0;
-            while (status is HttpStatusCode.TooManyRequests && retryCount <= maxRetries)
+            while (status is HttpStatusCode.TooManyRequests && retryCount is < maxRetries)
             {
                 _logger.BotRatelimited(url, retryCount);
 

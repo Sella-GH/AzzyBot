@@ -204,18 +204,21 @@ public sealed class DebugCommands
 
             if (string.IsNullOrEmpty(req.Content))
             {
-                await context.EditResponseAsync(sb.ToString());
+                await context.DeleteResponseAsync();
+                await context.FollowupAsync(sb.ToString(), ephemeral: true);
                 return;
             }
 
             string fileName = $"WebRequestDebug_{DateTime.UtcNow:yyyy-MM-dd_HH-mm-ss-fffffff}.txt";
             string filePath = await FileOperations.CreateTempFileAsync(req.Content, fileName);
             await using FileStream fs = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
-
             DiscordMessageBuilder builder = new();
-            builder.WithContent(sb.ToString());
             builder.AddFile(fileName, fs, AddFileOptions.CloseStream);
             await context.EditResponseAsync(builder);
+            if (File.Exists(filePath))
+                FileOperations.DeleteFile(filePath);
+
+            await context.FollowupAsync(sb.ToString(), ephemeral: true);
 
             return;
         }
