@@ -17,5 +17,5 @@ public sealed class MusicStreamingPlatformProvider : IChoiceProvider
     ];
 
     public ValueTask<IEnumerable<DiscordApplicationCommandOptionChoice>> ProvideAsync(CommandParameter parameter)
-    => ValueTask.FromResult(Platforms);
+        => ValueTask.FromResult(Platforms);
 }
