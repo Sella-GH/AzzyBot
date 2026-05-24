@@ -22,9 +22,9 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class AzuraCastStationsAutocomplete(ILogger<AzuraCastStationsAutocomplete> logger, IAzuraCastApiService azuraCastApi, IAzuraCastPingService azuraCastPing, IDbActions dbActions, IDiscordBotService botService) : IAutoCompleteProvider
+public sealed class AzuraCastStationsinDbAutocomplete(ILogger<AzuraCastStationsinDbAutocomplete> logger, IAzuraCastApiService azuraCastApi, IAzuraCastPingService azuraCastPing, IDbActions dbActions, IDiscordBotService botService) : IAutoCompleteProvider
 {
-    private readonly ILogger<AzuraCastStationsAutocomplete> _logger = logger;
+    private readonly ILogger<AzuraCastStationsinDbAutocomplete> _logger = logger;
     private readonly IAzuraCastApiService _azuraCast = azuraCastApi;
     private readonly IAzuraCastPingService _azuraCastPing = azuraCastPing;
     private readonly IDbActions _dbActions = dbActions;

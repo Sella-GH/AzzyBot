@@ -241,7 +241,7 @@ public sealed class MusicStreamingCommands
         public async ValueTask PlayMountAsync
         (
             SlashCommandContext context,
-            [Description("The station you want play."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("The station you want play."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int station,
             [Description("The mount point of the station."), SlashAutoCompleteProvider<AzuraCastMountAutocomplete>] int mountPoint,
             [Description("The volume which should be set. This is only respected when no music is being played.")] int volume = 50
         )

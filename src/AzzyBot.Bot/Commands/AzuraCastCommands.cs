@@ -61,7 +61,7 @@ public sealed class AzuraCastCommands
         public async ValueTask ExportPlaylistsAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to export the playlists."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("The station of which you want to export the playlists."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int station,
             [Description("Choose if you want to export the playlist in M3U or PLS format."), SlashChoiceProvider<AzuraExportPlaylistProvider>] string format,
             [Description("Select the playlist you want to export."), SlashAutoCompleteProvider<AzuraCastPlaylistAutocomplete>] int? userPlaylist = null
         )
@@ -152,7 +152,7 @@ public sealed class AzuraCastCommands
         public async ValueTask ForceApiPermissionCheckAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to check the api key."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int? station = null
+            [Description("The station of which you want to check the api key."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int? station = null
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -192,7 +192,7 @@ public sealed class AzuraCastCommands
         public async ValueTask ForceCacheRefreshAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to refresh the cache."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int? station = null
+            [Description("The station of which you want to refresh the cache."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int? station = null
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -347,7 +347,7 @@ public sealed class AzuraCastCommands
         public async ValueTask StartStationAsync
         (
             SlashCommandContext context,
-            [Description("The station you want to start."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station
+            [Description("The station you want to start."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int station
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -391,7 +391,7 @@ public sealed class AzuraCastCommands
         public async ValueTask SetStationNowPlayingEmbedAsync
         (
             SlashCommandContext context,
-            [Description("The station you want to set the now playing embed for."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("The station you want to set the now playing embed for."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int station,
             [Description("The channel where the now playing embed should be sent.")] DiscordChannel? channel = null
         )
         {
@@ -453,7 +453,7 @@ public sealed class AzuraCastCommands
         public async ValueTask StopStationAsync
         (
             SlashCommandContext context,
-            [Description("The station you want to stop."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station
+            [Description("The station you want to stop."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int station
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -518,7 +518,7 @@ public sealed class AzuraCastCommands
         public async ValueTask ToggleSongRequestsAsync
         (
             SlashCommandContext context,
-            [Description("The station you want to toggle song requests for."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station
+            [Description("The station you want to toggle song requests for."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int station
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -632,7 +632,7 @@ public sealed class AzuraCastCommands
         public async ValueTask AddInternalSongRequestAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to add the song request."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("The station of which you want to add the song request."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int station,
             [Description("The song you want to request."), SlashAutoCompleteProvider<AzuraCastRequestAutocomplete>] string song
         )
         {
@@ -707,7 +707,7 @@ public sealed class AzuraCastCommands
         public async ValueTask DeleteSongRequestAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to delete the song request."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("The station of which you want to delete the song request."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int station,
             [Description("The request id of the song you want to delete."), SlashAutoCompleteProvider<AzuraCastRequestAutocomplete>] int requestId = 0
         )
         {
@@ -750,7 +750,7 @@ public sealed class AzuraCastCommands
         public async ValueTask SkipSongAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to skip the song."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station
+            [Description("The station of which you want to skip the song."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int station
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -806,7 +806,7 @@ public sealed class AzuraCastCommands
         public async ValueTask SwitchPlaylistAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to switch the playlist."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("The station of which you want to switch the playlist."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int station,
             [Description("The playlist you want to switch to."), SlashAutoCompleteProvider<AzuraCastPlaylistAutocomplete>] int playlistId,
             [Description("Choose if you want to disable all other active playlists from the station. Defaults to Yes."), SlashChoiceProvider<BooleanYesNoStateProvider>] int removeOld = 0
         )
@@ -875,7 +875,7 @@ public sealed class AzuraCastCommands
         public async ValueTask GetSongHistoryAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to see the song history."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("The station of which you want to see the song history."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int station,
             [Description("The date of which you want to see the song history in the format YYYY-MM-DD.")] string? date = null
         )
         {
@@ -957,7 +957,7 @@ public sealed class AzuraCastCommands
         public async ValueTask GetSongsInPlaylistAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to see the songs in the playlist."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("The station of which you want to see the songs in the playlist."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int station,
             [Description("The playlist you want to see the songs from."), SlashAutoCompleteProvider<AzuraCastPlaylistAutocomplete>] int playlistId
         )
         {
@@ -1031,7 +1031,7 @@ public sealed class AzuraCastCommands
         public async ValueTask GetNowPlayingAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to see what's played."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station
+            [Description("The station of which you want to see what's played."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int station
         )
         {
             ArgumentNullException.ThrowIfNull(context);
@@ -1128,7 +1128,7 @@ public sealed class AzuraCastCommands
         public async ValueTask SearchSongAsync
         (
             SlashCommandContext context,
-            [Description("The station of which you want to search for a song."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("The station of which you want to search for a song."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int station,
             [Description("The song you want to search for."), SlashAutoCompleteProvider<AzuraCastRequestAutocomplete>] string song
         )
         {
@@ -1273,7 +1273,7 @@ public sealed class AzuraCastCommands
         public async ValueTask UploadFilesAsync
         (
             SlashCommandContext context,
-            [Description("The station you want to upload the file to."), SlashAutoCompleteProvider<AzuraCastStationsAutocomplete>] int station,
+            [Description("The station you want to upload the file to."), SlashAutoCompleteProvider<AzuraCastStationsinDbAutocomplete>] int station,
             [Description("The file you want to upload.")] DiscordAttachment file
         )
         {
