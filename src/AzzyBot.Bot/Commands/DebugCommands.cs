@@ -183,7 +183,7 @@ public sealed class DebugCommands
 
             await context.DeferResponseAsync();
 
-            AzzyDebugWebRequestStruct req = await _webRequestService.DebugGetWebAsync(url, acceptJson: true);
+            AzzyDebugWebRequestStruct req = await _webRequestService.DebugGetWebAsync(url);
             StringBuilder sb = new();
             sb.AppendLine(CultureInfo.InvariantCulture, $"Request Uri: {req.RequestUri}");
             sb.AppendLine(CultureInfo.InvariantCulture, $"Method: {req.Method}");

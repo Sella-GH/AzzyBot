@@ -18,7 +18,7 @@ public interface IWebRequestService
     Task<long> GetPingAsync(Uri uri);
     Task<string?> GetWebAsync(Uri url, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true, bool noLogging = false);
 #if DEBUG || DOCKER_DEBUG
-    Task<AzzyDebugWebRequestStruct> DebugGetWebAsync(Uri url, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true, bool noLogging = false);
+    Task<AzzyDebugWebRequestStruct> DebugGetWebAsync(Uri url);
 #endif
     Task PostWebAsync(Uri url, string? content = null, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true);
     Task PutWebAsync(Uri url, string? content = null, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true);

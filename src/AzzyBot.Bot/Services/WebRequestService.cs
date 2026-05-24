@@ -261,7 +261,7 @@ public sealed class WebRequestService : IWebRequestService
     }
 
 #if DEBUG || DOCKER_DEBUG
-    public async Task<AzzyDebugWebRequestStruct> DebugGetWebAsync(Uri url, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true, bool noLogging = false)
+    public async Task<AzzyDebugWebRequestStruct> DebugGetWebAsync(Uri url)
     {
         try
         {
@@ -273,7 +273,7 @@ public sealed class WebRequestService : IWebRequestService
             string? responseContent;
             using (HttpRequestMessage request = new(HttpMethod.Get, url))
             {
-                PrepareRequests(request, headers, acceptJson: acceptJson, noCache: noCache);
+                PrepareRequests(request, headers: null, acceptJson: true, noCache: true);
                 using HttpResponseMessage response = await client.SendAsync(request);
                 httpVersion = response.Version;
                 status = response.StatusCode;
@@ -292,7 +292,7 @@ public sealed class WebRequestService : IWebRequestService
                 retryCount++;
 
                 using HttpRequestMessage retryRequest = new(HttpMethod.Get, url);
-                PrepareRequests(retryRequest, headers, acceptJson: acceptJson, noCache: noCache);
+                PrepareRequests(retryRequest, headers: null, acceptJson: true, noCache: true);
 
                 using HttpResponseMessage response = await client.SendAsync(retryRequest);
                 httpVersion = response.Version;
@@ -321,16 +321,12 @@ public sealed class WebRequestService : IWebRequestService
         }
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
         {
-            if (!noLogging)
-                _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
-
+            _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
             throw;
         }
         catch (Exception ex)
         {
-            if (!noLogging)
-                _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
-
+            _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
             throw;
         }
     }

@@ -29,7 +29,6 @@ USER root
 # Upgrade internal tools and packages first
 RUN --mount=type=bind,from=build,source=/packages-microsoft-prod.deb,target=/tmp/packages-microsoft-prod.deb \
   apt-get update \
-  && apt-get upgrade -y \
   && apt-get install -y --no-install-recommends ca-certificates gnupg \
   && dpkg -i /tmp/packages-microsoft-prod.deb \
   && apt-get update \
