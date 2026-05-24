@@ -33,6 +33,7 @@ public interface IAzuraCastApiService
     Task<IEnumerable<AzuraMediaItemRecord>?> GetSongsInPlaylistAsync(Uri baseUrl, string apiKey, int stationId, AzuraPlaylistRecord playlist);
     Task<AzuraSongDataRecord?> GetSongInfoAsync(Uri baseUrl, string apiKey, AzuraCastStationEntity station, bool online, string? uniqueId = null, string? songId = null, string? name = null, string? artist = null, string? album = null);
     Task<AzuraStationRecord?> GetStationAsync(Uri baseUrl, string apiKey, int stationId);
+    Task<IEnumerable<AzuraAdminStationConfigRecord>?> GetStationsAdminConfigAsync(Uri baseUrl, string apiKey);
     Task<AzuraAdminStationConfigRecord?> GetStationAdminConfigAsync(Uri baseUrl, string apiKey, int stationId);
     Task<IEnumerable<AzuraStationHistoryItemRecord>?> GetStationHistoryAsync(Uri baseUrl, string apiKey, int stationId, in DateTimeOffset startHistory, in DateTimeOffset endHistory);
     Task<IEnumerable<AzuraHlsMountRecord>?> GetStationHlsMountPointsAsync(Uri baseUrl, string apiKey, int stationId);
