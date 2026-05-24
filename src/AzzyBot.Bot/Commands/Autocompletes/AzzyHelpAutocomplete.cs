@@ -39,10 +39,7 @@ public sealed class AzzyHelpAutocomplete(IOptions<AzzyBotSettings> settings) : I
             if (results.Count is 25)
                 break;
 
-            if (!string.IsNullOrWhiteSpace(search) && kvp.TrueForAll(r => !r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)))
-                continue;
-
-            foreach (string model in kvp.Where(r => !string.IsNullOrWhiteSpace(search) && r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)).Select(r => r.Name))
+            foreach (string model in kvp.Where(r => string.IsNullOrWhiteSpace(search) || r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)).Select(r => r.Name))
             {
                 if (results.Count is 25)
                     break;
