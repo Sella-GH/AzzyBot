@@ -21,19 +21,23 @@ public sealed class AzuraCheckFileChangesJob(IAzuraCastFileService azuraFileServ
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         try
         {
-            IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.ReadAzuraCastsAsync(loadPrefs: true, loadStations: true, loadStationChecks: true, loadGuild: true);
-            if (!azuraCasts.Any())
-                return;
-
-            foreach (AzuraCastEntity azuraCast in azuraCasts)
+            if (context.Parameter is not AzuraCastStationEntity azuraStation)
             {
-                foreach (AzuraCastStationEntity station in azuraCast.Stations.Where(s => s.Checks.FileChanges))
-                {
-                    await _azuraFileService.CheckForFileChangesAsync(station);
-                }
+                IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.ReadAzuraCastsAsync(loadPrefs: true, loadStations: true, loadStationChecks: true, loadGuild: true);
+                if (azuraCasts.Count is 0)
+                    return;
+
+                IEnumerable<AzuraCastStationEntity> stationsToCheck = azuraCasts.SelectMany(static ac => ac.Stations.Where(static s => s.Checks.FileChanges));
+                await Task.WhenAll(stationsToCheck.Select(_azuraFileService.CheckForFileChangesAsync));
+
+                return;
             }
+
+            await _azuraFileService.CheckForFileChangesAsync(azuraStation);
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
         {

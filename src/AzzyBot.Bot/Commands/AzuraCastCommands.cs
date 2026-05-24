@@ -45,11 +45,10 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AzuraCastCommands
 {
     [Command("azuracast"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast])]
-    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, IAzuraCastApiService azuraCastApi, IAzuraCastFileService azuraCastFile, IAzuraCastPingService azuraCastPing, IAzuraCastUpdateService azuraCastUpdate, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService, IMusicStreamingService musicStreaming)
+    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, IAzuraCastApiService azuraCastApi, IAzuraCastPingService azuraCastPing, IAzuraCastUpdateService azuraCastUpdate, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService, IMusicStreamingService musicStreaming)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
         private readonly IAzuraCastApiService _azuraCastApi = azuraCastApi;
-        private readonly IAzuraCastFileService _azuraCastFile = azuraCastFile;
         private readonly IAzuraCastPingService _azuraCastPing = azuraCastPing;
         private readonly IAzuraCastUpdateService _azuraCastUpdate = azuraCastUpdate;
         private readonly ICronJobManager _cronJobManager = cronJobManager;
@@ -208,12 +207,9 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            if (!station.HasValue)
+            if (station is null)
             {
-                foreach (AzuraCastStationEntity dStation in dAzuraCast.Stations)
-                {
-                    await _azuraCastFile.CheckForFileChangesAsync(dStation);
-                }
+                _cronJobManager.RunAzuraCheckFileChangesJob(dAzuraCast);
             }
             else
             {
@@ -225,10 +221,12 @@ public sealed class AzuraCastCommands
                     return;
                 }
 
-                await _azuraCastFile.CheckForFileChangesAsync(dStation);
+                _cronJobManager.RunAzuraCheckFileChangesJob(dStation);
             }
 
-            await context.EditResponseAsync((!station.HasValue) ? "I initiated the cache refresh for all stations." : "I initiated the cache refresh for the selected station.");
+            await context.EditResponseAsync((station is not null)
+                ? "I initiated the cache refresh for all stations."
+                : "I initiated the cache refresh for the selected station.");
         }
 
         [Command("force-online-check"), Description("Force the bot to check if the AzuraCast instance is online."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]

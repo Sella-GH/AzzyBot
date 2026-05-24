@@ -42,13 +42,13 @@ namespace AzzyBot.Bot.Commands;
 public sealed class ConfigCommands
 {
     [Command("config"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
-    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, IAzuraCastApiService azuraCastApi, IAzuraCastFileService azuraCastFile, IAzuraCastPingService azuraCastPing, IAzuraCastUpdateService azuraCastUpdate, IDbActions dbActions, IDiscordBotService botService)
+    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, IAzuraCastApiService azuraCastApi, IAzuraCastPingService azuraCastPing, IAzuraCastUpdateService azuraCastUpdate, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService)
     {
         private readonly ILogger<ConfigGroup> _logger = logger;
         private readonly IAzuraCastApiService _azuraCastApi = azuraCastApi;
-        private readonly IAzuraCastFileService _azuraCastFile = azuraCastFile;
         private readonly IAzuraCastPingService _azuraCastPing = azuraCastPing;
         private readonly IAzuraCastUpdateService _azuraCastUpdate = azuraCastUpdate;
+        private readonly ICronJobManager _cronJobManager = cronJobManager;
         private readonly IDbActions _dbActions = dbActions;
         private readonly IDiscordBotService _botService = botService;
 
@@ -217,7 +217,7 @@ public sealed class ConfigCommands
             }
 
             if (dAzuraCast.IsOnline)
-                await _azuraCastFile.CheckForFileChangesAsync(dStation);
+                _cronJobManager.RunAzuraCheckFileChangesJob(dStation);
         }
 
         [Command("delete-azuracast"), Description("Delete the existing AzuraCast setup."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -482,7 +482,7 @@ public sealed class ConfigCommands
                 }
 
                 if (dAzuraCast.IsOnline)
-                    await _azuraCastFile.CheckForFileChangesAsync(dStation);
+                    _cronJobManager.RunAzuraCheckFileChangesJob(dStation);
             }
 
             await context.DeleteResponseAsync();
@@ -540,7 +540,7 @@ public sealed class ConfigCommands
                 }
 
                 if (dAzuraCast.IsOnline)
-                    await _azuraCastFile.CheckForFileChangesAsync(dStation);
+                    _cronJobManager.RunAzuraCheckFileChangesJob(dStation);
             }
         }
 

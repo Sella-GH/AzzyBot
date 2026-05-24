@@ -9,7 +9,8 @@ public interface ICronJobManager : IExceptionHandler
 {
     void RunAzuraCheckApiPermissionsJob(AzuraCastEntity azuraCast);
     void RunAzuraCheckApiPermissionsJob(AzuraCastStationEntity station);
-    void RunAzuraCheckFileChangesJob();
+    void RunAzuraCheckFileChangesJob(AzuraCastEntity azuraCast);
+    void RunAzuraCheckFileChangesJob(AzuraCastStationEntity station);
     void RunAzuraCheckUpdatesJob();
     void RunAzuraPersistentNowPlayingJob();
     void RunAzuraRequestJob(AzuraCustomQueueItemModel queueItem);
