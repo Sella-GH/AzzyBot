@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Models.AzuraCast;
 using AzzyBot.Bot.Services.CronJobs;
 using AzzyBot.Bot.Services.Interfaces;
+using AzzyBot.Data.Entities;
 
 using NCronJob;
 
@@ -15,8 +16,11 @@ public sealed class CronJobManager(IInstantJobRegistry jobRegistry, IDiscordBotS
     private readonly IInstantJobRegistry _jobRegistry = jobRegistry;
     private readonly IDiscordBotService _botService = botService;
 
-    public void RunAzuraCheckApiPermissionsJob()
-        => _jobRegistry.RunInstantJob<AzuraCheckApiPermissionsJob>();
+    public void RunAzuraCheckApiPermissionsJob(AzuraCastEntity azuraCast)
+        => _jobRegistry.RunInstantJob<AzuraCheckApiPermissionsJob>(azuraCast);
+
+    public void RunAzuraCheckApiPermissionsJob(AzuraCastStationEntity station)
+        => _jobRegistry.RunInstantJob<AzuraCheckApiPermissionsJob>(station);
 
     public void RunAzuraCheckFileChangesJob()
         => _jobRegistry.RunInstantJob<AzuraCheckFileChangesJob>();

@@ -1,4 +1,5 @@
 using AzzyBot.Bot.Models.AzuraCast;
+using AzzyBot.Data.Entities;
 
 using NCronJob;
 
@@ -6,7 +7,8 @@ namespace AzzyBot.Bot.Services.Interfaces;
 
 public interface ICronJobManager : IExceptionHandler
 {
-    void RunAzuraCheckApiPermissionsJob();
+    void RunAzuraCheckApiPermissionsJob(AzuraCastEntity azuraCast);
+    void RunAzuraCheckApiPermissionsJob(AzuraCastStationEntity station);
     void RunAzuraCheckFileChangesJob();
     void RunAzuraCheckUpdatesJob();
     void RunAzuraPersistentNowPlayingJob();

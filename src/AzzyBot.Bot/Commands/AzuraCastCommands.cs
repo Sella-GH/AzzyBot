@@ -45,13 +45,14 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AzuraCastCommands
 {
     [Command("azuracast"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast])]
-    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, IAzuraCastApiService azuraCastApi, IAzuraCastFileService azuraCastFile, IAzuraCastPingService azuraCastPing, IAzuraCastUpdateService azuraCastUpdate, IDbActions dbActions, IDiscordBotService botService, IMusicStreamingService musicStreaming)
+    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, IAzuraCastApiService azuraCastApi, IAzuraCastFileService azuraCastFile, IAzuraCastPingService azuraCastPing, IAzuraCastUpdateService azuraCastUpdate, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService, IMusicStreamingService musicStreaming)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
         private readonly IAzuraCastApiService _azuraCastApi = azuraCastApi;
         private readonly IAzuraCastFileService _azuraCastFile = azuraCastFile;
         private readonly IAzuraCastPingService _azuraCastPing = azuraCastPing;
         private readonly IAzuraCastUpdateService _azuraCastUpdate = azuraCastUpdate;
+        private readonly ICronJobManager _cronJobManager = cronJobManager;
         private readonly IDbActions _dbActions = dbActions;
         private readonly IDiscordBotService _botService = botService;
         private readonly IMusicStreamingService _musicStreaming = musicStreaming;
@@ -167,9 +168,9 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            if (!station.HasValue)
+            if (station is null)
             {
-                await _azuraCastApi.CheckForApiPermissionsAsync(dAzuraCast);
+                _cronJobManager.RunAzuraCheckApiPermissionsJob(dAzuraCast);
             }
             else
             {
@@ -181,7 +182,7 @@ public sealed class AzuraCastCommands
                     return;
                 }
 
-                await _azuraCastApi.CheckForApiPermissionsAsync(dStation);
+                _cronJobManager.RunAzuraCheckApiPermissionsJob(dStation);
             }
 
             await context.EditResponseAsync("I initiated the permission check.\nThere won't be another message if your permissions are set correctly.");
