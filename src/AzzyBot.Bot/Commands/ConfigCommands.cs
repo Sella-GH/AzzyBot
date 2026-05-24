@@ -42,11 +42,10 @@ namespace AzzyBot.Bot.Commands;
 public sealed class ConfigCommands
 {
     [Command("config"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
-    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, IAzuraCastApiService azuraCastApi, IAzuraCastUpdateService azuraCastUpdate, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService)
+    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, IAzuraCastApiService azuraCastApi, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService)
     {
         private readonly ILogger<ConfigGroup> _logger = logger;
         private readonly IAzuraCastApiService _azuraCastApi = azuraCastApi;
-        private readonly IAzuraCastUpdateService _azuraCastUpdate = azuraCastUpdate;
         private readonly ICronJobManager _cronJobManager = cronJobManager;
         private readonly IDbActions _dbActions = dbActions;
         private readonly IDiscordBotService _botService = botService;
@@ -405,7 +404,7 @@ public sealed class ConfigCommands
                     _cronJobManager.RunAzuraStatusPingJob(dAzuraCast);
 
                 if (updates is 1)
-                    await _azuraCastUpdate.CheckForAzuraCastUpdatesAsync(dAzuraCast);
+                    _cronJobManager.RunAzuraCheckUpdatesJob(dAzuraCast);
             }
         }
 

@@ -28,8 +28,8 @@ public sealed class CronJobManager(IInstantJobRegistry jobRegistry, IDiscordBotS
     public void RunAzuraCheckFileChangesJob(AzuraCastStationEntity station)
         => _jobRegistry.RunInstantJob<AzuraCheckFileChangesJob>(station);
 
-    public void RunAzuraCheckUpdatesJob()
-        => _jobRegistry.RunInstantJob<AzuraCheckUpdatesJob>();
+    public void RunAzuraCheckUpdatesJob(AzuraCastEntity azuraCast)
+        => _jobRegistry.RunInstantJob<AzuraCheckUpdatesJob>(azuraCast);
 
     public void RunAzuraPersistentNowPlayingJob()
         => _jobRegistry.RunInstantJob<AzuraPersistentNowPlayingJob>();

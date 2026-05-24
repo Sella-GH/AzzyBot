@@ -45,11 +45,10 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AzuraCastCommands
 {
     [Command("azuracast"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast])]
-    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, IAzuraCastApiService azuraCastApi, IAzuraCastUpdateService azuraCastUpdate, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService, IMusicStreamingService musicStreaming)
+    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, IAzuraCastApiService azuraCastApi, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService, IMusicStreamingService musicStreaming)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
         private readonly IAzuraCastApiService _azuraCastApi = azuraCastApi;
-        private readonly IAzuraCastUpdateService _azuraCastUpdate = azuraCastUpdate;
         private readonly ICronJobManager _cronJobManager = cronJobManager;
         private readonly IDbActions _dbActions = dbActions;
         private readonly IDiscordBotService _botService = botService;
@@ -264,8 +263,8 @@ public sealed class AzuraCastCommands
                 return;
             }
 
+            _cronJobManager.RunAzuraCheckUpdatesJob(dAzuraCast);
             await context.EditResponseAsync("I initiated the check for AzuraCast Updates.\nThere won't be another message if there are no updates available.");
-            await _azuraCastUpdate.CheckForAzuraCastUpdatesAsync(dAzuraCast, true);
         }
 
         [Command("get-system-logs"), Description("Get the system logs of the AzuraCast instance."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
