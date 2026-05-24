@@ -14,7 +14,6 @@ using AzzyBot.Bot.Models;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Utilities;
-using AzzyBot.Core.Models;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services.Interfaces;
 
@@ -112,9 +111,9 @@ public sealed class CoreCommands
         }
 
         [Command("stats")]
-        public sealed class CoreStats(IOptions<AppStatsModel> stats, ILogger<CoreStats> logger)
+        public sealed class CoreStats(IOptions<AppStats> stats, ILogger<CoreStats> logger)
         {
-            private readonly AppStatsModel _stats = stats.Value;
+            private readonly AppStats _stats = stats.Value;
             private readonly ILogger<CoreStats> _logger = logger;
 
             [Command("hardware"), Description("Shows information about the hardware side of the bot.")]

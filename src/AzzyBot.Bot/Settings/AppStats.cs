@@ -2,12 +2,12 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace AzzyBot.Core.Models;
+namespace AzzyBot.Bot.Settings;
 
 /// <summary>
 /// Represents the application statistics record.
 /// </summary>
-public sealed record class AppStatsModel
+public sealed record class AppStats
 {
     /// <summary>
     /// The commit hash.

@@ -14,7 +14,6 @@ using AzzyBot.Bot.Services.Modules;
 using AzzyBot.Bot.Services.Modules.Interfaces;
 using AzzyBot.Bot.Settings;
 using AzzyBot.Bot.Settings.Validators;
-using AzzyBot.Core.Models;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Data.Extensions;
 using AzzyBot.Data.Settings;
@@ -177,9 +176,9 @@ public static class IServiceCollectionExtensions
                 .AddOptionsWithValidateOnStart<CoreUpdaterSettings>()
                 .BindConfiguration(nameof(CoreUpdaterSettings));
 
-            services.AddSingleton<IValidateOptions<AppStatsModel>, AppStatsValidator>()
-                .AddOptionsWithValidateOnStart<AppStatsModel>()
-                .BindConfiguration(nameof(AppStatsModel));
+            services.AddSingleton<IValidateOptions<AppStats>, AppStatsValidator>()
+                .AddOptionsWithValidateOnStart<AppStats>()
+                .BindConfiguration(nameof(AppStats));
         }
 
         private void DiscordClient(string token)

@@ -20,7 +20,7 @@
 - JSON types in `AzuraCastApiService.cs` are known at compile time instead of runtime
 - Reencoded all source files to UTF-8 without BOM
 - Renamed `Startup.cs` to `Program.cs` to align with .NET conventions
-- Reorganized the .slnx file a bit
+- Reorganized the namespaces, model names and slnx file structure to be more intuitive
 - Split up the logger actions into multiple files and scope the entries to the respective classes
 
 ### Dependencies
