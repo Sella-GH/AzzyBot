@@ -14,7 +14,7 @@ public interface ICronJobManager : IExceptionHandler
     void RunAzuraCheckUpdatesJob();
     void RunAzuraPersistentNowPlayingJob();
     void RunAzuraRequestJob(AzuraCustomQueueItemModel queueItem);
-    void RunAzuraStatusPingJob();
+    void RunAzuraStatusPingJob(AzuraCastEntity azuraCast);
     void RunAzzyBotCheckPermissionsJob();
     void RunAzzyBotInactiveGuildJob();
     void RunAzzyBotUpdateCheckJob();

@@ -45,11 +45,10 @@ namespace AzzyBot.Bot.Commands;
 public sealed class AzuraCastCommands
 {
     [Command("azuracast"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms, AzzyModules.AzuraCast])]
-    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, IAzuraCastApiService azuraCastApi, IAzuraCastPingService azuraCastPing, IAzuraCastUpdateService azuraCastUpdate, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService, IMusicStreamingService musicStreaming)
+    public sealed class AzuraCastGroup(ILogger<AzuraCastGroup> logger, IAzuraCastApiService azuraCastApi, IAzuraCastUpdateService azuraCastUpdate, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService, IMusicStreamingService musicStreaming)
     {
         private readonly ILogger<AzuraCastGroup> _logger = logger;
         private readonly IAzuraCastApiService _azuraCastApi = azuraCastApi;
-        private readonly IAzuraCastPingService _azuraCastPing = azuraCastPing;
         private readonly IAzuraCastUpdateService _azuraCastUpdate = azuraCastUpdate;
         private readonly ICronJobManager _cronJobManager = cronJobManager;
         private readonly IDbActions _dbActions = dbActions;
@@ -245,8 +244,8 @@ public sealed class AzuraCastCommands
                 return;
             }
 
+            _cronJobManager.RunAzuraStatusPingJob(dAzuraCast);
             await context.EditResponseAsync("I initiated the online check for the AzuraCast instance.");
-            await _azuraCastPing.PingInstanceAsync(dAzuraCast);
         }
 
         [Command("force-update-check"), Description("Force the bot to search for AzuraCast Updates."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]

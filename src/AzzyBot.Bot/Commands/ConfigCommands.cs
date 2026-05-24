@@ -42,11 +42,10 @@ namespace AzzyBot.Bot.Commands;
 public sealed class ConfigCommands
 {
     [Command("config"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
-    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, IAzuraCastApiService azuraCastApi, IAzuraCastPingService azuraCastPing, IAzuraCastUpdateService azuraCastUpdate, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService)
+    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, IAzuraCastApiService azuraCastApi, IAzuraCastUpdateService azuraCastUpdate, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService)
     {
         private readonly ILogger<ConfigGroup> _logger = logger;
         private readonly IAzuraCastApiService _azuraCastApi = azuraCastApi;
-        private readonly IAzuraCastPingService _azuraCastPing = azuraCastPing;
         private readonly IAzuraCastUpdateService _azuraCastUpdate = azuraCastUpdate;
         private readonly ICronJobManager _cronJobManager = cronJobManager;
         private readonly IDbActions _dbActions = dbActions;
@@ -158,7 +157,7 @@ public sealed class ConfigCommands
 
             await _botService.CheckPermissionsAsync(context.Guild, [notificationChannel.Id, outagesChannel.Id]);
             if (dAzuraCast.Checks.ServerStatus)
-                await _azuraCastPing.PingInstanceAsync(dAzuraCast);
+                _cronJobManager.RunAzuraStatusPingJob(dAzuraCast);
         }
 
         [Command("add-azuracast-station"), Description("Add an AzuraCast station to your instance."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -333,7 +332,7 @@ public sealed class ConfigCommands
                 }
 
                 if (dAzuraCast.Checks.ServerStatus)
-                    await _azuraCastPing.PingInstanceAsync(dAzuraCast);
+                    _cronJobManager.RunAzuraStatusPingJob(dAzuraCast);
             }
         }
 
@@ -403,7 +402,7 @@ public sealed class ConfigCommands
                 }
 
                 if (serverStatus is 1)
-                    await _azuraCastPing.PingInstanceAsync(dAzuraCast);
+                    _cronJobManager.RunAzuraStatusPingJob(dAzuraCast);
 
                 if (updates is 1)
                     await _azuraCastUpdate.CheckForAzuraCastUpdatesAsync(dAzuraCast);
@@ -639,7 +638,7 @@ public sealed class ConfigCommands
                         }
                         catch (HttpRequestException)
                         {
-                            await _azuraCastPing.PingInstanceAsync(ac);
+                            _cronJobManager.RunAzuraStatusPingJob(ac);
                             break;
                         }
                         catch (InvalidOperationException)

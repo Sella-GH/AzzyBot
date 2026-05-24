@@ -37,8 +37,8 @@ public sealed class CronJobManager(IInstantJobRegistry jobRegistry, IDiscordBotS
     public void RunAzuraRequestJob(AzuraCustomQueueItemModel queueItem)
         => _jobRegistry.RunInstantJob<AzuraRequestJob>(queueItem);
 
-    public void RunAzuraStatusPingJob()
-        => _jobRegistry.RunInstantJob<AzuraStatusPingJob>();
+    public void RunAzuraStatusPingJob(AzuraCastEntity azuraCast)
+        => _jobRegistry.RunInstantJob<AzuraStatusPingJob>(azuraCast);
 
     public void RunAzzyBotCheckPermissionsJob()
         => _jobRegistry.RunInstantJob<AzzyBotCheckPermissionsJob>();
