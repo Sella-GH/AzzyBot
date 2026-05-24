@@ -404,7 +404,11 @@ public static class EmbedBuilder
 
         message.AppendLine(GeneralStrings.ReminderForceLeaveThreat.Replace("{%TIMEFRAME%}", $"<t:{timestamp}:R>", StringComparison.InvariantCulture));
 
-        EmbedAuthorStruct author = new(guild.Name, null, guild.IconUrl);
+        EmbedAuthorStruct author = new()
+        {
+            IconUrl = guild.IconUrl,
+            Name = guild.Name
+        };
 
         return CreateBasicEmbed(title, message.ToString(), DiscordColor.Orange, author: author);
     }

@@ -2,9 +2,11 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Runtime.InteropServices;
 
 namespace AzzyBot.Bot.Structs;
 
+[StructLayout(LayoutKind.Auto)]
 public readonly struct AzzyDebugWebRequestStruct : IEquatable<AzzyDebugWebRequestStruct>
 {
     public required Uri RequestUri { get; init; }
@@ -32,9 +34,9 @@ public readonly struct AzzyDebugWebRequestStruct : IEquatable<AzzyDebugWebReques
     public override int GetHashCode()
         => HashCode.Combine(RequestUri, Method, HttpVersion, StatusCode, ReqHeaders, ResHeaders, Retries, Content);
 
-    public static bool operator ==(AzzyDebugWebRequestStruct? left, AzzyDebugWebRequestStruct? right)
-        => left?.Equals(right) is true;
+    public static bool operator ==(in AzzyDebugWebRequestStruct left, in AzzyDebugWebRequestStruct right)
+        => left.Equals(right);
 
-    public static bool operator !=(AzzyDebugWebRequestStruct? left, AzzyDebugWebRequestStruct? right)
-        => !left?.Equals(right) is true;
+    public static bool operator !=(in AzzyDebugWebRequestStruct left, in AzzyDebugWebRequestStruct right)
+        => !left.Equals(right);
 }

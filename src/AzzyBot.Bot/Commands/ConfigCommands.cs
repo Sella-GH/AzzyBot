@@ -615,14 +615,27 @@ public sealed class ConfigCommands
                     {
                         DiscordRole? stationAdminRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationAdminRoleId);
                         DiscordRole? stationDjRole = roles.FirstOrDefault(r => r.Id == station.Preferences.StationDjRoleId);
-                        stationRoles.Add(new(stationAdminRole?.Id ?? 0, stationAdminRole?.Name ?? "Name not found"));
-                        stationRoles.Add(new(stationDjRole?.Id ?? 0, stationDjRole?.Name ?? "Name not found"));
-                        string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(ac.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
+                        AzzyStationRoleStruct stationAdminStruct = new()
+                        {
+                            Id = stationAdminRole?.Id ?? 0,
+                            Name = stationAdminRole?.Name ?? "Name not found"
+                        };
+                        stationRoles.Add(stationAdminStruct);
+
+                        AzzyStationRoleStruct stationDjStruct = new()
+                        {
+                            Id = stationDjRole?.Id ?? 0,
+                            Name = stationDjRole?.Name ?? "Name not found"
+                        };
+                        stationRoles.Add(stationDjStruct);
 
                         AzuraStationModel? stationModel = null;
                         try
                         {
-                            stationModel = await _azuraCastApi.GetStationAsync(new(Crypto.Decrypt(ac.BaseUrl)), apiKey, station.StationId);
+                            Uri baseUrl = new(Crypto.Decrypt(ac.BaseUrl));
+                            string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(ac.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
+
+                            stationModel = await _azuraCastApi.GetStationAsync(baseUrl, apiKey, station.StationId);
                         }
                         catch (HttpRequestException)
                         {

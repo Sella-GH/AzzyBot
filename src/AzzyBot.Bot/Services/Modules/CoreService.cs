@@ -33,9 +33,7 @@ public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSet
     {
         IEnumerable<GuildEntity> guilds = await _dbActions.ReadGuildsAsync(loadGuildPrefs: true);
         if (!guilds.Any())
-        {
             return new Dictionary<GuildEntity, AzzyInactiveGuildStruct>();
-        }
 
         HashSet<GuildEntity> noLegals = [.. guilds.Where(g => !g.LegalsAccepted && g.UniqueId != _settings.ServerId)];
         HashSet<GuildEntity> noConfig = [.. guilds.Where(g => !g.ConfigSet && g.UniqueId != _settings.ServerId)];
@@ -46,11 +44,15 @@ public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSet
         {
             DiscordGuild? dGuild = _botService.GetDiscordGuild(guild.UniqueId);
             if (dGuild is null)
-            {
                 continue;
-            }
 
-            AzzyInactiveGuildStruct guildStruct = new(guild: dGuild, config: noConfig.Contains(guild), legals: noLegals.Contains(guild));
+            AzzyInactiveGuildStruct guildStruct = new()
+            {
+                Guild = dGuild,
+                NoConfig = noConfig.Contains(guild),
+                NoLegals = noLegals.Contains(guild)
+            };
+
             victims.Add(guild, guildStruct);
         }
 

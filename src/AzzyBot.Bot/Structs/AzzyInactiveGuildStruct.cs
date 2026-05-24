@@ -1,14 +1,16 @@
 using System;
+using System.Runtime.InteropServices;
 
 using DSharpPlus.Entities;
 
 namespace AzzyBot.Bot.Structs;
 
-public readonly struct AzzyInactiveGuildStruct(DiscordGuild guild, bool config, bool legals) : IEquatable<AzzyInactiveGuildStruct>
+[StructLayout(LayoutKind.Auto)]
+public readonly struct AzzyInactiveGuildStruct : IEquatable<AzzyInactiveGuildStruct>
 {
-    public DiscordGuild Guild { get; } = guild;
-    public bool NoConfig { get; } = config;
-    public bool NoLegals { get; } = legals;
+    public DiscordGuild Guild { get; init; }
+    public bool NoConfig { get; init; }
+    public bool NoLegals { get; init; }
 
     public override bool Equals(object? obj)
         => obj is AzzyInactiveGuildStruct other && Equals(other);
@@ -21,9 +23,9 @@ public readonly struct AzzyInactiveGuildStruct(DiscordGuild guild, bool config, 
     public override int GetHashCode()
         => HashCode.Combine(Guild, NoConfig, NoLegals);
 
-    public static bool operator ==(AzzyInactiveGuildStruct? left, AzzyInactiveGuildStruct? right)
-        => left?.Equals(right) is true;
+    public static bool operator ==(in AzzyInactiveGuildStruct left, in AzzyInactiveGuildStruct right)
+        => left.Equals(right);
 
-    public static bool operator !=(AzzyInactiveGuildStruct? left, AzzyInactiveGuildStruct? right)
-        => !left?.Equals(right) is true;
+    public static bool operator !=(in AzzyInactiveGuildStruct left, in AzzyInactiveGuildStruct right)
+        => !left.Equals(right);
 }

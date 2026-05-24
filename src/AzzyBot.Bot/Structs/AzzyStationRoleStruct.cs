@@ -1,11 +1,13 @@
 using System;
+using System.Runtime.InteropServices;
 
 namespace AzzyBot.Bot.Structs;
 
-public readonly struct AzzyStationRoleStruct(ulong id, string name) : IEquatable<AzzyStationRoleStruct>
+[StructLayout(LayoutKind.Auto)]
+public readonly struct AzzyStationRoleStruct : IEquatable<AzzyStationRoleStruct>
 {
-    public ulong Id { get; } = id;
-    public string Name { get; } = name;
+    public ulong Id { get; init; }
+    public string Name { get; init; }
 
     public override bool Equals(object? obj)
         => obj is AzzyStationRoleStruct other && Equals(other);
@@ -16,9 +18,9 @@ public readonly struct AzzyStationRoleStruct(ulong id, string name) : IEquatable
     public override int GetHashCode()
         => HashCode.Combine(Id, Name);
 
-    public static bool operator ==(AzzyStationRoleStruct? left, AzzyStationRoleStruct? right)
-        => left?.Equals(right) is true;
+    public static bool operator ==(in AzzyStationRoleStruct left, in AzzyStationRoleStruct right)
+        => left.Equals(right);
 
-    public static bool operator !=(AzzyStationRoleStruct? left, AzzyStationRoleStruct? right)
-        => !left?.Equals(right) is true;
+    public static bool operator !=(in AzzyStationRoleStruct left, in AzzyStationRoleStruct right)
+        => !left.Equals(right);
 }
