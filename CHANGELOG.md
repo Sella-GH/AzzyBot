@@ -22,6 +22,7 @@
 - Reencoded all source files to UTF-8 without BOM
 - Renamed `Startup.cs` to `Program.cs` to align with .NET conventions
 - Reorganized the namespaces, model names and slnx file structure to be more intuitive
+- Reworked background job handling so the jobs are triggered more often instead of the direct services
 - Split up the logger actions into multiple files and scope the entries to the respective classes
 
 ### Dependencies
