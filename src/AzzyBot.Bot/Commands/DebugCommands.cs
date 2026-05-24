@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
+using System.Net.Quic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,6 +13,8 @@ using AzzyBot.Bot.Commands.Choices;
 using AzzyBot.Bot.Logging;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Utilities.Helpers;
+using AzzyBot.Bot.Utilities.Structs;
+using AzzyBot.Core.Utilities;
 using AzzyBot.Core.Utilities.Encryption;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services.Interfaces;
@@ -179,9 +183,41 @@ public sealed class DebugCommands
 
             await context.DeferResponseAsync();
 
-            await _webRequestService.GetWebAsync(url, acceptJson: true);
+            AzzyDebugWebRequestStruct req = await _webRequestService.DebugGetWebAsync(url, acceptJson: true);
+            StringBuilder sb = new();
+            sb.AppendLine(CultureInfo.InvariantCulture, $"Request Uri: {req.RequestUri}");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"Method: {req.Method}");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"QUIC Support: {QuicConnection.IsSupported}");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"Version: {req.HttpVersion}");
+            sb.AppendLine(CultureInfo.InvariantCulture, $"Status Code: {req.StatusCode}");
+            foreach (KeyValuePair<string, IEnumerable<string>> header in req.ReqHeaders)
+            {
+                sb.AppendLine(CultureInfo.InvariantCulture, $"Request Header: {header.Key} - {string.Join(", ", header.Value)}");
+            }
 
-            await context.EditResponseAsync($"Web service test for *{url}* was successful!");
+            foreach (KeyValuePair<string, IEnumerable<string>> header in req.ResHeaders)
+            {
+                sb.AppendLine(CultureInfo.InvariantCulture, $"Response Header: {header.Key} - {string.Join(", ", header.Value)}");
+            }
+
+            sb.AppendLine(CultureInfo.InvariantCulture, $"Retries: {req.Retries}");
+
+            if (string.IsNullOrEmpty(req.Content))
+            {
+                await context.EditResponseAsync(sb.ToString());
+                return;
+            }
+
+            string fileName = $"WebRequestDebug_{DateTime.UtcNow:yyyy-MM-dd_HH-mm-ss-fffffff}.txt";
+            string filePath = await FileOperations.CreateTempFileAsync(req.Content, fileName);
+            await using FileStream fs = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
+
+            DiscordMessageBuilder builder = new();
+            builder.WithContent(sb.ToString());
+            builder.AddFile(fileName, fs, AddFileOptions.CloseStream);
+            await context.EditResponseAsync(builder);
+
+            return;
         }
     }
 }

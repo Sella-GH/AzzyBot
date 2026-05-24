@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Utilities.Records;
+#if DEBUG || DOCKER_DEBUG
+using AzzyBot.Bot.Utilities.Structs;
+#endif
 
 namespace AzzyBot.Bot.Services.Interfaces;
 
@@ -14,6 +17,9 @@ public interface IWebRequestService
     Task<AzzyIpAddressRecord> GetIpAddressesAsync();
     Task<long> GetPingAsync(Uri uri);
     Task<string?> GetWebAsync(Uri url, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true, bool noLogging = false);
+#if DEBUG || DOCKER_DEBUG
+    Task<AzzyDebugWebRequestStruct> DebugGetWebAsync(Uri url, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true, bool noLogging = false);
+#endif
     Task PostWebAsync(Uri url, string? content = null, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true);
     Task PutWebAsync(Uri url, string? content = null, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true);
     Task<string?> UploadAsync(Uri url, string file, string fileName, string filePath, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true);

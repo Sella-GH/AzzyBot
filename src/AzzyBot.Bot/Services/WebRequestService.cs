@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+#if DEBUG || DOCKER_DEBUG
+using System.Net.Http.Headers;
+#endif
 using System.Net.Mime;
 using System.Net.NetworkInformation;
+using System.Net.Quic;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -14,18 +18,29 @@ using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Bot.Utilities.Records;
+#if DEBUG || DOCKER_DEBUG
+using AzzyBot.Bot.Utilities.Structs;
+#endif
 using AzzyBot.Core.Utilities;
 
 using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Services;
 
-public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebRequestService> logger) : IWebRequestService
+public sealed class WebRequestService : IWebRequestService
 {
-    private readonly IHttpClientFactory _factory = factory;
-    private readonly ILogger<WebRequestService> _logger = logger;
+    private readonly IHttpClientFactory _factory;
+    private readonly ILogger<WebRequestService> _logger;
     private const string MediaTypeJson = MediaTypeNames.Application.Json;
     private static readonly string HttpClientName = SoftwareStats.GetAppName;
+
+    public WebRequestService(IHttpClientFactory factory, ILogger<WebRequestService> logger)
+    {
+        _factory = factory;
+        _logger = logger;
+
+        _logger.Http3QuicSupport(QuicConnection.IsSupported);
+    }
 
     public async Task<IReadOnlyList<bool>> CheckForApiPermissionsAsync(IReadOnlyList<Uri> urls, IReadOnlyDictionary<string, string> headers)
     {
@@ -42,7 +57,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
             try
             {
                 using HttpRequestMessage request = new(HttpMethod.Get, url);
-                AddRequestHeaders(request, headers, acceptJson: true, noCache: true);
+                PrepareRequests(request, headers, acceptJson: true, noCache: true);
 
                 using HttpResponseMessage? response = await client.SendAsync(request);
                 success = response.IsSuccessStatusCode;
@@ -71,7 +86,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         try
         {
             using HttpRequestMessage request = new(HttpMethod.Delete, uri);
-            AddRequestHeaders(request, headers, acceptJson: acceptJson, noCache: noCache);
+            PrepareRequests(request, headers, acceptJson: acceptJson, noCache: noCache);
 
             using HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
@@ -97,7 +112,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         {
             using HttpClient client = _factory.CreateClient(HttpClientName);
             using HttpRequestMessage request = new(HttpMethod.Get, url);
-            AddRequestHeaders(request, headers, acceptJson: acceptJson, acceptImage: acceptImage, noCache: noCache);
+            PrepareRequests(request, headers, acceptJson: acceptJson, acceptImage: acceptImage, noCache: noCache);
 
             using HttpResponseMessage response = await client.SendAsync(request);
             response.EnsureSuccessStatusCode();
@@ -191,7 +206,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
             string? responseContent;
             using (HttpRequestMessage request = new(HttpMethod.Get, url))
             {
-                AddRequestHeaders(request, headers, acceptJson: acceptJson, noCache: noCache);
+                PrepareRequests(request, headers, acceptJson: acceptJson, noCache: noCache);
                 using HttpResponseMessage response = await client.SendAsync(request);
                 status = response.StatusCode;
                 responseContent = await response.Content.ReadAsStringAsync();
@@ -207,7 +222,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
                 retryCount++;
 
                 using HttpRequestMessage retryRequest = new(HttpMethod.Get, url);
-                AddRequestHeaders(retryRequest, headers, acceptJson: acceptJson, noCache: noCache);
+                PrepareRequests(retryRequest, headers, acceptJson: acceptJson, noCache: noCache);
 
                 using HttpResponseMessage response = await client.SendAsync(retryRequest);
                 status = response.StatusCode;
@@ -245,6 +260,82 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         }
     }
 
+#if DEBUG || DOCKER_DEBUG
+    public async Task<AzzyDebugWebRequestStruct> DebugGetWebAsync(Uri url, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true, bool noLogging = false)
+    {
+        try
+        {
+            using HttpClient client = _factory.CreateClient(HttpClientName);
+            HttpStatusCode status;
+            Version httpVersion;
+            HttpRequestHeaders reqHeaders;
+            HttpResponseHeaders resHeaders;
+            string? responseContent;
+            using (HttpRequestMessage request = new(HttpMethod.Get, url))
+            {
+                PrepareRequests(request, headers, acceptJson: acceptJson, noCache: noCache);
+                using HttpResponseMessage response = await client.SendAsync(request);
+                httpVersion = response.Version;
+                status = response.StatusCode;
+                reqHeaders = request.Headers;
+                resHeaders = response.Headers;
+                responseContent = await response.Content.ReadAsStringAsync();
+            }
+
+            const int maxRetries = 7;
+            int retryCount = 0;
+            while (status is HttpStatusCode.TooManyRequests && retryCount <= maxRetries)
+            {
+                _logger.BotRatelimited(url, retryCount);
+
+                await Task.Delay(TimeSpan.FromSeconds(Math.Pow(2, retryCount)));
+                retryCount++;
+
+                using HttpRequestMessage retryRequest = new(HttpMethod.Get, url);
+                PrepareRequests(retryRequest, headers, acceptJson: acceptJson, noCache: noCache);
+
+                using HttpResponseMessage response = await client.SendAsync(retryRequest);
+                httpVersion = response.Version;
+                status = response.StatusCode;
+                reqHeaders = retryRequest.Headers;
+                resHeaders = response.Headers;
+                responseContent = await response.Content.ReadAsStringAsync();
+            }
+
+            return new()
+            {
+                RequestUri = url,
+                Method = HttpMethod.Get,
+                HttpVersion = httpVersion,
+                StatusCode = status,
+                ReqHeaders = reqHeaders,
+                ResHeaders = resHeaders,
+                Retries = retryCount,
+                Content = responseContent
+            };
+        }
+        catch (InvalidOperationException)
+        {
+            _logger.WebInvalidUri(url);
+            throw;
+        }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException)
+        {
+            if (!noLogging)
+                _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
+
+            throw;
+        }
+        catch (Exception ex)
+        {
+            if (!noLogging)
+                _logger.WebRequestFailed(HttpMethod.Get, ex.Message, url);
+
+            throw;
+        }
+    }
+#endif
+
     public async Task PostWebAsync(Uri url, string? content = null, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool noCache = true)
     {
         try
@@ -256,7 +347,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
                 Content = httpContent
             };
 
-            AddRequestHeaders(request, headers, acceptJson: acceptJson, noCache: noCache);
+            PrepareRequests(request, headers, acceptJson: acceptJson, noCache: noCache);
 
             using HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
@@ -287,7 +378,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
                 Content = httpContent
             };
 
-            AddRequestHeaders(request, headers, acceptJson: acceptJson, noCache: noCache);
+            PrepareRequests(request, headers, acceptJson: acceptJson, noCache: noCache);
 
             using HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
@@ -322,7 +413,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
                 Content = httpContent
             };
 
-            AddRequestHeaders(request, headers, acceptJson: acceptJson, noCache: noCache);
+            PrepareRequests(request, headers, acceptJson: acceptJson, noCache: noCache);
 
             using HttpResponseMessage response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
@@ -344,21 +435,23 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
         }
     }
 
-    private static void AddRequestHeaders(HttpRequestMessage message, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool acceptImage = false, bool noCache = true)
+    private static void PrepareRequests(HttpRequestMessage request, IReadOnlyDictionary<string, string>? headers = null, bool acceptJson = false, bool acceptImage = false, bool noCache = true)
     {
+        request.VersionPolicy = HttpVersionPolicy.RequestVersionOrHigher;
+
         if (acceptImage && acceptJson)
             throw new ArgumentException("Cannot accept both image and JSON content types.");
 
         if (acceptImage)
-            message.Headers.Accept.Add(new("image/*")); // Manual to allow all image types
+            request.Headers.Accept.Add(new("image/*")); // Manual to allow all image types
 
         if (acceptJson)
-            message.Headers.Accept.Add(new(MediaTypeJson));
+            request.Headers.Accept.Add(new(MediaTypeJson));
 
         if (noCache)
         {
-            message.Headers.CacheControl = new() { NoCache = true };
-            message.Headers.Pragma.Add(new("no-cache"));
+            request.Headers.CacheControl = new() { NoCache = true };
+            request.Headers.Pragma.Add(new("no-cache"));
         }
 
         if (headers is null)
@@ -366,7 +459,7 @@ public sealed class WebRequestService(IHttpClientFactory factory, ILogger<WebReq
 
         foreach (KeyValuePair<string, string> header in headers)
         {
-            message.Headers.Add(header.Key, header.Value);
+            request.Headers.Add(header.Key, header.Value);
         }
     }
 }
