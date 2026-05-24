@@ -8,9 +8,9 @@ namespace AzzyBot.Bot.Structs;
 [StructLayout(LayoutKind.Auto)]
 public readonly struct AzzyInactiveGuildStruct : IEquatable<AzzyInactiveGuildStruct>
 {
-    public DiscordGuild Guild { get; init; }
-    public bool NoConfig { get; init; }
-    public bool NoLegals { get; init; }
+    public required DiscordGuild Guild { get; init; }
+    public required bool NoConfig { get; init; }
+    public required bool NoLegals { get; init; }
 
     public override bool Equals(object? obj)
         => obj is AzzyInactiveGuildStruct other && Equals(other);
