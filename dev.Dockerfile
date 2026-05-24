@@ -27,11 +27,14 @@ FROM mcr.microsoft.com/dotnet/runtime:10.0-resolute AS runner
 USER root
 
 # Upgrade internal tools and packages first
-RUN --mount=type=bind,from=build,source=/packages-microsoft-prod.deb,target=/packages-microsoft-prod.deb \
+RUN --mount=type=bind,from=build,source=/packages-microsoft-prod.deb,target=/tmp/packages-microsoft-prod.deb \
   apt-get update \
   && apt-get upgrade -y \
+  && apt-get install -y --no-install-recommends ca-certificates gnupg \
+  && dpkg -i /tmp/packages-microsoft-prod.deb \
+  && apt-get update \
+  && apt-get upgrade -y \
   && apt-get install -y --no-install-recommends iputils-ping libgssapi-krb5-2 libzstd-dev \
-  && apt-get install -y --no-install-recommends /packages-microsoft-prod.deb \
   && apt-get install -y --no-install-recommends libmsquic libxdp1 libnl-3-200 libnl-route-3-200 \
   && apt-get autoremove --purge -y \
   && apt-get clean -y \
