@@ -34,13 +34,10 @@ public sealed class MusicStreamingPersistentNowPlayingJob(ILogger<MusicStreaming
         try
         {
             IReadOnlyList<MusicStreamingEntity> musicStreams = await _dbActions.ReadMusicStreamingAsync(loadGuild: true);
-            if (!musicStreams.Any())
+            if (musicStreams.Count is 0)
                 return;
 
-            foreach (MusicStreamingEntity stream in musicStreams)
-            {
-                await UpdateNowPlayingEmbedAsync(stream);
-            }
+            await Task.WhenAll(musicStreams.Select(UpdateNowPlayingEmbedAsync));
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
         {
