@@ -34,16 +34,12 @@ public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayi
         try
         {
             IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.ReadAzuraCastsAsync(loadPrefs: true, loadStations: true, loadStationPrefs: true, loadGuild: true);
-            if (!azuraCasts.Any())
+            if (azuraCasts.Count is 0)
                 return;
 
-            foreach (AzuraCastEntity azuraCast in azuraCasts.Where(static a => a.IsOnline))
-            {
-                foreach (AzuraCastStationEntity station in azuraCast.Stations.Where(static s => s.Preferences.NowPlayingEmbedChannelId is > 0))
-                {
-                    await UpdateNowPlayingEmbedAsync(station);
-                }
-            }
+            IEnumerable<AzuraCastEntity> azuraCastsToCheck = azuraCasts.Where(static a => a.IsOnline);
+            IEnumerable<AzuraCastStationEntity> stationsToCheck = azuraCastsToCheck.SelectMany(static a => a.Stations.Where(static s => s.Preferences.NowPlayingEmbedChannelId is > 0));
+            await Task.WhenAll(stationsToCheck.Select(UpdateNowPlayingEmbedAsync));
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
         {
