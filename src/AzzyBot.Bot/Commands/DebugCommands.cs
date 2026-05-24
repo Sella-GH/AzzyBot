@@ -180,7 +180,7 @@ public sealed class DebugCommands
 
             _logger.CommandRequested(nameof(DebugWebServiceTestsAsync), context.User.Username);
 
-            await context.DeferResponseAsync();
+            await context.DeferResponseAsync(ephemeral: true);
 
             AzzyDebugWebRequestStruct req = await _webRequestService.DebugGetWebAsync(url);
             StringBuilder sb = new();
@@ -203,23 +203,19 @@ public sealed class DebugCommands
 
             if (string.IsNullOrEmpty(req.Content))
             {
-                await context.DeleteResponseAsync();
-                await context.FollowupAsync(sb.ToString(), ephemeral: true);
+                await context.EditResponseAsync(sb.ToString());
                 return;
             }
 
             string fileName = $"WebRequestDebug_{DateTime.UtcNow:yyyy-MM-dd_HH-mm-ss-fffffff}.txt";
             string filePath = await FileOperations.CreateTempFileAsync(req.Content, fileName);
             await using FileStream fs = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
-            DiscordMessageBuilder builder = new();
+            DiscordInteractionResponseBuilder builder = new();
+            builder.WithContent(sb.ToString());
             builder.AddFile(fileName, fs, AddFileOptions.CloseStream);
-            await context.EditResponseAsync(builder);
+            await context.EditResponseAsync(builder.AsEphemeral());
             if (File.Exists(filePath))
                 FileOperations.DeleteFile(filePath);
-
-            await context.FollowupAsync(sb.ToString(), ephemeral: true);
-
-            return;
         }
     }
 }
