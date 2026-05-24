@@ -1,4 +1,4 @@
-﻿<Project>
+<Project>
 
   <!-- Development stuff -->
   <PropertyGroup>
@@ -59,12 +59,6 @@
     <RepositoryUrl>https://github.com/Sella-GH/AzzyBot</RepositoryUrl>
     <Version>2.10.0</Version>
   </PropertyGroup>
-  
-  <!-- Runtimeconfig settings -->
-  <ItemGroup>
-     <!-- Exclude HTTP/3 on purpose until .NET fixes it -->
-    <RuntimeHostConfigurationOption Value="false" Include="System.Net.SocketsHttpHandler.Http3Support" />
-  </ItemGroup>
 
   <PropertyGroup>
     <!-- JIT Settings -->

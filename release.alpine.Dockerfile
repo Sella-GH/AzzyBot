@@ -26,7 +26,7 @@ USER root
 # Upgrade internal tools and packages first
 RUN apk update \
   && apk upgrade \
-  && apk add --no-cache icu-data-full icu-libs iputils-ping krb5-libs tzdata zstd-dev \
+  && apk add --no-cache icu-data-full icu-libs iputils-ping krb5-libs libmsquic tzdata zstd-dev \
   && apk cache sync \
   && rm -rf /var/cache/apk/*
 

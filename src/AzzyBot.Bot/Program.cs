@@ -22,7 +22,11 @@ namespace AzzyBot.Bot;
 
 public static class Program
 {
+#if DEBUG || RELEASE
     public static async Task Main(string[] args)
+#else
+    public static async Task Main()
+#endif
     {
         #region Parse arguments
 

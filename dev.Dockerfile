@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:labs
 
-# BUILD IMAGE
+# --- BUILD IMAGE ---
 FROM mcr.microsoft.com/dotnet/sdk:10.0-resolute AS build
 USER root
 
@@ -20,14 +20,21 @@ RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.con
   && dotnet build ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c $CONFIG --no-incremental --no-restore --no-self-contained --ucr \
   && dotnet publish ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c $CONFIG --no-build --no-restore --no-self-contained -o out --ucr
 
-# RUNNER IMAGE
+ADD https://packages.microsoft.com/config/ubuntu/26.04/packages-microsoft-prod.deb /packages-microsoft-prod.deb
+
+# --- RUNNER IMAGE ---
 FROM mcr.microsoft.com/dotnet/runtime:10.0-resolute AS runner
 USER root
 
 # Upgrade internal tools and packages first
-RUN apt-get update \
+RUN --mount=type=bind,from=build,source=/packages-microsoft-prod.deb,target=/tmp/packages-microsoft-prod.deb \
+  apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates gnupg \
+  && dpkg -i /tmp/packages-microsoft-prod.deb \
+  && apt-get update \
   && apt-get upgrade -y \
   && apt-get install -y --no-install-recommends iputils-ping libgssapi-krb5-2 libzstd-dev \
+  && apt-get install -y --no-install-recommends libmsquic libxdp1 libnl-3-200 libnl-route-3-200 \
   && apt-get autoremove --purge -y \
   && apt-get clean -y \
   && rm -rf /var/lib/apt/lists/*

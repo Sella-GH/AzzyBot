@@ -18,7 +18,7 @@ public static class HardwareStats
     #endregion Constants
 
     public static bool CheckIfLinuxOs
-        => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+        => OperatingSystem.IsLinux();
 
     public static async Task<Dictionary<int, double>> GetSystemCpuAsync()
     {

@@ -73,6 +73,9 @@ public static partial class LoggerActions
     [LoggerMessage(LogLevel.Information, "Invite me using the following url: {invite}")]
     public static partial void InviteUrl(this ILogger<DiscordBotServiceHost> logger, string invite);
 
+    [LoggerMessage(LogLevel.Information, "Status of HTTP/3 QUIC Support: {quic}")]
+    public static partial void Http3QuicSupport(this ILogger<WebRequestService> logger, bool quic);
+
     [LoggerMessage(LogLevel.Information, "Command {command} requested by {user} to execute")]
     public static partial void CommandRequested(this ILogger logger, string command, string user);
 

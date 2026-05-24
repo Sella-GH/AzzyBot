@@ -4,6 +4,7 @@
 - Upgraded docker images to Ubuntu 26.04 resolute
 
 ### Improvements
+- Re-enabled HTTP/3 support after implementing several packages in the Dockerfiles
 - The bot now also sends a welcome notification to the first channel it can see when it's added to a server
   - This is in addition to the DM sent to the server owner and is intended to make sure that the bot can reach the users in some way
 - The command `config add-azuracast-station` was improved by adding autocomplete that displays only existing stations from the server to reduce issues
@@ -15,6 +16,7 @@
 
 ### Development
 - Abstracted all relevant services to interfaces to follow dependency inversion principles
+- Extended the command `debug webservice-tests` to show more information about the current request and response
 - JSON types in `AzuraCastApiService.cs` are known at compile time instead of runtime
 - Reencoded all source files to UTF-8 without BOM
 - Renamed `Startup.cs` to `Program.cs` to align with .NET conventions
