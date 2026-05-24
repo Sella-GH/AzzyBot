@@ -8,6 +8,12 @@ namespace AzzyBot.Bot.Utilities.Records.AzuraCast;
 public sealed record AzuraAdminStationConfigRecord
 {
     /// <summary>
+    /// Station ID
+    /// </summary>
+    [JsonPropertyName("id")]
+    public required int Id { get; set; }
+
+    /// <summary>
     /// The full display name of the station.
     /// </summary>
     [JsonPropertyName("name")]

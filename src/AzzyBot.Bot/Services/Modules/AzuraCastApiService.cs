@@ -534,7 +534,16 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}";
 
-        return GetFromApiAsync<AzuraStationRecord>(baseUrl, endpoint, JsonSourceGen.Default.AzuraStationRecord, CreateHeader(apiKey));
+        return GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.AzuraStationRecord, CreateHeader(apiKey));
+    }
+
+    public Task<IEnumerable<AzuraAdminStationConfigRecord>?> GetStationsAdminConfigAsync(Uri baseUrl, string apiKey)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+
+        string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Stations}";
+
+        return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraAdminStationConfigRecord, CreateHeader(apiKey));
     }
 
     public Task<AzuraAdminStationConfigRecord?> GetStationAdminConfigAsync(Uri baseUrl, string apiKey, int stationId)
@@ -544,7 +553,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}";
 
-        return GetFromApiAsync<AzuraAdminStationConfigRecord>(baseUrl, endpoint, JsonSourceGen.Default.AzuraAdminStationConfigRecord, CreateHeader(apiKey));
+        return GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.AzuraAdminStationConfigRecord, CreateHeader(apiKey));
     }
 
     public Task<IEnumerable<AzuraStationHistoryItemRecord>?> GetStationHistoryAsync(Uri baseUrl, string apiKey, int stationId, in DateTimeOffset startHistory, in DateTimeOffset endHistory)

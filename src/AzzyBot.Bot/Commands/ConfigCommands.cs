@@ -166,7 +166,7 @@ public sealed class ConfigCommands
         public async ValueTask AddAzuraCastStationAsync
         (
             SlashCommandContext context,
-            [Description("Enter the station id of your azuracast station.")] int station,
+            [Description("Enter the station id of your azuracast station."), SlashAutoCompleteProvider<AzuraCastStationsOnlineAutocomplete>] int station,
             [Description("Select the group that has the admin permissions on this station.")] DiscordRole adminGroup,
             [Description("Select a channel to get music requests when a request is not found on the server."), ChannelTypes(DiscordChannelType.Text)] DiscordChannel requestsChannel,
             [Description("Enable or disable the showing of the playlist in the nowplaying embed."), SlashChoiceProvider<BooleanEnableDisableStateProvider>] int showPlaylist,

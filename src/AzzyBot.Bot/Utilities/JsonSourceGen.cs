@@ -19,35 +19,36 @@ namespace AzzyBot.Bot.Utilities;
 [JsonSerializable(typeof(AzuraInternalRequestRecord))]
 [JsonSerializable(typeof(SerializableExceptionsRecord))]
 // Deserialization
-[JsonSerializable(typeof(AzuraAdminStationConfigRecord))] // Generic
-[JsonSerializable(typeof(AzuraErrorRecord))] // Generic
+[JsonSerializable(typeof(AzuraAdminStationConfigRecord))]
+[JsonSerializable(typeof(IEnumerable<AzuraAdminStationConfigRecord>))]
+[JsonSerializable(typeof(AzuraErrorRecord))]
 [JsonSerializable(typeof(AzuraFilesRecord))]
-[JsonSerializable(typeof(AzuraFilesDetailedRecord))] // Generic
-[JsonSerializable(typeof(IEnumerable<AzuraFilesDetailedRecord>))] // Generic
-[JsonSerializable(typeof(AzuraHardwareStatsRecord))] // Generic
+[JsonSerializable(typeof(AzuraFilesDetailedRecord))]
+[JsonSerializable(typeof(IEnumerable<AzuraFilesDetailedRecord>))]
+[JsonSerializable(typeof(AzuraHardwareStatsRecord))]
 [JsonSerializable(typeof(AzuraHlsMountRecord))]
-[JsonSerializable(typeof(IEnumerable<AzuraHlsMountRecord>))] // Generic
-[JsonSerializable(typeof(AzuraNowPlayingDataRecord))] // Generic
-[JsonSerializable(typeof(AzuraPlaylistRecord))] // Generic
-[JsonSerializable(typeof(IEnumerable<AzuraPlaylistRecord>))] // Generic
+[JsonSerializable(typeof(IEnumerable<AzuraHlsMountRecord>))]
+[JsonSerializable(typeof(AzuraNowPlayingDataRecord))]
+[JsonSerializable(typeof(AzuraPlaylistRecord))]
+[JsonSerializable(typeof(IEnumerable<AzuraPlaylistRecord>))]
 [JsonSerializable(typeof(AzuraRequestRecord))]
-[JsonSerializable(typeof(IEnumerable<AzuraRequestRecord>))] // Generic
+[JsonSerializable(typeof(IEnumerable<AzuraRequestRecord>))]
 [JsonSerializable(typeof(AzuraRequestQueueItemRecord))]
-[JsonSerializable(typeof(IEnumerable<AzuraRequestQueueItemRecord>))] // Generic
+[JsonSerializable(typeof(IEnumerable<AzuraRequestQueueItemRecord>))]
 [JsonSerializable(typeof(AzuraMediaItemRecord))]
-[JsonSerializable(typeof(IEnumerable<AzuraMediaItemRecord>))] // Generic
+[JsonSerializable(typeof(IEnumerable<AzuraMediaItemRecord>))]
 [JsonSerializable(typeof(AzuraSongDataRecord))]
 [JsonSerializable(typeof(AzuraStationHistoryItemRecord))]
-[JsonSerializable(typeof(IEnumerable<AzuraStationHistoryItemRecord>))] // Generic
+[JsonSerializable(typeof(IEnumerable<AzuraStationHistoryItemRecord>))]
 [JsonSerializable(typeof(AzuraStationListenerRecord))]
-[JsonSerializable(typeof(IEnumerable<AzuraStationListenerRecord>))] // Generic
+[JsonSerializable(typeof(IEnumerable<AzuraStationListenerRecord>))]
 [JsonSerializable(typeof(AzuraStationQueueItemDetailedRecord))]
-[JsonSerializable(typeof(IEnumerable<AzuraStationQueueItemDetailedRecord>))] // Generic
-[JsonSerializable(typeof(AzuraStationRecord))] // Generic
-[JsonSerializable(typeof(AzuraStationStatusRecord))] // Generic
-[JsonSerializable(typeof(AzuraStatusRecord))] // Generic
-[JsonSerializable(typeof(AzuraSystemLogsRecord))] // Generic
-[JsonSerializable(typeof(AzuraSystemLogRecord))] // Generic
+[JsonSerializable(typeof(IEnumerable<AzuraStationQueueItemDetailedRecord>))]
+[JsonSerializable(typeof(AzuraStationRecord))]
+[JsonSerializable(typeof(AzuraStationStatusRecord))]
+[JsonSerializable(typeof(AzuraStatusRecord))]
+[JsonSerializable(typeof(AzuraSystemLogsRecord))]
+[JsonSerializable(typeof(AzuraSystemLogRecord))]
 [JsonSerializable(typeof(AzuraUpdateRecord))]
 [JsonSerializable(typeof(AzuraUpdateErrorRecord))]
 [JsonSerializable(typeof(List<AzzyUpdateRecord>))]
