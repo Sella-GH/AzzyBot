@@ -21,18 +21,29 @@ public sealed class AzuraCheckApiPermissionsJob(IAzuraCastApiService apiService,
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         try
         {
+            switch (context.Parameter)
+            {
+                case AzuraCastEntity azura when azura.IsOnline:
+                    await _apiService.CheckForApiPermissionsAsync(azura);
+                    return;
+
+                case AzuraCastStationEntity station when station.AzuraCast.IsOnline:
+                    await _apiService.CheckForApiPermissionsAsync(station);
+                    return;
+            }
+
             // Preferences needed to send messages to the guilds channel
             // Stations needed to check the api permissions
             IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.ReadAzuraCastsAsync(loadPrefs: true, loadStations: true);
-            if (!azuraCasts.Any())
+            if (azuraCasts.Count is 0)
                 return;
 
-            foreach (AzuraCastEntity azuraCast in azuraCasts.Where(a => a.IsOnline))
-            {
-                await _apiService.CheckForApiPermissionsAsync(azuraCast);
-            }
+            IEnumerable<AzuraCastEntity> azuraCastsToCheck = azuraCasts.Where(static a => a.IsOnline);
+            await Task.WhenAll(azuraCastsToCheck.Select(_apiService.CheckForApiPermissionsAsync));
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
         {

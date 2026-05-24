@@ -5,6 +5,10 @@ using System.Threading.Tasks;
 using AzzyBot.Bot.Models.AzuraCast;
 using AzzyBot.Bot.Services.CronJobs;
 using AzzyBot.Bot.Services.Interfaces;
+using AzzyBot.Bot.Structs;
+using AzzyBot.Data.Entities;
+
+using DSharpPlus.Entities;
 
 using NCronJob;
 
@@ -15,11 +19,42 @@ public sealed class CronJobManager(IInstantJobRegistry jobRegistry, IDiscordBotS
     private readonly IInstantJobRegistry _jobRegistry = jobRegistry;
     private readonly IDiscordBotService _botService = botService;
 
-    public void RunAzzyBotInactiveGuildJob()
-        => _jobRegistry.RunInstantJob<AzzyBotInactiveGuildJob>();
+    public void RunAzuraCheckApiPermissionsJob(AzuraCastEntity azuraCast)
+        => _jobRegistry.RunInstantJob<AzuraCheckApiPermissionsJob>(azuraCast);
+
+    public void RunAzuraCheckApiPermissionsJob(AzuraCastStationEntity station)
+        => _jobRegistry.RunInstantJob<AzuraCheckApiPermissionsJob>(station);
+
+    public void RunAzuraCheckFileChangesJob(AzuraCastEntity azuraCast)
+        => _jobRegistry.RunInstantJob<AzuraCheckFileChangesJob>(azuraCast);
+
+    public void RunAzuraCheckFileChangesJob(AzuraCastStationEntity station)
+        => _jobRegistry.RunInstantJob<AzuraCheckFileChangesJob>(station);
+
+    public void RunAzuraCheckUpdatesJob(AzuraCastEntity azuraCast)
+        => _jobRegistry.RunInstantJob<AzuraCheckUpdatesJob>(azuraCast);
 
     public void RunAzuraRequestJob(AzuraCustomQueueItemModel queueItem)
         => _jobRegistry.RunInstantJob<AzuraRequestJob>(queueItem);
+
+    public void RunAzuraStatusPingJob(AzuraCastEntity azuraCast)
+        => _jobRegistry.RunInstantJob<AzuraStatusPingJob>(azuraCast);
+
+    public void RunAzzyBotCheckPermissionsJob(DiscordGuild guild, ulong[] guildIds)
+        => _jobRegistry.RunInstantJob<AzzyBotCheckPermissionsJob>(new AzzyCheckPermissionsStruct()
+        {
+            DiscordGuild = guild,
+            DiscordGuildIds = [.. guildIds]
+        });
+
+    public void RunAzzyBotCheckPermissionsJob(GuildEntity guild)
+        => _jobRegistry.RunInstantJob<AzzyBotCheckPermissionsJob>(new AzzyCheckPermissionsStruct()
+        {
+            GuildEntity = guild
+        });
+
+    public void RunAzzyBotInactiveGuildJob()
+        => _jobRegistry.RunInstantJob<AzzyBotInactiveGuildJob>();
 
     public async Task<bool> TryHandleAsync(IJobExecutionContext jobExecutionContext, Exception exception, CancellationToken cancellationToken)
     {

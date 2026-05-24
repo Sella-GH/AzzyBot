@@ -21,11 +21,11 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class AzuraCastStationsInDbAutocomplete(ILogger<AzuraCastStationsInDbAutocomplete> logger, IAzuraCastApiService azuraCastApi, IAzuraCastPingService azuraCastPing, IDbActions dbActions, IDiscordBotService botService) : IAutoCompleteProvider
+public sealed class AzuraCastStationsInDbAutocomplete(ILogger<AzuraCastStationsInDbAutocomplete> logger, IAzuraCastApiService azuraCastApi, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService) : IAutoCompleteProvider
 {
     private readonly ILogger<AzuraCastStationsInDbAutocomplete> _logger = logger;
     private readonly IAzuraCastApiService _azuraCast = azuraCastApi;
-    private readonly IAzuraCastPingService _azuraCastPing = azuraCastPing;
+    private readonly ICronJobManager _cronJobManager = cronJobManager;
     private readonly IDbActions _dbActions = dbActions;
     private readonly IDiscordBotService _botService = botService;
 
@@ -72,7 +72,7 @@ public sealed class AzuraCastStationsInDbAutocomplete(ILogger<AzuraCastStationsI
             }
             catch (HttpRequestException)
             {
-                await _azuraCastPing.PingInstanceAsync(azuraCast);
+                _cronJobManager.RunAzuraStatusPingJob(azuraCast);
                 return results;
             }
 

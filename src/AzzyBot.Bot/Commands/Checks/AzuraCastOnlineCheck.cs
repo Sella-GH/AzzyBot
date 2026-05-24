@@ -16,6 +16,7 @@ namespace AzzyBot.Bot.Commands.Checks;
 
 public sealed class AzuraCastOnlineCheck(ILogger<AzuraCastOnlineCheck> logger, IDbActions dbActions) : IContextCheck<AzuraCastOnlineCheckAttribute>
 {
+    private readonly ILogger<AzuraCastOnlineCheck> _logger = logger;
     private readonly IDbActions _dbActions = dbActions;
 
     public async ValueTask<string?> ExecuteCheckAsync(AzuraCastOnlineCheckAttribute attribute, CommandContext context)
@@ -29,7 +30,7 @@ public sealed class AzuraCastOnlineCheck(ILogger<AzuraCastOnlineCheck> logger, I
         AzuraCastEntity? azuraCast = await _dbActions.ReadAzuraCastAsync(context.Guild.Id);
         if (azuraCast is null)
         {
-            logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+            _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
             return "AzuraCast is null!";
         }
 

@@ -32,12 +32,12 @@ namespace AzzyBot.Bot.Commands;
 public sealed class CoreCommands
 {
     [Command("core"), RequireGuild, ModuleActivatedCheck([AzzyModules.LegalTerms])]
-    public sealed class CoreGroup(ILogger<CoreGroup> logger, IOptions<AzzyBotSettings> settings, IDbActions dbActions, IDiscordBotService botService)
+    public sealed class CoreGroup(ILogger<CoreGroup> logger, IOptions<AzzyBotSettings> settings, ICronJobManager cronJobManager, IDbActions dbActions)
     {
         private readonly ILogger<CoreGroup> _logger = logger;
         private readonly AzzyBotSettings _settings = settings.Value;
+        private readonly ICronJobManager _cronJobManager = cronJobManager;
         private readonly IDbActions _dbActions = dbActions;
-        private readonly IDiscordBotService _botService = botService;
 
         [Command("force-channel-permissions-check"), Description("Forces a check of the permissions for the bot in the necessary channel."), RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator])]
         public async ValueTask ForceChannelPermissionsCheckAsync(SlashCommandContext context)
@@ -53,9 +53,8 @@ public sealed class CoreCommands
                 return;
             }
 
+            _cronJobManager.RunAzzyBotCheckPermissionsJob(guild);
             await context.EditResponseAsync("I initiated a check of the permissions for the bot, please wait a little for the result.");
-
-            await _botService.CheckPermissionsAsync(guild);
         }
 
         [Command("help"), Description("Gives you an overview about all the available commands.")]

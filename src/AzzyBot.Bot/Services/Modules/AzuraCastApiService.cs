@@ -45,11 +45,11 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
     {
         ArgumentNullException.ThrowIfNull(azuraCast);
 
-        await CheckForAdminApiPermissionsAsync(azuraCast);
-        foreach (AzuraCastStationEntity station in azuraCast.Stations)
-        {
-            await CheckForStationApiPermissionsAsync(station);
-        }
+        IEnumerable<Task> tasks = azuraCast.Stations
+            .Select(CheckForStationApiPermissionsAsync)
+            .Prepend(CheckForAdminApiPermissionsAsync(azuraCast));
+
+        await Task.WhenAll(tasks);
     }
 
     public Task CheckForApiPermissionsAsync(AzuraCastStationEntity station)

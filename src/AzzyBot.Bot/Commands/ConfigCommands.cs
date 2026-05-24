@@ -42,13 +42,11 @@ namespace AzzyBot.Bot.Commands;
 public sealed class ConfigCommands
 {
     [Command("config"), RequireGuild, RequirePermissions(botPermissions: [], userPermissions: [DiscordPermission.Administrator]), ModuleActivatedCheck([AzzyModules.LegalTerms])]
-    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, IAzuraCastApiService azuraCastApi, IAzuraCastFileService azuraCastFile, IAzuraCastPingService azuraCastPing, IAzuraCastUpdateService azuraCastUpdate, IDbActions dbActions, IDiscordBotService botService)
+    public sealed class ConfigGroup(ILogger<ConfigGroup> logger, IAzuraCastApiService azuraCastApi, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService)
     {
         private readonly ILogger<ConfigGroup> _logger = logger;
         private readonly IAzuraCastApiService _azuraCastApi = azuraCastApi;
-        private readonly IAzuraCastFileService _azuraCastFile = azuraCastFile;
-        private readonly IAzuraCastPingService _azuraCastPing = azuraCastPing;
-        private readonly IAzuraCastUpdateService _azuraCastUpdate = azuraCastUpdate;
+        private readonly ICronJobManager _cronJobManager = cronJobManager;
         private readonly IDbActions _dbActions = dbActions;
         private readonly IDiscordBotService _botService = botService;
 
@@ -156,9 +154,9 @@ public sealed class ConfigCommands
                 return;
             }
 
-            await _botService.CheckPermissionsAsync(context.Guild, [notificationChannel.Id, outagesChannel.Id]);
+            _cronJobManager.RunAzzyBotCheckPermissionsJob(context.Guild, [notificationChannel.Id, outagesChannel.Id]);
             if (dAzuraCast.Checks.ServerStatus)
-                await _azuraCastPing.PingInstanceAsync(dAzuraCast);
+                _cronJobManager.RunAzuraStatusPingJob(dAzuraCast);
         }
 
         [Command("add-azuracast-station"), Description("Add an AzuraCast station to your instance."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -217,7 +215,7 @@ public sealed class ConfigCommands
             }
 
             if (dAzuraCast.IsOnline)
-                await _azuraCastFile.CheckForFileChangesAsync(dStation);
+                _cronJobManager.RunAzuraCheckFileChangesJob(dStation);
         }
 
         [Command("delete-azuracast"), Description("Delete the existing AzuraCast setup."), ModuleActivatedCheck([AzzyModules.AzuraCast]), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -320,7 +318,7 @@ public sealed class ConfigCommands
                     channels[0] = outagesChannel.Id;
                 }
 
-                await _botService.CheckPermissionsAsync(context.Guild, [.. channels]);
+                _cronJobManager.RunAzzyBotCheckPermissionsJob(context.Guild, [.. channels]);
             }
 
             if (url is not null)
@@ -333,7 +331,7 @@ public sealed class ConfigCommands
                 }
 
                 if (dAzuraCast.Checks.ServerStatus)
-                    await _azuraCastPing.PingInstanceAsync(dAzuraCast);
+                    _cronJobManager.RunAzuraStatusPingJob(dAzuraCast);
             }
         }
 
@@ -403,10 +401,10 @@ public sealed class ConfigCommands
                 }
 
                 if (serverStatus is 1)
-                    await _azuraCastPing.PingInstanceAsync(dAzuraCast);
+                    _cronJobManager.RunAzuraStatusPingJob(dAzuraCast);
 
                 if (updates is 1)
-                    await _azuraCastUpdate.CheckForAzuraCastUpdatesAsync(dAzuraCast);
+                    _cronJobManager.RunAzuraCheckUpdatesJob(dAzuraCast);
             }
         }
 
@@ -458,7 +456,7 @@ public sealed class ConfigCommands
                     channels.Add(uploadChannel.Id);
 
                 if (channels.Count is not 0)
-                    await _botService.CheckPermissionsAsync(context.Guild, [.. channels]);
+                    _cronJobManager.RunAzzyBotCheckPermissionsJob(context.Guild, [.. channels]);
             }
 
             if (stationId.HasValue || !string.IsNullOrWhiteSpace(apiKey))
@@ -482,7 +480,7 @@ public sealed class ConfigCommands
                 }
 
                 if (dAzuraCast.IsOnline)
-                    await _azuraCastFile.CheckForFileChangesAsync(dStation);
+                    _cronJobManager.RunAzuraCheckFileChangesJob(dStation);
             }
 
             await context.DeleteResponseAsync();
@@ -540,7 +538,7 @@ public sealed class ConfigCommands
                 }
 
                 if (dAzuraCast.IsOnline)
-                    await _azuraCastFile.CheckForFileChangesAsync(dStation);
+                    _cronJobManager.RunAzuraCheckFileChangesJob(dStation);
             }
         }
 
@@ -568,7 +566,7 @@ public sealed class ConfigCommands
             await context.EditResponseAsync(GeneralStrings.CoreSettingsModified);
 
             if (adminChannel is not null)
-                await _botService.CheckPermissionsAsync(context.Guild, [adminChannel.Id]);
+                _cronJobManager.RunAzzyBotCheckPermissionsJob(context.Guild, [adminChannel.Id]);
         }
 
         [Command("get-settings"), Description("Get all configured settings in a direct message.")]
@@ -639,7 +637,7 @@ public sealed class ConfigCommands
                         }
                         catch (HttpRequestException)
                         {
-                            await _azuraCastPing.PingInstanceAsync(ac);
+                            _cronJobManager.RunAzuraStatusPingJob(ac);
                             break;
                         }
                         catch (InvalidOperationException)

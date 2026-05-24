@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Services.Interfaces;
+using AzzyBot.Bot.Structs;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Services.Interfaces;
 
@@ -19,10 +19,27 @@ public sealed class AzzyBotCheckPermissionsJob(IDbActions dbActions, IDiscordBot
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         try
         {
+            if (context.Parameter is AzzyCheckPermissionsStruct permissionsStruct)
+            {
+                if (permissionsStruct.DiscordGuild is not null && permissionsStruct.DiscordGuildIds is not null)
+                {
+                    await _botService.CheckPermissionsAsync(permissionsStruct.DiscordGuild, [.. permissionsStruct.DiscordGuildIds]);
+                    return;
+                }
+
+                if (permissionsStruct.GuildEntity is not null)
+                {
+                    await _botService.CheckPermissionsAsync(permissionsStruct.GuildEntity);
+                    return;
+                }
+            }
+
             IReadOnlyList<GuildEntity> guilds = await _dbActions.ReadGuildsAsync(loadEverything: true);
-            if (!guilds.Any())
+            if (guilds.Count is 0)
                 return;
 
             await _botService.CheckPermissionsAsync(guilds);

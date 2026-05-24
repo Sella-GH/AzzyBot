@@ -54,7 +54,10 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
             return;
         }
 
-        AzzyUpdateModel? updaterModel = (isPreview) ? JsonSerializer.Deserialize(body, JsonSourceGen.Default.ListAzzyUpdateModel)?[0] : JsonSerializer.Deserialize(body, JsonSourceGen.Default.AzzyUpdateModel);
+        AzzyUpdateModel? updaterModel = (isPreview)
+            ? JsonSerializer.Deserialize(body, JsonSourceGen.Default.ListAzzyUpdateModel)?[0]
+            : JsonSerializer.Deserialize(body, JsonSourceGen.Default.AzzyUpdateModel);
+
         if (updaterModel is null)
         {
             _logger.OnlineVersionUnserializable();

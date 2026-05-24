@@ -21,16 +21,22 @@ public sealed class AzuraStatusPingJob(IAzuraCastPingService pingService, IDbAct
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         try
         {
-            IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.ReadAzuraCastsAsync(loadChecks: true, loadPrefs: true, loadGuild: true);
-            if (!azuraCasts.Any())
-                return;
-
-            foreach (AzuraCastEntity azuraCast in azuraCasts.Where(a => a.Checks.ServerStatus))
+            if (context.Parameter is AzuraCastEntity azuraCast)
             {
                 await _pingService.PingInstanceAsync(azuraCast);
+                return;
             }
+
+            IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.ReadAzuraCastsAsync(loadChecks: true, loadPrefs: true, loadGuild: true);
+            if (azuraCasts.Count is 0)
+                return;
+
+            IEnumerable<AzuraCastEntity> azuraCastsToPing = azuraCasts.Where(static a => a.Checks.ServerStatus);
+            await Task.WhenAll(azuraCastsToPing.Select(_pingService.PingInstanceAsync));
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
         {

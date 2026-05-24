@@ -21,16 +21,22 @@ public sealed class AzuraCheckUpdatesJob(IAzuraCastUpdateService azuraUpdateServ
 
     public async Task RunAsync(IJobExecutionContext context, CancellationToken token)
     {
+        ArgumentNullException.ThrowIfNull(context);
+
         try
         {
+            if (context.Parameter is AzuraCastEntity azuraCast)
+            {
+                await _azuraUpdateService.CheckForAzuraCastUpdatesAsync(azuraCast, forced: true);
+                return;
+            }
+
             IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.ReadAzuraCastsAsync(loadChecks: true, loadPrefs: true, loadGuild: true);
-            if (!azuraCasts.Any())
+            if (azuraCasts.Count is 0)
                 return;
 
-            foreach (AzuraCastEntity azuraCast in azuraCasts.Where(a => a.IsOnline && a.Checks.Updates))
-            {
-                await _azuraUpdateService.CheckForAzuraCastUpdatesAsync(azuraCast);
-            }
+            IEnumerable<AzuraCastEntity> azuraCastsToCheck = azuraCasts.Where(static a => a.IsOnline && a.Checks.Updates);
+            await Task.WhenAll(azuraCastsToCheck.Select(ac => _azuraUpdateService.CheckForAzuraCastUpdatesAsync(ac, forced: false)));
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
         {

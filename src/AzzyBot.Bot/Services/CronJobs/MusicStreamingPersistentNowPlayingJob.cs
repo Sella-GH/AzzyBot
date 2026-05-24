@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -34,11 +33,12 @@ public sealed class MusicStreamingPersistentNowPlayingJob(ILogger<MusicStreaming
         try
         {
             IReadOnlyList<MusicStreamingEntity> musicStreams = await _dbActions.ReadMusicStreamingAsync(loadGuild: true);
-            if (!musicStreams.Any())
+            if (musicStreams.Count is 0)
                 return;
 
             foreach (MusicStreamingEntity stream in musicStreams)
             {
+                token.ThrowIfCancellationRequested();
                 await UpdateNowPlayingEmbedAsync(stream);
             }
         }
