@@ -19,9 +19,9 @@ public readonly struct AzzyCheckPermissionsStruct : IEquatable<AzzyCheckPermissi
         => obj is AzzyCheckPermissionsStruct other && Equals(other);
 
     public bool Equals(AzzyCheckPermissionsStruct other)
-        => EqualityComparer<DiscordGuild?>.Default.Equals(DiscordGuild, other.DiscordGuild) &&
-            EqualityComparer<IReadOnlyList<ulong>?>.Default.Equals(DiscordGuildIds, other.DiscordGuildIds) &&
-            EqualityComparer<GuildEntity?>.Default.Equals(GuildEntity, other.GuildEntity);
+        => Equals(DiscordGuild, other.DiscordGuild) &&
+            DiscordGuildIds != other.DiscordGuildIds &&
+            GuildEntity != other.GuildEntity;
 
     public override int GetHashCode()
         => HashCode.Combine(DiscordGuild, DiscordGuildIds, GuildEntity);
