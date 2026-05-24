@@ -37,9 +37,14 @@ public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayi
             if (azuraCasts.Count is 0)
                 return;
 
-            IEnumerable<AzuraCastEntity> azuraCastsToCheck = azuraCasts.Where(static a => a.IsOnline);
-            IEnumerable<AzuraCastStationEntity> stationsToCheck = azuraCastsToCheck.SelectMany(static a => a.Stations.Where(static s => s.Preferences.NowPlayingEmbedChannelId is > 0));
-            await Task.WhenAll(stationsToCheck.Select(UpdateNowPlayingEmbedAsync));
+            IEnumerable<AzuraCastStationEntity> stationsToCheck = azuraCasts.Where(static a => a.IsOnline)
+                .SelectMany(static a => a.Stations.Where(static s => s.Preferences.NowPlayingEmbedChannelId is > 0));
+
+            foreach (AzuraCastStationEntity station in stationsToCheck)
+            {
+                token.ThrowIfCancellationRequested();
+                await UpdateNowPlayingEmbedAsync(station);
+            }
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
         {

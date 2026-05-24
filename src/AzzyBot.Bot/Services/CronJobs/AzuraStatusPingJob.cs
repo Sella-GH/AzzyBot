@@ -25,19 +25,18 @@ public sealed class AzuraStatusPingJob(IAzuraCastPingService pingService, IDbAct
 
         try
         {
-            if (context.Parameter is not AzuraCastEntity azuraCast)
+            if (context.Parameter is AzuraCastEntity azuraCast)
             {
-                IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.ReadAzuraCastsAsync(loadChecks: true, loadPrefs: true, loadGuild: true);
-                if (azuraCasts.Count is 0)
-                    return;
-
-                IEnumerable<AzuraCastEntity> azuraCastsToPing = azuraCasts.Where(static a => a.Checks.ServerStatus);
-                await Task.WhenAll(azuraCastsToPing.Select(_pingService.PingInstanceAsync));
-
+                await _pingService.PingInstanceAsync(azuraCast);
                 return;
             }
 
-            await _pingService.PingInstanceAsync(azuraCast);
+            IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.ReadAzuraCastsAsync(loadChecks: true, loadPrefs: true, loadGuild: true);
+            if (azuraCasts.Count is 0)
+                return;
+
+            IEnumerable<AzuraCastEntity> azuraCastsToPing = azuraCasts.Where(static a => a.Checks.ServerStatus);
+            await Task.WhenAll(azuraCastsToPing.Select(_pingService.PingInstanceAsync));
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
         {

@@ -25,19 +25,26 @@ public sealed class AzuraCheckFileChangesJob(IAzuraCastFileService azuraFileServ
 
         try
         {
-            if (context.Parameter is not AzuraCastStationEntity azuraStation)
+            IEnumerable<AzuraCastStationEntity> stationsToCheck;
+
+            switch (context.Parameter)
             {
-                IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.ReadAzuraCastsAsync(loadPrefs: true, loadStations: true, loadStationChecks: true, loadGuild: true);
-                if (azuraCasts.Count is 0)
+                case AzuraCastEntity azuraCast:
+                    stationsToCheck = azuraCast.Stations.Where(static s => s.Checks.FileChanges);
+                    await Task.WhenAll(stationsToCheck.Select(_azuraFileService.CheckForFileChangesAsync));
                     return;
 
-                IEnumerable<AzuraCastStationEntity> stationsToCheck = azuraCasts.SelectMany(static ac => ac.Stations.Where(static s => s.Checks.FileChanges));
-                await Task.WhenAll(stationsToCheck.Select(_azuraFileService.CheckForFileChangesAsync));
-
-                return;
+                case AzuraCastStationEntity azuraCastStation:
+                    await _azuraFileService.CheckForFileChangesAsync(azuraCastStation);
+                    return;
             }
 
-            await _azuraFileService.CheckForFileChangesAsync(azuraStation);
+            IReadOnlyList<AzuraCastEntity> azuraCasts = await _dbActions.ReadAzuraCastsAsync(loadPrefs: true, loadStations: true, loadStationChecks: true, loadGuild: true);
+            if (azuraCasts.Count is 0)
+                return;
+
+            stationsToCheck = azuraCasts.SelectMany(static ac => ac.Stations.Where(static s => s.Checks.FileChanges));
+            await Task.WhenAll(stationsToCheck.Select(_azuraFileService.CheckForFileChangesAsync));
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
         {

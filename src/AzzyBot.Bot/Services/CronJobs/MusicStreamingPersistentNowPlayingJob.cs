@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -37,7 +36,11 @@ public sealed class MusicStreamingPersistentNowPlayingJob(ILogger<MusicStreaming
             if (musicStreams.Count is 0)
                 return;
 
-            await Task.WhenAll(musicStreams.Select(UpdateNowPlayingEmbedAsync));
+            foreach (MusicStreamingEntity stream in musicStreams)
+            {
+                token.ThrowIfCancellationRequested();
+                await UpdateNowPlayingEmbedAsync(stream);
+            }
         }
         catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
         {
