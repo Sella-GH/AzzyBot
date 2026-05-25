@@ -3,6 +3,10 @@
 - Added a missing package to the docker images to fix errors regarding authentication
 - Upgraded docker images to Ubuntu 26.04 resolute
 
+### Additions
+- Added a new command `azuracast get-station-logs`
+  - This command is similar to `azuracast get-system-logs` but only shows the logs of a specific station
+
 ### Improvements
 - Re-enabled HTTP/3 support after implementing several packages in the Dockerfiles
 - The bot now also sends a welcome notification to the first channel it can see when it's added to a server
@@ -13,6 +17,7 @@
 ### Fixes
 - A bug was fixed regarding searches in autocompletes for stations
 - An `ArgumentException` could appear when you have multiple stations using the same discord roles
+- More exceptions in the autocomplete handling are caught now
 - The `azzy help` command autocomplete works now and shows the commands even when nothing is typed in the search field
 
 ### Development

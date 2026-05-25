@@ -299,8 +299,61 @@ public sealed class AzuraCastCommands
             string fileName = $"{ac.Id}_{logName}_{DateTimeOffset.Now:yyyy-MM-dd_hh-mm-ss-fffffff}.log";
             string filePath = await FileOperations.CreateTempFileAsync(systemLog.Content, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
-            DiscordMessageBuilder builder = new();
-            builder.WithContent($"Here is the requested system log ({logName}).");
+            DiscordMessageBuilder builder = new()
+            {
+                Content = $"Here is the requested system log ({logName})."
+            };
+            builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
+            await context.EditResponseAsync(builder);
+
+            FileOperations.DeleteFile(filePath);
+        }
+
+        [Command("get-station-logs"), Description("Get the station logs of the selected station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
+        public async ValueTask GetStationLogsAsync
+        (
+            SlashCommandContext context,
+            [Description("The station of which you want to see the logs."), SlashAutoCompleteProvider<AzuraCastStationsInDbAutocomplete>] int station,
+            [Description("The station log you want to see."), SlashAutoCompleteProvider<AzuraCastStationLogAutocomplete>] string logName
+        )
+        {
+            ArgumentNullException.ThrowIfNull(context);
+            ArgumentNullException.ThrowIfNull(context.Guild);
+
+            _logger.CommandRequested(nameof(GetStationLogsAsync), context.User.Username);
+
+            AzuraCastEntity? ac = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadStations: true);
+            if (ac is null)
+            {
+                _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+                await context.EditResponseAsync(GeneralStrings.InstanceNotFound);
+                return;
+            }
+
+            AzuraCastStationEntity? acStation = ac.Stations.FirstOrDefault(s => s.StationId == station);
+            if (acStation is null)
+            {
+                _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, ac.Id, station);
+                await context.EditResponseAsync(GeneralStrings.StationNotFound);
+                return;
+            }
+
+            string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
+            Uri baseUrl = new(Crypto.Decrypt(ac.BaseUrl));
+            AzuraSystemLogModel? stationLog = await _azuraCastApi.GetStationLogAsync(baseUrl, apiKey, station, logName);
+            if (stationLog is null)
+            {
+                await context.EditResponseAsync(GeneralStrings.StationLogEmpty);
+                return;
+            }
+
+            string fileName = $"{ac.Id}-{acStation.Id}-{acStation.StationId}_{logName}_{DateTimeOffset.Now:yyyy-MM-dd_hh-mm-ss-fffffff}.log";
+            string filePath = await FileOperations.CreateTempFileAsync(stationLog.Content, fileName);
+            await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
+            DiscordMessageBuilder builder = new()
+            {
+                Content = $"Here is the requested station log ({logName})."
+            };
             builder.AddFile(fileName, fileStream, AddFileOptions.CloseStream);
             await context.EditResponseAsync(builder);
 
