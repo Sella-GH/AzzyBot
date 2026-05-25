@@ -68,7 +68,7 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
                 return [];
             }
         }
-        catch (HttpRequestException)
+        catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException)
         {
             _cronJobManager.RunAzuraStatusPingJob(station.AzuraCast);
             return [];

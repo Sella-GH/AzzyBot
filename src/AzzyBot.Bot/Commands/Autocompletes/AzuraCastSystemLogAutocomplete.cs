@@ -55,7 +55,7 @@ public sealed class AzuraCastSystemLogAutocomplete(ILogger<AzuraCastSystemLogAut
                 return [];
             }
         }
-        catch (HttpRequestException)
+        catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException)
         {
             _cronJobManager.RunAzuraStatusPingJob(azuraCast);
             return [];

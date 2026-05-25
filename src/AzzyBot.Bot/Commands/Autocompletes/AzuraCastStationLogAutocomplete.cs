@@ -57,11 +57,11 @@ public sealed class AzuraCastStationLogAutocomplete(ILogger<AzuraCastStationLogA
             stationLogs = await _azuraCastApi.GetStationLogsAsync(baseUrl, apiKey, stationId);
             if (stationLogs is null)
             {
-                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the administrative **system logs** endpoint.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station logs** endpoint.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
                 return [];
             }
         }
-        catch (HttpRequestException)
+        catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException)
         {
             _cronJobManager.RunAzuraStatusPingJob(station.AzuraCast);
             return [];

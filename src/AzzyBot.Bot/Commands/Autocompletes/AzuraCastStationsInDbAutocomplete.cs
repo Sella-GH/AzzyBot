@@ -70,7 +70,7 @@ public sealed class AzuraCastStationsInDbAutocomplete(ILogger<AzuraCastStationsI
                     return results;
                 }
             }
-            catch (HttpRequestException)
+            catch (Exception ex) when (ex is HttpRequestException or InvalidOperationException)
             {
                 _cronJobManager.RunAzuraStatusPingJob(azuraCast);
                 return results;

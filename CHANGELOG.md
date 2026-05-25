@@ -17,6 +17,7 @@
 ### Fixes
 - A bug was fixed regarding searches in autocompletes for stations
 - An `ArgumentException` could appear when you have multiple stations using the same discord roles
+- More exceptions in the autocomplete handling are caught now
 - The `azzy help` command autocomplete works now and shows the commands even when nothing is typed in the search field
 
 ### Development

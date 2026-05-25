@@ -579,6 +579,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
     public async Task<AzuraSystemLogModel?> GetStationLogAsync(Uri baseUrl, string apiKey, int stationId, string logName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
         ArgumentException.ThrowIfNullOrWhiteSpace(logName);
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Log}/{logName}";
