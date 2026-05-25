@@ -100,12 +100,13 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         if (config is null)
             return;
 
-        List<Uri> apis = new(6)
+        List<Uri> apis = new(7)
         {
             new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}"),
             new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlists}"),
             new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}"),
-            new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Status}")
+            new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Status}"),
+            new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Logs}")
         };
 
         if (config.EnableRequests)
@@ -573,6 +574,33 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Listeners}";
 
         return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraStationListenerModel, CreateHeader(apiKey));
+    }
+
+    public async Task<AzuraSystemLogModel?> GetStationLogAsync(Uri baseUrl, string apiKey, int stationId, string logName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentException.ThrowIfNullOrWhiteSpace(logName);
+
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Log}/{logName}";
+
+        try
+        {
+            return await GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.AzuraSystemLogModel, CreateHeader(apiKey));
+        }
+        catch (HttpRequestException)
+        {
+            return null;
+        }
+    }
+
+    public Task<IEnumerable<AzuraSystemLogEntryModel>?> GetStationLogsAsync(Uri baseUrl, string apiKey, int stationId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
+
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Logs}";
+
+        return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraSystemLogEntryModel, CreateHeader(apiKey));
     }
 
     public Task<IEnumerable<AzuraHlsMountModel>?> GetStationHlsMountPointsAsync(Uri baseUrl, string apiKey, int stationId)

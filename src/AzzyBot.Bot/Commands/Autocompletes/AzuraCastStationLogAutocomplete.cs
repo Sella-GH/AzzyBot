@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -19,9 +21,9 @@ using Microsoft.Extensions.Logging;
 
 namespace AzzyBot.Bot.Commands.Autocompletes;
 
-public sealed class AzuraCastSystemLogAutocomplete(ILogger<AzuraCastSystemLogAutocomplete> logger, IAzuraCastApiService azuraCastApi, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService) : IAutoCompleteProvider
+public sealed class AzuraCastStationLogAutocomplete(ILogger<AzuraCastStationLogAutocomplete> logger, IAzuraCastApiService azuraCastApi, ICronJobManager cronJobManager, IDbActions dbActions, IDiscordBotService botService) : IAutoCompleteProvider
 {
-    private readonly ILogger<AzuraCastSystemLogAutocomplete> _logger = logger;
+    private readonly ILogger<AzuraCastStationLogAutocomplete> _logger = logger;
     private readonly IAzuraCastApiService _azuraCastApi = azuraCastApi;
     private readonly ICronJobManager _cronJobManager = cronJobManager;
     private readonly IDbActions _dbActions = dbActions;
@@ -32,38 +34,42 @@ public sealed class AzuraCastSystemLogAutocomplete(ILogger<AzuraCastSystemLogAut
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(context.Guild);
 
-        AzuraCastEntity? azuraCast = await _dbActions.ReadAzuraCastAsync(context.Guild.Id);
-        if (azuraCast is null)
+        int stationId = Convert.ToInt32(context.Options.Single(static o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
+        if (stationId is 0)
+            return [];
+
+        AzuraCastStationEntity? station = await _dbActions.ReadAzuraCastStationAsync(context.Guild.Id, stationId, loadAzuraCast: true, loadAzuraCastPrefs: true);
+        if (station is null)
         {
-            _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
+            _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, stationId);
             return [];
         }
-        else if (!azuraCast.IsOnline)
+        else if (!station.AzuraCast.IsOnline)
         {
             return [];
         }
 
-        Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
-        string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
-        AzuraSystemLogsModel? systemLogs;
+        Uri baseUrl = new(Crypto.Decrypt(station.AzuraCast.BaseUrl));
+        string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.AzuraCast.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
+        IEnumerable<AzuraSystemLogEntryModel>? stationLogs;
         try
         {
-            systemLogs = await _azuraCastApi.GetSystemLogsAsync(baseUrl, apiKey);
-            if (systemLogs is null)
+            stationLogs = await _azuraCastApi.GetStationLogsAsync(baseUrl, apiKey, stationId);
+            if (stationLogs is null)
             {
-                await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the administrative **system logs** endpoint.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the administrative **system logs** endpoint.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
                 return [];
             }
         }
         catch (HttpRequestException)
         {
-            _cronJobManager.RunAzuraStatusPingJob(azuraCast);
+            _cronJobManager.RunAzuraStatusPingJob(station.AzuraCast);
             return [];
         }
 
         string? search = context.UserInput;
         List<DiscordAutoCompleteChoice> results = new(25);
-        foreach (AzuraSystemLogEntryModel log in systemLogs.Logs)
+        foreach (AzuraSystemLogEntryModel log in stationLogs)
         {
             if (results.Count is 25)
                 break;

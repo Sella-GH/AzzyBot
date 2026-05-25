@@ -49,6 +49,7 @@ namespace AzzyBot.Bot.Utilities;
 [JsonSerializable(typeof(AzuraStatusModel))]
 [JsonSerializable(typeof(AzuraSystemLogsModel))]
 [JsonSerializable(typeof(AzuraSystemLogModel))]
+[JsonSerializable(typeof(IEnumerable<AzuraSystemLogEntryModel>))]
 [JsonSerializable(typeof(AzuraUpdateModel))]
 [JsonSerializable(typeof(AzuraUpdateErrorModel))]
 [JsonSerializable(typeof(List<AzzyUpdateModel>))]
