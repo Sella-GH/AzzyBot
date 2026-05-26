@@ -4,16 +4,19 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-using CsvHelper;
-using CsvHelper.Configuration;
+using nietras.SeparatedValues;
 
 namespace AzzyBot.Core.Utilities;
 
 public static class FileOperations
 {
+    private static readonly char[] _injectionCharacters = ['=', '@', '+', '-', '\t', '\r'];
+    private const char InjectionEscapeCharacter = '\'';
+
     public static async Task<string> CreateCsvFileAsync<T>(IEnumerable<T> content, string? path = null)
     {
         ArgumentNullException.ThrowIfNull(content);
@@ -22,18 +25,76 @@ public static class FileOperations
             ? Path.Combine(Path.GetTempPath(), Path.GetFileName(path))
             : Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 
-        await using StreamWriter writer = new(filePath);
-        CsvConfiguration config = new(CultureInfo.InvariantCulture)
-        {
-            Encoding = Encoding.UTF8,
-            InjectionOptions = InjectionOptions.Escape
-        };
+        IReadOnlyList<CsvColumn> columns = CsvColumnCache<T>.Columns;
 
-        await using CsvWriter csv = new(writer, config);
-        await csv.WriteRecordsAsync(content);
+        await using SepWriter writer = Sep.New(',').Writer(o => o with
+        {
+            CultureInfo = CultureInfo.InvariantCulture,
+            WriteHeader = true,
+            Escape = true
+        }).ToFile(filePath);
+
+        foreach (T item in content)
+        {
+            await using var row = writer.NewRow();
+            foreach (CsvColumn column in columns)
+            {
+                row[column.Header].Set(SanitizeForInjection(FormatValue(column.Getter(item))));
+            }
+        }
 
         return filePath;
     }
+
+    private sealed record CsvColumn(string Header, Func<object?, object?> Getter);
+
+    private static class CsvColumnCache<T>
+    {
+        public static readonly IReadOnlyList<CsvColumn> Columns = BuildColumns(typeof(T), static obj => obj);
+    }
+
+    private static IReadOnlyList<CsvColumn> BuildColumns(Type type, Func<object?, object?> parentGetter)
+    {
+        List<CsvColumn> columns = [];
+        foreach (PropertyInfo property in type.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+        {
+            if (!property.CanRead || property.GetIndexParameters().Length > 0)
+                continue;
+
+            Type propertyType = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
+            Func<object?, object?> getter = parent =>
+            {
+                object? owner = parentGetter(parent);
+                return (owner is null) ? null : property.GetValue(owner);
+            };
+
+            // Mimic CsvHelper auto-mapping: reference types (other than string) are
+            // flattened into their own members, everything else becomes a single column.
+            if (propertyType == typeof(string) || !propertyType.IsClass)
+            {
+                columns.Add(new CsvColumn(property.Name, getter));
+            }
+            else
+            {
+                columns.AddRange(BuildColumns(propertyType, getter));
+            }
+        }
+
+        return columns;
+    }
+
+    private static string FormatValue(object? value) => value switch
+    {
+        null => string.Empty,
+        string s => s,
+        IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
+        _ => value.ToString() ?? string.Empty
+    };
+
+    private static string SanitizeForInjection(string field)
+        => (field.Length > 0 && Array.IndexOf(_injectionCharacters, field[0]) >= 0)
+            ? InjectionEscapeCharacter + field
+            : field;
 
     public static async Task<string> CreateTempFileAsync(string content, string? fileName = null)
     {

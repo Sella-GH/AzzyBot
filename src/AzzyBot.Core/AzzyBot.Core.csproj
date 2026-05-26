@@ -27,7 +27,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvHelper" />
     <PackageReference Include="DSharpPlus" />
     <PackageReference Include="DSharpPlus.Commands" />
     <PackageReference Include="DSharpPlus.Interactivity" />
@@ -35,6 +34,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="Microsoft.Extensions.Http" />
     <PackageReference Include="NReco.Logging.File" />
+    <PackageReference Include="Sep" />
   </ItemGroup>
 
 </Project>

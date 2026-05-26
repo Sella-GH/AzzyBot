@@ -3,7 +3,6 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="DSharpPlus" Version="5.0.0-nightly-02587" />
     <PackageVersion Include="DSharpPlus.Commands" Version="5.0.0-nightly-02587" />
     <PackageVersion Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02587" />
@@ -22,6 +21,7 @@
     <PackageVersion Include="Roslynator.CodeFixes" Version="4.15.0" />
     <PackageVersion Include="Roslynator.Formatting.Analyzers" Version="4.15.0" />
     <PackageVersion Include="Roslynator.Refactorings" Version="4.15.0" />
+    <PackageVersion Include="Sep" Version="0.14.1" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.26.0.140279" />
     <PackageVersion Include="TagLibSharp2" Version="0.6.0" />
   </ItemGroup>
