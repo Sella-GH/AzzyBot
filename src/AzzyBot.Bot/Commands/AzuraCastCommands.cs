@@ -1051,7 +1051,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            IEnumerable<AzuraMediaItemModel>? songs = await _azuraCast.GetSongsInPlaylistAsync(baseUrl, apiKey, station, playlist);
+            IEnumerable<AzuraSongBasicDataModel>? songs = await _azuraCast.GetSongsInPlaylistAsync(baseUrl, apiKey, station, playlist);
             if (songs is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);

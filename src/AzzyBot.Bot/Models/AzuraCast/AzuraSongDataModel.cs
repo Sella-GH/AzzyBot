@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
 
+using Dameng.SepEx;
+
 namespace AzzyBot.Bot.Models.AzuraCast;
 
 /// <summary>
@@ -59,24 +61,31 @@ public record class AzuraSongAdvancedDataModel : AzuraSongBasicDataModel
 /// <summary>
 /// Represents the basic data for a song from AzuraCast.
 /// </summary>
-public record class AzuraSongBasicDataModel
+[GenSepParsable]
+public partial record class AzuraSongBasicDataModel
 {
     /// <summary>
     /// The song artist.
     /// </summary>
     [JsonPropertyName("artist")]
+    [SepColumnName("artist")]
+    [SepColumnIndex(2)]
     public required string Artist { get; set; } = string.Empty;
 
     /// <summary>
     /// The song title.
     /// </summary>
     [JsonPropertyName("title")]
+    [SepColumnName("Title")]
+    [SepColumnIndex(0)]
     public required string Title { get; set; } = string.Empty;
 
     /// <summary>
     /// The song album.
     /// </summary>
     [JsonPropertyName("album")]
+    [SepColumnName("Album")]
+    [SepColumnIndex(1)]
     public string Album { get; set; } = string.Empty;
 }
 
