@@ -26,8 +26,7 @@ public static class FileOperations
         await using SepWriter writ = Sep.New(',').Writer(static o => o with
         {
             CultureInfo = CultureInfo.InvariantCulture,
-            WriteHeader = true,
-            Escape = true
+            WriteHeader = true
         })
             .ToFile(filePath);
 

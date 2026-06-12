@@ -988,7 +988,17 @@ public sealed class AzuraCastCommands
             }
 
             IEnumerable<AzuraStationHistoryExportModel> exportHistory = [.. history
-                .Select(h => new AzuraStationHistoryExportModel() { Date = dateString, PlayedAt = DateTimeOffset.FromUnixTimeSeconds(h.PlayedAt), Song = h.Song, SongRequest = h.IsRequest, Streamer = h.Streamer, Playlist = h.Playlist })
+                .Select(h => new AzuraStationHistoryExportModel()
+                {
+                    Date = dateString,
+                    PlayedAt = DateTimeOffset.FromUnixTimeSeconds(h.PlayedAt),
+                    Title = h.Song.Title,
+                    Artist = h.Song.Artist,
+                    Album = h.Song.Album,
+                    SongRequest = h.IsRequest,
+                    Streamer = h.Streamer,
+                    Playlist = h.Playlist
+                })
                 .Reverse()];
 
             string fileName = $"{ac.GuildId}-{ac.Id}-{acStation.Id}-{acStation.StationId}_SongHistory_{dateStringFile}.csv";
