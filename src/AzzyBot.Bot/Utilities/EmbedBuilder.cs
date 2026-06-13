@@ -347,7 +347,7 @@ public static class EmbedBuilder
         if (!string.IsNullOrEmpty(file.Genre))
             fields.Add(GenreString, new(file.Genre, true));
 
-        fields.Add("Duration", new(file.Length, true));
+        fields.Add("Duration", new(file.LengthText, true));
 
         if (!string.IsNullOrEmpty(file.Isrc))
             fields.Add("ISRC", new(file.Isrc));

@@ -80,6 +80,12 @@ public partial record class AzuraSongBasicDataModel
     /// </summary>
     [JsonPropertyName("album")]
     public string Album { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The song duration in seconds.
+    /// </summary>
+    [JsonPropertyName("length")]
+    public required int Length { get; set; }
 }
 
 /// <summary>

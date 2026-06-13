@@ -498,7 +498,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         {
             Title = s.Media.Title,
             Artist = s.Media.Artist,
-            Album = s.Media.Album
+            Album = s.Media.Album,
+            Length = s.Media.Length
         });
     }
 
@@ -527,6 +528,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         {
             UniqueId = song.UniqueId,
             SongId = song.SongId,
+            Length = song.Length,
             Album = song.Album,
             Artist = song.Artist,
             Title = song.Title,

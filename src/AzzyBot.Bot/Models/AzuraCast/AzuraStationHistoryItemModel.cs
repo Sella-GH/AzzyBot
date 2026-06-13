@@ -67,6 +67,11 @@ public sealed partial record class AzuraStationHistoryExportModel
     public string Album { get; set; } = string.Empty;
 
     /// <summary>
+    /// The song duration in seconds.
+    /// </summary>
+    public required int Length { get; set; }
+
+    /// <summary>
     /// Indicates whether the song is a listener request.
     /// </summary>
     public bool SongRequest { get; set; }

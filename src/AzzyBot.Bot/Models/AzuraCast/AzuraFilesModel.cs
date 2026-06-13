@@ -43,6 +43,18 @@ public record class AzuraFilesModel
     /// </summary>
     [JsonPropertyName("album")]
     public string Album { get; init; } = string.Empty;
+
+    /// <summary>
+    /// The song duration in seconds.
+    /// </summary>
+    [JsonPropertyName("length")]
+    public int Length { get; init; }
+
+    /// <summary>
+    /// The formatted song duration (in mm:ss format)
+    /// </summary>
+    [JsonPropertyName("length_text")]
+    public string LengthText { get; init; } = string.Empty;
 }
 
 /// <summary>
@@ -50,12 +62,6 @@ public record class AzuraFilesModel
 /// </summary>
 public sealed record class AzuraFilesDetailedModel : AzuraFilesModel
 {
-    /// <summary>
-    /// The formatted song duration (in mm:ss format)
-    /// </summary>
-    [JsonPropertyName("length_text")]
-    public required string Length { get; init; }
-
     /// <summary>
     /// A list of all the playlists the media file is in.
     /// </summary>

@@ -995,6 +995,7 @@ public sealed class AzuraCastCommands
                     Title = h.Song.Title,
                     Artist = h.Song.Artist,
                     Album = h.Song.Album,
+                    Length = h.Song.Length,
                     SongRequest = h.IsRequest,
                     Streamer = h.Streamer,
                     Playlist = h.Playlist
