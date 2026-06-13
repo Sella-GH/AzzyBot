@@ -35,7 +35,6 @@ namespace AzzyBot.Bot.Utilities;
 [JsonSerializable(typeof(IEnumerable<AzuraRequestModel>))]
 [JsonSerializable(typeof(AzuraRequestQueueItemModel))]
 [JsonSerializable(typeof(IEnumerable<AzuraRequestQueueItemModel>))]
-[JsonSerializable(typeof(AzuraMediaItemModel))]
 [JsonSerializable(typeof(IEnumerable<AzuraMediaItemModel>))]
 [JsonSerializable(typeof(AzuraSongDataModel))]
 [JsonSerializable(typeof(AzuraStationHistoryItemModel))]
