@@ -1003,7 +1003,7 @@ public sealed class AzuraCastCommands
                 .Reverse()];
 
             string fileName = $"{ac.GuildId}-{ac.Id}-{acStation.Id}-{acStation.StationId}_SongHistory_{dateStringFile}.csv";
-            string filePath = await FileOperations.CreateCsvFileAsync(exportHistory, fileName);
+            string filePath = FileOperations.CreateCsvFile(exportHistory, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             DiscordMessageBuilder builder = new();
             builder.WithContent($"Here is the song history for station **{azuraStation.Name}** on **{dateString}**.");
@@ -1077,7 +1077,7 @@ public sealed class AzuraCastCommands
             }
 
             string fileName = $"{ac.GuildId}-{ac.Id}-{acStation.Id}-{acStation.StationId}_PlaylistSongs_{playlist.ShortName}.csv";
-            string filePath = await FileOperations.CreateCsvFileAsync(songs, fileName);
+            string filePath = FileOperations.CreateCsvFile(songs, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             DiscordMessageBuilder builder = new();
             builder.WithContent($"Here are the songs in playlist **{playlist.Name}**.");

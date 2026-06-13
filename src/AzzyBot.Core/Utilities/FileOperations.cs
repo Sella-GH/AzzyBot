@@ -15,7 +15,7 @@ namespace AzzyBot.Core.Utilities;
 
 public static class FileOperations
 {
-    public static async Task<string> CreateCsvFileAsync<T>(IEnumerable<T> content, string? path = null) where T : ISepParsable<T>
+    public static string CreateCsvFile<T>(IEnumerable<T> content, string? path = null) where T : ISepParsable<T>
     {
         ArgumentNullException.ThrowIfNull(content);
 
@@ -23,9 +23,10 @@ public static class FileOperations
             ? Path.Combine(Path.GetTempPath(), Path.GetFileName(path))
             : Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 
-        await using SepWriter writ = Sep.New(',').Writer(static o => o with
+        using SepWriter writ = Sep.New(',').Writer(static o => o with
         {
             CultureInfo = CultureInfo.InvariantCulture,
+            Escape = true,
             WriteHeader = true
         })
             .ToFile(filePath);
