@@ -35,6 +35,7 @@
 ### Dependencies
 - Added [Dameng.SepEx](https://github.com/dameng324/Dameng.SepEx) in version 0.3.0
 - Added [Sep](https://github.com/nietras/Sep) in version 0.15.0
+- Removed [CsvHelper](https://github.com/joshclose/csvhelper) in version 33.1.0
 - Updated [.NET SDK](https://github.com/dotnet/sdk) to minimum version 10.0.108
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02587
 - Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 10.0.8
