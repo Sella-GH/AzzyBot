@@ -1,4 +1,6 @@
 ## Unreleased
+
+## 2.11.0 - 2026-06-14
 ### General
 - Added a missing package to the docker images to fix errors regarding authentication
 - Replaced CsvHelper with Sep (and a source generator) for improved performance and better csv handling
@@ -36,11 +38,14 @@
 - Added [Dameng.SepEx](https://github.com/dameng324/Dameng.SepEx) in version 0.3.0
 - Added [Sep](https://github.com/nietras/Sep) in version 0.15.0
 - Removed [CsvHelper](https://github.com/joshclose/csvhelper) in version 33.1.0
-- Updated [.NET SDK](https://github.com/dotnet/sdk) to minimum version 10.0.108
-- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02587
-- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 10.0.8
-- Updated [Microsoft.Extensions.X](https://github.com/dotnet/runtime) libraries to version 10.0.8
-- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.26.0.140279
+- Updated [.NET SDK](https://github.com/dotnet/sdk) to minimum version 10.0.109
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02590
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 10.0.9
+- Updated [Microsoft.Extensions.X](https://github.com/dotnet/runtime) libraries to version 10.0.9
+- Updated [NCronJob](https://github.com/NCronJob-Dev/NCronJob) to version 4.10.2
+- Updated [Npgsql](https://github.com/npgsql/efcore.pg) to version 10.0.3
+- Updated [Npgsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg) to version 10.0.2
+- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.27.0.140913
 
 ## 2.10.0 - 2026-04-21
 ### Improvements
