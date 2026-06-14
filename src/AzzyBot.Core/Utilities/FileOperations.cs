@@ -7,14 +7,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using CsvHelper;
-using CsvHelper.Configuration;
+using Dameng.SepEx;
+
+using nietras.SeparatedValues;
 
 namespace AzzyBot.Core.Utilities;
 
 public static class FileOperations
 {
-    public static async Task<string> CreateCsvFileAsync<T>(IEnumerable<T> content, string? path = null)
+    public static string CreateCsvFile<T>(IEnumerable<T> content, string? path = null) where T : ISepParsable<T>
     {
         ArgumentNullException.ThrowIfNull(content);
 
@@ -22,15 +23,15 @@ public static class FileOperations
             ? Path.Combine(Path.GetTempPath(), Path.GetFileName(path))
             : Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 
-        await using StreamWriter writer = new(filePath);
-        CsvConfiguration config = new(CultureInfo.InvariantCulture)
+        using SepWriter writ = Sep.New(',').Writer(static o => o with
         {
-            Encoding = Encoding.UTF8,
-            InjectionOptions = InjectionOptions.Escape
-        };
+            CultureInfo = CultureInfo.InvariantCulture,
+            Escape = true,
+            WriteHeader = true
+        })
+            .ToFile(filePath);
 
-        await using CsvWriter csv = new(writer, config);
-        await csv.WriteRecordsAsync(content);
+        writ.WriteRecords(content);
 
         return filePath;
     }

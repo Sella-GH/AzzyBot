@@ -988,11 +988,22 @@ public sealed class AzuraCastCommands
             }
 
             IEnumerable<AzuraStationHistoryExportModel> exportHistory = [.. history
-                .Select(h => new AzuraStationHistoryExportModel() { Date = dateString, PlayedAt = DateTimeOffset.FromUnixTimeSeconds(h.PlayedAt), Song = h.Song, SongRequest = h.IsRequest, Streamer = h.Streamer, Playlist = h.Playlist })
+                .Select(h => new AzuraStationHistoryExportModel()
+                {
+                    Date = dateString,
+                    PlayedAt = DateTimeOffset.FromUnixTimeSeconds(h.PlayedAt),
+                    Title = h.Song.Title,
+                    Artist = h.Song.Artist,
+                    Album = h.Song.Album,
+                    Length = h.Song.Length,
+                    SongRequest = h.IsRequest,
+                    Streamer = h.Streamer,
+                    Playlist = h.Playlist
+                })
                 .Reverse()];
 
             string fileName = $"{ac.GuildId}-{ac.Id}-{acStation.Id}-{acStation.StationId}_SongHistory_{dateStringFile}.csv";
-            string filePath = await FileOperations.CreateCsvFileAsync(exportHistory, fileName);
+            string filePath = FileOperations.CreateCsvFile(exportHistory, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             DiscordMessageBuilder builder = new();
             builder.WithContent($"Here is the song history for station **{azuraStation.Name}** on **{dateString}**.");
@@ -1051,7 +1062,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            IEnumerable<AzuraMediaItemModel>? songs = await _azuraCast.GetSongsInPlaylistAsync(baseUrl, apiKey, station, playlist);
+            IEnumerable<AzuraSongBasicDataModel>? songs = await _azuraCast.GetSongsInPlaylistAsync(baseUrl, apiKey, station, playlist);
             if (songs is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
@@ -1066,7 +1077,7 @@ public sealed class AzuraCastCommands
             }
 
             string fileName = $"{ac.GuildId}-{ac.Id}-{acStation.Id}-{acStation.StationId}_PlaylistSongs_{playlist.ShortName}.csv";
-            string filePath = await FileOperations.CreateCsvFileAsync(songs, fileName);
+            string filePath = FileOperations.CreateCsvFile(songs, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             DiscordMessageBuilder builder = new();
             builder.WithContent($"Here are the songs in playlist **{playlist.Name}**.");

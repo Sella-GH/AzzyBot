@@ -1,6 +1,7 @@
 ## Unreleased
 ### General
 - Added a missing package to the docker images to fix errors regarding authentication
+- Replaced CsvHelper with Sep (and a source generator) for improved performance and better csv handling
 - Upgraded docker images to Ubuntu 26.04 resolute
 
 ### Additions
@@ -22,6 +23,7 @@
 
 ### Development
 - Abstracted all relevant services to interfaces to follow dependency inversion principles
+- Added some more API model properties to `AzuraFilesModels.cs`, `AzuraSongDataModel.cs` and `AzuraStationHistoryItemModel.cs`
 - Extended the command `debug webservice-tests` to show more information about the current request and response
 - JSON types in `AzuraCastApiService.cs` are known at compile time instead of runtime
 - Reencoded all source files to UTF-8 without BOM
@@ -31,6 +33,9 @@
 - Split up the logger actions into multiple files and scope the entries to the respective classes
 
 ### Dependencies
+- Added [Dameng.SepEx](https://github.com/dameng324/Dameng.SepEx) in version 0.3.0
+- Added [Sep](https://github.com/nietras/Sep) in version 0.15.0
+- Removed [CsvHelper](https://github.com/joshclose/csvhelper) in version 33.1.0
 - Updated [.NET SDK](https://github.com/dotnet/sdk) to minimum version 10.0.108
 - Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02587
 - Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 10.0.8

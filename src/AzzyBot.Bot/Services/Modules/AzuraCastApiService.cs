@@ -484,7 +484,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraRequestModel, CreateHeader(apiKey));
     }
 
-    public Task<IEnumerable<AzuraMediaItemModel>?> GetSongsInPlaylistAsync(Uri baseUrl, string apiKey, int stationId, AzuraPlaylistModel playlist)
+    public async Task<IEnumerable<AzuraSongBasicDataModel>?> GetSongsInPlaylistAsync(Uri baseUrl, string apiKey, int stationId, AzuraPlaylistModel playlist)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
@@ -492,7 +492,15 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
 
         string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}/{AzuraApiFilters.List}?{AzuraApiFilters.SearchPhrase}={AzuraApiFilters.Playlist}:{playlist.ShortName}";
 
-        return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraMediaItemModel, CreateHeader(apiKey));
+        IEnumerable<AzuraMediaItemModel>? songs = await GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraMediaItemModel, CreateHeader(apiKey));
+
+        return songs?.Select(static s => new AzuraSongBasicDataModel()
+        {
+            Title = s.Media.Title,
+            Artist = s.Media.Artist,
+            Album = s.Media.Album,
+            Length = s.Media.Length
+        });
     }
 
     public async Task<AzuraSongDataModel?> GetSongInfoAsync(Uri baseUrl, string apiKey, AzuraCastStationEntity station, bool online, string? uniqueId = null, string? songId = null, string? name = null, string? artist = null, string? album = null)
@@ -520,6 +528,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         {
             UniqueId = song.UniqueId,
             SongId = song.SongId,
+            Length = song.Length,
             Album = song.Album,
             Artist = song.Artist,
             Title = song.Title,

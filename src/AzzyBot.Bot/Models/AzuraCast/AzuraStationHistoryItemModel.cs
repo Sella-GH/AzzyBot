@@ -1,6 +1,8 @@
 using System;
 using System.Text.Json.Serialization;
 
+using Dameng.SepEx;
+
 namespace AzzyBot.Bot.Models.AzuraCast;
 
 /// <summary>
@@ -36,7 +38,8 @@ public sealed record class AzuraStationHistoryItemModel : AzuraStationQueueItemM
 /// <summary>
 /// Represents the custom data for a song that was played on the station to export it.
 /// </summary>
-public sealed record class AzuraStationHistoryExportModel
+[GenSepParsable]
+public sealed partial record class AzuraStationHistoryExportModel
 {
     /// <summary>
     /// The date the song was played.
@@ -49,9 +52,24 @@ public sealed record class AzuraStationHistoryExportModel
     public DateTimeOffset PlayedAt { get; set; }
 
     /// <summary>
-    /// The basic data for the song that was played.
+    /// The song artist.
     /// </summary>
-    public AzuraSongBasicDataModel? Song { get; set; }
+    public required string Artist { get; set; }
+
+    /// <summary>
+    /// The song title.
+    /// </summary>
+    public required string Title { get; set; }
+
+    /// <summary>
+    /// The song album.
+    /// </summary>
+    public string Album { get; set; } = string.Empty;
+
+    /// <summary>
+    /// The song duration in seconds.
+    /// </summary>
+    public required int Length { get; set; }
 
     /// <summary>
     /// Indicates whether the song is a listener request.
