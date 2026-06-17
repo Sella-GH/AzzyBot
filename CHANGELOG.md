@@ -1,4 +1,9 @@
 ## Unreleased
+### Fixes
+- The music streaming over `player play-mount` works again.
+
+### Dependencies
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02593
 
 ## 2.11.0 - 2026-06-14
 ### General

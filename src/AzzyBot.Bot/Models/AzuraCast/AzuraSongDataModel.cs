@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+
 using Dameng.SepEx;
 
 namespace AzzyBot.Bot.Models.AzuraCast;
@@ -85,7 +86,7 @@ public partial record class AzuraSongBasicDataModel
     /// The song duration in seconds.
     /// </summary>
     [JsonPropertyName("length")]
-    public required int Length { get; set; }
+    public int Length { get; set; }
 }
 
 /// <summary>
