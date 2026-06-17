@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -18,7 +19,7 @@ public readonly struct AzzyDebugWebRequestStruct : IEquatable<AzzyDebugWebReques
     public required int Retries { get; init; }
     public string? Content { get; init; }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
         => obj is AzzyDebugWebRequestStruct other && Equals(other);
 
     public bool Equals(AzzyDebugWebRequestStruct other)

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace AzzyBot.Bot.Structs;
@@ -9,7 +10,7 @@ public readonly struct AzzyStationRoleStruct : IEquatable<AzzyStationRoleStruct>
     public required ulong Id { get; init; }
     public required string Name { get; init; }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
         => obj is AzzyStationRoleStruct other && Equals(other);
 
     public bool Equals(AzzyStationRoleStruct other)

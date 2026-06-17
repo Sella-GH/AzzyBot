@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 using AzzyBot.Data.Entities;
@@ -15,7 +16,7 @@ public readonly struct AzzyCheckPermissionsStruct : IEquatable<AzzyCheckPermissi
     public IReadOnlyList<ulong>? DiscordGuildIds { get; init; }
     public GuildEntity? GuildEntity { get; init; }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
         => obj is AzzyCheckPermissionsStruct other && Equals(other);
 
     public bool Equals(AzzyCheckPermissionsStruct other)

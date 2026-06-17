@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 using DSharpPlus.Entities;
@@ -12,7 +13,7 @@ public readonly struct AzzyInactiveGuildStruct : IEquatable<AzzyInactiveGuildStr
     public required bool NoConfig { get; init; }
     public required bool NoLegals { get; init; }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
         => obj is AzzyInactiveGuildStruct other && Equals(other);
 
     public bool Equals(AzzyInactiveGuildStruct other)

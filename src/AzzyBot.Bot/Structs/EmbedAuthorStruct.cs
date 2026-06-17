@@ -12,7 +12,7 @@ public readonly struct EmbedAuthorStruct : IEquatable<EmbedAuthorStruct>
     public string? Url { get; init; }
     public string? IconUrl { get; init; }
 
-    public override bool Equals(object? obj)
+    public override bool Equals([NotNullWhen(true)] object? obj)
         => obj is EmbedAuthorStruct other && Equals(other);
 
     public bool Equals(EmbedAuthorStruct other)
