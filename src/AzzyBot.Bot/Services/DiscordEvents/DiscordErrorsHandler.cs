@@ -41,7 +41,7 @@ public sealed class DiscordErrorsHandler(IDiscordBotService botService) : IClien
                     break;
                 }
 
-                await _botService.LogExceptionAsync(exception, now, info: ((DiscordException)exception).JsonMessage);
+                await _botService.LogExceptionAsync(exception, now, jsonMessage: ((DiscordException)exception).JsonMessage);
                 break;
         }
     }

@@ -20,7 +20,7 @@ public interface IDiscordBotService
     DiscordGuild? GetDiscordGuild(ulong guildId = 0);
     IReadOnlyDictionary<ulong, DiscordGuild> GetDiscordGuilds { get; }
     Task<DiscordMember?> GetDiscordMemberAsync(ulong guildId, ulong userId = 0);
-    Task LogExceptionAsync(Exception ex, DateTimeOffset timestamp, SlashCommandContext? ctx = null, string? info = null);
+    Task LogExceptionAsync(Exception ex, DateTimeOffset timestamp, SlashCommandContext? ctx = null, string? jsonMessage = null);
     Task RespondToChecksExceptionAsync(ChecksFailedException ex, SlashCommandContext context);
     Task<bool> SendMessageAsync(ulong channelId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, IMention[]? mentions = null);
     Task<bool> SendMessageToOwnerAsync(ulong guildId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null);

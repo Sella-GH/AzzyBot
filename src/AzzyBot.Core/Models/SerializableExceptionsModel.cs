@@ -29,12 +29,6 @@ public sealed record class SerializableExceptionsModel
     public string? Message { get; init; }
 
     /// <summary>
-    /// The additional information of the exception.
-    /// </summary>
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? AdditionalInfo { get; init; }
-
-    /// <summary>
     /// The stack trace of the exception.
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -46,14 +40,13 @@ public sealed record class SerializableExceptionsModel
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public SerializableExceptionsModel? InnerException { get; init; }
 
-    public SerializableExceptionsModel(Exception ex, string? info = null)
+    public SerializableExceptionsModel(Exception ex)
     {
         ArgumentNullException.ThrowIfNull(ex);
 
         Source = ex.Source;
         Type = ex.GetType().ToString();
         Message = ex.Message;
-        AdditionalInfo = info;
         StackTrace = ex.StackTrace?.Split(Environment.NewLine).Select(static s => s.TrimStart()).ToList();
         InnerException = (ex.InnerException is not null) ? new SerializableExceptionsModel(ex.InnerException) : null;
     }

@@ -14,8 +14,10 @@ using AzzyBot.Bot.Logging;
 using AzzyBot.Bot.Resources;
 using AzzyBot.Bot.Services.Interfaces;
 using AzzyBot.Bot.Settings;
+using AzzyBot.Bot.Structs;
 using AzzyBot.Bot.Utilities;
 using AzzyBot.Core.Helpers;
+using AzzyBot.Core.Models;
 using AzzyBot.Core.Utilities;
 using AzzyBot.Data.Entities;
 using AzzyBot.Data.Logging;
@@ -172,7 +174,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         return member;
     }
 
-    public async Task LogExceptionAsync(Exception ex, DateTimeOffset timestamp, SlashCommandContext? ctx = null, string? info = null)
+    public async Task LogExceptionAsync(Exception ex, DateTimeOffset timestamp, SlashCommandContext? ctx = null, string? jsonMessage = null)
     {
         ArgumentNullException.ThrowIfNull(ex);
 
@@ -186,16 +188,35 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             DiscordMessage? discordMessage = await AcknowledgeExceptionAsync(ctx);
             string? message = discordMessage?.JumpLink.ToString();
             string guild = $"{ctx.Guild?.Name} ({ctx.Guild?.Id})";
-            string discordUser = $"{ctx.User.GlobalName} ({ctx.User.Id})";
+            string userMention = $"{ctx.User.GlobalName} ({ctx.User.Id})";
             string commandName = ctx.Command.FullName;
             Dictionary<string, string> commandOptions = new(ctx.Command.Parameters.Count);
             ProcessOptions(ctx.Arguments, commandOptions);
 
-            embed = CreateExceptionEmbed(ex, timestampString, info, guild, message, discordUser, commandName, commandOptions);
+            AzzyExceptionEmbedStruct values = new()
+            {
+                Exception = ex,
+                Timestamp = timestampString,
+                JsonMessage = jsonMessage,
+                Guild = guild,
+                Message = message,
+                UserMention = userMention,
+                CommandName = commandName,
+                CommandOptions = commandOptions
+            };
+
+            embed = CreateExceptionEmbed(values);
         }
         else
         {
-            embed = CreateExceptionEmbed(ex, timestampString, info);
+            AzzyExceptionEmbedStruct values = new()
+            {
+                Exception = ex,
+                Timestamp = timestampString,
+                JsonMessage = jsonMessage
+            };
+
+            embed = CreateExceptionEmbed(values);
         }
 
         try
@@ -203,14 +224,23 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             bool messageSent;
             if (!string.IsNullOrWhiteSpace(ex.StackTrace))
             {
-                string jsonDump = JsonSerializer.Serialize(new(ex, info), JsonSourceGen.Default.SerializableExceptionsModel);
+                List<string> filePaths = new(2);
+                SerializableExceptionsModel serEx = new(ex);
                 string fileTimestamp = timestampString.Replace(" ", "_", StringComparison.OrdinalIgnoreCase).Replace(":", "-", StringComparison.OrdinalIgnoreCase);
-                string fileName = $"AzzyBotException_{fileTimestamp}.json";
-                string tempFilePath = await FileOperations.CreateTempFileAsync(jsonDump, fileName);
+                string jsonEx = JsonSerializer.Serialize(serEx, JsonSourceGen.Default.SerializableExceptionsModel);
+                string exFileName = $"AzzyBotException_{fileTimestamp}.json";
+                string exTempFilePath = await FileOperations.CreateTempFileAsync(jsonEx, exFileName);
+                filePaths.Add(exTempFilePath);
 
-                messageSent = await SendMessageAsync(_settings.ErrorChannelId, embeds: [embed], filePaths: [tempFilePath]);
+                if (!string.IsNullOrEmpty(jsonMessage))
+                {
+                    string jsonFileName = $"AzzyBotJson_{fileTimestamp}.json";
+                    string jsonTempFilePath = await FileOperations.CreateTempFileAsync(jsonMessage, jsonFileName);
+                    filePaths.Add(jsonTempFilePath);
+                }
 
-                FileOperations.DeleteFile(tempFilePath);
+                messageSent = await SendMessageAsync(_settings.ErrorChannelId, embeds: [embed], filePaths: [exTempFilePath]);
+                FileOperations.DeleteFiles(filePaths);
             }
             else
             {
@@ -548,11 +578,8 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         await owner.SendMessageAsync(builder.ToString());
     }
 
-    private DiscordEmbedBuilder CreateExceptionEmbed(Exception ex, string timestamp, string? jsonMessage = null, string? guild = null, string? message = null, string? userMention = null, string? commandName = null, Dictionary<string, string>? commandOptions = null)
+    private DiscordEmbedBuilder CreateExceptionEmbed(in AzzyExceptionEmbedStruct values)
     {
-        ArgumentNullException.ThrowIfNull(ex);
-        ArgumentNullException.ThrowIfNull(timestamp);
-
         string os = HardwareStats.GetSystemOs;
         string arch = HardwareStats.GetSystemOsArch;
         string botName = SoftwareStats.GetAppName;
@@ -561,35 +588,35 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
 
         DiscordEmbedBuilder builder = new()
         {
-            Title = ex.GetType().Name,
-            Description = (ex.Message.Length <= 4096) ? ex.Message : "Description too big for embed.",
+            Title = values.Exception.GetType().Name,
+            Description = (values.Exception.Message.Length is <= 4096) ? values.Exception.Message : "Description too big for embed.",
             Color = DiscordColor.Red
         };
 
-        if (!string.IsNullOrEmpty(jsonMessage))
-            builder.AddField("Advanced Error", jsonMessage);
+        if (!string.IsNullOrEmpty(values.JsonMessage))
+            builder.AddField("Advanced Error", values.JsonMessage);
 
-        builder.AddField("Timestamp", timestamp);
+        builder.AddField("Timestamp", values.Timestamp);
 
-        if (!string.IsNullOrEmpty(ex.Source))
-            builder.AddField("Source", ex.Source);
+        if (!string.IsNullOrEmpty(values.Exception.Source))
+            builder.AddField("Source", values.Exception.Source);
 
-        if (guild is not null)
-            builder.AddField("Guild", guild);
+        if (values.Guild is not null)
+            builder.AddField("Guild", values.Guild);
 
-        if (message is not null)
-            builder.AddField("Message", message);
+        if (values.Message is not null)
+            builder.AddField("Message", values.Message);
 
-        if (userMention is not null)
-            builder.AddField("User", userMention);
+        if (values.UserMention is not null)
+            builder.AddField("User", values.UserMention);
 
-        if (!string.IsNullOrEmpty(commandName))
-            builder.AddField("Command", commandName);
+        if (!string.IsNullOrEmpty(values.CommandName))
+            builder.AddField("Command", values.CommandName);
 
-        if (commandOptions?.Count > 0)
+        if (values.CommandOptions?.Count is > 0)
         {
             StringBuilder sb = new();
-            foreach (KeyValuePair<string, string> kvp in commandOptions)
+            foreach (KeyValuePair<string, string> kvp in values.CommandOptions)
             {
                 sb.AppendLine(CultureInfo.InvariantCulture, $"**{kvp.Key}**: {kvp.Value}");
             }
