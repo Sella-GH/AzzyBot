@@ -696,7 +696,8 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             _logger.UnableToSendMessage(e.Message);
         }
 
-        if (streams.Count > 0 && filePaths is not null)
+        // If filePaths are provided, the streams are automatically there too
+        if (filePaths is { Count: > 0 })
         {
             foreach (FileStream stream in streams)
             {
