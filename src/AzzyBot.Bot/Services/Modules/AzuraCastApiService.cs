@@ -205,7 +205,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
             {
                 // See if we can catch an error message
                 error = JsonSerializer.Deserialize(body, JsonSourceGen.Default.AzuraErrorModel);
-                if (error is not null)
+                if (error is not null && error.Code is not 0)
                 {
                     await _botService.LogExceptionAsync(new InvalidOperationException($"API returned an error: {error.Message}"), DateTimeOffset.Now);
                     return default;
