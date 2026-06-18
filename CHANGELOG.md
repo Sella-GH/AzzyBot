@@ -1,4 +1,4 @@
-## Unreleased
+## 2.11.1 - 2026-06-18
 ### Fixes
 - The music streaming over `player play-mount` works again
 
@@ -244,7 +244,7 @@
 
 ### General
 - Changed docker images to use Ubuntu 24.04 instead of Debian 12
-  - This change was made based on referring that Ubuntu seems to be the [preferred](https://learn.microsoft.com/en-us/dotnet/core/compatibility/containers/10.0/default-images-use-ubuntu) container OS for .NET 
+  - This change was made based on referring that Ubuntu seems to be the [preferred](https://learn.microsoft.com/en-us/dotnet/core/compatibility/containers/10.0/default-images-use-ubuntu) container OS for .NET
   - Also we got a quite nice size improvement about up to 15 MB
 
 ### Improvements

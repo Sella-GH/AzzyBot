@@ -6,13 +6,11 @@ AzzyBot is a Discord music bot written in C# using .NET 10 and DSharpPlus. It's 
 
 **Key Statistics:**
 - **Language**: C# (.NET 10.0)
-- **Current Version**: 2.9.1
 - **Project Type**: Multi-project Discord bot solution
 - **Architecture**: 3-tier (Bot, Core, Data)
 - **Database**: PostgreSQL with Entity Framework Core
 - **Deployment**: Docker containers with multi-platform support (AMD64/ARM64, Ubuntu/Alpine)
 - **CI/CD**: GitHub Actions with extensive quality checks
-- **Code Lines**: ~50,000+ lines of C# and MSBuild scripts (varies with updates)
 
 ## Build Instructions & Environment Setup
 
@@ -35,7 +33,7 @@ dotnet build ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Debug --no-incremental --no
 
 ### Build Configurations
 - **Debug**: Development builds (`AzzyBot-Dev.exe` on Windows, `AzzyBot-Dev` on Linux)
-- **Release**: Production builds (`AzzyBot.exe` on Windows, `AzzyBot` on Linux)  
+- **Release**: Production builds (`AzzyBot.exe` on Windows, `AzzyBot` on Linux)
 - **Docker**: Container production builds (`AzzyBot-Docker.exe` / `AzzyBot-Docker`)
 - **Docker-debug**: Container development builds (`AzzyBot-Docker-Dev.exe` / `AzzyBot-Docker-Dev`)
 
@@ -48,7 +46,7 @@ dotnet build ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Debug --no-incremental --no
 ### Common Build Issues & Solutions
 
 **Issue**: `NETSDK1045: The current .NET SDK does not support targeting .NET 10.0`
-- **Solution**: Install .NET 10 SDK version 10.0.201 or later. **Do not downgrade the target framework.**
+- **Solution**: Install .NET 10 SDK according to global.json. **Do not downgrade the target framework.**
 
 **Issue**: Package restore failures
 - **Solution**: Use the `--configfile ./Nuget.config` parameter and ensure you have internet connectivity
@@ -134,12 +132,12 @@ The bot uses a modular architecture with two main modules:
         dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.config --force --no-cache --ucr
         dotnet build ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Release --no-incremental --no-restore --no-self-contained --ucr
         ```
-4. **Quality Checks**: 
+4. **Quality Checks**:
    - SonarCloud analysis (code quality, bugs, code smells)
    - CodeQL security scanning for C# code and GitHub Actions
    - HCL AppScan CodeSweep (additional security scanning on PRs)
 5. **Docker Builds**: Multi-platform images (linux/amd64, linux/arm64) for both Ubuntu and Alpine, pushed to Docker Hub
-6. **Release Process**: 
+6. **Release Process**:
    - Automated on commit messages containing `[release]` or `[pre-release]`
    - Creates git tags automatically
    - Builds Docker images and .NET binaries
@@ -154,7 +152,7 @@ The bot uses a modular architecture with two main modules:
 ### Build Matrix
 - **Platforms**: linux/amd64, linux/arm64
 - **OS Images**: Ubuntu 24.04 (default), Alpine (lightweight)
-- **Runners**: 
+- **Runners**:
   - `ubuntu-24.04` for standard builds
   - `ubuntu-slim` for metadata extraction
   - `windows-2025` for SonarCloud analysis (requires Windows for .NET Framework analyzers)
@@ -199,7 +197,7 @@ docker-compose -f docker-compose.dev.yml down
 ### Analysis Tools
 The project uses extensive static analysis:
 - **Roslynator**: 200+ C# code analysis rules
-- **SonarAnalyzer.CSharp**: Code quality and security analysis  
+- **SonarAnalyzer.CSharp**: Code quality and security analysis
 - **EditorConfig**: Strict formatting and style rules
 - **CodeQL**: Security vulnerability scanning
 
@@ -331,7 +329,7 @@ The project uses multiple security scanning tools:
 **Resources:**
 - `src/AzzyBot.Bot/Resources/UriStrings.resx` - URI string resources with code generation
 
-**Trust these instructions** - they are verified against the actual codebase (version 2.9.1) and CI/CD processes. Only search for additional information if these instructions are incomplete or appear incorrect based on build failures.
+**Trust these instructions** - they are verified against the actual codebase and CI/CD processes. Only search for additional information if these instructions are incomplete or appear incorrect based on build failures.
 
 ## Additional Notes
 
