@@ -1,0 +1,34 @@
+name: "[SCRATCH] parallel block test"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test parallel block (list shape)
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Run two steps in parallel
+        parallel:
+          - name: Branch one
+            id: branch_one
+            run: |
+              sleep 3
+              echo "one=done" >> "$GITHUB_OUTPUT"
+          - name: Branch two
+            id: branch_two
+            run: |
+              sleep 3
+              echo "two=done" >> "$GITHUB_OUTPUT"
+
+      - name: Confirm both branches completed
+        env:
+          ONE_OUT: ${{ steps.branch_one.outputs.one }}
+          TWO_OUT: ${{ steps.branch_two.outputs.two }}
+        run: |
+          echo "branch_one='$ONE_OUT' branch_two='$TWO_OUT'"
+          if [[ "$ONE_OUT" != "done" || "$TWO_OUT" != "done" ]]; then
+            echo "::error::parallel block did not complete both branches before continuing"
+            exit 1
+          fi
+          echo "SUCCESS: parallel block (list shape) works"

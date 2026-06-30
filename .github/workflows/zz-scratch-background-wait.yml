@@ -1,0 +1,38 @@
+name: "[SCRATCH] background + wait test"
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Test background/wait
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Slow background step
+        id: slow
+        background: true
+        run: |
+          echo "slow step starting at $(date +%s.%N)"
+          sleep 8
+          echo "result=hello-from-background" >> "$GITHUB_OUTPUT"
+          echo "slow step finishing at $(date +%s.%N)"
+
+      - name: Fast step that should overlap with slow step
+        run: |
+          echo "fast step running at $(date +%s.%N)"
+          sleep 1
+          echo "fast step done at $(date +%s.%N)"
+
+      - name: Wait for slow step
+        wait: slow
+
+      - name: Read output after wait
+        env:
+          SLOW_RESULT: ${{ steps.slow.outputs.result }}
+        run: |
+          echo "after wait, slow.outputs.result = '$SLOW_RESULT'"
+          if [[ "$SLOW_RESULT" != "hello-from-background" ]]; then
+            echo "::error::output not available after wait, got '$SLOW_RESULT'"
+            exit 1
+          fi
+          echo "SUCCESS: output correctly available after wait"
