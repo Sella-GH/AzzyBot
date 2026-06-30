@@ -55,19 +55,25 @@ jobs:
 
       - name: Get build environment
         id: get-environment
+        env:
+          IS_RELEASE_BRANCH: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') || contains(github.event.ref, 'dev/') || contains(github.event.ref, 'dependabot/') }}
+          IS_MAIN_NON_RELEASE: ${{ contains(github.ref_name, 'main') && (!contains(github.event.head_commit.message, '[pre-release]') || !contains(github.event.head_commit.message, '[release]')) }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
-          if ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') || contains(github.event.ref, 'dev/') || contains(github.event.ref, 'dependabot/') }}; then
-            echo "environment=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
-            echo "environment_alpine=${{ github.ref_name }}-alpine" >> "$GITHUB_OUTPUT"
-          elif ${{ contains(github.ref_name, 'main') && (!contains(github.event.head_commit.message, '[pre-release]') || !contains(github.event.head_commit.message, '[release]')) }}; then
+          if [[ "$IS_RELEASE_BRANCH" == "true" ]]; then
+            echo "environment=$REF_NAME" >> "$GITHUB_OUTPUT"
+            echo "environment_alpine=$REF_NAME-alpine" >> "$GITHUB_OUTPUT"
+          elif [[ "$IS_MAIN_NON_RELEASE" == "true" ]]; then
             echo "environment=dev" >> "$GITHUB_OUTPUT"
             echo "environment_alpine=dev-alpine" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Get build config
         id: get-config
+        env:
+          IS_RELEASE: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') }}
         run: |
-          if ${{ (contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/')) }}; then
+          if [[ "$IS_RELEASE" == "true" ]]; then
             echo "config=Docker" >> "$GITHUB_OUTPUT"
           else
             echo "config=Docker-debug" >> "$GITHUB_OUTPUT"
@@ -75,8 +81,10 @@ jobs:
 
       - name: Get correct Dockerfile
         id: get-dockerfile
+        env:
+          BUILD_CONFIG: ${{ steps.get-config.outputs.config }}
         run: |
-          if [[ "${{ steps.get-config.outputs.config }}" == "Docker" ]]; then
+          if [[ "$BUILD_CONFIG" == "Docker" ]]; then
             echo "dockerfile=release.Dockerfile" >> "$GITHUB_OUTPUT"
             echo "dockerfile_alpine=release.alpine.Dockerfile" >> "$GITHUB_OUTPUT"
           else
@@ -122,10 +130,14 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Replace values in files
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+          BUILD_DATETIME: ${{ needs.extract_meta.outputs.datetime }}
+          LOC_CS: ${{ needs.extract_meta.outputs.loc_cs }}
         run: |
-          sed -i "s\Commit not found\\${{ github.sha }}\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
-          sed -i "s\Compilation date not found\\${{ needs.extract_meta.outputs.datetime }}\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
-          sed -i "s\Lines of source code not found\\${{ needs.extract_meta.outputs.loc_cs}}\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
+          sed -i "s\Commit not found\\$COMMIT_SHA\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
+          sed -i "s\Compilation date not found\\$BUILD_DATETIME\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
+          sed -i "s\Lines of source code not found\\$LOC_CS\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
 
       - name: Log in to Docker Hub
         uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
@@ -154,9 +166,11 @@ jobs:
           cache-to: type=gha,scope=docker-ubuntu-${{ matrix.arch }}-${{ needs.extract_meta.outputs.config }},mode=max
 
       - name: Export digest
+        env:
+          BUILD_DIGEST: ${{ steps.build.outputs.digest }}
         run: |
           mkdir -p /tmp/digests
-          digest="${{ steps.build.outputs.digest }}"
+          digest="$BUILD_DIGEST"
           touch "/tmp/digests/${digest#sha256:}"
 
       - name: Upload digest
@@ -183,10 +197,14 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Replace values in files
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+          BUILD_DATETIME: ${{ needs.extract_meta.outputs.datetime }}
+          LOC_CS: ${{ needs.extract_meta.outputs.loc_cs }}
         run: |
-          sed -i "s\Commit not found\\${{ github.sha }}\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
-          sed -i "s\Compilation date not found\\${{ needs.extract_meta.outputs.datetime }}\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
-          sed -i "s\Lines of source code not found\\${{ needs.extract_meta.outputs.loc_cs}}\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
+          sed -i "s\Commit not found\\$COMMIT_SHA\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
+          sed -i "s\Compilation date not found\\$BUILD_DATETIME\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
+          sed -i "s\Lines of source code not found\\$LOC_CS\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
 
       - name: Log in to Docker Hub
         uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
@@ -215,9 +233,11 @@ jobs:
           cache-to: type=gha,scope=docker-alpine-${{ matrix.arch }}-${{ needs.extract_meta.outputs.config }},mode=max
 
       - name: Export digest
+        env:
+          BUILD_DIGEST: ${{ steps.build.outputs.digest }}
         run: |
           mkdir -p /tmp/digests
-          digest="${{ steps.build.outputs.digest }}"
+          digest="$BUILD_DIGEST"
           touch "/tmp/digests/${digest#sha256:}"
 
       - name: Upload digest

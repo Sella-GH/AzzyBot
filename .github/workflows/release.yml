@@ -125,8 +125,10 @@ jobs:
 
       - name: Set Release Version Output
         id: set_output
+        env:
+          RELEASE_VERSION: ${{ needs.extract_meta.outputs.version }}
         run: |
-          echo "release_version=${{ needs.extract_meta.outputs.version }}" >> "$GITHUB_OUTPUT"
+          echo "release_version=$RELEASE_VERSION" >> "$GITHUB_OUTPUT"
 
   upload_assets:
     name: Upload GitHub Release Assets
@@ -143,10 +145,12 @@ jobs:
       - name: Upload artifacts to release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_VERSION: ${{ needs.create_release.outputs.release_version }}
+          REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
           for dir in artifacts/*/; do
             name="$(basename "$dir")"
             (cd "$dir" && zip -r "../../${name}.zip" .)
-            gh release upload "${{ needs.create_release.outputs.release_version }}" "${name}.zip" --clobber --repo "${{ github.repository }}"
+            gh release upload "$RELEASE_VERSION" "${name}.zip" --clobber --repo "$REPO"
           done
