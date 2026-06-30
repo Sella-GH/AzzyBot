@@ -66,6 +66,14 @@ jobs:
           elif [[ "$IS_MAIN_NON_RELEASE" == "true" ]]; then
             echo "environment=dev" >> "$GITHUB_OUTPUT"
             echo "environment_alpine=dev-alpine" >> "$GITHUB_OUTPUT"
+          else
+            # Fallback for branches outside dev/**, rel/**, dependabot/**, main
+            # (e.g. a manual workflow_dispatch run on a feature branch) so the
+            # Docker tag is never empty. Sanitize since refs may contain `/`,
+            # which is not a valid Docker tag character.
+            SAFE_REF_NAME="$(echo "$REF_NAME" | tr -c 'a-zA-Z0-9._-' '-')"
+            echo "environment=$SAFE_REF_NAME" >> "$GITHUB_OUTPUT"
+            echo "environment_alpine=$SAFE_REF_NAME-alpine" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Get build config
