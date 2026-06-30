@@ -60,11 +60,11 @@ jobs:
       - name: Getting all files together
         run: |
           mkdir docker-zip
-          mv ./CHANGELOG.md ./docker-zip/CHANGELOG.md
-          mv ./docker-compose.yml ./docker-zip/docker-compose.yml
-          mv ./LICENSE ./docker-zip/LICENSE
-          mv ./README.md ./docker-zip/README.md
-          mv ./SECURITY.md ./docker-zip/SECURITY.md
+          cp ./CHANGELOG.md ./docker-zip/CHANGELOG.md
+          cp ./docker-compose.yml ./docker-zip/docker-compose.yml
+          cp ./LICENSE ./docker-zip/LICENSE
+          cp ./README.md ./docker-zip/README.md
+          cp ./SECURITY.md ./docker-zip/SECURITY.md
           mkdir -p ./docker-zip/AzzyBot/Backups
           touch ./docker-zip/AzzyBot/Backups/.keep
           mkdir -p ./docker-zip/AzzyBot/Certificates
@@ -73,10 +73,10 @@ jobs:
           touch ./docker-zip/AzzyBot/Backups/.keep
           mkdir -p ./docker-zip/AzzyBot/Modules/AzuraCast/Files
           mkdir -p ./docker-zip/AzzyBot/Modules/MusicStreaming/Files
-          mv ./src/AzzyBot.Bot/Modules/MusicStreaming/Files/application.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/application.yml
+          cp ./src/AzzyBot.Bot/Modules/MusicStreaming/Files/application.yml ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/application.yml
           #wget -qO ./docker-zip/AzzyBot/Modules/MusicStreaming/Files/plugins/java-lyrics-plugin-1.6.4.jar https://maven.lavalink.dev/releases/me/duncte123/java-lyrics-plugin/1.6.4/java-lyrics-plugin-1.6.4.jar
           mkdir -p ./docker-zip/AzzyBot/Settings
-          mv ./src/AzzyBot.Bot/Settings/AzzyBotSettings-Docker.json ./docker-zip/AzzyBot/Settings/AzzyBotSettings-Docker.json
+          cp ./src/AzzyBot.Bot/Settings/AzzyBotSettings-Docker.json ./docker-zip/AzzyBot/Settings/AzzyBotSettings-Docker.json
 
       - name: Archive docker-zip artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
