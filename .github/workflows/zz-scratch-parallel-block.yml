@@ -1,34 +1,45 @@
-name: "[SCRATCH] parallel block test"
+name: "[SCRATCH] background on uses: step + cancel test"
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - "claude/github-actions-optimization-bwsl2j"
+    paths:
+      - ".github/workflows/zz-scratch-parallel-block.yml"
 
 jobs:
   test:
-    name: Test parallel block (list shape)
+    name: Test background on uses step, and cancel
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
-      - name: Run two steps in parallel
-        parallel:
-          - name: Branch one
-            id: branch_one
-            run: |
-              sleep 3
-              echo "one=done" >> "$GITHUB_OUTPUT"
-          - name: Branch two
-            id: branch_two
-            run: |
-              sleep 3
-              echo "two=done" >> "$GITHUB_OUTPUT"
+      - name: "Checkout (background, a uses: step)"
+        id: checkout
+        background: true
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
-      - name: Confirm both branches completed
-        env:
-          ONE_OUT: ${{ steps.branch_one.outputs.one }}
-          TWO_OUT: ${{ steps.branch_two.outputs.two }}
+      - name: Start a long-lived background service
+        id: service
+        background: true
         run: |
-          echo "branch_one='$ONE_OUT' branch_two='$TWO_OUT'"
-          if [[ "$ONE_OUT" != "done" || "$TWO_OUT" != "done" ]]; then
-            echo "::error::parallel block did not complete both branches before continuing"
+          echo "pretend service starting"
+          sleep 60
+
+      - name: Wait for checkout only
+        wait: checkout
+
+      - name: Confirm checkout completed (workspace has files)
+        run: |
+          if [[ ! -f "AzzyBot.slnx" ]]; then
+            echo "::error::checkout (background uses: step) did not complete before wait returned"
             exit 1
           fi
-          echo "SUCCESS: parallel block (list shape) works"
+          echo "SUCCESS: background works on a uses: step"
+
+      - name: Cancel the long-lived service
+        cancel: service
+
+      - name: Done
+        run: echo "SUCCESS - cancel accepted"

@@ -2,11 +2,18 @@ name: "[SCRATCH] background + wait test"
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - "claude/github-actions-optimization-bwsl2j"
+    paths:
+      - ".github/workflows/zz-scratch-background-wait.yml"
 
 jobs:
   test:
     name: Test background/wait
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     steps:
       - name: Slow background step
         id: slow

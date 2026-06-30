@@ -2,11 +2,18 @@ name: "[SCRATCH] wait-all test"
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - "claude/github-actions-optimization-bwsl2j"
+    paths:
+      - ".github/workflows/zz-scratch-wait-all.yml"
 
 jobs:
   test:
     name: Test wait-all
     runs-on: ubuntu-slim
+    permissions:
+      contents: read
     steps:
       - name: Background step A
         id: a
