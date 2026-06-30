@@ -4,8 +4,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0-resolute AS build
 USER root
 
-RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=apt-resolute \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=apt-lib-resolute \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=apt-resolute-dev \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=apt-lib-resolute-dev \
     apt-get update \
   && apt-get upgrade -y \
   && apt-get autoremove -y
@@ -13,6 +13,7 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked,id=apt-resolute \
 WORKDIR /build
 
 # Restore layer: only invalidated by dependency/project-graph file changes
+# Keep in sync with the project list in AzzyBot.slnx — a new project needs its own COPY line here.
 ARG CONFIG
 COPY ./Nuget.config ./Nuget.config
 COPY ./global.json ./global.json
@@ -39,8 +40,8 @@ USER root
 
 # Upgrade internal tools and packages first
 RUN --mount=type=bind,from=build,source=/packages-microsoft-prod.deb,target=/tmp/packages-microsoft-prod.deb \
-    --mount=type=cache,target=/var/cache/apt,sharing=locked,id=apt-resolute-runner \
-    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=apt-lib-resolute-runner \
+    --mount=type=cache,target=/var/cache/apt,sharing=locked,id=apt-resolute-dev-runner \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked,id=apt-lib-resolute-dev-runner \
   apt-get update \
   && apt-get install -y --no-install-recommends ca-certificates gnupg \
   && dpkg -i /tmp/packages-microsoft-prod.deb \

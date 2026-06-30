@@ -132,7 +132,7 @@ jobs:
 
   upload_assets:
     name: Upload GitHub Release Assets
-    needs: [build-docker, create_release]
+    needs: [extract_meta, build-docker, create_release]
     runs-on: ubuntu-slim
     permissions:
       contents: write
@@ -141,6 +141,7 @@ jobs:
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           path: artifacts
+          pattern: ${{ needs.extract_meta.outputs.clean_version }}-docker
 
       - name: Upload artifacts to release
         env:
@@ -151,6 +152,6 @@ jobs:
           set -euo pipefail
           for dir in artifacts/*/; do
             name="$(basename "$dir")"
-            (cd "$dir" && zip -r "../../${name}.zip" .)
+            (cd "$dir" && python3 -m zipfile -c "../../${name}.zip" .)
             gh release upload "$RELEASE_VERSION" "${name}.zip" --clobber --repo "$REPO"
           done

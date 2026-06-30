@@ -4,13 +4,14 @@
 FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
 USER root
 
-RUN --mount=type=cache,target=/var/cache/apk,sharing=locked,id=apk-build \
+RUN --mount=type=cache,target=/var/cache/apk,sharing=locked,id=apk-build-dev \
     apk update \
   && apk upgrade
 
 WORKDIR /build
 
 # Restore layer: only invalidated by dependency/project-graph file changes
+# Keep in sync with the project list in AzzyBot.slnx — a new project needs its own COPY line here.
 ARG CONFIG
 COPY ./Nuget.config ./Nuget.config
 COPY ./global.json ./global.json
@@ -34,7 +35,7 @@ FROM mcr.microsoft.com/dotnet/runtime:10.0-alpine AS runner
 USER root
 
 # Upgrade internal tools and packages first
-RUN --mount=type=cache,target=/var/cache/apk,sharing=locked,id=apk-runner \
+RUN --mount=type=cache,target=/var/cache/apk,sharing=locked,id=apk-runner-dev \
     apk update \
   && apk upgrade \
   && apk add --no-cache icu-data-full icu-libs iputils-ping krb5-libs libmsquic tzdata zstd-dev

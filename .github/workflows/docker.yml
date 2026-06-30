@@ -55,31 +55,28 @@ jobs:
 
       - name: Get build environment
         id: get-environment
-        background: true
         env:
           IS_RELEASE_BRANCH: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') || contains(github.event.ref, 'dev/') || contains(github.event.ref, 'dependabot/') }}
           IS_MAIN_NON_RELEASE: ${{ contains(github.ref_name, 'main') && (!contains(github.event.head_commit.message, '[pre-release]') || !contains(github.event.head_commit.message, '[release]')) }}
           REF_NAME: ${{ github.ref_name }}
         run: |
+          SAFE_REF_NAME="$(printf '%s' "$REF_NAME" | tr -c 'a-zA-Z0-9._-' '-')"
           if [[ "$IS_RELEASE_BRANCH" == "true" ]]; then
-            echo "environment=$REF_NAME" >> "$GITHUB_OUTPUT"
-            echo "environment_alpine=$REF_NAME-alpine" >> "$GITHUB_OUTPUT"
+            echo "environment=$SAFE_REF_NAME" >> "$GITHUB_OUTPUT"
+            echo "environment_alpine=$SAFE_REF_NAME-alpine" >> "$GITHUB_OUTPUT"
           elif [[ "$IS_MAIN_NON_RELEASE" == "true" ]]; then
             echo "environment=dev" >> "$GITHUB_OUTPUT"
             echo "environment_alpine=dev-alpine" >> "$GITHUB_OUTPUT"
           else
             # Fallback for branches outside dev/**, rel/**, dependabot/**, main
             # (e.g. a manual workflow_dispatch run on a feature branch) so the
-            # Docker tag is never empty. Sanitize since refs may contain `/`,
-            # which is not a valid Docker tag character.
-            SAFE_REF_NAME="$(echo "$REF_NAME" | tr -c 'a-zA-Z0-9._-' '-')"
+            # Docker tag is never empty.
             echo "environment=$SAFE_REF_NAME" >> "$GITHUB_OUTPUT"
             echo "environment_alpine=$SAFE_REF_NAME-alpine" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Get build config
         id: get-config
-        background: true
         env:
           IS_RELEASE: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') }}
         run: |
@@ -89,20 +86,30 @@ jobs:
             echo "config=Docker-debug" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Get correct Dockerfile
+        id: get-dockerfile
+        env:
+          BUILD_CONFIG: ${{ steps.get-config.outputs.config }}
+        run: |
+          if [[ "$BUILD_CONFIG" == "Docker" ]]; then
+            echo "dockerfile=release.Dockerfile" >> "$GITHUB_OUTPUT"
+            echo "dockerfile_alpine=release.alpine.Dockerfile" >> "$GITHUB_OUTPUT"
+          else
+            echo "dockerfile=dev.Dockerfile" >> "$GITHUB_OUTPUT"
+            echo "dockerfile_alpine=dev.alpine.Dockerfile" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Get build metadata
         id: build-metadata
         background: true
         uses: ./.github/actions/build-metadata
-
-      - name: Wait for environment before computing Docker tags
-        wait: get-environment
 
       - name: Docker meta (ubuntu)
         id: meta-ubuntu
         background: true
         uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v3.6.1
         with:
-          flavor: latest=${{ (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) || 'false' }}
+          flavor: latest=${{ steps.get-config.outputs.config == 'Docker' || 'false' }}
           images: sellagh/azzybot
           tags: type=raw,value=${{ steps.get-environment.outputs.environment }}
 
@@ -115,24 +122,7 @@ jobs:
           images: sellagh/azzybot
           tags: |
             type=raw,value=${{ steps.get-environment.outputs.environment_alpine }}
-            ${{ (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) && 'type=raw,value=latest-alpine' || '' }}
-
-      - name: Wait for config before resolving Dockerfile
-        wait: get-config
-
-      - name: Get correct Dockerfile
-        id: get-dockerfile
-        background: true
-        env:
-          BUILD_CONFIG: ${{ steps.get-config.outputs.config }}
-        run: |
-          if [[ "$BUILD_CONFIG" == "Docker" ]]; then
-            echo "dockerfile=release.Dockerfile" >> "$GITHUB_OUTPUT"
-            echo "dockerfile_alpine=release.alpine.Dockerfile" >> "$GITHUB_OUTPUT"
-          else
-            echo "dockerfile=dev.Dockerfile" >> "$GITHUB_OUTPUT"
-            echo "dockerfile_alpine=dev.alpine.Dockerfile" >> "$GITHUB_OUTPUT"
-          fi
+            ${{ steps.get-config.outputs.config == 'Docker' && 'type=raw,value=latest-alpine' || '' }}
 
       - name: Wait for all background work before job outputs are read
         wait-all: true
@@ -163,16 +153,12 @@ jobs:
           sed -i "s\Compilation date not found\\$BUILD_DATETIME\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
           sed -i "s\Lines of source code not found\\$LOC_CS\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
 
-      - name: Log in to Docker Hub
+      - name: Docker login and buildx setup
         background: true
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+        uses: ./.github/actions/docker-login-buildx
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-      - name: Set up Docker Buildx
-        background: true
-        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Wait for prep steps before building
         wait-all: true
@@ -236,16 +222,12 @@ jobs:
           sed -i "s\Compilation date not found\\$BUILD_DATETIME\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
           sed -i "s\Lines of source code not found\\$LOC_CS\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
 
-      - name: Log in to Docker Hub
+      - name: Docker login and buildx setup
         background: true
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+        uses: ./.github/actions/docker-login-buildx
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-      - name: Set up Docker Buildx
-        background: true
-        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Wait for prep steps before building
         wait-all: true
@@ -298,14 +280,11 @@ jobs:
           pattern: ubuntu-*
           merge-multiple: true
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+      - name: Docker login and buildx setup
+        uses: ./.github/actions/docker-login-buildx
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Create manifest list and push
         working-directory: /tmp/digests
@@ -330,14 +309,11 @@ jobs:
           pattern: alpine-*
           merge-multiple: true
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+      - name: Docker login and buildx setup
+        uses: ./.github/actions/docker-login-buildx
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
+          dockerhub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub-password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Create manifest list and push
         working-directory: /tmp/digests
