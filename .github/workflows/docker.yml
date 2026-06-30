@@ -55,6 +55,7 @@ jobs:
 
       - name: Get build environment
         id: get-environment
+        background: true
         env:
           IS_RELEASE_BRANCH: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') || contains(github.event.ref, 'dev/') || contains(github.event.ref, 'dependabot/') }}
           IS_MAIN_NON_RELEASE: ${{ contains(github.ref_name, 'main') && (!contains(github.event.head_commit.message, '[pre-release]') || !contains(github.event.head_commit.message, '[release]')) }}
@@ -78,6 +79,7 @@ jobs:
 
       - name: Get build config
         id: get-config
+        background: true
         env:
           IS_RELEASE: ${{ contains(github.event.head_commit.message, '[release]') || contains(github.event.head_commit.message, '[pre-release]') || contains(github.event.ref, 'rel/') }}
         run: |
@@ -87,8 +89,40 @@ jobs:
             echo "config=Docker-debug" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Get build metadata
+        id: build-metadata
+        background: true
+        uses: ./.github/actions/build-metadata
+
+      - name: Wait for environment before computing Docker tags
+        wait: get-environment
+
+      - name: Docker meta (ubuntu)
+        id: meta-ubuntu
+        background: true
+        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v3.6.1
+        with:
+          flavor: latest=${{ (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) || 'false' }}
+          images: sellagh/azzybot
+          tags: type=raw,value=${{ steps.get-environment.outputs.environment }}
+
+      - name: Docker meta (alpine)
+        id: meta-alpine
+        background: true
+        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v3.6.1
+        with:
+          flavor: latest=false
+          images: sellagh/azzybot
+          tags: |
+            type=raw,value=${{ steps.get-environment.outputs.environment_alpine }}
+            ${{ (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) && 'type=raw,value=latest-alpine' || '' }}
+
+      - name: Wait for config before resolving Dockerfile
+        wait: get-config
+
       - name: Get correct Dockerfile
         id: get-dockerfile
+        background: true
         env:
           BUILD_CONFIG: ${{ steps.get-config.outputs.config }}
         run: |
@@ -100,27 +134,8 @@ jobs:
             echo "dockerfile_alpine=dev.alpine.Dockerfile" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Get build metadata
-        id: build-metadata
-        uses: ./.github/actions/build-metadata
-
-      - name: Docker meta (ubuntu)
-        id: meta-ubuntu
-        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v3.6.1
-        with:
-          flavor: latest=${{ (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) || 'false' }}
-          images: sellagh/azzybot
-          tags: type=raw,value=${{ steps.get-environment.outputs.environment }}
-
-      - name: Docker meta (alpine)
-        id: meta-alpine
-        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v3.6.1
-        with:
-          flavor: latest=false
-          images: sellagh/azzybot
-          tags: |
-            type=raw,value=${{ steps.get-environment.outputs.environment_alpine }}
-            ${{ (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) && 'type=raw,value=latest-alpine' || '' }}
+      - name: Wait for all background work before job outputs are read
+        wait-all: true
 
   docker-build-ubuntu:
     name: Build Docker Image For ubuntu - ${{ matrix.arch }}
