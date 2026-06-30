@@ -43,13 +43,15 @@ jobs:
       config: ${{ steps.get-config.outputs.config }}
       dockerfile: ${{ steps.get-dockerfile.outputs.dockerfile }}
       dockerfile_alpine: ${{ steps.get-dockerfile.outputs.dockerfile_alpine }}
-      datetime: ${{ steps.get-datetime.outputs.time }}
-      loc_cs: ${{ steps.get-loc_cs.outputs.total_lines }}
+      datetime: ${{ steps.build-metadata.outputs.datetime }}
+      loc_cs: ${{ steps.build-metadata.outputs.loc_cs }}
+      tags_ubuntu: ${{ steps.meta-ubuntu.outputs.tags }}
+      labels_ubuntu: ${{ steps.meta-ubuntu.outputs.labels }}
+      tags_alpine: ${{ steps.meta-alpine.outputs.tags }}
+      labels_alpine: ${{ steps.meta-alpine.outputs.labels }}
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with:
-          fetch-depth: 0
 
       - name: Get build environment
         id: get-environment
@@ -82,21 +84,30 @@ jobs:
             echo "dockerfile_alpine=dev.alpine.Dockerfile" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Get Date and Time
-        id: get-datetime
-        uses: Kaven-Universe/github-action-current-date-time@7c1d8465d1bfd7d35466d2ee82a8e460780561ae # v1.5.0
-        with:
-          format: "YYYY-MM-DDTHH:mm:ss"
+      - name: Get build metadata
+        id: build-metadata
+        uses: ./.github/actions/build-metadata
 
-      - name: Calculate Lines of Source Code
-        if: ${{ github.actor != 'dependabot[bot]' }}
-        id: get-loc_cs
-        uses: PavanMudigonda/lines-of-code-reporter@de8bca4aac0aa952e9c9f771b30b0b3ad2c73958 # v1.8
+      - name: Docker meta (ubuntu)
+        id: meta-ubuntu
+        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v3.6.1
         with:
-          include_lang: "C#,MSBuild script"
+          flavor: latest=${{ (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) || 'false' }}
+          images: sellagh/azzybot
+          tags: type=raw,value=${{ steps.get-environment.outputs.environment }}
 
-  docker-build:
-    name: Build Docker Image For ${{ matrix.os }} - ${{ matrix.arch }}
+      - name: Docker meta (alpine)
+        id: meta-alpine
+        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v3.6.1
+        with:
+          flavor: latest=false
+          images: sellagh/azzybot
+          tags: |
+            type=raw,value=${{ steps.get-environment.outputs.environment_alpine }}
+            ${{ (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) && 'type=raw,value=latest-alpine' || '' }}
+
+  docker-build-ubuntu:
+    name: Build Docker Image For ubuntu - ${{ matrix.arch }}
     needs: [extract_meta]
     runs-on: ubuntu-24.04${{ matrix.arch == 'arm64' && '-arm' || '' }}
     permissions:
@@ -104,14 +115,11 @@ jobs:
       contents: read
     strategy:
       matrix:
-        os: [ubuntu, alpine]
         arch: [amd64, arm64]
 
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with:
-          fetch-depth: 0
 
       - name: Replace values in files
         run: |
@@ -125,27 +133,8 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v3.6.1
-        with:
-          flavor: latest=${{ matrix.os == 'ubuntu' && (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) || 'false' }}
-          images: sellagh/azzybot
-          tags: |
-            type=raw,value=${{ matrix.os == 'ubuntu' && needs.extract_meta.outputs.environment || needs.extract_meta.outputs.environment_alpine }}
-            ${{ matrix.os == 'alpine' && (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) && 'type=raw,value=latest-alpine' || '' }}
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@06116385d9baf250c9f4dcb4858b16962ea869c3 # v4.1.0
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Build and push by digest
         id: build
@@ -157,10 +146,12 @@ jobs:
           build-args: |
             CONFIG=${{ needs.extract_meta.outputs.config }}
           context: .
-          file: ${{ matrix.os == 'ubuntu' && needs.extract_meta.outputs.dockerfile || needs.extract_meta.outputs.dockerfile_alpine }}
-          labels: ${{ steps.meta.outputs.labels }}
+          file: ${{ needs.extract_meta.outputs.dockerfile }}
+          labels: ${{ needs.extract_meta.outputs.labels_ubuntu }}
           platforms: linux/${{ matrix.arch }}
           outputs: type=image,name=sellagh/azzybot,push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha,scope=docker-ubuntu-${{ matrix.arch }}-${{ needs.extract_meta.outputs.config }}
+          cache-to: type=gha,scope=docker-ubuntu-${{ matrix.arch }}-${{ needs.extract_meta.outputs.config }},mode=max
 
       - name: Export digest
         run: |
@@ -171,28 +162,85 @@ jobs:
       - name: Upload digest
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: ${{ matrix.os }}-linux-${{ matrix.arch }}
+          name: ubuntu-linux-${{ matrix.arch }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
 
-  merge:
-    name: Creating Docker Release
-    runs-on: ubuntu-24.04
-    needs: [extract_meta, docker-build]
+  docker-build-alpine:
+    name: Build Docker Image For alpine - ${{ matrix.arch }}
+    needs: [extract_meta]
+    runs-on: ubuntu-24.04${{ matrix.arch == 'arm64' && '-arm' || '' }}
     permissions:
       checks: write
       contents: read
     strategy:
       matrix:
-        os: [ubuntu, alpine]
+        arch: [amd64, arm64]
 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Replace values in files
+        run: |
+          sed -i "s\Commit not found\\${{ github.sha }}\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
+          sed -i "s\Compilation date not found\\${{ needs.extract_meta.outputs.datetime }}\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
+          sed -i "s\Lines of source code not found\\${{ needs.extract_meta.outputs.loc_cs}}\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
+
+      - name: Build and push by digest
+        id: build
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
+        env:
+          DOCKER_BUILD_SUMMARY: false
+          DOCKER_BUILD_RECORD_UPLOAD: false
+        with:
+          build-args: |
+            CONFIG=${{ needs.extract_meta.outputs.config }}
+          context: .
+          file: ${{ needs.extract_meta.outputs.dockerfile_alpine }}
+          labels: ${{ needs.extract_meta.outputs.labels_alpine }}
+          platforms: linux/${{ matrix.arch }}
+          outputs: type=image,name=sellagh/azzybot,push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha,scope=docker-alpine-${{ matrix.arch }}-${{ needs.extract_meta.outputs.config }}
+          cache-to: type=gha,scope=docker-alpine-${{ matrix.arch }}-${{ needs.extract_meta.outputs.config }},mode=max
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: alpine-linux-${{ matrix.arch }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge-ubuntu:
+    name: Creating Docker Release (ubuntu)
+    runs-on: ubuntu-24.04
+    needs: [extract_meta, docker-build-ubuntu]
+    permissions:
+      checks: write
+      contents: read
     steps:
       - name: Download digests
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           path: /tmp/digests
-          pattern: ${{ matrix.os }}-*
+          pattern: ubuntu-*
           merge-multiple: true
 
       - name: Log in to Docker Hub
@@ -204,19 +252,42 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
 
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@80c7e94dd9b9319bd5eb7a0e0fe9291e23a2a2e9 # v3.6.1
+      - name: Create manifest list and push
+        working-directory: /tmp/digests
+        env:
+          DOCKER_TAGS: ${{ needs.extract_meta.outputs.tags_ubuntu }}
+        run: |
+          docker buildx imagetools create $(printf '%s\n' "$DOCKER_TAGS" | sed '/^$/d' | sed 's/^/-t /' | tr '\n' ' ') \
+            $(printf 'sellagh/azzybot@sha256:%s ' *)
+
+  merge-alpine:
+    name: Creating Docker Release (alpine)
+    runs-on: ubuntu-24.04
+    needs: [extract_meta, docker-build-alpine]
+    permissions:
+      checks: write
+      contents: read
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
-          flavor: latest=${{ matrix.os == 'ubuntu' && (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) || 'false' }}
-          images: sellagh/azzybot
-          tags: |
-            type=raw,value=${{ matrix.os == 'ubuntu' && needs.extract_meta.outputs.environment || needs.extract_meta.outputs.environment_alpine }}
-            ${{ matrix.os == 'alpine' && (contains(github.event.head_commit.message, '[release]') || contains(github.event.ref, 'rel/')) && 'type=raw,value=latest-alpine' || '' }}
+          path: /tmp/digests
+          pattern: alpine-*
+          merge-multiple: true
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
 
       - name: Create manifest list and push
         working-directory: /tmp/digests
+        env:
+          DOCKER_TAGS: ${{ needs.extract_meta.outputs.tags_alpine }}
         run: |
-          docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+          docker buildx imagetools create $(printf '%s\n' "$DOCKER_TAGS" | sed '/^$/d' | sed 's/^/-t /' | tr '\n' ' ') \
             $(printf 'sellagh/azzybot@sha256:%s ' *)
-

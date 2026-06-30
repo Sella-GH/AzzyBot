@@ -19,24 +19,22 @@ on:
 jobs:
   build:
     name: Build And Analyze
-    runs-on: windows-2025
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:
-      - name: Set up .NET SDK
-        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
-        with:
-          dotnet-version: 10
-
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
 
+      - name: Restore .NET dependencies (cached)
+        uses: ./.github/actions/dotnet-restore-cached
+
       - name: Cache SonarQube Cloud Packages
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # 6.1.0
         with:
-          path: ~\sonar\cache
+          path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
 
@@ -44,28 +42,25 @@ jobs:
         id: cache-sonar-scanner
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # 6.1.0
         with:
-          path: .\.sonar\scanner
+          path: ./.sonar/scanner
           key: ${{ runner.os }}-sonar-scanner
           restore-keys: ${{ runner.os }}-sonar-scanner
 
       - name: Install SonarQube Cloud Scanner
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
-        shell: powershell
         run: |
-          New-Item -Path .\.sonar\scanner -ItemType Directory
-          dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
+          mkdir -p ./.sonar/scanner
+          dotnet tool update dotnet-sonarscanner --tool-path ./.sonar/scanner
 
       - name: Build And Analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"Sella-GH_AzzyBot" /o:"sella-gh" /d:sonar.token="$env:SONAR_TOKEN" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.exclusions="extern/**/*, src/AzzyBot.Data/Migrations/**/*"
+          ./.sonar/scanner/dotnet-sonarscanner begin /k:"Sella-GH_AzzyBot" /o:"sella-gh" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.exclusions="extern/**/*, src/AzzyBot.Data/Migrations/**/*"
 
-          dotnet restore .\src\AzzyBot.Bot\AzzyBot.Bot.csproj --configfile .\Nuget.config --force --no-cache --ucr
-          dotnet build .\src\AzzyBot.Bot\AzzyBot.Bot.csproj -c Release --no-incremental --no-restore --no-self-contained --ucr
+          dotnet build ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c Release --no-incremental --no-restore --no-self-contained --ucr
 
-          .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="$env:SONAR_TOKEN"
+          ./.sonar/scanner/dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
 
   cleanup:
     name: Cleanup Runs

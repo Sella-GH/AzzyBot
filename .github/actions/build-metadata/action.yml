@@ -1,0 +1,26 @@
+name: "Build Metadata"
+description: "Computes build datetime and lines-of-code metrics shared across workflows"
+
+outputs:
+  datetime:
+    description: "Current date/time in YYYY-MM-DDTHH:mm:ss"
+    value: ${{ steps.get-datetime.outputs.time }}
+  loc_cs:
+    description: "Total lines of C#/MSBuild source code"
+    value: ${{ steps.get-loc_cs.outputs.total_lines }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get Date and Time
+      id: get-datetime
+      uses: Kaven-Universe/github-action-current-date-time@7c1d8465d1bfd7d35466d2ee82a8e460780561ae # v1.5.0
+      with:
+        format: "YYYY-MM-DDTHH:mm:ss"
+
+    - name: Calculate Lines of Source Code
+      if: ${{ github.actor != 'dependabot[bot]' }}
+      id: get-loc_cs
+      uses: PavanMudigonda/lines-of-code-reporter@de8bca4aac0aa952e9c9f771b30b0b3ad2c73958 # v1.8
+      with:
+        include_lang: "C#,MSBuild script"
