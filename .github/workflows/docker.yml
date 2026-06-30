@@ -153,6 +153,7 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Replace values in files
+        background: true
         env:
           COMMIT_SHA: ${{ github.sha }}
           BUILD_DATETIME: ${{ needs.extract_meta.outputs.datetime }}
@@ -163,13 +164,18 @@ jobs:
           sed -i "s\Lines of source code not found\\$LOC_CS\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
 
       - name: Log in to Docker Hub
+        background: true
         uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Set up Docker Buildx
+        background: true
         uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
+
+      - name: Wait for prep steps before building
+        wait-all: true
 
       - name: Build and push by digest
         id: build
@@ -220,6 +226,7 @@ jobs:
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
       - name: Replace values in files
+        background: true
         env:
           COMMIT_SHA: ${{ github.sha }}
           BUILD_DATETIME: ${{ needs.extract_meta.outputs.datetime }}
@@ -230,13 +237,18 @@ jobs:
           sed -i "s\Lines of source code not found\\$LOC_CS\g" ./src/AzzyBot.Bot/Modules/Core/Files/AppStats.json
 
       - name: Log in to Docker Hub
+        background: true
         uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Set up Docker Buildx
+        background: true
         uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
+
+      - name: Wait for prep steps before building
+        wait-all: true
 
       - name: Build and push by digest
         id: build
