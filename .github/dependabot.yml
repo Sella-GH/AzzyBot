@@ -6,20 +6,9 @@
 version: 2
 updates:
   - package-ecosystem: "github-actions"
-    directory: "/.github/workflows"
-    schedule:
-      interval: "daily"
-    assignees:
-      - "Sella-GH"
-    commit-message:
-      prefix: "[Actions]"
-      include: "scope"
-    labels:
-      - "area-ci"
-      - "area-dependencies"
-
-  - package-ecosystem: "github-actions"
-    directory: "/.github/actions"
+    directories:
+      - "/.github/workflows"
+      - "/.github/actions"
     schedule:
       interval: "daily"
     assignees:
