@@ -21,14 +21,12 @@ COPY ./src/AzzyBot.Bot/AzzyBot.Bot.csproj ./src/AzzyBot.Bot/AzzyBot.Bot.csproj
 COPY ./src/AzzyBot.Core/AzzyBot.Core.csproj ./src/AzzyBot.Core/AzzyBot.Core.csproj
 COPY ./src/AzzyBot.Data/AzzyBot.Data.csproj ./src/AzzyBot.Data/AzzyBot.Data.csproj
 
-RUN --mount=type=cache,target=/root/.nuget/packages,sharing=locked,id=nuget-packages-alpine \
-    dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.config --ucr
+RUN dotnet restore ./src/AzzyBot.Bot/AzzyBot.Bot.csproj --configfile ./Nuget.config --ucr
 
 # Build/publish layer: invalidated by any source change, but restore above stays cached
 COPY ./ ./
 
-RUN --mount=type=cache,target=/root/.nuget/packages,sharing=locked,id=nuget-packages-alpine \
-    dotnet build ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c $CONFIG --no-incremental --no-restore --no-self-contained --ucr \
+RUN dotnet build ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c $CONFIG --no-incremental --no-restore --no-self-contained --ucr \
   && dotnet publish ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c $CONFIG --no-build --no-restore --no-self-contained -o out --ucr
 
 # RUNNER IMAGE
