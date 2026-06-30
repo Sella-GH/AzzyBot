@@ -29,9 +29,11 @@ jobs:
           fetch-depth: 0
 
       - name: Restore .NET dependencies (cached)
+        background: true
         uses: ./.github/actions/dotnet-restore-cached
 
       - name: Cache SonarQube Cloud Packages
+        background: true
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # 6.1.0
         with:
           path: ~/.sonar/cache
@@ -40,11 +42,15 @@ jobs:
 
       - name: Cache SonarQube Cloud Scanner
         id: cache-sonar-scanner
+        background: true
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # 6.1.0
         with:
           path: ./.sonar/scanner
           key: ${{ runner.os }}-sonar-scanner
           restore-keys: ${{ runner.os }}-sonar-scanner
+
+      - name: Wait for setup steps
+        wait-all: true
 
       - name: Install SonarQube Cloud Scanner
         if: steps.cache-sonar-scanner.outputs.cache-hit != 'true'
