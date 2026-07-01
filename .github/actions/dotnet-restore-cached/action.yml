@@ -1,0 +1,33 @@
+name: "Dotnet Restore (Cached)"
+description: "Sets up the pinned .NET SDK with NuGet package caching and restores AzzyBot.Bot"
+
+inputs:
+  dotnet-version:
+    description: ".NET SDK version (informational; global.json pins the exact version)"
+    required: false
+    default: "10"
+  project-path:
+    description: "Path to the csproj to restore"
+    required: false
+    default: "./src/AzzyBot.Bot/AzzyBot.Bot.csproj"
+  nuget-config-path:
+    description: "Path to Nuget.config"
+    required: false
+    default: "./Nuget.config"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up .NET SDK
+      uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
+      with:
+        dotnet-version: ${{ inputs.dotnet-version }}
+        cache: true
+        cache-dependency-path: |
+          **/*.csproj
+          Directory.Packages.props
+          Directory.Build.props
+
+    - name: Restore
+      shell: bash
+      run: dotnet restore "${{ inputs.project-path }}" --configfile "${{ inputs.nuget-config-path }}" --ucr
