@@ -1,5 +1,7 @@
+# Requires actions/checkout to have run earlier in the calling job — this is a
+# local composite action and its action.yml must exist in the checked-out workspace.
 name: "Docker Login and Buildx Setup"
-description: "Logs into Docker Hub and sets up Docker Buildx"
+description: "Logs into Docker Hub and sets up Docker Buildx. Requires actions/checkout to run first in the caller."
 
 inputs:
   dockerhub-username:

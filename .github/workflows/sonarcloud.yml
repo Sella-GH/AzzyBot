@@ -29,7 +29,6 @@ jobs:
           fetch-depth: 0
 
       - name: Restore .NET dependencies (cached)
-        id: restore-dotnet
         background: true
         uses: ./.github/actions/dotnet-restore-cached
 
