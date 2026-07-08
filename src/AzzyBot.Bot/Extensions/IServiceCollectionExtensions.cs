@@ -41,6 +41,7 @@ public static class IServiceCollectionExtensions
 {
     extension(IServiceCollection services)
     {
+        [SuppressMessage("Minor Vulnerability", "S5332:Clear-text protocols should not be used", Justification = "Lavalink traffic works over HTTP")]
         public void AzzyBotServices(int logDays = 7)
         {
             IServiceProvider serviceProvider = services.BuildServiceProvider();
