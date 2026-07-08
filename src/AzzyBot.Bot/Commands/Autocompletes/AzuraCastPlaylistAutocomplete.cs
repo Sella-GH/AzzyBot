@@ -85,7 +85,7 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
 
             if (needState)
             {
-                results.Add(new($"{playlist.Name} ({Misc.GetReadableBool(playlist.IsEnabled, ReadableBool.EnabledDisabled, true)})", playlist.Id));
+                results.Add(new($"{playlist.Name} ({Misc.GetReadableBool(playlist.IsEnabled, ReadableBools.EnabledDisabled, true)})", playlist.Id));
             }
             else
             {

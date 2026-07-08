@@ -428,7 +428,7 @@ public static class EmbedBuilder
 #if DOCKER || DOCKER_DEBUG
             ["Dockerized?"] = new(Misc.GetReadableBool(true, ReadableBool.YesNo), true),
 #else
-            ["Dockerized?"] = new(Misc.GetReadableBool(false, ReadableBool.YesNo), true),
+            ["Dockerized?"] = new(Misc.GetReadableBool(false, ReadableBools.YesNo), true),
 #endif
             ["System Uptime"] = new($"<t:{uptime}>", true),
             ["Bot Memory"] = new($"{SoftwareStats.GetAppMemoryUsage()} GB", true)
@@ -633,8 +633,8 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedModel> fields = new(5)
         {
-            ["Configuration Complete"] = new(Misc.GetReadableBool(guild.ConfigSet, ReadableBool.YesNo)),
-            ["Legals Accepted"] = new(Misc.GetReadableBool(guild.LegalsAccepted, ReadableBool.YesNo)),
+            ["Configuration Complete"] = new(Misc.GetReadableBool(guild.ConfigSet, ReadableBools.YesNo)),
+            ["Legals Accepted"] = new(Misc.GetReadableBool(guild.LegalsAccepted, ReadableBools.YesNo)),
             ["Server ID"] = new(guild.UniqueId.ToString(CultureInfo.InvariantCulture)),
             ["Admin Role"] = new((!string.IsNullOrEmpty(adminRole?.Trim()) && adminRole.Trim() is not "()") ? adminRole.Trim() : NotSetString),
             ["Admin Notify Channel"] = new((guild.Preferences.AdminNotifyChannelId > 0) ? $"<#{guild.Preferences.AdminNotifyChannelId}>" : NotSetString)
@@ -652,11 +652,11 @@ public static class EmbedBuilder
         {
             ["Base Url"] = new($"||{((!string.IsNullOrEmpty(azuraCast.BaseUrl)) ? Crypto.Decrypt(azuraCast.BaseUrl) : NotSetString)}||"),
             ["Admin Api Key"] = new($"||{((!string.IsNullOrEmpty(azuraCast.AdminApiKey)) ? Crypto.Decrypt(azuraCast.AdminApiKey) : NotSetString)}||"),
-            ["Instance Online"] = new(Misc.GetReadableBool(azuraCast.IsOnline, ReadableBool.EnabledDisabled)),
+            ["Instance Online"] = new(Misc.GetReadableBool(azuraCast.IsOnline, ReadableBools.EnabledDisabled)),
             ["Instance Admin Role"] = new((!string.IsNullOrEmpty(instanceRole?.Trim()) && instanceRole.Trim() is not "()") ? instanceRole.Trim() : NotSetString),
             ["Notification Channel"] = new((azuraCast.Preferences.NotificationChannelId > 0) ? $"<#{azuraCast.Preferences.NotificationChannelId}>" : NotSetString),
             ["Outages Channel"] = new((azuraCast.Preferences.OutagesChannelId > 0) ? $"<#{azuraCast.Preferences.OutagesChannelId}>" : NotSetString),
-            ["Automatic Checks"] = new($"- Server Status: {Misc.GetReadableBool(azuraCast.Checks.ServerStatus, ReadableBool.EnabledDisabled)}\n- Updates: {Misc.GetReadableBool(azuraCast.Checks.Updates, ReadableBool.EnabledDisabled)}\n- Updates Changelog: {Misc.GetReadableBool(azuraCast.Checks.UpdatesShowChangelog, ReadableBool.EnabledDisabled)}")
+            ["Automatic Checks"] = new($"- Server Status: {Misc.GetReadableBool(azuraCast.Checks.ServerStatus, ReadableBools.EnabledDisabled)}\n- Updates: {Misc.GetReadableBool(azuraCast.Checks.Updates, ReadableBools.EnabledDisabled)}\n- Updates Changelog: {Misc.GetReadableBool(azuraCast.Checks.UpdatesShowChangelog, ReadableBools.EnabledDisabled)}")
         };
 
         return CreateBasicEmbed(title, color: DiscordColor.White, fields: fields);
@@ -694,8 +694,8 @@ public static class EmbedBuilder
             string nowPlayingChannel = (station.Preferences.NowPlayingEmbedChannelId is > 0) ? $"<#{station.Preferences.NowPlayingEmbedChannelId}>" : NotSetString;
             string requestsChannel = (station.Preferences.RequestsChannelId is > 0) ? $"<#{station.Preferences.RequestsChannelId}>" : NotSetString;
             int requestCount = stationRequests.FirstOrDefault(x => x.Key == station.Id).Value;
-            string showPlaylist = Misc.GetReadableBool(station.Preferences.ShowPlaylistInNowPlaying, ReadableBool.EnabledDisabled);
-            string fileChanges = Misc.GetReadableBool(station.Checks.FileChanges, ReadableBool.EnabledDisabled);
+            string showPlaylist = Misc.GetReadableBool(station.Preferences.ShowPlaylistInNowPlaying, ReadableBools.EnabledDisabled);
+            string fileChanges = Misc.GetReadableBool(station.Checks.FileChanges, ReadableBools.EnabledDisabled);
 
             Dictionary<string, AzzyDiscordEmbedModel> fields = new(12)
             {

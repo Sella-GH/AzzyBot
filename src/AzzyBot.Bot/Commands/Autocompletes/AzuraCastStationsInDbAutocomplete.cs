@@ -100,11 +100,11 @@ public sealed class AzuraCastStationsInDbAutocomplete(ILogger<AzuraCastStationsI
 
                 case "start-station" when !config.IsEnabled:
                 case "stop-station" when config.IsEnabled:
-                    results.Add(new($"{azuraStation.Name} ({Misc.GetReadableBool(config.IsEnabled, ReadableBool.StartedStopped, true)})", station.StationId));
+                    results.Add(new($"{azuraStation.Name} ({Misc.GetReadableBool(config.IsEnabled, ReadableBools.StartedStopped, true)})", station.StationId));
                     break;
 
                 case "toggle-song-requests":
-                    results.Add(new($"{azuraStation.Name} ({Misc.GetReadableBool(config.EnableRequests, ReadableBool.EnabledDisabled, true)})", station.StationId));
+                    results.Add(new($"{azuraStation.Name} ({Misc.GetReadableBool(config.EnableRequests, ReadableBools.EnabledDisabled, true)})", station.StationId));
                     break;
 
                 default:

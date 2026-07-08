@@ -605,7 +605,7 @@ public sealed class AzuraCastCommands
             stationConfig.EnableRequests = !stationConfig.EnableRequests;
             await _azuraCastApi.ModifyStationAdminConfigAsync(baseUrl, apiKey, station, stationConfig);
 
-            await context.EditResponseAsync($"I {Misc.GetReadableBool(stationConfig.EnableRequests, ReadableBool.EnabledDisabled, true)} song requests for station **{stationConfig.Name}**.");
+            await context.EditResponseAsync($"I {Misc.GetReadableBool(stationConfig.EnableRequests, ReadableBools.EnabledDisabled, true)} song requests for station **{stationConfig.Name}**.");
         }
 
         [Command("update-instance"), Description("Update the AzuraCast instance to the latest version."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
@@ -903,7 +903,7 @@ public sealed class AzuraCastCommands
             message.AppendLine(CultureInfo.InvariantCulture, $"I switched the {((states.Count is 1) ? "playlist" : "playlists")} for **{azuraStation.Name}**.");
             foreach (AzuraPlaylistStateModel state in states)
             {
-                message.AppendLine(CultureInfo.InvariantCulture, $"**{state.PlaylistName}** is now **{Misc.GetReadableBool(state.PlaylistState, ReadableBool.EnabledDisabled, true)}**.");
+                message.AppendLine(CultureInfo.InvariantCulture, $"**{state.PlaylistName}** is now **{Misc.GetReadableBool(state.PlaylistState, ReadableBools.EnabledDisabled, true)}**.");
             }
 
             await context.EditResponseAsync(message.ToString());
