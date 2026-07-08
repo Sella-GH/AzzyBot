@@ -1073,6 +1073,50 @@ dotnet_diagnostic.DSP1002.severity = warning
 ## DSP1003: A command taking a specific context type should not restrict itself to other processors.
 dotnet_diagnostic.DSP1003.severity = warning
 
+# Meziantou.Analyzer
+## MA0004: Use Task.ConfigureAwait(false) if the current SynchronizationContext is not needed.
+dotnet_diagnostic.MA0004.severity = none
+
+## MA0007: Add comma after the last value.
+dotnet_diagnostic.MA0007.severity = none
+
+## MA0015: Specify the parameter name in ArgumentException
+dotnet_diagnostic.MA0015.severity = none
+
+## MA0032: Use an overload with a CancellationToken
+#dotnet_diagnostic.MA0032.severity = none
+
+## MA0038: Make method static (deprecated, use CA1822 instead)
+dotnet_diagnostic.MA0038.severity = none
+
+## MA0041 - Make property static (deprecated, use CA1822 instead)
+dotnet_diagnostic.MA0041.severity = none
+
+## MA0048: File name must match type name
+#dotnet_diagnostic.MA0048.severity = none
+
+## MA0051: Method is too long
+dotnet_diagnostic.MA0051.severity = none
+
+## MA0136: Raw String contains an implicit end of line character
+#dotnet_diagnostic.MA0136.severity = none
+
+## MA0155: Do not use async void methods
+#dotnet_diagnostic.MA0155.severity = none
+
+## MA0157: Do not use 'Async' suffix when a method returns IAsyncEnumerable<T>
+#dotnet_diagnostic.MA0157.severity = none
+
+## MA0167: Use an overload with a TimeProvider argument
+### We won't ever have an own TimeProvider to use it!
+dotnet_diagnostic.MA0167.severity = none
+
+## MA0175: Record should not be declared with explicit 'class' keyword
+dotnet_diagnostic.MA0175.severity = none
+
+## MA0177: Use single-line XML comment syntax when possible
+dotnet_diagnostic.MA0177.severity = none
+
 # Json files
 [*.{json,JSON}]
 indent_size = 2

@@ -13,6 +13,7 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <IsPublishable>True</IsPublishable>
     <JsonSerializerIsReflectionEnabledByDefault>False</JsonSerializerIsReflectionEnabledByDefault> <!-- Source Generator for JSON -->
+    <MeziantouAnalysisMode>all-warnings</MeziantouAnalysisMode> <!-- Set Analyzer ruleset to default warning output -->
     <NoWarn>$(NoWarn);CA2007</NoWarn>
     <NuGetAuditMode>all</NuGetAuditMode>
     <Nullable>enable</Nullable>
@@ -84,6 +85,10 @@
 
   <!-- Global NuGet packages for every project -->
   <ItemGroup>
+    <PackageReference Include="Meziantou.Analyzer">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Roslynator.Analyzers">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
