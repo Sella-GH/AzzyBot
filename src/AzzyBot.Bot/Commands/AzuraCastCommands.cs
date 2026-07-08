@@ -605,7 +605,7 @@ public sealed class AzuraCastCommands
             stationConfig.EnableRequests = !stationConfig.EnableRequests;
             await _azuraCastApi.ModifyStationAdminConfigAsync(baseUrl, apiKey, station, stationConfig);
 
-            await context.EditResponseAsync($"I {Misc.GetReadableBool(stationConfig.EnableRequests, ReadableBools.EnabledDisabled, true)} song requests for station **{stationConfig.Name}**.");
+            await context.EditResponseAsync($"I {Misc.GetReadableBool(stationConfig.EnableRequests, ReadableBools.EnabledDisabled, lower: true)} song requests for station **{stationConfig.Name}**.");
         }
 
         [Command("update-instance"), Description("Update the AzuraCast instance to the latest version."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.InstanceAdminGroup]), AzuraCastOnlineCheck]
@@ -903,7 +903,7 @@ public sealed class AzuraCastCommands
             message.AppendLine(CultureInfo.InvariantCulture, $"I switched the {((states.Count is 1) ? "playlist" : "playlists")} for **{azuraStation.Name}**.");
             foreach (AzuraPlaylistStateModel state in states)
             {
-                message.AppendLine(CultureInfo.InvariantCulture, $"**{state.PlaylistName}** is now **{Misc.GetReadableBool(state.PlaylistState, ReadableBools.EnabledDisabled, true)}**.");
+                message.AppendLine(CultureInfo.InvariantCulture, $"**{state.PlaylistName}** is now **{Misc.GetReadableBool(state.PlaylistState, ReadableBools.EnabledDisabled, lower: true)}**.");
             }
 
             await context.EditResponseAsync(message.ToString());
@@ -1273,7 +1273,7 @@ public sealed class AzuraCastCommands
 
             if (stationConfig.RequestThreshold is not 0)
             {
-                IEnumerable<AzuraRequestQueueItemModel>? requestsPlayed = await _azuraCast.GetStationRequestItemsAsync(baseUrl, apiKey, station, true);
+                IEnumerable<AzuraRequestQueueItemModel>? requestsPlayed = await _azuraCast.GetStationRequestItemsAsync(baseUrl, apiKey, station, history: true);
                 if (requestsPlayed is null)
                 {
                     await context.EditResponseAsync(GeneralStrings.PermissionIssue);
@@ -1286,7 +1286,7 @@ public sealed class AzuraCastCommands
             }
 
             IEnumerable<AzuraStationQueueItemDetailedModel>? stationQueue = await _azuraCast.GetStationQueueAsync(baseUrl, apiKey, station);
-            IEnumerable<AzuraRequestQueueItemModel>? requestsPending = await _azuraCast.GetStationRequestItemsAsync(baseUrl, apiKey, station, false);
+            IEnumerable<AzuraRequestQueueItemModel>? requestsPending = await _azuraCast.GetStationRequestItemsAsync(baseUrl, apiKey, station, history: false);
             if (stationQueue is null || requestsPending is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);

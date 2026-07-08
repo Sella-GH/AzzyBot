@@ -45,7 +45,7 @@ public static class AzzyHelp
 
         string[] parts = commandName.Split(' ');
 
-        return GetCommandGroups(commands, adminServer, approvedDebug, member, true).Where(c => c.Key == parts[0]).SelectMany(static r => r.Value).FirstOrDefault(c => c.Name == commandName) ?? throw new InvalidOperationException($"Command not found: {commandName}");
+        return GetCommandGroups(commands, adminServer, approvedDebug, member, singleCommand: true).Where(c => c.Key == parts[0]).SelectMany(static r => r.Value).FirstOrDefault(c => c.Name == commandName) ?? throw new InvalidOperationException($"Command not found: {commandName}");
     }
 
     private static Dictionary<string, List<AzzyHelpModel>> GetCommandGroups(IReadOnlyDictionary<string, Command> commands, bool adminServer, bool approvedDebug, DiscordMember member, bool singleCommand = false)

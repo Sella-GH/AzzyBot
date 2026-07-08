@@ -333,7 +333,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
         foreach (LavalinkTrack track in tracks.Tracks)
         {
-            await player.PlayAsync(track, true);
+            await player.PlayAsync(track, enqueue: true);
         }
 
         return (tracks.Tracks.Length > 2) ? $"I queued the playlist **{tracks.Playlist?.Name}** with **{tracks.Tracks.Length}** tracks." : $"I queued **{tracks.Track.Title}** by **{tracks.Track.Author}**";

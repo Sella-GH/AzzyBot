@@ -837,7 +837,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
 
         try
         {
-            await dbContext.Guilds.ExecuteUpdateAsync(g => g.SetProperty(p => p.LegalsAccepted, false));
+            await dbContext.Guilds.ExecuteUpdateAsync(g => g.SetProperty(p => p.LegalsAccepted, valueExpression: false));
         }
         catch (DbUpdateConcurrencyException ex)
         {

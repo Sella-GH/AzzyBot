@@ -35,7 +35,7 @@ public static class Program
 #endif
 
 #if DEBUG
-        LogLevel logLevel = Enum.Parse<LogLevel>(logLevelArg ?? "Debug", true);
+        LogLevel logLevel = Enum.Parse<LogLevel>(logLevelArg ?? "Debug", ignoreCase: true);
 #elif RELEASE
         LogLevel logLevel = Enum.Parse<LogLevel>(logLevelArg ?? "Information", true);
 #endif

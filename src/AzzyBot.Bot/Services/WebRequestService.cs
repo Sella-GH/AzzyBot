@@ -235,8 +235,8 @@ public sealed class WebRequestService : IWebRequestService
                 >= 100 and <= 199 => null,
                 >= 200 and <= 399 => responseContent,
                 >= 400 and <= 499 => null,
-                >= 500 => throw new HttpRequestException($"Server returned an error: {statusCode}.", null, status),
-                _ => throw new HttpRequestException($"Unexpected status code: {statusCode}.", null, status)
+                >= 500 => throw new HttpRequestException($"Server returned an error: {statusCode}.", inner: null, status),
+                _ => throw new HttpRequestException($"Unexpected status code: {statusCode}.", inner: null, status)
             };
         }
         catch (InvalidOperationException)

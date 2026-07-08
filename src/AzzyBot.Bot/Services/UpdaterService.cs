@@ -47,7 +47,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
         string localVersion = SoftwareStats.GetAppVersion;
         bool isPreview = localVersion.Contains("-preview", StringComparison.OrdinalIgnoreCase);
 
-        string? body = await _webService.GetWebAsync((isPreview) ? _previewApiUrl : _latestApiUrl, _headers, true);
+        string? body = await _webService.GetWebAsync((isPreview) ? _previewApiUrl : _latestApiUrl, _headers, acceptJson: true);
         if (string.IsNullOrEmpty(body))
         {
             _logger.OnlineVersionEmpty();

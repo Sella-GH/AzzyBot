@@ -160,25 +160,25 @@ public static class EmbedBuilder
         cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"1-Min: **{Math.Round(stats.Cpu.Load[0], 2)}**");
         cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"5-Min: **{Math.Round(stats.Cpu.Load[1], 2)}**");
         cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"15-Min: **{Math.Round(stats.Cpu.Load[2], 2)}**");
-        fields.Add("CPU Load", new(cpuLoads.ToString(), true));
+        fields.Add("CPU Load", new(cpuLoads.ToString(), isInline: true));
 
         memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Memory.Total}**");
         memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Used: **{stats.Memory.Used}**");
         memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Cached: **{stats.Memory.Cached}**");
         memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Free: **{stats.Memory.Free}**");
-        fields.Add("Memory Usage", new(memoryUsage.ToString(), true));
+        fields.Add("Memory Usage", new(memoryUsage.ToString(), isInline: true));
 
         diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Disk.Total}**");
         diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Used: **{stats.Disk.Used}**");
         diskUsage.AppendLine(CultureInfo.InvariantCulture, $"Free: **{stats.Disk.Free}**");
-        fields.Add("Disk Usage", new(diskUsage.ToString(), true));
+        fields.Add("Disk Usage", new(diskUsage.ToString(), isInline: true));
 
         foreach (AzuraNetworkData network in stats.Network)
         {
             if (fields.Count is 25)
                 break;
 
-            fields.Add($"Interface: {network.InterfaceName}", new($"Received: **{network.Received.Speed}**\nTransmitted: **{network.Transmitted.Speed}**", true));
+            fields.Add($"Interface: {network.InterfaceName}", new($"Received: **{network.Received.Speed}**\nTransmitted: **{network.Transmitted.Speed}**", isInline: true));
         }
 
         return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: AzuraCastPic.OriginalString, fields: fields);
@@ -195,25 +195,25 @@ public static class EmbedBuilder
         Dictionary<string, AzzyDiscordEmbedModel> fields = new(8)
         {
             [StationString] = new(data.Station.Name),
-            [TitleString] = new(data.NowPlaying.Song.Title, true)
+            [TitleString] = new(data.NowPlaying.Song.Title, isInline: true)
         };
 
         if (!string.IsNullOrEmpty(data.NowPlaying.Song.Artist))
         {
             fields.Add(ArtistString, new(data.NowPlaying.Song.Artist
                 .Replace(",", " &", StringComparison.OrdinalIgnoreCase)
-                .Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true));
+                .Replace(";", " & ", StringComparison.OrdinalIgnoreCase), isInline: true));
         }
 
         if (!string.IsNullOrEmpty(data.NowPlaying.Song.Album))
         {
             fields.Add(AlbumString, new(data.NowPlaying.Song.Album
                 .Replace(",", " &", StringComparison.OrdinalIgnoreCase)
-                .Replace(";", " & ", StringComparison.OrdinalIgnoreCase), true));
+                .Replace(";", " & ", StringComparison.OrdinalIgnoreCase), isInline: true));
         }
 
         if (!string.IsNullOrEmpty(data.NowPlaying.Song.Genre))
-            fields.Add(GenreString, new(data.NowPlaying.Song.Genre, true));
+            fields.Add(GenreString, new(data.NowPlaying.Song.Genre, isInline: true));
 
         bool isLive = data.Live.IsLive;
         bool isIcecastLive = data.NowPlaying.Duration is 0; // Fix for #305 because you can also stream over Icecast
@@ -237,7 +237,7 @@ public static class EmbedBuilder
         else
         {
             if (!string.IsNullOrEmpty(playlistName))
-                fields.Add("Playlist", new(playlistName, true));
+                fields.Add("Playlist", new(playlistName, isInline: true));
 
             TimeSpan duration = TimeSpan.FromSeconds(data.NowPlaying.Duration);
             TimeSpan elapsed = TimeSpan.FromSeconds(data.NowPlaying.Elapsed);
@@ -262,12 +262,12 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedModel> fields = new(5)
         {
-            [TitleString] = new(song.Song.Title, true),
-            [ArtistString] = new(song.Song.Artist, true)
+            [TitleString] = new(song.Song.Title, isInline: true),
+            [ArtistString] = new(song.Song.Artist, isInline: true)
         };
 
         if (!string.IsNullOrEmpty(song.Song.Album))
-            fields.Add(AlbumString, new(song.Song.Album, true));
+            fields.Add(AlbumString, new(song.Song.Album, isInline: true));
 
         if (!string.IsNullOrEmpty(song.Song.Genre))
             fields.Add(GenreString, new(song.Song.Genre));
@@ -337,17 +337,17 @@ public static class EmbedBuilder
         Dictionary<string, AzzyDiscordEmbedModel> fields = new(8)
         {
             [StationString] = new(stationName),
-            [TitleString] = new(file.Title, true),
-            [ArtistString] = new(file.Artist, true)
+            [TitleString] = new(file.Title, isInline: true),
+            [ArtistString] = new(file.Artist, isInline: true)
         };
 
         if (!string.IsNullOrEmpty(file.Album))
-            fields.Add(AlbumString, new(file.Album, true));
+            fields.Add(AlbumString, new(file.Album, isInline: true));
 
         if (!string.IsNullOrEmpty(file.Genre))
-            fields.Add(GenreString, new(file.Genre, true));
+            fields.Add(GenreString, new(file.Genre, isInline: true));
 
-        fields.Add("Duration", new(file.LengthText, true));
+        fields.Add("Duration", new(file.LengthText, isInline: true));
 
         if (!string.IsNullOrEmpty(file.Isrc))
             fields.Add("ISRC", new(file.Isrc));
@@ -423,19 +423,19 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedModel> fields = new(25)
         {
-            ["Operating System"] = new(os, true),
-            ["Architecture"] = new(osArch, true),
+            ["Operating System"] = new(os, isInline: true),
+            ["Architecture"] = new(osArch, isInline: true),
 #if DOCKER || DOCKER_DEBUG
             ["Dockerized?"] = new(Misc.GetReadableBool(true, ReadableBool.YesNo), true),
 #else
-            ["Dockerized?"] = new(Misc.GetReadableBool(false, ReadableBools.YesNo), true),
+            ["Dockerized?"] = new(Misc.GetReadableBool(value: false, ReadableBools.YesNo), isInline: true),
 #endif
-            ["System Uptime"] = new($"<t:{uptime}>", true),
-            ["Bot Memory"] = new($"{SoftwareStats.GetAppMemoryUsage()} GB", true)
+            ["System Uptime"] = new($"<t:{uptime}>", isInline: true),
+            ["Bot Memory"] = new($"{SoftwareStats.GetAppMemoryUsage()} GB", isInline: true)
         };
 
         if (ping is not 0)
-            fields.Add("Discord Ping", new($"{ping} ms", true));
+            fields.Add("Discord Ping", new($"{ping} ms", isInline: true));
 
         if (!HardwareStats.CheckIfLinuxOs)
             return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl?.OriginalString, footerText: notLinux, fields: fields);
@@ -480,19 +480,19 @@ public static class EmbedBuilder
         if (cpuLoads is not null)
         {
             string cpuLoad = $"1-Min: **{cpuLoads.OneMin}**\n5-Min: **{cpuLoads.FiveMin}**\n15-Min: **{cpuLoads.FifteenMin}**";
-            fields.Add("CPU Load", new(cpuLoad, true));
+            fields.Add("CPU Load", new(cpuLoad, isInline: true));
         }
 
         if (memory is not null)
         {
             string memoryUsage = $"Total: **{memory.Total} GB**\nUsed: **{memory.Used} GB**\nFree: **{Math.Round(memory.Total - memory.Used, 2)} GB**";
-            fields.Add("Memory Usage", new(memoryUsage, true));
+            fields.Add("Memory Usage", new(memoryUsage, isInline: true));
         }
 
         if (disk is not null)
         {
             string diskUsage = $"Total: **{disk.TotalSize} GB**\nUsed: **{disk.TotalUsedSpace} GB**\nFree: **{disk.TotalFreeSpace} GB**";
-            fields.Add("Disk Usage", new(diskUsage, true));
+            fields.Add("Disk Usage", new(diskUsage, isInline: true));
         }
 
         if (networkUsage.Count > 0)
@@ -502,7 +502,7 @@ public static class EmbedBuilder
                 if (fields.Count is 25)
                     break;
 
-                fields.Add($"Interface: {kvp.Key}", new($"Received: **{kvp.Value.Received} KB**\nTransmitted: **{kvp.Value.Transmitted} KB**", true));
+                fields.Add($"Interface: {kvp.Key}", new($"Received: **{kvp.Value.Received} KB**\nTransmitted: **{kvp.Value.Transmitted} KB**", isInline: true));
             }
         }
 
@@ -536,7 +536,7 @@ public static class EmbedBuilder
         Dictionary<string, AzzyDiscordEmbedModel> fields = new(commands.Count);
         foreach (AzzyHelpModel command in commands)
         {
-            fields.Add(command.Name, new(command.Description, true));
+            fields.Add(command.Name, new(command.Description, isInline: true));
         }
 
         return CreateBasicEmbed(title, color: DiscordColor.Blurple, fields: fields);
@@ -560,24 +560,24 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedModel> fields = new(13)
         {
-            ["Authors"] = new(formattedAuthors, true),
-            ["Repository"] = new($"[GitHub]({UriStrings.GitHubRepoUri})", true),
+            ["Authors"] = new(formattedAuthors, isInline: true),
+            ["Repository"] = new($"[GitHub]({UriStrings.GitHubRepoUri})", isInline: true),
 #if DEBUG || DOCKER_DEBUG
-            ["Environment"] = new(Environments.Development, true),
+            ["Environment"] = new(Environments.Development, isInline: true),
 #else
             ["Environment"] = new(Environments.Production, true),
 #endif
-            ["Bot Name"] = new(SoftwareStats.GetAppName, true),
-            ["Bot Version"] = new(SoftwareStats.GetAppVersion, true),
-            [".NET Version"] = new(SoftwareStats.GetAppDotNetVersion, true),
-            ["D#+ Version"] = new(dspVersion, true),
-            ["Source Code"] = new(sourceCode, true),
-            ["Compilation Date"] = new($"<t:{compileDate.ToLocalTime().ToUnixTimeSeconds()}>", true),
+            ["Bot Name"] = new(SoftwareStats.GetAppName, isInline: true),
+            ["Bot Version"] = new(SoftwareStats.GetAppVersion, isInline: true),
+            [".NET Version"] = new(SoftwareStats.GetAppDotNetVersion, isInline: true),
+            ["D#+ Version"] = new(dspVersion, isInline: true),
+            ["Source Code"] = new(sourceCode, isInline: true),
+            ["Compilation Date"] = new($"<t:{compileDate.ToLocalTime().ToUnixTimeSeconds()}>", isInline: true),
             ["AzzyBot GitHub Commit"] = new(formattedCommit),
             ["Uptime"] = new($"<t:{SoftwareStats.GetAppUptime().ToLocalTime().ToUnixTimeSeconds()}>"),
-            ["License"] = new($"[AGPL-3.0]({UriStrings.GitHubRepoLicenseUrl})", true),
-            ["Terms Of Service"] = new($"[Terms Of Service]({UriStrings.GitHubRepoTosUrl})", true),
-            ["Privacy Policy"] = new($"[Privacy Policy]({UriStrings.GitHubRepoPrivacyPolicyUrl})", true)
+            ["License"] = new($"[AGPL-3.0]({UriStrings.GitHubRepoLicenseUrl})", isInline: true),
+            ["Terms Of Service"] = new($"[Terms Of Service]({UriStrings.GitHubRepoTosUrl})", isInline: true),
+            ["Privacy Policy"] = new($"[Privacy Policy]({UriStrings.GitHubRepoPrivacyPolicyUrl})", isInline: true)
         };
 
         return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl?.OriginalString, fields: fields);
@@ -731,8 +731,8 @@ public static class EmbedBuilder
         {
             ["Guild ID"] = new(guild.Id.ToString(CultureInfo.InvariantCulture)),
             ["Creation Date"] = new($"<t:{guild.CreationTimestamp.ToUnixTimeSeconds()}>"),
-            ["Owner"] = new($"{owner.DisplayName} ({owner.Id})", true),
-            ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture), true)
+            ["Owner"] = new($"{owner.DisplayName} ({owner.Id})", isInline: true),
+            ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture), isInline: true)
         };
 
         return CreateBasicEmbed(title, description, DiscordColor.Gold, thumbnailUrl: guild.IconUrl, fields: fields);
@@ -792,8 +792,8 @@ public static class EmbedBuilder
         Dictionary<string, AzzyDiscordEmbedModel> fields = new(4)
         {
             ["Source"] = new(track.SourceName ?? "Not defined"),
-            [TitleString] = new(track.Title, true),
-            [ArtistString] = new(track.Author, true)
+            [TitleString] = new(track.Title, isInline: true),
+            [ArtistString] = new(track.Author, isInline: true)
         };
 
         // Evalute this once there is a bug

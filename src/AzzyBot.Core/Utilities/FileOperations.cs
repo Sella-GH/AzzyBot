@@ -57,7 +57,7 @@ public static class FileOperations
 
         string zipPath = Path.Combine(zipFileDir, zipFileName);
         await using FileStream stream = new(zipPath, FileMode.Create);
-        await using ZipArchive zipFile = new(stream, ZipArchiveMode.Create, false, Encoding.UTF8);
+        await using ZipArchive zipFile = new(stream, ZipArchiveMode.Create, leaveOpen: false, Encoding.UTF8);
         foreach (string file in Directory.EnumerateFiles(filesDir))
         {
             string fileName = Path.GetFileName(file);

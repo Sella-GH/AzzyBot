@@ -61,7 +61,7 @@ public sealed class MusicStreamingCommands
 
             if (volume is < 0 or > 100)
             {
-                await context.RespondAsync(GeneralStrings.VolumeInvalid, true);
+                await context.RespondAsync(GeneralStrings.VolumeInvalid, ephemeral: true);
                 return;
             }
 
@@ -140,7 +140,7 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(LeaveAsync), context.User.Username);
 
-            if (!await _musicStreaming.StopMusicAsync(context, true))
+            if (!await _musicStreaming.StopMusicAsync(context, disconnect: true))
                 return;
 
             await context.EditResponseAsync(GeneralStrings.VoiceLeft);
@@ -225,7 +225,7 @@ public sealed class MusicStreamingCommands
 
             if (volume is < 0 or > 100)
             {
-                await context.RespondAsync(GeneralStrings.VolumeInvalid, true);
+                await context.RespondAsync(GeneralStrings.VolumeInvalid, ephemeral: true);
                 return;
             }
 
@@ -265,7 +265,7 @@ public sealed class MusicStreamingCommands
 
             if (volume is < 0 or > 100)
             {
-                await context.RespondAsync(GeneralStrings.VolumeInvalid, true);
+                await context.RespondAsync(GeneralStrings.VolumeInvalid, ephemeral: true);
                 return;
             }
 
@@ -321,14 +321,14 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(QueueAsync), context.User.Username);
 
-            IEnumerable<ITrackQueueItem>? history = await _musicStreaming.HistoryAsync(context, true);
+            IEnumerable<ITrackQueueItem>? history = await _musicStreaming.HistoryAsync(context, queue: true);
             if (history?.Any() is not true)
             {
                 await context.EditResponseAsync("There are no upcoming songs.");
                 return;
             }
 
-            DiscordEmbed embed = EmbedBuilder.BuildMusicStreamingHistoryEmbed(history, true);
+            DiscordEmbed embed = EmbedBuilder.BuildMusicStreamingHistoryEmbed(history, isQueue: true);
             await context.EditResponseAsync(embed);
         }
 
