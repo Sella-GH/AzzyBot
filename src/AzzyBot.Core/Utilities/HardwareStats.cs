@@ -53,7 +53,7 @@ public static class HardwareStats
 
             for (int i = 1; i < values.Length; i++)
             {
-                if (!long.TryParse(parts[i], out values[i - 1]))
+                if (!long.TryParse(parts[i], CultureInfo.InvariantCulture, out values[i - 1]))
                     throw new InvalidOperationException("Could not convert string to long");
             }
 
@@ -173,7 +173,7 @@ public static class HardwareStats
 
             string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-            return (long.TryParse(parts[1], out long value)) ? value : throw new InvalidOperationException("Could not parse value");
+            return (long.TryParse(parts[1], CultureInfo.InvariantCulture, out long value)) ? value : throw new InvalidOperationException("Could not parse value");
         }
 
         foreach (string line in memoryInfoLines)
