@@ -51,7 +51,7 @@ public interface IAzuraCastApiService
     Task SkipSongAsync(Uri baseUrl, string apiKey, int stationId);
     Task<bool> StartStationAsync(Uri baseUrl, string apiKey, int stationId, SlashCommandContext context);
     Task<bool> StopStationAsync(Uri baseUrl, string apiKey, int stationId);
-    Task<List<AzuraPlaylistStateModel>?> SwitchPlaylistsAsync(Uri baseUrl, string apiKey, int stationId, int playlistId, bool removeOld);
+    Task<IReadOnlyList<AzuraPlaylistStateModel>?> SwitchPlaylistsAsync(Uri baseUrl, string apiKey, int stationId, int playlistId, bool removeOld);
     Task TogglePlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId);
     Task UpdateInstanceAsync(Uri baseUrl, string apiKey);
     Task<T?> UploadFileAsync<T>(Uri baseUrl, string apiKey, int stationId, string file, string fileName, string filePath, JsonTypeInfo<T> jsonType);

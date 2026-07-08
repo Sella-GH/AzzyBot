@@ -891,7 +891,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            List<AzuraPlaylistStateModel>? states = await _azuraCast.SwitchPlaylistsAsync(baseUrl, apiKey, station, playlistId, removeOld is 1);
+            IReadOnlyList<AzuraPlaylistStateModel>? states = await _azuraCast.SwitchPlaylistsAsync(baseUrl, apiKey, station, playlistId, removeOld is 1);
             if (states is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);

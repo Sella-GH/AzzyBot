@@ -20,7 +20,7 @@ public static class HardwareStats
     public static bool CheckIfLinuxOs
         => OperatingSystem.IsLinux();
 
-    public static async Task<Dictionary<int, double>> GetSystemCpuAsync()
+    public static async Task<IReadOnlyDictionary<int, double>> GetSystemCpuAsync()
     {
         // Declare some variable stuff
         const int idleTime = 3;
@@ -106,11 +106,11 @@ public static class HardwareStats
         return coreUsages;
     }
 
-    public static async Task<Dictionary<string, double>> GetSystemCpuTempAsync()
+    public static async Task<IReadOnlyDictionary<string, double>> GetSystemCpuTempAsync()
     {
         string typeFolderPath = Path.Combine("/sys", "class", "thermal");
         if (!Directory.Exists(typeFolderPath))
-            return [];
+            return new Dictionary<string, double>();
 
         Dictionary<string, double> result = [];
         foreach (string folder in Directory.GetDirectories(typeFolderPath))
@@ -198,7 +198,7 @@ public static class HardwareStats
         return new(memTotalGb, memUsedGb);
     }
 
-    public static async Task<Dictionary<string, AppNetworkSpeedModel>> GetSystemNetworkUsageAsync()
+    public static async Task<IReadOnlyDictionary<string, AppNetworkSpeedModel>> GetSystemNetworkUsageAsync()
     {
         const int delayInMs = 1000;
         const int bytesPerKbit = 125;

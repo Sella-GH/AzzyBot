@@ -805,7 +805,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         return true;
     }
 
-    public async Task<List<AzuraPlaylistStateModel>?> SwitchPlaylistsAsync(Uri baseUrl, string apiKey, int stationId, int playlistId, bool removeOld)
+    public async Task<IReadOnlyList<AzuraPlaylistStateModel>?> SwitchPlaylistsAsync(Uri baseUrl, string apiKey, int stationId, int playlistId, bool removeOld)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);

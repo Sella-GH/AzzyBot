@@ -440,12 +440,12 @@ public static class EmbedBuilder
         if (!HardwareStats.CheckIfLinuxOs)
             return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl?.OriginalString, footerText: notLinux, fields: fields);
 
-        Dictionary<int, double> cpuUsage = await HardwareStats.GetSystemCpuAsync();
-        Dictionary<string, double> cpuTemp = await HardwareStats.GetSystemCpuTempAsync();
+        IReadOnlyDictionary<int, double> cpuUsage = await HardwareStats.GetSystemCpuAsync();
+        IReadOnlyDictionary<string, double> cpuTemp = await HardwareStats.GetSystemCpuTempAsync();
         AppCpuLoadModel cpuLoads = await HardwareStats.GetSystemCpuLoadAsync();
         AppMemoryUsageModel memory = await HardwareStats.GetSystemMemoryUsageAsync();
         AppDiskUsageModel disk = HardwareStats.GetSystemDiskUsage();
-        Dictionary<string, AppNetworkSpeedModel> networkUsage = await HardwareStats.GetSystemNetworkUsageAsync();
+        IReadOnlyDictionary<string, AppNetworkSpeedModel> networkUsage = await HardwareStats.GetSystemNetworkUsageAsync();
 
         if (cpuTemp.Count > 0)
         {

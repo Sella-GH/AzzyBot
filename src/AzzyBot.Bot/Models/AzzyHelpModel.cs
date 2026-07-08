@@ -25,9 +25,9 @@ public sealed record class AzzyHelpModel
     /// <summary>
     /// The parameters for the command.
     /// </summary>
-    public Dictionary<string, string> Parameters { get; init; }
+    public IReadOnlyDictionary<string, string> Parameters { get; init; }
 
-    public AzzyHelpModel(string subCommand, string name, string description, Dictionary<string, string> parameters)
+    public AzzyHelpModel(string subCommand, string name, string description, IReadOnlyDictionary<string, string> parameters)
     {
         SubCommand = subCommand;
         Name = name;
