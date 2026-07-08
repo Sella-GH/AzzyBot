@@ -320,7 +320,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}/" + ((requestId is 0) ? AzuraApiEndpoints.Clear : requestId);
+        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}/{((requestId is 0) ? AzuraApiEndpoints.Clear : requestId)}";
 
         if (requestId is 0)
         {
