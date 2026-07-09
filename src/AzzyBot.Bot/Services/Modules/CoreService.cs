@@ -125,7 +125,7 @@ public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSet
                 leaveDate = (guild.Value.NoLegals) ? DateTimeOffset.UtcNow.AddDays(3) : DateTimeOffset.UtcNow.AddDays(7);
             }
 
-            DiscordEmbed embed = EmbedBuilder.BuildAzzyInactiveGuildEmbed(guild.Value.NoConfig, guild.Value.NoLegals, guild.Value.Guild, leaveDate);
+            DiscordEmbed embed = EmbedBuilder.BuildAzzyInactiveGuildEmbed(guild.Value.NoConfig, guild.Value.NoLegals, guild.Value.Guild, in leaveDate);
 
             bool result = false;
             if (guild.Key.Preferences.AdminNotifyChannelId is not 0)

@@ -84,7 +84,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
             _azzyNotifyCounter = 0;
         }
 
-        if (!Misc.CheckUpdateNotification(_azzyNotifyCounter, _lastAzzyUpdateNotificationTime))
+        if (!Misc.CheckUpdateNotification(_azzyNotifyCounter, in _lastAzzyUpdateNotificationTime))
             return;
 
         _lastAzzyUpdateNotificationTime = DateTimeOffset.UtcNow;
@@ -95,7 +95,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
 
         List<DiscordEmbed> embeds = new(3)
         {
-            EmbedBuilder.BuildAzzyUpdatesAvailableEmbed(updateVersion, releaseDate, _latestUrl)
+            EmbedBuilder.BuildAzzyUpdatesAvailableEmbed(updateVersion, in releaseDate, _latestUrl)
         };
 
         if (_updaterSettings.DisplayChangelog && !string.IsNullOrEmpty(changelog))

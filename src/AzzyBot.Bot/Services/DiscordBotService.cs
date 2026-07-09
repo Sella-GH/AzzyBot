@@ -205,7 +205,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
                 CommandOptions = commandOptions
             };
 
-            embed = CreateExceptionEmbed(values);
+            embed = CreateExceptionEmbed(in values);
         }
         else
         {
@@ -216,7 +216,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
                 JsonMessage = jsonMessage
             };
 
-            embed = CreateExceptionEmbed(values);
+            embed = CreateExceptionEmbed(in values);
         }
 
         try

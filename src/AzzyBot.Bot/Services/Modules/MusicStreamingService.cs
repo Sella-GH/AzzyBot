@@ -103,7 +103,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
                 SelfDeaf = true
             };
 
-            defaultPlayer = await GetLavalinkDefaultPlayerAsync(context.Guild.Id, channelId.Value, defaultPlayerOptions, retrieveOptions);
+            defaultPlayer = await GetLavalinkDefaultPlayerAsync(context.Guild.Id, channelId.Value, defaultPlayerOptions, in retrieveOptions);
             if (defaultPlayer.IsSuccess)
                 return defaultPlayer.Player;
 
@@ -125,7 +125,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
                 SelfDeaf = true
             };
 
-            queuedPlayer = await GetLavalinkQueuedPlayerAsync(context.Guild.Id, channelId.Value, queuedPlayerOptions, retrieveOptions);
+            queuedPlayer = await GetLavalinkQueuedPlayerAsync(context.Guild.Id, channelId.Value, queuedPlayerOptions, in retrieveOptions);
             if (queuedPlayer.IsSuccess)
                 return queuedPlayer.Player;
 

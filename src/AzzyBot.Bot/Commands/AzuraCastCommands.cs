@@ -965,7 +965,7 @@ public sealed class AzuraCastCommands
             string dateString = dateTime.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             string dateStringFile = dateTime.ToString("yyyy-MM-dd_HH-mm-ss-fffffff", CultureInfo.InvariantCulture);
 
-            IEnumerable<AzuraStationHistoryItemModel>? history = await _azuraCast.GetStationHistoryAsync(baseUrl, apiKey, station, dateTime, dateTime.AddDays(1));
+            IEnumerable<AzuraStationHistoryItemModel>? history = await _azuraCast.GetStationHistoryAsync(baseUrl, apiKey, station, in dateTime, dateTime.AddDays(1));
             if (history is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
