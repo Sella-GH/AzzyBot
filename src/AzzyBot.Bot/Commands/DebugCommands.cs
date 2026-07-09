@@ -92,7 +92,7 @@ public sealed class DebugCommands
 
             sb.AppendLine("Guild exists, setting up the test.");
 
-            async Task ChangeGuildValues(GuildEntity guildEntity, int value)
+            async Task ChangeGuildValuesAsync(GuildEntity guildEntity, int value)
             {
                 if (value is 1)
                 {
@@ -107,8 +107,8 @@ public sealed class DebugCommands
             }
 
             IReadOnlyList<Task> tasks = [
-                ChangeGuildValues(guild, 1),
-                ChangeGuildValues(guild, 2)
+                ChangeGuildValuesAsync(guild, 1),
+                ChangeGuildValuesAsync(guild, 2)
             ];
 
             sb.AppendLine("Starting the concurrency test");
