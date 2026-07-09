@@ -100,7 +100,7 @@ public static class HardwareStats
 
             double coreUsage = CalculateCpuUsage(prevCoreTimes[idleTime], currCoreTimes[idleTime], CalculateTimes(prevCoreTimes), CalculateTimes(currCoreTimes));
 
-            coreUsages.Add(coreIndex, Math.Round(coreUsage, 2));
+            coreUsages.Add(coreIndex, Math.Round(coreUsage, 2, MidpointRounding.ToEven));
         }
 
         return coreUsages;
@@ -134,7 +134,7 @@ public static class HardwareStats
 
             string tempInfo = await File.ReadAllTextAsync(tempFilePath);
 
-            result.Add(type, Math.Round(double.Parse(tempInfo, CultureInfo.InvariantCulture) / 1000.0));
+            result.Add(type, Math.Round(double.Parse(tempInfo, CultureInfo.InvariantCulture) / 1000.0, MidpointRounding.ToEven));
         }
 
         return result;
@@ -158,7 +158,7 @@ public static class HardwareStats
         double totalFreeSpace = drive.TotalFreeSpace / (1024.0 * 1024.0 * 1024.0);
         double totalUsedSpace = totalSize - totalFreeSpace;
 
-        return new(Math.Round(totalSize, 2), Math.Round(totalFreeSpace, 2), Math.Round(totalUsedSpace, 2));
+        return new(Math.Round(totalSize, 2, MidpointRounding.ToEven), Math.Round(totalFreeSpace, 2, MidpointRounding.ToEven), Math.Round(totalUsedSpace, 2, MidpointRounding.ToEven));
     }
 
     public static async Task<AppMemoryUsageModel> GetSystemMemoryUsageAsync()
@@ -192,8 +192,8 @@ public static class HardwareStats
             }
         }
 
-        double memTotalGb = Math.Round(memTotalKb / (1024.0 * 1024.0), 2);
-        double memUsedGb = Math.Round((memTotalKb - memFreeKb) / (1024.0 * 1024.0), 2);
+        double memTotalGb = Math.Round(memTotalKb / (1024.0 * 1024.0), 2, MidpointRounding.ToEven);
+        double memUsedGb = Math.Round((memTotalKb - memFreeKb) / (1024.0 * 1024.0), 2, MidpointRounding.ToEven);
 
         return new(memTotalGb, memUsedGb);
     }
@@ -236,7 +236,7 @@ public static class HardwareStats
             double rxSpeedKbits = (currNetworkStats[networkName].Received - kvp.Value.Received) * 8.0 / bytesPerKbit / (delayInMs / 1000.0);
             double txSpeedKbits = (currNetworkStats[networkName].Transmitted - kvp.Value.Transmitted) * 8.0 / bytesPerKbit / (delayInMs / 1000.0);
 
-            networkSpeeds.Add(networkName, new(Math.Round(rxSpeedKbits, 2), Math.Round(txSpeedKbits, 2)));
+            networkSpeeds.Add(networkName, new(Math.Round(rxSpeedKbits, 2, MidpointRounding.ToEven), Math.Round(txSpeedKbits, 2, MidpointRounding.ToEven)));
         }
 
         return networkSpeeds;

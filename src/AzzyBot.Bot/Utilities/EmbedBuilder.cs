@@ -157,9 +157,9 @@ public static class EmbedBuilder
 
         fields.Add("CPU Usage", new(cpuUsage.ToString()));
 
-        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"1-Min: **{Math.Round(stats.Cpu.Load[0], 2)}**");
-        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"5-Min: **{Math.Round(stats.Cpu.Load[1], 2)}**");
-        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"15-Min: **{Math.Round(stats.Cpu.Load[2], 2)}**");
+        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"1-Min: **{Math.Round(stats.Cpu.Load[0], 2, MidpointRounding.ToEven)}**");
+        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"5-Min: **{Math.Round(stats.Cpu.Load[1], 2, MidpointRounding.ToEven)}**");
+        cpuLoads.AppendLine(CultureInfo.InvariantCulture, $"15-Min: **{Math.Round(stats.Cpu.Load[2], 2, MidpointRounding.ToEven)}**");
         fields.Add("CPU Load", new(cpuLoads.ToString(), isInline: true));
 
         memoryUsage.AppendLine(CultureInfo.InvariantCulture, $"Total: **{stats.Memory.Total}**");
@@ -352,7 +352,7 @@ public static class EmbedBuilder
         if (!string.IsNullOrEmpty(file.Isrc))
             fields.Add("ISRC", new(file.Isrc));
 
-        fields.Add("File Size", new($"{Math.Round(fileSize / (1024.0 * 1024.0), 2)} MB"));
+        fields.Add("File Size", new($"{Math.Round(fileSize / (1024.0 * 1024.0), 2, MidpointRounding.ToEven)} MB"));
 
         return CreateBasicEmbed(title, description, DiscordColor.SpringGreen, thumbnailUrl: new(stationArt), fields: fields);
     }
@@ -485,7 +485,7 @@ public static class EmbedBuilder
 
         if (memory is not null)
         {
-            string memoryUsage = $"Total: **{memory.Total} GB**\nUsed: **{memory.Used} GB**\nFree: **{Math.Round(memory.Total - memory.Used, 2)} GB**";
+            string memoryUsage = $"Total: **{memory.Total} GB**\nUsed: **{memory.Used} GB**\nFree: **{Math.Round(memory.Total - memory.Used, 2, MidpointRounding.ToEven)} GB**";
             fields.Add("Memory Usage", new(memoryUsage, isInline: true));
         }
 

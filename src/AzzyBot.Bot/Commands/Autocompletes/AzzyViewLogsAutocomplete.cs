@@ -29,7 +29,7 @@ public sealed class AzzyViewLogsAutocomplete : IAutoCompleteProvider
                 continue;
 
             FileInfo fileInfo = new(file);
-            results.Add(new($"{fileInfo.Name} ({Math.Round(fileInfo.Length / (1024.0 * 1024.0), 2)} MB)", file));
+            results.Add(new($"{fileInfo.Name} ({Math.Round(fileInfo.Length / (1024.0 * 1024.0), 2, MidpointRounding.ToEven)} MB)", file));
         }
 
         return ValueTask.FromResult(results.AsEnumerable());
