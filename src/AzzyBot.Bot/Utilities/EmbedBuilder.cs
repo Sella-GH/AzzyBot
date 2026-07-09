@@ -784,7 +784,7 @@ public static class EmbedBuilder
     public static DiscordEmbed BuildMusicStreamingNowPlayingEmbed(LavalinkTrack track, TimeSpan? elapsed)
     {
         ArgumentNullException.ThrowIfNull(track);
-        if (!elapsed.HasValue)
+        if (elapsed is null)
             throw new ArgumentNullException(nameof(elapsed), "Elapsed time cannot be null.");
 
         const string title = "Now Playing";

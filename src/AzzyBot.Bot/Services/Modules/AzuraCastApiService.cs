@@ -769,9 +769,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
             }
             catch (Exception e) when (e is HttpRequestException or InvalidOperationException or JsonException)
             {
-                if (!firstTime.HasValue)
-                    firstTime = true;
-
+                firstTime ??= true;
                 if (firstTime.Value)
                 {
                     await context.EditResponseAsync("You have activated the option \"**Always Write Playlists to Liquidsoap**\" which means you have to wait more time until you can finally use your station.\nI inform you when it's finished.");

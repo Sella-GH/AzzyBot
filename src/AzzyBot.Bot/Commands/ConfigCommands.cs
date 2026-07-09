@@ -459,7 +459,7 @@ public sealed class ConfigCommands
                     _cronJobManager.RunAzzyBotCheckPermissionsJob(context.Guild, [.. channels]);
             }
 
-            if (stationId.HasValue || !string.IsNullOrWhiteSpace(apiKey))
+            if (stationId is not null || !string.IsNullOrWhiteSpace(apiKey))
             {
                 await _dbActions.UpdateAzuraCastStationAsync(context.Guild.Id, station, stationId, apiKey);
 

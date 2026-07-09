@@ -501,7 +501,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         if (!string.IsNullOrEmpty(apiKey))
             azuraCast.AdminApiKey = Crypto.Encrypt(apiKey);
 
-        if (isOnline.HasValue)
+        if (isOnline is not null)
             azuraCast.IsOnline = isOnline.Value;
 
         dbContext.AzuraCast.Update(azuraCast);
@@ -535,16 +535,16 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             return;
         }
 
-        if (serverStatus.HasValue)
+        if (serverStatus is not null)
             checks.ServerStatus = serverStatus.Value;
 
-        if (updates.HasValue)
+        if (updates is not null)
             checks.Updates = updates.Value;
 
-        if (changelog.HasValue)
+        if (changelog is not null)
             checks.UpdatesShowChangelog = changelog.Value;
 
-        if (updateNotificationCounter.HasValue)
+        if (updateNotificationCounter is not null)
             checks.UpdateNotificationCounter = updateNotificationCounter.Value;
 
         if (updateLastUpdateCheck)
@@ -584,13 +584,13 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             return;
         }
 
-        if (instanceAdminGroup.HasValue)
+        if (instanceAdminGroup is not null)
             preferences.InstanceAdminRoleId = instanceAdminGroup.Value;
 
-        if (notificationId.HasValue)
+        if (notificationId is not null)
             preferences.NotificationChannelId = notificationId.Value;
 
-        if (outagesId.HasValue)
+        if (outagesId is not null)
             preferences.OutagesChannelId = outagesId.Value;
 
         dbContext.AzuraCastPreferences.Update(preferences);
@@ -624,7 +624,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             return;
         }
 
-        if (newStationId.HasValue)
+        if (newStationId is not null)
             azuraStation.StationId = newStationId.Value;
 
         if (!string.IsNullOrEmpty(apiKey))
@@ -667,7 +667,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             return;
         }
 
-        if (fileChanges.HasValue)
+        if (fileChanges is not null)
             checks.FileChanges = fileChanges.Value;
 
         if (updateLastFileChangesCheck)
@@ -704,28 +704,28 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             return;
         }
 
-        if (stationAdminGroup.HasValue)
+        if (stationAdminGroup is not null)
             preferences.StationAdminRoleId = stationAdminGroup.Value;
 
-        if (stationDjGroup.HasValue)
+        if (stationDjGroup is not null)
             preferences.StationDjRoleId = stationDjGroup.Value;
 
-        if (fileUploadId.HasValue)
+        if (fileUploadId is not null)
             preferences.FileUploadChannelId = fileUploadId.Value;
 
-        if (nowPlayingEmbedChannelId.HasValue)
+        if (nowPlayingEmbedChannelId is not null)
             preferences.NowPlayingEmbedChannelId = nowPlayingEmbedChannelId.Value;
 
-        if (nowPlayingEmbedMessageId.HasValue)
+        if (nowPlayingEmbedMessageId is not null)
             preferences.NowPlayingEmbedMessageId = nowPlayingEmbedMessageId.Value;
 
-        if (requestId.HasValue)
+        if (requestId is not null)
             preferences.RequestsChannelId = requestId.Value;
 
         if (!string.IsNullOrEmpty(fileUploadPath))
             preferences.FileUploadPath = fileUploadPath;
 
-        if (playlist.HasValue)
+        if (playlist is not null)
             preferences.ShowPlaylistInNowPlaying = playlist.Value;
 
         dbContext.AzuraCastStationPreferences.Update(preferences);
@@ -801,7 +801,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
         if (updateLastPermissionCheck)
             guild.LastPermissionCheck = now;
 
-        if (reminderLeaveDate.HasValue)
+        if (reminderLeaveDate is not null)
         {
             guild.ReminderLeaveDate = reminderLeaveDate.Value;
         }
@@ -811,7 +811,7 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             guild.ReminderLeaveDate = DateTimeOffset.MinValue;
         }
 
-        if (legalsAccepted.HasValue)
+        if (legalsAccepted is not null)
             guild.LegalsAccepted = legalsAccepted.Value;
 
         dbContext.Guilds.Update(guild);
@@ -865,10 +865,10 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             return;
         }
 
-        if (adminRoleId.HasValue)
+        if (adminRoleId is not null)
             preferences.AdminRoleId = adminRoleId.Value;
 
-        if (adminNotifyChannelId.HasValue)
+        if (adminNotifyChannelId is not null)
             preferences.AdminNotifyChannelId = adminNotifyChannelId.Value;
 
         if (preferences.AdminRoleId is not 0 && preferences.AdminNotifyChannelId is not 0)
@@ -906,13 +906,13 @@ public sealed class DbActions(ILogger<DbActions> logger, IDbContextFactory<AzzyD
             return;
         }
 
-        if (nowPlayingEmbedChannelId.HasValue)
+        if (nowPlayingEmbedChannelId is not null)
             musicStreaming.NowPlayingEmbedChannelId = nowPlayingEmbedChannelId.Value;
 
-        if (nowPlayingEmbedMessageId.HasValue)
+        if (nowPlayingEmbedMessageId is not null)
             musicStreaming.NowPlayingEmbedMessageId = nowPlayingEmbedMessageId.Value;
 
-        if (volume.HasValue)
+        if (volume is not null)
             musicStreaming.Volume = volume.Value;
 
         dbContext.MusicStreaming.Update(musicStreaming);
