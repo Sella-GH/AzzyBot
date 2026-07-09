@@ -936,7 +936,7 @@ public sealed class AzuraCastCommands
             DateTimeOffset dateTime;
             if (date is null)
             {
-                dateTime = DateTime.Today;
+                dateTime = new(DateTime.Today);
             }
             else if (!DateTimeOffset.TryParse(date, CultureInfo.CurrentCulture, out dateTime))
             {

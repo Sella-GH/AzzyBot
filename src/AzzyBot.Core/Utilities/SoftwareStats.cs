@@ -31,6 +31,6 @@ public static class SoftwareStats
     {
         using Process app = Process.GetCurrentProcess();
 
-        return app.StartTime;
+        return new(app.StartTime);
     }
 }
