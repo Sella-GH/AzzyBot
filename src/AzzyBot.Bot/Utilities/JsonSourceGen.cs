@@ -52,6 +52,4 @@ namespace AzzyBot.Bot.Utilities;
 [JsonSerializable(typeof(AzuraUpdateModel))]
 [JsonSerializable(typeof(AzuraUpdateErrorModel))]
 [JsonSerializable(typeof(List<AzzyUpdateModel>))]
-public sealed partial class JsonSourceGen : JsonSerializerContext
-{
-}
+public sealed partial class JsonSourceGen : JsonSerializerContext;
