@@ -33,7 +33,7 @@ jobs:
 
     steps:
      - name: Checkout
-       uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+       uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
      - name: Get build metadata
        id: build-metadata
@@ -57,7 +57,7 @@ jobs:
       artifact_name: ${{ needs.extract_meta.outputs.clean_version }}-docker
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Getting all files together
         run: |
@@ -96,7 +96,7 @@ jobs:
       release_version: ${{ steps.set_output.outputs.release_version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Extract Latest Changelog Entry
         id: extract_changelog
