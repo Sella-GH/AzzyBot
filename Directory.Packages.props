@@ -23,7 +23,7 @@
     <PackageVersion Include="Roslynator.Formatting.Analyzers" Version="4.16.0" />
     <PackageVersion Include="Roslynator.Refactorings" Version="4.16.0" />
     <PackageVersion Include="Sep" Version="0.15.1" />
-    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.31.0.145097" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.32.0.713" />
     <PackageVersion Include="TagLibSharp2" Version="0.6.0" />
   </ItemGroup>
 </Project>
