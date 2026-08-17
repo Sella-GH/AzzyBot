@@ -17,11 +17,11 @@
     <PackageVersion Include="Npgsql" Version="10.0.3" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
     <PackageVersion Include="NReco.Logging.File" Version="1.4.0" />
-    <PackageVersion Include="Roslynator.Analyzers" Version="4.16.0" />
-    <PackageVersion Include="Roslynator.CodeAnalysis.Analyzers" Version="4.16.0" />
-    <PackageVersion Include="Roslynator.CodeFixes" Version="4.16.0" />
-    <PackageVersion Include="Roslynator.Formatting.Analyzers" Version="4.16.0" />
-    <PackageVersion Include="Roslynator.Refactorings" Version="4.16.0" />
+    <PackageVersion Include="Roslynator.Analyzers" Version="4.16.1" />
+    <PackageVersion Include="Roslynator.CodeAnalysis.Analyzers" Version="4.16.1" />
+    <PackageVersion Include="Roslynator.CodeFixes" Version="4.16.1" />
+    <PackageVersion Include="Roslynator.Formatting.Analyzers" Version="4.16.1" />
+    <PackageVersion Include="Roslynator.Refactorings" Version="4.16.1" />
     <PackageVersion Include="Sep" Version="0.15.2" />
     <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.32.0.713" />
     <PackageVersion Include="TagLibSharp2" Version="0.6.0" />
