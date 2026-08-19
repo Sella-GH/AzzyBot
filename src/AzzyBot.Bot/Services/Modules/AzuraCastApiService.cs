@@ -74,8 +74,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         if (azuraCast.Checks.Updates)
             apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Updates}"));
 
-        IEnumerable<string> missing = await ExecuteApiPermissionCheckAsync(apis, adminApiKey);
-        if (!missing.Any())
+        IReadOnlyList<string> missing = await ExecuteApiPermissionCheckAsync(apis, adminApiKey);
+        if (missing.Count is 0)
             return;
 
         StringBuilder builder = new();
@@ -116,8 +116,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
             apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}"));
 
         string apiKey = (!string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : adminApiKey;
-        IEnumerable<string> missing = await ExecuteApiPermissionCheckAsync(apis, apiKey);
-        if (!missing.Any())
+        IReadOnlyList<string> missing = await ExecuteApiPermissionCheckAsync(apis, apiKey);
+        if (missing.Count is 0)
             return;
 
         StringBuilder builder = new();

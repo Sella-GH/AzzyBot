@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -45,8 +44,8 @@ public sealed class AzuraCastStationsInDbAutocomplete(ILogger<AzuraCastStationsI
             return [];
         }
 
-        IEnumerable<AzuraCastStationEntity> stationsInDb = azuraCast.Stations;
-        if (!stationsInDb.Any())
+        ICollection<AzuraCastStationEntity> stationsInDb = azuraCast.Stations;
+        if (stationsInDb.Count is 0)
             return [];
 
         string? search = context.UserInput;
