@@ -14,7 +14,7 @@ namespace AzzyBot.Bot.Commands.Autocompletes;
 
 public sealed class AzzyViewLogsAutocomplete : IAutoCompleteProvider
 {
-    public ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)
+    public async ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -32,6 +32,6 @@ public sealed class AzzyViewLogsAutocomplete : IAutoCompleteProvider
             results.Add(new($"{fileInfo.Name} ({Math.Round(fileInfo.Length / (1024.0 * 1024.0), 2, MidpointRounding.ToEven)} MB)", file));
         }
 
-        return ValueTask.FromResult(results.AsEnumerable());
+        return results.AsEnumerable();
     }
 }

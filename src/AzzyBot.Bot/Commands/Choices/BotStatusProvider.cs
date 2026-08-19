@@ -17,6 +17,6 @@ public sealed class BotStatusProvider : IChoiceProvider
         new("Do Not Disturb", 4)
     ];
 
-    public ValueTask<IEnumerable<DiscordApplicationCommandOptionChoice>> ProvideAsync(CommandParameter parameter)
-        => ValueTask.FromResult(BotStatusChoices);
+    public async ValueTask<IEnumerable<DiscordApplicationCommandOptionChoice>> ProvideAsync(CommandParameter parameter)
+        => BotStatusChoices;
 }

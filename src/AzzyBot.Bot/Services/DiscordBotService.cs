@@ -374,11 +374,11 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         await AcknowledgeExceptionAsync(context);
     }
 
-    public Task<bool> SendMessageAsync(ulong channelId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, IMention[]? mentions = null)
+    public async Task<bool> SendMessageAsync(ulong channelId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, IMention[]? mentions = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId);
 
-        return SendMessageCoreAsync(async builder =>
+        return await SendMessageCoreAsync(async builder =>
         {
             DiscordChannel? channel = await GetDiscordChannelAsync(channelId);
             if (channel is null)
@@ -404,11 +404,11 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         }, content, embeds, filePaths, mentions);
     }
 
-    public Task<bool> SendMessageToOwnerAsync(ulong guildId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null)
+    public async Task<bool> SendMessageToOwnerAsync(ulong guildId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId);
 
-        return SendMessageCoreAsync(async builder =>
+        return await SendMessageCoreAsync(async builder =>
         {
             DiscordGuild? guild = GetDiscordGuild(guildId);
             if (guild is null)

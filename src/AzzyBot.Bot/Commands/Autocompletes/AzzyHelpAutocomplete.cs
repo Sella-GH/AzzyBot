@@ -19,7 +19,7 @@ public sealed class AzzyHelpAutocomplete(IOptions<AzzyBotSettings> settings) : I
 {
     private readonly AzzyBotSettings _settings = settings.Value;
 
-    public ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)
+    public async ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(context.Client.CurrentApplication.Owners);
@@ -48,6 +48,6 @@ public sealed class AzzyHelpAutocomplete(IOptions<AzzyBotSettings> settings) : I
             }
         }
 
-        return ValueTask.FromResult(results.AsEnumerable());
+        return results.AsEnumerable();
     }
 }

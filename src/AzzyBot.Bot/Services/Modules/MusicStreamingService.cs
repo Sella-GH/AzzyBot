@@ -138,18 +138,18 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         return null;
     }
 
-    private ValueTask<PlayerResult<LavalinkPlayer>> GetLavalinkDefaultPlayerAsync(ulong guildId, ulong channelId, LavalinkPlayerOptions playerOptions, in PlayerRetrieveOptions retrieveOptions)
+    private async ValueTask<PlayerResult<LavalinkPlayer>> GetLavalinkDefaultPlayerAsync(ulong guildId, ulong channelId, LavalinkPlayerOptions playerOptions, in PlayerRetrieveOptions retrieveOptions)
     {
         ArgumentNullException.ThrowIfNull(playerOptions);
 
-        return _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Default, Options.Create(playerOptions), retrieveOptions);
+        return await _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Default, Options.Create(playerOptions), retrieveOptions);
     }
 
-    private ValueTask<PlayerResult<QueuedLavalinkPlayer>> GetLavalinkQueuedPlayerAsync(ulong guildId, ulong channelId, QueuedLavalinkPlayerOptions playerOptions, in PlayerRetrieveOptions retrieveOptions)
+    private async ValueTask<PlayerResult<QueuedLavalinkPlayer>> GetLavalinkQueuedPlayerAsync(ulong guildId, ulong channelId, QueuedLavalinkPlayerOptions playerOptions, in PlayerRetrieveOptions retrieveOptions)
     {
         ArgumentNullException.ThrowIfNull(playerOptions);
 
-        return _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Queued, Options.Create(playerOptions), retrieveOptions);
+        return await _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Queued, Options.Create(playerOptions), retrieveOptions);
     }
 
     [SuppressMessage("Style", "IDE0072:Add missing cases", Justification = "Those are not needed.")]

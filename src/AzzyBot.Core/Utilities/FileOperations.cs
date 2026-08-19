@@ -96,18 +96,18 @@ public static class FileOperations
         }
     }
 
-    public static Task<byte[]> GetBase64BytesFromFileAsync(string path)
+    public static async Task<byte[]> GetBase64BytesFromFileAsync(string path)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
 
-        return File.ReadAllBytesAsync(path);
+        return await File.ReadAllBytesAsync(path);
     }
 
-    public static Task<string> GetFileContentAsync(string path)
+    public static async Task<string> GetFileContentAsync(string path)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
 
-        return File.ReadAllTextAsync(path);
+        return await File.ReadAllTextAsync(path);
     }
 
     public static IEnumerable<string> GetFilesInDirectory(string path, bool latest = false)
