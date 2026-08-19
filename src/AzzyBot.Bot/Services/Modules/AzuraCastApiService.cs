@@ -39,6 +39,9 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
             ["X-API-Key"] = apiKey
         };
 
+    private static bool MatchesOptionalFilter(string? filter, string? value)
+        => filter is null || string.Equals(value, filter, StringComparison.OrdinalIgnoreCase);
+
     public async Task CheckForApiPermissionsAsync(AzuraCastEntity azuraCast)
     {
         ArgumentNullException.ThrowIfNull(azuraCast);
@@ -462,11 +465,10 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         IEnumerable<AzuraRequestModel>? songs = await GetRequestableSongsAsync(baseUrl, apiKey, stationId);
 
         return songs?.FirstOrDefault(s =>
-            (songId is null || string.Equals(s.Song.SongId, songId, StringComparison.OrdinalIgnoreCase)) &&
-            (name is null || string.Equals(s.Song.Title, name, StringComparison.OrdinalIgnoreCase)) &&
-            (artist is null || string.Equals(s.Song.Artist, artist, StringComparison.OrdinalIgnoreCase)) &&
-            (album is null || string.Equals(s.Song.Album, album, StringComparison.OrdinalIgnoreCase))
-            );
+            MatchesOptionalFilter(songId, s.Song.SongId) &&
+            MatchesOptionalFilter(name, s.Song.Title) &&
+            MatchesOptionalFilter(artist, s.Song.Artist) &&
+            MatchesOptionalFilter(album, s.Song.Album));
     }
 
     public async Task<IEnumerable<AzuraRequestModel>?> GetRequestableSongsAsync(Uri baseUrl, string apiKey, int stationId)
@@ -511,12 +513,11 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
             return null;
 
         AzuraFilesModel? song = songs.FirstOrDefault(s =>
-            (uniqueId is null || string.Equals(s.UniqueId, uniqueId, StringComparison.OrdinalIgnoreCase)) &&
-            (songId is null || string.Equals(s.SongId, songId, StringComparison.OrdinalIgnoreCase)) &&
-            (name is null || string.Equals(s.Title, name, StringComparison.OrdinalIgnoreCase)) &&
-            (artist is null || string.Equals(s.Artist, artist, StringComparison.OrdinalIgnoreCase)) &&
-            (album is null || string.Equals(s.Album, album, StringComparison.OrdinalIgnoreCase))
-            ) ??
+            MatchesOptionalFilter(uniqueId, s.UniqueId) &&
+            MatchesOptionalFilter(songId, s.SongId) &&
+            MatchesOptionalFilter(name, s.Title) &&
+            MatchesOptionalFilter(artist, s.Artist) &&
+            MatchesOptionalFilter(album, s.Album)) ??
             throw new InvalidOperationException($"Song {name} not found.");
 
         return new()
