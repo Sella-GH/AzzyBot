@@ -62,10 +62,9 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         return channel.PermissionsFor(member).HasAllPermissions(permissions);
     }
 
-    public async Task CheckPermissionsAsync(DiscordGuild guild, ulong[] channelIds)
+    public async Task CheckPermissionsAsync(DiscordGuild guild, ReadOnlyMemory<ulong> channelIds)
     {
         ArgumentNullException.ThrowIfNull(guild);
-        ArgumentNullException.ThrowIfNull(channelIds);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelIds.Length);
 
         DiscordMember? member = await GetDiscordMemberAsync(guild.Id);
@@ -126,7 +125,8 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
 
         await _dbActions.UpdateGuildAsync(guildEntity.UniqueId, updateLastPermissionCheck: true);
 
-        await CheckPermissionsCoreAsync(guild, member, channels);
+        ulong[] channelArray = [.. channels];
+        await CheckPermissionsCoreAsync(guild, member, channelArray);
     }
 
     public async Task CheckPermissionsAsync(IReadOnlyList<GuildEntity> guilds)
@@ -374,7 +374,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         await AcknowledgeExceptionAsync(context);
     }
 
-    public async Task<bool> SendMessageAsync(ulong channelId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, IMention[]? mentions = null)
+    public async Task<bool> SendMessageAsync(ulong channelId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, ReadOnlyMemory<IMention>? mentions = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId);
 
@@ -539,11 +539,13 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         }
     }
 
-    private async Task CheckPermissionsCoreAsync(DiscordGuild guild, DiscordMember member, IEnumerable<ulong> channelIds)
+    private async Task CheckPermissionsCoreAsync(DiscordGuild guild, DiscordMember member, ReadOnlyMemory<ulong> channelIds)
     {
         List<ulong> channelNotAccessible = [];
-        foreach (ulong channelId in channelIds)
+        ulong[] channelArray = [.. channelIds.Span];
+        for (int i = 0; i < channelArray.Length; i++)
         {
+            ulong channelId = channelArray[i];
             DiscordChannel? channel = await GetDiscordChannelAsync(channelId);
             if (channel is null)
             {
@@ -636,7 +638,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         return builder;
     }
 
-    private async Task<bool> SendMessageCoreAsync(Func<DiscordMessageBuilder, Task> sendAction, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, IMention[]? mentions = null)
+    private async Task<bool> SendMessageCoreAsync(Func<DiscordMessageBuilder, Task> sendAction, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, ReadOnlyMemory<IMention>? mentions = null)
     {
         if (!CheckIfClientIsConnected)
         {
@@ -663,7 +665,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         }
 
         if (mentions is not null)
-            builder.WithAllowedMentions(mentions);
+            builder.WithAllowedMentions([.. mentions.Value.Span]);
 
         List<FileStream> streams = new(10);
         if (filePaths?.Count > 0)
