@@ -46,7 +46,7 @@ public sealed class AzuraPersistentNowPlayingJob(ILogger<AzuraPersistentNowPlayi
                 await UpdateNowPlayingEmbedAsync(station);
             }
         }
-        catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
+        catch (Exception ex) when (ex is not (OperationCanceledException or TaskCanceledException))
         {
             await _botService.LogExceptionAsync(ex, DateTimeOffset.Now);
         }

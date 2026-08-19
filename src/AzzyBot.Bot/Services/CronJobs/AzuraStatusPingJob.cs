@@ -38,7 +38,7 @@ public sealed class AzuraStatusPingJob(IAzuraCastPingService pingService, IDbAct
             IEnumerable<AzuraCastEntity> azuraCastsToPing = azuraCasts.Where(static a => a.Checks.ServerStatus);
             await Task.WhenAll(azuraCastsToPing.Select(_pingService.PingInstanceAsync));
         }
-        catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
+        catch (Exception ex) when (ex is not (OperationCanceledException or TaskCanceledException))
         {
             await _botService.LogExceptionAsync(ex, DateTimeOffset.Now);
         }

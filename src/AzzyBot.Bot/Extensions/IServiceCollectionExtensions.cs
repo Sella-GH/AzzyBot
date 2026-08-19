@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Net;
 using System.Net.Http;
 
@@ -41,6 +42,7 @@ public static class IServiceCollectionExtensions
 {
     extension(IServiceCollection services)
     {
+        [SuppressMessage("Minor Vulnerability", "S5332:Clear-text protocols should not be used", Justification = "Lavalink traffic works over HTTP")]
         public void AzzyBotServices(int logDays = 7)
         {
             IServiceProvider serviceProvider = services.BuildServiceProvider();
@@ -121,7 +123,7 @@ public static class IServiceCollectionExtensions
                 {
                     if (!string.IsNullOrWhiteSpace(musicSettings.LavalinkHost) && musicSettings.LavalinkPort is not 0)
                     {
-                        baseAddress = new($"http://{musicSettings.LavalinkHost}:{musicSettings.LavalinkPort}");
+                        baseAddress = new(string.Create(CultureInfo.InvariantCulture, $"http://{musicSettings.LavalinkHost}:{musicSettings.LavalinkPort}"));
                     }
                     else if (!string.IsNullOrWhiteSpace(musicSettings.LavalinkHost) && musicSettings.LavalinkPort is 0)
                     {
@@ -132,7 +134,7 @@ public static class IServiceCollectionExtensions
 #if DOCKER || DOCKER_DEBUG
                         baseAddress = new($"http://AzzyBot-Ms:{musicSettings.LavalinkPort}");
 #else
-                        baseAddress = new($"http://localhost:{musicSettings.LavalinkPort}");
+                        baseAddress = new(string.Create(CultureInfo.InvariantCulture, $"http://localhost:{musicSettings.LavalinkPort}"));
 #endif
                     }
 

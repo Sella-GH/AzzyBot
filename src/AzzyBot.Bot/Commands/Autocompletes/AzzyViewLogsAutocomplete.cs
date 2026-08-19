@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,13 +15,13 @@ namespace AzzyBot.Bot.Commands.Autocompletes;
 
 public sealed class AzzyViewLogsAutocomplete : IAutoCompleteProvider
 {
-    public ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)
+    public async ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
         string? search = context.UserInput;
         List<DiscordAutoCompleteChoice> results = new(25);
-        foreach (string file in FileOperations.GetFilesInDirectory("Logs").OrderByDescending(static f => f))
+        foreach (string file in FileOperations.GetFilesInDirectory("Logs").OrderDescending(StringComparer.Ordinal))
         {
             if (results.Count is 25)
                 break;
@@ -29,9 +30,9 @@ public sealed class AzzyViewLogsAutocomplete : IAutoCompleteProvider
                 continue;
 
             FileInfo fileInfo = new(file);
-            results.Add(new($"{fileInfo.Name} ({Math.Round(fileInfo.Length / (1024.0 * 1024.0), 2)} MB)", file));
+            results.Add(new(string.Create(CultureInfo.InvariantCulture, $"{fileInfo.Name} ({Math.Round(fileInfo.Length / (1024.0 * 1024.0), 2, MidpointRounding.ToEven)} MB)"), file));
         }
 
-        return ValueTask.FromResult(results.AsEnumerable());
+        return results.AsEnumerable();
     }
 }

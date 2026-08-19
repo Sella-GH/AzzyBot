@@ -6,7 +6,7 @@ using Npgsql;
 
 namespace AzzyBot.Data.Settings;
 
-public sealed record DatabaseSettings
+public sealed record class DatabaseSettings
 {
     /// <summary>
     /// The primary encryption key used to encrypt/decrypt sensitive data in the database.

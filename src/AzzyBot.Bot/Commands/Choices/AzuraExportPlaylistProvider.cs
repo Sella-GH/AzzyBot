@@ -15,6 +15,6 @@ public sealed class AzuraExportPlaylistProvider : IChoiceProvider
         new("PLS", "pls")
     ];
 
-    public ValueTask<IEnumerable<DiscordApplicationCommandOptionChoice>> ProvideAsync(CommandParameter parameter)
-        => ValueTask.FromResult(ExportProviders);
+    public async ValueTask<IEnumerable<DiscordApplicationCommandOptionChoice>> ProvideAsync(CommandParameter parameter)
+        => ExportProviders;
 }

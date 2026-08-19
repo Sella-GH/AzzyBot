@@ -20,7 +20,7 @@ public static class HardwareStats
     public static bool CheckIfLinuxOs
         => OperatingSystem.IsLinux();
 
-    public static async Task<Dictionary<int, double>> GetSystemCpuAsync()
+    public static async Task<IReadOnlyDictionary<int, double>> GetSystemCpuAsync()
     {
         // Declare some variable stuff
         const int idleTime = 3;
@@ -29,7 +29,7 @@ public static class HardwareStats
 
         #region Declare local methods
 
-        static double CalculateCpuUsage(long prevIdle, long currIdle, long prevTotal, long currTotal) => (1.0 - ((double)(currIdle - prevIdle) / (currTotal - prevTotal))) * percentage;
+        static double CalculateCpuUsage(long prevIdle, long currIdle, long prevTotal, long currTotal) => (1.0 - (double.CreateChecked(currIdle - prevIdle) / (currTotal - prevTotal))) * percentage;
 
         static long CalculateTimes(long[] times)
         {
@@ -53,7 +53,7 @@ public static class HardwareStats
 
             for (int i = 1; i < values.Length; i++)
             {
-                if (!long.TryParse(parts[i], out values[i - 1]))
+                if (!long.TryParse(parts[i], CultureInfo.InvariantCulture, out values[i - 1]))
                     throw new InvalidOperationException("Could not convert string to long");
             }
 
@@ -100,17 +100,17 @@ public static class HardwareStats
 
             double coreUsage = CalculateCpuUsage(prevCoreTimes[idleTime], currCoreTimes[idleTime], CalculateTimes(prevCoreTimes), CalculateTimes(currCoreTimes));
 
-            coreUsages.Add(coreIndex, Math.Round(coreUsage, 2));
+            coreUsages.Add(coreIndex, Math.Round(coreUsage, 2, MidpointRounding.ToEven));
         }
 
         return coreUsages;
     }
 
-    public static async Task<Dictionary<string, double>> GetSystemCpuTempAsync()
+    public static async Task<IReadOnlyDictionary<string, double>> GetSystemCpuTempAsync()
     {
         string typeFolderPath = Path.Combine("/sys", "class", "thermal");
         if (!Directory.Exists(typeFolderPath))
-            return [];
+            return new Dictionary<string, double>(StringComparer.Ordinal);
 
         Dictionary<string, double> result = [];
         foreach (string folder in Directory.GetDirectories(typeFolderPath))
@@ -134,7 +134,7 @@ public static class HardwareStats
 
             string tempInfo = await File.ReadAllTextAsync(tempFilePath);
 
-            result.Add(type, Math.Round(double.Parse(tempInfo, CultureInfo.InvariantCulture) / 1000.0));
+            result.Add(type, Math.Round(double.Parse(tempInfo, CultureInfo.InvariantCulture) / 1000.0, MidpointRounding.ToEven));
         }
 
         return result;
@@ -153,12 +153,12 @@ public static class HardwareStats
 
     public static AppDiskUsageModel GetSystemDiskUsage()
     {
-        DriveInfo drive = Array.Find(DriveInfo.GetDrives(), static d => d.IsReady && d.Name == "/") ?? throw new InvalidOperationException("There is more than one root drive");
+        DriveInfo drive = Array.Find(DriveInfo.GetDrives(), static d => d.IsReady && string.Equals(d.Name, "/", StringComparison.Ordinal)) ?? throw new InvalidOperationException("There is more than one root drive");
         double totalSize = drive.TotalSize / (1024.0 * 1024.0 * 1024.0);
         double totalFreeSpace = drive.TotalFreeSpace / (1024.0 * 1024.0 * 1024.0);
         double totalUsedSpace = totalSize - totalFreeSpace;
 
-        return new(Math.Round(totalSize, 2), Math.Round(totalFreeSpace, 2), Math.Round(totalUsedSpace, 2));
+        return new(Math.Round(totalSize, 2, MidpointRounding.ToEven), Math.Round(totalFreeSpace, 2, MidpointRounding.ToEven), Math.Round(totalUsedSpace, 2, MidpointRounding.ToEven));
     }
 
     public static async Task<AppMemoryUsageModel> GetSystemMemoryUsageAsync()
@@ -173,7 +173,7 @@ public static class HardwareStats
 
             string[] parts = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-            return (long.TryParse(parts[1], out long value)) ? value : throw new InvalidOperationException("Could not parse value");
+            return (long.TryParse(parts[1], CultureInfo.InvariantCulture, out long value)) ? value : throw new InvalidOperationException("Could not parse value");
         }
 
         foreach (string line in memoryInfoLines)
@@ -192,13 +192,13 @@ public static class HardwareStats
             }
         }
 
-        double memTotalGb = Math.Round(memTotalKb / (1024.0 * 1024.0), 2);
-        double memUsedGb = Math.Round((memTotalKb - memFreeKb) / (1024.0 * 1024.0), 2);
+        double memTotalGb = Math.Round(memTotalKb / (1024.0 * 1024.0), 2, MidpointRounding.ToEven);
+        double memUsedGb = Math.Round((memTotalKb - memFreeKb) / (1024.0 * 1024.0), 2, MidpointRounding.ToEven);
 
         return new(memTotalGb, memUsedGb);
     }
 
-    public static async Task<Dictionary<string, AppNetworkSpeedModel>> GetSystemNetworkUsageAsync()
+    public static async Task<IReadOnlyDictionary<string, AppNetworkSpeedModel>> GetSystemNetworkUsageAsync()
     {
         const int delayInMs = 1000;
         const int bytesPerKbit = 125;
@@ -229,14 +229,14 @@ public static class HardwareStats
         await Task.Delay(delayInMs);
         Dictionary<string, AppNetworkStatsModel> currNetworkStats = await ReadNetworkStatsAsync();
 
-        Dictionary<string, AppNetworkSpeedModel> networkSpeeds = new(prevNetworkStats.Count);
+        Dictionary<string, AppNetworkSpeedModel> networkSpeeds = new(prevNetworkStats.Count, StringComparer.Ordinal);
         foreach (KeyValuePair<string, AppNetworkStatsModel> kvp in prevNetworkStats)
         {
             string networkName = kvp.Key;
             double rxSpeedKbits = (currNetworkStats[networkName].Received - kvp.Value.Received) * 8.0 / bytesPerKbit / (delayInMs / 1000.0);
             double txSpeedKbits = (currNetworkStats[networkName].Transmitted - kvp.Value.Transmitted) * 8.0 / bytesPerKbit / (delayInMs / 1000.0);
 
-            networkSpeeds.Add(networkName, new(Math.Round(rxSpeedKbits, 2), Math.Round(txSpeedKbits, 2)));
+            networkSpeeds.Add(networkName, new(Math.Round(rxSpeedKbits, 2, MidpointRounding.ToEven), Math.Round(txSpeedKbits, 2, MidpointRounding.ToEven)));
         }
 
         return networkSpeeds;

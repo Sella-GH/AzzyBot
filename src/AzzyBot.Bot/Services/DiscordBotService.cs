@@ -62,10 +62,9 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         return channel.PermissionsFor(member).HasAllPermissions(permissions);
     }
 
-    public async Task CheckPermissionsAsync(DiscordGuild guild, ulong[] channelIds)
+    public async Task CheckPermissionsAsync(DiscordGuild guild, ReadOnlyMemory<ulong> channelIds)
     {
         ArgumentNullException.ThrowIfNull(guild);
-        ArgumentNullException.ThrowIfNull(channelIds);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelIds.Length);
 
         DiscordMember? member = await GetDiscordMemberAsync(guild.Id);
@@ -126,7 +125,8 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
 
         await _dbActions.UpdateGuildAsync(guildEntity.UniqueId, updateLastPermissionCheck: true);
 
-        await CheckPermissionsCoreAsync(guild, member, channels);
+        ulong[] channelArray = [.. channels];
+        await CheckPermissionsCoreAsync(guild, member, channelArray);
     }
 
     public async Task CheckPermissionsAsync(IReadOnlyList<GuildEntity> guilds)
@@ -190,7 +190,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             string guild = $"{ctx.Guild?.Name} ({ctx.Guild?.Id})";
             string userMention = $"{ctx.User.GlobalName} ({ctx.User.Id})";
             string commandName = ctx.Command.FullName;
-            Dictionary<string, string> commandOptions = new(ctx.Command.Parameters.Count);
+            Dictionary<string, string> commandOptions = new(ctx.Command.Parameters.Count, StringComparer.Ordinal);
             ProcessOptions(ctx.Arguments, commandOptions);
 
             AzzyExceptionEmbedStruct values = new()
@@ -205,7 +205,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
                 CommandOptions = commandOptions
             };
 
-            embed = CreateExceptionEmbed(values);
+            embed = CreateExceptionEmbed(in values);
         }
         else
         {
@@ -216,7 +216,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
                 JsonMessage = jsonMessage
             };
 
-            embed = CreateExceptionEmbed(values);
+            embed = CreateExceptionEmbed(in values);
         }
 
         try
@@ -320,7 +320,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             string message = "You don't have the required permissions to execute this command!\nPlease contact {0}.";
             string[] info = azuraCastDiscordPermCheck.ErrorMessage.Split(':');
 
-            if (info.Length is 0 && azuraCastDiscordPermCheck.ErrorMessage is "Instance")
+            if (info.Length is 0 && string.Equals(azuraCastDiscordPermCheck.ErrorMessage, "Instance", StringComparison.Ordinal))
             {
                 message = message.Replace("{0}", $"<@&{azuraCast.Preferences.InstanceAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
             }
@@ -333,11 +333,11 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
                     return;
                 }
 
-                if (info[0] is "Station")
+                if (string.Equals(info[0], "Station", StringComparison.Ordinal))
                 {
                     message = message.Replace("{0}", $"<@&{station.Preferences.StationAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
                 }
-                else if (info[0] is "DJ")
+                else if (string.Equals(info[0], "DJ", StringComparison.Ordinal))
                 {
                     message = message.Replace("{0}", $"<@&{((station.Preferences.StationDjRoleId is 0) ? station.Preferences.StationAdminRoleId : station.Preferences.StationDjRoleId)}>", StringComparison.OrdinalIgnoreCase);
                 }
@@ -374,11 +374,11 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         await AcknowledgeExceptionAsync(context);
     }
 
-    public Task<bool> SendMessageAsync(ulong channelId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, IMention[]? mentions = null)
+    public async Task<bool> SendMessageAsync(ulong channelId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, ReadOnlyMemory<IMention>? mentions = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(channelId);
 
-        return SendMessageCoreAsync(async builder =>
+        return await SendMessageCoreAsync(async builder =>
         {
             DiscordChannel? channel = await GetDiscordChannelAsync(channelId);
             if (channel is null)
@@ -404,11 +404,11 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         }, content, embeds, filePaths, mentions);
     }
 
-    public Task<bool> SendMessageToOwnerAsync(ulong guildId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null)
+    public async Task<bool> SendMessageToOwnerAsync(ulong guildId, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(guildId);
 
-        return SendMessageCoreAsync(async builder =>
+        return await SendMessageCoreAsync(async builder =>
         {
             DiscordGuild? guild = GetDiscordGuild(guildId);
             if (guild is null)
@@ -449,7 +449,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         DiscordActivityType activityType;
         if (Enum.IsDefined(typeof(DiscordActivityType), type))
         {
-            activityType = (DiscordActivityType)type;
+            activityType = Enum.Parse<DiscordActivityType>(type.ToString(CultureInfo.InvariantCulture));
         }
         else
         {
@@ -495,7 +495,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             return DiscordUserStatus.Online;
         }
 
-        DiscordUserStatus userStatus = (DiscordUserStatus)status;
+        DiscordUserStatus userStatus = Enum.Parse<DiscordUserStatus>(status.ToString(CultureInfo.InvariantCulture));
         _logger.BotStatusUserStatusSet(userStatus.ToString());
 
         return userStatus;
@@ -532,18 +532,22 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         foreach (KeyValuePair<CommandParameter, object?> kvp in parameters)
         {
             string name = kvp.Key.Name;
-            string value = kvp.Value?.ToString() ?? "undefined";
+            string value = $"{kvp.Value}";
+            if (string.IsNullOrEmpty(value))
+                value = "undefined";
 
             if (!string.IsNullOrEmpty(name) && value is not "0")
                 commandParameters.Add(name, value);
         }
     }
 
-    private async Task CheckPermissionsCoreAsync(DiscordGuild guild, DiscordMember member, IEnumerable<ulong> channelIds)
+    private async Task CheckPermissionsCoreAsync(DiscordGuild guild, DiscordMember member, ReadOnlyMemory<ulong> channelIds)
     {
         List<ulong> channelNotAccessible = [];
-        foreach (ulong channelId in channelIds)
+        ulong[] channelArray = [.. channelIds.Span];
+        for (int i = 0; i < channelArray.Length; i++)
         {
+            ulong channelId = channelArray[i];
             DiscordChannel? channel = await GetDiscordChannelAsync(channelId);
             if (channel is null)
             {
@@ -636,7 +640,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         return builder;
     }
 
-    private async Task<bool> SendMessageCoreAsync(Func<DiscordMessageBuilder, Task> sendAction, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, IMention[]? mentions = null)
+    private async Task<bool> SendMessageCoreAsync(Func<DiscordMessageBuilder, Task> sendAction, string? content = null, IReadOnlyList<DiscordEmbed>? embeds = null, IReadOnlyList<string>? filePaths = null, ReadOnlyMemory<IMention>? mentions = null)
     {
         if (!CheckIfClientIsConnected)
         {
@@ -663,7 +667,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         }
 
         if (mentions is not null)
-            builder.WithAllowedMentions(mentions);
+            builder.WithAllowedMentions([.. mentions.Value.Span]);
 
         List<FileStream> streams = new(10);
         if (filePaths?.Count > 0)

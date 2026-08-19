@@ -51,10 +51,9 @@ public sealed class ModuleActivatedCheck(ILogger<ModuleActivatedCheck> logger, I
                         _logger.DatabaseGuildNotFound(context.Guild.Id);
                         return ModuleCheckMessages.GuildIsNull;
                     }
-                    else if (!guild.LegalsAccepted)
-                    {
+
+                    if (!guild.LegalsAccepted)
                         return ModuleCheckMessages.LegalsNotAccepted;
-                    }
 
                     return null;
 

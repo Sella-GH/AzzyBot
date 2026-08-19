@@ -16,6 +16,6 @@ public sealed class MusicStreamingPlatformProvider : IChoiceProvider
         new(nameof(TrackSearchMode.SoundCloud), TrackSearchMode.SoundCloud.Prefix ?? string.Empty)
     ];
 
-    public ValueTask<IEnumerable<DiscordApplicationCommandOptionChoice>> ProvideAsync(CommandParameter parameter)
-        => ValueTask.FromResult(Platforms);
+    public async ValueTask<IEnumerable<DiscordApplicationCommandOptionChoice>> ProvideAsync(CommandParameter parameter)
+        => Platforms;
 }

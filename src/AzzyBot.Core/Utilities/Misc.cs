@@ -46,14 +46,14 @@ public static class Misc
     }
 
     [SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase", Justification = "Make it more universal")]
-    public static string GetReadableBool(bool value, ReadableBool type, bool lower = false)
+    public static string GetReadableBool(bool value, ReadableBools type, bool lower = false)
     {
         string result = type switch
         {
-            ReadableBool.EnabledDisabled => (value) ? "Enabled" : "Disabled",
-            ReadableBool.StartedStopped => (value) ? "Started" : "Stopped",
-            ReadableBool.YesNo => (value) ? "Yes" : "No",
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
+            ReadableBools.EnabledDisabled => (value) ? "Enabled" : "Disabled",
+            ReadableBools.StartedStopped => (value) ? "Started" : "Stopped",
+            ReadableBools.YesNo => (value) ? "Yes" : "No",
+            _ => throw new ArgumentOutOfRangeException(nameof(type), type, message: null)
         };
 
         return (lower) ? result.ToLowerInvariant() : result;

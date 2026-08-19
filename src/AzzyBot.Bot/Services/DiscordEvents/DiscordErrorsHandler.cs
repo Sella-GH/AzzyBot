@@ -35,13 +35,13 @@ public sealed class DiscordErrorsHandler(IDiscordBotService botService) : IClien
                 break;
 
             default:
-                if (exception is not DiscordException)
+                if (exception is not DiscordException discordException)
                 {
                     await _botService.LogExceptionAsync(exception, now);
                     break;
                 }
 
-                await _botService.LogExceptionAsync(exception, now, jsonMessage: ((DiscordException)exception).JsonMessage);
+                await _botService.LogExceptionAsync(exception, now, jsonMessage: discordException.JsonMessage);
                 break;
         }
     }

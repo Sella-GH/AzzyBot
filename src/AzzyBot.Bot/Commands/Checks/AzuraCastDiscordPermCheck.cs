@@ -43,7 +43,7 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
         if (context is SlashCommandContext ctx && ctx.Interaction.ResponseState is DiscordInteractionResponseState.Unacknowledged)
             await context.DeferResponseAsync();
 
-        int stationId = Convert.ToInt32(context.Arguments.SingleOrDefault(static o => o.Key.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
+        int stationId = Convert.ToInt32(context.Arguments.SingleOrDefault(static o => string.Equals(o.Key.Name, "station", StringComparison.Ordinal) && o.Value is not null).Value, CultureInfo.InvariantCulture);
         AzuraCastEntity? azuraCast = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true, loadStationPrefs: true);
         if (azuraCast is null)
         {
@@ -137,32 +137,32 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
                 break;
         }
 
-        if (perm is AzuraCastDiscordPerm.InstanceAdminGroup && isInstanceAdmin)
-            return null;
-
-        if (perm is AzuraCastDiscordPerm.StationAdminGroup && (isInstanceAdmin || isStationAdmin))
-            return null;
-
-        if (perm is AzuraCastDiscordPerm.StationDJGroup && (isInstanceAdmin || isStationAdmin || isStationDj))
-            return null;
-
-        if (perm is AzuraCastDiscordPerm.InstanceAdminGroup)
+        switch (perm)
         {
-            _logger.AzuraCastDiscordPermission(nameof(AzuraCastDiscordPerm.InstanceAdminGroup));
-            return "Instance";
-        }
-        else if (perm is AzuraCastDiscordPerm.StationAdminGroup)
-        {
-            _logger.AzuraCastDiscordPermission(nameof(AzuraCastDiscordPerm.StationAdminGroup));
-            return $"Station:{station.StationId}";
-        }
-        else if (perm is AzuraCastDiscordPerm.StationDJGroup)
-        {
-            _logger.AzuraCastDiscordPermission(nameof(AzuraCastDiscordPerm.StationDJGroup));
-            return $"DJ:{station.StationId}";
-        }
+            case AzuraCastDiscordPerm.InstanceAdminGroup when isInstanceAdmin:
+                return null;
 
-        _logger.AzuraCastDiscordPermission("Invalid permission!");
-        return "Invalid permission!";
+            case AzuraCastDiscordPerm.StationAdminGroup when (isInstanceAdmin || isStationAdmin):
+                return null;
+
+            case AzuraCastDiscordPerm.StationDJGroup when (isInstanceAdmin || isStationAdmin || isStationDj):
+                return null;
+
+            case AzuraCastDiscordPerm.InstanceAdminGroup:
+                _logger.AzuraCastDiscordPermission(nameof(AzuraCastDiscordPerm.InstanceAdminGroup));
+                return "Instance";
+
+            case AzuraCastDiscordPerm.StationAdminGroup:
+                _logger.AzuraCastDiscordPermission(nameof(AzuraCastDiscordPerm.StationAdminGroup));
+                return string.Create(CultureInfo.InvariantCulture, $"Station:{station.StationId}");
+
+            case AzuraCastDiscordPerm.StationDJGroup:
+                _logger.AzuraCastDiscordPermission(nameof(AzuraCastDiscordPerm.StationDJGroup));
+                return string.Create(CultureInfo.InvariantCulture, $"DJ:{station.StationId}");
+
+            default:
+                _logger.AzuraCastDiscordPermission("Invalid permission!");
+                return "Invalid permission!";
+        }
     }
 }

@@ -38,10 +38,9 @@ public sealed class AzuraCastSystemLogAutocomplete(ILogger<AzuraCastSystemLogAut
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
             return [];
         }
-        else if (!azuraCast.IsOnline)
-        {
+
+        if (!azuraCast.IsOnline)
             return [];
-        }
 
         Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
         string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
