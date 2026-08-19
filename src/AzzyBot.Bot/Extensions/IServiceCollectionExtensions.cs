@@ -132,7 +132,7 @@ public static class IServiceCollectionExtensions
                     else if (string.IsNullOrWhiteSpace(musicSettings.LavalinkHost) && musicSettings.LavalinkPort is not 0)
                     {
 #if DOCKER || DOCKER_DEBUG
-                        baseAddress = new($"http://AzzyBot-Ms:{musicSettings.LavalinkPort}");
+                        baseAddress = new(string.Create(CultureInfo.InvariantCulture, $"http://AzzyBot-Ms:{musicSettings.LavalinkPort}"));
 #else
                         baseAddress = new(string.Create(CultureInfo.InvariantCulture, $"http://localhost:{musicSettings.LavalinkPort}"));
 #endif

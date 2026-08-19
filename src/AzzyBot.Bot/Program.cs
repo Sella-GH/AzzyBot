@@ -37,14 +37,14 @@ public static class Program
 #if DEBUG
         LogLevel logLevel = Enum.Parse<LogLevel>(logLevelArg ?? "Debug", ignoreCase: true);
 #elif RELEASE
-        LogLevel logLevel = Enum.Parse<LogLevel>(logLevelArg ?? "Information", true);
+        LogLevel logLevel = Enum.Parse<LogLevel>(logLevelArg ?? "Information", ignoreCase: true);
 #endif
 
 #if DEBUG || RELEASE
         const int logDays = 7;
 #else
-        bool skipWaiting = Environment.GetEnvironmentVariable("SKIP_WAITING") is "true";
-        LogLevel logLevel = Enum.Parse<LogLevel>(Environment.GetEnvironmentVariable("LOG_LEVEL") ?? "Information", true);
+        bool skipWaiting = string.Equals(Environment.GetEnvironmentVariable("SKIP_WAITING"), "true", StringComparison.OrdinalIgnoreCase);
+        LogLevel logLevel = Enum.Parse<LogLevel>(Environment.GetEnvironmentVariable("LOG_LEVEL") ?? "Information", ignoreCase: true);
         int logDays = int.Parse(Environment.GetEnvironmentVariable("LOG_RETENTION_DAYS") ?? "7", NumberStyles.Integer, CultureInfo.InvariantCulture);
 
         // Give the database time to start up

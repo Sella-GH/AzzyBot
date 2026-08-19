@@ -426,7 +426,7 @@ public static class EmbedBuilder
             ["Operating System"] = new(os, isInline: true),
             ["Architecture"] = new(osArch, isInline: true),
 #if DOCKER || DOCKER_DEBUG
-            ["Dockerized?"] = new(Misc.GetReadableBool(true, ReadableBool.YesNo), true),
+            ["Dockerized?"] = new(Misc.GetReadableBool(value: true, ReadableBools.YesNo), isInline: true),
 #else
             ["Dockerized?"] = new(Misc.GetReadableBool(value: false, ReadableBools.YesNo), isInline: true),
 #endif
@@ -565,7 +565,7 @@ public static class EmbedBuilder
 #if DEBUG || DOCKER_DEBUG
             ["Environment"] = new(Environments.Development, isInline: true),
 #else
-            ["Environment"] = new(Environments.Production, true),
+            ["Environment"] = new(Environments.Production, isInline: true),
 #endif
             ["Bot Name"] = new(SoftwareStats.GetAppName, isInline: true),
             ["Bot Version"] = new(SoftwareStats.GetAppVersion, isInline: true),
