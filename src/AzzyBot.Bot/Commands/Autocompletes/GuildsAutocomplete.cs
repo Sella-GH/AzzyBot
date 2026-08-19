@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Services.Interfaces;
@@ -26,7 +25,7 @@ public sealed class GuildsAutocomplete(IOptions<AzzyBotSettings> settings, IDisc
 
         IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
         if (guilds.Count is 0)
-            return new List<DiscordAutoCompleteChoice>(1).AsEnumerable();
+            return [];
 
         string commandName = context.Command.Name;
         string? search = context.UserInput;
@@ -45,6 +44,6 @@ public sealed class GuildsAutocomplete(IOptions<AzzyBotSettings> settings, IDisc
             results.Add(new($"{guild.Name} ({guild.Id})", guild.Id.ToString(CultureInfo.InvariantCulture)));
         }
 
-        return results.AsEnumerable();
+        return results;
     }
 }

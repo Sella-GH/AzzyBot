@@ -33,6 +33,6 @@ public sealed class AzzyViewLogsAutocomplete : IAutoCompleteProvider
             results.Add(new(string.Create(CultureInfo.InvariantCulture, $"{fileInfo.Name} ({Math.Round(fileInfo.Length / (1024.0 * 1024.0), 2, MidpointRounding.ToEven)} MB)"), file));
         }
 
-        return results.AsEnumerable();
+        return results;
     }
 }

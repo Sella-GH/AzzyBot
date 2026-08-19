@@ -16,5 +16,5 @@ public sealed class BooleanYesNoStateProvider : IChoiceProvider
     ];
 
     public async ValueTask<IEnumerable<DiscordApplicationCommandOptionChoice>> ProvideAsync(CommandParameter parameter)
-    => BooleanStates;
+        => BooleanStates;
 }

@@ -27,7 +27,7 @@ public sealed class AzzyBotCheckPermissionsJob(IDbActions dbActions, IDiscordBot
             {
                 if (permissionsStruct.DiscordGuild is not null && permissionsStruct.DiscordGuildIds is not null)
                 {
-                    ulong[] guildIds = [permissionsStruct.DiscordGuild.Id];
+                    ulong[] guildIds = [.. permissionsStruct.DiscordGuildIds];
                     await _botService.CheckPermissionsAsync(permissionsStruct.DiscordGuild, guildIds);
                     return;
                 }

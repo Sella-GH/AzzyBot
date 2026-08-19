@@ -48,6 +48,6 @@ public sealed class AzzyHelpAutocomplete(IOptions<AzzyBotSettings> settings) : I
             }
         }
 
-        return results.AsEnumerable();
+        return results;
     }
 }
