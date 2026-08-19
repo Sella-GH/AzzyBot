@@ -103,7 +103,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
                 SelfDeaf = true
             };
 
-            defaultPlayer = await GetLavalinkDefaultPlayerAsync(context.Guild.Id, channelId.Value, defaultPlayerOptions, in retrieveOptions);
+            defaultPlayer = await GetLavalinkDefaultPlayerAsync(context.Guild.Id, channelId.Value, defaultPlayerOptions, retrieveOptions);
             if (defaultPlayer.IsSuccess)
                 return defaultPlayer.Player;
 
@@ -125,7 +125,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
                 SelfDeaf = true
             };
 
-            queuedPlayer = await GetLavalinkQueuedPlayerAsync(context.Guild.Id, channelId.Value, queuedPlayerOptions, in retrieveOptions);
+            queuedPlayer = await GetLavalinkQueuedPlayerAsync(context.Guild.Id, channelId.Value, queuedPlayerOptions, retrieveOptions);
             if (queuedPlayer.IsSuccess)
                 return queuedPlayer.Player;
 
@@ -138,14 +138,14 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         return null;
     }
 
-    private async ValueTask<PlayerResult<LavalinkPlayer>> GetLavalinkDefaultPlayerAsync(ulong guildId, ulong channelId, LavalinkPlayerOptions playerOptions, in PlayerRetrieveOptions retrieveOptions)
+    private async ValueTask<PlayerResult<LavalinkPlayer>> GetLavalinkDefaultPlayerAsync(ulong guildId, ulong channelId, LavalinkPlayerOptions playerOptions, PlayerRetrieveOptions retrieveOptions)
     {
         ArgumentNullException.ThrowIfNull(playerOptions);
 
         return await _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Default, Options.Create(playerOptions), retrieveOptions);
     }
 
-    private async ValueTask<PlayerResult<QueuedLavalinkPlayer>> GetLavalinkQueuedPlayerAsync(ulong guildId, ulong channelId, QueuedLavalinkPlayerOptions playerOptions, in PlayerRetrieveOptions retrieveOptions)
+    private async ValueTask<PlayerResult<QueuedLavalinkPlayer>> GetLavalinkQueuedPlayerAsync(ulong guildId, ulong channelId, QueuedLavalinkPlayerOptions playerOptions, PlayerRetrieveOptions retrieveOptions)
     {
         ArgumentNullException.ThrowIfNull(playerOptions);
 
