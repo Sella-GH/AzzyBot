@@ -47,7 +47,11 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)
-        => _logger.BotStopping();
+    {
+        _logger.BotStopping();
+
+        await Task.CompletedTask;
+    }
 
     private async Task EnsureAzzyBotDbTableIsCreatedAsync()
     {

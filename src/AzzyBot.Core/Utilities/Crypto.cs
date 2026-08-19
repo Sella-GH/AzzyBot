@@ -66,7 +66,7 @@ public static class Crypto
     /// Decrypts a cipher text using AES-GCM with the specified key.
     /// </summary>
     /// <param name="cipher">The cipher text to decrypt, in the format 'nonce:cipher:tag'.</param>
-    /// <param name="key">An optional 32-byte key to use for decryption. If not provided, a default key is used.</param>
+    /// <param name="key">A 32-byte key to use for decryption. If not provided, a default key is used.</param>
     /// <returns>The decrypted plain text as a string.</returns>
     /// <exception cref="ArgumentException">Thrown if <paramref name="cipher"/> is null, empty, or consists only of white-space characters. Also thrown if
     /// <paramref name="key"/> is provided but is not a 32-byte array.</exception>

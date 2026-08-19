@@ -153,7 +153,7 @@ public static class HardwareStats
 
     public static AppDiskUsageModel GetSystemDiskUsage()
     {
-        DriveInfo drive = Array.Find(DriveInfo.GetDrives(), static d => d.IsReady && string.Equals(d.Name, "/", StringComparison.Ordinal)) ?? throw new InvalidOperationException("There is more than one root drive");
+        DriveInfo drive = Array.Find(DriveInfo.GetDrives(), static d => d.IsReady && string.Equals(d.Name, "/", StringComparison.Ordinal)) ?? throw new InvalidOperationException("Root drive '/' not found.");
         double totalSize = drive.TotalSize / (1024.0 * 1024.0 * 1024.0);
         double totalFreeSpace = drive.TotalFreeSpace / (1024.0 * 1024.0 * 1024.0);
         double totalUsedSpace = totalSize - totalFreeSpace;
