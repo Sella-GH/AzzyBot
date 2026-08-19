@@ -27,7 +27,7 @@ public readonly struct AzzyCheckPermissionsStruct : IEquatable<AzzyCheckPermissi
     public override int GetHashCode()
         => HashCode.Combine(DiscordGuild, DiscordGuildIds, GuildEntity);
 
-    public static bool operator==(in AzzyCheckPermissionsStruct left, in AzzyCheckPermissionsStruct right)
+    public static bool operator ==(in AzzyCheckPermissionsStruct left, in AzzyCheckPermissionsStruct right)
         => left.Equals(right);
 
     public static bool operator !=(in AzzyCheckPermissionsStruct left, in AzzyCheckPermissionsStruct right)
