@@ -19,8 +19,7 @@ public sealed class UriArgumentConverter : ISlashArgumentConverter<Uri>
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        string? value = context.Argument?.ToString();
-
+        string value = $"{context.Argument}";
         if (string.IsNullOrWhiteSpace(value))
             return Optional.FromNoValue<Uri>();
 
