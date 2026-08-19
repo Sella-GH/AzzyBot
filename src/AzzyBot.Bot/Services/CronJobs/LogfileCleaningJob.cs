@@ -41,7 +41,7 @@ public sealed class LogfileCleaningJob(ILogger<LogfileCleaningJob> logger, IDisc
 
             _logger.LogfileCleanupComplete(files.Count);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
+        catch (Exception ex) when (ex is not (OperationCanceledException or TaskCanceledException))
         {
             await _botService.LogExceptionAsync(ex, DateTimeOffset.Now);
         }

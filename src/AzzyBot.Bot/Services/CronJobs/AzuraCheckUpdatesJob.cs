@@ -38,7 +38,7 @@ public sealed class AzuraCheckUpdatesJob(IAzuraCastUpdateService azuraUpdateServ
             IEnumerable<AzuraCastEntity> azuraCastsToCheck = azuraCasts.Where(static a => a.IsOnline && a.Checks.Updates);
             await Task.WhenAll(azuraCastsToCheck.Select(ac => _azuraUpdateService.CheckForAzuraCastUpdatesAsync(ac, forced: false)));
         }
-        catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
+        catch (Exception ex) when (ex is not (OperationCanceledException or TaskCanceledException))
         {
             await _botService.LogExceptionAsync(ex, DateTimeOffset.Now);
         }

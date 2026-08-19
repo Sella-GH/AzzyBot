@@ -44,7 +44,7 @@ public sealed class AzzyBotCheckPermissionsJob(IDbActions dbActions, IDiscordBot
 
             await _botService.CheckPermissionsAsync(guilds);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
+        catch (Exception ex) when (ex is not (OperationCanceledException or TaskCanceledException))
         {
             await _botService.LogExceptionAsync(ex, DateTimeOffset.Now);
         }

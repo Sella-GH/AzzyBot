@@ -69,7 +69,7 @@ public sealed class AzuraRequestJob(ILogger<AzuraRequestJob> logger, IAzuraCastA
                 _logger.BackgroundServiceSongRequestRequeued(queueItem.RequestId, station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
             }
         }
-        catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
+        catch (Exception ex) when (ex is not (OperationCanceledException or TaskCanceledException))
         {
             await _botService.LogExceptionAsync(ex, DateTimeOffset.Now);
         }
