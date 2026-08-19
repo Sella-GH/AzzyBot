@@ -34,7 +34,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
     private readonly Uri _latestApiUrl = new("https://api.github.com/repos/Sella-GH/AzzyBot/releases/latest");
     private readonly Uri _previewApiUrl = new("https://api.github.com/repos/Sella-GH/AzzyBot/releases");
 
-    private readonly Dictionary<string, string> _headers = new(1)
+    private readonly Dictionary<string, string> _headers = new(1, StringComparer.Ordinal)
     {
         ["User-Agent"] = SoftwareStats.GetAppName
     };

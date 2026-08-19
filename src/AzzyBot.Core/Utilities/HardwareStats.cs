@@ -110,7 +110,7 @@ public static class HardwareStats
     {
         string typeFolderPath = Path.Combine("/sys", "class", "thermal");
         if (!Directory.Exists(typeFolderPath))
-            return new Dictionary<string, double>();
+            return new Dictionary<string, double>(StringComparer.Ordinal);
 
         Dictionary<string, double> result = [];
         foreach (string folder in Directory.GetDirectories(typeFolderPath))
@@ -229,7 +229,7 @@ public static class HardwareStats
         await Task.Delay(delayInMs);
         Dictionary<string, AppNetworkStatsModel> currNetworkStats = await ReadNetworkStatsAsync();
 
-        Dictionary<string, AppNetworkSpeedModel> networkSpeeds = new(prevNetworkStats.Count);
+        Dictionary<string, AppNetworkSpeedModel> networkSpeeds = new(prevNetworkStats.Count, StringComparer.Ordinal);
         foreach (KeyValuePair<string, AppNetworkStatsModel> kvp in prevNetworkStats)
         {
             string networkName = kvp.Key;

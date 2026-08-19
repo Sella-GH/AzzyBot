@@ -51,7 +51,7 @@ public static class AzzyHelp
     private static Dictionary<string, List<AzzyHelpModel>> GetCommandGroups(IReadOnlyDictionary<string, Command> commands, bool adminServer, bool approvedDebug, DiscordMember member, bool singleCommand = false)
     {
         List<string> commandGroups = [.. commands.Where(c => c.Value.Subcommands.Count > 0 && CheckIfMemberHasPermission(adminServer, approvedDebug, member, c.Value.Name)).Select(static c => c.Value.Name)];
-        Dictionary<string, List<AzzyHelpModel>> groupedCommands = new(commands.Count);
+        Dictionary<string, List<AzzyHelpModel>> groupedCommands = new(commands.Count, StringComparer.Ordinal);
         foreach (string group in commandGroups)
         {
             Command command = commands[group];
@@ -87,7 +87,7 @@ public static class AzzyHelp
     {
         ArgumentNullException.ThrowIfNull(command);
 
-        Dictionary<string, string> parameters = new(command.Parameters.Count);
+        Dictionary<string, string> parameters = new(command.Parameters.Count, StringComparer.Ordinal);
         foreach (CommandParameter parameter in command.Parameters)
         {
             string paramName = parameter.Name ?? "No name provided";

@@ -34,12 +34,10 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
     public string FilePath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "AzuraCast", "Files");
 
     private static Dictionary<string, string> CreateHeader(string apiKey)
-    {
-        return new(1)
+        => new(1, StringComparer.Ordinal)
         {
             ["X-API-Key"] = apiKey
         };
-    }
 
     public async Task CheckForApiPermissionsAsync(AzuraCastEntity azuraCast)
     {

@@ -190,7 +190,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             string guild = $"{ctx.Guild?.Name} ({ctx.Guild?.Id})";
             string userMention = $"{ctx.User.GlobalName} ({ctx.User.Id})";
             string commandName = ctx.Command.FullName;
-            Dictionary<string, string> commandOptions = new(ctx.Command.Parameters.Count);
+            Dictionary<string, string> commandOptions = new(ctx.Command.Parameters.Count, StringComparer.Ordinal);
             ProcessOptions(ctx.Arguments, commandOptions);
 
             AzzyExceptionEmbedStruct values = new()

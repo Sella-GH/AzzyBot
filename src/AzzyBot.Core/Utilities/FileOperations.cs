@@ -114,7 +114,7 @@ public static class FileOperations
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
 
-        return (!latest) ? Directory.EnumerateFiles(path) : Directory.EnumerateFiles(path).OrderDescending();
+        return (!latest) ? Directory.EnumerateFiles(path) : Directory.EnumerateFiles(path).OrderDescending(StringComparer.Ordinal);
     }
 
     public static async Task WriteToFileAsync(string path, string content)
