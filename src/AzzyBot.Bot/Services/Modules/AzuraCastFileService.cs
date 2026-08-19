@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -41,14 +42,14 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
         AzuraStationModel? azuraStation = await _azuraCast.GetStationAsync(baseUrl, apiKey, station.StationId);
         if (azuraStation is null)
         {
-            await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station ID: {station.StationId}.\n{_azuraCast.AzuraCastPermissionsWiki}");
+            await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **station** endpoint on station ID: {station.StationId}.\n{_azuraCast.AzuraCastPermissionsWiki}"));
             return;
         }
 
         IEnumerable<AzuraFilesModel>? onlineFiles = await _azuraCast.GetFilesOnlineBasicAsync(baseUrl, apiKey, station.StationId);
         if (onlineFiles is null)
         {
-            await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station *{azuraStation.Name}* (ID: {station.StationId}).\n{_azuraCast.AzuraCastPermissionsWiki}");
+            await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **files** endpoint on station *{azuraStation.Name}* (ID: {station.StationId}).\n{_azuraCast.AzuraCastPermissionsWiki}"));
             return;
         }
 

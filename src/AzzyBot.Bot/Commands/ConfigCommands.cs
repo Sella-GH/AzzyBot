@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -234,7 +235,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            FileOperations.DeleteFiles(_azuraCastApi.FilePath, $"{ac.Id}-");
+            FileOperations.DeleteFiles(_azuraCastApi.FilePath, string.Create(CultureInfo.InvariantCulture, $"{ac.Id}-"));
             await _dbActions.DeleteAzuraCastAsync(context.Guild.Id);
 
             await context.EditResponseAsync(GeneralStrings.ConfigInstanceDeleted);
@@ -260,7 +261,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            FileOperations.DeleteFile(Path.Combine(_azuraCastApi.FilePath, $"{acStation.AzuraCast.GuildId}-{acStation.AzuraCastId}-{acStation.Id}-{acStation.StationId}-files.json"));
+            FileOperations.DeleteFile(Path.Combine(_azuraCastApi.FilePath, string.Create(CultureInfo.InvariantCulture, $"{acStation.AzuraCast.GuildId}-{acStation.AzuraCastId}-{acStation.Id}-{acStation.StationId}-files.json")));
             await _dbActions.DeleteAzuraCastStationAsync(station);
 
             await context.EditResponseAsync(GeneralStrings.ConfigStationDeleted);

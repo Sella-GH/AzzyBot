@@ -94,7 +94,7 @@ public sealed class AzuraCastCommands
             if (playlists is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{_azuraCastApi.AzuraCastPermissionsWiki}"));
                 return;
             }
 
@@ -104,7 +104,7 @@ public sealed class AzuraCastCommands
                 foreach (AzuraPlaylistModel playlist in playlists)
                 {
                     Uri playlistUrl = (string.Equals(format, "m3u", StringComparison.Ordinal)) ? playlist.Links.Export.M3U : playlist.Links.Export.PLS;
-                    string fileName = Path.Combine(tempDir, $"{ac.Id}-{acStation.Id}-{playlist.ShortName}.{format}");
+                    string fileName = Path.Combine(tempDir, string.Create(CultureInfo.InvariantCulture, $"{ac.Id}-{acStation.Id}-{playlist.ShortName}.{format}"));
                     filePaths.Add(fileName);
                     await _azuraCastApi.DownloadPlaylistAsync(playlistUrl, apiKey, fileName);
                 }
@@ -119,12 +119,12 @@ public sealed class AzuraCastCommands
                 }
 
                 Uri playlistUrl = (string.Equals(format, "m3u", StringComparison.Ordinal)) ? playlist.Links.Export.M3U : playlist.Links.Export.PLS;
-                string fileName = Path.Combine(tempDir, $"{ac.Id}-{acStation.Id}-{playlist.ShortName}.{format}");
+                string fileName = Path.Combine(tempDir, string.Create(CultureInfo.InvariantCulture, $"{ac.Id}-{acStation.Id}-{playlist.ShortName}.{format}"));
                 filePaths.Add(fileName);
                 await _azuraCastApi.DownloadPlaylistAsync(playlistUrl, apiKey, fileName);
             }
 
-            string zFileName = $"{ac.Id}-{acStation.Id}-{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss}_{((filePaths.Count > 1) ? "Playlists" : "Playlist")}_{format}.zip";
+            string zFileName = string.Create(CultureInfo.InvariantCulture, $"{ac.Id}-{acStation.Id}-{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss}_{((filePaths.Count > 1) ? "Playlists" : "Playlist")}_{format}.zip");
             await FileOperations.CreateZipFileAsync(zFileName, _azuraCastApi.FilePath, tempDir);
             filePaths.Add(Path.Combine(_azuraCastApi.FilePath, zFileName));
 
@@ -134,7 +134,7 @@ public sealed class AzuraCastCommands
             if (azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station {station}.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **station** endpoint on station {station}.\n{_azuraCastApi.AzuraCastPermissionsWiki}"));
                 return;
             }
 
@@ -296,7 +296,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            string fileName = $"{ac.Id}_{logName}_{DateTimeOffset.Now:yyyy-MM-dd_hh-mm-ss-fffffff}.log";
+            string fileName = string.Create(CultureInfo.InvariantCulture, $"{ac.Id}_{logName}_{DateTimeOffset.Now:yyyy-MM-dd_hh-mm-ss-fffffff}.log");
             string filePath = await FileOperations.CreateTempFileAsync(systemLog.Content, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             DiscordMessageBuilder builder = new()
@@ -347,7 +347,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            string fileName = $"{ac.Id}-{acStation.Id}-{acStation.StationId}_{logName}_{DateTimeOffset.Now:yyyy-MM-dd_hh-mm-ss-fffffff}.log";
+            string fileName = string.Create(CultureInfo.InvariantCulture, $"{ac.Id}-{acStation.Id}-{acStation.StationId}_{logName}_{DateTimeOffset.Now:yyyy-MM-dd_hh-mm-ss-fffffff}.log");
             string filePath = await FileOperations.CreateTempFileAsync(stationLog.Content, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             DiscordMessageBuilder builder = new()
@@ -429,7 +429,7 @@ public sealed class AzuraCastCommands
             if (azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{_azuraCastApi.AzuraCastPermissionsWiki}"));
                 return;
             }
 
@@ -532,7 +532,7 @@ public sealed class AzuraCastCommands
             if (azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{_azuraCastApi.AzuraCastPermissionsWiki}"));
                 return;
             }
 
@@ -598,7 +598,7 @@ public sealed class AzuraCastCommands
             if (stationConfig is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{_azuraCastApi.AzuraCastPermissionsWiki}"));
                 return;
             }
 
@@ -713,7 +713,7 @@ public sealed class AzuraCastCommands
             if (stationConfig is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}"));
                 return;
             }
 
@@ -727,7 +727,7 @@ public sealed class AzuraCastCommands
             if (songs is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **files** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}"));
                 return;
             }
 
@@ -792,7 +792,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            await context.EditResponseAsync($"I deleted the song request with the id **{requestId}**.");
+            await context.EditResponseAsync(string.Create(CultureInfo.InvariantCulture, $"I deleted the song request with the id **{requestId}**."));
         }
 
         [Command("skip-song"), Description("Skips the current song of the selected station."), AzuraCastDiscordPermCheck([AzuraCastDiscordPerm.StationDJGroup, AzuraCastDiscordPerm.StationAdminGroup, AzuraCastDiscordPerm.InstanceAdminGroup])]
@@ -887,7 +887,7 @@ public sealed class AzuraCastCommands
             if (azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **station** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}"));
                 return;
             }
 
@@ -895,7 +895,7 @@ public sealed class AzuraCastCommands
             if (states is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}"));
                 return;
             }
 
@@ -969,7 +969,7 @@ public sealed class AzuraCastCommands
             if (history is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **reports** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **reports** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}"));
                 return;
             }
 
@@ -983,7 +983,7 @@ public sealed class AzuraCastCommands
             if (azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **station** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}"));
                 return;
             }
 
@@ -1002,7 +1002,7 @@ public sealed class AzuraCastCommands
                 })
                 .Reverse()];
 
-            string fileName = $"{ac.GuildId}-{ac.Id}-{acStation.Id}-{acStation.StationId}_SongHistory_{dateStringFile}.csv";
+            string fileName = string.Create(CultureInfo.InvariantCulture, $"{ac.GuildId}-{ac.Id}-{acStation.Id}-{acStation.StationId}_SongHistory_{dateStringFile}.csv");
             string filePath = FileOperations.CreateCsvFile(exportHistory, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             DiscordMessageBuilder builder = new();
@@ -1052,7 +1052,7 @@ public sealed class AzuraCastCommands
                 if (playlist is null)
                 {
                     await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                    await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
+                    await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}"));
                     return;
                 }
             }
@@ -1066,7 +1066,7 @@ public sealed class AzuraCastCommands
             if (songs is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}"));
                 return;
             }
 
@@ -1076,7 +1076,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            string fileName = $"{ac.GuildId}-{ac.Id}-{acStation.Id}-{acStation.StationId}_PlaylistSongs_{playlist.ShortName}.csv";
+            string fileName = string.Create(CultureInfo.InvariantCulture, $"{ac.GuildId}-{ac.Id}-{acStation.Id}-{acStation.StationId}_PlaylistSongs_{playlist.ShortName}.csv");
             string filePath = FileOperations.CreateCsvFile(songs, fileName);
             await using FileStream fileStream = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             DiscordMessageBuilder builder = new();
@@ -1137,7 +1137,7 @@ public sealed class AzuraCastCommands
                 if (playlist is null)
                 {
                     await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                    await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
+                    await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **playlists** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}"));
                     return;
                 }
 
@@ -1162,7 +1162,7 @@ public sealed class AzuraCastCommands
             string artId = artUri[artPos..];
 
             // Create and then replace the file path, because we don't know if it's only .jpg or else
-            string filePath = Path.Combine(Path.GetTempPath(), $"{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{ac.GuildId}-{ac.Id}-{acStation.Id}_{artId}");
+            string filePath = Path.Combine(Path.GetTempPath(), string.Create(CultureInfo.InvariantCulture, $"{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{ac.GuildId}-{ac.Id}-{acStation.Id}_{artId}"));
             filePath = await _azuraCast.DownloadSongArtworkAsync(new(artUri), apiKey, filePath);
 
             // Get the file type from the path
@@ -1220,7 +1220,7 @@ public sealed class AzuraCastCommands
             if (stationConfig is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **administrative station** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}"));
                 return;
             }
 
@@ -1277,7 +1277,7 @@ public sealed class AzuraCastCommands
                 if (requestsPlayed is null)
                 {
                     await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                    await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **reports** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
+                    await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **reports** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}"));
                     return;
                 }
 
@@ -1290,7 +1290,7 @@ public sealed class AzuraCastCommands
             if (stationQueue is null || requestsPending is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **queue** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **queue** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}"));
                 return;
             }
 
@@ -1304,7 +1304,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            DiscordButtonComponent button = new(DiscordButtonStyle.Success, $"request_song_{context.User.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Request Song");
+            DiscordButtonComponent button = new(DiscordButtonStyle.Success, string.Create(CultureInfo.InvariantCulture, $"request_song_{context.User.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}"), "Request Song");
             DiscordMessageBuilder builder = new();
             builder.AddEmbed(embed);
             builder.AddActionRowComponent(button);
@@ -1379,7 +1379,7 @@ public sealed class AzuraCastCommands
             string apiKey = (!string.IsNullOrEmpty(acStation.ApiKey)) ? Crypto.Decrypt(acStation.ApiKey) : Crypto.Decrypt(ac.AdminApiKey);
             Uri baseUrl = new(Crypto.Decrypt(ac.BaseUrl));
 
-            string filePath = Path.Combine(Path.GetTempPath(), $"{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{ac.GuildId}-{ac.Id}-{acStation.Id}_{file.FileName}");
+            string filePath = Path.Combine(Path.GetTempPath(), string.Create(CultureInfo.InvariantCulture, $"{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}_{ac.GuildId}-{ac.Id}-{acStation.Id}_{file.FileName}"));
             await _webRequest.DownloadAsync(new(file.Url), filePath);
 
             AzuraFileComplianceModel compliance = await AzuraFileChecker.FileIsCompliantAsync(filePath);
@@ -1405,11 +1405,11 @@ public sealed class AzuraCastCommands
             if (uploadedFile is null || azuraStation is null)
             {
                 await context.EditResponseAsync(GeneralStrings.PermissionIssue);
-                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(ac.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **files** endpoint on station {station}.\n{_azuraCast.AzuraCastPermissionsWiki}"));
                 return;
             }
 
-            string artUrl = $"{baseUrl}/api/{AzuraApiEndpoints.Station}/{acStation.StationId}/{AzuraApiEndpoints.Art}/{uploadedFile.UniqueId}";
+            string artUrl = string.Create(CultureInfo.InvariantCulture, $"{baseUrl}/api/{AzuraApiEndpoints.Station}/{acStation.StationId}/{AzuraApiEndpoints.Art}/{uploadedFile.UniqueId}");
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastUploadFileEmbed(uploadedFile, file.FileSize, azuraStation.Name, artUrl);
 
             await context.EditResponseAsync(embed);

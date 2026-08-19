@@ -207,7 +207,7 @@ public sealed class DebugCommands
                 return;
             }
 
-            string fileName = $"WebRequestDebug_{DateTime.UtcNow:yyyy-MM-dd_HH-mm-ss-fffffff}.txt";
+            string fileName = string.Create(CultureInfo.InvariantCulture, $"WebRequestDebug_{DateTime.UtcNow:yyyy-MM-dd_HH-mm-ss-fffffff}.txt");
             string filePath = await FileOperations.CreateTempFileAsync(req.Content, fileName);
             await using FileStream fs = new(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
             DiscordInteractionResponseBuilder builder = new();

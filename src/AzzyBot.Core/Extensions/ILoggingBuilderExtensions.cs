@@ -35,7 +35,7 @@ public static class ILoggingBuilderExtensions
                 c.FormatLogFileName = _ => string.Format(CultureInfo.InvariantCulture, logPath, DateTimeOffset.Now);
                 c.FormatLogEntry = (message) =>
                 {
-                    string logMessage = $"[{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss}] {message.LogLevel}: {message.LogName}[{message.EventId.Id}] {message.Message}";
+                    string logMessage = string.Create(CultureInfo.InvariantCulture, $"[{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss}] {message.LogLevel}: {message.LogName}[{message.EventId.Id}] {message.Message}");
                     if (message.Exception is not null)
                         logMessage += Environment.NewLine + message.Exception;
 

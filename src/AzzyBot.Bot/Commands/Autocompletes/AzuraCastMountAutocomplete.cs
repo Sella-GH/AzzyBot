@@ -61,7 +61,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
             stationModel = await _azuraCast.GetStationAsync(baseUrl, apiKey, stationId);
             if (stationModel is null)
             {
-                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({stationId}) endpoint.\n{_azuraCast.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **station** ({stationId}) endpoint.\n{_azuraCast.AzuraCastPermissionsWiki}"));
                 return [];
             }
         }

@@ -154,12 +154,12 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
         else if (perm is AzuraCastDiscordPerm.StationAdminGroup)
         {
             _logger.AzuraCastDiscordPermission(nameof(AzuraCastDiscordPerm.StationAdminGroup));
-            return $"Station:{station.StationId}";
+            return string.Create(CultureInfo.InvariantCulture, $"Station:{station.StationId}");
         }
         else if (perm is AzuraCastDiscordPerm.StationDJGroup)
         {
             _logger.AzuraCastDiscordPermission(nameof(AzuraCastDiscordPerm.StationDJGroup));
-            return $"DJ:{station.StationId}";
+            return string.Create(CultureInfo.InvariantCulture, $"DJ:{station.StationId}");
         }
 
         _logger.AzuraCastDiscordPermission("Invalid permission!");

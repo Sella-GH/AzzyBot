@@ -64,7 +64,7 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
             playlists = await _azuraCast.GetPlaylistsAsync(baseUrl, apiKey, stationId);
             if (playlists is null)
             {
-                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station ({stationId}).\n{_azuraCast.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **playlists** endpoint on station ({stationId}).\n{_azuraCast.AzuraCastPermissionsWiki}"));
                 return [];
             }
         }

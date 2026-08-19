@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -65,7 +66,7 @@ public sealed class AzuraCastStationsInDbAutocomplete(ILogger<AzuraCastStationsI
                 azuraStation = await _azuraCast.GetStationAsync(baseUrl, stationApiKey, station.StationId);
                 if (azuraStation is null)
                 {
-                    await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** (ID: {station.StationId}) endpoint.\n{_azuraCast.AzuraCastPermissionsWiki}");
+                    await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **station** (ID: {station.StationId}) endpoint.\n{_azuraCast.AzuraCastPermissionsWiki}"));
                     return results;
                 }
             }

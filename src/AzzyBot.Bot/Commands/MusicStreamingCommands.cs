@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -68,7 +69,7 @@ public sealed class MusicStreamingCommands
             if (!await _musicStreaming.SetVolumeAsync(context, volume))
                 return;
 
-            string message = $"I set the volume to {volume}%.";
+            string message = string.Create(CultureInfo.InvariantCulture, $"I set the volume to {volume}%.");
             if (saveState is 1)
             {
                 MusicStreamingEntity? ms = await _dbActions.ReadMusicStreamingAsync(context.Guild.Id);
@@ -346,7 +347,7 @@ public sealed class MusicStreamingCommands
             if (!await _musicStreaming.ClearQueueAsync(context, songNumber))
                 return;
 
-            await context.EditResponseAsync((songNumber is -1) ? "The queue was cleared successfully." : $"I removed the song with the number **{songNumber}**.");
+            await context.EditResponseAsync((songNumber is -1) ? "The queue was cleared successfully." : string.Create(CultureInfo.InvariantCulture, $"I removed the song with the number **{songNumber}**."));
         }
 
         [Command("resume"), Description("Resume the paused player and play music again.")]

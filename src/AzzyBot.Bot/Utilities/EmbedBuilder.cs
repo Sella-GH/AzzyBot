@@ -107,7 +107,7 @@ public static class EmbedBuilder
         }
         else if (added is not 0)
         {
-            addedFiles = $"**{added}** files were added.";
+            addedFiles = string.Create(CultureInfo.InvariantCulture, $"**{added}** files were added.");
         }
 
         if (removed is 1)
@@ -116,7 +116,7 @@ public static class EmbedBuilder
         }
         else if (removed is not 0)
         {
-            removedFiles = $"**{removed}** files were removed.";
+            removedFiles = string.Create(CultureInfo.InvariantCulture, $"**{removed}** files were removed.");
         }
 
         Dictionary<string, AzzyDiscordEmbedModel> fields = new()
@@ -143,7 +143,7 @@ public static class EmbedBuilder
         int init = 5 + ((stats.Network.Count > 20) ? 20 : stats.Network.Count);
         Dictionary<string, AzzyDiscordEmbedModel> fields = new(init)
         {
-            { "Ping", new($"{stats.Ping} ms") }
+            { "Ping", new(string.Create(CultureInfo.InvariantCulture, $"{stats.Ping} ms")) }
         };
 
         cpuUsage.AppendLine(CultureInfo.InvariantCulture, $"IO-Wait: **{stats.Cpu.Total.IoWait}**%");
@@ -228,7 +228,7 @@ public static class EmbedBuilder
             DateTimeOffset streamingTime = DateTimeOffset.Now.AddTicks(-streamStart.Ticks);
 
             message = $"Currently served *live* by the one and only **{data.Live.StreamerName}**";
-            fields.Add("Streaming live since", new($"<t:{streamingTime.ToUnixTimeSeconds()}>"));
+            fields.Add("Streaming live since", new(string.Create(CultureInfo.InvariantCulture, $"<t:{streamingTime.ToUnixTimeSeconds()}>")));
         }
         else if (isIcecastLive)
         {
@@ -291,7 +291,8 @@ public static class EmbedBuilder
         const string title = "AzuraCast Updates Available";
         string updateDesc = (update.RollingUpdatesAvailable is 1) ? "update" : "updates";
         string description = (update.NeedsRollingUpdate)
-            ? $"Your AzuraCast installation needs **{update.RollingUpdatesAvailable}** {updateDesc}."
+            ? string.Create(CultureInfo.InvariantCulture, $"Your AzuraCast installation needs **{update.RollingUpdatesAvailable}** {updateDesc}."
+)
             : "A new release of AzuraCast is available. Update now to get the latest bug fixes, features and improvements!";
 
         Dictionary<string, AzzyDiscordEmbedModel> fields = new(3);
@@ -352,7 +353,7 @@ public static class EmbedBuilder
         if (!string.IsNullOrEmpty(file.Isrc))
             fields.Add("ISRC", new(file.Isrc));
 
-        fields.Add("File Size", new($"{Math.Round(fileSize / (1024.0 * 1024.0), 2, MidpointRounding.ToEven)} MB"));
+        fields.Add("File Size", new(string.Create(CultureInfo.InvariantCulture, $"{Math.Round(fileSize / (1024.0 * 1024.0), 2, MidpointRounding.ToEven)} MB")));
 
         return CreateBasicEmbed(title, description, DiscordColor.SpringGreen, thumbnailUrl: new(stationArt), fields: fields);
     }
@@ -402,7 +403,7 @@ public static class EmbedBuilder
             message.AppendLine(GeneralStrings.ReminderConfigFix);
         }
 
-        message.AppendLine(GeneralStrings.ReminderForceLeaveThreat.Replace("{%TIMEFRAME%}", $"<t:{timestamp}:R>", StringComparison.InvariantCulture));
+        message.AppendLine(GeneralStrings.ReminderForceLeaveThreat.Replace("{%TIMEFRAME%}", string.Create(CultureInfo.InvariantCulture, $"<t:{timestamp}:R>"), StringComparison.InvariantCulture));
 
         EmbedAuthorStruct author = new()
         {
@@ -430,12 +431,12 @@ public static class EmbedBuilder
 #else
             ["Dockerized?"] = new(Misc.GetReadableBool(value: false, ReadableBools.YesNo), isInline: true),
 #endif
-            ["System Uptime"] = new($"<t:{uptime}>", isInline: true),
-            ["Bot Memory"] = new($"{SoftwareStats.GetAppMemoryUsage()} GB", isInline: true)
+            ["System Uptime"] = new(string.Create(CultureInfo.InvariantCulture, $"<t:{uptime}>"), isInline: true),
+            ["Bot Memory"] = new(string.Create(CultureInfo.InvariantCulture, $"{SoftwareStats.GetAppMemoryUsage()} GB"), isInline: true)
         };
 
         if (ping is not 0)
-            fields.Add("Discord Ping", new($"{ping} ms", isInline: true));
+            fields.Add("Discord Ping", new(string.Create(CultureInfo.InvariantCulture, $"{ping} ms"), isInline: true));
 
         if (!HardwareStats.CheckIfLinuxOs)
             return CreateBasicEmbed(title, color: DiscordColor.Orange, thumbnailUrl: avaUrl?.OriginalString, footerText: notLinux, fields: fields);
@@ -479,19 +480,19 @@ public static class EmbedBuilder
 
         if (cpuLoads is not null)
         {
-            string cpuLoad = $"1-Min: **{cpuLoads.OneMin}**\n5-Min: **{cpuLoads.FiveMin}**\n15-Min: **{cpuLoads.FifteenMin}**";
+            string cpuLoad = string.Create(CultureInfo.InvariantCulture, $"1-Min: **{cpuLoads.OneMin}**\n5-Min: **{cpuLoads.FiveMin}**\n15-Min: **{cpuLoads.FifteenMin}**");
             fields.Add("CPU Load", new(cpuLoad, isInline: true));
         }
 
         if (memory is not null)
         {
-            string memoryUsage = $"Total: **{memory.Total} GB**\nUsed: **{memory.Used} GB**\nFree: **{Math.Round(memory.Total - memory.Used, 2, MidpointRounding.ToEven)} GB**";
+            string memoryUsage = string.Create(CultureInfo.InvariantCulture, $"Total: **{memory.Total} GB**\nUsed: **{memory.Used} GB**\nFree: **{Math.Round(memory.Total - memory.Used, 2, MidpointRounding.ToEven)} GB**");
             fields.Add("Memory Usage", new(memoryUsage, isInline: true));
         }
 
         if (disk is not null)
         {
-            string diskUsage = $"Total: **{disk.TotalSize} GB**\nUsed: **{disk.TotalUsedSpace} GB**\nFree: **{disk.TotalFreeSpace} GB**";
+            string diskUsage = string.Create(CultureInfo.InvariantCulture, $"Total: **{disk.TotalSize} GB**\nUsed: **{disk.TotalUsedSpace} GB**\nFree: **{disk.TotalFreeSpace} GB**");
             fields.Add("Disk Usage", new(diskUsage, isInline: true));
         }
 
@@ -502,7 +503,7 @@ public static class EmbedBuilder
                 if (fields.Count is 25)
                     break;
 
-                fields.Add($"Interface: {kvp.Key}", new($"Received: **{kvp.Value.Received} KB**\nTransmitted: **{kvp.Value.Transmitted} KB**", isInline: true));
+                fields.Add($"Interface: {kvp.Key}", new(string.Create(CultureInfo.InvariantCulture, $"Received: **{kvp.Value.Received} KB**\nTransmitted: **{kvp.Value.Transmitted} KB**"), isInline: true));
             }
         }
 
@@ -554,7 +555,7 @@ public static class EmbedBuilder
     {
         const string title = "AzzyBot Informational Stats";
         string[] authors = SoftwareStats.GetAppAuthors.Split(',');
-        string sourceCode = $"{loc} lines";
+        string sourceCode = string.Create(CultureInfo.InvariantCulture, $"{loc} lines");
         string formattedAuthors = $"- [{authors[0].Trim()}]({UriStrings.GitHubCreatorUri})\n- [{authors[1].Trim()}]({UriStrings.GitHubRepoContribUri})";
         string formattedCommit = $"[{commit}]({UriStrings.GitHubRepoCommitUri}/{commit})";
 
@@ -572,9 +573,9 @@ public static class EmbedBuilder
             [".NET Version"] = new(SoftwareStats.GetAppDotNetVersion, isInline: true),
             ["D#+ Version"] = new(dspVersion, isInline: true),
             ["Source Code"] = new(sourceCode, isInline: true),
-            ["Compilation Date"] = new($"<t:{compileDate.ToLocalTime().ToUnixTimeSeconds()}>", isInline: true),
+            ["Compilation Date"] = new(string.Create(CultureInfo.InvariantCulture, $"<t:{compileDate.ToLocalTime().ToUnixTimeSeconds()}>"), isInline: true),
             ["AzzyBot GitHub Commit"] = new(formattedCommit),
-            ["Uptime"] = new($"<t:{SoftwareStats.GetAppUptime().ToLocalTime().ToUnixTimeSeconds()}>"),
+            ["Uptime"] = new(string.Create(CultureInfo.InvariantCulture, $"<t:{SoftwareStats.GetAppUptime().ToLocalTime().ToUnixTimeSeconds()}>")),
             ["License"] = new($"[AGPL-3.0]({UriStrings.GitHubRepoLicenseUrl})", isInline: true),
             ["Terms Of Service"] = new($"[Terms Of Service]({UriStrings.GitHubRepoTosUrl})", isInline: true),
             ["Privacy Policy"] = new($"[Privacy Policy]({UriStrings.GitHubRepoPrivacyPolicyUrl})", isInline: true)
@@ -593,7 +594,7 @@ public static class EmbedBuilder
 
         Dictionary<string, AzzyDiscordEmbedModel> fields = new(3)
         {
-            ["Release Date"] = new($"<t:{updateDate.ToLocalTime().ToUnixTimeSeconds()}>"),
+            ["Release Date"] = new(string.Create(CultureInfo.InvariantCulture, $"<t:{updateDate.ToLocalTime().ToUnixTimeSeconds()}>")),
             ["Your Version"] = new(yourVersion),
             ["New Version"] = new(version)
         };
@@ -730,7 +731,7 @@ public static class EmbedBuilder
         Dictionary<string, AzzyDiscordEmbedModel> fields = new(4)
         {
             ["Guild ID"] = new(guild.Id.ToString(CultureInfo.InvariantCulture)),
-            ["Creation Date"] = new($"<t:{guild.CreationTimestamp.ToUnixTimeSeconds()}>"),
+            ["Creation Date"] = new(string.Create(CultureInfo.InvariantCulture, $"<t:{guild.CreationTimestamp.ToUnixTimeSeconds()}>")),
             ["Owner"] = new($"{owner.DisplayName} ({owner.Id})", isInline: true),
             ["Members"] = new(guild.MemberCount.ToString(CultureInfo.InvariantCulture), isInline: true)
         };
@@ -749,7 +750,7 @@ public static class EmbedBuilder
         if (guild is not null)
         {
             fields.Add("Guild ID", new(guild.Id.ToString(CultureInfo.InvariantCulture)));
-            fields.Add("Removal Date", new($"<t:{DateTimeOffset.Now.ToUnixTimeSeconds()}>"));
+            fields.Add("Removal Date", new(string.Create(CultureInfo.InvariantCulture, $"<t:{DateTimeOffset.Now.ToUnixTimeSeconds()}>")));
             fields.Add("Owner", new(guild.OwnerId.ToString(CultureInfo.InvariantCulture)));
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,7 +30,7 @@ public sealed class AzzyViewLogsAutocomplete : IAutoCompleteProvider
                 continue;
 
             FileInfo fileInfo = new(file);
-            results.Add(new($"{fileInfo.Name} ({Math.Round(fileInfo.Length / (1024.0 * 1024.0), 2, MidpointRounding.ToEven)} MB)", file));
+            results.Add(new(string.Create(CultureInfo.InvariantCulture, $"{fileInfo.Name} ({Math.Round(fileInfo.Length / (1024.0 * 1024.0), 2, MidpointRounding.ToEven)} MB)"), file));
         }
 
         return results.AsEnumerable();
