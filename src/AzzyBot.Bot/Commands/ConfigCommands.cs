@@ -644,13 +644,17 @@ public sealed class ConfigCommands
                         catch (InvalidOperationException)
                         {
                             // This can happen when the permissions are not sufficient to access the station
-                            await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I can't access the **station** ({station.StationId}) endpoint.\n{_azuraCastApi.AzuraCastPermissionsWiki} Maybe also check if the API key is valid.");
+                            string resMessage = string.Create(CultureInfo.InvariantCulture, $"I can't access the **station** ({station.StationId}) endpoint.\n{_azuraCastApi.AzuraCastPermissionsWiki} Maybe also check if the API key is valid.");
+                            await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, resMessage);
                             continue;
                         }
 
                         string stationName = stationModel?.Name ?? "Station unaccessible.";
                         if (stationModel is null)
-                            await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
+                        {
+                            string resMessage = string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **station** ({station.StationId}) endpoint.\n{_azuraCastApi.AzuraCastPermissionsWiki}");
+                            await _botService.SendMessageAsync(guild.AzuraCast.Preferences.NotificationChannelId, resMessage);
+                        }
 
                         stationNames.Add(station.Id, stationName);
 
@@ -677,7 +681,7 @@ public sealed class ConfigCommands
 
             _logger.CommandRequested(nameof(ResetSettingsAsync), context.User.Username);
 
-            DiscordButtonComponent button = new(DiscordButtonStyle.Danger, $"reset_settings_{context.User.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Confirm reset.");
+            DiscordButtonComponent button = new(DiscordButtonStyle.Danger, string.Create(CultureInfo.InvariantCulture, $"reset_settings_{context.User.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}"), "Confirm reset.");
             DiscordMessageBuilder messageBuilder = new();
             messageBuilder.AddActionRowComponent(button);
             messageBuilder.WithContent("Are you sure you want to reset all of your settings?");
@@ -727,7 +731,7 @@ public sealed class ConfigCommands
                 return;
             }
 
-            DiscordButtonComponent button = new(DiscordButtonStyle.Success, $"accept_legals_{context.Guild.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}", "Accept Legals.");
+            DiscordButtonComponent button = new(DiscordButtonStyle.Success, string.Create(CultureInfo.InvariantCulture, $"accept_legals_{context.Guild.Id}_{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}"), "Accept Legals.");
             DiscordMessageBuilder messageBuilder = new();
             messageBuilder.AddActionRowComponent(button);
             string content = GeneralStrings.LegalsInformation

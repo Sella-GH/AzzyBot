@@ -75,8 +75,8 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
 
         _logger.BackgroundServiceStationFilesChanged(station.AzuraCast.GuildId, station.AzuraCastId, station.Id, station.StationId);
 
-        string addedFileName = Path.Combine(_azuraCast.FilePath, $"{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}-{station.AzuraCast.GuildId}-{station.AzuraCastId}-{station.Id}-{station.StationId}-added.txt");
-        string removedFileName = Path.Combine(_azuraCast.FilePath, $"{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}-{station.AzuraCast.GuildId}-{station.AzuraCastId}-{station.Id}-{station.StationId}-removed.txt");
+        string addedFileName = Path.Combine(_azuraCast.FilePath, string.Create(CultureInfo.InvariantCulture, $"{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}-{station.AzuraCast.GuildId}-{station.AzuraCastId}-{station.Id}-{station.StationId}-added.txt"));
+        string removedFileName = Path.Combine(_azuraCast.FilePath, string.Create(CultureInfo.InvariantCulture, $"{DateTimeOffset.Now:yyyy-MM-dd_HH-mm-ss-fffffff}-{station.AzuraCast.GuildId}-{station.AzuraCastId}-{station.Id}-{station.StationId}-removed.txt"));
         StringBuilder added = new();
         StringBuilder removed = new();
         List<string> paths = new(addedFiles.Count + removedFiles.Count);
@@ -99,7 +99,7 @@ public sealed class AzuraCastFileService(ILogger<AzuraCastFileService> logger, I
             paths.Add(removedFileName);
         }
 
-        await FileOperations.WriteToFileAsync(Path.Combine(_azuraCast.FilePath, $"{station.AzuraCast.GuildId}-{station.AzuraCastId}-{station.Id}-{station.StationId}-files.json"), JsonSerializer.Serialize(onlineFiles, JsonSourceGen.Default.IEnumerableAzuraFilesModel));
+        await FileOperations.WriteToFileAsync(Path.Combine(_azuraCast.FilePath, string.Create(CultureInfo.InvariantCulture, $"{station.AzuraCast.GuildId}-{station.AzuraCastId}-{station.Id}-{station.StationId}-files.json")), JsonSerializer.Serialize(onlineFiles, JsonSourceGen.Default.IEnumerableAzuraFilesModel));
         DiscordEmbed embed = EmbedBuilder.BuildAzuraCastFileChangesEmbed(stationName, addedFiles.Count, removedFiles.Count);
         await _botService.SendMessageAsync(channelId, $"Changes in the files of station **{stationName}** detected. Check the details below.", [embed], paths);
     }

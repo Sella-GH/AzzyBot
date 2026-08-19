@@ -401,7 +401,8 @@ public sealed class MusicStreamingCommands
             if (!await _musicStreaming.SkipSongAsync(context, count))
                 return;
 
-            await context.EditResponseAsync($"I skipped **{count}** {((count is 1) ? "song" : "songs")}.");
+            string textRes = string.Create(CultureInfo.InvariantCulture, $"I skipped **{count}** {((count is 1) ? "song" : "songs")}.");
+            await context.EditResponseAsync(textRes);
         }
 
         [Command("stop"), Description("Stop the music.")]
