@@ -748,7 +748,7 @@ dotnet_diagnostic.rcs1172.severity = warning
 dotnet_diagnostic.rcs1173.severity = warning
 
 ## Remove redundant async/await
-dotnet_diagnostic.rcs1174.severity = warning
+dotnet_diagnostic.rcs1174.severity = none
 
 ## Unused 'this' parameter
 dotnet_diagnostic.rcs1175.severity = warning
@@ -1084,7 +1084,7 @@ dotnet_diagnostic.MA0007.severity = none
 dotnet_diagnostic.MA0015.severity = none
 
 ## MA0032: Use an overload with a CancellationToken
-#dotnet_diagnostic.MA0032.severity = none
+dotnet_diagnostic.MA0032.severity = none
 
 ## MA0038: Make method static (deprecated, use CA1822 instead)
 dotnet_diagnostic.MA0038.severity = none
@@ -1099,13 +1099,13 @@ dotnet_diagnostic.MA0048.severity = none
 dotnet_diagnostic.MA0051.severity = none
 
 ## MA0136: Raw String contains an implicit end of line character
-#dotnet_diagnostic.MA0136.severity = none
+dotnet_diagnostic.MA0136.severity = none
 
 ## MA0155: Do not use async void methods
-#dotnet_diagnostic.MA0155.severity = none
+dotnet_diagnostic.MA0155.severity = none
 
 ## MA0157: Do not use 'Async' suffix when a method returns IAsyncEnumerable<T>
-#dotnet_diagnostic.MA0157.severity = none
+dotnet_diagnostic.MA0157.severity = none
 
 ## MA0167: Use an overload with a TimeProvider argument
 ### We won't ever have an own TimeProvider to use it!
@@ -1116,6 +1116,9 @@ dotnet_diagnostic.MA0175.severity = none
 
 ## MA0177: Use single-line XML comment syntax when possible
 dotnet_diagnostic.MA0177.severity = none
+
+## MA0215: Return the task instead of awaiting it
+dotnet_diagnostic.MA0215.severity = none
 
 # Json files
 [*.{json,JSON}]
