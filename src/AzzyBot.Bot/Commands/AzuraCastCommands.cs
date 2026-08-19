@@ -731,7 +731,7 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            AzuraFilesModel? songData = songs.FirstOrDefault(s => s.SongId == song);
+            AzuraFilesModel? songData = songs.FirstOrDefault(s => string.Equals(s.SongId, song, StringComparison.OrdinalIgnoreCase));
             if (songData is null)
             {
                 await context.EditResponseAsync(GeneralStrings.SongRequestNotFound);
@@ -1141,7 +1141,7 @@ public sealed class AzuraCastCommands
                     return;
                 }
 
-                playlistName = playlist.Where(p => p.Name == nowPlaying.NowPlaying.Playlist).Select(static p => p.Name).FirstOrDefault();
+                playlistName = playlist.Where(p => string.Equals(p.Name, nowPlaying.NowPlaying.Playlist, StringComparison.OrdinalIgnoreCase)).Select(static p => p.Name).FirstOrDefault();
             }
 
             DiscordMessageBuilder builder = new();
@@ -1282,7 +1282,7 @@ public sealed class AzuraCastCommands
                 }
 
                 long threshold = DateTimeOffset.UtcNow.AddMinutes(-stationConfig.RequestThreshold).ToUnixTimeSeconds();
-                isPlayed = requestsPlayed.Any(r => (r.Track.SongId == songRequest.Song.SongId || r.Track.UniqueId == songRequest.Song.UniqueId) && r.Timestamp.ToUnixTimeSeconds() >= threshold);
+                isPlayed = requestsPlayed.Any(r => (string.Equals(r.Track.SongId, songRequest.Song.SongId, StringComparison.OrdinalIgnoreCase) || string.Equals(r.Track.UniqueId, songRequest.Song.UniqueId, StringComparison.OrdinalIgnoreCase)) && r.Timestamp.ToUnixTimeSeconds() >= threshold);
             }
 
             IEnumerable<AzuraStationQueueItemDetailedModel>? stationQueue = await _azuraCast.GetStationQueueAsync(baseUrl, apiKey, station);
@@ -1294,8 +1294,8 @@ public sealed class AzuraCastCommands
                 return;
             }
 
-            isQueued = stationQueue.Any(q => q.Song.SongId == songRequest.Song.SongId && q.Song.UniqueId == songRequest.Song.UniqueId);
-            isRequested = requestsPending.Any(r => r.Track.SongId == songRequest.Song.SongId && r.Track.UniqueId == songRequest.RequestId); // Need to use RequestId because those are the same... dunno why
+            isQueued = stationQueue.Any(q => string.Equals(q.Song.SongId, songRequest.Song.SongId, StringComparison.OrdinalIgnoreCase) && string.Equals(q.Song.UniqueId, songRequest.Song.UniqueId, StringComparison.OrdinalIgnoreCase));
+            isRequested = requestsPending.Any(r => string.Equals(r.Track.SongId, songRequest.Song.SongId, StringComparison.OrdinalIgnoreCase) && string.Equals(r.Track.UniqueId, songRequest.RequestId, StringComparison.OrdinalIgnoreCase)); // Need to use RequestId because those are the same... dunno why
 
             DiscordEmbed embed = EmbedBuilder.BuildAzuraCastMusicSearchSongEmbed(songRequest, isQueued || isRequested, isPlayed);
             if (!stationConfig.IsEnabled || !stationConfig.EnableRequests || isQueued || isRequested || isPlayed)

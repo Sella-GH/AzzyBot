@@ -464,10 +464,10 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         IEnumerable<AzuraRequestModel>? songs = await GetRequestableSongsAsync(baseUrl, apiKey, stationId);
 
         return songs?.FirstOrDefault(s =>
-            (songId is null || s.Song.SongId == songId) &&
-            (name is null || s.Song.Title == name) &&
-            (artist is null || s.Song.Artist == artist) &&
-            (album is null || s.Song.Album == album)
+            (songId is null || string.Equals(s.Song.SongId, songId, StringComparison.OrdinalIgnoreCase)) &&
+            (name is null || string.Equals(s.Song.Title, name, StringComparison.OrdinalIgnoreCase)) &&
+            (artist is null || string.Equals(s.Song.Artist, artist, StringComparison.OrdinalIgnoreCase)) &&
+            (album is null || string.Equals(s.Song.Album, album, StringComparison.OrdinalIgnoreCase))
             );
     }
 
@@ -513,11 +513,11 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
             return null;
 
         AzuraFilesModel? song = songs.FirstOrDefault(s =>
-            (uniqueId is null || s.UniqueId == uniqueId) &&
-            (songId is null || s.SongId == songId) &&
-            (name is null || s.Title == name) &&
-            (artist is null || s.Artist == artist) &&
-            (album is null || s.Album == album)
+            (uniqueId is null || string.Equals(s.UniqueId, uniqueId, StringComparison.OrdinalIgnoreCase)) &&
+            (songId is null || string.Equals(s.SongId, songId, StringComparison.OrdinalIgnoreCase)) &&
+            (name is null || string.Equals(s.Title, name, StringComparison.OrdinalIgnoreCase)) &&
+            (artist is null || string.Equals(s.Artist, artist, StringComparison.OrdinalIgnoreCase)) &&
+            (album is null || string.Equals(s.Album, album, StringComparison.OrdinalIgnoreCase))
             ) ??
             throw new InvalidOperationException($"Song {name} not found.");
 

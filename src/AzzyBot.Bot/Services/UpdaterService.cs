@@ -67,7 +67,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
         await _dbActions.UpdateAzzyBotAsync(updateLastUpdateCheck: true);
 
         string onlineVersion = updaterModel.Name;
-        if (localVersion == onlineVersion)
+        if (string.Equals(localVersion, onlineVersion, StringComparison.OrdinalIgnoreCase))
             return;
 
         if (!DateTimeOffset.TryParse(updaterModel.CreatedAt, CultureInfo.CurrentCulture, out DateTimeOffset releaseDate))
@@ -78,7 +78,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
 
     private async Task SendUpdateMessageAsync(string updateVersion, DateTimeOffset releaseDate, string changelog)
     {
-        if (_lastOnlineVersion != updateVersion)
+        if (!string.Equals(_lastOnlineVersion, updateVersion, StringComparison.OrdinalIgnoreCase))
         {
             _lastAzzyUpdateNotificationTime = DateTimeOffset.MinValue;
             _azzyNotifyCounter = 0;

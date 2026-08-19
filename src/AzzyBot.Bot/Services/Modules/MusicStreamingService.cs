@@ -158,10 +158,10 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         return status switch
         {
             PlayerRetrieveStatus.BotNotConnected => "I'm not connected to a voice channel.",
-            PlayerRetrieveStatus.PreconditionFailed when precondition == PlayerPrecondition.NotPaused.ToString() => "I'm not paused.",
-            PlayerRetrieveStatus.PreconditionFailed when precondition == PlayerPrecondition.NotPlaying.ToString() => "I'm not playing music.",
-            PlayerRetrieveStatus.PreconditionFailed when precondition == PlayerPrecondition.Paused.ToString() => "I'm already paused.",
-            PlayerRetrieveStatus.PreconditionFailed when precondition == PlayerPrecondition.Playing.ToString() => "I'm already playing music.",
+            PlayerRetrieveStatus.PreconditionFailed when string.Equals(precondition, PlayerPrecondition.NotPaused.ToString(), StringComparison.Ordinal) => "I'm not paused.",
+            PlayerRetrieveStatus.PreconditionFailed when string.Equals(precondition, PlayerPrecondition.NotPlaying.ToString(), StringComparison.Ordinal) => "I'm not playing music.",
+            PlayerRetrieveStatus.PreconditionFailed when string.Equals(precondition, PlayerPrecondition.Paused.ToString(), StringComparison.Ordinal) => "I'm already paused.",
+            PlayerRetrieveStatus.PreconditionFailed when string.Equals(precondition, PlayerPrecondition.Playing.ToString(), StringComparison.Ordinal) => "I'm already playing music.",
             _ => "An unknown error occurred while trying to retrieve the player."
         };
     }

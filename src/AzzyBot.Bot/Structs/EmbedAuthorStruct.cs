@@ -16,9 +16,9 @@ public readonly struct EmbedAuthorStruct : IEquatable<EmbedAuthorStruct>
         => obj is EmbedAuthorStruct other && Equals(other);
 
     public bool Equals(EmbedAuthorStruct other)
-        => Name == other.Name &&
-            Url == other.Url &&
-            IconUrl == other.IconUrl;
+        => string.Equals(Name, other.Name, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(Url, other.Url, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(IconUrl, other.IconUrl, StringComparison.OrdinalIgnoreCase);
 
     public override int GetHashCode()
         => HashCode.Combine(Name, Url, IconUrl);

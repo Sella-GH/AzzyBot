@@ -14,7 +14,7 @@ public readonly struct AzzyStationRoleStruct : IEquatable<AzzyStationRoleStruct>
         => obj is AzzyStationRoleStruct other && Equals(other);
 
     public bool Equals(AzzyStationRoleStruct other)
-        => Id == other.Id && Name == other.Name;
+        => Id == other.Id && string.Equals(Name, other.Name, StringComparison.OrdinalIgnoreCase);
 
     public override int GetHashCode()
         => HashCode.Combine(Id, Name);

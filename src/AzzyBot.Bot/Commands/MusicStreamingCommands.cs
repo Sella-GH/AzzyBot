@@ -161,7 +161,7 @@ public sealed class MusicStreamingCommands
                 await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
                 return;
             }
-            else if ((track.Author == SoftwareStats.GetAppAuthors || track.Identifier == SoftwareStats.GetAppName) && pos == TimeSpan.MinValue)
+            else if ((string.Equals(track.Author, SoftwareStats.GetAppAuthors, StringComparison.OrdinalIgnoreCase) || string.Equals(track.Identifier, SoftwareStats.GetAppName, StringComparison.OrdinalIgnoreCase)) && pos == TimeSpan.MinValue)
             {
                 await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;
@@ -185,7 +185,7 @@ public sealed class MusicStreamingCommands
                 await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
                 return;
             }
-            else if (track.Author == AppName && track.Title == AppName && track.Identifier == AppName)
+            else if (string.Equals(track.Author, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Title, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Identifier, AppName, StringComparison.OrdinalIgnoreCase))
             {
                 await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;
@@ -363,7 +363,7 @@ public sealed class MusicStreamingCommands
                 await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
                 return;
             }
-            else if (track.Author == AppName && track.Title == AppName && track.Identifier == AppName)
+            else if (string.Equals(track.Author, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Title, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Identifier, AppName, StringComparison.OrdinalIgnoreCase))
             {
                 await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;
@@ -392,7 +392,7 @@ public sealed class MusicStreamingCommands
                 await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
                 return;
             }
-            else if (track.Author == AppName && track.Title == AppName && track.Identifier == AppName)
+            else if (string.Equals(track.Author, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Title, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Identifier, AppName, StringComparison.OrdinalIgnoreCase))
             {
                 await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;

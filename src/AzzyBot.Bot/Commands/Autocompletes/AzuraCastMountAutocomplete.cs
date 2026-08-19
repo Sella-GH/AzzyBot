@@ -74,7 +74,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
         // Try to detect if the bot is already listening to the station
         IEnumerable<AzuraStationListenerModel>? listeners = await _azuraCast.GetStationListenersAsync(baseUrl, apiKey, stationId);
         AzzyIpAddressModel ipAddresses = await _webRequest.GetIpAddressesAsync();
-        string? playingMountPoint = listeners?.FirstOrDefault(l => l.Ip == ipAddresses.Ipv4 || l.Ip == ipAddresses.Ipv6)?.MountName;
+        string? playingMountPoint = listeners?.FirstOrDefault(l => string.Equals(l.Ip, ipAddresses.Ipv4, StringComparison.Ordinal) || string.Equals(l.Ip, ipAddresses.Ipv6, StringComparison.Ordinal))?.MountName;
 
         // List all available mounts
         string? search = context.UserInput;
@@ -89,7 +89,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
                 continue;
 
             StringBuilder name = new();
-            if (!string.IsNullOrEmpty(playingMountPoint) && playingMountPoint == mount.Name)
+            if (!string.IsNullOrEmpty(playingMountPoint) && string.Equals(playingMountPoint, mount.Name, StringComparison.OrdinalIgnoreCase))
                 name.Append("(Currently Playing) ");
 
             if (!mount.Name.Contains("kbps", StringComparison.OrdinalIgnoreCase))
@@ -119,7 +119,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
             int hlsListeners = hlsMounts.Sum(static m => m.Listeners);
 
             StringBuilder name = new();
-            if (!string.IsNullOrEmpty(playingMountPoint) && hlsMounts.Any(m => $"HLS: {m.Name}" == playingMountPoint))
+            if (!string.IsNullOrEmpty(playingMountPoint) && hlsMounts.Any(m => string.Equals($"HLS: {m.Name}", playingMountPoint, StringComparison.OrdinalIgnoreCase)))
                 name.Append("(Currently Playing) ");
 
             name.Append("HTTP Live Streaming ");

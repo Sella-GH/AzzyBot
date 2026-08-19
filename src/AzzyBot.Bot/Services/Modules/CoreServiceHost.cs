@@ -42,7 +42,7 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
         _logger.BotStarting(name, version, os, arch, dotnet);
 
         await EnsureAzzyBotDbTableIsCreatedAsync();
-        if (!string.IsNullOrWhiteSpace(_dbSettings.NewEncryptionKey) && (_dbSettings.NewEncryptionKey != _dbSettings.EncryptionKey))
+        if (!string.IsNullOrWhiteSpace(_dbSettings.NewEncryptionKey) && (!string.Equals(_dbSettings.NewEncryptionKey, _dbSettings.EncryptionKey, StringComparison.Ordinal)))
             await ReencryptDatabaseAsync();
     }
 

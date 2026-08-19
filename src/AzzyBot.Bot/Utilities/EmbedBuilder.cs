@@ -299,7 +299,7 @@ public static class EmbedBuilder
         if (!string.IsNullOrEmpty(update.CurrentRelease))
         {
             fields.Add("Current Version", new(update.CurrentRelease));
-            if (!string.IsNullOrEmpty(update.LatestRelease) && ((update.CurrentRelease != update.LatestRelease) && update.NeedsReleaseUpdate))
+            if (!string.IsNullOrEmpty(update.LatestRelease) && ((!string.Equals(update.CurrentRelease, update.LatestRelease, StringComparison.OrdinalIgnoreCase)) && update.NeedsReleaseUpdate))
                 fields.Add("Latest Version", new(update.LatestRelease));
         }
         else
