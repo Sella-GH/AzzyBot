@@ -29,7 +29,7 @@ public static class HardwareStats
 
         #region Declare local methods
 
-        static double CalculateCpuUsage(long prevIdle, long currIdle, long prevTotal, long currTotal) => (1.0 - ((double)(currIdle - prevIdle) / (currTotal - prevTotal))) * percentage;
+        static double CalculateCpuUsage(long prevIdle, long currIdle, long prevTotal, long currTotal) => (1.0 - (double.CreateChecked(currIdle - prevIdle) / (currTotal - prevTotal))) * percentage;
 
         static long CalculateTimes(long[] times)
         {

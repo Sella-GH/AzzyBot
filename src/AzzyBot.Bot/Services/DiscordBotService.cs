@@ -449,7 +449,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
         DiscordActivityType activityType;
         if (Enum.IsDefined(typeof(DiscordActivityType), type))
         {
-            activityType = (DiscordActivityType)type;
+            activityType = Enum.Parse<DiscordActivityType>(type.ToString(CultureInfo.InvariantCulture));
         }
         else
         {
@@ -495,7 +495,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             return DiscordUserStatus.Online;
         }
 
-        DiscordUserStatus userStatus = (DiscordUserStatus)status;
+        DiscordUserStatus userStatus = Enum.Parse<DiscordUserStatus>(status.ToString(CultureInfo.InvariantCulture));
         _logger.BotStatusUserStatusSet(userStatus.ToString());
 
         return userStatus;

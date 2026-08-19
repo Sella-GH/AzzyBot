@@ -188,11 +188,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         if (body is null)
             return default;
 
-        if (typeof(T) == typeof(string))
-        {
-            object? obj = body;
-            return (T)obj;
-        }
+        if (typeof(T) == typeof(string) && body is T stringBody)
+            return stringBody;
 
         try
         {
