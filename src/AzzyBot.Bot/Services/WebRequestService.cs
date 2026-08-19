@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -229,7 +230,7 @@ public sealed class WebRequestService : IWebRequestService
                 responseContent = await response.Content.ReadAsStringAsync();
             }
 
-            int statusCode = (int)status;
+            int statusCode = Convert.ToInt32(status, CultureInfo.InvariantCulture);
             return statusCode switch
             {
                 >= 100 and <= 199 => null,
