@@ -43,7 +43,7 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
         if (context is SlashCommandContext ctx && ctx.Interaction.ResponseState is DiscordInteractionResponseState.Unacknowledged)
             await context.DeferResponseAsync();
 
-        int stationId = Convert.ToInt32(context.Arguments.SingleOrDefault(static o => o.Key.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
+        int stationId = Convert.ToInt32(context.Arguments.SingleOrDefault(static o => string.Equals(o.Key.Name, "station", StringComparison.Ordinal) && o.Value is not null).Value, CultureInfo.InvariantCulture);
         AzuraCastEntity? azuraCast = await _dbActions.ReadAzuraCastAsync(context.Guild.Id, loadPrefs: true, loadStations: true, loadStationPrefs: true);
         if (azuraCast is null)
         {

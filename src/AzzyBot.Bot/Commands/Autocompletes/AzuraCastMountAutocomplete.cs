@@ -37,7 +37,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(context.Guild);
 
-        int stationId = Convert.ToInt32(context.Options.Single(static o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
+        int stationId = Convert.ToInt32(context.Options.Single(static o => string.Equals(o.Name, "station", StringComparison.Ordinal) && o.Value is not null).Value, CultureInfo.InvariantCulture);
         if (stationId is 0)
             return [];
 

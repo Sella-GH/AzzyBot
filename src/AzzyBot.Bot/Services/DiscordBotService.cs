@@ -320,7 +320,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             string message = "You don't have the required permissions to execute this command!\nPlease contact {0}.";
             string[] info = azuraCastDiscordPermCheck.ErrorMessage.Split(':');
 
-            if (info.Length is 0 && azuraCastDiscordPermCheck.ErrorMessage is "Instance")
+            if (info.Length is 0 && string.Equals(azuraCastDiscordPermCheck.ErrorMessage, "Instance", StringComparison.Ordinal))
             {
                 message = message.Replace("{0}", $"<@&{azuraCast.Preferences.InstanceAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
             }
@@ -333,11 +333,11 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
                     return;
                 }
 
-                if (info[0] is "Station")
+                if (string.Equals(info[0], "Station", StringComparison.Ordinal))
                 {
                     message = message.Replace("{0}", $"<@&{station.Preferences.StationAdminRoleId}>", StringComparison.OrdinalIgnoreCase);
                 }
-                else if (info[0] is "DJ")
+                else if (string.Equals(info[0], "DJ", StringComparison.Ordinal))
                 {
                     message = message.Replace("{0}", $"<@&{((station.Preferences.StationDjRoleId is 0) ? station.Preferences.StationAdminRoleId : station.Preferences.StationDjRoleId)}>", StringComparison.OrdinalIgnoreCase);
                 }

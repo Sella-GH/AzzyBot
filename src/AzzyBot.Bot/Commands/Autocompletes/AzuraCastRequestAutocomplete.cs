@@ -33,7 +33,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(context.Guild);
 
-        int stationId = Convert.ToInt32(context.Options.Single(static o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
+        int stationId = Convert.ToInt32(context.Options.Single(static o => string.Equals(o.Name, "station", StringComparison.Ordinal) && o.Value is not null).Value, CultureInfo.InvariantCulture);
         if (stationId is 0)
             return [];
 
@@ -107,7 +107,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
             }
         }
 
-        if (station.AzuraCast.IsOnline && context.Command.Name is "delete-song-request")
+        if (station.AzuraCast.IsOnline && string.Equals(context.Command.Name, "delete-song-request", StringComparison.Ordinal))
         {
             IEnumerable<AzuraRequestQueueItemModel>? requests = await _azuraCast.GetStationRequestItemsAsync(baseUrl, apiKey, stationId, history: false);
             if (requests is null)

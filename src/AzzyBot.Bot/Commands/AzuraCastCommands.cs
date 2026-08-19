@@ -103,7 +103,7 @@ public sealed class AzuraCastCommands
             {
                 foreach (AzuraPlaylistModel playlist in playlists)
                 {
-                    Uri playlistUrl = (format is "m3u") ? playlist.Links.Export.M3U : playlist.Links.Export.PLS;
+                    Uri playlistUrl = (string.Equals(format, "m3u", StringComparison.Ordinal)) ? playlist.Links.Export.M3U : playlist.Links.Export.PLS;
                     string fileName = Path.Combine(tempDir, $"{ac.Id}-{acStation.Id}-{playlist.ShortName}.{format}");
                     filePaths.Add(fileName);
                     await _azuraCastApi.DownloadPlaylistAsync(playlistUrl, apiKey, fileName);
@@ -118,7 +118,7 @@ public sealed class AzuraCastCommands
                     return;
                 }
 
-                Uri playlistUrl = (format is "m3u") ? playlist.Links.Export.M3U : playlist.Links.Export.PLS;
+                Uri playlistUrl = (string.Equals(format, "m3u", StringComparison.Ordinal)) ? playlist.Links.Export.M3U : playlist.Links.Export.PLS;
                 string fileName = Path.Combine(tempDir, $"{ac.Id}-{acStation.Id}-{playlist.ShortName}.{format}");
                 filePaths.Add(fileName);
                 await _azuraCastApi.DownloadPlaylistAsync(playlistUrl, apiKey, fileName);
