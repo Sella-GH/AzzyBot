@@ -137,32 +137,32 @@ public class AzuraCastDiscordPermCheck(ILogger<AzuraCastDiscordPermCheck> logger
                 break;
         }
 
-        if (perm is AzuraCastDiscordPerm.InstanceAdminGroup && isInstanceAdmin)
-            return null;
-
-        if (perm is AzuraCastDiscordPerm.StationAdminGroup && (isInstanceAdmin || isStationAdmin))
-            return null;
-
-        if (perm is AzuraCastDiscordPerm.StationDJGroup && (isInstanceAdmin || isStationAdmin || isStationDj))
-            return null;
-
-        if (perm is AzuraCastDiscordPerm.InstanceAdminGroup)
+        switch (perm)
         {
-            _logger.AzuraCastDiscordPermission(nameof(AzuraCastDiscordPerm.InstanceAdminGroup));
-            return "Instance";
-        }
-        else if (perm is AzuraCastDiscordPerm.StationAdminGroup)
-        {
-            _logger.AzuraCastDiscordPermission(nameof(AzuraCastDiscordPerm.StationAdminGroup));
-            return string.Create(CultureInfo.InvariantCulture, $"Station:{station.StationId}");
-        }
-        else if (perm is AzuraCastDiscordPerm.StationDJGroup)
-        {
-            _logger.AzuraCastDiscordPermission(nameof(AzuraCastDiscordPerm.StationDJGroup));
-            return string.Create(CultureInfo.InvariantCulture, $"DJ:{station.StationId}");
-        }
+            case AzuraCastDiscordPerm.InstanceAdminGroup when isInstanceAdmin:
+                return null;
 
-        _logger.AzuraCastDiscordPermission("Invalid permission!");
-        return "Invalid permission!";
+            case AzuraCastDiscordPerm.StationAdminGroup when (isInstanceAdmin || isStationAdmin):
+                return null;
+
+            case AzuraCastDiscordPerm.StationDJGroup when (isInstanceAdmin || isStationAdmin || isStationDj):
+                return null;
+
+            case AzuraCastDiscordPerm.InstanceAdminGroup:
+                _logger.AzuraCastDiscordPermission(nameof(AzuraCastDiscordPerm.InstanceAdminGroup));
+                return "Instance";
+
+            case AzuraCastDiscordPerm.StationAdminGroup:
+                _logger.AzuraCastDiscordPermission(nameof(AzuraCastDiscordPerm.StationAdminGroup));
+                return string.Create(CultureInfo.InvariantCulture, $"Station:{station.StationId}");
+
+            case AzuraCastDiscordPerm.StationDJGroup:
+                _logger.AzuraCastDiscordPermission(nameof(AzuraCastDiscordPerm.StationDJGroup));
+                return string.Create(CultureInfo.InvariantCulture, $"DJ:{station.StationId}");
+
+            default:
+                _logger.AzuraCastDiscordPermission("Invalid permission!");
+                return "Invalid permission!";
+        }
     }
 }

@@ -44,10 +44,9 @@ public sealed class AzuraCastStationLogAutocomplete(ILogger<AzuraCastStationLogA
             _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, stationId);
             return [];
         }
-        else if (!station.AzuraCast.IsOnline)
-        {
+
+        if (!station.AzuraCast.IsOnline)
             return [];
-        }
 
         Uri baseUrl = new(Crypto.Decrypt(station.AzuraCast.BaseUrl));
         string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.AzuraCast.AdminApiKey) : Crypto.Decrypt(station.ApiKey);

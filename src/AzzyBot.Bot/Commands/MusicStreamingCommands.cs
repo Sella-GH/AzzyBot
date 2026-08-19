@@ -161,7 +161,8 @@ public sealed class MusicStreamingCommands
                 await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
                 return;
             }
-            else if ((string.Equals(track.Author, SoftwareStats.GetAppAuthors, StringComparison.OrdinalIgnoreCase) || string.Equals(track.Identifier, SoftwareStats.GetAppName, StringComparison.OrdinalIgnoreCase)) && pos == TimeSpan.MinValue)
+
+            if ((string.Equals(track.Author, SoftwareStats.GetAppAuthors, StringComparison.OrdinalIgnoreCase) || string.Equals(track.Identifier, SoftwareStats.GetAppName, StringComparison.OrdinalIgnoreCase)) && pos == TimeSpan.MinValue)
             {
                 await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;
@@ -185,7 +186,8 @@ public sealed class MusicStreamingCommands
                 await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
                 return;
             }
-            else if (string.Equals(track.Author, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Title, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Identifier, AppName, StringComparison.OrdinalIgnoreCase))
+
+            if (string.Equals(track.Author, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Title, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Identifier, AppName, StringComparison.OrdinalIgnoreCase))
             {
                 await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;
@@ -363,7 +365,8 @@ public sealed class MusicStreamingCommands
                 await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
                 return;
             }
-            else if (string.Equals(track.Author, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Title, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Identifier, AppName, StringComparison.OrdinalIgnoreCase))
+
+            if (string.Equals(track.Author, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Title, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Identifier, AppName, StringComparison.OrdinalIgnoreCase))
             {
                 await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;
@@ -392,7 +395,8 @@ public sealed class MusicStreamingCommands
                 await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
                 return;
             }
-            else if (string.Equals(track.Author, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Title, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Identifier, AppName, StringComparison.OrdinalIgnoreCase))
+
+            if (string.Equals(track.Author, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Title, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Identifier, AppName, StringComparison.OrdinalIgnoreCase))
             {
                 await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;

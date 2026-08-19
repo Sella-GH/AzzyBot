@@ -49,7 +49,8 @@ public sealed class DiscordGuildsHandler(ILogger<DiscordGuildsHandler> logger, I
 
             return;
         }
-        else if (eventArgs.Unavailable)
+
+        if (eventArgs.Unavailable)
         {
             _logger.GuildUnavailable(eventArgs.Guild.Name);
             return;

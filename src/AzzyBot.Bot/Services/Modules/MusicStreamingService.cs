@@ -68,7 +68,8 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
             return null;
         }
-        else if (channelId is not 0)
+
+        if (channelId is not 0)
         {
             DiscordMember? bot = await _botService.GetDiscordMemberAsync(context.Guild.Id);
             if (bot is null)

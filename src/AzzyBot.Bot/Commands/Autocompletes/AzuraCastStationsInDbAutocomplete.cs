@@ -40,10 +40,9 @@ public sealed class AzuraCastStationsInDbAutocomplete(ILogger<AzuraCastStationsI
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
             return [];
         }
-        else if (!azuraCast.IsOnline)
-        {
+
+        if (!azuraCast.IsOnline)
             return [];
-        }
 
         ICollection<AzuraCastStationEntity> stationsInDb = azuraCast.Stations;
         if (stationsInDb.Count is 0)

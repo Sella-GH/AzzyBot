@@ -1347,7 +1347,8 @@ public sealed class AzuraCastCommands
                 await context.EditResponseAsync(GeneralStrings.FileNotFound);
                 return;
             }
-            else if (file.FileSize > FileSizes.AzuraFileSize)
+
+            if (file.FileSize is > FileSizes.AzuraFileSize)
             {
                 await context.EditResponseAsync(GeneralStrings.FileTooBig);
                 return;
