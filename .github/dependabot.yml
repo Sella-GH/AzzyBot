@@ -51,8 +51,12 @@ updates:
       Analyzers:
         applies-to: version-updates
         patterns:
-        - "Roslynator.*"
-        - "SonarAnalyzer.*"
+        - "Roslynator.Analyzers"
+        - "Roslynator.CodeAnalysis.Analyzers"
+        - "Roslynator.CodeFixes"
+        - "Roslynator.Formatting.Analyzers"
+        - "Roslynator.Refactorings"
+        - "SonarAnalyzer.CSharp"
         update-types:
         - "major"
         - "minor"
@@ -61,19 +65,22 @@ updates:
         applies-to: version-updates
         patterns:
         - "DSharpPlus"
-        - "DSharpPlus.*"
+        - "DSharpPlus.Commands"
+        - "DSharpPlus.Interactivity"
         - "LavaLink4NET.DSharpPlus.Nightly"
-        - "NReco.*"
-        - "Microsoft.*"
+        - "Microsoft.EntityFrameworkCore.Tools"
+        - "Microsoft.Extensions.Hosting"
+        - "Microsoft.Extensions.Http"
+        - "NReco.Logging.File"
         update-types:
         - "minor"
         - "patch"
       Database:
         applies-to: version-updates
         patterns:
-        - "EntityFrameworkCore.*"
-        - "Npgsql*"
-        - "Npgsql.*"
+        - "EntityFrameworkCore.Exceptions.PostgreSQL"
+        - "Npgsql"
+        - "Npgsql.Npgsql.EntityFrameworkCore.PostgreSQL"
         update-types:
         - "minor"
         - "patch"
@@ -81,15 +88,22 @@ updates:
         applies-to: version-updates
         exclude-patterns:
         - "DSharpPlus"
-        - "DSharpPlus.*"
-        - "EntityFrameworkCore.*"
-        - "Microsoft.*"
+        - "DSharpPlus.Commands"
+        - "DSharpPlus.Interactivity"
+        - "EntityFrameworkCore.Exceptions.PostgreSQL"
+        - "Microsoft.EntityFrameworkCore.Tools"
+        - "Microsoft.Extensions.Hosting"
+        - "Microsoft.Extensions.Http"
         - "LavaLink4NET.DSharpPlus.Nightly"
         - "Npgsql"
-        - "Npgsql.*"
-        - "NReco.*"
-        - "Roslynator.*"
-        - "SonarAnalyzer.*"
+        - "Npgsql.Npgsql.EntityFrameworkCore.PostgreSQL"
+        - "NReco.Logging.File"
+        - "Roslynator.Analyzers"
+        - "Roslynator.CodeAnalysis.Analyzers"
+        - "Roslynator.CodeFixes"
+        - "Roslynator.Formatting.Analyzers"
+        - "Roslynator.Refactorings"
+        - "SonarAnalyzer.CSharp"
         update-types:
         - "major"
         - "minor"
