@@ -45,13 +45,13 @@ public static class AzzyHelp
 
         string[] parts = commandName.Split(' ');
 
-        return GetCommandGroups(commands, adminServer, approvedDebug, member, true).Where(c => c.Key == parts[0]).SelectMany(static r => r.Value).FirstOrDefault(c => c.Name == commandName) ?? throw new InvalidOperationException($"Command not found: {commandName}");
+        return GetCommandGroups(commands, adminServer, approvedDebug, member, singleCommand: true).Where(c => string.Equals(c.Key, parts[0], StringComparison.OrdinalIgnoreCase)).SelectMany(static r => r.Value).FirstOrDefault(c => string.Equals(c.Name, commandName, StringComparison.OrdinalIgnoreCase)) ?? throw new InvalidOperationException($"Command not found: {commandName}");
     }
 
     private static Dictionary<string, List<AzzyHelpModel>> GetCommandGroups(IReadOnlyDictionary<string, Command> commands, bool adminServer, bool approvedDebug, DiscordMember member, bool singleCommand = false)
     {
         List<string> commandGroups = [.. commands.Where(c => c.Value.Subcommands.Count > 0 && CheckIfMemberHasPermission(adminServer, approvedDebug, member, c.Value.Name)).Select(static c => c.Value.Name)];
-        Dictionary<string, List<AzzyHelpModel>> groupedCommands = new(commands.Count);
+        Dictionary<string, List<AzzyHelpModel>> groupedCommands = new(commands.Count, StringComparer.Ordinal);
         foreach (string group in commandGroups)
         {
             Command command = commands[group];
@@ -87,7 +87,7 @@ public static class AzzyHelp
     {
         ArgumentNullException.ThrowIfNull(command);
 
-        Dictionary<string, string> parameters = new(command.Parameters.Count);
+        Dictionary<string, string> parameters = new(command.Parameters.Count, StringComparer.Ordinal);
         foreach (CommandParameter parameter in command.Parameters)
         {
             string paramName = parameter.Name ?? "No name provided";

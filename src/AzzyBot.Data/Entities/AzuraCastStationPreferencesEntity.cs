@@ -68,5 +68,7 @@ public sealed class AzuraCastStationPreferencesEntity
     /// <summary>
     /// The parenting <see cref="AzuraCastStationEntity"/> database item.
     /// </summary>
+#pragma warning disable MA0191 // Do not use the null-forgiving operator
     public AzuraCastStationEntity Station { get; set; } = null!;
+#pragma warning restore MA0191 // Do not use the null-forgiving operator
 }

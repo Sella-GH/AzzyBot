@@ -35,7 +35,7 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(context.Guild);
 
-        int stationId = Convert.ToInt32(context.Options.Single(static o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
+        int stationId = Convert.ToInt32(context.Options.Single(static o => string.Equals(o.Name, "station", StringComparison.Ordinal) && o.Value is not null).Value, CultureInfo.InvariantCulture);
         if (stationId is 0)
             return [];
 
@@ -54,7 +54,7 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
             return [];
         }
 
-        bool needState = context.Command.Name is "switch-playlist";
+        bool needState = string.Equals(context.Command.Name, "switch-playlist", StringComparison.Ordinal);
         string? search = context.UserInput;
         string apiKey = (!string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : Crypto.Decrypt(station.AzuraCast.AdminApiKey);
         Uri baseUrl = new(Crypto.Decrypt(station.AzuraCast.BaseUrl));
@@ -64,7 +64,7 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
             playlists = await _azuraCast.GetPlaylistsAsync(baseUrl, apiKey, stationId);
             if (playlists is null)
             {
-                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station ({stationId}).\n{_azuraCast.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **playlists** endpoint on station ({stationId}).\n{_azuraCast.AzuraCastPermissionsWiki}"));
                 return [];
             }
         }
@@ -85,7 +85,7 @@ public sealed class AzuraCastPlaylistAutocomplete(ILogger<AzuraCastPlaylistAutoc
 
             if (needState)
             {
-                results.Add(new($"{playlist.Name} ({Misc.GetReadableBool(playlist.IsEnabled, ReadableBool.EnabledDisabled, true)})", playlist.Id));
+                results.Add(new($"{playlist.Name} ({Misc.GetReadableBool(playlist.IsEnabled, ReadableBools.EnabledDisabled, lower: true)})", playlist.Id));
             }
             else
             {

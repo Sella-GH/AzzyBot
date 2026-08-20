@@ -33,7 +33,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(context.Guild);
 
-        int stationId = Convert.ToInt32(context.Options.Single(static o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
+        int stationId = Convert.ToInt32(context.Options.Single(static o => string.Equals(o.Name, "station", StringComparison.Ordinal) && o.Value is not null).Value, CultureInfo.InvariantCulture);
         if (stationId is 0)
             return [];
 
@@ -107,12 +107,12 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
             }
         }
 
-        if (station.AzuraCast.IsOnline && context.Command.Name is "delete-song-request")
+        if (station.AzuraCast.IsOnline && string.Equals(context.Command.Name, "delete-song-request", StringComparison.Ordinal))
         {
             IEnumerable<AzuraRequestQueueItemModel>? requests = await _azuraCast.GetStationRequestItemsAsync(baseUrl, apiKey, stationId, history: false);
             if (requests is null)
             {
-                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **requests** endpoint on station ({stationId}).\n{_azuraCast.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **requests** endpoint on station ({stationId}).\n{_azuraCast.AzuraCastPermissionsWiki}"));
                 return results;
             }
 
@@ -135,7 +135,7 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
                 IEnumerable<AzuraRequestModel>? requests = await _azuraCast.GetRequestableSongsAsync(baseUrl, apiKey, stationId);
                 if (requests is null)
                 {
-                    await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **requests** endpoint on station ({stationId}).\n{_azuraCast.AzuraCastPermissionsWiki}");
+                    await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **requests** endpoint on station ({stationId}).\n{_azuraCast.AzuraCastPermissionsWiki}"));
                     return results;
                 }
 
@@ -146,14 +146,14 @@ public sealed class AzuraCastRequestAutocomplete(ILogger<AzuraCastRequestAutocom
                 IEnumerable<AzuraFilesDetailedModel>? filesOnline = await _azuraCast.GetFilesOnlineDetailedAsync(baseUrl, apiKey, stationId);
                 if (filesOnline is null)
                 {
-                    await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **files** endpoint on station ({stationId}).\n{_azuraCast.AzuraCastPermissionsWiki}");
+                    await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **files** endpoint on station ({stationId}).\n{_azuraCast.AzuraCastPermissionsWiki}"));
                     return results;
                 }
 
                 IEnumerable<AzuraPlaylistModel>? playlists = await _azuraCast.GetPlaylistsWithRequestsAsync(baseUrl, apiKey, stationId);
                 if (playlists is null)
                 {
-                    await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **playlists** endpoint on station ({stationId}).\n{_azuraCast.AzuraCastPermissionsWiki}");
+                    await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **playlists** endpoint on station ({stationId}).\n{_azuraCast.AzuraCastPermissionsWiki}"));
                     return results;
                 }
 

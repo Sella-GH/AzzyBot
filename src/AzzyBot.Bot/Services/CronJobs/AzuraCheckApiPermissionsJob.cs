@@ -45,7 +45,7 @@ public sealed class AzuraCheckApiPermissionsJob(IAzuraCastApiService apiService,
             IEnumerable<AzuraCastEntity> azuraCastsToCheck = azuraCasts.Where(static a => a.IsOnline);
             await Task.WhenAll(azuraCastsToCheck.Select(_apiService.CheckForApiPermissionsAsync));
         }
-        catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
+        catch (Exception ex) when (ex is not (OperationCanceledException or TaskCanceledException))
         {
             await _botService.LogExceptionAsync(ex, DateTimeOffset.Now);
         }

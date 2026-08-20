@@ -24,13 +24,13 @@ public static class SoftwareStats
     {
         using Process app = Process.GetCurrentProcess();
 
-        return Math.Round(app.WorkingSet64 / (1024.0 * 1024.0 * 1024.0), 2);
+        return Math.Round(app.WorkingSet64 / (1024.0 * 1024.0 * 1024.0), 2, MidpointRounding.ToEven);
     }
 
     public static DateTimeOffset GetAppUptime()
     {
         using Process app = Process.GetCurrentProcess();
 
-        return app.StartTime;
+        return new(app.StartTime);
     }
 }

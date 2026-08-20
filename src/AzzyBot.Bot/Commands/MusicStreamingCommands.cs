@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -61,14 +62,14 @@ public sealed class MusicStreamingCommands
 
             if (volume is < 0 or > 100)
             {
-                await context.RespondAsync(GeneralStrings.VolumeInvalid, true);
+                await context.RespondAsync(GeneralStrings.VolumeInvalid, ephemeral: true);
                 return;
             }
 
             if (!await _musicStreaming.SetVolumeAsync(context, volume))
                 return;
 
-            string message = $"I set the volume to {volume}%.";
+            string message = string.Create(CultureInfo.InvariantCulture, $"I set the volume to {volume}%.");
             if (saveState is 1)
             {
                 MusicStreamingEntity? ms = await _dbActions.ReadMusicStreamingAsync(context.Guild.Id);
@@ -140,7 +141,7 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(LeaveAsync), context.User.Username);
 
-            if (!await _musicStreaming.StopMusicAsync(context, true))
+            if (!await _musicStreaming.StopMusicAsync(context, disconnect: true))
                 return;
 
             await context.EditResponseAsync(GeneralStrings.VoiceLeft);
@@ -160,7 +161,8 @@ public sealed class MusicStreamingCommands
                 await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
                 return;
             }
-            else if ((track.Author == SoftwareStats.GetAppAuthors || track.Identifier == SoftwareStats.GetAppName) && pos == TimeSpan.MinValue)
+
+            if ((string.Equals(track.Author, SoftwareStats.GetAppAuthors, StringComparison.OrdinalIgnoreCase) || string.Equals(track.Identifier, SoftwareStats.GetAppName, StringComparison.OrdinalIgnoreCase)) && pos == TimeSpan.MinValue)
             {
                 await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;
@@ -184,7 +186,8 @@ public sealed class MusicStreamingCommands
                 await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
                 return;
             }
-            else if (track.Author == AppName && track.Title == AppName && track.Identifier == AppName)
+
+            if (string.Equals(track.Author, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Title, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Identifier, AppName, StringComparison.OrdinalIgnoreCase))
             {
                 await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;
@@ -225,7 +228,7 @@ public sealed class MusicStreamingCommands
 
             if (volume is < 0 or > 100)
             {
-                await context.RespondAsync(GeneralStrings.VolumeInvalid, true);
+                await context.RespondAsync(GeneralStrings.VolumeInvalid, ephemeral: true);
                 return;
             }
 
@@ -265,7 +268,7 @@ public sealed class MusicStreamingCommands
 
             if (volume is < 0 or > 100)
             {
-                await context.RespondAsync(GeneralStrings.VolumeInvalid, true);
+                await context.RespondAsync(GeneralStrings.VolumeInvalid, ephemeral: true);
                 return;
             }
 
@@ -321,14 +324,14 @@ public sealed class MusicStreamingCommands
 
             _logger.CommandRequested(nameof(QueueAsync), context.User.Username);
 
-            IEnumerable<ITrackQueueItem>? history = await _musicStreaming.HistoryAsync(context, true);
+            IEnumerable<ITrackQueueItem>? history = await _musicStreaming.HistoryAsync(context, queue: true);
             if (history?.Any() is not true)
             {
                 await context.EditResponseAsync("There are no upcoming songs.");
                 return;
             }
 
-            DiscordEmbed embed = EmbedBuilder.BuildMusicStreamingHistoryEmbed(history, true);
+            DiscordEmbed embed = EmbedBuilder.BuildMusicStreamingHistoryEmbed(history, isQueue: true);
             await context.EditResponseAsync(embed);
         }
 
@@ -346,7 +349,7 @@ public sealed class MusicStreamingCommands
             if (!await _musicStreaming.ClearQueueAsync(context, songNumber))
                 return;
 
-            await context.EditResponseAsync((songNumber is -1) ? "The queue was cleared successfully." : $"I removed the song with the number **{songNumber}**.");
+            await context.EditResponseAsync((songNumber is -1) ? "The queue was cleared successfully." : string.Create(CultureInfo.InvariantCulture, $"I removed the song with the number **{songNumber}**."));
         }
 
         [Command("resume"), Description("Resume the paused player and play music again.")]
@@ -362,7 +365,8 @@ public sealed class MusicStreamingCommands
                 await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
                 return;
             }
-            else if (track.Author == AppName && track.Title == AppName && track.Identifier == AppName)
+
+            if (string.Equals(track.Author, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Title, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Identifier, AppName, StringComparison.OrdinalIgnoreCase))
             {
                 await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;
@@ -391,7 +395,8 @@ public sealed class MusicStreamingCommands
                 await context.EditResponseAsync(GeneralStrings.VoiceNothingPlaying);
                 return;
             }
-            else if (track.Author == AppName && track.Title == AppName && track.Identifier == AppName)
+
+            if (string.Equals(track.Author, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Title, AppName, StringComparison.OrdinalIgnoreCase) && string.Equals(track.Identifier, AppName, StringComparison.OrdinalIgnoreCase))
             {
                 await context.EditResponseAsync(GeneralStrings.VoicePlayingAzuraCast);
                 return;
@@ -400,7 +405,8 @@ public sealed class MusicStreamingCommands
             if (!await _musicStreaming.SkipSongAsync(context, count))
                 return;
 
-            await context.EditResponseAsync($"I skipped **{count}** {((count is 1) ? "song" : "songs")}.");
+            string textRes = string.Create(CultureInfo.InvariantCulture, $"I skipped **{count}** {((count is 1) ? "song" : "songs")}.");
+            await context.EditResponseAsync(textRes);
         }
 
         [Command("stop"), Description("Stop the music.")]

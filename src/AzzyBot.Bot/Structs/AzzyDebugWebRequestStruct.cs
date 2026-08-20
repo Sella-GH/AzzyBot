@@ -30,7 +30,7 @@ public readonly struct AzzyDebugWebRequestStruct : IEquatable<AzzyDebugWebReques
             ReqHeaders == other.ReqHeaders &&
             ResHeaders == other.ResHeaders &&
             Retries == other.Retries &&
-            Content == other.Content;
+            string.Equals(Content, other.Content, StringComparison.OrdinalIgnoreCase);
 
     public override int GetHashCode()
         => HashCode.Combine(RequestUri, Method, HttpVersion, StatusCode, ReqHeaders, ResHeaders, Retries, Content);

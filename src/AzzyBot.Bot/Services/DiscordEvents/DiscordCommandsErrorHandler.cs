@@ -42,8 +42,8 @@ public sealed class DiscordCommandsErrorHandler(ILogger<DiscordCommandsErrorHand
                 await _botService.RespondToChecksExceptionAsync(checksFailed, slashContext);
                 break;
 
-            case DiscordException:
-                await _botService.LogExceptionAsync(ex, now, slashContext, ((DiscordException)e.Exception).JsonMessage);
+            case DiscordException discordException:
+                await _botService.LogExceptionAsync(ex, now, slashContext, discordException.JsonMessage);
                 break;
 
             default:

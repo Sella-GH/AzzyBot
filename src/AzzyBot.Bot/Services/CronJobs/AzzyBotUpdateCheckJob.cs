@@ -19,7 +19,7 @@ public sealed class AzzyBotUpdateCheckJob(IDiscordBotService botService, IUpdate
         {
             await _updater.CheckForAzzyUpdatesAsync();
         }
-        catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
+        catch (Exception ex) when (ex is not (OperationCanceledException or TaskCanceledException))
         {
             await _botService.LogExceptionAsync(ex, DateTimeOffset.Now);
         }

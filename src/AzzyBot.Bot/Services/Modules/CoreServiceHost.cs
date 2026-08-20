@@ -42,15 +42,15 @@ public sealed class CoreServiceHost(ILogger<CoreServiceHost> logger, IOptions<Az
         _logger.BotStarting(name, version, os, arch, dotnet);
 
         await EnsureAzzyBotDbTableIsCreatedAsync();
-        if (!string.IsNullOrWhiteSpace(_dbSettings.NewEncryptionKey) && (_dbSettings.NewEncryptionKey != _dbSettings.EncryptionKey))
+        if (!string.IsNullOrWhiteSpace(_dbSettings.NewEncryptionKey) && (!string.Equals(_dbSettings.NewEncryptionKey, _dbSettings.EncryptionKey, StringComparison.Ordinal)))
             await ReencryptDatabaseAsync();
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public async Task StopAsync(CancellationToken cancellationToken)
     {
         _logger.BotStopping();
 
-        return Task.CompletedTask;
+        await Task.CompletedTask;
     }
 
     private async Task EnsureAzzyBotDbTableIsCreatedAsync()

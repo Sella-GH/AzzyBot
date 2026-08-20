@@ -22,12 +22,12 @@ public readonly struct AzzyExceptionEmbedStruct : IEquatable<AzzyExceptionEmbedS
 
     public bool Equals(AzzyExceptionEmbedStruct other)
         => Exception.Equals(other.Exception) &&
-            Timestamp == other.Timestamp &&
-            JsonMessage == other.JsonMessage &&
-            Guild == other.Guild &&
-            Message == other.Message &&
-            UserMention == other.UserMention &&
-            CommandName == other.CommandName &&
+            string.Equals(Timestamp, other.Timestamp, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(JsonMessage, other.JsonMessage, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(Guild, other.Guild, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(Message, other.Message, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(UserMention, other.UserMention, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(CommandName, other.CommandName, StringComparison.OrdinalIgnoreCase) &&
             EqualityComparer<IReadOnlyDictionary<string, string>?>.Default.Equals(CommandOptions, other.CommandOptions);
 
     public override int GetHashCode()

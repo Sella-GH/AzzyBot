@@ -39,7 +39,7 @@ public sealed class AzuraCastDiscordChannelCheck(ILogger<AzuraCastDiscordChannel
         if (context is SlashCommandContext ctx && ctx.Interaction.ResponseState is DiscordInteractionResponseState.Unacknowledged)
             await context.DeferResponseAsync();
 
-        int stationId = Convert.ToInt32(context.Arguments.SingleOrDefault(static o => o.Key.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
+        int stationId = Convert.ToInt32(context.Arguments.SingleOrDefault(static o => string.Equals(o.Key.Name, "station", StringComparison.Ordinal) && o.Value is not null).Value, CultureInfo.InvariantCulture);
         AzuraCastStationPreferencesEntity? prefs = await _dbActions.ReadAzuraCastStationPreferencesAsync(context.Guild.Id, stationId);
         if (prefs is null)
         {

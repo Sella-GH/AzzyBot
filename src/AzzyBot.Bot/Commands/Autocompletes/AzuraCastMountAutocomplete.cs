@@ -37,7 +37,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(context.Guild);
 
-        int stationId = Convert.ToInt32(context.Options.Single(static o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
+        int stationId = Convert.ToInt32(context.Options.Single(static o => string.Equals(o.Name, "station", StringComparison.Ordinal) && o.Value is not null).Value, CultureInfo.InvariantCulture);
         if (stationId is 0)
             return [];
 
@@ -47,10 +47,9 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
             _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, stationId);
             return [];
         }
-        else if (!station.AzuraCast.IsOnline)
-        {
+
+        if (!station.AzuraCast.IsOnline)
             return [];
-        }
 
         Uri baseUrl = new(Crypto.Decrypt(station.AzuraCast.BaseUrl));
         string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.AzuraCast.AdminApiKey) : Crypto.Decrypt(station.ApiKey);
@@ -61,7 +60,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
             stationModel = await _azuraCast.GetStationAsync(baseUrl, apiKey, stationId);
             if (stationModel is null)
             {
-                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** ({stationId}) endpoint.\n{_azuraCast.AzuraCastPermissionsWiki}");
+                await _botService.SendMessageAsync(station.AzuraCast.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **station** ({stationId}) endpoint.\n{_azuraCast.AzuraCastPermissionsWiki}"));
                 return [];
             }
         }
@@ -74,7 +73,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
         // Try to detect if the bot is already listening to the station
         IEnumerable<AzuraStationListenerModel>? listeners = await _azuraCast.GetStationListenersAsync(baseUrl, apiKey, stationId);
         AzzyIpAddressModel ipAddresses = await _webRequest.GetIpAddressesAsync();
-        string? playingMountPoint = listeners?.FirstOrDefault(l => l.Ip == ipAddresses.Ipv4 || l.Ip == ipAddresses.Ipv6)?.MountName;
+        string? playingMountPoint = listeners?.FirstOrDefault(l => string.Equals(l.Ip, ipAddresses.Ipv4, StringComparison.Ordinal) || string.Equals(l.Ip, ipAddresses.Ipv6, StringComparison.Ordinal))?.MountName;
 
         // List all available mounts
         string? search = context.UserInput;
@@ -89,7 +88,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
                 continue;
 
             StringBuilder name = new();
-            if (!string.IsNullOrEmpty(playingMountPoint) && playingMountPoint == mount.Name)
+            if (!string.IsNullOrEmpty(playingMountPoint) && string.Equals(playingMountPoint, mount.Name, StringComparison.OrdinalIgnoreCase))
                 name.Append("(Currently Playing) ");
 
             if (!mount.Name.Contains("kbps", StringComparison.OrdinalIgnoreCase))
@@ -119,7 +118,7 @@ public sealed class AzuraCastMountAutocomplete(ILogger<AzuraCastMountAutocomplet
             int hlsListeners = hlsMounts.Sum(static m => m.Listeners);
 
             StringBuilder name = new();
-            if (!string.IsNullOrEmpty(playingMountPoint) && hlsMounts.Any(m => $"HLS: {m.Name}" == playingMountPoint))
+            if (!string.IsNullOrEmpty(playingMountPoint) && hlsMounts.Any(m => string.Equals($"HLS: {m.Name}", playingMountPoint, StringComparison.OrdinalIgnoreCase)))
                 name.Append("(Currently Playing) ");
 
             name.Append("HTTP Live Streaming ");

@@ -35,7 +35,7 @@ public interface IAzuraCastApiService
     Task<AzuraStationModel?> GetStationAsync(Uri baseUrl, string apiKey, int stationId);
     Task<IEnumerable<AzuraAdminStationConfigModel>?> GetStationsAdminConfigAsync(Uri baseUrl, string apiKey);
     Task<AzuraAdminStationConfigModel?> GetStationAdminConfigAsync(Uri baseUrl, string apiKey, int stationId);
-    Task<IEnumerable<AzuraStationHistoryItemModel>?> GetStationHistoryAsync(Uri baseUrl, string apiKey, int stationId, in DateTimeOffset startHistory, in DateTimeOffset endHistory);
+    Task<IEnumerable<AzuraStationHistoryItemModel>?> GetStationHistoryAsync(Uri baseUrl, string apiKey, int stationId, DateTimeOffset startHistory, DateTimeOffset endHistory);
     Task<IEnumerable<AzuraHlsMountModel>?> GetStationHlsMountPointsAsync(Uri baseUrl, string apiKey, int stationId);
     Task<IEnumerable<AzuraStationListenerModel>?> GetStationListenersAsync(Uri baseUrl, string apiKey, int stationId);
     Task<AzuraSystemLogModel?> GetStationLogAsync(Uri baseUrl, string apiKey, int stationId, string logName);
@@ -51,7 +51,7 @@ public interface IAzuraCastApiService
     Task SkipSongAsync(Uri baseUrl, string apiKey, int stationId);
     Task<bool> StartStationAsync(Uri baseUrl, string apiKey, int stationId, SlashCommandContext context);
     Task<bool> StopStationAsync(Uri baseUrl, string apiKey, int stationId);
-    Task<List<AzuraPlaylistStateModel>?> SwitchPlaylistsAsync(Uri baseUrl, string apiKey, int stationId, int playlistId, bool removeOld);
+    Task<IReadOnlyList<AzuraPlaylistStateModel>?> SwitchPlaylistsAsync(Uri baseUrl, string apiKey, int stationId, int playlistId, bool removeOld);
     Task TogglePlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId);
     Task UpdateInstanceAsync(Uri baseUrl, string apiKey);
     Task<T?> UploadFileAsync<T>(Uri baseUrl, string apiKey, int stationId, string file, string fileName, string filePath, JsonTypeInfo<T> jsonType);

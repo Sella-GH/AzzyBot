@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -40,13 +40,12 @@ public sealed class AzuraCastStationsInDbAutocomplete(ILogger<AzuraCastStationsI
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
             return [];
         }
-        else if (!azuraCast.IsOnline)
-        {
-            return [];
-        }
 
-        IEnumerable<AzuraCastStationEntity> stationsInDb = azuraCast.Stations;
-        if (!stationsInDb.Any())
+        if (!azuraCast.IsOnline)
+            return [];
+
+        ICollection<AzuraCastStationEntity> stationsInDb = azuraCast.Stations;
+        if (stationsInDb.Count is 0)
             return [];
 
         string? search = context.UserInput;
@@ -66,7 +65,7 @@ public sealed class AzuraCastStationsInDbAutocomplete(ILogger<AzuraCastStationsI
                 azuraStation = await _azuraCast.GetStationAsync(baseUrl, stationApiKey, station.StationId);
                 if (azuraStation is null)
                 {
-                    await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, $"I don't have the permission to access the **station** (ID: {station.StationId}) endpoint.\n{_azuraCast.AzuraCastPermissionsWiki}");
+                    await _botService.SendMessageAsync(azuraCast.Preferences.NotificationChannelId, string.Create(CultureInfo.InvariantCulture, $"I don't have the permission to access the **station** (ID: {station.StationId}) endpoint.\n{_azuraCast.AzuraCastPermissionsWiki}"));
                     return results;
                 }
             }
@@ -100,11 +99,11 @@ public sealed class AzuraCastStationsInDbAutocomplete(ILogger<AzuraCastStationsI
 
                 case "start-station" when !config.IsEnabled:
                 case "stop-station" when config.IsEnabled:
-                    results.Add(new($"{azuraStation.Name} ({Misc.GetReadableBool(config.IsEnabled, ReadableBool.StartedStopped, true)})", station.StationId));
+                    results.Add(new($"{azuraStation.Name} ({Misc.GetReadableBool(config.IsEnabled, ReadableBools.StartedStopped, lower: true)})", station.StationId));
                     break;
 
                 case "toggle-song-requests":
-                    results.Add(new($"{azuraStation.Name} ({Misc.GetReadableBool(config.EnableRequests, ReadableBool.EnabledDisabled, true)})", station.StationId));
+                    results.Add(new($"{azuraStation.Name} ({Misc.GetReadableBool(config.EnableRequests, ReadableBools.EnabledDisabled, lower: true)})", station.StationId));
                     break;
 
                 default:

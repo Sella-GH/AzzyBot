@@ -34,12 +34,13 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
     public string FilePath { get; } = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Modules", "AzuraCast", "Files");
 
     private static Dictionary<string, string> CreateHeader(string apiKey)
-    {
-        return new(1)
+        => new(1, StringComparer.Ordinal)
         {
             ["X-API-Key"] = apiKey
         };
-    }
+
+    private static bool MatchesOptionalFilter(string? filter, string? value)
+        => filter is null || string.Equals(value, filter, StringComparison.OrdinalIgnoreCase);
 
     public async Task CheckForApiPermissionsAsync(AzuraCastEntity azuraCast)
     {
@@ -52,11 +53,11 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         await Task.WhenAll(tasks);
     }
 
-    public Task CheckForApiPermissionsAsync(AzuraCastStationEntity station)
+    public async Task CheckForApiPermissionsAsync(AzuraCastStationEntity station)
     {
         ArgumentNullException.ThrowIfNull(station);
 
-        return CheckForStationApiPermissionsAsync(station);
+        await CheckForStationApiPermissionsAsync(station);
     }
 
     private async Task CheckForAdminApiPermissionsAsync(AzuraCastEntity azuraCast)
@@ -74,8 +75,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         if (azuraCast.Checks.Updates)
             apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Updates}"));
 
-        IEnumerable<string> missing = await ExecuteApiPermissionCheckAsync(apis, adminApiKey);
-        if (!missing.Any())
+        IReadOnlyList<string> missing = await ExecuteApiPermissionCheckAsync(apis, adminApiKey);
+        if (missing.Count is 0)
             return;
 
         StringBuilder builder = new();
@@ -102,22 +103,22 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
 
         List<Uri> apis = new(7)
         {
-            new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}"),
-            new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlists}"),
-            new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}"),
-            new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Status}"),
-            new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Logs}")
+            new(string.Create(CultureInfo.InvariantCulture, $"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}")),
+            new(string.Create(CultureInfo.InvariantCulture, $"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlists}")),
+            new(string.Create(CultureInfo.InvariantCulture, $"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}")),
+            new(string.Create(CultureInfo.InvariantCulture, $"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Status}")),
+            new(string.Create(CultureInfo.InvariantCulture, $"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Logs}"))
         };
 
         if (config.EnableRequests)
-            apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}"));
+            apis.Add(new(string.Create(CultureInfo.InvariantCulture, $"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}")));
 
         if (station.Checks.FileChanges)
-            apis.Add(new($"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}"));
+            apis.Add(new(string.Create(CultureInfo.InvariantCulture, $"{apiUrl}/{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}")));
 
         string apiKey = (!string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.ApiKey) : adminApiKey;
-        IEnumerable<string> missing = await ExecuteApiPermissionCheckAsync(apis, apiKey);
-        if (!missing.Any())
+        IReadOnlyList<string> missing = await ExecuteApiPermissionCheckAsync(apis, apiKey);
+        if (missing.Count is 0)
             return;
 
         StringBuilder builder = new();
@@ -188,11 +189,8 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         if (body is null)
             return default;
 
-        if (typeof(T) == typeof(string))
-        {
-            object? obj = body;
-            return (T)obj;
-        }
+        if (typeof(T) == typeof(string) && body is T stringBody)
+            return stringBody;
 
         try
         {
@@ -260,7 +258,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         IEnumerable<string> files = FileOperations.GetFilesInDirectory(FilePath);
-        string fileName = $"{guildId}-{azuraCastId}-{databaseId}-{stationId}-files.json";
+        string fileName = string.Create(CultureInfo.InvariantCulture, $"{guildId}-{azuraCastId}-{databaseId}-{stationId}-files.json");
 
         return files.FirstOrDefault(f => f.Contains(fileName, StringComparison.OrdinalIgnoreCase)) ?? string.Empty;
     }
@@ -307,7 +305,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         Uri uri = new($"{baseUrl}api/{endpoint}");
         try
         {
-            return await _webService.UploadAsync(uri, file, fileName, filePath, headers, true);
+            return await _webService.UploadAsync(uri, file, fileName, filePath, headers, acceptJson: true);
         }
         catch (HttpRequestException ex)
         {
@@ -320,7 +318,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}/" + ((requestId is 0) ? AzuraApiEndpoints.Clear : requestId);
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}/{((requestId is 0) ? AzuraApiEndpoints.Clear : requestId)}");
 
         if (requestId is 0)
         {
@@ -340,12 +338,12 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         await _webService.DownloadAsync(url, downloadPath, CreateHeader(apiKey), acceptJson: true);
     }
 
-    public Task<string> DownloadSongArtworkAsync(Uri url, string apiKey, string downloadPath)
+    public async Task<string> DownloadSongArtworkAsync(Uri url, string apiKey, string downloadPath)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentException.ThrowIfNullOrWhiteSpace(downloadPath);
 
-        return _webService.DownloadAsync(url, downloadPath, CreateHeader(apiKey), acceptImage: true);
+        return await _webService.DownloadAsync(url, downloadPath, CreateHeader(apiKey), acceptImage: true);
     }
 
     public async Task<IEnumerable<AzuraFilesModel>> GetFilesLocalAsync(int guildId, int azuraCastId, int databaseId, int stationId)
@@ -379,24 +377,24 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         }
     }
 
-    public Task<IEnumerable<AzuraFilesModel>?> GetFilesOnlineBasicAsync(Uri baseUrl, string apiKey, int stationId)
+    public async Task<IEnumerable<AzuraFilesModel>?> GetFilesOnlineBasicAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}");
 
-        return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraFilesModel, CreateHeader(apiKey));
+        return await GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraFilesModel, CreateHeader(apiKey));
     }
 
-    public Task<IEnumerable<AzuraFilesDetailedModel>?> GetFilesOnlineDetailedAsync(Uri baseUrl, string apiKey, int stationId)
+    public async Task<IEnumerable<AzuraFilesDetailedModel>?> GetFilesOnlineDetailedAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}");
 
-        return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraFilesDetailedModel, CreateHeader(apiKey));
+        return await GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraFilesDetailedModel, CreateHeader(apiKey));
     }
 
     public async Task<AzuraHardwareStatsModel?> GetHardwareStatsAsync(Uri baseUrl, string apiKey)
@@ -413,40 +411,40 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         return stats;
     }
 
-    public Task<AzuraStatusModel?> GetInstanceStatusAsync(Uri baseUrl)
+    public async Task<AzuraStatusModel?> GetInstanceStatusAsync(Uri baseUrl)
     {
         const string endpoint = AzuraApiEndpoints.Status;
 
-        return GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.AzuraStatusModel, noLogging: true);
+        return await GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.AzuraStatusModel, noLogging: true);
     }
 
-    public Task<AzuraNowPlayingDataModel?> GetNowPlayingAsync(Uri baseUrl, string apiKey, int stationId, bool noLogging = false)
+    public async Task<AzuraNowPlayingDataModel?> GetNowPlayingAsync(Uri baseUrl, string apiKey, int stationId, bool noLogging = false)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        string endpoint = $"{AzuraApiEndpoints.NowPlaying}/{stationId}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.NowPlaying}/{stationId}");
 
-        return GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.AzuraNowPlayingDataModel, CreateHeader(apiKey), noLogging);
+        return await GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.AzuraNowPlayingDataModel, CreateHeader(apiKey), noLogging);
     }
 
-    public Task<AzuraPlaylistModel?> GetPlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
-        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
-
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlist}/{playlistId}";
-
-        return GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.AzuraPlaylistModel, CreateHeader(apiKey));
-    }
-
-    public Task<IEnumerable<AzuraPlaylistModel>?> GetPlaylistsAsync(Uri baseUrl, string apiKey, int stationId)
+    public async Task<AzuraPlaylistModel?> GetPlaylistAsync(Uri baseUrl, string apiKey, int stationId, int playlistId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlists}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlist}/{playlistId}");
 
-        return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraPlaylistModel, CreateHeader(apiKey));
+        return await GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.AzuraPlaylistModel, CreateHeader(apiKey));
+    }
+
+    public async Task<IEnumerable<AzuraPlaylistModel>?> GetPlaylistsAsync(Uri baseUrl, string apiKey, int stationId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
+
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlists}");
+
+        return await GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraPlaylistModel, CreateHeader(apiKey));
     }
 
     public async Task<IEnumerable<AzuraPlaylistModel>?> GetPlaylistsWithRequestsAsync(Uri baseUrl, string apiKey, int stationId)
@@ -467,21 +465,20 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         IEnumerable<AzuraRequestModel>? songs = await GetRequestableSongsAsync(baseUrl, apiKey, stationId);
 
         return songs?.FirstOrDefault(s =>
-            (songId is null || s.Song.SongId == songId) &&
-            (name is null || s.Song.Title == name) &&
-            (artist is null || s.Song.Artist == artist) &&
-            (album is null || s.Song.Album == album)
-            );
+            MatchesOptionalFilter(songId, s.Song.SongId) &&
+            MatchesOptionalFilter(name, s.Song.Title) &&
+            MatchesOptionalFilter(artist, s.Song.Artist) &&
+            MatchesOptionalFilter(album, s.Song.Album));
     }
 
-    public Task<IEnumerable<AzuraRequestModel>?> GetRequestableSongsAsync(Uri baseUrl, string apiKey, int stationId)
+    public async Task<IEnumerable<AzuraRequestModel>?> GetRequestableSongsAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Requests}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Requests}");
 
-        return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraRequestModel, CreateHeader(apiKey));
+        return await GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraRequestModel, CreateHeader(apiKey));
     }
 
     public async Task<IEnumerable<AzuraSongBasicDataModel>?> GetSongsInPlaylistAsync(Uri baseUrl, string apiKey, int stationId, AzuraPlaylistModel playlist)
@@ -490,7 +487,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
         ArgumentNullException.ThrowIfNull(playlist);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}/{AzuraApiFilters.List}?{AzuraApiFilters.SearchPhrase}={AzuraApiFilters.Playlist}:{playlist.ShortName}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}/{AzuraApiFilters.List}?{AzuraApiFilters.SearchPhrase}={AzuraApiFilters.Playlist}:{playlist.ShortName}");
 
         IEnumerable<AzuraMediaItemModel>? songs = await GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraMediaItemModel, CreateHeader(apiKey));
 
@@ -516,12 +513,11 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
             return null;
 
         AzuraFilesModel? song = songs.FirstOrDefault(s =>
-            (uniqueId is null || s.UniqueId == uniqueId) &&
-            (songId is null || s.SongId == songId) &&
-            (name is null || s.Title == name) &&
-            (artist is null || s.Artist == artist) &&
-            (album is null || s.Album == album)
-            ) ??
+            MatchesOptionalFilter(uniqueId, s.UniqueId) &&
+            MatchesOptionalFilter(songId, s.SongId) &&
+            MatchesOptionalFilter(name, s.Title) &&
+            MatchesOptionalFilter(artist, s.Artist) &&
+            MatchesOptionalFilter(album, s.Album)) ??
             throw new InvalidOperationException($"Song {name} not found.");
 
         return new()
@@ -533,56 +529,57 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
             Artist = song.Artist,
             Title = song.Title,
             Text = $"{song.Title} - {song.Artist}",
-            Art = $"{baseUrl}api/{AzuraApiEndpoints.Station}/{station.StationId}/{AzuraApiEndpoints.Art}/{song.UniqueId}"
+            Art = string.Create(CultureInfo.InvariantCulture, $"{baseUrl}api/{AzuraApiEndpoints.Station}/{station.StationId}/{AzuraApiEndpoints.Art}/{song.UniqueId}"
+)
         };
     }
 
-    public Task<AzuraStationModel?> GetStationAsync(Uri baseUrl, string apiKey, int stationId)
+    public async Task<AzuraStationModel?> GetStationAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}");
 
-        return GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.AzuraStationModel, CreateHeader(apiKey));
+        return await GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.AzuraStationModel, CreateHeader(apiKey));
     }
 
-    public Task<IEnumerable<AzuraAdminStationConfigModel>?> GetStationsAdminConfigAsync(Uri baseUrl, string apiKey)
+    public async Task<IEnumerable<AzuraAdminStationConfigModel>?> GetStationsAdminConfigAsync(Uri baseUrl, string apiKey)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Stations}";
 
-        return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraAdminStationConfigModel, CreateHeader(apiKey));
+        return await GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraAdminStationConfigModel, CreateHeader(apiKey));
     }
 
-    public Task<AzuraAdminStationConfigModel?> GetStationAdminConfigAsync(Uri baseUrl, string apiKey, int stationId)
+    public async Task<AzuraAdminStationConfigModel?> GetStationAdminConfigAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}");
 
-        return GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.AzuraAdminStationConfigModel, CreateHeader(apiKey));
+        return await GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.AzuraAdminStationConfigModel, CreateHeader(apiKey));
     }
 
-    public Task<IEnumerable<AzuraStationHistoryItemModel>?> GetStationHistoryAsync(Uri baseUrl, string apiKey, int stationId, in DateTimeOffset startHistory, in DateTimeOffset endHistory)
+    public async Task<IEnumerable<AzuraStationHistoryItemModel>?> GetStationHistoryAsync(Uri baseUrl, string apiKey, int stationId, DateTimeOffset startHistory, DateTimeOffset endHistory)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}?{AzuraApiFilters.Start}={startHistory:yyyy-MM-dd}&{AzuraApiFilters.End}={endHistory:yyyy-MM-dd}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.History}?{AzuraApiFilters.Start}={startHistory:yyyy-MM-dd}&{AzuraApiFilters.End}={endHistory:yyyy-MM-dd}");
 
-        return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraStationHistoryItemModel, CreateHeader(apiKey));
+        return await GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraStationHistoryItemModel, CreateHeader(apiKey));
     }
 
-    public Task<IEnumerable<AzuraStationListenerModel>?> GetStationListenersAsync(Uri baseUrl, string apiKey, int stationId)
+    public async Task<IEnumerable<AzuraStationListenerModel>?> GetStationListenersAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Listeners}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Listeners}");
 
-        return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraStationListenerModel, CreateHeader(apiKey));
+        return await GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraStationListenerModel, CreateHeader(apiKey));
     }
 
     public async Task<AzuraSystemLogModel?> GetStationLogAsync(Uri baseUrl, string apiKey, int stationId, string logName)
@@ -591,7 +588,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
         ArgumentException.ThrowIfNullOrWhiteSpace(logName);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Log}/{logName}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Log}/{logName}");
 
         try
         {
@@ -603,46 +600,47 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         }
     }
 
-    public Task<IEnumerable<AzuraSystemLogEntryModel>?> GetStationLogsAsync(Uri baseUrl, string apiKey, int stationId)
+    public async Task<IEnumerable<AzuraSystemLogEntryModel>?> GetStationLogsAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Logs}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Logs}");
 
-        return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraSystemLogEntryModel, CreateHeader(apiKey));
+        return await GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraSystemLogEntryModel, CreateHeader(apiKey));
     }
 
-    public Task<IEnumerable<AzuraHlsMountModel>?> GetStationHlsMountPointsAsync(Uri baseUrl, string apiKey, int stationId)
+    public async Task<IEnumerable<AzuraHlsMountModel>?> GetStationHlsMountPointsAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.HlsStreams}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.HlsStreams}");
 
-        return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraHlsMountModel, CreateHeader(apiKey));
+        return await GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraHlsMountModel, CreateHeader(apiKey));
     }
 
-    public Task<IEnumerable<AzuraStationQueueItemDetailedModel>?> GetStationQueueAsync(Uri baseUrl, string apiKey, int stationId)
+    public async Task<IEnumerable<AzuraStationQueueItemDetailedModel>?> GetStationQueueAsync(Uri baseUrl, string apiKey, int stationId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Queue}");
 
-        return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraStationQueueItemDetailedModel, CreateHeader(apiKey));
+        return await GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraStationQueueItemDetailedModel, CreateHeader(apiKey));
     }
 
-    public Task<IEnumerable<AzuraRequestQueueItemModel>?> GetStationRequestItemsAsync(Uri baseUrl, string apiKey, int stationId, bool history)
+    public async Task<IEnumerable<AzuraRequestQueueItemModel>?> GetStationRequestItemsAsync(Uri baseUrl, string apiKey, int stationId, bool history)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
         string endpoint = (history)
-            ? $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}?{AzuraApiFilters.Type}={AzuraApiFilters.History}"
-            : $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}?{AzuraApiFilters.Type}={AzuraApiFilters.Pending}";
+            ? string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}?{AzuraApiFilters.Type}={AzuraApiFilters.History}"
+)
+            : string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Reports}/{AzuraApiEndpoints.Requests}?{AzuraApiFilters.Type}={AzuraApiFilters.Pending}");
 
-        return GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraRequestQueueItemModel, CreateHeader(apiKey));
+        return await GetFromApiListAsync(baseUrl, endpoint, JsonSourceGen.Default.IEnumerableAzuraRequestQueueItemModel, CreateHeader(apiKey));
     }
 
     public async Task<AzuraSystemLogModel?> GetSystemLogAsync(Uri baseUrl, string apiKey, string logName)
@@ -662,22 +660,22 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         }
     }
 
-    public Task<AzuraSystemLogsModel?> GetSystemLogsAsync(Uri baseUrl, string apiKey)
+    public async Task<AzuraSystemLogsModel?> GetSystemLogsAsync(Uri baseUrl, string apiKey)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Logs}";
 
-        return GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.AzuraSystemLogsModel, CreateHeader(apiKey));
+        return await GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.AzuraSystemLogsModel, CreateHeader(apiKey));
     }
 
-    public Task<string?> GetUpdatesAsync(Uri baseUrl, string apiKey)
+    public async Task<string?> GetUpdatesAsync(Uri baseUrl, string apiKey)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
 
         string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Updates}";
 
-        return GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.String, CreateHeader(apiKey));
+        return await GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.String, CreateHeader(apiKey));
     }
 
     public async Task ModifyStationAdminConfigAsync(Uri baseUrl, string apiKey, int stationId, AzuraAdminStationConfigModel config)
@@ -686,7 +684,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
         ArgumentNullException.ThrowIfNull(config);
 
-        string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}");
 
         await PutToApiAsync(baseUrl, endpoint, JsonSerializer.Serialize(config, JsonSourceGen.Default.AzuraAdminStationConfigModel), CreateHeader(apiKey));
     }
@@ -696,7 +694,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
         ArgumentException.ThrowIfNullOrWhiteSpace(songPath);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}/{AzuraApiEndpoints.Batch}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}/{AzuraApiEndpoints.Batch}");
 
         // Get the last slash to separate the path from the song
         int lastSlash = songPath.LastIndexOf('/');
@@ -713,7 +711,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
         ArgumentException.ThrowIfNullOrWhiteSpace(requestId);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Request}/{requestId}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Request}/{requestId}");
 
         await PostToApiAsync(baseUrl, endpoint);
     }
@@ -723,7 +721,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Backend}/{AzuraApiEndpoints.Skip}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Backend}/{AzuraApiEndpoints.Skip}");
 
         await PostToApiAsync(baseUrl, endpoint, headers: CreateHeader(apiKey));
     }
@@ -734,7 +732,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
         ArgumentNullException.ThrowIfNull(context);
 
-        string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}");
         AzuraAdminStationConfigModel? config = await GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.AzuraAdminStationConfigModel, CreateHeader(apiKey));
         if (config is null)
             return false;
@@ -745,7 +743,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         await context.EditResponseAsync("I activated the station, please wait for it to start up.");
         await Task.Delay(TimeSpan.FromSeconds(10));
 
-        endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Status}";
+        endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Status}");
         AzuraStationStatusModel? status = await GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.AzuraStationStatusModel, CreateHeader(apiKey));
         if (status is null)
             return false;
@@ -769,9 +767,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
             }
             catch (Exception e) when (e is HttpRequestException or InvalidOperationException or JsonException)
             {
-                if (!firstTime.HasValue)
-                    firstTime = true;
-
+                firstTime ??= true;
                 if (firstTime.Value)
                 {
                     await context.EditResponseAsync("You have activated the option \"**Always Write Playlists to Liquidsoap**\" which means you have to wait more time until you can finally use your station.\nI inform you when it's finished.");
@@ -792,7 +788,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
 
-        string endpoint = $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Admin}/{AzuraApiEndpoints.Station}/{stationId}");
 
         AzuraAdminStationConfigModel? config = await GetFromApiAsync(baseUrl, endpoint, JsonSourceGen.Default.AzuraAdminStationConfigModel, CreateHeader(apiKey));
         if (config is null)
@@ -805,7 +801,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         return true;
     }
 
-    public async Task<List<AzuraPlaylistStateModel>?> SwitchPlaylistsAsync(Uri baseUrl, string apiKey, int stationId, int playlistId, bool removeOld)
+    public async Task<IReadOnlyList<AzuraPlaylistStateModel>?> SwitchPlaylistsAsync(Uri baseUrl, string apiKey, int stationId, int playlistId, bool removeOld)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKey);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
@@ -826,7 +822,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
             }
         }
 
-        AzuraPlaylistModel current = playlists.FirstOrDefault(p => p.Id == playlistId) ?? throw new InvalidOperationException($"Playlist with id {playlistId} not found.");
+        AzuraPlaylistModel current = playlists.FirstOrDefault(p => p.Id == playlistId) ?? throw new InvalidOperationException(string.Create(CultureInfo.InvariantCulture, $"Playlist with id {playlistId} not found."));
         await TogglePlaylistAsync(baseUrl, apiKey, stationId, current.Id);
         states.Add(new(current.Name, !current.IsEnabled));
 
@@ -839,7 +835,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(stationId);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(playlistId);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlist}/{playlistId}/{AzuraApiEndpoints.Toggle}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Playlist}/{playlistId}/{AzuraApiEndpoints.Toggle}");
 
         await PutToApiAsync(baseUrl, endpoint, headers: CreateHeader(apiKey));
     }
@@ -887,7 +883,7 @@ public sealed class AzuraCastApiService(ILogger<AzuraCastApiService> logger, IDi
         ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
         ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
 
-        string endpoint = $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}";
+        string endpoint = string.Create(CultureInfo.InvariantCulture, $"{AzuraApiEndpoints.Station}/{stationId}/{AzuraApiEndpoints.Files}");
         string? result = await UploadToApiAsync(baseUrl, endpoint, file, fileName, filePath, CreateHeader(apiKey));
         if (result is null)
             return default;

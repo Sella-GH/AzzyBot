@@ -41,7 +41,7 @@ public sealed class AzuraCastPingService(ILogger<AzuraCastPingService> logger, I
                 message = $"The certificate for AzuraCast instance **{uri}** is self-signed and therefore not valid!\nYou need a valid HTTPS certificate for your AzuraCast instance so I can safely connect to it.";
             }
             // Because somebody actually managed it to provide a malformed URL...
-            else if (uri.OriginalString != uri.GetLeftPart(UriPartial.Authority))
+            else if (!string.Equals(uri.OriginalString, uri.GetLeftPart(UriPartial.Authority), StringComparison.OrdinalIgnoreCase))
             {
                 _logger.BackgroundServiceInstanceStatus(azuraCast.GuildId, azuraCast.Id, "invalid because of malformed url");
                 message = $"I am **unable to establish a connection** to your AzuraCast instance **{uri}**! Make sure you only provide the URL to your instance (e.g. https://demo.azuracast.com) without anything behind!";

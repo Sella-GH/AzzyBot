@@ -18,6 +18,6 @@ public sealed class BotActivityProvider : IChoiceProvider
         new("Competing", 5)
     ];
 
-    public ValueTask<IEnumerable<DiscordApplicationCommandOptionChoice>> ProvideAsync(CommandParameter parameter)
-        => ValueTask.FromResult(BotActivity);
+    public async ValueTask<IEnumerable<DiscordApplicationCommandOptionChoice>> ProvideAsync(CommandParameter parameter)
+        => BotActivity;
 }

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Threading.Tasks;
 
 using AzzyBot.Bot.Services.Interfaces;
@@ -20,13 +19,13 @@ public sealed class GuildsAutocomplete(IOptions<AzzyBotSettings> settings, IDisc
     private readonly AzzyBotSettings _settings = settings.Value;
     private readonly IDiscordBotService _botService = botService;
 
-    public ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)
+    public async ValueTask<IEnumerable<DiscordAutoCompleteChoice>> AutoCompleteAsync(AutoCompleteContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
         IReadOnlyDictionary<ulong, DiscordGuild> guilds = _botService.GetDiscordGuilds;
         if (guilds.Count is 0)
-            return ValueTask.FromResult(new List<DiscordAutoCompleteChoice>(1).AsEnumerable());
+            return [];
 
         string commandName = context.Command.Name;
         string? search = context.UserInput;
@@ -45,6 +44,6 @@ public sealed class GuildsAutocomplete(IOptions<AzzyBotSettings> settings, IDisc
             results.Add(new($"{guild.Name} ({guild.Id})", guild.Id.ToString(CultureInfo.InvariantCulture)));
         }
 
-        return ValueTask.FromResult(results.AsEnumerable());
+        return results;
     }
 }
