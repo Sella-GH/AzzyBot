@@ -19,6 +19,16 @@ updates:
     labels:
       - "area-ci"
       - "area-dependencies"
+    groups:
+      CodeQL:
+        applies-to: version-updates
+        patterns:
+          - "github/codeql-action"
+          - "github/codeql-action/*"
+        update-types:
+          - "major"
+          - "minor"
+          - "patch"
 
   - package-ecosystem: "dotnet-sdk"
     directory: "/"
