@@ -18,7 +18,7 @@ public sealed class AzuraFileComparer : IEqualityComparer<AzuraFilesModel>
         if (x is null || y is null)
             return false;
 
-        return x.UniqueId == y.UniqueId && x.SongId == y.SongId;
+        return string.Equals(x.UniqueId, y.UniqueId, StringComparison.OrdinalIgnoreCase) && string.Equals(x.SongId, y.SongId, StringComparison.OrdinalIgnoreCase);
     }
 
     public int GetHashCode(AzuraFilesModel? obj)

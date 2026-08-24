@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -151,7 +152,7 @@ public sealed class CoreCommands
 
                 _logger.CommandRequested(nameof(PingAsync), context.User.Username);
 
-                await context.RespondAsync($"Pong! {context.Client.GetConnectionLatency(context.Guild.Id).Milliseconds} ms");
+                await context.RespondAsync(string.Create(CultureInfo.InvariantCulture, $"Pong! {context.Client.GetConnectionLatency(context.Guild.Id).Milliseconds} ms"));
             }
         }
     }

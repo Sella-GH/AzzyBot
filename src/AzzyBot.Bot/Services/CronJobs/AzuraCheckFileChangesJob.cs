@@ -46,7 +46,7 @@ public sealed class AzuraCheckFileChangesJob(IAzuraCastFileService azuraFileServ
             stationsToCheck = azuraCasts.SelectMany(static ac => ac.Stations.Where(static s => s.Checks.FileChanges));
             await Task.WhenAll(stationsToCheck.Select(_azuraFileService.CheckForFileChangesAsync));
         }
-        catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
+        catch (Exception ex) when (ex is not (OperationCanceledException or TaskCanceledException))
         {
             await _botService.LogExceptionAsync(ex, DateTimeOffset.Now);
         }

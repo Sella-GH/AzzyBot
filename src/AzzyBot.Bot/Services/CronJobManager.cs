@@ -40,7 +40,7 @@ public sealed class CronJobManager(IInstantJobRegistry jobRegistry, IDiscordBotS
     public void RunAzuraStatusPingJob(AzuraCastEntity azuraCast)
         => _jobRegistry.RunInstantJob<AzuraStatusPingJob>(azuraCast);
 
-    public void RunAzzyBotCheckPermissionsJob(DiscordGuild guild, ulong[] guildIds)
+    public void RunAzzyBotCheckPermissionsJob(DiscordGuild guild, ReadOnlySpan<ulong> guildIds)
         => _jobRegistry.RunInstantJob<AzzyBotCheckPermissionsJob>(new AzzyCheckPermissionsStruct()
         {
             DiscordGuild = guild,

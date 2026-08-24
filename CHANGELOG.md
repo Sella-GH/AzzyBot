@@ -1,3 +1,19 @@
+## Unreleased
+### Improvements
+- Reworked a lot of code to comply with new Analyzer rules and to be more aligned with C# best practices
+
+### Dependencies
+- Added [Meziantou.Analyzer](https://github.com/Meziantou/Meziantou.Analyzer) in version 3.0.167
+- Updated [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus) to version 5.0.0-nightly-02599
+- Updated [Lavalink4NET](https://github.com/lavalink4net/Lavalink4NET) to version 4.2.2
+- Updated [Microsoft.EntityFrameworkCore.Tools](https://github.com/dotnet/efcore) to version 10.0.11
+- Updated [Microsoft.Extensions.X](https://github.com/dotnet/runtime) libraries to version 10.0.11
+- Updated [Npgsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg) to version 10.0.3
+- Updated [Nreco.Logging.File](https://github.com/nreco/logging) to version 1.4.0
+- Updated [Roslynator](https://github.com/dotnet/roslynator) to version 4.16.1
+- Updated [Sep](https://github.com/nietras/Sep) to version 0.17.1
+- Updated [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet) to version 10.32.0.713
+
 ## 2.11.1 - 2026-06-18
 ### Fixes
 - The music streaming over `player play-mount` works again

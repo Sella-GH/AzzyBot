@@ -34,7 +34,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
     private readonly Uri _latestApiUrl = new("https://api.github.com/repos/Sella-GH/AzzyBot/releases/latest");
     private readonly Uri _previewApiUrl = new("https://api.github.com/repos/Sella-GH/AzzyBot/releases");
 
-    private readonly Dictionary<string, string> _headers = new(1)
+    private readonly Dictionary<string, string> _headers = new(1, StringComparer.Ordinal)
     {
         ["User-Agent"] = SoftwareStats.GetAppName
     };
@@ -47,7 +47,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
         string localVersion = SoftwareStats.GetAppVersion;
         bool isPreview = localVersion.Contains("-preview", StringComparison.OrdinalIgnoreCase);
 
-        string? body = await _webService.GetWebAsync((isPreview) ? _previewApiUrl : _latestApiUrl, _headers, true);
+        string? body = await _webService.GetWebAsync((isPreview) ? _previewApiUrl : _latestApiUrl, _headers, acceptJson: true);
         if (string.IsNullOrEmpty(body))
         {
             _logger.OnlineVersionEmpty();
@@ -67,7 +67,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
         await _dbActions.UpdateAzzyBotAsync(updateLastUpdateCheck: true);
 
         string onlineVersion = updaterModel.Name;
-        if (localVersion == onlineVersion)
+        if (string.Equals(localVersion, onlineVersion, StringComparison.OrdinalIgnoreCase))
             return;
 
         if (!DateTimeOffset.TryParse(updaterModel.CreatedAt, CultureInfo.CurrentCulture, out DateTimeOffset releaseDate))
@@ -78,13 +78,13 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
 
     private async Task SendUpdateMessageAsync(string updateVersion, DateTimeOffset releaseDate, string changelog)
     {
-        if (_lastOnlineVersion != updateVersion)
+        if (!string.Equals(_lastOnlineVersion, updateVersion, StringComparison.OrdinalIgnoreCase))
         {
             _lastAzzyUpdateNotificationTime = DateTimeOffset.MinValue;
             _azzyNotifyCounter = 0;
         }
 
-        if (!Misc.CheckUpdateNotification(_azzyNotifyCounter, _lastAzzyUpdateNotificationTime))
+        if (!Misc.CheckUpdateNotification(_azzyNotifyCounter, in _lastAzzyUpdateNotificationTime))
             return;
 
         _lastAzzyUpdateNotificationTime = DateTimeOffset.UtcNow;
@@ -95,7 +95,7 @@ public sealed class UpdaterService(ILogger<UpdaterService> logger, IOptions<Azzy
 
         List<DiscordEmbed> embeds = new(3)
         {
-            EmbedBuilder.BuildAzzyUpdatesAvailableEmbed(updateVersion, releaseDate, _latestUrl)
+            EmbedBuilder.BuildAzzyUpdatesAvailableEmbed(updateVersion, in releaseDate, _latestUrl)
         };
 
         if (_updaterSettings.DisplayChangelog && !string.IsNullOrEmpty(changelog))

@@ -68,7 +68,8 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
             return null;
         }
-        else if (channelId is not 0)
+
+        if (channelId is not 0)
         {
             DiscordMember? bot = await _botService.GetDiscordMemberAsync(context.Guild.Id);
             if (bot is null)
@@ -138,18 +139,18 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         return null;
     }
 
-    private ValueTask<PlayerResult<LavalinkPlayer>> GetLavalinkDefaultPlayerAsync(ulong guildId, ulong channelId, LavalinkPlayerOptions playerOptions, in PlayerRetrieveOptions retrieveOptions)
+    private async ValueTask<PlayerResult<LavalinkPlayer>> GetLavalinkDefaultPlayerAsync(ulong guildId, ulong channelId, LavalinkPlayerOptions playerOptions, PlayerRetrieveOptions retrieveOptions)
     {
         ArgumentNullException.ThrowIfNull(playerOptions);
 
-        return _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Default, Options.Create(playerOptions), retrieveOptions);
+        return await _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Default, Options.Create(playerOptions), retrieveOptions);
     }
 
-    private ValueTask<PlayerResult<QueuedLavalinkPlayer>> GetLavalinkQueuedPlayerAsync(ulong guildId, ulong channelId, QueuedLavalinkPlayerOptions playerOptions, in PlayerRetrieveOptions retrieveOptions)
+    private async ValueTask<PlayerResult<QueuedLavalinkPlayer>> GetLavalinkQueuedPlayerAsync(ulong guildId, ulong channelId, QueuedLavalinkPlayerOptions playerOptions, PlayerRetrieveOptions retrieveOptions)
     {
         ArgumentNullException.ThrowIfNull(playerOptions);
 
-        return _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Queued, Options.Create(playerOptions), retrieveOptions);
+        return await _audioService.Players.RetrieveAsync(guildId, channelId, PlayerFactory.Queued, Options.Create(playerOptions), retrieveOptions);
     }
 
     [SuppressMessage("Style", "IDE0072:Add missing cases", Justification = "Those are not needed.")]
@@ -158,10 +159,10 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
         return status switch
         {
             PlayerRetrieveStatus.BotNotConnected => "I'm not connected to a voice channel.",
-            PlayerRetrieveStatus.PreconditionFailed when precondition == PlayerPrecondition.NotPaused.ToString() => "I'm not paused.",
-            PlayerRetrieveStatus.PreconditionFailed when precondition == PlayerPrecondition.NotPlaying.ToString() => "I'm not playing music.",
-            PlayerRetrieveStatus.PreconditionFailed when precondition == PlayerPrecondition.Paused.ToString() => "I'm already paused.",
-            PlayerRetrieveStatus.PreconditionFailed when precondition == PlayerPrecondition.Playing.ToString() => "I'm already playing music.",
+            PlayerRetrieveStatus.PreconditionFailed when string.Equals(precondition, PlayerPrecondition.NotPaused.ToString(), StringComparison.Ordinal) => "I'm not paused.",
+            PlayerRetrieveStatus.PreconditionFailed when string.Equals(precondition, PlayerPrecondition.NotPlaying.ToString(), StringComparison.Ordinal) => "I'm not playing music.",
+            PlayerRetrieveStatus.PreconditionFailed when string.Equals(precondition, PlayerPrecondition.Paused.ToString(), StringComparison.Ordinal) => "I'm already paused.",
+            PlayerRetrieveStatus.PreconditionFailed when string.Equals(precondition, PlayerPrecondition.Playing.ToString(), StringComparison.Ordinal) => "I'm already playing music.",
             _ => "An unknown error occurred while trying to retrieve the player."
         };
     }
@@ -333,7 +334,7 @@ public sealed class MusicStreamingService(IAudioService audioService, ILogger<Mu
 
         foreach (LavalinkTrack track in tracks.Tracks)
         {
-            await player.PlayAsync(track, true);
+            await player.PlayAsync(track, enqueue: true);
         }
 
         return (tracks.Tracks.Length > 2) ? $"I queued the playlist **{tracks.Playlist?.Name}** with **{tracks.Tracks.Length}** tracks." : $"I queued **{tracks.Track.Title}** by **{tracks.Track.Author}**";

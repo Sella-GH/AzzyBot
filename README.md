@@ -75,7 +75,7 @@ Follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wi
 * [Visual Studio 2026 Community](https://visualstudio.microsoft.com/de/downloads)
 
 ### Dependencies
-* [CsvHelper](https://github.com/JoshClose/CsvHelper)
+* [Dameng.SepEx](https://github.com/dameng324/Dameng.SepEx)
 * [DSharpPlus](https://github.com/DSharpPlus/DSharpPlus)
 * [EntityFrameworkCore.Exceptions.PostgreSQL](https://github.com/Giorgi/EntityFramework.Exceptions)
 * [Lavalink4NET](https://github.com/angelobreuer/Lavalink4NET)
@@ -86,6 +86,7 @@ Follow the instructions inside the [wiki](https://github.com/Sella-GH/AzzyBot/wi
 * [Npsql.EntityFrameworkCore.PostgreSQL](https://github.com/npgsql/efcore.pg)
 * [NReco.Logging.File](https://github.com/NReco/Logging)
 * [Roslynator](https://github.com/dotnet/roslynator)
+* [Sep](https://github.com/nietras/Sep)
 * [SonarAnalyzer.CSharp](https://github.com/SonarSource/sonar-dotnet)
 * [TagLibSharp2](https://github.com/decriptor/TagLibSharp2)
 

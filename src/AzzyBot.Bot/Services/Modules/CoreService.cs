@@ -31,8 +31,8 @@ public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSet
 
     public async Task<IReadOnlyDictionary<GuildEntity, AzzyInactiveGuildStruct>> CheckUnusedGuildsAsync()
     {
-        IEnumerable<GuildEntity> guilds = await _dbActions.ReadGuildsAsync(loadGuildPrefs: true);
-        if (!guilds.Any())
+        IReadOnlyList<GuildEntity> guilds = await _dbActions.ReadGuildsAsync(loadGuildPrefs: true);
+        if (guilds.Count is 0)
             return new Dictionary<GuildEntity, AzzyInactiveGuildStruct>();
 
         HashSet<GuildEntity> noLegals = [.. guilds.Where(g => !g.LegalsAccepted && g.UniqueId != _settings.ServerId)];
@@ -125,7 +125,7 @@ public sealed class CoreService(ILogger<CoreService> logger, IOptions<AzzyBotSet
                 leaveDate = (guild.Value.NoLegals) ? DateTimeOffset.UtcNow.AddDays(3) : DateTimeOffset.UtcNow.AddDays(7);
             }
 
-            DiscordEmbed embed = EmbedBuilder.BuildAzzyInactiveGuildEmbed(guild.Value.NoConfig, guild.Value.NoLegals, guild.Value.Guild, leaveDate);
+            DiscordEmbed embed = EmbedBuilder.BuildAzzyInactiveGuildEmbed(guild.Value.NoConfig, guild.Value.NoLegals, guild.Value.Guild, in leaveDate);
 
             bool result = false;
             if (guild.Key.Preferences.AdminNotifyChannelId is not 0)

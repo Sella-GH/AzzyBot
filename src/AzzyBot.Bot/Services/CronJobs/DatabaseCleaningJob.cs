@@ -27,7 +27,7 @@ public sealed class DatabaseCleaningJob(IDbMaintenance dbMaintenance, IDiscordBo
 
             await _dbMaintenance.CleanupLeftoverGuildsAsync(guilds);
         }
-        catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
+        catch (Exception ex) when (ex is not (OperationCanceledException or TaskCanceledException))
         {
             await _botService.LogExceptionAsync(ex, DateTimeOffset.Now);
         }

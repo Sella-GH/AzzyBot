@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace AzzyBot.Bot.Settings;
 
-public sealed record AzzyBotSettings
+public sealed record class AzzyBotSettings
 {
     /// <summary>
     /// The discord bot token.
@@ -43,7 +43,7 @@ public sealed record AzzyBotSettings
     public string? SettingsFile { get; set; }
 }
 
-public sealed record DiscordStatusSettings
+public sealed record class DiscordStatusSettings
 {
     /// <summary>
     /// The activity type the bot is showing.
@@ -70,7 +70,7 @@ public sealed record DiscordStatusSettings
     public Uri? StreamUrl { get; set; }
 }
 
-public sealed record MusicStreamingSettings
+public sealed record class MusicStreamingSettings
 {
     /// <summary>
     /// The hostname of the lavalink server.
@@ -91,7 +91,7 @@ public sealed record MusicStreamingSettings
     public string? LavalinkPassword { get; set; } = "AzzyB0TMus1cStr3am!ng";
 }
 
-public sealed record CoreUpdaterSettings
+public sealed record class CoreUpdaterSettings
 {
     /// <summary>
     /// Whether to display the changelog when the bot finds an update.
