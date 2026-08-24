@@ -34,7 +34,7 @@ public sealed class AzuraCastStationLogAutocomplete(ILogger<AzuraCastStationLogA
         ArgumentNullException.ThrowIfNull(context);
         ArgumentNullException.ThrowIfNull(context.Guild);
 
-        int stationId = Convert.ToInt32(context.Options.Single(static o => o.Name is "station" && o.Value is not null).Value, CultureInfo.InvariantCulture);
+        int stationId = Convert.ToInt32(context.Options.Single(static o => string.Equals(o.Name, "station", StringComparison.Ordinal) && o.Value is not null).Value, CultureInfo.InvariantCulture);
         if (stationId is 0)
             return [];
 
@@ -44,10 +44,9 @@ public sealed class AzuraCastStationLogAutocomplete(ILogger<AzuraCastStationLogA
             _logger.DatabaseAzuraCastStationNotFound(context.Guild.Id, 0, stationId);
             return [];
         }
-        else if (!station.AzuraCast.IsOnline)
-        {
+
+        if (!station.AzuraCast.IsOnline)
             return [];
-        }
 
         Uri baseUrl = new(Crypto.Decrypt(station.AzuraCast.BaseUrl));
         string apiKey = (string.IsNullOrEmpty(station.ApiKey)) ? Crypto.Decrypt(station.AzuraCast.AdminApiKey) : Crypto.Decrypt(station.ApiKey);

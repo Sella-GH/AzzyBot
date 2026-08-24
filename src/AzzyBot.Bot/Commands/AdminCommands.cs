@@ -126,7 +126,7 @@ public sealed class AdminCommands
                     return;
                 }
 
-                DiscordEmbed embed = await EmbedBuilder.BuildGuildAddedEmbedAsync(guild, true);
+                DiscordEmbed embed = await EmbedBuilder.BuildGuildAddedEmbedAsync(guild, getInfo: true);
                 await context.EditResponseAsync(embed);
             }
         }
@@ -144,7 +144,7 @@ public sealed class AdminCommands
 
             if (!ulong.TryParse(serverId, out ulong guildIdValue))
             {
-                await context.RespondAsync(GeneralStrings.GuildIdInvalid, true);
+                await context.RespondAsync(GeneralStrings.GuildIdInvalid, ephemeral: true);
                 return;
             }
 
@@ -244,7 +244,7 @@ public sealed class AdminCommands
             else
             {
                 dateTime = DateTime.Today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
-                logfile = FileOperations.GetFilesInDirectory("Logs", true).First();
+                logfile = FileOperations.GetFilesInDirectory("Logs", latest: true).First();
             }
 
             await using FileStream fileStream = new(logfile, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);

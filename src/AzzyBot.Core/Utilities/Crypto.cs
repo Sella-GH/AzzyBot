@@ -8,27 +8,34 @@ public static class Crypto
 {
     private static byte[] EncryptionKey = new byte[32];
 
-    public static void SetEncryptionKey(byte[] key)
+    public static void SetEncryptionKey(ReadOnlySpan<byte> key)
     {
-        ArgumentNullException.ThrowIfNull(key);
         ArgumentOutOfRangeException.ThrowIfLessThan(key.Length, 32);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(key.Length, 32);
 
-        EncryptionKey = key;
+        EncryptionKey = [.. key];
     }
 
     /// <summary>
     /// Encrypts the specified plain text using AES-GCM encryption.
     /// </summary>
     /// <param name="plain">The plain text to encrypt.</param>
-    /// <param name="newKey">An optional 32-byte encryption key. If not provided, a default key is used.</param>
     /// <returns>A Base64-encoded string containing the nonce, ciphertext, and authentication tag, separated by colons.</returns>
-    /// <exception cref="ArgumentException">Thrown if <paramref name="newKey"/> is provided and is not a 32-byte array.</exception>
-    public static string Encrypt(string plain, byte[]? newKey = null)
+    public static string Encrypt(string plain)
+        => Encrypt(plain, EncryptionKey);
+
+    /// <summary>
+    /// Encrypts the specified plain text using AES-GCM encryption with the provided key span.
+    /// </summary>
+    /// <param name="plain">The plain text to encrypt.</param>
+    /// <param name="key">The 32-byte encryption key.</param>
+    /// <returns>A Base64-encoded string containing the nonce, ciphertext, and authentication tag, separated by colons.</returns>
+    /// <exception cref="ArgumentException">Thrown if <paramref name="plain"/> is null, empty, or consists only of white-space characters.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="key"/> is not a 32-byte span.</exception>
+    public static string Encrypt(string plain, ReadOnlySpan<byte> key)
     {
-        byte[] key = newKey ?? EncryptionKey;
-        if (key.Length is not 32)
-            throw new ArgumentException("Key must be a 32-byte array.", nameof(newKey));
+        ArgumentException.ThrowIfNullOrWhiteSpace(plain);
+        ArgumentOutOfRangeException.ThrowIfNotEqual(key.Length, 32);
 
         byte[] nonce = new byte[12]; // 96-bit nonce
         RandomNumberGenerator.Fill(nonce);
@@ -51,14 +58,24 @@ public static class Crypto
     /// Decrypts a cipher text using AES-GCM with the specified key.
     /// </summary>
     /// <param name="cipher">The cipher text to decrypt, in the format 'nonce:cipher:tag'.</param>
-    /// <param name="newKey">An optional 32-byte key to use for decryption. If not provided, a default key is used.</param>
     /// <returns>The decrypted plain text as a string.</returns>
-    /// <exception cref="FormatException">Thrown if <paramref name="cipher"/> is not in the format 'nonce:cipher:tag'.</exception>
+    public static string Decrypt(string cipher)
+        => Decrypt(cipher, EncryptionKey);
+
+    /// <summary>
+    /// Decrypts a cipher text using AES-GCM with the specified key.
+    /// </summary>
+    /// <param name="cipher">The cipher text to decrypt, in the format 'nonce:cipher:tag'.</param>
+    /// <param name="key">A 32-byte key to use for decryption. If not provided, a default key is used.</param>
+    /// <returns>The decrypted plain text as a string.</returns>
     /// <exception cref="ArgumentException">Thrown if <paramref name="cipher"/> is null, empty, or consists only of white-space characters. Also thrown if
-    /// <paramref name="newKey"/> is provided but is not a 32-byte array.</exception>
-    public static string Decrypt(string cipher, byte[]? newKey = null)
+    /// <paramref name="key"/> is provided but is not a 32-byte array.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="key"/> is not a 32-byte span.</exception>
+    /// <exception cref="FormatException">Thrown if <paramref name="cipher"/> is not in the format 'nonce:cipher:tag'.</exception>
+    public static string Decrypt(string cipher, ReadOnlySpan<byte> key)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(cipher);
+        ArgumentOutOfRangeException.ThrowIfNotEqual(key.Length, 32);
 
         string[] parts = cipher.Split(':');
         if (parts.Length is not 3)
@@ -67,10 +84,6 @@ public static class Crypto
         byte[] nonce = Convert.FromBase64String(parts[0]);
         byte[] cipherBytes = Convert.FromBase64String(parts[1]);
         byte[] tagBytes = Convert.FromBase64String(parts[2]);
-        byte[] key = newKey ?? EncryptionKey;
-        if (key.Length is not 32)
-            throw new ArgumentException("Key must be a 32-byte array.", nameof(newKey));
-
         byte[] plainBytes = new byte[cipherBytes.Length];
 
         using AesGcm aes = new(key, 16);

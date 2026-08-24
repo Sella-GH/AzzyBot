@@ -41,7 +41,7 @@ public sealed class AzuraCastUpdateService(IAzuraCastApiService azuraCastApiServ
                 return;
             }
         }
-        catch (Exception ex) when (ex is not OperationCanceledException or TaskCanceledException)
+        catch (Exception ex) when (ex is not (OperationCanceledException or TaskCanceledException))
         {
             // The server is probably down or something, check if user has uptime monitoring enabled
             // If yes then just exit silently

@@ -36,10 +36,9 @@ public sealed class AzuraCastStationsOnlineAutocomplete(ILogger<AzuraCastStation
             _logger.DatabaseAzuraCastNotFound(context.Guild.Id);
             return [];
         }
-        else if (!azuraCast.IsOnline)
-        {
+
+        if (!azuraCast.IsOnline)
             return [];
-        }
 
         Uri baseUrl = new(Crypto.Decrypt(azuraCast.BaseUrl));
         string apiKey = Crypto.Decrypt(azuraCast.AdminApiKey);
@@ -59,7 +58,7 @@ public sealed class AzuraCastStationsOnlineAutocomplete(ILogger<AzuraCastStation
             if (!string.IsNullOrWhiteSpace(search) && !station.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            results.Add(new DiscordAutoCompleteChoice($"{station.Name} ({Misc.GetReadableBool(station.IsEnabled, ReadableBool.EnabledDisabled)})", station.Id));
+            results.Add(new DiscordAutoCompleteChoice($"{station.Name} ({Misc.GetReadableBool(station.IsEnabled, ReadableBools.EnabledDisabled)})", station.Id));
         }
 
         return results;
