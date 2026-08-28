@@ -9,7 +9,7 @@
     <PackageVersion Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02600" />
     <PackageVersion Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="10.0.1" />
     <PackageVersion Include="Lavalink4NET.DSharpPlus.Nightly" Version="4.2.2" />
-    <PackageVersion Include="Meziantou.Analyzer" Version="3.0.189" />
+    <PackageVersion Include="Meziantou.Analyzer" Version="3.0.190" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.11" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.11" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.11" />
