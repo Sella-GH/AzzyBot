@@ -762,7 +762,7 @@ public static class EmbedBuilder
         StringBuilder builder = new();
 
         int count = 0;
-        foreach (LavalinkTrack item in history.Where(static i => i.Track is not null).Select(i => i.Track!))
+        foreach (LavalinkTrack item in history.Where(static i => i.Track is not null).Select(static i => i.Track!))
         {
             if (title.Length + builder.Length > 6000)
                 break;

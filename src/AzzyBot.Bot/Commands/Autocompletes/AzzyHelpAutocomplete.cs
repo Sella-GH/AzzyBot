@@ -34,12 +34,12 @@ public sealed class AzzyHelpAutocomplete(IOptions<AzzyBotSettings> settings) : I
         bool approvedDebug = guildId == _settings.ServerId;
         string? search = context.UserInput;
         List<DiscordAutoCompleteChoice> results = new(25);
-        foreach (List<AzzyHelpModel> kvp in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member).Select(k => k.Value))
+        foreach (List<AzzyHelpModel> kvp in AzzyHelp.GetAllCommands(context.Extension.Commands, adminServer, approvedDebug, member).Select(static k => k.Value))
         {
             if (results.Count is 25)
                 break;
 
-            foreach (string model in kvp.Where(r => string.IsNullOrWhiteSpace(search) || r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)).Select(r => r.Name))
+            foreach (string model in kvp.Where(r => string.IsNullOrWhiteSpace(search) || r.Name.Contains(search, StringComparison.OrdinalIgnoreCase)).Select(static r => r.Name))
             {
                 if (results.Count is 25)
                     break;

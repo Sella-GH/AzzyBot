@@ -113,7 +113,7 @@ public sealed class DiscordBotService(ILogger<DiscordBotService> logger, IOption
             if (guildEntity.AzuraCast.Preferences.OutagesChannelId is not 0)
                 channels.Add(guildEntity.AzuraCast.Preferences.OutagesChannelId);
 
-            foreach (AzuraCastStationPreferencesEntity station in guildEntity.AzuraCast.Stations.Select(s => s.Preferences))
+            foreach (AzuraCastStationPreferencesEntity station in guildEntity.AzuraCast.Stations.Select(static s => s.Preferences))
             {
                 if (station.FileUploadChannelId is not 0)
                     channels.Add(station.FileUploadChannelId);

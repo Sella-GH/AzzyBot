@@ -27,13 +27,13 @@ public static class ILoggingBuilderExtensions
             }
 
             logging.AddConsole();
-            logging.AddFile(Path.Combine("Logs", "AzzyBot_{0:yyyy-MM-dd}.log"), c =>
+            logging.AddFile(Path.Combine("Logs", "AzzyBot_{0:yyyy-MM-dd}.log"), static c =>
             {
                 string logPath = Path.Combine("Logs", "AzzyBot_{0:yyyy-MM-dd}.log");
 
                 c.UseUtcTimestamp = false;
                 c.FormatLogFileName = _ => string.Format(CultureInfo.InvariantCulture, logPath, DateTimeOffset.Now);
-                c.FormatLogEntry = (message) =>
+                c.FormatLogEntry = static (message) =>
                 {
                     string logMessage = string.Create(CultureInfo.InvariantCulture, $"[{DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss}] {message.LogLevel}: {message.LogName}[{message.EventId.Id}] {message.Message}");
                     if (message.Exception is not null)

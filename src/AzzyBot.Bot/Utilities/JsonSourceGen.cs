@@ -10,7 +10,13 @@ using AzzyBot.Core.Models;
 namespace AzzyBot.Bot.Utilities;
 
 [SuppressMessage("Roslynator", "RCS1251:Remove unnecessary braces from record declaration", Justification = "Class has to be empty.")]
-[JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Default, WriteIndented = true)]
+[JsonSourceGenerationOptions
+(
+    GenerationMode = JsonSourceGenerationMode.Default,
+    WriteIndented = true,
+    RespectNullableAnnotations = true,
+    RespectRequiredConstructorParameters = true
+)]
 // Serialization
 [JsonSerializable(typeof(AppSettingsModel))]
 [JsonSerializable(typeof(AzuraAdminStationConfigModel))]
