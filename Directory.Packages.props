@@ -9,11 +9,11 @@
     <PackageVersion Include="DSharpPlus.Interactivity" Version="5.0.0-nightly-02605" />
     <PackageVersion Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="10.0.1" />
     <PackageVersion Include="Lavalink4NET.DSharpPlus.Nightly" Version="4.2.2" />
-    <PackageVersion Include="Meziantou.Analyzer" Version="3.0.322" />
+    <PackageVersion Include="Meziantou.Analyzer" Version="3.0.324" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="11.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="11.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="11.0.0" />
-    <PackageVersion Include="NCronJob" Version="4.14.0" />
+    <PackageVersion Include="NCronJob" Version="5.0.0" />
     <PackageVersion Include="Npgsql" Version="10.0.3" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
     <PackageVersion Include="NReco.Logging.File" Version="1.4.0" />
