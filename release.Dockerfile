@@ -35,7 +35,7 @@ RUN dotnet build ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c $CONFIG --no-incrementa
 ADD https://packages.microsoft.com/config/ubuntu/26.04/packages-microsoft-prod.deb /packages-microsoft-prod.deb
 
 # --- RUNNER IMAGE ---
-FROM mcr.microsoft.com/dotnet/runtime:10.0-resolute AS runner
+FROM mcr.microsoft.com/dotnet/runtime:11.0-resolute AS runner
 USER root
 
 # Upgrade internal tools and packages first
