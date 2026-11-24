@@ -31,7 +31,7 @@ RUN dotnet build ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c $CONFIG --no-incrementa
   && dotnet publish ./src/AzzyBot.Bot/AzzyBot.Bot.csproj -c $CONFIG --no-build --no-restore --no-self-contained -o out --ucr
 
 # RUNNER IMAGE
-FROM mcr.microsoft.com/dotnet/runtime:10.0-alpine AS runner
+FROM mcr.microsoft.com/dotnet/runtime:11.0-alpine AS runner
 USER root
 
 # Upgrade internal tools and packages first
