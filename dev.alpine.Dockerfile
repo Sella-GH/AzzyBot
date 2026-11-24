@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:labs
 
 # BUILD IMAGE
-FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine AS build
+FROM mcr.microsoft.com/dotnet/sdk:11.0-alpine AS build
 USER root
 
 RUN --mount=type=cache,target=/var/cache/apk,sharing=locked,id=apk-build-dev \
